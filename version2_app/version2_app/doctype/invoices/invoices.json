@@ -111,7 +111,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCanceled",
+   "options": "Pending\nSuccess\nCancelled",
    "read_only": 1
   },
   {
@@ -488,7 +488,7 @@
    "fieldname": "credit_irn_generated",
    "fieldtype": "Select",
    "label": "Credit IRN Generated",
-   "options": "Pending\nSuccess\nCanceled\nFailed"
+   "options": "Pending\nSuccess\nCancelled\nFailed"
   },
   {
    "fieldname": "credit_qr_code",
@@ -578,7 +578,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-11-26 12:41:29.325157",
+ "modified": "2020-11-26 16:03:25.907820",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -237,7 +237,7 @@ class Invoices(Document):
 			invoice.cancelled_on = cancel_response['result']['CancelDate']
 			invoice.cancel_message = reason
 			invoice.irn_cancelled = 'Yes'
-			invoice.irn_generated = 'Canceled'
+			invoice.irn_generated = 'Cancelled'
 			invoice.save()
 			if invoice.has_credit_items=="Yes":
 				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason)
@@ -245,7 +245,7 @@ class Invoices(Document):
 					# invoice.cancelled_on = cancel_response['result']['CancelDate']
 					# invoice.cancel_message = reason
 					invoice.credit_irn_cancelled = 'Yes'
-					invoice.credit_irn_generated = 'Canceled'
+					invoice.credit_irn_generated = 'Cancelled'
 					invoice.save()
 					return {
 						"success": True,
@@ -489,27 +489,30 @@ def insert_invoice(data):
 		sgst_amount = 0
 		igst_amount = 0
 		
+
+
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
 		# print(data['items_data'])
 		#calculat items
 		# items_data = calulate_items(data['items'], data['invoice_number'],company_code)
 		for item in data['items_data']:
-			
+			print(type(item['item_value']),item['item_value'],len(str(item['item_value'])),str(item['item_value'])[0])
 			if item['taxable'] == 'No':
 				other_charges += item['item_value']
 
 			elif item['sac_code'].isdigit():  
-
+				if "-" == str(item['item_value'])[0]:
+					print(item)
 				if "-" not in str(item['item_value']):
 					# has_cedit_items = "Yes"
-					print(item)
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
 					value_before_gst += item['item_value']
 					value_after_gst += item['item_value_after_gst']
 				else:
+					print("--------",item['item_value'])
 					credit_value_before_gst += abs(item['item_value'])
 					credit_value_after_gst  += abs(item['item_value_after_gst'])
 			else:
@@ -518,11 +521,14 @@ def insert_invoice(data):
 		if (round(value_after_gst,2) - round(credit_value_after_gst,2)) >0:
 			ready_to_generate_irn = "Yes"
 		else:
-			ready_to_generate_irn = "No"	
-		if credit_value_after_gst>0:
+			ready_to_generate_irn = "No"
+		print(credit_value_before_gst,"iiiiiiiiiiiiiiiiiii")		
+		if credit_value_before_gst>0:
+
 			has_credit_items = "Yes"
 		else:
 			has_credit_items = "No"	
+		print(has_credit_items,"ppppppppppppppppppppp")	
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -588,12 +594,25 @@ def insert_invoice(data):
 			'has_credit_items':has_credit_items,
 			'invoice_process_time': datetime.datetime.utcnow() - datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f")
 		})
+		if data['amened'] == 'Yes':
+			invCount = frappe.db.get_list('Invoices', filters={
+					'invoice_number': ['like', '%'+data['guest_data']['invoice_number']+'%']
+				})
+			invoice.amended_from = invCount[0]['name']
+			invoice.invoice_number = "Amened"+data['guest_data']['invoice_number']
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-
+		if data['amened'] == 'Yes':
+			getInvoiceNUmber =frappe.db.get_value('Invoices', {'invoice_number': "Amened"+data['guest_data']['invoice_number']})
+			
+			updateInvoi = frappe.get_doc('Invoices',getInvoiceNUmber)
+			updateInvoi.invoice_number = getInvoiceNUmber
+			updateInvoi.save()
+			data['invoice_number'] = getInvoiceNUmber
+			data['guest_data']['invoice_number'] = getInvoiceNUmber
 		# insert items
 		# items = data['items_data']
 		# items = [x for x in items if x['sac_code']!="Liquor"]
-		itemsInsert = insert_items(data['items_data'])
+		itemsInsert = insert_items(data['items_data'],data['invoice_number'])
 		# insert tax summaries
 		insert_tax_summaries(data['items_data'], data['invoice_number'])
 		# taxSummariesInsert = insert_tax_summariesd(data['items_data'], data['guest_data']['invoice_number'])
@@ -646,10 +665,10 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 		
 
 
-def insert_items(items):
+def insert_items(items,invoice_number):
 	try:
 		for item in items:
-			print(item)
+			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
 			if "-" in str(item['item_value']):
 				item['is_credit_item'] = "Yes"

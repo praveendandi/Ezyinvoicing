@@ -138,7 +138,7 @@ def reinitiateInvoice(data):
     items = []
     # print(companyApis['calculation_by'])
     # if companyApis['calculation_by'] == "Description":
-
+    itemsort = 0
     for i in original_data:
         pattern = re.compile("([0-9])\/([0-9])")
         check_date = re.findall(pattern, i)
@@ -196,6 +196,8 @@ def reinitiateInvoice(data):
                     pass
                 if index == len(i.split(' '))-1:
                     item['item_value'] = float(j.replace(',', ''))
+                item['sort_order'] =  itemsort+1
+            itemsort+=1    
                     
             items.append(item) 
     
@@ -355,5 +357,4 @@ def reinitiateInvoice(data):
         print("gspApiData fialed:  ",gspApiDataResponse['message'])
         return {"success":False,"message":gspApiDataResponse['message']}
     
-
 

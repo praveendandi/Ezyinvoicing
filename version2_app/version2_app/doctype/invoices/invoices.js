@@ -30,7 +30,7 @@ frappe.ui.form.on('Invoices', {
 					cancelIrnButton(frm)
 				}
 			}
-			else if (frm.doc.irn_generated == 'Canceled') {
+			else if (frm.doc.irn_generated == 'Cancelled') {
 				pendingOrSucccessIndicator(frm, 'Cancelled')
 				addCacelledMessage(frm)
 			}
