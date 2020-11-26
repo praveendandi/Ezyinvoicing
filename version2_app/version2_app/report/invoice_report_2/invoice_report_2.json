@@ -1,0 +1,40 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2020-11-25 10:10:25.626430",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "[{\"label\":\"JOURNAL NO\",\"fieldname\":\"journal_no\",\"id\":\"journal_no\",\"name\":\"JOURNAL NO\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"DATE\",\"fieldname\":\"date\",\"id\":\"date\",\"name\":\"DATE\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"GST No\",\"fieldname\":\"gst_no\",\"id\":\"gst_no\",\"name\":\"GST No\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"HSN / SAC CODE\",\"fieldname\":\"hsn_/_sac_code\",\"id\":\"hsn_/_sac_code\",\"name\":\"HSN / SAC CODE\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"VENDOR NAME\",\"fieldname\":\"vendor_name\",\"id\":\"vendor_name\",\"name\":\"VENDOR NAME\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"ADDRESS\",\"fieldname\":\"address\",\"id\":\"address\",\"name\":\"ADDRESS\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"PARTICULARS\",\"fieldname\":\"particulars\",\"id\":\"particulars\",\"name\":\"PARTICULARS\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"BASE AMOUNT\",\"fieldname\":\"base_amount\",\"id\":\"base_amount\",\"name\":\"BASE AMOUNT\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Rate\",\"fieldname\":\"rate\",\"id\":\"rate\",\"name\":\"Rate\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"SGST\",\"fieldname\":\"sgst\",\"id\":\"sgst\",\"name\":\"SGST\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"CGST\",\"fieldname\":\"cgst\",\"id\":\"cgst\",\"name\":\"CGST\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"IGST\",\"fieldname\":\"igst\",\"id\":\"igst\",\"name\":\"IGST\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Total\",\"fieldname\":\"total\",\"id\":\"total\",\"name\":\"Total\",\"width\":null,\"editable\":false,\"compareValue\":null}]",
+ "modified": "2020-11-25 10:12:25.027392",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Invoice Report 2",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Invoices",
+ "reference_report": "Sample Report 2",
+ "report_name": "Invoice Report 2",
+ "report_type": "Custom Report",
+ "roles": [
+  {
+   "role": "Front Office"
+  },
+  {
+   "role": "IT"
+  },
+  {
+   "role": "Finance"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Guest"
+  }
+ ]
+}

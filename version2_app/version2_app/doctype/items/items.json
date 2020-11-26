@@ -1,0 +1,172 @@
+{
+ "actions": [],
+ "creation": "2020-10-09 09:44:30.903183",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_name",
+  "sac_code",
+  "date",
+  "cgst",
+  "cgst_amount",
+  "sgst",
+  "sgst_amount",
+  "igst",
+  "column_break_9",
+  "igst_amount",
+  "description",
+  "gst_rate",
+  "item_value",
+  "item_taxable_value",
+  "item_value_after_gst",
+  "sac_code_found",
+  "is_credit_item",
+  "taxable",
+  "item_type",
+  "quantity",
+  "sort_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sac_code",
+   "fieldtype": "Data",
+   "label": "SAC Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cgst",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "CGST %",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "CGST Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sgst",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "SGST %",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "SGST Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "igst",
+   "fieldtype": "Int",
+   "label": "IGST %",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "label": "IGST Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "gst_rate",
+   "fieldtype": "Int",
+   "label": "GST Rate"
+  },
+  {
+   "fieldname": "item_value",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Item Value"
+  },
+  {
+   "fieldname": "item_taxable_value",
+   "fieldtype": "Float",
+   "label": "Item Taxable value"
+  },
+  {
+   "fieldname": "item_value_after_gst",
+   "fieldtype": "Float",
+   "label": "Item Value After GST"
+  },
+  {
+   "fieldname": "sac_code_found",
+   "fieldtype": "Select",
+   "label": "SAC CODE FOUND",
+   "options": "Yes\nNo",
+   "reqd": 1
+  },
+  {
+   "fieldname": "is_credit_item",
+   "fieldtype": "Select",
+   "label": "Is Credit Item",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "taxable",
+   "fieldtype": "Select",
+   "label": "Taxable",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "item_type",
+   "fieldtype": "Select",
+   "label": "Item Type",
+   "options": "SAC\nHSN"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Select",
+   "label": "Quantity",
+   "options": "Units\nOthers"
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Sort Order"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2020-11-26 10:14:17.591538",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

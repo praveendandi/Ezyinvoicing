@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "autoname": "field:description",
+ "creation": "2020-10-08 14:49:38.244242",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "description",
+  "taxble",
+  "sgst",
+  "cgst",
+  "igst",
+  "column_break_5",
+  "code",
+  "type",
+  "status",
+  "company",
+  "is_service"
+ ],
+ "fields": [
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "taxble",
+   "fieldtype": "Select",
+   "label": "Taxble",
+   "options": "Yes\nNo",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sgst",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "SGST",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cgst",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "CGST",
+   "reqd": 1
+  },
+  {
+   "fieldname": "igst",
+   "fieldtype": "Data",
+   "label": "IGST",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "label": "Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "HSN\nSAC",
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Active\nIn-Active",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "is_service",
+   "fieldtype": "Select",
+   "label": "Is Service",
+   "options": "Yes\nNo"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2020-11-20 12:55:21.073760",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "SAC HSN CODES",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Finance",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

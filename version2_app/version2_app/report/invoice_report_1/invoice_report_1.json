@@ -1,0 +1,40 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2020-11-25 09:56:25.056474",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "[{\"label\":\"Guest Name\",\"fieldname\":\"guest_name\",\"id\":\"guest_name\",\"name\":\"Guest Name\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Room Number\",\"fieldname\":\"room_number\",\"id\":\"room_number\",\"name\":\"Room Number\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Invoice Number\",\"fieldname\":\"invoice_number\",\"id\":\"invoice_number\",\"name\":\"Invoice Number\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"GST Number\",\"fieldname\":\"gst_number\",\"id\":\"gst_number\",\"name\":\"GST Number\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"SAC Code\",\"fieldname\":\"sac_code\",\"id\":\"sac_code\",\"name\":\"SAC Code\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Category\",\"fieldname\":\"category\",\"id\":\"category\",\"name\":\"Category\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"CGST 6\",\"fieldname\":\"cgst_6\",\"id\":\"cgst_6\",\"name\":\"CGST 6\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"CGST 9\",\"fieldname\":\"cgst_9\",\"id\":\"cgst_9\",\"name\":\"CGST 9\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"CGST 14\",\"fieldname\":\"cgst_14\",\"id\":\"cgst_14\",\"name\":\"CGST 14\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"SGST 6\",\"fieldname\":\"sgst_6\",\"id\":\"sgst_6\",\"name\":\"SGST 6\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"SGST 9\",\"fieldname\":\"sgst_9\",\"id\":\"sgst_9\",\"name\":\"SGST 9\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"SGST 14\",\"fieldname\":\"sgst_14\",\"id\":\"sgst_14\",\"name\":\"SGST 14\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"IGST 6\",\"fieldname\":\"igst_6\",\"id\":\"igst_6\",\"name\":\"IGST 6\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"IGST 9\",\"fieldname\":\"igst_9\",\"id\":\"igst_9\",\"name\":\"IGST 9\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"IGSt 14\",\"fieldname\":\"igst_14\",\"id\":\"igst_14\",\"name\":\"IGSt 14\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Total Invoice\",\"fieldname\":\"total_invoice\",\"id\":\"total_invoice\",\"name\":\"Total Invoice\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Total Tax\",\"fieldname\":\"total_tax\",\"id\":\"total_tax\",\"name\":\"Total Tax\",\"width\":null,\"editable\":false,\"compareValue\":null},{\"label\":\"Total Amount\",\"fieldname\":\"total_amount\",\"id\":\"total_amount\",\"name\":\"Total Amount\",\"width\":null,\"editable\":false,\"compareValue\":null}]",
+ "modified": "2020-11-25 10:12:36.791740",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Invoice Report 1",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Invoices",
+ "reference_report": "Sample Report 1",
+ "report_name": "Invoice Report 1",
+ "report_type": "Custom Report",
+ "roles": [
+  {
+   "role": "Front Office"
+  },
+  {
+   "role": "IT"
+  },
+  {
+   "role": "Finance"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Guest"
+  }
+ ]
+}

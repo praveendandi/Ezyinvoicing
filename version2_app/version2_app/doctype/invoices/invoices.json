@@ -1,0 +1,663 @@
+{
+ "actions": [],
+ "autoname": "field:invoice_number",
+ "creation": "2020-10-09 10:18:59.336771",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_details_section",
+  "invoice_number",
+  "irn_generated",
+  "guest_name",
+  "gst_number",
+  "invoice_file",
+  "column_break_5",
+  "room_number",
+  "invoice_type",
+  "invoice_date",
+  "invoice_with_gst_details",
+  "tax_payer_details_column",
+  "legal_name",
+  "address_1",
+  "email",
+  "column_break_27",
+  "trade_name",
+  "address_2",
+  "phone_number",
+  "column_break_28",
+  "state_code",
+  "location",
+  "pincode",
+  "section_break_28",
+  "items",
+  "section_break_25",
+  "amount_before_gst",
+  "amount_after_gst",
+  "column_break_31",
+  "credit_value_before_gst",
+  "credit_value_after_gst",
+  "column_break_32",
+  "pms_invoice_summary_without_gst",
+  "pms_invoice_summary",
+  "gst_summary_column",
+  "gst_summary",
+  "section_break_9",
+  "sac_hsn_based_taxes",
+  "credit_note_items",
+  "e_invoice_details_section",
+  "irn_number",
+  "irn_cancelled",
+  "qr_code_generated",
+  "qr_code",
+  "column_break_30",
+  "qr_code_image",
+  "other_charges",
+  "signed_invoice_generated",
+  "signed_invoice",
+  "signed_invoice_image",
+  "company",
+  "payment_type",
+  "ack_no",
+  "ack_date",
+  "cancel_message",
+  "cancelled_on",
+  "amended_from",
+  "ready_to_generate_irn",
+  "error_message",
+  "irn_generated_time",
+  "credit_ack_no",
+  "credit_irn_number",
+  "credit_ack_date",
+  "credit_signed_invoice",
+  "credit_signed_invoice_generated",
+  "credit_irn_generated",
+  "credit_qr_code",
+  "credit_qr_code_generated",
+  "credit_irn_cancelled",
+  "credit_irn_generated_time",
+  "credit_qr_code_image",
+  "invoice_with_credit_gst_details",
+  "has_credit_items",
+  "credit_irn_error_message",
+  "confirmation_number",
+  "invoice_from",
+  "invoice_process_time",
+  "irn_process_time",
+  "cgst_amount",
+  "sgst_amount",
+  "igst_amount",
+  "total_gst_amount"
+ ],
+ "fields": [
+  {
+   "collapsible": 1,
+   "fieldname": "invoice_details_section",
+   "fieldtype": "Section Break",
+   "label": "INVOICE DETAILS"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Invoice Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "irn_generated",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "IRN Generated",
+   "options": "Pending\nSuccess\nCanceled",
+   "read_only": 1
+  },
+  {
+   "fieldname": "guest_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Guest Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "gst_number",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "GST Number",
+   "length": 15,
+   "options": "TaxPayerDetail",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_file",
+   "fieldtype": "Attach",
+   "hidden": 1,
+   "label": "Invoice File"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "room_number",
+   "fieldtype": "Int",
+   "in_standard_filter": 1,
+   "label": "Room Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "label": "Invoice Type",
+   "options": "B2B\nB2C",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Invoice Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_with_gst_details",
+   "fieldtype": "Attach",
+   "hidden": 1,
+   "label": "Invoice With GST Details"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "tax_payer_details_column",
+   "fieldtype": "Section Break",
+   "label": "Tax Payer details"
+  },
+  {
+   "fieldname": "legal_name",
+   "fieldtype": "Data",
+   "label": "Legal Name"
+  },
+  {
+   "fieldname": "address_1",
+   "fieldtype": "Data",
+   "label": "Address 1"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "trade_name",
+   "fieldtype": "Data",
+   "label": "Trade Name"
+  },
+  {
+   "fieldname": "address_2",
+   "fieldtype": "Data",
+   "label": "Address 2"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "column_break_28",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "state_code",
+   "fieldtype": "Data",
+   "label": "State Code",
+   "length": 2,
+   "reqd": 1
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Pincode",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_28",
+   "fieldtype": "Section Break",
+   "label": "Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Items"
+  },
+  {
+   "fieldname": "section_break_25",
+   "fieldtype": "Section Break"
+  },
+  {
+   "bold": 1,
+   "fieldname": "amount_before_gst",
+   "fieldtype": "Float",
+   "label": "Gst Invoice Summary Before GST",
+   "options": "Currency",
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "amount_after_gst",
+   "fieldtype": "Float",
+   "label": "Gst Invoice Summary",
+   "options": "currency",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "gst_summary_column",
+   "fieldtype": "Section Break",
+   "label": "GST Summary"
+  },
+  {
+   "fieldname": "gst_summary",
+   "fieldtype": "Table",
+   "label": "GST Summary",
+   "options": "Tax Summaries"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break",
+   "label": "SAC HSN Based Taxes"
+  },
+  {
+   "fieldname": "sac_hsn_based_taxes",
+   "fieldtype": "Table",
+   "label": "SAC HSN Based Taxes",
+   "options": "SAC HSN Tax Summaries"
+  },
+  {
+   "fieldname": "e_invoice_details_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "E Invoice Details",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "irn_number",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "IRN Number",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "irn_cancelled",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "IRN Cancelled",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "qr_code_generated",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "QR Code Generated",
+   "options": "Pending\nSuccess",
+   "read_only": 1
+  },
+  {
+   "fieldname": "qr_code",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "QR Code "
+  },
+  {
+   "fieldname": "column_break_30",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qr_code_image",
+   "fieldtype": "Attach",
+   "label": "QR Code Image"
+  },
+  {
+   "fieldname": "signed_invoice_generated",
+   "fieldtype": "Select",
+   "label": "Signed Invoice Generated",
+   "options": "Yes\nNo",
+   "reqd": 1
+  },
+  {
+   "fieldname": "signed_invoice",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Signed Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "signed_invoice_image",
+   "fieldtype": "Attach",
+   "label": "Signed Invoice Image"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Company",
+   "options": "company"
+  },
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Payment Type",
+   "options": "Payment Types"
+  },
+  {
+   "fieldname": "ack_no",
+   "fieldtype": "Data",
+   "label": "Ack No",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "ack_date",
+   "fieldtype": "Data",
+   "label": "Ack Date"
+  },
+  {
+   "fieldname": "cancel_message",
+   "fieldtype": "Data",
+   "label": "Cancel Message"
+  },
+  {
+   "fieldname": "cancelled_on",
+   "fieldtype": "Data",
+   "label": "Cancelled On"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Invoices",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "other_charges",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Other Charges",
+   "options": "Currency"
+  },
+  {
+   "bold": 1,
+   "fieldname": "credit_value_before_gst",
+   "fieldtype": "Float",
+   "label": "Credit Invoice Summary Without Gst"
+  },
+  {
+   "bold": 1,
+   "fieldname": "credit_value_after_gst",
+   "fieldtype": "Float",
+   "label": "Credit Invoice Summary"
+  },
+  {
+   "fieldname": "column_break_31",
+   "fieldtype": "Column Break"
+  },
+  {
+   "bold": 1,
+   "fieldname": "pms_invoice_summary_without_gst",
+   "fieldtype": "Float",
+   "label": "Pms Invoice Summary Without Gst"
+  },
+  {
+   "bold": 1,
+   "fieldname": "pms_invoice_summary",
+   "fieldtype": "Float",
+   "label": "Pms Invoice Summary"
+  },
+  {
+   "fieldname": "column_break_32",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "credit_note_items",
+   "fieldtype": "Table",
+   "label": "Credit Note Items",
+   "options": "Credit Note Items"
+  },
+  {
+   "fieldname": "ready_to_generate_irn",
+   "fieldtype": "Select",
+   "label": "Ready To Generate IRN",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Data",
+   "label": "Error message"
+  },
+  {
+   "fieldname": "irn_generated_time",
+   "fieldtype": "Datetime",
+   "in_standard_filter": 1,
+   "label": "IRN Generated Time"
+  },
+  {
+   "fieldname": "credit_ack_no",
+   "fieldtype": "Data",
+   "label": "Credit Ack No"
+  },
+  {
+   "fieldname": "credit_irn_number",
+   "fieldtype": "Small Text",
+   "label": "Credit IRN Number"
+  },
+  {
+   "fieldname": "credit_ack_date",
+   "fieldtype": "Data",
+   "label": "Credit Ack Date"
+  },
+  {
+   "fieldname": "credit_signed_invoice",
+   "fieldtype": "Text",
+   "label": "Credit Signed Invoice"
+  },
+  {
+   "fieldname": "credit_signed_invoice_generated",
+   "fieldtype": "Select",
+   "label": "Credit Signed Invoice Generated",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "credit_irn_generated",
+   "fieldtype": "Select",
+   "label": "Credit IRN Generated",
+   "options": "Pending\nSuccess\nCanceled\nFailed"
+  },
+  {
+   "fieldname": "credit_qr_code",
+   "fieldtype": "Small Text",
+   "label": "Credit Qr Code"
+  },
+  {
+   "fieldname": "credit_qr_code_generated",
+   "fieldtype": "Select",
+   "label": "Credit Qr Code Generated ",
+   "options": "Pending\nSuccess\nFailed"
+  },
+  {
+   "fieldname": "credit_irn_cancelled",
+   "fieldtype": "Select",
+   "label": "Credit IRN Cancelled",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "credit_irn_generated_time",
+   "fieldtype": "Datetime",
+   "label": "Credit IRN Generated Time "
+  },
+  {
+   "fieldname": "credit_qr_code_image",
+   "fieldtype": "Attach",
+   "label": "Credit Qr Code Image"
+  },
+  {
+   "fieldname": "invoice_with_credit_gst_details",
+   "fieldtype": "Attach",
+   "label": "Invoice With Credit GST Details"
+  },
+  {
+   "fieldname": "has_credit_items",
+   "fieldtype": "Select",
+   "label": "Has Credit Items",
+   "options": "No\nYes"
+  },
+  {
+   "fieldname": "credit_irn_error_message",
+   "fieldtype": "Text",
+   "label": "Credit IRN Error Message"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number"
+  },
+  {
+   "fieldname": "invoice_from",
+   "fieldtype": "Select",
+   "label": "Invoice From",
+   "options": "Manual\nPms"
+  },
+  {
+   "fieldname": "invoice_process_time",
+   "fieldtype": "Time",
+   "label": "Invoice Process Time"
+  },
+  {
+   "fieldname": "irn_process_time",
+   "fieldtype": "Time",
+   "label": "Irn Process Time"
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Float",
+   "label": "CGST Amount"
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Float",
+   "label": "SGST Amount"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "label": "IGST Amount"
+  },
+  {
+   "fieldname": "total_gst_amount",
+   "fieldtype": "Float",
+   "label": "Total Gst Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2020-11-26 12:41:29.325157",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Invoices",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Front Office",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

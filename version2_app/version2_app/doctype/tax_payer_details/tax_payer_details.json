@@ -1,0 +1,198 @@
+{
+ "actions": [],
+ "autoname": "field:gst_number",
+ "creation": "2020-10-08 14:03:21.833895",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tax_payer_deatils_section",
+  "gst_number",
+  "legal_name",
+  "email",
+  "address_1",
+  "address_2",
+  "location",
+  "pincode",
+  "gst_status",
+  "tax_type",
+  "column_break_20",
+  "company",
+  "trade_name",
+  "phone_number",
+  "state_code",
+  "last_fetched",
+  "address_floor_number",
+  "address_street",
+  "block_status",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "tax_payer_deatils_section",
+   "fieldtype": "Section Break",
+   "label": "Tax Payer Deatils"
+  },
+  {
+   "fieldname": "gst_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "GST Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "legal_name",
+   "fieldtype": "Data",
+   "label": "Legal Name"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "address_1",
+   "fieldtype": "Data",
+   "label": "Address 1"
+  },
+  {
+   "fieldname": "address_2",
+   "fieldtype": "Data",
+   "label": "Address 2"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "label": "Pincode"
+  },
+  {
+   "fieldname": "gst_status",
+   "fieldtype": "Data",
+   "label": "Gst Status"
+  },
+  {
+   "fieldname": "tax_type",
+   "fieldtype": "Data",
+   "label": "Tax Type"
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "trade_name",
+   "fieldtype": "Data",
+   "label": "Trade Name"
+  },
+  {
+   "fieldname": "phone_number",
+   "fieldtype": "Data",
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "state_code",
+   "fieldtype": "Data",
+   "label": "State Code"
+  },
+  {
+   "fieldname": "last_fetched",
+   "fieldtype": "Data",
+   "label": "Last Fetched"
+  },
+  {
+   "fieldname": "address_floor_number",
+   "fieldtype": "Data",
+   "label": "Address Floor Number"
+  },
+  {
+   "fieldname": "address_street",
+   "fieldtype": "Data",
+   "label": "Address Street"
+  },
+  {
+   "fieldname": "block_status",
+   "fieldtype": "Data",
+   "label": "Block Status"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nIn-Active"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2020-11-20 12:25:21.046666",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Tax Payer Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,320 @@
+{
+ "actions": [],
+ "autoname": "field:provider",
+ "creation": "2020-10-08 13:29:14.358562",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "provider_details_section",
+  "provider",
+  "mode",
+  "column_break_4",
+  "provider_status",
+  "company",
+  "test_urls_section",
+  "auth_test",
+  "generate_test_irn",
+  "generate_test_qr_code_image",
+  "extract_test_qr_code",
+  "get_test_irn",
+  "column_break_13",
+  "get_tax_payer_test",
+  "cancel_test_irn",
+  "get_test_qr_image",
+  "extract_test_signed_invoice",
+  "production_urls_section",
+  "extract_prod_qr_code",
+  "auth_prod",
+  "generate_prod_irn",
+  "generate_prod_qr_code_image",
+  "get_prod_irn",
+  "column_break_24",
+  "get_tax_payer_prod",
+  "cancel_prod_irn",
+  "get_prod_qr_image",
+  "extract_prod_signed_invoice",
+  "section_break_15",
+  "gsp_prod_app_id",
+  "gsp_prod_app_secret",
+  "gst__prod_username",
+  "gst_prod_password",
+  "gst_prod_number",
+  "column_break_19",
+  "gsp_prod_token",
+  "gsp_prod_token_expired_on",
+  "testing_gsp_details_section",
+  "gsp_test_app_id",
+  "gsp_test_app_secret",
+  "gst__test_username",
+  "gst_test_password",
+  "column_break_27",
+  "gsp_test_token",
+  "gsp_test_token_expired_on",
+  "gst_test_number"
+ ],
+ "fields": [
+  {
+   "fieldname": "provider_details_section",
+   "fieldtype": "Section Break",
+   "label": "Provider Details"
+  },
+  {
+   "fieldname": "provider",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Provider",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "Testing\nUat\nProduction",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "provider_status",
+   "fieldtype": "Select",
+   "label": "Provider status",
+   "options": "Active\nIn-Active",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "test_urls_section",
+   "fieldtype": "Section Break",
+   "label": "TEST URLS"
+  },
+  {
+   "fieldname": "auth_test",
+   "fieldtype": "Data",
+   "label": "Auth TEST"
+  },
+  {
+   "fieldname": "generate_test_irn",
+   "fieldtype": "Data",
+   "label": "Generate TEST IRN"
+  },
+  {
+   "fieldname": "generate_test_qr_code_image",
+   "fieldtype": "Data",
+   "label": "Generate TEST QR Code Image"
+  },
+  {
+   "fieldname": "extract_test_qr_code",
+   "fieldtype": "Data",
+   "label": "Extract TEST QR Code"
+  },
+  {
+   "fieldname": "get_test_irn",
+   "fieldtype": "Data",
+   "label": "Get TEST IRN"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "get_tax_payer_test",
+   "fieldtype": "Data",
+   "label": "Get Tax Payer TEST"
+  },
+  {
+   "fieldname": "cancel_test_irn",
+   "fieldtype": "Data",
+   "label": "Cancel TEST IRN"
+  },
+  {
+   "fieldname": "get_test_qr_image",
+   "fieldtype": "Data",
+   "label": "Get TEST Qr Image"
+  },
+  {
+   "fieldname": "extract_test_signed_invoice",
+   "fieldtype": "Data",
+   "label": "Extract TEST Signed Invoice"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "production_urls_section",
+   "fieldtype": "Section Break",
+   "label": "PRODUCTION URLS"
+  },
+  {
+   "fieldname": "extract_prod_qr_code",
+   "fieldtype": "Data",
+   "label": "Extract PROD QR Code"
+  },
+  {
+   "fieldname": "auth_prod",
+   "fieldtype": "Data",
+   "label": "Auth PROD"
+  },
+  {
+   "fieldname": "generate_prod_irn",
+   "fieldtype": "Data",
+   "label": "Generate PROD IRN"
+  },
+  {
+   "fieldname": "generate_prod_qr_code_image",
+   "fieldtype": "Data",
+   "label": "Generate PROD QR Code Image"
+  },
+  {
+   "fieldname": "get_prod_irn",
+   "fieldtype": "Data",
+   "label": "Get PROD IRN"
+  },
+  {
+   "fieldname": "column_break_24",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "get_tax_payer_prod",
+   "fieldtype": "Data",
+   "label": "Get Tax Payer PROD"
+  },
+  {
+   "fieldname": "cancel_prod_irn",
+   "fieldtype": "Data",
+   "label": "Cancel PROD IRN"
+  },
+  {
+   "fieldname": "get_prod_qr_image",
+   "fieldtype": "Data",
+   "label": "Get PROD Qr Image"
+  },
+  {
+   "fieldname": "extract_prod_signed_invoice",
+   "fieldtype": "Data",
+   "label": "Extract PROD Signed Invoice"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break",
+   "label": "Production GSP Details"
+  },
+  {
+   "fieldname": "gsp_prod_app_id",
+   "fieldtype": "Data",
+   "label": "GSP PROD App Id"
+  },
+  {
+   "fieldname": "gsp_prod_app_secret",
+   "fieldtype": "Data",
+   "label": "GSP PROD App Secret"
+  },
+  {
+   "fieldname": "gst__prod_username",
+   "fieldtype": "Data",
+   "label": "GST  PROD Username"
+  },
+  {
+   "fieldname": "gst_prod_password",
+   "fieldtype": "Data",
+   "label": "GST PROD Password"
+  },
+  {
+   "fieldname": "gst_prod_number",
+   "fieldtype": "Data",
+   "label": "GST PROD Number"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gsp_prod_token",
+   "fieldtype": "Small Text",
+   "label": "GSP PROD Token"
+  },
+  {
+   "fieldname": "gsp_prod_token_expired_on",
+   "fieldtype": "Data",
+   "label": "GSP PROD Token Expired On"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "testing_gsp_details_section",
+   "fieldtype": "Section Break",
+   "label": "Testing GSP Details"
+  },
+  {
+   "fieldname": "gsp_test_app_id",
+   "fieldtype": "Data",
+   "label": "GSP TEST App Id"
+  },
+  {
+   "fieldname": "gsp_test_app_secret",
+   "fieldtype": "Data",
+   "label": "GSP TEST App Secret"
+  },
+  {
+   "fieldname": "gst__test_username",
+   "fieldtype": "Data",
+   "label": "GST  TEST Username"
+  },
+  {
+   "fieldname": "gst_test_password",
+   "fieldtype": "Data",
+   "label": "GST TEST Password"
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "gsp_test_token",
+   "fieldtype": "Small Text",
+   "label": "GSP TEST Token"
+  },
+  {
+   "fieldname": "gsp_test_token_expired_on",
+   "fieldtype": "Data",
+   "label": "GSP TEST Token Expired On"
+  },
+  {
+   "fieldname": "gst_test_number",
+   "fieldtype": "Data",
+   "label": "GST TEST Number"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2020-10-23 12:51:22.593289",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "GSP APIS",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
