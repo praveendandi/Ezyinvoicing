@@ -37,7 +37,9 @@ def Reinitiate_invoice(data):
 		other_charges = 0
 		credit_value_before_gst = 0
 		credit_value_after_gst = 0
-		
+		cgst_amount = 0
+		sgst_amount = 0
+		igst_amount = 0
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
 				
@@ -52,6 +54,9 @@ def Reinitiate_invoice(data):
 					# has_cedit_items = Y
 					value_before_gst += item['item_value']
 					value_after_gst += item['item_value_after_gst']
+					cgst_amount+=item['cgst_amount']
+					sgst_amount+=item['sgst_amount']
+					igst_amount+=item['igst_amount']
 				else:
 					credit_value_before_gst += abs(item['item_value'])
 					credit_value_after_gst  += abs(item['item_value_after_gst'])
@@ -99,6 +104,9 @@ def Reinitiate_invoice(data):
 		doc.other_charges= other_charges
 		doc.ready_to_generate_irn = ready_to_generate_irn
 		doc.has_cedit_items = has_cedit_items
+		doc.cgst_amount=round(cgst_amount,2)
+		doc.sgst_amount=round(sgst_amount,2)
+		doc.igst_amount=round(igst_amount,2)
 		doc.irn_generated='Pending'
 		doc.irn_cancelled='No'
 		doc.qr_code_generated='Pending'

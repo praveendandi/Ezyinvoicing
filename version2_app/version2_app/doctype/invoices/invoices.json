@@ -44,8 +44,8 @@
   "gst_summary",
   "section_break_9",
   "sac_hsn_based_taxes",
-  "credit_note_items",
   "e_invoice_details_section",
+  "credit_note_items",
   "irn_number",
   "irn_cancelled",
   "qr_code_generated",
@@ -111,7 +111,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled",
+   "options": "Pending\nSuccess\nCancelled\nError",
    "read_only": 1
   },
   {
@@ -578,7 +578,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-11-26 16:03:25.907820",
+ "modified": "2020-11-27 15:10:43.921966",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
