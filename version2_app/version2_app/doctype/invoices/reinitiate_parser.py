@@ -17,7 +17,7 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 start_time=str(datetime.datetime.utcnow()) 
 # sys.exit()
-
+#hi
 site_folder_path = "version2_app.com/"
 host = "http://localhost:8000/api/method/"
 folder_path = frappe.utils.get_bench_path()
