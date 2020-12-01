@@ -16,7 +16,8 @@
   "type",
   "status",
   "company",
-  "is_service"
+  "is_service",
+  "transactioncode"
  ],
  "fields": [
   {
@@ -92,11 +93,16 @@
    "fieldtype": "Select",
    "label": "Is Service",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "transactioncode",
+   "fieldtype": "Data",
+   "label": "TransactionCode"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-11-20 12:55:21.073760",
+ "modified": "2020-11-30 17:18:12.669808",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

@@ -129,8 +129,7 @@
    "in_standard_filter": 1,
    "label": "GST Number",
    "length": 15,
-   "options": "TaxPayerDetail",
-   "reqd": 1
+   "options": "TaxPayerDetail"
   },
   {
    "fieldname": "invoice_file",
@@ -578,7 +577,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-11-27 15:10:43.921966",
+ "modified": "2020-11-30 17:38:23.218395",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

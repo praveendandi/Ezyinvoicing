@@ -66,14 +66,14 @@ def reinitiateInvoice(data):
     gstNumber = ''
     date_time_obj = ''
     total_invoice_amount = ''
-    conformation_number = ''
+    confirmation_number = ''
     for i in raw_data:
         if "Total" in i:
             total_invoice = i.split(" ")
             
             total_invoice_amount = float(total_invoice[-1].replace(",",""))
         if "Confirmation No." in i:
-            conformation_number = i.split(" ")[-1]
+            confirmation_number = i.split(" ")[-1]
         if "Departure :" in i:
             depatureDateIndex = i.index('Departure')
             date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
@@ -266,7 +266,7 @@ def reinitiateInvoice(data):
     guest['gstNumber'] = gstNumber
     guest['room_number'] = int(roomNumber)
     guest['company_code'] = "JP-2022"
-    guest['conformation_number'] = conformation_number
+    guest['confirmation_number'] = confirmation_number
 
 
     

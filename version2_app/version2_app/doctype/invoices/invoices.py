@@ -8,6 +8,7 @@ from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 import pandas as pd
+# from datetime import da
 import datetime
 import random
 from frappe.utils import get_site_name
@@ -16,7 +17,7 @@ import time
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 site = 'http://0.0.0.0:8000/'
-site_folder_path = 'version2_app.com/'
+site_folder_path = 'version2_app.com'
 fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
 
 
@@ -324,6 +325,7 @@ def attach_qr_code(invoice_number, gsp,code):
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		company = frappe.get_doc('company',invoice.company)
 		folder_path = frappe.utils.get_bench_path()
+		site_folder_path = company.site_name
 		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
 		path = folder_path + '/sites/' + site_folder_path
 		src_pdf_filename = path + invoice.invoice_file
@@ -382,7 +384,8 @@ def create_qr_image(invoice_number, gsp):
 		# file_path = frappe.get_site_path('private', 'files',
 		#                                  invoice.invoice_file)
 		folder_path = frappe.utils.get_bench_path()
-		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host) + "/private/files/"
+		company = frappe.get_doc('company',invoice.company)
+		site_folder_path = company.site_name
 		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
 		# print(path)
 		headers = {
@@ -478,152 +481,147 @@ def insert_invoice(data):
 	'''
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
-	# try:
-	# print(data)
-	value_before_gst = 0
-	value_after_gst = 0
-	other_charges = 0
-	credit_value_before_gst = 0
-	credit_value_after_gst = 0
-	cgst_amount = 0
-	sgst_amount = 0
-	igst_amount = 0
-	
+	try:
+		# print(data)
+		value_before_gst = 0
+		value_after_gst = 0
+		other_charges = 0
+		credit_value_before_gst = 0
+		credit_value_after_gst = 0
+		cgst_amount = 0
+		sgst_amount = 0
+		igst_amount = 0
+		
 
 
-	if "legal_name" not in data['taxpayer']:
-		data['taxpayer']['legal_name'] = " "
-	# print(data['items_data'])
-	#calculat items
-	# items_data = calulate_items(data['items'], data['invoice_number'],company_code)
-	for item in data['items_data']:
-		# print(type(item['item_value']),item['item_value'],len(str(item['item_value'])),str(item['item_value'])[0])
-		if item['taxable'] == 'No':
-			other_charges += item['item_value']
+		if "legal_name" not in data['taxpayer']:
+			data['taxpayer']['legal_name'] = " "
+		# print(data['items_data'])
+		#calculat items
+		# items_data = calulate_items(data['items'], data['invoice_number'],company_code)
+		for item in data['items_data']:
+			# print(type(item['item_value']),item['item_value'],len(str(item['item_value'])),str(item['item_value'])[0])
+			if item['taxable'] == 'No':
+				other_charges += item['item_value']
 
-		elif item['sac_code'].isdigit():  
-			if "-" == str(item['item_value'])[0]:
-				print(item)
-			if "-" not in str(item['item_value']):
-				# has_cedit_items = "Yes"
-				cgst_amount+=item['cgst_amount']
-				sgst_amount+=item['sgst_amount']
-				igst_amount+=item['igst_amount']
-				value_before_gst += item['item_value']
-				value_after_gst += item['item_value_after_gst']
+			elif item['sac_code'].isdigit():  
+				if "-" not in str(item['item_value']):
+					# has_cedit_items = "Yes"
+					cgst_amount+=item['cgst_amount']
+					sgst_amount+=item['sgst_amount']
+					igst_amount+=item['igst_amount']
+					value_before_gst += item['item_value']
+					value_after_gst += item['item_value_after_gst']
+				else:
+					credit_value_before_gst += abs(item['item_value'])
+					credit_value_after_gst  += abs(item['item_value_after_gst'])
 			else:
-				print("--------",item['item_value'])
-				credit_value_before_gst += abs(item['item_value'])
-				credit_value_after_gst  += abs(item['item_value_after_gst'])
+				pass
+		# print(datetime.datetime.utcnow()-datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f"))	
+		if (round(value_after_gst,2) - round(credit_value_after_gst,2)) >0:
+			ready_to_generate_irn = "Yes"
 		else:
-			pass
-	# print(datetime.datetime.utcnow()-datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f"))	
-	if (round(value_after_gst,2) - round(credit_value_after_gst,2)) >0:
-		ready_to_generate_irn = "Yes"
-	else:
-		ready_to_generate_irn = "No"
-	# print(credit_value_before_gst,"iiiiiiiiiiiiiiiiiii")		
-	if credit_value_before_gst>0:
+			ready_to_generate_irn = "No"
+		# print(credit_value_before_gst,"iiiiiiiiiiiiiiiiiii")		
+		if credit_value_before_gst>0:
 
-		has_credit_items = "Yes"
-	else:
-		has_credit_items = "No"	
-	# print(has_credit_items,"ppppppppppppppppppppp")	
-	invoice = frappe.get_doc({
-		'doctype':
-		'Invoices',
-		
-		'invoice_number':
-		data['guest_data']['invoice_number'],
-		'guest_name':
-		data['guest_data']['name'],
-		'invoice_from':"Pms",
-		'gst_number':
-		data['guest_data']['gstNumber'],
-		'invoice_file':
-		data['guest_data']['invoice_file'],
-		'room_number':
-		data['guest_data']['room_number'],
-		'confirmation_number':data['guest_data']['conformation_number'],
-		'invoice_type':
-		data['guest_data']['invoice_type'],
-		'invoice_date':
-		datetime.datetime.strptime(data['guest_data']['invoice_date'],
-									'%d-%b-%y %H:%M:%S'),
-		'legal_name':
-		data['taxpayer']['legal_name'],
-		'address_1':
-		data['taxpayer']['address_1'],
-		'email':
-		data['taxpayer']['email'],
-		'trade_name':
-		data['taxpayer']['trade_name'],
-		'address_2':
-		data['taxpayer']['address_2'],
-		'phone_number':
-		data['taxpayer']['phone_number'],
-		'location':
-		data['taxpayer']['location'],
-		'pincode':
-		data['taxpayer']['pincode'],
-		'state_code':
-		data['taxpayer']['state_code'],
-		'amount_before_gst':
-		round(value_before_gst, 2),
-		"amount_after_gst":
-		round(value_after_gst, 2),
-		"other_charges": round(other_charges,2),
-		"credit_value_before_gst":round(credit_value_before_gst,2),
-		"credit_value_after_gst":round(credit_value_after_gst,2),
-		"pms_invoice_summary_without_gst":round(value_before_gst,2) - round(credit_value_before_gst,2),
-		"pms_invoice_summary": round(value_after_gst,2) - round(credit_value_after_gst,2),
-		'irn_generated':
-		'Pending',
-		'irn_cancelled':
-		'No',
-		'qr_code_generated':
-		'Pending',
-		'signed_invoice_generated':
-		'No',
-		'company':
-		data['company_code'],
-		'cgst_amount':round(cgst_amount,2),
-		'sgst_amount':round(sgst_amount,2),
-		'igst_amount':round(igst_amount,2),
-		'total_gst_amount': round(cgst_amount,2)+round(sgst_amount,2)+round(igst_amount,2),
-		'has_credit_items':has_credit_items,
-		'invoice_process_time': datetime.datetime.utcnow() - datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f")
-	})
-	if data['amened'] == 'Yes':
-		invCount = frappe.db.get_list('Invoices', filters={
-				'invoice_number': ['like', '%'+data['guest_data']['invoice_number']+'%']
-			})
-		invoice.amended_from = invCount[0]['name']
-		invoice.invoice_number = "Amened"+data['guest_data']['invoice_number']
-	v = invoice.insert(ignore_permissions=True, ignore_links=True)
-	if data['amened'] == 'Yes':
-		getInvoiceNUmber =frappe.db.get_value('Invoices', {'invoice_number': "Amened"+data['guest_data']['invoice_number']})
-		
-		updateInvoi = frappe.get_doc('Invoices',getInvoiceNUmber)
-		updateInvoi.invoice_number = getInvoiceNUmber
-		updateInvoi.save()
-		data['invoice_number'] = getInvoiceNUmber
-		data['guest_data']['invoice_number'] = getInvoiceNUmber
-	# insert items
-	# items = data['items_data']
-	# items = [x for x in items if x['sac_code']!="Liquor"]
-	itemsInsert = insert_items(data['items_data'],data['invoice_number'])
-	# insert tax summaries
-	# insert_tax_summaries(data['items_data'], data['invoice_number'])
-	# taxSummariesInsert = insert_tax_summariesd(data['items_data'], data['guest_data']['invoice_number'])
-	# insert sac code based taxes
-	insert_tax_summaries2(data['items_data'], data['invoice_number'])
-	hsnbasedtaxcodes = insert_hsn_code_based_taxes(data['items_data'], data['guest_data']['invoice_number'])
-	# print(itemsInsert,taxSummariesInsert,hsnbasedtaxcodes)
-	return {"success":True}
-	# except Exception as e:
-	# 	print(e,"insert invoice")
-	# 	return {"success":False,"message":e}
+			has_credit_items = "Yes"
+		else:
+			has_credit_items = "No"	
+		invoice = frappe.get_doc({
+			'doctype':
+			'Invoices',
+			
+			'invoice_number':
+			data['guest_data']['invoice_number'],
+			'guest_name':
+			data['guest_data']['name'],
+			'invoice_from':"Pms",
+			'gst_number':
+			data['guest_data']['gstNumber'],
+			'invoice_file':
+			data['guest_data']['invoice_file'],
+			'room_number':
+			data['guest_data']['room_number'],
+			'confirmation_number':data['guest_data']['confirmation_number'],
+			'invoice_type':
+			data['guest_data']['invoice_type'],
+			'invoice_date':
+			datetime.datetime.strptime(data['guest_data']['invoice_date'],
+										'%d-%b-%y %H:%M:%S'),
+			'legal_name':
+			data['taxpayer']['legal_name'],
+			'address_1':
+			data['taxpayer']['address_1'],
+			'email':
+			data['taxpayer']['email'],
+			'trade_name':
+			data['taxpayer']['trade_name'],
+			'address_2':
+			data['taxpayer']['address_2'],
+			'phone_number':
+			data['taxpayer']['phone_number'],
+			'location':
+			data['taxpayer']['location'],
+			'pincode':
+			data['taxpayer']['pincode'],
+			'state_code':
+			data['taxpayer']['state_code'],
+			'amount_before_gst':
+			round(value_before_gst, 2),
+			"amount_after_gst":
+			round(value_after_gst, 2),
+			"other_charges": round(other_charges,2),
+			"credit_value_before_gst":round(credit_value_before_gst,2),
+			"credit_value_after_gst":round(credit_value_after_gst,2),
+			"pms_invoice_summary_without_gst":round(value_before_gst,2) - round(credit_value_before_gst,2),
+			"pms_invoice_summary": round(value_after_gst,2) - round(credit_value_after_gst,2),
+			'irn_generated':
+			'Pending',
+			'irn_cancelled':
+			'No',
+			'qr_code_generated':
+			'Pending',
+			'signed_invoice_generated':
+			'No',
+			'company':
+			data['company_code'],
+			'cgst_amount':round(cgst_amount,2),
+			'sgst_amount':round(sgst_amount,2),
+			'igst_amount':round(igst_amount,2),
+			'total_gst_amount': round(cgst_amount,2)+round(sgst_amount,2)+round(igst_amount,2),
+			'has_credit_items':has_credit_items,
+			'invoice_process_time': datetime.datetime.utcnow() - datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f")
+		})
+		if data['amened'] == 'Yes':
+			invCount = frappe.db.get_list('Invoices', filters={
+					'invoice_number': ['like', '%'+data['guest_data']['invoice_number']+'%']
+				})
+			invoice.amended_from = invCount[0]['name']
+			invoice.invoice_number = "Amened"+data['guest_data']['invoice_number']
+		v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		if data['amened'] == 'Yes':
+			getInvoiceNUmber =frappe.db.get_value('Invoices', {'invoice_number': "Amened"+data['guest_data']['invoice_number']})
+			
+			updateInvoi = frappe.get_doc('Invoices',getInvoiceNUmber)
+			updateInvoi.invoice_number = getInvoiceNUmber
+			updateInvoi.save()
+			data['invoice_number'] = getInvoiceNUmber
+			data['guest_data']['invoice_number'] = getInvoiceNUmber
+
+		# insert items
+		itemsInsert = insert_items(data['items_data'],data['invoice_number'])
+
+		# insert tax summaries
+		# insert_tax_summaries(data['items_data'], data['invoice_number'])
+		# insert sac code based taxes
+		items = [x for x in data['items_data'] if '-' not in str(x['item_value'])]
+		insert_tax_summaries2(items, data['invoice_number'])
+		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'])
+		return {"success":True}
+	except Exception as e:
+		print(e,"insert invoice")
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -665,7 +663,7 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 		return {"sucess":True,"data":doc}
 	except Exception as e:
 		print(e,"insert hsn")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -685,7 +683,7 @@ def insert_items(items,invoice_number):
 			# print(doc)
 	except Exception as e:
 		print(e,"********************insert itemns api")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 @frappe.whitelist(allow_guest=True)
@@ -697,19 +695,7 @@ def calulate_items(data):
 			final_item = {}
 			calulationType = frappe.get_doc(
 						'company', data['company_code'])
-			# if ("Liquor" in item['name']) or ("Liq" in item['name']):
-			# 	item['sac_code'] = "Liquor"
-			# 	final_item['other_charges'] = item['item_value']
-			# 	final_item['sac_code_found'] = 'No'
-			# 	final_item['cgst'] = 0
-			# 	final_item['cgst_amount'] = 0
-			# 	final_item['sgst'] = 0
-			# 	final_item['sgst_amount'] = 0
-			# 	final_item['igst'] = 0
-			# 	final_item['igst_amount'] = 0
-			# 	final_item['gst_rate'] = 0
-			# 	final_item['item_value_after_gst'] = 0
-			# 	final_item['item_value'] = item['item_value']			
+						
 			if calulationType.calculation_by == "Description":
 				sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES', item['name'])
@@ -957,7 +943,7 @@ def calulate_items(data):
 		return {"success":True,"data":total_items}
 	except Exception as e:
 		print(e, "calculation api")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -1019,10 +1005,14 @@ def insert_tax_summariesd(items, invoice_number):
 		return {"success":True}
 	except Exception as e:
 		print('tax', e)
-		return {'succes':False,"message":e}
+		return {'succes':False,"message":str(e)}
 		
 
 def insert_tax_summaries2(items,invoice_number):
+	# items_data = []
+	# for each in items:
+	# 	if "-" not in str(each['item_value']):
+	# 		items_data.append(each)
 	df = pd.DataFrame(items)
 	df = df.set_index('sgst')
 	df1 = df.groupby(['cgst'])[["cgst_amount", "sgst_amount","igst_amount"]].apply(lambda x : x.astype(float).sum())
@@ -1249,7 +1239,7 @@ def get_tax_payer_details(data):
 			return {"success":True,"data":doc}
 	except Exception as e:
 		print(e,"get tax payers")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 	   
 
 @frappe.whitelist(allow_guest=True)
@@ -1259,7 +1249,7 @@ def check_company_exist(code):
 		return {"success":True,"data":company}
 	except Exception as e:
 		print(e,"check company exist")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -1269,7 +1259,7 @@ def check_company_exist_for_Irn(code):
 		return {"success":True,"data":company}
 	except Exception as e:
 		print(e,"check company exist")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -1295,7 +1285,7 @@ def check_token_is_valid(data):
 
 	except Exception as e:
 		print(e,"check token is valid")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -1334,69 +1324,70 @@ def login_gsp(code, mode):
 
 @frappe.whitelist(allow_guest=True)
 def gsp_api_data(data):
-	# try:
-	print(data,"**********8")
-	mode = data['mode']
-	gsp_apis = frappe.db.get_value('GSP APIS', {
-		"company": data['code'],
-		"name": data['provider'],
-	}, [
-		'auth_test', 'cancel_test_irn', 'extract_prod_qr_code',
-		'extract_test_qr_code', 'extract_test_signed_invoice',
-		'generate_prod_irn', 'generate_test_irn',
-		'generate_test_qr_code_image', 'get_tax_payer_prod',
-		'get_tax_payer_test', 'get_test_irn', 'get_test_qr_image',
-		'auth_prod', 'cancel_prod_irn', 'extract_prod_qr_code',
-		'extract_prod_signed_invoice', 'generate_prod_irn',
-		'generate_prod_qr_code_image', 'get_prod_irn', 'get_prod_qr_image',
-		'get_tax_payer_prod', 'gsp_prod_app_id', 'gsp_prod_app_secret',
-		'gsp_test_app_id', 'gsp_test_app_secret', 'gsp_test_token',
-		'gst__prod_username', 'gst__test_username', 'gst_prod_password',
-		'gst_test_password', 'gsp_prod_token', 'gst_test_number',
-		'gst_prod_number',
-	],
-									as_dict=1)
-	api_details = dict()
-	api_details['auth'] = gsp_apis[
-		'auth_test'] if mode == 'Testing' else gsp_apis['auth_prod']
-	api_details['generate_irn'] = gsp_apis[
-		'generate_test_irn'] if mode == 'Testing' else gsp_apis[
-			'generate_prod_irn']
-	api_details['cancel_irn'] = gsp_apis[
-		'cancel_test_irn'] if mode == 'Testing' else gsp_apis[
-			'cancel_prod_irn']
-	api_details['get_taxpayer_details'] = gsp_apis[
-		'get_tax_payer_test'] if mode == 'Testing' else gsp_apis[
-			'get_tax_payer_prod']
-	api_details['generate_qr_code'] = gsp_apis[
-		'generate_test_qr_code_image'] if mode == 'Testing' else gsp_apis[
-			'generate_prod_qr_code_image']
-	api_details['generate_signed_qr_code'] = gsp_apis[
-		'extract_test_signed_invoice'] if mode == 'Testing' else gsp_apis[
-			'extract_prod_signed_invoice']
-	api_details['username'] = gsp_apis[
-		'gst__test_username'] if mode == 'Testing' else gsp_apis[
-			'gst__prod_username']
-	api_details['password'] = gsp_apis[
-		'gst_test_password'] if mode == 'Testing' else gsp_apis[
-			'gst_prod_password']
-	api_details['appId'] = gsp_apis[
-		'gsp_test_app_id'] if mode == 'Testing' else gsp_apis[
-			'gsp_prod_app_id']
-	api_details['secret'] = gsp_apis[
-		'gsp_test_app_secret'] if mode == 'Testing' else gsp_apis[
-			'gsp_prod_app_secret']
-	api_details['token'] = gsp_apis[
-		'gsp_test_token'] if mode == 'Testing' else gsp_apis[
-			'gsp_prod_token']
-	api_details['gst'] = gsp_apis[
-		'gst_test_number'] if mode == 'Testing' else gsp_apis[
-			'gst_prod_number']
-
-	return {"success":True,"data":api_details}
-	# except Exception as e:
-	# 	print(e,"gsp api details")
-	# 	return {"success":False,"message":e}
+	try:
+		# print(data,"**********8")
+		mode = data['mode']
+		gsp_apis = frappe.db.get_value('GSP APIS', {
+			"company": data['code'],
+			"name": data['provider'],
+		}, [
+			'auth_test', 'cancel_test_irn', 'extract_prod_qr_code',
+			'extract_test_qr_code', 'extract_test_signed_invoice',
+			'generate_prod_irn', 'generate_test_irn',
+			'generate_test_qr_code_image', 'get_tax_payer_prod',
+			'get_tax_payer_test', 'get_test_irn', 'get_test_qr_image',
+			'auth_prod', 'cancel_prod_irn', 'extract_prod_qr_code',
+			'extract_prod_signed_invoice', 'generate_prod_irn',
+			'generate_prod_qr_code_image', 'get_prod_irn', 'get_prod_qr_image',
+			'get_tax_payer_prod', 'gsp_prod_app_id', 'gsp_prod_app_secret',
+			'gsp_test_app_id', 'gsp_test_app_secret', 'gsp_test_token',
+			'gst__prod_username', 'gst__test_username', 'gst_prod_password',
+			'gst_test_password', 'gsp_prod_token', 'gst_test_number',
+			'gst_prod_number',
+		],
+										as_dict=1)
+		print(gsp_apis,"******")								
+		api_details = dict()
+		api_details['auth'] = gsp_apis[
+			'auth_test'] if mode == 'Testing' else gsp_apis['auth_prod']
+		api_details['generate_irn'] = gsp_apis[
+			'generate_test_irn'] if mode == 'Testing' else gsp_apis[
+				'generate_prod_irn']
+		api_details['cancel_irn'] = gsp_apis[
+			'cancel_test_irn'] if mode == 'Testing' else gsp_apis[
+				'cancel_prod_irn']
+		api_details['get_taxpayer_details'] = gsp_apis[
+			'get_tax_payer_test'] if mode == 'Testing' else gsp_apis[
+				'get_tax_payer_prod']
+		api_details['generate_qr_code'] = gsp_apis[
+			'generate_test_qr_code_image'] if mode == 'Testing' else gsp_apis[
+				'generate_prod_qr_code_image']
+		api_details['generate_signed_qr_code'] = gsp_apis[
+			'extract_test_signed_invoice'] if mode == 'Testing' else gsp_apis[
+				'extract_prod_signed_invoice']
+		api_details['username'] = gsp_apis[
+			'gst__test_username'] if mode == 'Testing' else gsp_apis[
+				'gst__prod_username']
+		api_details['password'] = gsp_apis[
+			'gst_test_password'] if mode == 'Testing' else gsp_apis[
+				'gst_prod_password']
+		api_details['appId'] = gsp_apis[
+			'gsp_test_app_id'] if mode == 'Testing' else gsp_apis[
+				'gsp_prod_app_id']
+		api_details['secret'] = gsp_apis[
+			'gsp_test_app_secret'] if mode == 'Testing' else gsp_apis[
+				'gsp_prod_app_secret']
+		api_details['token'] = gsp_apis[
+			'gsp_test_token'] if mode == 'Testing' else gsp_apis[
+				'gsp_prod_token']
+		api_details['gst'] = gsp_apis[
+			'gst_test_number'] if mode == 'Testing' else gsp_apis[
+				'gst_prod_number']
+		# print(api_details,"//////")
+		return {"success":True,"data":api_details}
+	except Exception as e:
+		print(e,"gsp api details")
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -1462,8 +1453,8 @@ def gsp_api_data_for_irn(data):
 		# print(api_details)
 		return {"success":True,"data":api_details}
 	except Exception as e:
-		print(e,"gsp api details")
-		return {"success":False,"message":e}
+		print(e,"gsp api details for irn")
+		return {"success":False,"message":str(e)}
 		
 
 
@@ -1517,8 +1508,7 @@ def check_invoice_file_exists(data):
 	try:
 		invoiceExists = frappe.get_value('File',
 		{"file_name": data['invoice']+".pdf"})
-		# invoiceExists=frappe.db.get_list('File', filters={
-		# 	'file_name': ['like', '%'+data['invoice']+'%']})
+		
 		if invoiceExists:
 			# frappe.delete_doc('File', invoiceExists)
 
@@ -1534,25 +1524,20 @@ def check_invoice_file_exists(data):
 		return {"success":False,"message":"sample"}
 	except Exception as e:
 		print(e,"check file exist")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def check_invoice_exists(invoice):
+def check_invoice_exists(invoice_number):
 	try:
-		invoiceExists = frappe.get_doc('Invoices',
-		invoice)
-		# invoiceExists=frappe.db.get_list('File', filters={
-		# 	'file_name': ['like', '%'+data['invoice']+'%']})	
+		invoiceExists = frappe.get_doc('Invoices',invoice_number)
+		# print(invoiceExists,invoice_number,"/////////")	
 		if invoiceExists:
-			# frappe.delete_doc('File', invoiceExists)
-
-			# filedata = frappe.get_doc('File',invoiceExists)
-			# invoiceExists.delete_doc()
+		
 			return {"success":True,"data":invoiceExists}
 		return {"success":False}
 	except Exception as e:
-		print(e,"check file exist")
-		return {"success":False,"message":e}
+		print(e,"check invoice exist")
+		return {"success":False,"message":str(e)}
 
 
  
@@ -1560,6 +1545,8 @@ def check_invoice_exists(invoice):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	try:
+		# print(data,"8888")
+		
 		invoice = frappe.get_doc({
 				'doctype':
 				'Invoices',

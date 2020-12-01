@@ -29,7 +29,6 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		print(data['taxpayer'])
 		total_invoice_amount = data['total_invoice_amount']
 		del data['total_invoice_amount']
 		value_before_gst = 0
@@ -63,6 +62,7 @@ def Reinitiate_invoice(data):
 			else:
 				pass
 		if (round(value_after_gst,2) - round(credit_value_after_gst,2)) >0:
+			
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"		
@@ -88,7 +88,7 @@ def Reinitiate_invoice(data):
 		doc.legal_name=data['taxpayer']['legal_name']
 		doc.address_1=data['taxpayer']['address_1']
 		doc.email=data['taxpayer']['email']
-		doc.conformation_number = data['guest_data']['conformation_number']
+		doc.confirmation_number = data['guest_data']['confirmation_number']
 		doc.trade_name=data['taxpayer']['trade_name']
 		doc.address_2=data['taxpayer']['address_2']
 		phone_number=data['taxpayer']['phone_number']
@@ -114,10 +114,7 @@ def Reinitiate_invoice(data):
 		doc.company=data['company_code']
 		doc.save()
 
-		# v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		# print(invoice)
-		# if total_invoice_amount == value_after_gst - credit_value_after_gst: 
-			# v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		
 		items = data['items_data']
 		# items = [x for x in items if x['sac_code']!="Liquor"]
 	
@@ -175,9 +172,9 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 def insert_items(items):
 	try:
-		itemsDelete = frappe.db.delete('Items', {
-    		'parent': items[0]['parent']})
-		frappe.db.commit()
+		# itemsDelete = frappe.db.delete('Items', {
+    	# 	'parent': items[0]['parent']})
+		# frappe.db.commit()
 		for item in items:
 			
 			if "-" in str(item['item_value']):
@@ -186,10 +183,10 @@ def insert_items(items):
 				item['is_credit_item'] = "No"
 			doc = frappe.get_doc(item)
 			doc.insert(ignore_permissions=True, ignore_links=True)
-		return {"sucess":True,"data":doc}
+		return {"sucess":True,"data":"success"}
 			# print(doc)
 	except Exception as e:
-		print(e,"insert itemns api")
+		print(e,"insert items api")
 		return {"success":False,"message":e}
 		
 
@@ -361,26 +358,3 @@ def insert_tax_summaries(items, invoice_number):
 
 
 
-import os
-import subprocess
-# site = 'http://0.0.0.0:8000/'
-# site_folder_path = 'version2_app.com'
-
-@frappe.whitelist(allow_guest=True)
-def CallReinitiateParser(data):
-	
-	folder_path = frappe.utils.get_bench_path()
-	path = folder_path + '/sites/' + site_folder_path
-	filepath = path+data['filepath']
-	path = path + "public/files/jp_siddharth_reinitiate.py"
-	print(path,"************","python "+path+" "+filepath+" "+"yes")
-	# v=os.system("python "+path+" "+filepath+" "+"yes")
-	# print(v,type(v),"*))))))))))))))")
-	v = os.popen("python "+path+" "+filepath+" "+"yes")
-	print(v.read(),"///////////////////")
-	# out = subprocess.Popen(["python "+path+" "+filepath+" "+"yes"], 
-    #        stdout=subprocess.PIPE, 
-    #        stderr=subprocess.STDOUT)
-	# out =subprocess.call("python "+path+" "+filepath+" "+"yes")
-	# print(out,"*********")
-	return {"success":True,"data":'out'}
