@@ -23,11 +23,14 @@
   "address_2",
   "state_code",
   "calculation_by",
+  "merchant_name",
+  "b2c_qr_url",
   "column_break_15",
   "location",
   "pincode",
   "font_file",
   "b2c_qr_type",
+  "merchant_virtual_payment_address",
   "section_break_22",
   "qr_rect_x0",
   "qr_rect_x1",
@@ -340,12 +343,27 @@
    "fieldname": "b2c_qr_type",
    "fieldtype": "Select",
    "label": "B2C QR Type",
-   "options": "Digital Payment\nInvoice Details"
+   "options": "Virtual Payment\nInvoice Details"
+  },
+  {
+   "fieldname": "merchant_name",
+   "fieldtype": "Data",
+   "label": "Merchant Name"
+  },
+  {
+   "fieldname": "merchant_virtual_payment_address",
+   "fieldtype": "Data",
+   "label": "Merchant Virtual Payment Address"
+  },
+  {
+   "fieldname": "b2c_qr_url",
+   "fieldtype": "Data",
+   "label": "B2C QR URL"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-02 11:16:18.502305",
+ "modified": "2020-12-02 11:25:30.800368",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
