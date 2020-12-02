@@ -328,7 +328,7 @@ def attach_qr_code(invoice_number, gsp,code):
 		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
 		path = folder_path + '/sites/' + site_folder_path
 		src_pdf_filename = path + invoice.invoice_file
-		dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
+		dst_pdf_filename = path + "private/files/" + invoice_number + 'withQr.pdf'
 		# attaching qr code
 		img_filename = path + invoice.qr_code_image
 		# img_rect = fitz.Rect(250, 200, 340, 270)
@@ -341,7 +341,7 @@ def attach_qr_code(invoice_number, gsp,code):
 		document.save(dst_pdf_filename)
 		document.close()
 		# attacing irn an ack
-		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
+		dst_pdf_text_filename = path + "private/files/" + invoice_number + 'withQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
 		text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ack_no + "\n" + "ACK DATE: " + invoice.ack_date
 		if company.irn_details_page == "First":
@@ -391,7 +391,7 @@ def create_qr_image(invoice_number, gsp):
 		folder_path = frappe.utils.get_bench_path()
 		company = frappe.get_doc('company',invoice.company)
 		site_folder_path = company.site_name
-		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
+		path = folder_path + '/sites/' + site_folder_path + "private/files/"
 		# print(path)
 		headers = {
 			"user_name": gsp['username'],
