@@ -665,7 +665,7 @@ def insert_invoice(data):
 			'gst_number':
 			data['guest_data']['gstNumber'],
 			'invoice_file':
-			"/"+data['guest_data']['invoice_file'],
+			data['guest_data']['invoice_file'],
 			'room_number':
 			data['guest_data']['room_number'],
 			'confirmation_number':data['guest_data']['confirmation_number'],
