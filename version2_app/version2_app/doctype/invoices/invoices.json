@@ -87,7 +87,10 @@
   "cgst_amount",
   "sgst_amount",
   "igst_amount",
-  "total_gst_amount"
+  "total_gst_amount",
+  "b2c_qrimage",
+  "b2c_qrinvoice",
+  "qr_generated"
  ],
  "fields": [
   {
@@ -570,12 +573,28 @@
    "fieldname": "total_gst_amount",
    "fieldtype": "Float",
    "label": "Total Gst Amount"
+  },
+  {
+   "fieldname": "b2c_qrimage",
+   "fieldtype": "Attach",
+   "label": "B2C QRImage"
+  },
+  {
+   "fieldname": "b2c_qrinvoice",
+   "fieldtype": "Attach",
+   "label": "B2C QRInvoice"
+  },
+  {
+   "default": "No",
+   "fieldname": "qr_generated",
+   "fieldtype": "Data",
+   "label": "QR Generated"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-02 09:42:28.893890",
+ "modified": "2020-12-02 13:02:28.139411",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -8,6 +8,12 @@ from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 import pandas as pd
+import json
+import qrcode
+import os, os.path
+import random, string
+from random import randint
+from google.cloud import storage
 # from datetime import da
 import datetime
 import random
@@ -17,7 +23,7 @@ import time
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 site = 'http://0.0.0.0:8000/'
-site_folder_path = 'version2_app.com'
+# site_folder_path = 'version2_app.com'
 fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
 
 
@@ -283,6 +289,120 @@ class Invoices(Document):
 		taxPayerDeatilsData.save()
 		return True
 
+	def send_invoicedata_to_gcb(self, invoice_number):
+		try:
+			folder_path = frappe.utils.get_bench_path()
+			
+			doc = frappe.get_doc('Invoices', invoice_number)
+			company = frappe.get_doc('company', doc.company)
+			path = folder_path + '/sites/' + company.site_name
+			file_name = invoice_number + 'b2cqr.png'
+			dst_pdf_filename = path + "/private/files/" + file_name
+			
+			if doc.b2c_qrimage:
+				attach_qr = attach_b2c_qrcode({
+					"invoice_number": invoice_number,
+					"company": doc.company
+				})
+				if attach_qr["success"] == False:
+					return {"success": False, "message": attach_qr["message"]}
+				else:
+					return {"success":True, "message": "QR-Code generated successfully"}
+			
+			filename = invoice_number + doc.company + ".json"
+			b2c_file = path + "/private/files/" + filename
+			items_count = 0
+			hsn_code = ""
+			items = doc.items
+			items_count = 0
+			hsn_code = ""
+			if company.b2c_qr_type == "Invoice Details":
+				for xyz in items:
+					if xyz.sac_code not in hsn_code:
+						hsn_code += xyz.sac_code+", "
+					items_count += 1
+				b2c_data = {
+					"invoice_number": doc.invoice_number,
+					"invoice_type": doc.invoice_type,
+					"invoice_date": str(doc.invoice_date),
+					"pms_invoice_summary": doc.pms_invoice_summary,
+					"irn": "N/A",
+					"company_name": company.company_name,
+					"guest_name": doc.guest_name,
+					"issued_by": "ezyinvoicing",
+					"items_count": items_count,
+					"hsn_code": hsn_code.rstrip(', ')
+				}
+				storage_client = storage.Client.from_service_account_json(
+					folder_path +"/apps/version2_app/version2_app/version2_app/doctype/invoices/jaypee-group-a9b672ada582.json"
+				)
+				bucket = storage_client.get_bucket("ezyinvoices-b2c")
+				with open(b2c_file, "w") as outfile:
+					json.dump(b2c_data, outfile)
+				blob = bucket.blob(filename)
+				with open(b2c_file, 'rb') as img_data:
+					blob.upload_from_file(img_data)
+				qr = qrcode.QRCode(
+					version=1,
+					error_correction=qrcode.constants.ERROR_CORRECT_L,
+					box_size=10,
+					border=4
+				)
+				qrurl = company.b2c_qr_url + blob.public_url
+				qr.add_data(qrurl)
+				qr.make(fit=True)
+				img = qr.make_image(fill_color="black", back_color="white")
+				img.save(dst_pdf_filename)
+			elif company.b2c_qr_type == "Virtual Payment":
+				headers = {'Content-Type': 'application/json'}
+				generate_qr = requests.post(
+					"https://upiqr.in/api/qr?format=png",
+					headers=headers,
+					json={
+						"vpa": company.merchant_virtual_payment_address,
+						"name": company.merchant_name,
+						"txnReference": invoice_number,
+						"amount": '%.2f' % doc.pms_invoice_summary
+					})
+				if generate_qr.status_code == 200:
+					with open(dst_pdf_filename, "wb") as f:
+						f.write(generate_qr.content)
+			else:
+				return {"success":False, "message":"Please select any in 'B2C QR Code Type' in Company Details"}
+			files = {"file": open(dst_pdf_filename, 'rb')}
+			payload = {
+				"is_private": 1,
+				"folder": "Home",
+				"doctype": "Invoices",
+				"docname": invoice_number,
+				'fieldname': 'b2c_qrimage'
+			}
+			upload_qr_image = requests.post(site + "api/method/upload_file",
+											files=files,
+											data=payload)
+			response = upload_qr_image.json()
+			if 'message' in response:
+				doc.b2c_qrimage = response['message']['file_url']
+				doc.name = invoice_number
+				doc.save(ignore_permissions=True, ignore_version=True)
+				attach_qr = attach_b2c_qrcode({
+					"invoice_number": invoice_number,
+					"company": doc.company
+				})
+				if attach_qr["success"] == False:
+					if os.path.exists(b2c_file):
+						os.remove(b2c_file)
+					if os.path.exists(dst_pdf_filename):
+						os.remove(dst_pdf_filename)
+					return {"success": False, "message": attach_qr["message"]}
+				if os.path.exists(b2c_file):
+					os.remove(b2c_file)
+				if os.path.exists(dst_pdf_filename):
+					os.remove(dst_pdf_filename)
+				return {"success":True, "message": "QR-Code generated successfully"}
+		except Exception as e:
+			print(e,"send invoicedata to gcb")
+			return {"success": False, "message": str(e)}
 
 def cancel_irn(irn_number, gsp, reason):
 	try:
@@ -328,7 +448,7 @@ def attach_qr_code(invoice_number, gsp,code):
 		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
 		path = folder_path + '/sites/' + site_folder_path
 		src_pdf_filename = path + invoice.invoice_file
-		dst_pdf_filename = path + "private/files/" + invoice_number + 'withQr.pdf'
+		dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
 		# attaching qr code
 		img_filename = path + invoice.qr_code_image
 		# img_rect = fitz.Rect(250, 200, 340, 270)
@@ -391,7 +511,7 @@ def create_qr_image(invoice_number, gsp):
 		folder_path = frappe.utils.get_bench_path()
 		company = frappe.get_doc('company',invoice.company)
 		site_folder_path = company.site_name
-		path = folder_path + '/sites/' + site_folder_path + "private/files/"
+		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
 		# print(path)
 		headers = {
 			"user_name": gsp['username'],
@@ -1601,6 +1721,73 @@ def Error_Insert_invoice(data):
 	except Exception as e:
 		print(e,"  Error insert Invoice")
 		return {"success":False,"message":str(e)}
+
+
+
+
+def attach_b2c_qrcode(data):
+	try:
+		invoice = frappe.get_doc('Invoices', data["invoice_number"])
+		company = frappe.get_doc('company', invoice.company)
+		folder_path = frappe.utils.get_bench_path()
+		path = folder_path + '/sites/' + company.site_name
+		attach_qrpath = path + "/private/files/" + data["invoice_number"] + "attachb2cqr.pdf"
+		src_pdf_filename = path + invoice.invoice_file
+		img_filename = path + invoice.b2c_qrimage
+		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
+							company.qr_rect_y0, company.qr_rect_y1)
+		document = fitz.open(src_pdf_filename)
+		page = document[0]
+		page.insertImage(img_rect, filename=img_filename)
+		document.save(attach_qrpath)
+		document.close()
+		dst_pdf_text_filename = path + "/private/files/" + data["invoice_number"] + 'withattachqr.pdf'
+		doc = fitz.open(attach_qrpath)
+		irn_number = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(50))
+		ack_no = str(randint(100000000000, 9999999999999))
+		ack_date = str(datetime.datetime.now())
+		text = "IRN: " + irn_number + "\n" + "ACK NO: " + ack_no + "\n" + "ACK DATE: " + ack_date
+		page = doc[0]
+		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		page.insertText(
+			where,
+			text,
+			fontname="Roboto-Black",  # arbitrary if fontfile given
+			fontfile=fontpath,  # any file containing a font
+			fontsize=6,  # default
+			rotate=0,  # rotate text
+			color=(0, 0, 0),  # some color (blue)
+			overlay=True)
+		doc.save(dst_pdf_text_filename)
+		doc.close()
+		files_new = {"file": open(dst_pdf_text_filename, 'rb')}
+		payload_new = {
+			"is_private": 1,
+			"folder": "Home",
+			"doctype": "Invoices",
+			"docname": data["invoice_number"],
+			'fieldname': 'b2c_qrinvoice'
+		}
+		upload_qrinvoice_image = requests.post(
+			site + "api/method/upload_file",
+			files=files_new,
+			data=payload_new)
+		attach_response = upload_qrinvoice_image.json()
+		if 'message' in attach_response:
+			invoice.b2c_qrinvoice = attach_response['message']['file_url']
+			invoice.name = data["invoice_number"]
+			invoice.qr_generated = "Yes"
+			invoice.save(ignore_permissions=True, ignore_version=True)
+			if os.path.exists(attach_qrpath):
+				os.remove(attach_qrpath)
+			return {"success": True, "message": "Qr Attached successfully"}
+	except Exception as e:
+		print(e, "attach b2c qrcode")
+		return {"success": False, "message": e}
+
+
+
+
 
 
 

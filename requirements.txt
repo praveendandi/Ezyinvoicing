@@ -2,3 +2,5 @@ frappe
 PyMuPDF
 pdfplumber
 pandas
+qrcode
+google-cloud-storage
