@@ -461,7 +461,7 @@ def attach_qr_code(invoice_number, gsp,code):
 		document.save(dst_pdf_filename)
 		document.close()
 		# attacing irn an ack
-		dst_pdf_text_filename = path + "private/files/" + invoice_number + 'withQrIrn.pdf'
+		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
 		text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ack_no + "\n" + "ACK DATE: " + invoice.ack_date
 		if company.irn_details_page == "First":
@@ -1777,6 +1777,7 @@ def attach_b2c_qrcode(data):
 			invoice.b2c_qrinvoice = attach_response['message']['file_url']
 			invoice.name = data["invoice_number"]
 			invoice.qr_generated = "Yes"
+			invoice.qr_code_generated = "Success"
 			invoice.save(ignore_permissions=True, ignore_version=True)
 			if os.path.exists(attach_qrpath):
 				os.remove(attach_qrpath)
