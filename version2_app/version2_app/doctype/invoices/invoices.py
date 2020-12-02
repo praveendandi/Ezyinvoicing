@@ -177,7 +177,7 @@ class Invoices(Document):
 			else:
 				credit_note_items.append(item)
 		gst_data["ValDtls"] = {
-			"AssVal": ass_value,
+			"AssVal": round(ass_value,2),
 			"CgstVal": round(total_cgst_value, 2),
 			"SgstVal": round(total_sgst_value, 2),
 			"IgstVal": round(total_igst_value, 2),
@@ -190,7 +190,6 @@ class Invoices(Document):
 			"TotInvValFc": round(invoice.amount_after_gst, 2)
 		}
 		response = postIrn(gst_data, GSP_details['data'])
-		print(response)
 		if response['success']:
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.ack_no = response['result']['AckNo']
@@ -906,7 +905,7 @@ def calulate_items(data):
 				item['name'],
 				'sort_order':final_item['sort_order'],
 				'date':
-				datetime.datetime.strptime(item['date'], '%Y-%m-%d'),
+				datetime.datetime.strptime(item['date'], '%d-%m-%y'),
 				'cgst':
 				final_item['cgst'],
 				'cgst_amount':
@@ -1513,13 +1512,7 @@ def check_invoice_file_exists(data):
 			# frappe.delete_doc('File', invoiceExists)
 
 			filedata = frappe.get_doc('File',invoiceExists)
-			# meta = frappe.get_meta('File')
-			# print(meta.__dict__,"*********8888888")
-
-			# print(filedata.__dict__,"**************")
-			# filedata.is_hidden="Yes"
-			# filedata.save()
-			# invoiceExists.delete_doc()
+			
 			return {"success":True,"data":filedata}
 		return {"success":False,"message":"sample"}
 	except Exception as e:

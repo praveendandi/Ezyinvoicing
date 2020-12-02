@@ -267,7 +267,7 @@ def file_parsing(filepath):
 		# print(check_invoice)
 		# guest['invoice_number'] = guest['invoice_number']+"-A"
 		inv_data = check_invoice['data']
-		print(inv_data.docstatus)
+		# print(inv_data.docstatus)
 		if inv_data.docstatus==2:
 			amened='Yes'
 		else:
@@ -299,11 +299,10 @@ def file_parsing(filepath):
 						
 						error_data['error_message'] = calulateItemsApiResponse['message']
 						errorInvoice = Error_Insert_invoice(error_data)
-						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'],"***********")
+						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
-					# itsindex = getTaxPayerDetailsResponse['message']['message'].index("'")
-					print(error_data)
+					# print(error_data)
 					error_data['error_message'] = getTaxPayerDetailsResponse['message']
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
@@ -313,11 +312,30 @@ def file_parsing(filepath):
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
-			error_data['error_message'] = "Your Invoice is in B2C Format"
-			error_data['invoice_type'] = "B2C"
-			errorInvoice = Error_Insert_invoice(error_data)
-			return {"success":False,"message":"Your Invoice is in B2C Format"}
-			print("B2C")
+			# error_data['error_message'] = "Your Invoice is in B2C Format"
+			# error_data['invoice_type'] = "B2C"
+			# errorInvoice = Error_Insert_invoice(error_data)
+			# return {"success":False,"message":"Your Invoice is in B2C Format"}
+			# print("B2C")
+			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code']})
+			if calulateItemsApiResponse['success'] == True:
+				guest['invoice_file'] = filepath
+				insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
+				if insertInvoiceApiResponse['success']== True:
+					print("B2C Invoice Created",insertInvoiceApiResponse)
+					return {"success":True,"message":"Invoice Created"}
+				else:
+					
+					error_data['error_message'] = insertInvoiceApiResponse['message']
+					errorInvoice = Error_Insert_invoice(error_data)
+					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+					return {"success":False,"message":insertInvoiceApiResponse['message']}
+			else:
+						
+				error_data['error_message'] = calulateItemsApiResponse['message']
+				errorInvoice = Error_Insert_invoice(error_data)
+				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+				return {"success":False,"message":calulateItemsApiResponse['message']}		
 	else:
 		error_data['error_message'] = gspApiDataResponse['message']
 		errorInvoice = Error_Insert_invoice(error_data)

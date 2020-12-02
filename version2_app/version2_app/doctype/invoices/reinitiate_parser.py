@@ -16,9 +16,10 @@ from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 start_time=str(datetime.datetime.utcnow()) 
-# sys.exit()
+
 #hi
-site_folder_path = "version2_app.com/"
+#mhkcp
+site_folder_path = "mhkcp_local.com/"
 host = "http://localhost:8000/api/method/"
 folder_path = frappe.utils.get_bench_path()
 path = folder_path + '/sites/' + site_folder_path
@@ -40,7 +41,7 @@ headers = {
 } 
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
-    companyCheckResponse = check_company_exist("JP-2022")
+    companyCheckResponse = check_company_exist("MHKCP-01")
     
     invoicepath = data['filepath']
     file_path=path+data['filepath']
@@ -58,49 +59,56 @@ def reinitiateInvoice(data):
         for j in i.splitlines():
             raw_data.append(j)
     data = []
-    entered = False
-    guestDetailsEntered = False
+	entered = False
+	guestDetailsEntered = False
+	guestDeatils = []
+	invoiceNumber = ''
+	gstNumber = ''
+	date_time_obj = ''
+	total_invoice_amount = ''
+	conf_number = ''
+	membership = ''
+	for i in raw_data:
+		if "Confirmation No." in i:
+			conformation_number = i.split(":")
+			conf_number = conformation_number[-1].replace(" ", "")
+		if "Total" in i:
+			total_invoice = i.split(" ")
+			total_invoice_amount = float(total_invoice[-2].replace(",", ""))
+		if "Departure :" in i:
+			depatureDateIndex = i.index('Departure')
+			date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
+		if "Room No." in i:
+            roomNumber = room[-1]
+			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
+		if "Cust GSTIN" in i:
+			gstNumber = i.split(':')[1].replace(' ', '')
+			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			print(gstNumber)
+		if "Bill  No." in i:
+			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+		if "Bill To" in i:
+			guestDetailsEntered = True
+		if "Checkout By:" in i:
+			guestDetailsEntered = False
+		if guestDetailsEntered == True:
+			guestDeatils.append(i)
+		if i in "Date Description Reference Debit Credit":
+			entered = True
+		if 'CGST 6%=' in i:
+			entered = False
+		if 'Billing' in i:
+			entered = False
+		if 'Total' in i:
+			entered = False
+		if entered == True:
+			data.append(i)
+		if "Guest Name" in i:
+			guestDeatils.append(i)
+		if "Membership" in i:
+			Membership = i.split(":")
+			membership = Membership[-1].replace(" ", "")
 
-    guestDeatils = []
-    invoiceNumber = ''
-    gstNumber = ''
-    date_time_obj = ''
-    total_invoice_amount = ''
-    confirmation_number = ''
-    for i in raw_data:
-        if "Total" in i:
-            total_invoice = i.split(" ")
-            
-            total_invoice_amount = float(total_invoice[-1].replace(",",""))
-        if "Confirmation No." in i:
-            confirmation_number = i.split(" ")[-1]
-        if "Departure :" in i:
-            depatureDateIndex = i.index('Departure')
-            date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-        if "Room No " in i:
-            roomNumber = ''.join(filter(lambda j: j.isdigit(), i)) 
-        if "GST ID  :" in i:
-            gstNumber = i.split(':')[1].replace(' ', '')
-        if "Invoice No." in i:
-            invoiceNumber = i.split(':')[len(i.split(':'))-1]
-        if "Billing" in i:
-            guestDetailsEntered = True
-        if "Checkout By" in i:
-            guestDetailsEntered = False
-        if guestDetailsEntered == True:
-            guestDeatils.append(i)
-        if "Guest Name" in i:
-            guestDeatils.append(i)  
-        if i in "Date Description Reference Debit Credit":
-            entered = True
-        if 'CGST 6%=' in i:
-            entered = False
-        if 'Billing  :' in i:
-            entered = False
-        if 'Total' in i:
-            entered = False
-        if entered == True:
-            data.append(i)
 
 
     paymentTypes = GetPaymentTypes()
@@ -136,70 +144,66 @@ def reinitiateInvoice(data):
                 pass
 
     items = []
-    # print(companyApis['calculation_by'])
-    # if companyApis['calculation_by'] == "Description":
-    itemsort = 0
-    for i in original_data:
-        pattern = re.compile("([0-9])\/([0-9])")
-        check_date = re.findall(pattern, i)
-        if len(check_date) > 0:
-            item = dict() 
-            for index, j in enumerate(i.split(' ')):
-                # print(j,index)
-                if "CHECK" in j:
-                    pass
-                if "Food" in j:
-                    item['sac_code'] = "996331"
-                if index == 0:
-                    itemDate = j.split('/')
-                    item['date'] = "20"+itemDate[2]+"-"+itemDate[1]+"-"+itemDate[0]
-                if index == 1:
-                    item['name'] = j
-                if index == 2 and "CHECK" not in j:
-                    item['name'] = item['name']+' '+j
-                if index == 3 and "CHECK" not in j and "." not in j:
-                    if type(j) is str and len(j)>3 and '%' not in j and j[0]!='#':
-                        item['name'] = item['name']+' '+j
-                    if '%' in j:
-                        item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
-                        item['name'] = item['name']+' '+j
-                    
-                    if 'sac_code' in item and item['sac_code'] != '':
-                        if 'SAC' in j:
-                            item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
-                if j=="Bevg" and index==4:
+	itemsort = 0
+	for i in original_data:
+		pattern = re.compile(
+			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
+		)
+		check_date = re.findall(pattern, i)
+		if len(check_date) > 0:
+			item = dict()
+			for index, j in enumerate(i.split(' ')):
+				print(index,j)
+				if index == 0:
+					item['date'] = j
+				if index == 1:
+					item['name'] = j
+				if index == 2:
+					if len(i.split(" "))>3:
+						item['name'] = item['name'] + ' ' + j
+				if index == 3:
+					if "#" not in j and '[' not in j and ']' not in j:
+						item["name"] = item["name"] + ' ' + j		
+				if index == 4:
+					if ".00" in j:
+						pass
+						# item['item_value'] = float(j.replace(',', ''))
+					else:
+						if re.fullmatch('[A-Za-z]+', j) and '#' not in j and '[' not in j and "Room" not in j and ']' not in j:
+							item["name"] = item["name"] + ' ' + j
+				if '%' in j:
+					item['percentage'] = ''.join(
+								filter(lambda j: j.isdigit(), j))
+					item["name"] = item["name"] + ' ' + j
+				if index>4 and index<9:
+					
+					if ".00" in j:
+						pass
+						# print(j,"0000000000000000000000")
+						# item['item_value'] = float(j.replace(',', ''))
 
-                    item['name'] = item['name']+' '+j 
-                if index==4 and j==")" and "Telephone" in i:
-                    item['name'] = item['name']+' '+j 
+					else:
+						if "#" not in j and '[' not in j and "Room" not in j and "615" not in j and ":" not in j and not j.isdigit() and ']' not in j:
+							item["name"] = item["name"] + ' ' + j
+				
+				if "Dry" in j:
+					print(j,"*******************888")
+				if "SGST" in j:
+					item['name'] = item['name'] + ' SGST'
+				if "CGST" in j:
+					item['name'] = item['name'] + ' CGST'   
+				if "IGST" in j:
+					item['name'] = item['name'] + ' IGST'      
 
-                if ("SGST" in j) or ("CGST" in j):
-                    item['name'] = item['name']+' '+j 
 
-                if "INR" in j:
-                    item['name'] = item['name']+' '+j
-                if '%' in j and len(j)==2 and index!=3:
-                    item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
-                    item['name'] = item['name']+' '+j   
-
-                if j=="9":
-                    item['percentage'] = '9'
-                    item['name'] = item['name']+' '+'9%'  
-
-                if 'SAC' in j:
-                    item['name'] = item['name']+' '+j
-
-                if len(j) is 6 and j.isdigit():
-                    item['sac_code'] = j  
-                    item['name'] = item['name']+' '+j 
-                if "#" in j:
-                    pass
-                if index == len(i.split(' '))-1:
-                    item['item_value'] = float(j.replace(',', ''))
-                item['sort_order'] =  itemsort+1
-            itemsort+=1    
-                    
-            items.append(item) 
+				if 'SAC' in j:
+					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
+				if index == len(i.split(' ')) - 1:
+					if index != 0:
+						item['item_value'] = float(j.replace(',', ''))
+				item['sort_order'] =  itemsort+1
+			itemsort+=1			
+			items.append(item)
     
     files = {'file': open(
         file_path, 'rb')}
@@ -266,7 +270,7 @@ def reinitiateInvoice(data):
     guest['gstNumber'] = gstNumber
     guest['room_number'] = int(roomNumber)
     guest['company_code'] = "JP-2022"
-    guest['confirmation_number'] = confirmation_number
+    guest['conformation_number'] = conformation_number
 
 
     
