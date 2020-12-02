@@ -334,7 +334,9 @@ def attach_qr_code(invoice_number, gsp,code):
 		# img_rect = fitz.Rect(250, 200, 340, 270)
 		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1, company.qr_rect_y0, company.qr_rect_y1)		
 		document = fitz.open(src_pdf_filename)
+		
 		page = document[0]
+		
 		page.insertImage(img_rect, filename=img_filename)
 		document.save(dst_pdf_filename)
 		document.close()
@@ -342,7 +344,11 @@ def attach_qr_code(invoice_number, gsp,code):
 		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
 		text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ack_no + "\n" + "ACK DATE: " + invoice.ack_date
-		page = doc[0]
+		if company.irn_details_page == "First":
+			page = doc[0]
+		else:
+			page = doc[-1]	
+		# page = doc[0]
 		# where = fitz.Point(15, 55)
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
 		page.insertText(
