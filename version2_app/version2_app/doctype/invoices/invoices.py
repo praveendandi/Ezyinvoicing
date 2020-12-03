@@ -855,7 +855,43 @@ def calulate_items(data):
 					final_item['cess'] = item['cess']
 					final_item['cess_amount'] = item['cessAmount']
 
-				# elif item['sac_code'] == '996311':
+				elif item['name'] == 'Telephone Local':
+					final_item['sort_order'] = item['sort_order']
+					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
+					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
+					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
+										int(sac_code_based_gst_rates.sgst))
+					base_value = item['item_value'] * (100 /
+														(gst_percentage + 100))
+					gst_value = item['item_value'] - base_value
+					final_item['cgst_amount'] = gst_value / 2
+					final_item['sgst_amount'] = gst_value / 2
+					final_item['other_charges'] = 0
+					final_item['igst'] = int(sac_code_based_gst_rates.igst)
+
+					if int(sac_code_based_gst_rates.igst) <= 0:
+						final_item['igst_amount'] = 0
+					else:
+						gst_percentage = (int(sac_code_based_gst_rates.cgst) +
+											int(sac_code_based_gst_rates.sgst))
+						base_value = item['item_value'] * (
+							100 / (gst_percentage + 100))
+						final_item[
+							'igst_amount'] = item['item_value'] - base_value
+						final_item['other_charges'] = 0
+					final_item['gst_rate'] = int(
+						sac_code_based_gst_rates.cgst) + int(
+							sac_code_based_gst_rates.sgst) + int(
+								sac_code_based_gst_rates.igst)
+					final_item['item_value'] = round(
+						item['item_value'] - final_item['cgst_amount'] -
+						final_item['sgst_amount'] - final_item['igst_amount'],
+						2)
+					final_item['item_value_after_gst'] = item['item_value']
+					final_item['sac_code_found'] = 'Yes'
+					final_item['taxable'] = sac_code_based_gst_rates.taxble
+					final_item['cess'] = item['cess']
+					final_item['cess_amount'] = item['cessAmount']
 				elif sac_code_based_gst_rates.description == item['name'] and sac_code_based_gst_rates.taxble == "Yes":
 					final_item['sort_order'] = item['sort_order']
 					final_item['cgst'] = item['cgst']
@@ -1798,7 +1834,7 @@ def attach_b2c_qrcode(data):
 		if 'message' in attach_response:
 			invoice.b2c_qrinvoice = attach_response['message']['file_url']
 			invoice.name = data["invoice_number"]
-			invoice.qr_generated = "Yes"
+			invoice.qr_generated = "Success"
 			invoice.qr_code_generated = "Success"
 			invoice.save(ignore_permissions=True, ignore_version=True)
 			if os.path.exists(attach_qrpath):

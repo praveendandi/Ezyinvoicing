@@ -586,7 +586,7 @@
    "label": "B2C QRInvoice"
   },
   {
-   "default": "No",
+   "default": "Pending",
    "fieldname": "qr_generated",
    "fieldtype": "Data",
    "label": "QR Generated"
@@ -600,7 +600,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-03 17:26:07.325163",
+ "modified": "2020-12-03 19:03:47.277175",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
