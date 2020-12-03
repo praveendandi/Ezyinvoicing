@@ -124,6 +124,7 @@ class Invoices(Document):
 		total_igst_value = 0
 		total_sgst_value = 0
 		total_cgst_value = 0
+		total_cess_value = 0
 		ass_value = 0
 		for index, item in enumerate(invoice.items):
 			# print(item.sac_code,"HsnCD")
@@ -131,6 +132,7 @@ class Invoices(Document):
 				total_igst_value += item.igst_amount
 				total_sgst_value += item.sgst_amount
 				total_cgst_value += item.cgst_amount
+				total_cess_value +=item.cess_amount
 				ass_value += item.item_value
 				i = {
 					"SlNo":
@@ -163,9 +165,9 @@ class Invoices(Document):
 					"SgstAmt":
 					round(item.sgst_amount, 1),
 					"CesRt":
-					0,
+					item.cess,
 					"CesAmt":
-					0,
+					round(item.cess_amount,2),
 					"CesNonAdvlAmt":
 					0,
 					"StateCesRt":
@@ -187,7 +189,7 @@ class Invoices(Document):
 			"CgstVal": round(total_cgst_value, 2),
 			"SgstVal": round(total_sgst_value, 2),
 			"IgstVal": round(total_igst_value, 2),
-			"CesVal": 0,
+			"CesVal": round(total_cess_value,2),
 			"StCesVal": 0,
 			"Discount": 0,
 			"OthChrg": 0,
@@ -616,9 +618,12 @@ def insert_invoice(data):
 		cgst_amount = 0
 		sgst_amount = 0
 		igst_amount = 0
+		cess_amount = 0
 		
-
-
+		if data['guest_data']['invoice_type'] == "B2B":
+			irn_generated = "Pending"
+		else:	
+			irn_generated = "NA"
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
 		# print(data['items_data'])
@@ -635,6 +640,7 @@ def insert_invoice(data):
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
+					cess_amount+=item['cess_amount']
 					value_before_gst += item['item_value']
 					value_after_gst += item['item_value_after_gst']
 				else:
@@ -642,12 +648,10 @@ def insert_invoice(data):
 					credit_value_after_gst  += abs(item['item_value_after_gst'])
 			else:
 				pass
-		# print(datetime.datetime.utcnow()-datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f"))	
 		if (round(value_after_gst,2) - round(credit_value_after_gst,2)) >0:
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
-		# print(credit_value_before_gst,"iiiiiiiiiiiiiiiiiii")		
 		if credit_value_before_gst>0:
 
 			has_credit_items = "Yes"
@@ -702,7 +706,7 @@ def insert_invoice(data):
 			"pms_invoice_summary_without_gst":round(value_before_gst,2) - round(credit_value_before_gst,2),
 			"pms_invoice_summary": round(value_after_gst,2) - round(credit_value_after_gst,2),
 			'irn_generated':
-			'Pending',
+			irn_generated,
 			'irn_cancelled':
 			'No',
 			'qr_code_generated':
@@ -714,6 +718,7 @@ def insert_invoice(data):
 			'cgst_amount':round(cgst_amount,2),
 			'sgst_amount':round(sgst_amount,2),
 			'igst_amount':round(igst_amount,2),
+			'cess_amount':round(cess_amount,2),
 			'total_gst_amount': round(cgst_amount,2)+round(sgst_amount,2)+round(igst_amount,2),
 			'has_credit_items':has_credit_items,
 			'invoice_process_time': datetime.datetime.utcnow() - datetime.datetime.strptime(data['guest_data']['start_time'],"%Y-%m-%d %H:%M:%S.%f")
@@ -839,7 +844,7 @@ def calulate_items(data):
 					final_item[
 						'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
 					final_item['item_value_after_gst'] = item['item_value'] + item[
-						'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
+						'cgstAmount'] + item['sgstAmount'] + item['igstAmount'] + item['cessAmount']
 					final_item['item_value'] = item['item_value']
 					if item['sac_code'].isdigit():
 						final_item['sac_code_found'] = 'Yes' 
@@ -847,6 +852,8 @@ def calulate_items(data):
 						final_item['sac_code_found'] = 'No'	
 					final_item['other_charges'] = 0	 
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
+					final_item['cess'] = item['cess']
+					final_item['cess_amount'] = item['cessAmount']
 
 				# elif item['sac_code'] == '996311':
 				elif sac_code_based_gst_rates.description == item['name'] and sac_code_based_gst_rates.taxble == "Yes":
@@ -860,11 +867,13 @@ def calulate_items(data):
 					final_item[
 						'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
 					final_item['item_value_after_gst'] = item['item_value'] + item[
-						'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
+						'cgstAmount'] + item['sgstAmount'] + item['igstAmount'] + item['cessAmount']
 					final_item['item_value'] = item['item_value']
 					final_item['sac_code_found'] = 'Yes'  
 					final_item['other_charges'] = 0
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
+					final_item['cess'] = item['cess']
+					final_item['cess_amount'] = item['cessAmount']
 				# elif item['sac_code'] == '998599':	
 				# 	final_item['sort_order'] = item['sort_order']
 				# 	final_item['cgst'] = item['cgst']
@@ -932,6 +941,8 @@ def calulate_items(data):
 					final_item['item_value_after_gst'] = item['item_value']
 					final_item['item_value'] = item['item_value']
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
+					final_item['cess'] = 0
+					final_item['cess_amount'] = 0
 			else:
 				sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES', item['sac_code'])
@@ -946,11 +957,13 @@ def calulate_items(data):
 					final_item[
 						'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
 					final_item['item_value_after_gst'] = item['item_value'] + item[
-						'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
+						'cgstAmount'] + item['sgstAmount'] + item['igstAmount'] + item['cessAmount']
 					final_item['item_value'] = item['item_value']
 					final_item['sac_code_found'] = 'Yes'
 					final_item['other_charges'] = 0
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
+					final_item['cess'] = item['cess']
+					final_item['cess_amount'] = item['cessAmount']
 				elif item['sac_code'] == '998599':
 					final_item['sort_order'] = item['sort_order']	
 					final_item['cgst'] = item['cgst']
@@ -967,6 +980,8 @@ def calulate_items(data):
 					final_item['sac_code_found'] = 'Yes'  
 					final_item['other_charges'] = 0	
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
+					final_item['cess'] = item['cess']
+					final_item['cess_amount'] = item['cessAmount']
 				else:
 					if item['sac_code'].isdigit():
 						sac_code_based_gst_rates = frappe.get_doc(
@@ -1008,6 +1023,8 @@ def calulate_items(data):
 						final_item['sac_code_found'] = 'Yes'
 						final_item['other_charges'] = 0
 						final_item['taxable'] = sac_code_based_gst_rates.taxble
+						final_item['cess'] = item['cess']
+						final_item['cess_amount'] = item['cessAmount']
 					else:
 						final_item['sort_order'] = item['sort_order']
 						item['sac_code'] = 'No Sac'
@@ -1023,6 +1040,8 @@ def calulate_items(data):
 						final_item['item_value'] = item['item_value']
 						final_item['other_charges'] = 0
 						final_item['taxable'] = sac_code_based_gst_rates.taxble
+						final_item['cess'] = 0
+						final_item['cess_amount'] = 0
 			total_items.append({
 				'doctype':
 				'Items',
@@ -1055,6 +1074,8 @@ def calulate_items(data):
 				final_item['gst_rate'],
 				'item_value_after_gst':
 				round(final_item['item_value_after_gst'], 2),
+				'cess':final_item['cess'],
+				'cess_amount':final_item['cess_amount'],
 				'parent':
 				data['invoice_number'],
 				'parentfield':
