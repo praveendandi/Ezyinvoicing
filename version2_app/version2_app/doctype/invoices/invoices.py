@@ -848,73 +848,74 @@ def calulate_items(data):
 					final_item['other_charges'] = 0	 
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
 
-				elif item['sac_code'] == '996311':
-					final_item['sort_order'] = item['sort_order']
-					final_item['cgst'] = item['cgst']
-					final_item['cgst_amount'] = round(item['cgstAmount'], 2)
-					final_item['sgst'] = item['sgst']
-					final_item['sgst_amount'] = round(item['sgstAmount'], 2)
-					final_item['igst'] = item['igst']
-					final_item['igst_amount'] = round(item['igstAmount'], 2)
-					final_item[
-						'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
-					final_item['item_value_after_gst'] = item['item_value'] + item[
-						'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
-					final_item['item_value'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'  
-					final_item['other_charges'] = 0
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-				elif item['sac_code'] == '998599':	
-					final_item['sort_order'] = item['sort_order']
-					final_item['cgst'] = item['cgst']
-					final_item['cgst_amount'] = round(item['cgstAmount'], 2)
-					final_item['sgst'] = item['sgst']
-					final_item['sgst_amount'] = round(item['sgstAmount'], 2)
-					final_item['igst'] = item['igst']
-					final_item['igst_amount'] = round(item['igstAmount'], 2)
-					final_item[
-						'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
-					final_item['item_value_after_gst'] = item['item_value'] + item[
-						'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
-					final_item['item_value'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'  
-					final_item['other_charges'] = 0 
-					final_item['taxable'] = sac_code_based_gst_rates.taxble 
+				# elif item['sac_code'] == '996311':
 				elif sac_code_based_gst_rates.description == item['name'] and sac_code_based_gst_rates.taxble == "Yes":
 					final_item['sort_order'] = item['sort_order']
-					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
-					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
-					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-										int(sac_code_based_gst_rates.sgst))
-					base_value = item['item_value'] * (100 /
-														(gst_percentage + 100))
-					gst_value = item['item_value'] - base_value
-					final_item['cgst_amount'] = gst_value / 2
-					final_item['sgst_amount'] = gst_value / 2
+					final_item['cgst'] = item['cgst']
+					final_item['cgst_amount'] = round(item['cgstAmount'], 2)
+					final_item['sgst'] = item['sgst']
+					final_item['sgst_amount'] = round(item['sgstAmount'], 2)
+					final_item['igst'] = item['igst']
+					final_item['igst_amount'] = round(item['igstAmount'], 2)
+					final_item[
+						'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
+					final_item['item_value_after_gst'] = item['item_value'] + item[
+						'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
+					final_item['item_value'] = item['item_value']
+					final_item['sac_code_found'] = 'Yes'  
 					final_item['other_charges'] = 0
-					final_item['igst'] = int(sac_code_based_gst_rates.igst)
-
-					if int(sac_code_based_gst_rates.igst) <= 0:
-						final_item['igst_amount'] = 0
-					else:
-						gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-											int(sac_code_based_gst_rates.sgst))
-						base_value = item['item_value'] * (
-							100 / (gst_percentage + 100))
-						final_item[
-							'igst_amount'] = item['item_value'] - base_value
-						final_item['other_charges'] = 0
-					final_item['gst_rate'] = int(
-						sac_code_based_gst_rates.cgst) + int(
-							sac_code_based_gst_rates.sgst) + int(
-								sac_code_based_gst_rates.igst)
-					final_item['item_value'] = round(
-						item['item_value'] - final_item['cgst_amount'] -
-						final_item['sgst_amount'] - final_item['igst_amount'],
-						2)
-					final_item['item_value_after_gst'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
+				# elif item['sac_code'] == '998599':	
+				# 	final_item['sort_order'] = item['sort_order']
+				# 	final_item['cgst'] = item['cgst']
+				# 	final_item['cgst_amount'] = round(item['cgstAmount'], 2)
+				# 	final_item['sgst'] = item['sgst']
+				# 	final_item['sgst_amount'] = round(item['sgstAmount'], 2)
+				# 	final_item['igst'] = item['igst']
+				# 	final_item['igst_amount'] = round(item['igstAmount'], 2)
+				# 	final_item[
+				# 		'gst_rate'] = item['cgst'] + item['sgst'] + item['igst']
+				# 	final_item['item_value_after_gst'] = item['item_value'] + item[
+				# 		'cgstAmount'] + item['sgstAmount'] + item['igstAmount']
+				# 	final_item['item_value'] = item['item_value']
+				# 	final_item['sac_code_found'] = 'Yes'  
+				# 	final_item['other_charges'] = 0 
+				# 	final_item['taxable'] = sac_code_based_gst_rates.taxble 
+				# elif sac_code_based_gst_rates.description == item['name'] and sac_code_based_gst_rates.taxble == "Yes":
+				# 	final_item['sort_order'] = item['sort_order']
+				# 	final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
+				# 	final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
+				# 	gst_percentage = (int(sac_code_based_gst_rates.cgst) +
+				# 						int(sac_code_based_gst_rates.sgst))
+				# 	base_value = item['item_value'] * (100 /
+				# 										(gst_percentage + 100))
+				# 	gst_value = item['item_value'] - base_value
+				# 	final_item['cgst_amount'] = gst_value / 2
+				# 	final_item['sgst_amount'] = gst_value / 2
+				# 	final_item['other_charges'] = 0
+				# 	final_item['igst'] = int(sac_code_based_gst_rates.igst)
+
+				# 	if int(sac_code_based_gst_rates.igst) <= 0:
+				# 		final_item['igst_amount'] = 0
+				# 	else:
+				# 		gst_percentage = (int(sac_code_based_gst_rates.cgst) +
+				# 							int(sac_code_based_gst_rates.sgst))
+				# 		base_value = item['item_value'] * (
+				# 			100 / (gst_percentage + 100))
+				# 		final_item[
+				# 			'igst_amount'] = item['item_value'] - base_value
+				# 		final_item['other_charges'] = 0
+				# 	final_item['gst_rate'] = int(
+				# 		sac_code_based_gst_rates.cgst) + int(
+				# 			sac_code_based_gst_rates.sgst) + int(
+				# 				sac_code_based_gst_rates.igst)
+				# 	final_item['item_value'] = round(
+				# 		item['item_value'] - final_item['cgst_amount'] -
+				# 		final_item['sgst_amount'] - final_item['igst_amount'],
+				# 		2)
+				# 	final_item['item_value_after_gst'] = item['item_value']
+				# 	final_item['sac_code_found'] = 'Yes'
+				# 	final_item['taxable'] = sac_code_based_gst_rates.taxble
 
 				else:
 					final_item['sort_order'] = item['sort_order']
@@ -1031,7 +1032,7 @@ def calulate_items(data):
 				item['name'],
 				'sort_order':final_item['sort_order'],
 				'date':
-				datetime.datetime.strptime(item['date'], '%d-%m-%y'),
+				datetime.datetime.strptime(item['date'], data['invoice_item_date_format']),
 				'cgst':
 				final_item['cgst'],
 				'cgst_amount':

@@ -523,4 +523,4 @@ def postIrn(gst_data, gsp):
 		# print(irn_response.text)
 	except Exception as e:
 		print(e, "post irn")
-		return {"success": False, 'message':e}
+		return {"success": False, 'message':str(e)}
