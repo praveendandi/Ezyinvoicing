@@ -36,7 +36,19 @@ frappe.ui.form.on('Invoices', {
 			}
 			getGstDetails(frm.doc.gst_number)
 		}
+		else if(frm.doc.invoice_type == 'B2C'){
+			if (frm.doc.ready_to_generate_irn == 'Yes' && frm.doc.qr_generated == 'No') {
+				pendingOrSucccessIndicator(frm, 'Pending')
+				addGenerateQrButton(frm)
+			} else {
+				if (frm.doc.error_message != undefined && frm.doc.qr_generated == 'No') {
+					addErrTextButton(frm)
+					addQRReinitiateButton(frm)
+				}
+			}
+		}
 	},
+
 	onload: function (frm) {
 		// createIrn(frm)
 	},
@@ -123,6 +135,41 @@ const addGetIrnButton = function (frm) {
 		}
 	})
 }
+
+const addGenerateQrButton = function (frm) {
+	frm.add_custom_button("GET IRN", function () {
+
+			frappe.confirm('Are you sure you want proceed?', () => {
+
+
+				frappe.show_progress('Loading', 70, 100, "Please Wait we Are Working On Your Request")
+				frappe.call({
+					method: 'send_invoicedata_to_gcb',
+					doc: frm.doc,
+					args: {
+						'invoice_number': frm.doc.invoice_number
+					},
+					callback: function (r) {
+						console.log(r)
+						frappe.hide_progress()
+						if (r.message.success) {
+							frappe.msgprint(r.message.message)
+							frm.reload_doc()
+						}
+						else {
+							frappe.msgprint(r.message.message)
+						}
+
+					}
+				})
+			}, () => {
+				console.log("cancelled")
+			})
+		
+	})
+}
+
+
 
 const createIrn = function (frm) {
 	frappe.show_progress('Loading', 70, 100, "Please Wait we Are Working On Your Request")
@@ -283,6 +330,32 @@ const addReinitiateButton = function (frm) {
 		})
 	})
 }
+
+const addQRReinitiateButton = function (frm) {
+	frm.add_custom_button("REINTIATE QR", function () {
+
+		frappe.call({
+			method: 'version2_app.version2_app.doctype.invoices.reinitate_parser.file_parser',
+			// doc: frm.doc,
+			args: {
+
+				'invoice': frm.doc.invoice_number
+
+			},
+			callback: function (r) {
+				if (r.message.success) {
+					frappe.msgprint(r.message.message)
+					frm.reload_doc()
+				}
+				else {
+					frappe.msgprint(r.message.message)
+				}
+
+			}
+		})
+	})
+}
+
 
 
 //address1

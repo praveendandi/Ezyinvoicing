@@ -8,20 +8,36 @@ from frappe.model.document import Document
 from frappe.utils import get_site_name
 import shutil
 import os
-site_folder_path = "version2_app.com"
-# host = "http://localhost:8000/api/method/"
-folder_path = frappe.utils.get_bench_path()
-path = folder_path + '/sites/' + site_folder_path
+import pdfplumber
+from datetime import date, datetime
+import requests
+import pandas as pd
+import re
+import json
+import sys
+import frappe
+from frappe.utils import get_site_name
+
+
 class company(Document):
+	# pass
 	def on_update(self):
 		if self.name:
-			filepath = path+self.invoice_parsing_file
+			folder_path = frappe.utils.get_bench_path()
+			site_folder_path = self.site_name
+			folder_path = frappe.utils.get_bench_path()
+			path = folder_path + '/sites/' + site_folder_path
+
+			reinitatefilepath = path+self.invoice_reinitiate_parsing_file
 			destination_path = folder_path+self.reinitiate_file_path
-			# print(filepath,destination_path,"/./////////")
+			# invoice_parser_file_path
+			invoicefilepath = path+self.invoice_parser_file
+			destination_path2 = folder_path+self.invoice_parser_file_path
 			try:
 				print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
 				
-				shutil.copy(filepath, destination_path)
+				shutil.copy(reinitatefilepath, destination_path)
+				shutil.copy(invoicefilepath,destination_path2)
 			except Exception as e:
 				# shutil.copy(filepath, destination_path)
 				print(str(e),"************on_update company")
@@ -29,4 +45,4 @@ class company(Document):
 
 
 
-			
+

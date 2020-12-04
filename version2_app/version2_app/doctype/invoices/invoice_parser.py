@@ -10,7 +10,7 @@ import frappe
 from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
-from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
+# from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
@@ -21,8 +21,7 @@ folder_path = frappe.utils.get_bench_path()
 
 
 @frappe.whitelist(allow_guest=True)
-def reinitiateInvoice(data):
-	filepath = data['filepath']
+def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
 	companyCheckResponse = check_company_exist("MHKCP-01")
 	site_folder_path = companyCheckResponse['data'].site_name
@@ -97,7 +96,7 @@ def reinitiateInvoice(data):
 	
 
 	original_data = []
-	payment_list = "Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
+	payment_list = "'Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
 	for index, i in enumerate(data):
 	
 		if 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
@@ -271,12 +270,19 @@ def reinitiateInvoice(data):
 
 	# check_invoice_exists
 	check_invoice = check_invoice_exists(guest['invoice_number'])
+	# guest['invoice_number'] = guest['invoice_number']+"-A"
 	if check_invoice['success']==True:
+
+		# print(check_invoice)
+		# guest['invoice_number'] = guest['invoice_number']+"-A"
 		inv_data = check_invoice['data']
+		# print(inv_data.docstatus)
 		if inv_data.docstatus==2:
 			amened='Yes'
 		else:
 			amened='No'    
+
+
 	# print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
@@ -288,7 +294,7 @@ def reinitiateInvoice(data):
 					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 					if calulateItemsApiResponse['success'] == True:
 						guest['invoice_file'] = filepath
-						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
+						insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
 						if insertInvoiceApiResponse['success']== True:
 							print("Invoice Created",insertInvoiceApiResponse)
 							return {"success":True,"message":"Invoice Created"}
@@ -302,11 +308,10 @@ def reinitiateInvoice(data):
 						
 						error_data['error_message'] = calulateItemsApiResponse['message']
 						errorInvoice = Error_Insert_invoice(error_data)
-						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'],"***********")
+						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
-					# itsindex = getTaxPayerDetailsResponse['message']['message'].index("'")
-					print(error_data)
+					# print(error_data)
 					error_data['error_message'] = getTaxPayerDetailsResponse['message']
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
@@ -316,14 +321,13 @@ def reinitiateInvoice(data):
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
-			
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 
 
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
-				insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
+				insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
 				if insertInvoiceApiResponse['success']== True:
 					print("B2C Invoice Created",insertInvoiceApiResponse)
 					return {"success":True,"message":"Invoice Created"}
@@ -338,7 +342,7 @@ def reinitiateInvoice(data):
 				error_data['error_message'] = calulateItemsApiResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-				return {"success":False,"message":calulateItemsApiResponse['message']}	
+				return {"success":False,"message":calulateItemsApiResponse['message']}		
 	else:
 		error_data['error_message'] = gspApiDataResponse['message']
 		errorInvoice = Error_Insert_invoice(error_data)

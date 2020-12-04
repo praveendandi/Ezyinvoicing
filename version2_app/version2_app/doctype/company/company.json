@@ -22,11 +22,15 @@
   "address_1",
   "address_2",
   "state_code",
+  "calculation_by",
+  "merchant_name",
+  "b2c_qr_url",
   "column_break_15",
   "location",
   "pincode",
   "font_file",
-  "calculation_by",
+  "b2c_qr_type",
+  "merchant_virtual_payment_address",
   "section_break_22",
   "qr_rect_x0",
   "qr_rect_x1",
@@ -48,11 +52,16 @@
   "check_gstnumber_length_api",
   "error_insert_invoice_api",
   "payment_types_api",
-  "invoice_parsing_file",
+  "invoice_reinitiate_parsing_file",
   "invoice_file_path",
   "reinitiate_invoice_api",
   "check_invoice_exists",
-  "reinitiate_file_path"
+  "reinitiate_file_path",
+  "invoice_parser_file",
+  "site_name",
+  "irn_details_page",
+  "invoice_item_date_format",
+  "invoice_parser_file_path"
  ],
  "fields": [
   {
@@ -292,11 +301,6 @@
    "label": "Payment Types Api"
   },
   {
-   "fieldname": "invoice_parsing_file",
-   "fieldtype": "Attach",
-   "label": "Invoice Parsing File"
-  },
-  {
    "fieldname": "invoice_file_path",
    "fieldtype": "Data",
    "label": "Invoice File Path"
@@ -315,11 +319,63 @@
    "fieldname": "reinitiate_file_path",
    "fieldtype": "Data",
    "label": "Reinitiate File Path"
+  },
+  {
+   "fieldname": "invoice_parser_file",
+   "fieldtype": "Attach",
+   "label": "Invoice Parser File "
+  },
+  {
+   "fieldname": "invoice_reinitiate_parsing_file",
+   "fieldtype": "Attach",
+   "label": "Invoice Reinitiate Parsing File"
+  },
+  {
+   "fieldname": "site_name",
+   "fieldtype": "Data",
+   "label": "Site Name"
+  },
+  {
+   "fieldname": "irn_details_page",
+   "fieldtype": "Select",
+   "label": "IRN Details Page",
+   "options": "First\nLast"
+  },
+  {
+   "fieldname": "b2c_qr_type",
+   "fieldtype": "Select",
+   "label": "B2C QR Type",
+   "options": "Virtual Payment\nInvoice Details"
+  },
+  {
+   "fieldname": "merchant_name",
+   "fieldtype": "Data",
+   "label": "Merchant Name"
+  },
+  {
+   "fieldname": "merchant_virtual_payment_address",
+   "fieldtype": "Data",
+   "label": "Merchant Virtual Payment Address"
+  },
+  {
+   "fieldname": "b2c_qr_url",
+   "fieldtype": "Data",
+   "label": "B2C QR URL"
+  },
+  {
+   "fieldname": "invoice_item_date_format",
+   "fieldtype": "Data",
+   "label": "Invoice Item Date Format"
+  },
+  {
+   "fieldname": "invoice_parser_file_path",
+   "fieldtype": "Data",
+   "label": "Invoice Parser File Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-11-26 11:54:18.519875",
+ "modified": "2020-12-03 12:38:51.550745",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

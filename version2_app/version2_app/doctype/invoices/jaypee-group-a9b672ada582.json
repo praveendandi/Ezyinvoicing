@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "jaypee-group",
+  "private_key_id": "a9b672ada5827e7dbf35b416d404dc3dff8385da",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCiW0RNuZQZA70x\nhMnnDCS717cw/AdSNzVLQ38cb4GjZuwf3EcjEOO6eEqs/iKJdRGKCyI41dw7cA1o\nwnCpMashEFVBK3UwXesamNayrg0BszhJxSmvaSSttgIKpTlCLhfj8vn26ilhyFPa\nFhunC0LMhT5Q5jJl7uXRnBQ4cL0jKEJxxvGK2UoWyhQAMMUlnIfEW/20nRU6Wvif\nCaw2nPcuLYt4vrgDAen5Mc6RA/8XGwmZTAKmi/5oknuIp+gp3JlbUxeBj6TgFulD\nYqV/1NCFtvCdaF79LJv5mZNo5F93SubCzkkjUrx94pugv17j2W23vW78VDG7mxKc\nPP32QjszAgMBAAECggEAL85i9uYBqzn0IBwjHXLwcBVNPlG/0CAsg6xsxdE5oYVB\nWwJQOg2TmMkp5/Vu8v2zO+waWBT049WTRTkX1mInKzW1fNqQh7zn6O1/Lp7cepcs\nqGAzbZCuua3BvSO4j/mllDvsCZ4asE2+DxX6b3373eAQIN8fkO8+4bEtLQ9ZSfvs\nl0fqMaR7xVbC8OvQ6CzJnOn6zc58RySCrkgXlAJAcW0cjsLNVpkKYPcJZgnZ3P0C\nuzS8u5jWm7n0ZnVnA7xhTjN/DYVeBsDzUZDoPTTUkW6KdiXpPY+W5fi8lyPq19v+\nVjaRK9CBrvt9DJM042iujdCfr1qf2dSiKrrNIIZdTQKBgQDicA3MlVwuhz4y1vCv\nyyYzXpfmbsgK5Jzgsl/vbak0Q5u2mFAF3T1gb0o5iTkTP3zA88W11GSq8suCiwku\nDOCREUEwohW9fQT6Haj59d6yf3ULJnXLL5J8dfcC9PWGokxEpZMonfKRC+lEjabd\n0Y+7IMvwJ49+4ARMPa9vAG9DHQKBgQC3jYGzGKygpACJZ4K/RvqDvAUjP4bqfP/V\n1g+TU9X63Pb1Tpn7PozXJP+Hbowq+9e6qHaj8oWJxtaNQ/w+7HIbBsSGVGPlHe2a\nt0UT/KvZy0nqwwr343rZYFAFyQweWvMun+OFJszbmPXbfqBSVy1XlBhuWTR8/e2Z\nxV8LENBWjwKBgQCo8rY5CM/on1vXDuwyHb744QExG0MCbaRnOm+98vImXrNVv7sl\nRPdAdojI+QuuwtXQGZJQopIhwln5osdMpqr/UgJzyNuzsA4AmBS1u69XOyYXFbEZ\n0vrXBiUw/Zgbxghlx6xOx9puQpbfYVk5c9xr4IKJQtsb7QUH5ZZ5mbdqOQKBgQCu\nwibTmtF5HMx6BjiA3xZS6GfH2IsepKZ8NJOdxLs9XrYudoi6oiI8ELjNfB4uKpuJ\n1y0mCRjFRbAuzaTTUBGP09C2yJBXqzf3DzjQv8fq09drkgnWXBox7rYh2/oSyKsy\nH/7iXj+7cJXcRmJkIyZDdPgR0BLeUnGu7zD/eyGw1wKBgDY9syJ4pOk2pxYzBByt\n2rp9iEwYwnCJd6EOO8Uzfxm29gqaK6VjoFUjr5nTrtPunjGJ6ffVnqTOawpRLSKk\nwqKnQw8amprIXSpwHELDsvVYKRIC47mNtMm5BNsIbUgcwsbD6xJlq5cfvDIEDx3W\n38xQcUnLQGU2gCPUY1kvvd62\n-----END PRIVATE KEY-----\n",
+  "client_email": "ezyinvoices@jaypee-group.iam.gserviceaccount.com",
+  "client_id": "109016677090496165373",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ezyinvoices%40jaypee-group.iam.gserviceaccount.com"
+}

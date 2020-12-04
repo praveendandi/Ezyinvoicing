@@ -87,7 +87,11 @@
   "cgst_amount",
   "sgst_amount",
   "igst_amount",
-  "total_gst_amount"
+  "total_gst_amount",
+  "b2c_qrimage",
+  "b2c_qrinvoice",
+  "qr_generated",
+  "cess_amount"
  ],
  "fields": [
   {
@@ -111,7 +115,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled\nError",
+   "options": "Pending\nSuccess\nCancelled\nError\nNA",
    "read_only": 1
   },
   {
@@ -129,8 +133,7 @@
    "in_standard_filter": 1,
    "label": "GST Number",
    "length": 15,
-   "options": "TaxPayerDetail",
-   "reqd": 1
+   "options": "TaxPayerDetail"
   },
   {
    "fieldname": "invoice_file",
@@ -217,8 +220,7 @@
    "fieldname": "state_code",
    "fieldtype": "Data",
    "label": "State Code",
-   "length": 2,
-   "reqd": 1
+   "length": 2
   },
   {
    "fieldname": "location",
@@ -228,8 +230,7 @@
   {
    "fieldname": "pincode",
    "fieldtype": "Data",
-   "label": "Pincode",
-   "reqd": 1
+   "label": "Pincode"
   },
   {
    "collapsible": 1,
@@ -573,12 +574,33 @@
    "fieldname": "total_gst_amount",
    "fieldtype": "Float",
    "label": "Total Gst Amount"
+  },
+  {
+   "fieldname": "b2c_qrimage",
+   "fieldtype": "Attach",
+   "label": "B2C QRImage"
+  },
+  {
+   "fieldname": "b2c_qrinvoice",
+   "fieldtype": "Attach",
+   "label": "B2C QRInvoice"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "qr_generated",
+   "fieldtype": "Data",
+   "label": "QR Generated"
+  },
+  {
+   "fieldname": "cess_amount",
+   "fieldtype": "Float",
+   "label": "CESS Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-11-27 15:10:43.921966",
+ "modified": "2020-12-03 19:03:47.277175",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -29,6 +29,7 @@ def attach_qr_code(invoice_number, gsp,code):
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		company = frappe.get_doc('company',invoice.company)
 		folder_path = frappe.utils.get_bench_path()
+		site_folder_path = company.site_name
 		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
 		path = folder_path + '/sites/' + site_folder_path
 		src_pdf_filename = path + invoice.invoice_file
@@ -86,7 +87,9 @@ def create_qr_image(invoice_number, gsp):
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		# file_path = frappe.get_site_path('private', 'files',
 		#                                  invoice.invoice_file)
+		company = frappe.get_doc('company',invoice.company)
 		folder_path = frappe.utils.get_bench_path()
+		site_folder_path = company.site_name
 		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host) + "/private/files/"
 		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
 		# print(path)
@@ -304,7 +307,6 @@ def insert_items(items,invoice_number):
 			if item['sac_code'].isdigit():
 				
 				doc = frappe.get_doc(item)
-				# print(doc,"///////////////")
 				doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess":True,"data":doc}
 			# print(doc)
@@ -329,7 +331,7 @@ def CreditgenerateIrn(invoice_number):
 	GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data'],"invoice":invoice_number}
 	taxpayer_details = get_tax_payer_details(GspData)
 	#gst data
-	print(taxpayer_details,"taxxxxxx")
+	# print(taxpayer_details,"taxxxxxx")
 	gst_data = {
 		"Version": "1.1",
 		"TranDtls": {
@@ -401,15 +403,16 @@ def CreditgenerateIrn(invoice_number):
 	total_igst_value = 0
 	total_sgst_value = 0
 	total_cgst_value = 0
+	total_cess_calue = 0
 	ass_value = 0
 	for index, item in enumerate(invoice.items):
 		# print(item.sac_code,"HsnCD")
 		if item.is_credit_item == "Yes":
-			# print(item,"itttttttttttttt")
 			credit_items.append(item.__dict__)
 			total_igst_value += abs(item.igst_amount)
 			total_sgst_value += abs(item.sgst_amount)
 			total_cgst_value += abs(item.cgst_amount)
+			total_cess_calue += abs(item.cess_amount)
 			ass_value += abs(item.item_value)
 			i = {
 				"SlNo":
@@ -442,9 +445,9 @@ def CreditgenerateIrn(invoice_number):
 				"SgstAmt":
 				abs(round(item.sgst_amount, 2)),
 				"CesRt":
-				0,
+				item.cess,
 				"CesAmt":
-				0,
+				item.cess_amount,
 				"CesNonAdvlAmt":
 				0,
 				"StateCesRt":
@@ -464,7 +467,7 @@ def CreditgenerateIrn(invoice_number):
 		"CgstVal": round(total_cgst_value, 2),
 		"SgstVal": round(total_sgst_value, 2),
 		"IgstVal": round(total_igst_value, 2),
-		"CesVal": 0,
+		"CesVal": round(total_cess_calue,2),
 		"StCesVal": 0,
 		"Discount": 0,
 		"OthChrg": 0,
@@ -521,4 +524,4 @@ def postIrn(gst_data, gsp):
 		# print(irn_response.text)
 	except Exception as e:
 		print(e, "post irn")
-		return {"success": False, 'message':e}
+		return {"success": False, 'message':str(e)}
