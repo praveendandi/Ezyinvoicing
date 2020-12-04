@@ -162,7 +162,7 @@ def reinitiateInvoice(data):
 					if len(i.split(" "))>3:
 						item['name'] = item['name'] + ' ' + j
 				if index == 3:
-					if "#" not in j and '[' not in j and ']' not in j:
+					if "#" not in j and '[' not in j and ']' not in j and '.' not in j and ',' not in j:
 						item["name"] = item["name"] + ' ' + j		
 				if index == 4:
 					if ".00" in j:
