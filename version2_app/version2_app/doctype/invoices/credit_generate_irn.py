@@ -13,7 +13,7 @@ import fitz
 # /home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf
 site = 'http://0.0.0.0:8000/'
 site_folder_path = 'version2_app.com'
-fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
+# fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
 
 def check_company_exist_for_Irn(code):
 	try:
@@ -53,7 +53,7 @@ def attach_qr_code(invoice_number, gsp,code):
 			where,
 			text,
 			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=fontpath,  # any file containing a font
+			fontfile=folder_path+company.font_file_path,#fontpath,  # any file containing a font
 			fontsize=6,  # default
 			rotate=0,  # rotate text
 			color=(0, 0, 0),  # some color (blue)
@@ -101,9 +101,20 @@ def create_qr_image(invoice_number, gsp):
 			"Authorization": "Bearer " + gsp['token'],
 			"Irn": invoice.credit_irn_number
 		}
-		qr_response = requests.get(gsp['generate_qr_code'],
-									headers=headers,
-									stream=True)
+		if company.proxy == 0:
+			qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+						}
+			qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True,proxies=proxies)
+
 		file_name = invoice_number + "creditqr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -130,8 +141,10 @@ def create_qr_image(invoice_number, gsp):
 	except Exception as e:
 		print(e, "qr image")
 
-def request_get(api, headers,invoice):
+def request_get(api, headers,invoice,code):
 	try:
+		company = check_company_exist(code)
+		
 		headers = {
 			"user_name": headers["username"],
 			"password": headers["password"],
@@ -139,7 +152,16 @@ def request_get(api, headers,invoice):
 			"requestid": invoice+str(random.randrange(1, 10**4)),
 			"Authorization": "Bearer " + headers['token']
 		}
-		raw_response = requests.get(api, headers=headers)
+		if company.proxy == 0:
+			raw_response = requests.get(api, headers=headers)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+						}
+			raw_response = requests.get(api, headers=headers,proxies=proxies)
+	
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
 			return raw_response.json()
@@ -158,7 +180,7 @@ def get_tax_payer_details(data):
 		tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'])
 		if tay_payer_details is None:
 			response = request_get(data['apidata']['get_taxpayer_details'] + data['gstNumber'],
-									data['apidata'],data['invoice'])
+									data['apidata'],data['invoice'],data['code'])
 			if response['success']:
 				
 				details = response['result']
@@ -476,7 +498,7 @@ def CreditgenerateIrn(invoice_number):
 		"TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
 	}
 	# print(gst_data)
-	response = postIrn(gst_data, GSP_details['data'])
+	response = postIrn(gst_data, GSP_details['data'],company_details)
 	if response['success']==True:
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		invoice.credit_ack_no = response['result']['AckNo']
@@ -501,7 +523,7 @@ def CreditgenerateIrn(invoice_number):
 
 	return response
 
-def postIrn(gst_data, gsp):
+def postIrn(gst_data, gsp,company):
 	try:
 		# print(gst_data)
 		headers = {
@@ -511,12 +533,21 @@ def postIrn(gst_data, gsp):
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token']
 		}
-		# print(headers)
-		# print(gst_data,"****************************")
-		# print(gsp['generate_irn'])
-		irn_response = requests.post(gsp['generate_irn'],
+		
+		if company['data'].proxy == 0:
+			irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data)
+		else:
+			
+			proxyhost = company['data'].proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
+					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+						}
+			qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,
-										json=gst_data)
+										stream=True,proxies=proxies)									
 		if irn_response.status_code == 200:
 			return irn_response.json()
 		else:

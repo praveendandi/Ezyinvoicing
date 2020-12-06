@@ -23,13 +23,6 @@ import time
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 site = 'http://0.0.0.0:8000/'
-# site_folder_path = 'version2_app.com'
-fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
-
-
-# site = 'http://jps.ezyinvoicing.com/'
-# site_folder_path = 'jps.ezyinvoicing.com/'
-# fontpath = '/home/frappe/invoices/apps/jp_siddharth/jp_siddharth/jp_siddharth/doctype/invoices/Roboto-Black.ttf'
 
 class Invoices(Document):
 	# def on_update(self):
@@ -38,192 +31,204 @@ class Invoices(Document):
 
 	# 		# frappe.throw('Age must be less than 60')
 	def generateIrn(self, invoice_number):
-		# try:
-		# get invoice details
-		start_time = datetime.datetime.utcnow()
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		# get seller details
-		company_details = check_company_exist_for_Irn(invoice.company)
-		# get gsp_details
-		credit_note_items = []
-		companyData = {"code":company_details['data'].name,"mode":company_details['data'].mode,"provider":company_details['data'].provider}
-		GSP_details = gsp_api_data(companyData)
-		# print(GSP_details)
-		# get taxpayer details
-		GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data']}
-		taxpayer_details = get_tax_payer_details(GspData)
-		#gst data
-		gst_data = {
-			"Version": "1.1",
-			"TranDtls": {
-				"TaxSch": "GST",
-				"SupTyp": "B2B",
-				"RegRev": "Y",
-				"IgstOnIntra": "N"
-			},
-			"SellerDtls": {
-				"Gstin":
-				GSP_details['data']['gst'],
-				"LglNm":
-				company_details['data'].legal_name,
-				"TrdNm":
-				company_details['data'].trade_name,
-				"Addr1":
-				company_details['data'].address_1,
-				"Addr2":
-				company_details['data'].address_2,
-				"Loc":
-				company_details['data'].location,
-				"Pin":
-				193502 if company_details['data'].mode == "Testing" else
-				company_details['data'].pincode,
-				"Stcd":
-				"01" if company_details['data'].mode == "Testing" else
-				company_details['data'].state_code,
-				"Ph":
-				company_details['data'].phone_number,
-				"Em":
-				company_details['data'].email
-			},
-			"BuyerDtls": {
-				"Gstin":
-				taxpayer_details['data'].gst_number,
-				"LglNm":
-				taxpayer_details['data'].legal_name,
-				"TrdNm":
-				taxpayer_details['data'].trade_name,
-				"Pos":
-				"01" if company_details['data'].mode == "Testing" else
-				company_details['data'].state_code,
-				"Addr1":
-				taxpayer_details['data'].address_1,
-				"Addr2":
-				taxpayer_details['data'].address_2,
-				"Loc":
-				taxpayer_details['data'].location,
-				"Pin":
-				int(taxpayer_details['data'].pincode),
-				"Stcd":
-				taxpayer_details['data'].state_code,
-				# "Ph": taxpayer_details.phone_number,
-				# "Em": taxpayer_details.
-			},
-			"DocDtls": {
-				"Typ":
-				"INV",
-				"No":
-				invoice.invoice_number + str(random.randint(0, 10000)) +
-				'T' if company_details['data'].mode == 'Testing' else
-				invoice.invoice_number,
-				"Dt":
-				datetime.datetime.strftime(invoice.invoice_date,
-											'%d/%m/%Y')
-			},
-			"ItemList": [],
-		}
-		total_igst_value = 0
-		total_sgst_value = 0
-		total_cgst_value = 0
-		total_cess_value = 0
-		ass_value = 0
-		for index, item in enumerate(invoice.items):
-			# print(item.sac_code,"HsnCD")
-			if item.is_credit_item == "No" and item.taxable=="Yes":
-				total_igst_value += item.igst_amount
-				total_sgst_value += item.sgst_amount
-				total_cgst_value += item.cgst_amount
-				total_cess_value +=item.cess_amount
-				ass_value += item.item_value
-				i = {
-					"SlNo":
-					str(index + 1),
-					"PrdDesc":
-					item.item_name,
-					"IsServc":
-					"Y",
-					"HsnCd":
-					item.sac_code if item.sac_code != 'No Sac' else '',
-					"Qty":
-					1,
-					"FreeQty":
-					0,
-					"UnitPrice":
-					round(item.item_value, 1),
-					"TotAmt":
-					round(item.item_value, 1),
-					"Discount":
-					0,
-					"AssAmt":
-					0 if item.sac_code == 'No Sac' else round(
-						item.item_value, 1),
-					"GstRt":
-					item.gst_rate,
-					"IgstAmt":
-					round(item.igst_amount, 1),
-					"CgstAmt":
-					round(item.cgst_amount, 1),
-					"SgstAmt":
-					round(item.sgst_amount, 1),
-					"CesRt":
-					item.cess,
-					"CesAmt":
-					round(item.cess_amount,2),
-					"CesNonAdvlAmt":
-					0,
-					"StateCesRt":
-					0,
-					"StateCesAmt":
-					0,
-					"StateCesNonAdvlAmt":
-					0,
-					"OthChrg":
-					00,
-					"TotItemVal":
-					round(item.item_value_after_gst, 2),
-				}
-				gst_data['ItemList'].append(i)
-			else:
-				credit_note_items.append(item)
-		gst_data["ValDtls"] = {
-			"AssVal": round(ass_value,2),
-			"CgstVal": round(total_cgst_value, 2),
-			"SgstVal": round(total_sgst_value, 2),
-			"IgstVal": round(total_igst_value, 2),
-			"CesVal": round(total_cess_value,2),
-			"StCesVal": 0,
-			"Discount": 0,
-			"OthChrg": 0,
-			"RndOffAmt": 0,
-			"TotInvVal": round(invoice.amount_after_gst, 2),
-			"TotInvValFc": round(invoice.amount_after_gst, 2)
-		}
-		response = postIrn(gst_data, GSP_details['data'])
-		if response['success']:
+		try:
+			# get invoice details
+			start_time = datetime.datetime.utcnow()
 			invoice = frappe.get_doc('Invoices', invoice_number)
-			invoice.ack_no = response['result']['AckNo']
-			invoice.irn_number = response['result']['Irn']
-			invoice.ack_date = response['result']['AckDt']
-			invoice.signed_invoice = response['result']['SignedInvoice']
-			invoice.signed_invoice_generated = 'Yes'
-			invoice.irn_generated = 'Success'
-			invoice.qr_code = response['result']['SignedQRCode']
-			invoice.qr_code_generated = 'Success'
-			invoice.irn_cancelled = 'No'
-			invoice.irn_generated_time = datetime.datetime.utcnow()
-			invoice.irn_process_time = datetime.datetime.utcnow() - start_time
-			invoice.save(ignore_permissions=True,ignore_version=True)
-			create_qr = create_qr_image(invoice_number, GSP_details['data'])
-			if create_qr['success'] == True:
+			# get seller details
+			company_details = check_company_exist_for_Irn(invoice.company)
+			# get gsp_details
+			credit_note_items = []
+			companyData = {"code":company_details['data'].name,"mode":company_details['data'].mode,"provider":company_details['data'].provider}
+			GSP_details = gsp_api_data(companyData)
+			# print(GSP_details)
+			# get taxpayer details
+			GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data']}
+			taxpayer_details = get_tax_payer_details(GspData)
+			#gst data
+			gst_data = {
+				"Version": "1.1",
+				"TranDtls": {
+					"TaxSch": "GST",
+					"SupTyp": "B2B",
+					"RegRev": "Y",
+					"IgstOnIntra": "N"
+				},
+				"SellerDtls": {
+					"Gstin":
+					GSP_details['data']['gst'],
+					"LglNm":
+					company_details['data'].legal_name,
+					"TrdNm":
+					company_details['data'].trade_name,
+					"Addr1":
+					company_details['data'].address_1,
+					"Addr2":
+					company_details['data'].address_2,
+					"Loc":
+					company_details['data'].location,
+					"Pin":
+					193502 if company_details['data'].mode == "Testing" else
+					company_details['data'].pincode,
+					"Stcd":
+					"01" if company_details['data'].mode == "Testing" else
+					company_details['data'].state_code,
+					"Ph":
+					company_details['data'].phone_number,
+					"Em":
+					company_details['data'].email
+				},
+				"BuyerDtls": {
+					"Gstin":
+					taxpayer_details['data'].gst_number,
+					"LglNm":
+					taxpayer_details['data'].legal_name,
+					"TrdNm":
+					taxpayer_details['data'].trade_name,
+					"Pos":
+					"01" if company_details['data'].mode == "Testing" else
+					company_details['data'].state_code,
+					"Addr1":
+					taxpayer_details['data'].address_1,
+					"Addr2":
+					taxpayer_details['data'].address_2,
+					"Loc":
+					taxpayer_details['data'].location,
+					"Pin":
+					int(taxpayer_details['data'].pincode),
+					"Stcd":
+					taxpayer_details['data'].state_code,
+					# "Ph": taxpayer_details.phone_number,
+					# "Em": taxpayer_details.
+				},
+				"DocDtls": {
+					"Typ":
+					"INV",
+					"No":
+					invoice.invoice_number + str(random.randint(0, 10000)) +
+					'T' if company_details['data'].mode == 'Testing' else
+					invoice.invoice_number,
+					"Dt":
+					datetime.datetime.strftime(invoice.invoice_date,
+												'%d/%m/%Y')
+				},
+				"ItemList": [],
+			}
+			total_igst_value = 0
+			total_sgst_value = 0
+			total_cgst_value = 0
+			total_cess_value = 0
+			ass_value = 0
+			for index, item in enumerate(invoice.items):
+				# print(item.sac_code,"HsnCD")
+				if item.is_credit_item == "No" and item.taxable=="Yes":
+					total_igst_value += item.igst_amount
+					total_sgst_value += item.sgst_amount
+					total_cgst_value += item.cgst_amount
+					total_cess_value +=item.cess_amount
+					ass_value += item.item_value
+					i = {
+						"SlNo":
+						str(index + 1),
+						"PrdDesc":
+						item.item_name,
+						"IsServc":
+						"Y",
+						"HsnCd":
+						item.sac_code if item.sac_code != 'No Sac' else '',
+						"Qty":
+						1,
+						"FreeQty":
+						0,
+						"UnitPrice":
+						round(item.item_value, 1),
+						"TotAmt":
+						round(item.item_value, 1),
+						"Discount":
+						0,
+						"AssAmt":
+						0 if item.sac_code == 'No Sac' else round(
+							item.item_value, 1),
+						"GstRt":
+						item.gst_rate,
+						"IgstAmt":
+						round(item.igst_amount, 1),
+						"CgstAmt":
+						round(item.cgst_amount, 1),
+						"SgstAmt":
+						round(item.sgst_amount, 1),
+						"CesRt":
+						item.cess,
+						"CesAmt":
+						round(item.cess_amount,2),
+						"CesNonAdvlAmt":
+						0,
+						"StateCesRt":
+						0,
+						"StateCesAmt":
+						0,
+						"StateCesNonAdvlAmt":
+						0,
+						"OthChrg":
+						00,
+						"TotItemVal":
+						round(item.item_value_after_gst, 2),
+					}
+					gst_data['ItemList'].append(i)
+				else:
+					credit_note_items.append(item)
+			gst_data["ValDtls"] = {
+				"AssVal": round(ass_value,2),
+				"CgstVal": round(total_cgst_value, 2),
+				"SgstVal": round(total_sgst_value, 2),
+				"IgstVal": round(total_igst_value, 2),
+				"CesVal": round(total_cess_value,2),
+				"StCesVal": 0,
+				"Discount": 0,
+				"OthChrg": 0,
+				"RndOffAmt": 0,
+				"TotInvVal": round(invoice.amount_after_gst, 2),
+				"TotInvValFc": round(invoice.amount_after_gst, 2)
+			}
+			# return{"success":True}
+			if ass_value>0:
+
+				response = postIrn(gst_data, GSP_details['data'],company_details['data'])
+				if response['success']:
+					invoice = frappe.get_doc('Invoices', invoice_number)
+					invoice.ack_no = response['result']['AckNo']
+					invoice.irn_number = response['result']['Irn']
+					invoice.ack_date = response['result']['AckDt']
+					invoice.signed_invoice = response['result']['SignedInvoice']
+					invoice.signed_invoice_generated = 'Yes'
+					invoice.irn_generated = 'Success'
+					invoice.qr_code = response['result']['SignedQRCode']
+					invoice.qr_code_generated = 'Success'
+					invoice.irn_cancelled = 'No'
+					invoice.irn_generated_time = datetime.datetime.utcnow()
+					invoice.irn_process_time = datetime.datetime.utcnow() - start_time
+					invoice.save(ignore_permissions=True,ignore_version=True)
+					create_qr = create_qr_image(invoice_number, GSP_details['data'])
+					if create_qr['success'] == True:
+						if credit_note_items != []:
+							CreditgenerateIrn(invoice_number)
+							invoice = frappe.get_doc('Invoices', invoice_number)
+							invoice.irn_process_time = datetime.datetime.utcnow() - start_time
+							invoice.save(ignore_permissions=True,ignore_version=True)
+					return response
+				else:
+					return response
+			else:
 				if credit_note_items != []:
 					CreditgenerateIrn(invoice_number)
 					invoice = frappe.get_doc('Invoices', invoice_number)
 					invoice.irn_process_time = datetime.datetime.utcnow() - start_time
 					invoice.save(ignore_permissions=True,ignore_version=True)
-			return response
-		else:
-			return response
-		# except Exception as e:
-		# 	print(e, "generate Irn")
+					return {"success":True}
+				return {"success":False}
+
+		except Exception as e:
+			print(str(e), "generate Irn")
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
 		# try:
@@ -239,7 +244,7 @@ class Invoices(Document):
 		# GSP_details = gsp_api_data(company_details.name,
 		# 						   company_details.mode,
 		# 						   company_details.provider)
-		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason)
+		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
 		print(cancel_response)
 		if cancel_response['success']:
 			invoice.cancelled_on = cancel_response['result']['CancelDate']
@@ -248,7 +253,7 @@ class Invoices(Document):
 			invoice.irn_generated = 'Cancelled'
 			invoice.save()
 			if invoice.has_credit_items=="Yes":
-				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason)
+				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
 				if credit_cancel_response['success']:
 					# invoice.cancelled_on = cancel_response['result']['CancelDate']
 					# invoice.cancel_message = reason
@@ -357,15 +362,31 @@ class Invoices(Document):
 				img.save(dst_pdf_filename)
 			elif company.b2c_qr_type == "Virtual Payment":
 				headers = {'Content-Type': 'application/json'}
-				generate_qr = requests.post(
-					"https://upiqr.in/api/qr?format=png",
-					headers=headers,
-					json={
-						"vpa": company.merchant_virtual_payment_address,
-						"name": company.merchant_name,
-						"txnReference": invoice_number,
-						"amount": '%.2f' % doc.pms_invoice_summary
-					})
+				if company.proxy == 0:
+					generate_qr = requests.post(
+						"https://upiqr.in/api/qr?format=png",
+						headers=headers,
+						json={
+							"vpa": company.merchant_virtual_payment_address,
+							"name": company.merchant_name,
+							"txnReference": invoice_number,
+							"amount": '%.2f' % doc.pms_invoice_summary
+						})
+				else:
+					proxyhost = company.proxy_url
+					proxyhost = proxyhost.replace("http://","@")
+					proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+							'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+								}		
+					generate_qr = requests.post(
+						"https://upiqr.in/api/qr?format=png",
+						headers=headers,
+						json={
+							"vpa": company.merchant_virtual_payment_address,
+							"name": company.merchant_name,
+							"txnReference": invoice_number,
+							"amount": '%.2f' % doc.pms_invoice_summary
+						},proxies=proxies)			
 				if generate_qr.status_code == 200:
 					with open(dst_pdf_filename, "wb") as f:
 						f.write(generate_qr.content)
@@ -406,23 +427,10 @@ class Invoices(Document):
 			print(e,"send invoicedata to gcb")
 			return {"success": False, "message": str(e)}
 
-def cancel_irn(irn_number, gsp, reason):
+def cancel_irn(irn_number, gsp, reason,company):
 	try:
 		print(gsp['data'])
-		# input_file = "/home/caratred/Desktop/frappe/invoice/sites/jp.invoices.local/private/files/296830withQrIrn.pdf"
-		# output_file = '/home/caratred/Desktop/frappe/invoice/sites/jp.invoices.local/private/files/canc.pdf'
-		# watermark_file = '/home/caratred/Desktop/frappe/invoice/sites/jp.invoices.local/private/files/cancelled.pdf'
-		# with open(input_file, "rb") as filehandle_input:
-		#     pdf = PdfFileReader(filehandle_input)
-		#     with open(watermark_file, "rb") as filehandle_watermark:
-		#         watermark = PdfFileReader(filehandle_watermark)
-		#         first_page = pdf.getPage(0)
-		#         first_page_watermark = watermark.getPage(0)
-		#         first_page.mergePage(first_page_watermark)
-		#         pdf_writer = PdfFileWriter()
-		#         pdf_writer.addPage(first_page)
-		#         with open(output_file, "wb") as filehandle_output:
-		#             pdf_writer.write(filehandle_output)
+		
 		headers = {
 			"user_name": gsp['data']['username'],
 			"password": gsp['data']['password'],
@@ -431,10 +439,20 @@ def cancel_irn(irn_number, gsp, reason):
 			"Authorization": "Bearer " + gsp['data']['token'],
 		}
 		payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
+		if company.proxy == 0:
 
-		cancel_response = requests.post(gsp['data']['cancel_irn'],
-										headers=headers,
-										json=payload)
+			cancel_response = requests.post(gsp['data']['cancel_irn'],
+											headers=headers,
+											json=payload)
+		else:
+			proxyhost = company['data'].proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
+					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+						}	
+			cancel_response = requests.post(gsp['data']['cancel_irn'],
+											headers=headers,
+											json=payload,proxies=proxies)											
 		repsone = cancel_response.json()
 		return repsone
 	except Exception as e:
@@ -477,7 +495,7 @@ def attach_qr_code(invoice_number, gsp,code):
 			where,
 			text,
 			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=fontpath,  # any file containing a font
+			fontfile=folder_path+company.font_file_path,#fontpath,  # any file containing a font
 			fontsize=6,  # default
 			rotate=0,  # rotate text
 			color=(0, 0, 0),  # some color (blue)
@@ -523,9 +541,19 @@ def create_qr_image(invoice_number, gsp):
 			"Authorization": "Bearer " + gsp['token'],
 			"Irn": invoice.irn_number
 		}
-		qr_response = requests.get(gsp['generate_qr_code'],
-									headers=headers,
-									stream=True)
+		if company.proxy == 0:
+			qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True)
+		else:
+			proxyhost = company['data'].proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
+					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+						}	
+			qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True,proxies=proxies)										
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -555,7 +583,7 @@ def create_qr_image(invoice_number, gsp):
 
 
 
-def postIrn(gst_data, gsp):
+def postIrn(gst_data, gsp,company):
 	try:
 		# print(gst_data)
 		headers = {
@@ -565,12 +593,21 @@ def postIrn(gst_data, gsp):
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token']
 		}
-		# print(headers)
-		# print(gst_data)
-		# print(gsp['generate_irn'])
-		irn_response = requests.post(gsp['generate_irn'],
-										headers=headers,
-										json=gst_data)
+		if company.proxy == 0:
+
+			irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+						}
+			irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data,proxies=proxies)			
+
 		# print(irn_response.text)
 		if irn_response.status_code == 200:
 			return irn_response.json()
@@ -648,7 +685,7 @@ def insert_invoice(data):
 					credit_value_after_gst  += abs(item['item_value_after_gst'])
 			else:
 				pass
-		if (round(value_after_gst,2) - round(credit_value_after_gst,2)) >0:
+		if (round(value_after_gst,2)>0) or (round(credit_value_after_gst,2)>0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
@@ -1363,7 +1400,7 @@ def get_tax_payer_details(data):
 		tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'])
 		if tay_payer_details is None:
 			response = request_get(data['apidata']['get_taxpayer_details'] + data['gstNumber'],
-									data['apidata'],data['invoice'])
+									data['apidata'],data['invoice'],data['code'])
 			if response['success']:
 					
 				details = response['result']
@@ -1484,7 +1521,7 @@ def login_gsp(code, mode):
 				"gspappid": gsp["gsp_test_app_id"],
 				"gspappsecret": gsp["gsp_test_app_secret"],
 			}
-			login_response = request_post(gsp['auth_test'], headers)
+			login_response = request_post(gsp['auth_test'],code, headers)
 
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
@@ -1496,7 +1533,7 @@ def login_gsp(code, mode):
 				"gspappid": gsp["gsp_prod_app_id"],
 				"gspappsecret": gsp["gsp_prod_app_secret"]
 			}
-			login_response = request_post(gsp['auth_prod'], headers)
+			login_response = request_post(gsp['auth_prod'],code, headers)
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on= login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
@@ -1642,9 +1679,18 @@ def gsp_api_data_for_irn(data):
 
 
 
-def request_post(url, headers=None):
+def request_post(url, code, headers=None):
 	try:
-		data = requests.post(url, headers=headers)
+		company = frappe.get_doc('company',code)
+		if company.proxy == 0:
+			data = requests.post(url, headers=headers)
+		else:
+			proxyhost = company['data'].proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
+					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+						}
+			data = requests.post(url, headers=headers,proxies=proxies)				
 		if data.status_code == 200:
 			response_data = data.json()
 			if 'access_token' in response_data:
@@ -1657,7 +1703,7 @@ def request_post(url, headers=None):
 		print(e,"request post")
 
 
-def request_get(api, headers,invoice):
+def request_get(api, headers,invoice,code):
 	try:
 		headers = {
 			"user_name": headers["username"],
@@ -1666,7 +1712,16 @@ def request_get(api, headers,invoice):
 			"requestid": invoice+str(random.randrange(1, 10**4)),
 			"Authorization": "Bearer " + headers['token']
 		}
-		raw_response = requests.get(api, headers=headers)
+		comapny = frappe.get_doc('company',code)
+		if company.proxy==0:
+			raw_response = requests.get(api, headers=headers)
+		else:
+			proxyhost = company['data'].proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
+					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+						}
+			raw_response = requests.get(api, headers=headers,proxies=proxies)				
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
 			return raw_response.json()
@@ -1811,7 +1866,7 @@ def attach_b2c_qrcode(data):
 			where,
 			text,
 			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=fontpath,  # any file containing a font
+			fontfile=folder_path+company.font_file_path,#fontpath,  # any file containing a font
 			fontsize=6,  # default
 			rotate=0,  # rotate text
 			color=(0, 0, 0),  # some color (blue)
