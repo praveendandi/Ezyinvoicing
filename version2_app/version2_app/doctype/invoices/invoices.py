@@ -445,10 +445,10 @@ def cancel_irn(irn_number, gsp, reason,company):
 											headers=headers,
 											json=payload)
 		else:
-			proxyhost = company['data'].proxy_url
+			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
-					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
 						}	
 			cancel_response = requests.post(gsp['data']['cancel_irn'],
 											headers=headers,
@@ -546,10 +546,10 @@ def create_qr_image(invoice_number, gsp):
 										headers=headers,
 										stream=True)
 		else:
-			proxyhost = company['data'].proxy_url
+			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
-					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
 						}	
 			qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,
