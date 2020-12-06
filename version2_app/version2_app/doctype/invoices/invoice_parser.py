@@ -300,24 +300,24 @@ def file_parsing(filepath):
 							return {"success":True,"message":"Invoice Created"}
 						else:
 							
-							error_data['error_message'] = insertInvoiceApiResponse['message']
+							error_data['error_message'] = str(insertInvoiceApiResponse['message'])
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
 						
-						error_data['error_message'] = calulateItemsApiResponse['message']
+						error_data['error_message'] = str(calulateItemsApiResponse['message'])
 						errorInvoice = Error_Insert_invoice(error_data)
 						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
 					# print(error_data)
-					error_data['error_message'] = getTaxPayerDetailsResponse['message']
+					error_data['error_message'] = str(getTaxPayerDetailsResponse['message'])
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
 			else:
 				# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
-				error_data['error_message'] = checkTokenIsValidResponse['message']
+				error_data['error_message'] = str(checkTokenIsValidResponse['message'])
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
@@ -333,18 +333,18 @@ def file_parsing(filepath):
 					return {"success":True,"message":"Invoice Created"}
 				else:
 					
-					error_data['error_message'] = insertInvoiceApiResponse['message']
+					error_data['error_message'] = str(insertInvoiceApiResponse['message'])
 					errorInvoice = Error_Insert_invoice(error_data)
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 					return {"success":False,"message":insertInvoiceApiResponse['message']}
 			else:
 						
-				error_data['error_message'] = calulateItemsApiResponse['message']
+				error_data['error_message'] = str(calulateItemsApiResponse['message'])
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 				return {"success":False,"message":calulateItemsApiResponse['message']}		
 	else:
-		error_data['error_message'] = gspApiDataResponse['message']
+		error_data['error_message'] = str(gspApiDataResponse['message'])
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}

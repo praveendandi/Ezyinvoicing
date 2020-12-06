@@ -1685,10 +1685,10 @@ def request_post(url, code, headers=None):
 		if company.proxy == 0:
 			data = requests.post(url, headers=headers)
 		else:
-			proxyhost = company['data'].proxy_url
+			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
-					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
 						}
 			data = requests.post(url, headers=headers,proxies=proxies)				
 		if data.status_code == 200:
@@ -1714,7 +1714,7 @@ def request_get(api, headers,invoice,code):
 		}
 		comapny = frappe.get_doc('company',code)
 		print(company,"request getttttttt")
-		if company.proxy==0:
+		if company['proxy']==0:
 			raw_response = requests.get(api, headers=headers)
 		else:
 			proxyhost = company.proxy_url
