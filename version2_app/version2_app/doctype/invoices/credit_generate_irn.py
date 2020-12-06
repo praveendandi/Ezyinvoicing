@@ -143,7 +143,7 @@ def create_qr_image(invoice_number, gsp):
 
 def request_get(api, headers,invoice,code):
 	try:
-		company = check_company_exist(code)
+		company = check_company_exist_for_Irn(code)
 		
 		headers = {
 			"user_name": headers["username"],
