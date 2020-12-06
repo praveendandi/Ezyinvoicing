@@ -545,14 +545,14 @@ def postIrn(gst_data, gsp,company):
 			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
 					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
 						}
-			qr_response = requests.get(gsp['generate_qr_code'],
-										headers=headers,
-										stream=True,proxies=proxies)									
+			irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data,proxies=proxies)									
 		if irn_response.status_code == 200:
 			return irn_response.json()
 		else:
 			return {"success": False, 'message': irn_response.text}
 		# print(irn_response.text)
 	except Exception as e:
-		print(e, "post irn")
+		print(e, "post irn credit")
 		return {"success": False, 'message':str(e)}
