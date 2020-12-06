@@ -93,13 +93,13 @@ def request_get(api, data,company):
 			"Authorization": "Bearer " + data["apidata"]["token"]
 		}
 		# print(headerData)
-		if company['proxies'] == 0:
+		if company['proxy'] == 0:
 			raw_response = requests.get(api, headers=headerData)
 		else:
-			proxyhost = company['data'].proxy_url
+			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
-					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
 						}
 			raw_response = requests.get(api, headers=headerData,proxies=proxies)				
 		if raw_response.status_code == 200:
