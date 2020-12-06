@@ -1705,6 +1705,7 @@ def request_post(url, code, headers=None):
 
 def request_get(api, headers,invoice,code):
 	try:
+		# print("////////////////")
 		headers = {
 			"user_name": headers["username"],
 			"password": headers["password"],
@@ -1712,9 +1713,9 @@ def request_get(api, headers,invoice,code):
 			"requestid": invoice+str(random.randrange(1, 10**4)),
 			"Authorization": "Bearer " + headers['token']
 		}
-		comapny = frappe.get_doc('company',code)
+		company = frappe.get_doc('company',code)
 		print(company,"request getttttttt")
-		if company['proxy']==0:
+		if company.proxy==0:
 			raw_response = requests.get(api, headers=headers)
 		else:
 			proxyhost = company.proxy_url

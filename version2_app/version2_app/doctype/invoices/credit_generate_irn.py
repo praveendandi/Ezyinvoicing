@@ -141,7 +141,7 @@ def create_qr_image(invoice_number, gsp):
 	except Exception as e:
 		print(e, "qr image")
 
-def request_get(api, headers,invoice,code):
+def request_get_data(api, headers,invoice,code):
 	try:
 		company = check_company_exist_for_Irn(code)
 		
@@ -172,14 +172,14 @@ def request_get(api, headers,invoice,code):
 
 
 
-def get_tax_payer_details(data):
+def get_tax_payer_details_data(data):
 	'''
 	get TaxPayerDetail from gsp   gstNumber, code, apidata
 	'''
 	try:
 		tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'])
 		if tay_payer_details is None:
-			response = request_get(data['apidata']['get_taxpayer_details'] + data['gstNumber'],
+			response = request_get_data(data['apidata']['get_taxpayer_details'] + data['gstNumber'],
 									data['apidata'],data['invoice'],data['code'])
 			if response['success']:
 				
@@ -351,7 +351,7 @@ def CreditgenerateIrn(invoice_number):
 	# print(GSP_details)
 	# get taxpayer details
 	GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data'],"invoice":invoice_number}
-	taxpayer_details = get_tax_payer_details(GspData)
+	taxpayer_details = get_tax_payer_details_data(GspData)
 	#gst data
 	# print(taxpayer_details,"taxxxxxx")
 	gst_data = {
