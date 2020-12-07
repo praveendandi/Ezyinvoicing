@@ -116,11 +116,11 @@ def file_parsing(filepath):
 			elif len(j) == 1:
 				if j[0] not in paymentTypes:
 					original_data.append(i)
-					
 
 
 
-	items = []
+
+	items = [] 
 	itemsort = 0
 	for i in original_data:
 		pattern = re.compile(
