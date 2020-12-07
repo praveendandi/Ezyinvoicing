@@ -876,6 +876,7 @@ def calulate_items(data):
 				if item['sac_code']== "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if item['sac_code'] == '996311':
+					print("slabbbbbbbbb")
 					final_item['sort_order'] = item['sort_order']
 					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
 					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
@@ -948,6 +949,7 @@ def calulate_items(data):
 					final_item['type'] = "Included"	
 
 				if "-" in str(item['item_value']) and item['sac_code'] == '996311':
+					
 					final_item['sort_order'] = item['sort_order']
 					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
 					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)

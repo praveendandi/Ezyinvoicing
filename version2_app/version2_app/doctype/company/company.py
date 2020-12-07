@@ -18,7 +18,6 @@ import sys
 import frappe
 from frappe.utils import get_site_name
 
-
 class company(Document):
 	# pass
 	def on_update(self):
@@ -45,4 +44,16 @@ class company(Document):
 
 
 
+
+@frappe.whitelist(allow_guest=True)
+def getUserRoles():
+    if frappe.local.request.method=="GET":
+        #data = json.loads(frappe.request.data)
+        doc = frappe.get_roles(frappe.session.user)
+        # perm = frappe.get_permissions(frappe.session.user)
+        # print(doc)
+        # frappe.db.commit()
+        return {"success":True,"data":doc}
+    else:
+        return {"success":False, "message":"User doesn't exists! please Register"}
 
