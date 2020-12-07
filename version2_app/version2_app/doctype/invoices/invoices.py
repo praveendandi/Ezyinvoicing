@@ -122,7 +122,7 @@ class Invoices(Document):
 			ass_value = 0
 			for index, item in enumerate(invoice.items):
 				# print(item.sac_code,"HsnCD")
-				if item.is_credit_item == "No" and item.taxable=="Yes":
+				if item.is_credit_item == "No" and item.taxable=="Yes" and item.type=="Included":
 					total_igst_value += item.igst_amount
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
@@ -177,7 +177,8 @@ class Invoices(Document):
 					}
 					gst_data['ItemList'].append(i)
 				else:
-					credit_note_items.append(item)
+					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes":
+						credit_note_items.append(item)
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value,2),
 				"CgstVal": round(total_cgst_value, 2),
