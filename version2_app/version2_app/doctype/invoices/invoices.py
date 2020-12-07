@@ -19,6 +19,7 @@ import datetime
 import random
 from frappe.utils import get_site_name
 import time
+import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
@@ -324,6 +325,10 @@ class Invoices(Document):
 			items_count = 0
 			hsn_code = ""
 			if company.b2c_qr_type == "Invoice Details":
+				proxyhost = company.proxy_url
+				proxyhost = proxyhost.replace("http://","@")
+				os.environ['http_proxy'] = "http://"+company.proxy_username+":"+company.proxy_password+proxyhost
+				os.environ['https_proxy'] = "https://"+company.proxy_username+":"+company.proxy_password+proxyhost
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
 						hsn_code += xyz.sac_code+", "
