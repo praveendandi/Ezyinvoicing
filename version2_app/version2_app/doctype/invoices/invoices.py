@@ -19,6 +19,7 @@ import datetime
 import random
 from frappe.utils import get_site_name
 import time
+import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
@@ -324,6 +325,10 @@ class Invoices(Document):
 			items_count = 0
 			hsn_code = ""
 			if company.b2c_qr_type == "Invoice Details":
+				proxyhost = company.proxy_url
+				proxyhost = proxyhost.replace("http://","@")
+				os.environ['http_proxy'] = "http://"+company.proxy_username+":"+company.proxy_password+proxyhost
+				os.environ['https_proxy'] = "https://"+company.proxy_username+":"+company.proxy_password+proxyhost
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
 						hsn_code += xyz.sac_code+", "
@@ -524,62 +529,62 @@ def attach_qr_code(invoice_number, gsp,code):
 
 
 def create_qr_image(invoice_number, gsp):
-	try:
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		# file_path = frappe.get_site_path('private', 'files',
-		#                                  invoice.invoice_file)
-		folder_path = frappe.utils.get_bench_path()
-		company = frappe.get_doc('company',invoice.company)
-		site_folder_path = company.site_name
-		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
-		# print(path)
-		headers = {
-			"user_name": gsp['username'],
-			"password": gsp['password'],
-			"gstin": gsp['gst'],
-			"requestid": str(random.randint(0, 1000000000000000000)),
-			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.irn_number
-		}
-		if company.proxy == 0:
-			qr_response = requests.get(gsp['generate_qr_code'],
-										headers=headers,
-										stream=True)
-		else:
-			proxyhost = company.proxy_url
-			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-						}	
-			qr_response = requests.get(gsp['generate_qr_code'],
-										headers=headers,
-										stream=True,proxies=proxies)										
-		file_name = invoice_number + "qr.png"
-		full_file_path = path + file_name
-		with open(full_file_path, "wb") as f:
-			for chunk in qr_response.iter_content(1024):
-				f.write(chunk)
-		files = {"file": open(full_file_path, 'rb')}
-		payload = {
-			"is_private": 1,
-			"folder": "Home",
-			"doctype": "Invoices",
-			"docname": invoice_number,
-			'fieldname': 'qr_code_image'
-		}
-		upload_qr_image = requests.post(site + "api/method/upload_file",
-										files=files,
-										data=payload)
-		response = upload_qr_image.json()
-		if 'message' in response:
-			invoice.qr_code_image = response['message']['file_url']
-			invoice.save()
-			attach_qr_code(invoice_number, gsp,invoice.company)
-			return {"success":True}
+	# try:
+	invoice = frappe.get_doc('Invoices', invoice_number)
+	# file_path = frappe.get_site_path('private', 'files',
+	#                                  invoice.invoice_file)
+	folder_path = frappe.utils.get_bench_path()
+	company = frappe.get_doc('company',invoice.company)
+	site_folder_path = company.site_name
+	path = folder_path + '/sites/' + site_folder_path + "/private/files/"
+	# print(path)
+	headers = {
+		"user_name": gsp['username'],
+		"password": gsp['password'],
+		"gstin": gsp['gst'],
+		"requestid": str(random.randint(0, 1000000000000000000)),
+		"Authorization": "Bearer " + gsp['token'],
+		"Irn": invoice.irn_number
+	}
+	if company.proxy == 0:
+		qr_response = requests.get(gsp['generate_qr_code'],
+									headers=headers,
+									stream=True)
+	else:
+		proxyhost = company.proxy_url
+		proxyhost = proxyhost.replace("http://","@")
+		proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+					}	
+		qr_response = requests.get(gsp['generate_qr_code'],
+									headers=headers,
+									stream=True,proxies=proxies)										
+	file_name = invoice_number + "qr.png"
+	full_file_path = path + file_name
+	with open(full_file_path, "wb") as f:
+		for chunk in qr_response.iter_content(1024):
+			f.write(chunk)
+	files = {"file": open(full_file_path, 'rb')}
+	payload = {
+		"is_private": 1,
+		"folder": "Home",
+		"doctype": "Invoices",
+		"docname": invoice_number,
+		'fieldname': 'qr_code_image'
+	}
+	upload_qr_image = requests.post(site + "api/method/upload_file",
+									files=files,
+									data=payload)
+	response = upload_qr_image.json()
+	if 'message' in response:
+		invoice.qr_code_image = response['message']['file_url']
+		invoice.save()
+		attach_qr_code(invoice_number, gsp,invoice.company)
 		return {"success":True}
-	except Exception as e:
-		print(e, "qr image")
-		return {"success":False}
+	return {"success":True}
+	# except Exception as e:
+	# 	print(e, "qr image")
+	# 	return {"success":False}
 
 
 

@@ -264,7 +264,7 @@ def file_parsing(filepath):
 	guest['start_time'] = str(start_time)
 	
 	company_code = {"code":"MHKCP-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"MHKCP-01","invoice_date":date_time_obj}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
@@ -315,24 +315,24 @@ def file_parsing(filepath):
 							return {"success":True,"message":"Invoice Created"}
 						else:
 							
-							error_data['error_message'] = str(insertInvoiceApiResponse['message'])
+							error_data['error_message'] = insertInvoiceApiResponse['message']
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
 						
-						error_data['error_message'] = str(calulateItemsApiResponse['message'])
+						error_data['error_message'] = calulateItemsApiResponse['message']
 						errorInvoice = Error_Insert_invoice(error_data)
 						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
 					# print(error_data)
-					error_data['error_message'] = str(getTaxPayerDetailsResponse['message'])
+					error_data['error_message'] = getTaxPayerDetailsResponse['message']
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
 			else:
 				# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
-				error_data['error_message'] = str(checkTokenIsValidResponse['message'])
+				error_data['error_message'] = checkTokenIsValidResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
@@ -348,18 +348,18 @@ def file_parsing(filepath):
 					return {"success":True,"message":"Invoice Created"}
 				else:
 					
-					error_data['error_message'] = str(insertInvoiceApiResponse['message'])
+					error_data['error_message'] = insertInvoiceApiResponse['message']
 					errorInvoice = Error_Insert_invoice(error_data)
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 					return {"success":False,"message":insertInvoiceApiResponse['message']}
 			else:
 						
-				error_data['error_message'] = str(calulateItemsApiResponse['message'])
+				error_data['error_message'] = calulateItemsApiResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 				return {"success":False,"message":calulateItemsApiResponse['message']}		
 	else:
-		error_data['error_message'] = str(gspApiDataResponse['message'])
+		error_data['error_message'] = gspApiDataResponse['message']
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}
