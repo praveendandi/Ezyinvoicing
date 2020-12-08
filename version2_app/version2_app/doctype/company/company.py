@@ -16,7 +16,6 @@ import re
 import json
 import sys
 import frappe
-from frappe.utils import get_site_name
 
 class company(Document):
 	# pass

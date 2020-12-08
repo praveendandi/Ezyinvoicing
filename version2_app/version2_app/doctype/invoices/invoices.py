@@ -1275,6 +1275,7 @@ def calulate_items(data):
 				"invoices",
 				'sac_code_found':
 				final_item['sac_code_found'],
+				'type':final_item['type'],
 				'other_charges': final_item['other_charges'],
 				'taxable':final_item['taxable']
 			})
