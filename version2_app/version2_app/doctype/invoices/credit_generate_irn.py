@@ -13,7 +13,7 @@ import fitz
 # /home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf
 site = 'http://0.0.0.0:8000/'
 site_folder_path = 'version2_app.com'
-fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
+# fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
 
 def check_company_exist_for_Irn(code):
 	try:
@@ -53,7 +53,7 @@ def attach_qr_code(invoice_number, gsp,code):
 			where,
 			text,
 			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=fontpath,  # any file containing a font
+			fontfile=folder_path+company.font_file_path,#fontpath,  # any file containing a font
 			fontsize=6,  # default
 			rotate=0,  # rotate text
 			color=(0, 0, 0),  # some color (blue)
@@ -83,55 +83,68 @@ def attach_qr_code(invoice_number, gsp,code):
 
 
 def create_qr_image(invoice_number, gsp):
-	try:
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		# file_path = frappe.get_site_path('private', 'files',
-		#                                  invoice.invoice_file)
-		company = frappe.get_doc('company',invoice.company)
-		folder_path = frappe.utils.get_bench_path()
-		site_folder_path = company.site_name
-		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host) + "/private/files/"
-		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
-		# print(path)
-		headers = {
-			"user_name": gsp['username'],
-			"password": gsp['password'],
-			"gstin": gsp['gst'],
-			"requestid": str(random.randint(0, 1000000000000000000)),
-			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.credit_irn_number
-		}
+	# try:
+	invoice = frappe.get_doc('Invoices', invoice_number)
+	# file_path = frappe.get_site_path('private', 'files',
+	#                                  invoice.invoice_file)
+	company = frappe.get_doc('company',invoice.company)
+	folder_path = frappe.utils.get_bench_path()
+	site_folder_path = company.site_name
+	# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host) + "/private/files/"
+	path = folder_path + '/sites/' + site_folder_path + "/private/files/"
+	# print(path)
+	headers = {
+		"user_name": gsp['username'],
+		"password": gsp['password'],
+		"gstin": gsp['gst'],
+		"requestid": str(random.randint(0, 1000000000000000000)),
+		"Authorization": "Bearer " + gsp['token'],
+		"Irn": invoice.credit_irn_number
+	}
+	if company.proxy == 0:
 		qr_response = requests.get(gsp['generate_qr_code'],
 									headers=headers,
 									stream=True)
-		file_name = invoice_number + "creditqr.png"
-		full_file_path = path + file_name
-		with open(full_file_path, "wb") as f:
-			for chunk in qr_response.iter_content(1024):
-				f.write(chunk)
-		files = {"file": open(full_file_path, 'rb')}
-		payload = {
-			"is_private": 1,
-			"folder": "Home",
-			"doctype": "Invoices",
-			"docname": invoice_number,
-			'fieldname': 'credit_qr_code_image'
-		}
-		upload_qr_image = requests.post(site + "api/method/upload_file",
-										files=files,
-										data=payload)
-		response = upload_qr_image.json()
-		if 'message' in response:
-			invoice.credit_qr_code_image = response['message']['file_url']
-			invoice.save()
-			attach_qr_code(invoice_number, gsp,invoice.company)
+	else:
+		proxyhost = company.proxy_url
+		proxyhost = proxyhost.replace("http://","@")
+		proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+					}
+		qr_response = requests.get(gsp['generate_qr_code'],
+									headers=headers,
+									stream=True,proxies=proxies)
 
-		return
-	except Exception as e:
-		print(e, "qr image")
+	file_name = invoice_number + "creditqr.png"
+	full_file_path = path + file_name
+	with open(full_file_path, "wb") as f:
+		for chunk in qr_response.iter_content(1024):
+			f.write(chunk)
+	files = {"file": open(full_file_path, 'rb')}
+	payload = {
+		"is_private": 1,
+		"folder": "Home",
+		"doctype": "Invoices",
+		"docname": invoice_number,
+		'fieldname': 'credit_qr_code_image'
+	}
+	upload_qr_image = requests.post(site + "api/method/upload_file",
+									files=files,
+									data=payload)
+	response = upload_qr_image.json()
+	if 'message' in response:
+		invoice.credit_qr_code_image = response['message']['file_url']
+		invoice.save()
+		attach_qr_code(invoice_number, gsp,invoice.company)
 
-def request_get(api, headers,invoice):
+	return
+	# except Exception as e:
+	# 	print(e, " credit qr image")
+
+def request_get_data(api, headers,invoice,code):
 	try:
+		company = check_company_exist_for_Irn(code)
+		
 		headers = {
 			"user_name": headers["username"],
 			"password": headers["password"],
@@ -139,7 +152,16 @@ def request_get(api, headers,invoice):
 			"requestid": invoice+str(random.randrange(1, 10**4)),
 			"Authorization": "Bearer " + headers['token']
 		}
-		raw_response = requests.get(api, headers=headers)
+		if company.proxy == 0:
+			raw_response = requests.get(api, headers=headers)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+						}
+			raw_response = requests.get(api, headers=headers,proxies=proxies)
+	
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
 			return raw_response.json()
@@ -150,15 +172,15 @@ def request_get(api, headers,invoice):
 
 
 
-def get_tax_payer_details(data):
+def get_tax_payer_details_data(data):
 	'''
 	get TaxPayerDetail from gsp   gstNumber, code, apidata
 	'''
 	try:
 		tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'])
 		if tay_payer_details is None:
-			response = request_get(data['apidata']['get_taxpayer_details'] + data['gstNumber'],
-									data['apidata'],data['invoice'])
+			response = request_get_data(data['apidata']['get_taxpayer_details'] + data['gstNumber'],
+									data['apidata'],data['invoice'],data['code'])
 			if response['success']:
 				
 				details = response['result']
@@ -329,7 +351,7 @@ def CreditgenerateIrn(invoice_number):
 	# print(GSP_details)
 	# get taxpayer details
 	GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data'],"invoice":invoice_number}
-	taxpayer_details = get_tax_payer_details(GspData)
+	taxpayer_details = get_tax_payer_details_data(GspData)
 	#gst data
 	# print(taxpayer_details,"taxxxxxx")
 	gst_data = {
@@ -476,7 +498,7 @@ def CreditgenerateIrn(invoice_number):
 		"TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
 	}
 	# print(gst_data)
-	response = postIrn(gst_data, GSP_details['data'])
+	response = postIrn(gst_data, GSP_details['data'],company_details)
 	if response['success']==True:
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		invoice.credit_ack_no = response['result']['AckNo']
@@ -501,7 +523,7 @@ def CreditgenerateIrn(invoice_number):
 
 	return response
 
-def postIrn(gst_data, gsp):
+def postIrn(gst_data, gsp,company):
 	try:
 		# print(gst_data)
 		headers = {
@@ -511,17 +533,26 @@ def postIrn(gst_data, gsp):
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token']
 		}
-		# print(headers)
-		# print(gst_data,"****************************")
-		# print(gsp['generate_irn'])
-		irn_response = requests.post(gsp['generate_irn'],
-										headers=headers,
-										json=gst_data)
+		
+		if company['data'].proxy == 0:
+			irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data)
+		else:
+			
+			proxyhost = company['data'].proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
+					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
+						}
+			irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data,proxies=proxies)									
 		if irn_response.status_code == 200:
 			return irn_response.json()
 		else:
 			return {"success": False, 'message': irn_response.text}
 		# print(irn_response.text)
 	except Exception as e:
-		print(e, "post irn")
+		print(e, "post irn credit")
 		return {"success": False, 'message':str(e)}

@@ -1,0 +1,13 @@
+{
+ "creation": "2020-12-05 11:08:49.495607",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart Source",
+ "idx": 0,
+ "modified": "2020-12-05 11:08:49.495607",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "SAC Codes",
+ "owner": "Administrator",
+ "source_name": "SAC Codes ",
+ "timeseries": 1
+}
