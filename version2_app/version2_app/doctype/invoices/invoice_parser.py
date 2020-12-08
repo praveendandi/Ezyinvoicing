@@ -97,13 +97,10 @@ def file_parsing(filepath):
 	
 	paymentTypes = GetPaymentTypes()
 	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
-	print(paymentTypes)
 	original_data = []
-	# payment_list = "Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
 	for index, i in enumerate(data):
 	
-		# if 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
-		# 	original_data.append(i)
+		
 		if 'XX/XX' in i:
 			i = " "
 		if i !=" ":
@@ -119,6 +116,11 @@ def file_parsing(filepath):
 
 
 
+		# if 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
+		# 	original_data.append(i)
+		# if 'XX/XX' in i and i in payment_list:
+		# 	original_data.pop(len(original_data) - 1)
+		# 	original_data.pop(len(original_data) - 1)
 
 	items = [] 
 	itemsort = 0
@@ -267,13 +269,13 @@ def file_parsing(filepath):
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
-	error_data['gst_number'] = gstNumber
-	if guest['invoice_type'] == "B2C":
-		error_data['gst_number'] == " "
-	error_data['state_code'] = "36"
+	# error_data['gst_number'] = gstNumber
+	# if guest['invoice_type'] == "B2C":
+	# 	error_data['gst_number'] == " "
+	# error_data['state_code'] = "36"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "500082"
-	# gstNumber = "12345"
+	# error_data['pincode'] = "500082"
+	gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
@@ -285,13 +287,8 @@ def file_parsing(filepath):
 
 	# check_invoice_exists
 	check_invoice = check_invoice_exists(guest['invoice_number'])
-	# guest['invoice_number'] = guest['invoice_number']+"-A"
 	if check_invoice['success']==True:
-
-		# print(check_invoice)
-		# guest['invoice_number'] = guest['invoice_number']+"-A"
 		inv_data = check_invoice['data']
-		# print(inv_data.docstatus)
 		if inv_data.docstatus==2:
 			amened='Yes'
 		else:

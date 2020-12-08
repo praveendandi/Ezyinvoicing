@@ -325,11 +325,14 @@ class Invoices(Document):
 			items = doc.items
 			items_count = 0
 			hsn_code = ""
+			headers = {'Content-Type': 'application/json'}
 			if company.b2c_qr_type == "Invoice Details":
 				proxyhost = company.proxy_url
 				proxyhost = proxyhost.replace("http://","@")
-				os.environ['http_proxy'] = "http://"+company.proxy_username+":"+company.proxy_password+proxyhost
-				os.environ['https_proxy'] = "https://"+company.proxy_username+":"+company.proxy_password+proxyhost
+				proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+						'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+							}
+				
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
 						hsn_code += xyz.sac_code+", "
@@ -344,30 +347,43 @@ class Invoices(Document):
 					"guest_name": doc.guest_name,
 					"issued_by": "ezyinvoicing",
 					"items_count": items_count,
-					"hsn_code": hsn_code.rstrip(', ')
+					"hsn_code": hsn_code.rstrip(', '),
+					"company":company.name
 				}
-				storage_client = storage.Client.from_service_account_json(
-					folder_path +"/apps/version2_app/version2_app/version2_app/doctype/invoices/jaypee-group-a9b672ada582.json"
-				)
-				bucket = storage_client.get_bucket("ezyinvoices-b2c")
-				with open(b2c_file, "w") as outfile:
-					json.dump(b2c_data, outfile)
-				blob = bucket.blob(filename)
-				with open(b2c_file, 'rb') as img_data:
-					blob.upload_from_file(img_data)
+				if company.proxy == 0:
+					json_response = requests.post("https://gst.caratred.in/ezy/api/addJsonToGcb",headers=headers,json=b2c_data)
+					response = json_response.json()
+					if response["success"]==False:
+						return {"success":False, "message":response["message"]}
+				else:
+					json_response = requests.post("https://gst.caratred.in/ezy/api/addJsonToGcb",headers=headers,json=b2c_data,proxies=proxies)
+					response = json_response.json()
+					if response["success"]==False:
+						return {"success":False, "message":response["message"]}
+
+				# storage_client = storage.Client.from_service_account_json(
+				# 	folder_path +"/apps/version2_app/version2_app/version2_app/doctype/invoices/jaypee-group-a9b672ada582.json"
+				# )
+				# bucket = storage_client.get_bucket("ezyinvoices-b2c")
+				# with open(b2c_file, "w") as outfile:
+				# 	json.dump(b2c_data, outfile)
+				# blob = bucket.blob(filename)
+				# with open(b2c_file, 'rb') as img_data:
+				# 	blob.upload_from_file(img_data)
+
 				qr = qrcode.QRCode(
 					version=1,
 					error_correction=qrcode.constants.ERROR_CORRECT_L,
 					box_size=10,
 					border=4
 				)
-				qrurl = company.b2c_qr_url + blob.public_url
+				qrurl = company.b2c_qr_url + response['data']
 				qr.add_data(qrurl)
 				qr.make(fit=True)
 				img = qr.make_image(fill_color="black", back_color="white")
 				img.save(dst_pdf_filename)
 			elif company.b2c_qr_type == "Virtual Payment":
-				headers = {'Content-Type': 'application/json'}
+				
 				if company.proxy == 0:
 					generate_qr = requests.post(
 						"https://upiqr.in/api/qr?format=png",
@@ -530,62 +546,62 @@ def attach_qr_code(invoice_number, gsp,code):
 
 
 def create_qr_image(invoice_number, gsp):
-	# try:
-	invoice = frappe.get_doc('Invoices', invoice_number)
-	# file_path = frappe.get_site_path('private', 'files',
-	#                                  invoice.invoice_file)
-	folder_path = frappe.utils.get_bench_path()
-	company = frappe.get_doc('company',invoice.company)
-	site_folder_path = company.site_name
-	path = folder_path + '/sites/' + site_folder_path + "/private/files/"
-	# print(path)
-	headers = {
-		"user_name": gsp['username'],
-		"password": gsp['password'],
-		"gstin": gsp['gst'],
-		"requestid": str(random.randint(0, 1000000000000000000)),
-		"Authorization": "Bearer " + gsp['token'],
-		"Irn": invoice.irn_number
-	}
-	if company.proxy == 0:
-		qr_response = requests.get(gsp['generate_qr_code'],
-									headers=headers,
-									stream=True)
-	else:
-		proxyhost = company.proxy_url
-		proxyhost = proxyhost.replace("http://","@")
-		proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-					'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-					}	
-		qr_response = requests.get(gsp['generate_qr_code'],
-									headers=headers,
-									stream=True,proxies=proxies)										
-	file_name = invoice_number + "qr.png"
-	full_file_path = path + file_name
-	with open(full_file_path, "wb") as f:
-		for chunk in qr_response.iter_content(1024):
-			f.write(chunk)
-	files = {"file": open(full_file_path, 'rb')}
-	payload = {
-		"is_private": 1,
-		"folder": "Home",
-		"doctype": "Invoices",
-		"docname": invoice_number,
-		'fieldname': 'qr_code_image'
-	}
-	upload_qr_image = requests.post(site + "api/method/upload_file",
-									files=files,
-									data=payload)
-	response = upload_qr_image.json()
-	if 'message' in response:
-		invoice.qr_code_image = response['message']['file_url']
-		invoice.save()
-		attach_qr_code(invoice_number, gsp,invoice.company)
+	try:
+		invoice = frappe.get_doc('Invoices', invoice_number)
+		# file_path = frappe.get_site_path('private', 'files',
+		#                                  invoice.invoice_file)
+		folder_path = frappe.utils.get_bench_path()
+		company = frappe.get_doc('company',invoice.company)
+		site_folder_path = company.site_name
+		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
+		# print(path)
+		headers = {
+			"user_name": gsp['username'],
+			"password": gsp['password'],
+			"gstin": gsp['gst'],
+			"requestid": str(random.randint(0, 1000000000000000000)),
+			"Authorization": "Bearer " + gsp['token'],
+			"Irn": invoice.irn_number
+		}
+		if company.proxy == 0:
+			qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+						'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+						}	
+			qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True,proxies=proxies)										
+		file_name = invoice_number + "qr.png"
+		full_file_path = path + file_name
+		with open(full_file_path, "wb") as f:
+			for chunk in qr_response.iter_content(1024):
+				f.write(chunk)
+		files = {"file": open(full_file_path, 'rb')}
+		payload = {
+			"is_private": 1,
+			"folder": "Home",
+			"doctype": "Invoices",
+			"docname": invoice_number,
+			'fieldname': 'qr_code_image'
+		}
+		upload_qr_image = requests.post(site + "api/method/upload_file",
+										files=files,
+										data=payload)
+		response = upload_qr_image.json()
+		if 'message' in response:
+			invoice.qr_code_image = response['message']['file_url']
+			invoice.save()
+			attach_qr_code(invoice_number, gsp,invoice.company)
+			return {"success":True}
 		return {"success":True}
-	return {"success":True}
-	# except Exception as e:
-	# 	print(e, "qr image")
-	# 	return {"success":False}
+	except Exception as e:
+		print(e, "qr image")
+		return {"success":False}
 
 
 
@@ -1883,7 +1899,6 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
 	try:
 		invoiceExists = frappe.get_doc('Invoices',invoice_number)
-		# print(invoiceExists,invoice_number,"/////////")	
 		if invoiceExists:
 		
 			return {"success":True,"data":invoiceExists}
