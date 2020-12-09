@@ -80,8 +80,10 @@ def getTaxPayerDetails(data):
 		
 	return {"success":True,"data":data,"count":count}
 
-def request_get(api, data):
+def request_get(api, data,company):
 	try:
+		
+	
 		print(api,data)
 		headerData = {
 			"user_name": data['apidata']["username"],
@@ -91,8 +93,15 @@ def request_get(api, data):
 			"Authorization": "Bearer " + data["apidata"]["token"]
 		}
 		# print(headerData)
-		raw_response = requests.get(api, headers=headerData)
-		print(raw_response,"----------------")
+		if company['proxy'] == 0:
+			raw_response = requests.get(api, headers=headerData)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+						}
+			raw_response = requests.get(api, headers=headerData,proxies=proxies)				
 		if raw_response.status_code == 200:
 			return raw_response.json()
 		else:
@@ -118,7 +127,7 @@ def TaxPayerDetails(data):
 					# print(gspApiDataResponse)
 					GspData = {"gstNumber":data['gstNumber'],"code":data['code'],"apidata":gspApiDataResponse['message']['data']}
 					response = request_get(gspApiDataResponse['message']['data']['get_taxpayer_details']+ data['gstNumber'],
-										GspData)
+										GspData,companyApis)
 					if response['success']:
 							
 						details = response['result']

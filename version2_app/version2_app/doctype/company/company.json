@@ -61,7 +61,12 @@
   "site_name",
   "irn_details_page",
   "invoice_item_date_format",
-  "invoice_parser_file_path"
+  "invoice_parser_file_path",
+  "font_file_path",
+  "proxy",
+  "proxy_url",
+  "proxy_username",
+  "proxy_password"
  ],
  "fields": [
   {
@@ -371,11 +376,37 @@
    "fieldname": "invoice_parser_file_path",
    "fieldtype": "Data",
    "label": "Invoice Parser File Path"
+  },
+  {
+   "fieldname": "font_file_path",
+   "fieldtype": "Data",
+   "label": "Font File Path"
+  },
+  {
+   "default": "0",
+   "fieldname": "proxy",
+   "fieldtype": "Check",
+   "label": "Proxy"
+  },
+  {
+   "fieldname": "proxy_url",
+   "fieldtype": "Data",
+   "label": "Proxy Url"
+  },
+  {
+   "fieldname": "proxy_username",
+   "fieldtype": "Data",
+   "label": "Proxy UserName"
+  },
+  {
+   "fieldname": "proxy_password",
+   "fieldtype": "Data",
+   "label": "Proxy Password"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-03 12:38:51.550745",
+ "modified": "2020-12-05 12:28:03.260500",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
