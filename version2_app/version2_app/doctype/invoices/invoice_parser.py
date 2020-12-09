@@ -12,7 +12,7 @@ from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 # from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
-# from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
+from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
 folder_path = frappe.utils.get_bench_path()
@@ -323,7 +323,7 @@ def file_parsing(filepath):
 	error_data['state_code'] = "36"
 	error_data['room_number'] = guest['room_number']
 	error_data['pincode'] = "500082"
-	gstNumber = "12345"
+	# gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
