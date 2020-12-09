@@ -1,0 +1,39 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2020-12-08 11:08:16.988380",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2020-12-08 11:09:35.288426",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "test123",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": " SELECT \"----\",if(tabItems.type=\"Included\",(if((tabItems.item_value*tabItems.gst_rate/100) - (tabItems.igst_amount+tabItems.sgst_amount+tabItems.cgst_amount) = 0),\"-\",\"invalid\"),\"-\") from tabInvoices JOIN tabItems ON tabInvoices.name = tabItems.parent",
+ "ref_doctype": "Invoices",
+ "report_name": "test123",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "IT"
+  },
+  {
+   "role": "Finance"
+  },
+  {
+   "role": "Guest"
+  }
+ ]
+}

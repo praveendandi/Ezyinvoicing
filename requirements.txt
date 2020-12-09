@@ -4,3 +4,5 @@ pdfplumber
 pandas
 qrcode
 google-cloud-storage
+XlsxWriter
+wget
