@@ -59,7 +59,9 @@
   "reinitiate_file_path",
   "invoice_parser_file",
   "site_name",
-  "irn_details_page"
+  "irn_details_page",
+  "invoice_item_date_format",
+  "invoice_parser_file_path"
  ],
  "fields": [
   {
@@ -359,11 +361,21 @@
    "fieldname": "b2c_qr_url",
    "fieldtype": "Data",
    "label": "B2C QR URL"
+  },
+  {
+   "fieldname": "invoice_item_date_format",
+   "fieldtype": "Data",
+   "label": "Invoice Item Date Format"
+  },
+  {
+   "fieldname": "invoice_parser_file_path",
+   "fieldtype": "Data",
+   "label": "Invoice Parser File Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-02 11:25:30.800368",
+ "modified": "2020-12-03 12:38:51.550745",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

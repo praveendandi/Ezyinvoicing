@@ -90,7 +90,8 @@
   "total_gst_amount",
   "b2c_qrimage",
   "b2c_qrinvoice",
-  "qr_generated"
+  "qr_generated",
+  "cess_amount"
  ],
  "fields": [
   {
@@ -114,7 +115,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled\nError",
+   "options": "Pending\nSuccess\nCancelled\nError\nNA",
    "read_only": 1
   },
   {
@@ -585,16 +586,21 @@
    "label": "B2C QRInvoice"
   },
   {
-   "default": "No",
+   "default": "Pending",
    "fieldname": "qr_generated",
    "fieldtype": "Data",
    "label": "QR Generated"
+  },
+  {
+   "fieldname": "cess_amount",
+   "fieldtype": "Float",
+   "label": "CESS Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-02 13:02:28.139411",
+ "modified": "2020-12-03 19:03:47.277175",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

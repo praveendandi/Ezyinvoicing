@@ -41,7 +41,11 @@ def Reinitiate_invoice(data):
 		igst_amount = 0
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
-				
+		
+		if data['guest_data']['invoice_type'] == "B2B":
+			irn_generated = "Pending"
+		else:	
+			irn_generated = "NA"
 		#calculat items
 		# items_data = calulate_items(data['items'], data['invoice_number'],company_code)
 		for item in data['items_data']:
@@ -107,7 +111,7 @@ def Reinitiate_invoice(data):
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
 		doc.igst_amount=round(igst_amount,2)
-		doc.irn_generated='Pending'
+		doc.irn_generated=irn_generated
 		doc.irn_cancelled='No'
 		doc.qr_code_generated='Pending'
 		doc.signed_invoice_generated='No'

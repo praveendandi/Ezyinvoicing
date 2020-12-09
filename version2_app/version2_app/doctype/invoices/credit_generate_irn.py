@@ -403,15 +403,16 @@ def CreditgenerateIrn(invoice_number):
 	total_igst_value = 0
 	total_sgst_value = 0
 	total_cgst_value = 0
+	total_cess_calue = 0
 	ass_value = 0
 	for index, item in enumerate(invoice.items):
 		# print(item.sac_code,"HsnCD")
 		if item.is_credit_item == "Yes":
-			# print(item,"itttttttttttttt")
 			credit_items.append(item.__dict__)
 			total_igst_value += abs(item.igst_amount)
 			total_sgst_value += abs(item.sgst_amount)
 			total_cgst_value += abs(item.cgst_amount)
+			total_cess_calue += abs(item.cess_amount)
 			ass_value += abs(item.item_value)
 			i = {
 				"SlNo":
@@ -444,9 +445,9 @@ def CreditgenerateIrn(invoice_number):
 				"SgstAmt":
 				abs(round(item.sgst_amount, 2)),
 				"CesRt":
-				0,
+				item.cess,
 				"CesAmt":
-				0,
+				item.cess_amount,
 				"CesNonAdvlAmt":
 				0,
 				"StateCesRt":
@@ -466,7 +467,7 @@ def CreditgenerateIrn(invoice_number):
 		"CgstVal": round(total_cgst_value, 2),
 		"SgstVal": round(total_sgst_value, 2),
 		"IgstVal": round(total_igst_value, 2),
-		"CesVal": 0,
+		"CesVal": round(total_cess_calue,2),
 		"StCesVal": 0,
 		"Discount": 0,
 		"OthChrg": 0,
@@ -523,4 +524,4 @@ def postIrn(gst_data, gsp):
 		# print(irn_response.text)
 	except Exception as e:
 		print(e, "post irn")
-		return {"success": False, 'message':e}
+		return {"success": False, 'message':str(e)}

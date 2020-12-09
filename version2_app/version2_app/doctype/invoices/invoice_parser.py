@@ -96,7 +96,7 @@ def file_parsing(filepath):
 
 
 	original_data = []
-	payment_list = "Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
+	payment_list = "'Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
 	for index, i in enumerate(data):
 
 		if 'UPI Payment' not in i and 'Maestro Card' not in i and 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
@@ -291,7 +291,7 @@ def file_parsing(filepath):
 			if checkTokenIsValidResponse['success'] == True:
 				getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":guest['gstNumber'],"code":company_code['code'],"invoice":guest['invoice_number'],"apidata":gspApiDataResponse['data']})
 				if getTaxPayerDetailsResponse['success'] == True:
-					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code']})
+					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 					if calulateItemsApiResponse['success'] == True:
 						guest['invoice_file'] = filepath
 						insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
@@ -324,7 +324,7 @@ def file_parsing(filepath):
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 
 
-			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code']})
+			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
 				insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
