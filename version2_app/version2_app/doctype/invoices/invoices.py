@@ -883,11 +883,14 @@ def calulate_items(data):
 			calulationType = frappe.get_doc(
 						'company', data['company_code'])
 			if calulationType.calculation_by == "Description":
+				sac_code_based_gst = frappe.db.get_list(
+					'SAC HSN CODES',
+					filters={'name': ['=',item['name']]})
+				if not sac_code_based_gst:
+					sac_code_based_gst = frappe.db.get_list(
+						'SAC HSN CODES',
+						filters={'name': ['like', '%' + item['name'] + '%']})
 				
-				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={
-							'name': ['like', '%'+item['name']+'%']
-						})
-				# print(len(sac_code_based_gst),sac_code_based_gst)		
 						
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
@@ -917,7 +920,7 @@ def calulate_items(data):
 				if "-" in str(item['item_value']) and item['sac_code'] == '996311':
 					final_item['sort_order'] = item['sort_order']
 					
-					if item['item_value']>1000 and item['item_value']<7500:
+					if item['item_value']>1000 and item['item_value']<=7500:
 						gst_percentage = 12
 					elif item['item_value']>7500:
 						gst_percentage = 18
@@ -953,7 +956,7 @@ def calulate_items(data):
 				elif item['sac_code'] == '996311':
 					final_item['sort_order'] = item['sort_order']
 					
-					if item['item_value']>1000 and item['item_value']<7500:
+					if item['item_value']>1000 and item['item_value']<=7500:
 						gst_percentage = 12
 					elif item['item_value']>7500:
 						gst_percentage = 18
@@ -1108,7 +1111,7 @@ def calulate_items(data):
 					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
 					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
 									int(sac_code_based_gst_rates.sgst))
-					if item['item_value']>1000 and item['item_value']<7500:
+					if item['item_value']>1000 and item['item_value']<=7500:
 						gst_percentage = 12
 					elif item['item_value']>7500:
 						gst_percentage = 18
