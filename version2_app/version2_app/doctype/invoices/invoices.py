@@ -1001,7 +1001,8 @@ def calulate_items(data):
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
-					SAC_CODE = sac_code_based_gst_rates.code 
+					SAC_CODE = sac_code_based_gst_rates.code
+					item['item_type'] = sac_code_based_gst_rates.type
 				else:
 					
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
@@ -1334,6 +1335,7 @@ def calulate_items(data):
 				item['name'],
 				'sort_order':
 				final_item['sort_order'],
+				"item_type":item['item_type'],
 				'date':
 				datetime.datetime.strptime(item['date'],
 										   data['invoice_item_date_format']),
