@@ -108,7 +108,6 @@ def file_parsing(filepath):
 			j = j[1:-1]
 			if len(j)>1:
 				ele = j[0]+" "+j[1]
-				print(ele,paymentTypes)
 				if ele not in paymentTypes:
 					original_data.append(i)
 			elif len(j) == 1:
