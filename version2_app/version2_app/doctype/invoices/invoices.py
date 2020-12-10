@@ -997,10 +997,14 @@ def calulate_items(data):
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
 						filters={'name': ['like', '%' + item['name'] + '%']})
-				if len(sac_code_based_gst) > 0:
+					
+				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
-						'SAC HSN CODES', sac_code_based_gst[0]['name'])
-				SAC_CODE = sac_code_based_gst_rates.code
+					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
+					SAC_CODE = sac_code_based_gst_rates.code 
+				else:
+					
+					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
 
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
@@ -1020,8 +1024,8 @@ def calulate_items(data):
 				if "-" in str(
 						item['item_value']) and item['sac_code'] == '996311':
 					final_item['sort_order'] = item['sort_order']
-
-					if item['item_value'] > 1000 and item['item_value'] < 7500:
+					
+					if item['item_value']>1000 and item['item_value']<=7500:
 						gst_percentage = 12
 					elif item['item_value'] > 7500:
 						gst_percentage = 18
@@ -1057,8 +1061,8 @@ def calulate_items(data):
 						final_item['type'] = "Included"
 				elif item['sac_code'] == '996311':
 					final_item['sort_order'] = item['sort_order']
-
-					if item['item_value'] > 1000 and item['item_value'] <= 7500:
+					
+					if item['item_value']>1000 and item['item_value']<=7500:
 						gst_percentage = 12
 					elif item['item_value'] > 7500:
 						gst_percentage = 18
@@ -1217,8 +1221,8 @@ def calulate_items(data):
 					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
 					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
 					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-									  int(sac_code_based_gst_rates.sgst))
-					if item['item_value'] > 1000 and item['item_value'] < 7500:
+									int(sac_code_based_gst_rates.sgst))
+					if item['item_value']>1000 and item['item_value']<=7500:
 						gst_percentage = 12
 					elif item['item_value'] > 7500:
 						gst_percentage = 18
@@ -1762,86 +1766,70 @@ def login_gsp(code, mode):
 
 @frappe.whitelist(allow_guest=True)
 def gsp_api_data(data):
-	# try:
-	# print(data,"**********8")
-	mode = data['mode']
-	gsp_apis = frappe.db.get_value('GSP APIS', {
-		"company": data['code'],
-		"name": data['provider'],
-	}, [
-		'auth_test',
-		'cancel_test_irn',
-		'extract_prod_qr_code',
-		'extract_test_qr_code',
-		'extract_test_signed_invoice',
-		'generate_prod_irn',
-		'generate_test_irn',
-		'generate_test_qr_code_image',
-		'get_tax_payer_prod',
-		'get_tax_payer_test',
-		'get_test_irn',
-		'get_test_qr_image',
-		'auth_prod',
-		'cancel_prod_irn',
-		'extract_prod_qr_code',
-		'extract_prod_signed_invoice',
-		'generate_prod_irn',
-		'generate_prod_qr_code_image',
-		'get_prod_irn',
-		'get_prod_qr_image',
-		'get_tax_payer_prod',
-		'gsp_prod_app_id',
-		'gsp_prod_app_secret',
-		'gsp_test_app_id',
-		'gsp_test_app_secret',
-		'gsp_test_token',
-		'gst__prod_username',
-		'gst__test_username',
-		'gst_prod_password',
-		'gst_test_password',
-		'gsp_prod_token',
-		'gst_test_number',
-		'gst_prod_number',
-	],
-								   as_dict=1)
-	print(gsp_apis, "******")
-	api_details = dict()
-	api_details['auth'] = gsp_apis[
-		'auth_test'] if mode == 'Testing' else gsp_apis['auth_prod']
-	api_details['generate_irn'] = gsp_apis[
-		'generate_test_irn'] if mode == 'Testing' else gsp_apis[
-			'generate_prod_irn']
-	api_details['cancel_irn'] = gsp_apis[
-		'cancel_test_irn'] if mode == 'Testing' else gsp_apis['cancel_prod_irn']
-	api_details['get_taxpayer_details'] = gsp_apis[
-		'get_tax_payer_test'] if mode == 'Testing' else gsp_apis[
-			'get_tax_payer_prod']
-	api_details['generate_qr_code'] = gsp_apis[
-		'generate_test_qr_code_image'] if mode == 'Testing' else gsp_apis[
-			'generate_prod_qr_code_image']
-	api_details['generate_signed_qr_code'] = gsp_apis[
-		'extract_test_signed_invoice'] if mode == 'Testing' else gsp_apis[
-			'extract_prod_signed_invoice']
-	api_details['username'] = gsp_apis[
-		'gst__test_username'] if mode == 'Testing' else gsp_apis[
-			'gst__prod_username']
-	api_details['password'] = gsp_apis[
-		'gst_test_password'] if mode == 'Testing' else gsp_apis[
-			'gst_prod_password']
-	api_details['appId'] = gsp_apis[
-		'gsp_test_app_id'] if mode == 'Testing' else gsp_apis['gsp_prod_app_id']
-	api_details['secret'] = gsp_apis[
-		'gsp_test_app_secret'] if mode == 'Testing' else gsp_apis[
-			'gsp_prod_app_secret']
-	api_details['token'] = gsp_apis[
-		'gsp_test_token'] if mode == 'Testing' else gsp_apis['gsp_prod_token']
-	api_details['gst'] = gsp_apis[
-		'gst_test_number'] if mode == 'Testing' else gsp_apis['gst_prod_number']
-	# print(api_details,"//////")
-	return {"success": True, "data": api_details}
-	# except Exception as e:
-	# 	print(e,"gsp api details")
-	# 	return {"success":False,"message":str(e)}
+	try:
+		# print(data,"**********8")
+		mode = data['mode']
+		gsp_apis = frappe.db.get_value('GSP APIS', {
+			"company": data['code'],
+			"name": data['provider'],
+		}, [
+			'auth_test', 'cancel_test_irn', 'extract_prod_qr_code',
+			'extract_test_qr_code', 'extract_test_signed_invoice',
+			'generate_prod_irn', 'generate_test_irn',
+			'generate_test_qr_code_image', 'get_tax_payer_prod',
+			'get_tax_payer_test', 'get_test_irn', 'get_test_qr_image',
+			'auth_prod', 'cancel_prod_irn', 'extract_prod_qr_code',
+			'extract_prod_signed_invoice', 'generate_prod_irn',
+			'generate_prod_qr_code_image', 'get_prod_irn', 'get_prod_qr_image',
+			'get_tax_payer_prod', 'gsp_prod_app_id', 'gsp_prod_app_secret',
+			'gsp_test_app_id', 'gsp_test_app_secret', 'gsp_test_token',
+			'gst__prod_username', 'gst__test_username', 'gst_prod_password',
+			'gst_test_password', 'gsp_prod_token', 'gst_test_number',
+			'gst_prod_number',
+		],
+										as_dict=1)
+		api_details = dict()
+		api_details['auth'] = gsp_apis[
+			'auth_test'] if mode == 'Testing' else gsp_apis['auth_prod']
+		api_details['generate_irn'] = gsp_apis[
+			'generate_test_irn'] if mode == 'Testing' else gsp_apis[
+				'generate_prod_irn']
+		api_details['cancel_irn'] = gsp_apis[
+			'cancel_test_irn'] if mode == 'Testing' else gsp_apis[
+				'cancel_prod_irn']
+		api_details['get_taxpayer_details'] = gsp_apis[
+			'get_tax_payer_test'] if mode == 'Testing' else gsp_apis[
+				'get_tax_payer_prod']
+		api_details['generate_qr_code'] = gsp_apis[
+			'generate_test_qr_code_image'] if mode == 'Testing' else gsp_apis[
+				'generate_prod_qr_code_image']
+		api_details['generate_signed_qr_code'] = gsp_apis[
+			'extract_test_signed_invoice'] if mode == 'Testing' else gsp_apis[
+				'extract_prod_signed_invoice']
+		api_details['username'] = gsp_apis[
+			'gst__test_username'] if mode == 'Testing' else gsp_apis[
+				'gst__prod_username']
+		api_details['password'] = gsp_apis[
+			'gst_test_password'] if mode == 'Testing' else gsp_apis[
+				'gst_prod_password']
+		api_details['appId'] = gsp_apis[
+			'gsp_test_app_id'] if mode == 'Testing' else gsp_apis[
+				'gsp_prod_app_id']
+		api_details['secret'] = gsp_apis[
+			'gsp_test_app_secret'] if mode == 'Testing' else gsp_apis[
+				'gsp_prod_app_secret']
+		api_details['token'] = gsp_apis[
+			'gsp_test_token'] if mode == 'Testing' else gsp_apis[
+				'gsp_prod_token']
+		api_details['gst'] = gsp_apis[
+			'gst_test_number'] if mode == 'Testing' else gsp_apis[
+				'gst_prod_number']
+		# print(api_details,"//////")
+		return {"success":True,"data":api_details}
+	except Exception as e:
+		print(e,"gsp api details")
+		return {"success":False,"message":str(e)}
+		
 
 
 def gsp_api_data_for_irn(data):
