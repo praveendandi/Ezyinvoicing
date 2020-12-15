@@ -27,6 +27,26 @@ site = 'http://0.0.0.0:8000/'
 
 
 class Invoices(Document):
+	# def on_cancel(self):
+	# 	if self.docstatus==2:
+	# 		if self.irn_generated == "Cancelled":
+	# 			print(self.irn_generated,"/...........")
+	# 			invoice = frappe.get_doc('Invoices', self.name)
+	# 			print(invoice,"/a/a/a")
+	# def before_cancel(self):
+	# 	# if self.docstatus==2:
+	# 	# if self.irn_generated == "Cancelled":
+	# 	print(self.irn_generated,"/[[[[[[[[[")
+	# 	invoice = frappe.get_doc('Invoices', self.name)
+	# 	print(invoice,"/a/a/a")
+	# 	invoice.irn_generated = "Cancelled"
+	# 	invoice.save()
+	# 	print("aaaaaaaaaaaaaaaaaaaaaaaaa")
+	# def on_update(self):
+	# 	if self.name:
+	# 		print("on_updateeeeeeeeeeeee")		
+
+
 	def generateIrn(self, invoice_number):
 		try:
 			# get invoice details
@@ -122,6 +142,7 @@ class Invoices(Document):
 			total_sgst_value = 0
 			total_cgst_value = 0
 			total_cess_value = 0
+			discount_value = 0
 			ass_value = 0
 			for index, item in enumerate(invoice.items):
 				# print(item.sac_code,"HsnCD")
@@ -180,9 +201,11 @@ class Invoices(Document):
 					}
 					gst_data['ItemList'].append(i)
 				else:
-					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes":
+					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details.allaowance_type=="Credit":
 						
 						credit_note_items.append(item)
+					else:
+						discount_value +=item.item_value_after_gst	
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2),
 				"CgstVal": round(total_cgst_value, 2),
@@ -190,7 +213,7 @@ class Invoices(Document):
 				"IgstVal": round(total_igst_value, 2),
 				"CesVal": round(total_cess_value, 2),
 				"StCesVal": 0,
-				"Discount": 0,
+				"Discount": discount_value,
 				"OthChrg": 0,
 				"RndOffAmt": 0,
 				"TotInvVal": round(invoice.amount_after_gst, 2),
@@ -219,7 +242,7 @@ class Invoices(Document):
 					invoice.save(ignore_permissions=True, ignore_version=True)
 					create_qr = create_qr_image(invoice_number,
 												GSP_details['data'])
-					if create_qr['success'] == True:
+					if create_qr['success'] == True and company_details.allaowance_type=="Credit":
 						if credit_note_items != []:
 							CreditgenerateIrn(invoice_number)
 							invoice = frappe.get_doc('Invoices',
@@ -232,7 +255,7 @@ class Invoices(Document):
 				else:
 					return response
 			else:
-				if credit_note_items != []:
+				if credit_note_items != [] and company_details.allaowance_type=="Credit":
 					CreditgenerateIrn(invoice_number)
 					invoice = frappe.get_doc('Invoices', invoice_number)
 					invoice.irn_process_time = datetime.datetime.utcnow(
@@ -244,125 +267,125 @@ class Invoices(Document):
 		except Exception as e:
 			print(str(e), "generate Irn")
 
-	def cancelIrn(self, invoice_number, reason='wrong Entry'):
-		try:
-			# get invoice details
-			invoice = frappe.get_doc('Invoices', invoice_number)
-			# get seller details
-
-			company_details = check_company_exist_for_Irn(invoice.company)
-			# get gsp_details
-			gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
-			GSP_details = gsp_api_data_for_irn(gsp_data)
-			# GSP_details = gsp_api_data(company_details.name,
-			# 						   company_details.mode,
-			# 						   company_details.provider)
-			cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
-			if cancel_response['success']:
-				invoice.cancelled_on = cancel_response['result']['CancelDate']
-				invoice.cancel_message = reason
-				invoice.irn_cancelled = 'Yes'
-				invoice.irn_generated = 'Cancelled'
-				invoice.save()
-				print("cannnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn")
-				if invoice.has_credit_items=="Yes":
-					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
-					if credit_cancel_response['success']:
-						# invoice.cancelled_on = cancel_response['result']['CancelDate']
-						# invoice.cancel_message = reason
-						invoice.credit_irn_cancelled = 'Yes'
-						invoice.credit_irn_generated = 'Cancelled'
-						invoice.save()
-						return {
-							"success": True,
-							"message": "E-Invoice is cancelled successfully"
-						}
-					return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
-				return {
-					"success": True,
-					"message": "E-Invoice is cancelled successfully"
-					}		
-			else:
-				return {"success": False, "message": "Invoice is not active"}
-
-		except Exception as e:
-			print(e,"cancel irn")
-
 	# def cancelIrn(self, invoice_number, reason='wrong Entry'):
-	# 	# try:
-	# 	# get invoice details
-	# 	invoice = frappe.get_doc('Invoices', invoice_number)
-	# 	# get seller details
-	# 	print(invoice)
-	# 	company_details = check_company_exist_for_Irn(invoice.company)
-	# 	# get gsp_details
-		
-	# 	gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
-	# 	GSP_details = gsp_api_data_for_irn(gsp_data)
-	# 	if len(invoice.irn_number)>10: 
+	# 	try:
+	# 		# get invoice details
+	# 		invoice = frappe.get_doc('Invoices', invoice_number)
+	# 		# get seller details
+
+	# 		company_details = check_company_exist_for_Irn(invoice.company)
+	# 		# get gsp_details
+	# 		gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
+	# 		GSP_details = gsp_api_data_for_irn(gsp_data)
+	# 		# GSP_details = gsp_api_data(company_details.name,
+	# 		# 						   company_details.mode,
+	# 		# 						   company_details.provider)
 	# 		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
 	# 		if cancel_response['success']:
-	# 			Cancelledinvoice = frappe.get_doc({
-	# 				'doctype':'Cancelled Invoices Details',
-	# 				'invoices':invoice_number,
-	# 				'invoice_number': invoice_number,
-	# 				'cancelled_on' : cancel_response['result']['CancelDate'],
-	# 				'cancelled_irn_number':cancel_response['result']['Irn'],
-	# 				'cancel_message': reason,
-	# 				'irn_cancelled':'Yes',
-	# 				'irn_generated':'Cancelled'})
-	# 			Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
-
+	# 			invoice.cancelled_on = cancel_response['result']['CancelDate']
+	# 			invoice.cancel_message = reason
+	# 			invoice.irn_cancelled = 'Yes'
+	# 			invoice.irn_generated = 'Cancelled'
+	# 			invoice.save()
+	# 			print("cannnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn")
 	# 			if invoice.has_credit_items=="Yes":
 	# 				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
 	# 				if credit_cancel_response['success']:
-	# 					CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
-	# 					CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
-	# 					CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
-	# 					CancelledCreditinvoice.cancelled_credit_irn_number = credit_cancel_response['result']['Irn']
-	# 					CancelledCreditinvoice.credit_irn = 'Yes'
-	# 					CancelledCreditinvoice.save()
+	# 					# invoice.cancelled_on = cancel_response['result']['CancelDate']
+	# 					# invoice.cancel_message = reason
+	# 					invoice.credit_irn_cancelled = 'Yes'
+	# 					invoice.credit_irn_generated = 'Cancelled'
+	# 					invoice.save()
 	# 					return {
 	# 						"success": True,
 	# 						"message": "E-Invoice is cancelled successfully"
 	# 					}
+	# 				return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
 	# 			return {
 	# 				"success": True,
 	# 				"message": "E-Invoice is cancelled successfully"
-	# 				}
+	# 				}		
 	# 		else:
 	# 			return {"success": False, "message": "Invoice is not active"}
-	# 	# if invoice.has_credit_items=="Yes" and len(invoice.irn_number)<10:
-	# 	# 	credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
-	# 	# 	if credit_cancel_response['success']:
-	# 	# 		CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
-	# 	# 		CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
-	# 	# 		CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
-	# 	# 		CancelledCreditinvoice.credit_irn = 'Yes'
-	# 	# 		CancelledCreditinvoice.save()
-	# 	# 		Cancelledinvoice = frappe.get_doc({
-	# 	# 			'doctype':'Cancelled Invoices Details',
-	# 	# 			'invoices':invoice_number,
-	# 	# 			'invoice_number': invoice_number,
-	# 	# 			'cancelled_on' : credit_cancel_response['result']['CancelDate'],
-	# 	# 			'cancelled_irn_number':credit_cancel_response['result']['Irn'],
-	# 	# 			'cancel_message': reason,
-	# 	# 			'credit_irn_cancelled':'Yes',
-	# 	# 			'credit_irn_generated':'Cancelled'})
-	# 	# 		Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
 
-	# 	# 		return {
-	# 	# 			"success": True,
-	# 	# 			"message": "E-Invoice is cancelled successfully"
-	# 	# 		}		
-	# 	else:
-	# 		return {
-	# 				"success": False,
-	# 				"message": "Cance Irn Failed"
-	# 			}
+	# 	except Exception as e:
+	# 		print(e,"cancel irn")
 
-	# 	# except Exception as e:
-	# 	# 	print(e,"cancel irn")		
+	def cancelIrn(self, invoice_number, reason='wrong Entry'):
+		# try:
+		# get invoice details
+		invoice = frappe.get_doc('Invoices', invoice_number)
+		# get seller details
+		print(invoice)
+		company_details = check_company_exist_for_Irn(invoice.company)
+		# get gsp_details
+		
+		gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
+		GSP_details = gsp_api_data_for_irn(gsp_data)
+		if len(invoice.irn_number)>10: 
+			cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
+			if cancel_response['success']:
+				Cancelledinvoice = frappe.get_doc({
+					'doctype':'Cancelled Invoices Details',
+					'invoices':invoice_number,
+					'invoice_number': invoice_number,
+					'cancelled_on' : cancel_response['result']['CancelDate'],
+					'cancelled_irn_number':cancel_response['result']['Irn'],
+					'cancel_message': reason,
+					'irn_cancelled':'Yes',
+					'irn_generated':'Cancelled'})
+				Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
+
+				if invoice.has_credit_items=="Yes":
+					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+					if credit_cancel_response['success']:
+						CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
+						CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
+						CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
+						CancelledCreditinvoice.cancelled_credit_irn_number = credit_cancel_response['result']['Irn']
+						CancelledCreditinvoice.credit_irn = 'Yes'
+						CancelledCreditinvoice.save()
+						return {
+							"success": True,
+							"message": "E-Invoice is cancelled successfully"
+						}
+				return {
+					"success": True,
+					"message": "E-Invoice is cancelled successfully"
+					}
+			else:
+				return {"success": False, "message": "Invoice is not active"}
+		# if invoice.has_credit_items=="Yes" and len(invoice.irn_number)<10:
+		# 	credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+		# 	if credit_cancel_response['success']:
+		# 		CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
+		# 		CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
+		# 		CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
+		# 		CancelledCreditinvoice.credit_irn = 'Yes'
+		# 		CancelledCreditinvoice.save()
+		# 		Cancelledinvoice = frappe.get_doc({
+		# 			'doctype':'Cancelled Invoices Details',
+		# 			'invoices':invoice_number,
+		# 			'invoice_number': invoice_number,
+		# 			'cancelled_on' : credit_cancel_response['result']['CancelDate'],
+		# 			'cancelled_irn_number':credit_cancel_response['result']['Irn'],
+		# 			'cancel_message': reason,
+		# 			'credit_irn_cancelled':'Yes',
+		# 			'credit_irn_generated':'Cancelled'})
+		# 		Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
+
+		# 		return {
+		# 			"success": True,
+		# 			"message": "E-Invoice is cancelled successfully"
+		# 		}		
+		else:
+			return {
+					"success": False,
+					"message": "Cance Irn Failed"
+				}
+
+		# except Exception as e:
+		# 	print(e,"cancel irn")		
 
 	def getTaxPayerDetails(self, gstNumber):
 		try:
