@@ -21,7 +21,6 @@ class company(Document):
 	# pass
 	def on_update(self):
 		if self.name:
-			
 			folder_path = frappe.utils.get_bench_path()
 			site_folder_path = self.site_name
 			folder_path = frappe.utils.get_bench_path()
