@@ -173,6 +173,7 @@ class Invoices(Document):
 					gst_data['ItemList'].append(i)
 				else:
 					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes":
+						
 						credit_note_items.append(item)
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value,2),
@@ -228,49 +229,124 @@ class Invoices(Document):
 			print(str(e), "generate Irn")
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
-		# try:
-		# get invoice details
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		# get seller details
+		try:
+			# get invoice details
+			invoice = frappe.get_doc('Invoices', invoice_number)
+			# get seller details
+
+			company_details = check_company_exist_for_Irn(invoice.company)
+			# get gsp_details
+			gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
+			GSP_details = gsp_api_data_for_irn(gsp_data)
+			# GSP_details = gsp_api_data(company_details.name,
+			# 						   company_details.mode,
+			# 						   company_details.provider)
+			cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
+			if cancel_response['success']:
+				invoice.cancelled_on = cancel_response['result']['CancelDate']
+				invoice.cancel_message = reason
+				invoice.irn_cancelled = 'Yes'
+				invoice.irn_generated = 'Cancelled'
+				invoice.save()
+				print("cannnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn")
+				if invoice.has_credit_items=="Yes":
+					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+					if credit_cancel_response['success']:
+						# invoice.cancelled_on = cancel_response['result']['CancelDate']
+						# invoice.cancel_message = reason
+						invoice.credit_irn_cancelled = 'Yes'
+						invoice.credit_irn_generated = 'Cancelled'
+						invoice.save()
+						return {
+							"success": True,
+							"message": "E-Invoice is cancelled successfully"
+						}
+					return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
+				return {
+					"success": True,
+					"message": "E-Invoice is cancelled successfully"
+					}		
+			else:
+				return {"success": False, "message": "Invoice is not active"}
+
+		except Exception as e:
+			print(e,"cancel irn")
+
+	# def cancelIrn(self, invoice_number, reason='wrong Entry'):
+	# 	# try:
+	# 	# get invoice details
+	# 	invoice = frappe.get_doc('Invoices', invoice_number)
+	# 	# get seller details
+	# 	print(invoice)
+	# 	company_details = check_company_exist_for_Irn(invoice.company)
+	# 	# get gsp_details
 		
+	# 	gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
+	# 	GSP_details = gsp_api_data_for_irn(gsp_data)
+	# 	if len(invoice.irn_number)>10: 
+	# 		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
+	# 		if cancel_response['success']:
+	# 			Cancelledinvoice = frappe.get_doc({
+	# 				'doctype':'Cancelled Invoices Details',
+	# 				'invoices':invoice_number,
+	# 				'invoice_number': invoice_number,
+	# 				'cancelled_on' : cancel_response['result']['CancelDate'],
+	# 				'cancelled_irn_number':cancel_response['result']['Irn'],
+	# 				'cancel_message': reason,
+	# 				'irn_cancelled':'Yes',
+	# 				'irn_generated':'Cancelled'})
+	# 			Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
 
-		company_details = check_company_exist_for_Irn(invoice.company)
-		# get gsp_details
-		gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
-		GSP_details = gsp_api_data_for_irn(gsp_data)
-		# GSP_details = gsp_api_data(company_details.name,
-		# 						   company_details.mode,
-		# 						   company_details.provider)
-		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
-		print(cancel_response)
-		if cancel_response['success']:
-			invoice.cancelled_on = cancel_response['result']['CancelDate']
-			invoice.cancel_message = reason
-			invoice.irn_cancelled = 'Yes'
-			invoice.irn_generated = 'Cancelled'
-			invoice.save()
-			if invoice.has_credit_items=="Yes":
-				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
-				if credit_cancel_response['success']:
-					# invoice.cancelled_on = cancel_response['result']['CancelDate']
-					# invoice.cancel_message = reason
-					invoice.credit_irn_cancelled = 'Yes'
-					invoice.credit_irn_generated = 'Cancelled'
-					invoice.save()
-					return {
-						"success": True,
-						"message": "E-Invoice is cancelled successfully"
-					}
-				return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
-			return {
-				"success": True,
-				"message": "E-Invoice is cancelled successfully"
-				}		
-		else:
-			return {"success": False, "message": "Invoice is not active"}
+	# 			if invoice.has_credit_items=="Yes":
+	# 				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+	# 				if credit_cancel_response['success']:
+	# 					CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
+	# 					CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
+	# 					CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
+	# 					CancelledCreditinvoice.cancelled_credit_irn_number = credit_cancel_response['result']['Irn']
+	# 					CancelledCreditinvoice.credit_irn = 'Yes'
+	# 					CancelledCreditinvoice.save()
+	# 					return {
+	# 						"success": True,
+	# 						"message": "E-Invoice is cancelled successfully"
+	# 					}
+	# 			return {
+	# 				"success": True,
+	# 				"message": "E-Invoice is cancelled successfully"
+	# 				}
+	# 		else:
+	# 			return {"success": False, "message": "Invoice is not active"}
+	# 	# if invoice.has_credit_items=="Yes" and len(invoice.irn_number)<10:
+	# 	# 	credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+	# 	# 	if credit_cancel_response['success']:
+	# 	# 		CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
+	# 	# 		CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
+	# 	# 		CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
+	# 	# 		CancelledCreditinvoice.credit_irn = 'Yes'
+	# 	# 		CancelledCreditinvoice.save()
+	# 	# 		Cancelledinvoice = frappe.get_doc({
+	# 	# 			'doctype':'Cancelled Invoices Details',
+	# 	# 			'invoices':invoice_number,
+	# 	# 			'invoice_number': invoice_number,
+	# 	# 			'cancelled_on' : credit_cancel_response['result']['CancelDate'],
+	# 	# 			'cancelled_irn_number':credit_cancel_response['result']['Irn'],
+	# 	# 			'cancel_message': reason,
+	# 	# 			'credit_irn_cancelled':'Yes',
+	# 	# 			'credit_irn_generated':'Cancelled'})
+	# 	# 		Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
 
-		# except Exception as e:
-		# 	print(e,"cancel irn")
+	# 	# 		return {
+	# 	# 			"success": True,
+	# 	# 			"message": "E-Invoice is cancelled successfully"
+	# 	# 		}		
+	# 	else:
+	# 		return {
+	# 				"success": False,
+	# 				"message": "Cance Irn Failed"
+	# 			}
+
+	# 	# except Exception as e:
+	# 	# 	print(e,"cancel irn")		
 
 	def getTaxPayerDetails(self, gstNumber):
 		try:
@@ -322,11 +398,12 @@ class Invoices(Document):
 			hsn_code = ""
 			headers = {'Content-Type': 'application/json'}
 			if company.b2c_qr_type == "Invoice Details":
-				proxyhost = company.proxy_url
-				proxyhost = proxyhost.replace("http://","@")
-				proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-						'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-							}
+				if company.proxy == 1:
+					proxyhost = company.proxy_url
+					proxyhost = proxyhost.replace("http://","@")
+					proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+							'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+								}
 				
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
@@ -369,7 +446,7 @@ class Invoices(Document):
 				qr = qrcode.QRCode(
 					version=1,
 					error_correction=qrcode.constants.ERROR_CORRECT_L,
-					box_size=10,
+					box_size=3,
 					border=4
 				)
 				qrurl = company.b2c_qr_url + response['data']
@@ -681,17 +758,13 @@ def insert_invoice(data):
 			irn_generated = "NA"
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
-		# print(data['items_data'])
 		#calculat items
-		# items_data = calulate_items(data['items'], data['invoice_number'],company_code)
 		for item in data['items_data']:
-			# print(type(item['item_value']),item['item_value'],len(str(item['item_value'])),str(item['item_value'])[0])
 			if item['taxable'] == 'No':
 				other_charges += item['item_value']
 
 			elif item['sac_code'].isdigit():  
 				if "-" not in str(item['item_value']):
-					# has_cedit_items = "Yes"
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
@@ -721,6 +794,7 @@ def insert_invoice(data):
 			'guest_name':
 			data['guest_data']['name'],
 			'invoice_from':"Pms",
+			'print_by':data['guest_data']['print_by'],
 			'gst_number':
 			data['guest_data']['gstNumber'],
 			'invoice_file':
@@ -821,8 +895,9 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 		tax_data = []
 		for sac in sac_codes:
-			# print(sac)
+			print(sac)
 			sac_tax = {
+				'cess':0,
 				'cgst': 0,
 				'sgst': 0,
 				'igst': 0,
@@ -834,16 +909,16 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 				'parenttype': "invoices"
 			}
 			for item in items:
+				# print(item)
 				if item['sac_code'] == sac:
 					sac_tax['cgst'] += item['cgst_amount']
 					sac_tax['sgst'] += item['sgst_amount']
 					sac_tax['igst'] += item['igst_amount']
+					sac_tax['cess'] += item['cess_amount']
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
-			
-			sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst']
-			# print(sac,"ssssssssss")
+			sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
 			doc = frappe.get_doc(sac)
 			doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess":True,"data":'doc'}
@@ -868,7 +943,7 @@ def insert_items(items,invoice_number):
 		return {"sucess":True,"data":doc}
 		# print(doc)
 	except Exception as e:
-		print(e,"********************insert itemns api")
+		print(e,"**********  insert itemns api")
 		return {"success":False,"message":str(e)}
 		
 
@@ -896,6 +971,7 @@ def calulate_items(data):
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
 					SAC_CODE = sac_code_based_gst_rates.code 
+					item['item_type'] = sac_code_based_gst_rates.type
 				else:
 					
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
@@ -1158,8 +1234,7 @@ def calulate_items(data):
 					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
 					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
 									int(sac_code_based_gst_rates.sgst))
-					# gst_value = (item['item_value']*100) /(gst_percentage+100)
-					# print(gst_percentage,"gst percentage")
+				
 					base_value = item['item_value'] * (100 /
 													(gst_percentage + 100))
 					gst_value = item['item_value'] - base_value
@@ -1222,6 +1297,7 @@ def calulate_items(data):
 				'item_name':
 				item['name'],
 				'sort_order':final_item['sort_order'],
+				"item_type":item['item_type'],
 				'date':
 				datetime.datetime.strptime(item['date'], data['invoice_item_date_format']),
 				'cgst':
@@ -1328,17 +1404,15 @@ def insert_tax_summariesd(items, invoice_number):
 		
 
 def insert_tax_summaries2(items,invoice_number):
-	# items_data = []
-	# for each in items:
-	# 	if "-" not in str(each['item_value']):
-	# 		items_data.append(each)
 	df = pd.DataFrame(items)
-	df = df.set_index('sgst')
-	df1 = df.groupby(['cgst'])[["cgst_amount", "sgst_amount","igst_amount"]].apply(lambda x : x.astype(float).sum())
-	df1.reset_index(level=0, inplace=True) 
 
+	df = df.set_index('sgst')
+	df1 = df.groupby(['cgst','cess'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess"]].apply(lambda x : x.astype(float).sum())
+	df1.reset_index(level=0, inplace=True) 
+	
 	data = df1.to_dict('records')
 	for each in data:
+		print(each)
 		if each['cgst']>0:
 			doc = frappe.get_doc({
 					'doctype': 'Tax Summaries',
@@ -1374,7 +1448,26 @@ def insert_tax_summaries2(items,invoice_number):
 				'parenttype': "Invoices"
 					})
 				doc.insert(ignore_permissions=True)
-
+		if each['cess']>0:
+			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CESS','tax_percentage':each['cess']})
+			if tax_summary_cess is ():
+				if each['cess_amount']>0:
+					doc = frappe.get_doc({
+					'doctype': 'Tax Summaries',
+					'invoce_number': invoice_number,
+					'tax_percentage': each['cess'],
+					'amount': each['cess_amount'],
+					'tax_type': "CESS",
+					'parent': invoice_number,
+					'parentfield': 'gst_summary',
+					'parenttype': "Invoices"
+						})
+					doc.insert(ignore_permissions=True)	
+			else:
+				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
+				tax_summary_cess_update.tax_percentage = each['cess_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_cess_update.save()
 
 
 
@@ -1404,6 +1497,7 @@ def insert_tax_summaries(items, invoice_number):
 					if item['cgst'] > 0:
 						if tax['tax_type'] == 'CGST' and tax[
 								'tax_percentage'] == item['cgst']:
+
 							tax['amount'] += item['cgst_amount']
 							found = True
 					if item['igst'] > 0:
@@ -1644,7 +1738,6 @@ def login_gsp(code, mode):
 @frappe.whitelist(allow_guest=True)
 def gsp_api_data(data):
 	try:
-		# print(data,"**********8")
 		mode = data['mode']
 		gsp_apis = frappe.db.get_value('GSP APIS', {
 			"company": data['code'],

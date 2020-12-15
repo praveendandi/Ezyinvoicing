@@ -430,6 +430,7 @@ def CreditgenerateIrn(invoice_number):
 	for index, item in enumerate(invoice.items):
 		# print(item.sac_code,"HsnCD")
 		if item.is_credit_item == "Yes":
+			print("/aaaaaaaaaaaaaaaaaaa")
 			credit_items.append(item.__dict__)
 			total_igst_value += abs(item.igst_amount)
 			total_sgst_value += abs(item.sgst_amount)
@@ -513,7 +514,7 @@ def CreditgenerateIrn(invoice_number):
 		invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 		invoice.save(ignore_permissions=True,ignore_version=True)
 		create_qr_image(invoice_number, GSP_details['data'])
-		# print(credit_items)
+		print(credit_items)
 		insert_credit_items = insert_items(credit_items,invoice_number)
 	else:
 		invoice = frappe.get_doc('Invoices', invoice_number)

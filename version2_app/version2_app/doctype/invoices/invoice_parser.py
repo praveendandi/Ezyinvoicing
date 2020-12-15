@@ -52,6 +52,7 @@ def file_parsing(filepath):
 	total_invoice_amount = ''
 	conf_number = ''
 	membership = ''
+	print_by = ''
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -93,6 +94,9 @@ def file_parsing(filepath):
 		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
+		if "Printed By / On" in i:
+			print_by = i.split(":")
+			print_by = print_by[1].replace(" ", "")
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -194,11 +198,14 @@ def file_parsing(filepath):
 					if item['sac_code'].isdigit():
 						item['name'] = item['name']+' '+item['sac_code']
 				if len(j)==6 and j.isdigit():
-					item['name'] = item['name']+' '+j
-					item['sac_code'] = j
+					if j not in item['name'] and j[0]!='0':
+
+						item['name'] = item['name']+' '+j
+						item['sac_code'] = j
 				if len(j)==8 and j.isdigit():
-					item['name'] = item['name']+' '+j
-					item['sac_code'] = j	
+					if j not in item['name'] and j[0]!='0':
+						item['name'] = item['name']+' '+j
+						item['sac_code'] = j	
 				if index == len(i.split(' ')) - 1:
 					if index != 0:
 						item['item_value'] = float(j.replace(',', ''))
@@ -212,7 +219,7 @@ def file_parsing(filepath):
 		# print(item)
 		if len(item) > 1:
 
-			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"] and 'Cess' not in item['name']:# and "Service Charge" not in item['name'] and "Utility Charge" not in item['name']:
+			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and 'Cess' not in item['name']:# and "Service Charge" not in item['name'] and "Utility Charge" not in item['name']:
 				# print(item)
 				if 'sac_code' in item:
 					if item['sac_code']== '':
@@ -311,6 +318,7 @@ def file_parsing(filepath):
 	guest['company_code'] = "HICC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
+	guest['print_by'] = print_by
 	
 	company_code = {"code":"HICC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
@@ -341,7 +349,7 @@ def file_parsing(filepath):
 		else:
 			amened='No'    
 
-	# print(guest['items'])
+	print(guest['items'])
 
 	# print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})

@@ -1,0 +1,45 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2020-12-14 17:30:22.092742",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2020-12-15 10:07:55.682680",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Pending Invoices",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "select tabInvoices.name as 'Invoice Number',tabInvoices.guest_name as 'Guest Name',tabInvoices.confirmation_number as 'Confirmation No.',tabInvoices.gst_number as 'GST No.',tabInvoices.room_number as 'Room No.',tabInvoices.invoice_type as 'Invoice Type',tabInvoices.has_credit_items as 'Credit Notes',tabInvoices.irn_generated as 'IRN Generated',tabInvoices.invoice_date as 'Date',DATEDIFF(CURDATE(),DATE(tabInvoices.creation)) as \"No of days\" from tabInvoices where tabInvoices.irn_generated = \"Pending\" and (DATE(tabInvoices.creation) between %(from_date)s and %(to_date)s) order by tabInvoices.name, tabInvoices.room_number",
+ "ref_doctype": "Invoices",
+ "report_name": "Pending Invoices",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Guest"
+  },
+  {
+   "role": "ezy-IT"
+  },
+  {
+   "role": "ezy-Finance"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "ezy-FrontOffice"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ]
+}

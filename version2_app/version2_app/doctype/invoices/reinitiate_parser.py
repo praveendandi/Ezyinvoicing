@@ -194,11 +194,13 @@ def reinitiateInvoice(data):
 					if item['sac_code'].isdigit():
 						item['name'] = item['name']+' '+item['sac_code']
 				if len(j)==6 and j.isdigit():
-					item['name'] = item['name']+' '+j
-					item['sac_code'] = j
+					if j not in item['name'] and j[0]!='0':
+						item['name'] = item['name']+' '+j
+						item['sac_code'] = j
 				if len(j)==8 and j.isdigit():
-					item['name'] = item['name']+' '+j
-					item['sac_code'] = j	
+					if j not in item['name'] and j[0]!='0':	
+						item['name'] = item['name']+' '+j
+						item['sac_code'] = j	
 				if index == len(i.split(' ')) - 1:
 					if index != 0:
 						item['item_value'] = float(j.replace(',', ''))
