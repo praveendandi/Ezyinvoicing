@@ -353,16 +353,17 @@ class Invoices(Document):
 			hsn_code = ""
 			headers = {'Content-Type': 'application/json'}
 			if company.b2c_qr_type == "Invoice Details":
-				proxyhost = company.proxy_url
-				proxyhost = proxyhost.replace("http://", "@")
-				proxies = {
-					'http':
-					'http://' + company.proxy_username + ":" +
-					company.proxy_password + proxyhost,
-					'https':
-					'https://' + company.proxy_username + ":" +
-					company.proxy_password + proxyhost
-				}
+				if company.proxy == 1:
+					proxyhost = company.proxy_url
+					proxyhost = proxyhost.replace("http://", "@")
+					proxies = {
+						'http':
+						'http://' + company.proxy_username + ":" +
+						company.proxy_password + proxyhost,
+						'https':
+						'https://' + company.proxy_username + ":" +
+						company.proxy_password + proxyhost
+					}
 
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
@@ -877,6 +878,7 @@ def insert_invoice(data):
 			datetime.datetime.utcnow() - datetime.datetime.strptime(
 				data['guest_data']['start_time'], "%Y-%m-%d %H:%M:%S.%f")
 		})
+		
 		if data['amened'] == 'Yes':
 			invCount = frappe.db.get_list(
 				'Invoices',
@@ -893,13 +895,15 @@ def insert_invoice(data):
 				'invoice_number':
 				"Amened" + data['guest_data']['invoice_number']
 			})
-
+			# print(getInvoiceNUmber)
 			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
+			# print(updateInvoi)
 			updateInvoi.invoice_number = getInvoiceNUmber
 			updateInvoi.save()
+
 			data['invoice_number'] = getInvoiceNUmber
 			data['guest_data']['invoice_number'] = getInvoiceNUmber
-
+			print(data['invoice_number'],"/////////////")
 		# insert items
 
 		itemsInsert = insert_items(data['items_data'], data['invoice_number'])
