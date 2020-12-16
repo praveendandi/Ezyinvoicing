@@ -27,24 +27,8 @@ site = 'http://0.0.0.0:8000/'
 
 
 class Invoices(Document):
-	# def on_cancel(self):
-	# 	if self.docstatus==2:
-	# 		if self.irn_generated == "Cancelled":
-	# 			print(self.irn_generated,"/...........")
-	# 			invoice = frappe.get_doc('Invoices', self.name)
-	# 			print(invoice,"/a/a/a")
-	# def before_cancel(self):
-	# 	# if self.docstatus==2:
-	# 	# if self.irn_generated == "Cancelled":
-	# 	print(self.irn_generated,"/[[[[[[[[[")
-	# 	invoice = frappe.get_doc('Invoices', self.name)
-	# 	print(invoice,"/a/a/a")
-	# 	invoice.irn_generated = "Cancelled"
-	# 	invoice.save()
-	# 	print("aaaaaaaaaaaaaaaaaaaaaaaaa")
-	# def on_update(self):
-	# 	if self.name:
-	# 		print("on_updateeeeeeeeeeeee")		
+
+
 
 
 	def generateIrn(self, invoice_number):
@@ -201,11 +185,12 @@ class Invoices(Document):
 					}
 					gst_data['ItemList'].append(i)
 				else:
-					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details.allaowance_type=="Credit":
+					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
 						
 						credit_note_items.append(item)
 					else:
 						discount_value +=item.item_value_after_gst	
+			discount_value = abs(discount_value)			
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2),
 				"CgstVal": round(total_cgst_value, 2),
@@ -213,7 +198,7 @@ class Invoices(Document):
 				"IgstVal": round(total_igst_value, 2),
 				"CesVal": round(total_cess_value, 2),
 				"StCesVal": 0,
-				"Discount": discount_value,
+				"Discount": round(discount_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
 				"TotInvVal": round(invoice.amount_after_gst, 2),
@@ -242,7 +227,7 @@ class Invoices(Document):
 					invoice.save(ignore_permissions=True, ignore_version=True)
 					create_qr = create_qr_image(invoice_number,
 												GSP_details['data'])
-					if create_qr['success'] == True and company_details.allaowance_type=="Credit":
+					if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
 						if credit_note_items != []:
 							CreditgenerateIrn(invoice_number)
 							invoice = frappe.get_doc('Invoices',
@@ -255,7 +240,7 @@ class Invoices(Document):
 				else:
 					return response
 			else:
-				if credit_note_items != [] and company_details.allaowance_type=="Credit":
+				if credit_note_items != [] and company_details['data'].allowance_type=="Credit":
 					CreditgenerateIrn(invoice_number)
 					invoice = frappe.get_doc('Invoices', invoice_number)
 					invoice.irn_process_time = datetime.datetime.utcnow(
@@ -833,6 +818,8 @@ def insert_invoice(data):
 	'''
 	try:
 		# print(data)
+		company = frappe.get_doc('company',data['company_code'])
+
 		value_before_gst = 0
 		value_after_gst = 0
 		other_charges = 0
@@ -842,6 +829,7 @@ def insert_invoice(data):
 		sgst_amount = 0
 		igst_amount = 0
 		cess_amount = 0
+		discountAmount = 0
 		# print(data['items_data'])
 		if data['guest_data']['invoice_type'] == "B2B":
 			irn_generated = "Pending"
@@ -853,7 +841,8 @@ def insert_invoice(data):
 		for item in data['items_data']:
 			if item['taxable'] == 'No':
 				other_charges += item['item_value']
-
+			elif item['taxable']=="Yes" and item['item_type']=="Discount":
+				discountAmount += item['item_value'] 
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
 					cgst_amount+=item['cgst_amount']
@@ -867,8 +856,15 @@ def insert_invoice(data):
 					credit_value_after_gst += abs(item['item_value_after_gst'])
 			else:
 				pass
-		if (round(value_after_gst, 2) > 0) or (round(credit_value_after_gst, 2)
-											   > 0):
+		print(discountAmount)	
+		if company.allowance_type=="Discount":
+
+			value_after_gst = value_after_gst+discountAmount
+			# value_before_gst = value_before_gst+discountAmount
+			print(value_after_gst,value_before_gst,"/aaaaaaaaaaaaa")
+
+
+		if (value_after_gst > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
@@ -877,6 +873,8 @@ def insert_invoice(data):
 			has_credit_items = "Yes"
 		else:
 			has_credit_items = "No"
+		
+
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -884,6 +882,7 @@ def insert_invoice(data):
 			data['guest_data']['invoice_number'],
 			'guest_name':
 			data['guest_data']['name'],
+			'ready_to_generate_irn':ready_to_generate_irn,
 			'invoice_from':"Pms",
 			'print_by':data['guest_data']['print_by'],
 			'gst_number':
@@ -1091,6 +1090,26 @@ def calulate_items(data):
 
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
+				if sac_code_based_gst_rates.type == "Discount":
+					
+						final_item['sac_code'] = 'No Sac'
+						final_item['sac_code_found'] = 'No'
+						final_item['cgst'] = 0
+						final_item['other_charges'] = 0
+						final_item['cgst_amount'] = 0
+						final_item['sgst'] = 0
+						final_item['sgst_amount'] = 0
+						final_item['igst'] = 0
+						final_item['igst_amount'] = 0
+						final_item['gst_rate'] = 0
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = item['item_value']
+						final_item['taxable'] = sac_code_based_gst_rates.taxble
+						final_item['cess'] = 0
+						final_item['cess_amount'] = 0
+						final_item['type'] = "Excempted"
+						item['item_type'] = "Discount"
+
 				if item['cgst'] == 0:
 					if ("Service" in item['name']) or ("Utility"
 													   in item['name']):

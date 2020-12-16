@@ -52,6 +52,7 @@ def file_parsing(filepath):
 	total_invoice_amount = ''
 	conf_number = ''
 	membership = ''
+	print_by = ''
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -93,6 +94,11 @@ def file_parsing(filepath):
 		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
+		if "Printed By / On" in i:
+			print_by = i.split(":")
+			print_by = print_by[1].replace(" ","")
+
+	
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -101,28 +107,24 @@ def file_parsing(filepath):
 	for index, i in enumerate(data):
 	
 		
-		if 'XX/XX' in i:
+		if ('XX/XX' in i) or ("Cash" in i):
 			i = " "
 		if i !=" ":
 			j = i.split(' ')
 			j = j[1:-1]
 			if len(j)>1:
 				ele = j[0]+" "+j[1]
-				print(ele,paymentTypes)
 				if ele not in paymentTypes:
 					original_data.append(i)
+				else:
+					pass	
 			elif len(j) == 1:
 				if j[0] not in paymentTypes:
 					original_data.append(i)
 
 
 
-		# if 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
-		# 	original_data.append(i)
-		# if 'XX/XX' in i and i in payment_list:
-		# 	original_data.pop(len(original_data) - 1)
-		# 	original_data.pop(len(original_data) - 1)
-
+	
 	items = [] 
 	itemsort = 0
 	for i in original_data:
@@ -182,9 +184,7 @@ def file_parsing(filepath):
 					item['name'] = item['name'] + ' CGST'
 				if "IGST" in j:
 					item['name'] = item['name'] + ' IGST'
-				# if "Cess" in j:
-				# 	print(i,j)
-					# item['name'] = item['name'] + ' Cess'
+				
 				if "HICC" in j:
 					if "HICC" not in item['name']:
 						item['name'] = item['name']+' HICC'
@@ -193,13 +193,39 @@ def file_parsing(filepath):
 					if "SAC" not in item['name']:
 						item['name'] = item['name']+ ' SAC'
 					if item['sac_code'].isdigit():
-						item['name'] = item['name']+' '+item['sac_code']
+						if item['sac_code'] not in item['name']:
+							item['name'] = item['name']+' '+item['sac_code']
+				if "CGST" in j:
+					ind = i.find("CGST")
+					ind2 = i.find("%")
+					item['percentage'] = i[ind + 6:ind2]
+				if "SGST" in j:  # or ("SGST" in j):
+					ind = i.find("SGST")
+					ind2 = i.find("%")
+					item['percentage'] = i[ind + 7:ind2]
+
+				if "CESS" in j:
+					v = re.findall("\d+\%", j)
+					if len(v)>0:
+						item['percentage'] = v[0][:-1]
+					else:	
+						ind = i.find("CESS")
+						ind2 = i.find("%")
+						item['percentage'] = i[ind + 6:ind2]		
 				if len(j)==6 and j.isdigit():
-					item['name'] = item['name']+' '+j
-					item['sac_code'] = j
+					if j not in item['name'] and j[0]!="0":
+						item['name'] = item['name']+' '+j
+						item['sac_code'] = j
 				if len(j)==8 and j.isdigit():
-					item['name'] = item['name']+' '+j
-					item['sac_code'] = j	
+					if j not in item['name'] and j[0]!="0":
+						item['name'] = item['name']+' '+j
+						item['sac_code'] = j	
+				if '@' in i and '%' in i:
+					if 'name' in list(item.keys()):
+						if ("GST" in item['name']) or ("CESS" in item['name']):
+							ind = i.find("@")
+							ind2 = i.find("%")
+							item['percentage'] = i[ind+1:ind2]	
 				if index == len(i.split(' ')) - 1:
 					if index != 0:
 						item['item_value'] = float(j.replace(',', ''))
@@ -252,6 +278,7 @@ def file_parsing(filepath):
 						itemToUpdate['cess'] = float(item['percentage'])
 						itemToUpdate['cessAmount'] = item['item_value']
 					else:
+						print(item)
 						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
 						itemToUpdate['cessAmount'] = item['item_value']	
 				elif 'Cess' in item['name']:
@@ -312,6 +339,7 @@ def file_parsing(filepath):
 	guest['company_code'] = "HICC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
+	guest['print_by'] = print_by
 	
 	company_code = {"code":"HICC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
@@ -323,7 +351,7 @@ def file_parsing(filepath):
 	error_data['state_code'] = "36"
 	error_data['room_number'] = guest['room_number']
 	error_data['pincode'] = "500082"
-	# gstNumber = "12345"
+	# gstNumber = "06AADCM5146R1ZZ"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
