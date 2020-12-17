@@ -165,7 +165,7 @@
   },
   {
    "fieldname": "cess",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "CESS %"
   },
   {
@@ -178,7 +178,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-12-16 18:08:18.991917",
+ "modified": "2020-12-17 10:37:40.196544",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
