@@ -858,9 +858,10 @@ def insert_invoice(data):
 				pass
 		print(discountAmount)	
 		if company.allowance_type=="Discount":
-			discountAmount = abs(discountAmount)+abs(credit_value_after_gst)
-			value_after_gst = value_after_gst+discountAmount
-			# value_before_gst = value_before_gst+discountAmount
+			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
+			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
+			value_after_gst = value_after_gst+discountAfterAmount
+			value_before_gst = value_before_gst+discountBeforeAmount
 			if value_after_gst == 0:
 				
 				credit_value_after_gst = 0
