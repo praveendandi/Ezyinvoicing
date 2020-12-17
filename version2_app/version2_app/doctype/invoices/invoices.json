@@ -91,7 +91,8 @@
   "b2c_qrimage",
   "b2c_qrinvoice",
   "qr_generated",
-  "cess_amount"
+  "cess_amount",
+  "print_by"
  ],
  "fields": [
   {
@@ -595,12 +596,17 @@
    "fieldname": "cess_amount",
    "fieldtype": "Float",
    "label": "CESS Amount"
+  },
+  {
+   "fieldname": "print_by",
+   "fieldtype": "Data",
+   "label": "Print By"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-03 19:03:47.277175",
+ "modified": "2020-12-14 17:57:34.191679",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -624,7 +630,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "IT",
+   "role": "ezy-IT",
    "share": 1,
    "write": 1
   },
@@ -634,18 +640,23 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Finance",
+   "role": "ezy-Finance",
    "share": 1,
    "write": 1
   },
   {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Front Office",
+   "role": "ezy-FrontOffice",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
@@ -675,6 +686,18 @@
    "role": "Administrator",
    "share": 1,
    "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
    "write": 1
   }
  ],

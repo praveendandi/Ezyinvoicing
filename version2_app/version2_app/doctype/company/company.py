@@ -37,7 +37,6 @@ class company(Document):
 				shutil.copy(reinitatefilepath, destination_path)
 				shutil.copy(invoicefilepath,destination_path2)
 			except Exception as e:
-				# shutil.copy(filepath, destination_path)
 				print(str(e),"************on_update company")
 				frappe.throw("file updated Failed")
 

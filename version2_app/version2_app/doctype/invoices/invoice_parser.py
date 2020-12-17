@@ -17,14 +17,14 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 folder_path = frappe.utils.get_bench_path()
 
-# site_folder_path = "HICC_local.com/"
+# site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HICC-01")
+	companyCheckResponse = check_company_exist("MHKCP-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -66,10 +66,10 @@ def file_parsing(filepath):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST ID" in i and "Telangana" not in i:
+		if "Cust GSTIN" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace(" ","")
-			gstNumber = gstNumber[:15]
+			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			print(gstNumber)
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
@@ -146,61 +146,39 @@ def file_parsing(filepath):
 				if index == 4:
 					if ".00" in j:
 						pass
+						# item['item_value'] = float(j.replace(',', ''))
 					else:
-						if re.fullmatch('[A-Za-z]+', j) and '#' not in j and '[' not in j and "Room" not in j and ']' not in j and 'Pkg.' not in j and 'Split' not in j:
-							item["name"] = item["name"] + ' ' + j
-				if j == "Dinner" and "Dinner" not in item['name']:
-					item["name"] = item["name"] + ' ' + j
-
-				if '%' in j:
-					if j not in item['name']:
-						v = re.findall("\d+\.\d+\%", j)
-						if len(v)==1:
-							item['percentage'] = v[0][:-1]
-
-						if "(" not in j and "." not in j:
-							
-							item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
+						if re.fullmatch(
+						  '[A-Za-z]+', j
+						) and '#' not in j and '[' not in j and "Room" not in j and ']' not in j and 'Pkg.' not in j and 'Split' not in j:
 							item["name"] = item["name"] + ' ' + j
 				if '%' in j:
-					
-					v = re.findall("\d+\.\d+\%", j)
-					if len(v)==1:
-						item['percentage'] = v[0][:-1]
 					if "(" not in j and "." not in j:
 						item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
+						item["name"] = item["name"] + ' ' + j
+				if index>4 and index<5:
+					if ".00" in j:
+						pass
+						# print(j,"0000000000000000000000")
+						# item['item_value'] = float(j.replace(',', ''))
 
-				
+					else:
+						if "#" not in j and '[' not in j and "Room" not in j and "615" not in j and ":" not in j and not j.isdigit() and ']' not in j and 'Pkg.' not in j and '(' not in j and 'into' not in j and '.' not in j and 'Split' not in j:
+							item["name"] = item["name"] + ' ' + j
 				if index == 5:
 					if "CompBreakfast" in j or "Beverage" in j:
 						item["name"] = item["name"] + ' ' + j
-				
+				if "Dry" in j:
+					print(j,"*******************888")
 				if "SGST" in j:
 					item['name'] = item['name'] + ' SGST'
 				if "CGST" in j:
 					item['name'] = item['name'] + ' CGST'
 				if "IGST" in j:
 					item['name'] = item['name'] + ' IGST'
-				# if "Cess" in j:
-				# 	print(i,j)
-					# item['name'] = item['name'] + ' Cess'
-				if "HICC" in j:
-					if "HICC" not in item['name']:
-						item['name'] = item['name']+' HICC'
+
 				if 'SAC' in j:
 					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
-					if "SAC" not in item['name']:
-						item['name'] = item['name']+ ' SAC'
-					if item['sac_code'].isdigit():
-						item['name'] = item['name']+' '+item['sac_code']
-				if len(j)==6 and j.isdigit():
-					if j not in item['name']:
-						item['name'] = item['name']+' '+j
-						item['sac_code'] = j
-				if len(j)==8 and j.isdigit():
-					if j not in item['name']:
-						item['name'] = item['name']+' '+j
-						item['sac_code'] = j	
 				if index == len(i.split(' ')) - 1:
 					if index != 0:
 						item['item_value'] = float(j.replace(',', ''))
@@ -211,57 +189,31 @@ def file_parsing(filepath):
 
 	finalData = []
 	for item in items:
-		# print(item)
+
 		if len(item) > 1:
 
-			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"] and 'Cess' not in item['name']:# and "Service Charge" not in item['name'] and "Utility Charge" not in item['name']:
-				# print(item)
+			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"]:
+
 				if 'sac_code' in item:
-					if item['sac_code']== '':
-						item['sac_code'] = 'No Sac'
-					else:
-						item['sac_code'] = item['sac_code']
+					item['sac_code'] = item['sac_code']
 				else:
 					item['sac_code'] = 'No Sac'
 				finalData.append(item)
 			else:
 				itemToUpdate = finalData[len(finalData) - 1]
+				# itemToUpdate[item['name']] = item['TotAmt']
 				if 'SGST' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['sgst'] = float(item['percentage'])
-						itemToUpdate['sgstAmount'] = item['item_value']
-					else:
-						itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['sgstAmount'] = item['item_value']
+					itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
+					itemToUpdate['sgstAmount'] = item['item_value']
 				elif 'CGST' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['cgst'] = float(item['percentage'])
-						itemToUpdate['cgstAmount'] = item['item_value']
-					else:
-						print(item)
-						itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['cgstAmount'] = item['item_value']
+					itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
+					itemToUpdate['cgstAmount'] = item['item_value']
 				elif 'IGST' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['igst'] = float(item['percentage'])
-						itemToUpdate['igstAmount'] = item['item_value']
-					else:
-						itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['igstAmount'] = item['item_value']
+					itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
+					itemToUpdate['igstAmount'] = item['item_value']
 				elif 'CESS' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['cess'] = float(item['percentage'])
-						itemToUpdate['cessAmount'] = item['item_value']
-					else:
-						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['cessAmount'] = item['item_value']	
-				elif 'Cess' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['cess'] = float(item['percentage'])
-						itemToUpdate['cessAmount'] = item['item_value']
-					else:
-						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['cessAmount'] = item['item_value']
+					itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
+					itemToUpdate['cessAmount'] = item['item_value']
 				elif 'Allow ' in item["name"]:
 					if "sgst" in itemToUpdate:
 						itemToUpdate['cgst'] = 9
@@ -269,7 +221,6 @@ def file_parsing(filepath):
 					else:
 						itemToUpdate['sgst'] = 9
 						itemToUpdate['sgstAmount'] = item['item_value']
-							
 
 
 	invoiceItems = []
@@ -310,11 +261,11 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HICC-01"
+	guest['company_code'] = "MHKCP-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	
-	company_code = {"code":"HICC-01"}
+	company_code = {"code":"MHKCP-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
@@ -343,7 +294,6 @@ def file_parsing(filepath):
 		else:
 			amened='No'    
 
-	# print(guest['items'])
 
 	# print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
@@ -389,7 +339,6 @@ def file_parsing(filepath):
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
-
 				insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
 				if insertInvoiceApiResponse['success']== True:
 					print("B2C Invoice Created",insertInvoiceApiResponse)
