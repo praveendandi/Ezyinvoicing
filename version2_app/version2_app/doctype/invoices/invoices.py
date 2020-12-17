@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 import requests
-from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
+from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn,insert_credit_items
 import pandas as pd
 import json
 import qrcode
@@ -27,291 +27,283 @@ site = 'http://0.0.0.0:8000/'
 
 
 class Invoices(Document):
-	# def on_cancel(self):
-	# 	if self.docstatus==2:
-	# 		if self.irn_generated == "Cancelled":
-	# 			print(self.irn_generated,"/...........")
-	# 			invoice = frappe.get_doc('Invoices', self.name)
-	# 			print(invoice,"/a/a/a")
-	# def before_cancel(self):
-	# 	# if self.docstatus==2:
-	# 	# if self.irn_generated == "Cancelled":
-	# 	print(self.irn_generated,"/[[[[[[[[[")
-	# 	invoice = frappe.get_doc('Invoices', self.name)
-	# 	print(invoice,"/a/a/a")
-	# 	invoice.irn_generated = "Cancelled"
-	# 	invoice.save()
-	# 	print("aaaaaaaaaaaaaaaaaaaaaaaaa")
-	# def on_update(self):
-	# 	if self.name:
-	# 		print("on_updateeeeeeeeeeeee")		
+
+
 
 
 	def generateIrn(self, invoice_number):
-		try:
-			# get invoice details
-			start_time = datetime.datetime.utcnow()
-			invoice = frappe.get_doc('Invoices', invoice_number)
-			# get seller details
-			company_details = check_company_exist_for_Irn(invoice.company)
-			# get gsp_details
-			credit_note_items = []
-			companyData = {
-				"code": company_details['data'].name,
-				"mode": company_details['data'].mode,
-				"provider": company_details['data'].provider
-			}
-			GSP_details = gsp_api_data(companyData)
-			# get taxpayer details
-			GspData = {
-				"gstNumber": invoice.gst_number,
-				"code": invoice.company,
-				"apidata": GSP_details['data']
-			}
-			taxpayer_details = get_tax_payer_details(GspData)
-			#gst data
-			gst_data = {
-				"Version": "1.1",
-				"TranDtls": {
-					"TaxSch": "GST",
-					"SupTyp": "B2B",
-					"RegRev": "Y",
-					"IgstOnIntra": "N"
-				},
-				"SellerDtls": {
-					"Gstin":
-					GSP_details['data']['gst'],
-					"LglNm":
-					company_details['data'].legal_name,
-					"TrdNm":
-					company_details['data'].trade_name,
-					"Addr1":
-					company_details['data'].address_1,
-					"Addr2":
-					company_details['data'].address_2,
-					"Loc":
-					company_details['data'].location,
-					"Pin":
-					193502 if company_details['data'].mode == "Testing" else
-					company_details['data'].pincode,
-					"Stcd":
-					"01" if company_details['data'].mode == "Testing" else
-					company_details['data'].state_code,
-					"Ph":
-					company_details['data'].phone_number,
-					"Em":
-					company_details['data'].email
-				},
-				"BuyerDtls": {
-					"Gstin":
-					taxpayer_details['data'].gst_number,
-					"LglNm":
-					taxpayer_details['data'].legal_name,
-					"TrdNm":
-					taxpayer_details['data'].trade_name,
-					"Pos":
-					"01" if company_details['data'].mode == "Testing" else
-					company_details['data'].state_code,
-					"Addr1":
-					taxpayer_details['data'].address_1,
-					"Addr2":
-					taxpayer_details['data'].address_2,
-					"Loc":
-					taxpayer_details['data'].location,
-					"Pin":
-					int(taxpayer_details['data'].pincode),
-					"Stcd":
-					taxpayer_details['data'].state_code,
-					# "Ph": taxpayer_details.phone_number,
-					# "Em": taxpayer_details.
-				},
-				"DocDtls": {
-					"Typ":
-					"INV",
-					"No":
-					invoice.invoice_number + str(random.randint(0, 10000)) +
-					'T' if company_details['data'].mode == 'Testing' else
-					invoice.invoice_number,
-					"Dt":
-					datetime.datetime.strftime(invoice.invoice_date,
-											   '%d/%m/%Y')
-				},
-				"ItemList": [],
-			}
-			total_igst_value = 0
-			total_sgst_value = 0
-			total_cgst_value = 0
-			total_cess_value = 0
-			discount_value = 0
-			ass_value = 0
-			for index, item in enumerate(invoice.items):
-				# print(item.sac_code,"HsnCD")
-				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type == "Included":
-					total_igst_value += item.igst_amount
-					total_sgst_value += item.sgst_amount
-					total_cgst_value += item.cgst_amount
-					total_cess_value += item.cess_amount
-					ass_value += item.item_value
-					i = {
-						"SlNo":
-						str(index + 1),
-						"PrdDesc":
-						item.item_name,
-						"IsServc":
-						"Y",
-						"HsnCd":
-						item.sac_code if item.sac_code != 'No Sac' else '',
-						"Qty":
-						1,
-						"FreeQty":
-						0,
-						"UnitPrice":
-						round(item.item_value, 1),
-						"TotAmt":
-						round(item.item_value, 1),
-						"Discount":
-						0,
-						"AssAmt":
-						0 if item.sac_code == 'No Sac' else round(
-							item.item_value, 1),
-						"GstRt":
-						item.gst_rate,
-						"IgstAmt":
-						round(item.igst_amount, 1),
-						"CgstAmt":
-						round(item.cgst_amount, 1),
-						"SgstAmt":
-						round(item.sgst_amount, 1),
-						"CesRt":
-						item.cess,
-						"CesAmt":
-						round(item.cess_amount, 2),
-						"CesNonAdvlAmt":
-						0,
-						"StateCesRt":
-						0,
-						"StateCesAmt":
-						0,
-						"StateCesNonAdvlAmt":
-						0,
-						"OthChrg":
-						00,
-						"TotItemVal":
-						round(item.item_value_after_gst, 2),
-					}
-					gst_data['ItemList'].append(i)
-				else:
-					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
-						
-						credit_note_items.append(item)
-					else:
-						discount_value +=item.item_value_after_gst
-			print(discount_value)	
-			discount_value = abs(discount_value)			
-			gst_data["ValDtls"] = {
-				"AssVal": round(ass_value, 2),
-				"CgstVal": round(total_cgst_value, 2),
-				"SgstVal": round(total_sgst_value, 2),
-				"IgstVal": round(total_igst_value, 2),
-				"CesVal": round(total_cess_value, 2),
-				"StCesVal": 0,
-				"Discount": round(discount_value,2),
-				"OthChrg": 0,
-				"RndOffAmt": 0,
-				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_value,2),
-				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_value,2)
-			}
-			print(gst_data['ValDtls'])
-			# return{"success":True}
-			if ass_value > 0:
-
-				response = postIrn(gst_data, GSP_details['data'],
-								   company_details['data'])
-				if response['success']:
-					invoice = frappe.get_doc('Invoices', invoice_number)
-					invoice.ack_no = response['result']['AckNo']
-					invoice.irn_number = response['result']['Irn']
-					invoice.ack_date = response['result']['AckDt']
-					invoice.signed_invoice = response['result'][
-						'SignedInvoice']
-					invoice.signed_invoice_generated = 'Yes'
-					invoice.irn_generated = 'Success'
-					invoice.qr_code = response['result']['SignedQRCode']
-					invoice.qr_code_generated = 'Success'
-					invoice.irn_cancelled = 'No'
-					invoice.irn_generated_time = datetime.datetime.utcnow()
-					invoice.irn_process_time = datetime.datetime.utcnow(
-					) - start_time
-					invoice.save(ignore_permissions=True, ignore_version=True)
-					create_qr = create_qr_image(invoice_number,
-												GSP_details['data'])
-					if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
-						if credit_note_items != []:
-							CreditgenerateIrn(invoice_number)
-							invoice = frappe.get_doc('Invoices',
-													 invoice_number)
-							invoice.irn_process_time = datetime.datetime.utcnow(
-							) - start_time
-							invoice.save(ignore_permissions=True,
-										 ignore_version=True)
-					return response
-				else:
-					return response
+		# try:
+		# get invoice details
+		start_time = datetime.datetime.utcnow()
+		invoice = frappe.get_doc('Invoices', invoice_number)
+		# get seller details
+		company_details = check_company_exist_for_Irn(invoice.company)
+		# get gsp_details
+		credit_note_items = []
+		companyData = {
+			"code": company_details['data'].name,
+			"mode": company_details['data'].mode,
+			"provider": company_details['data'].provider
+		}
+		GSP_details = gsp_api_data(companyData)
+		# get taxpayer details
+		GspData = {
+			"gstNumber": invoice.gst_number,
+			"code": invoice.company,
+			"apidata": GSP_details['data']
+		}
+		taxpayer_details = get_tax_payer_details(GspData)
+		#gst data
+		gst_data = {
+			"Version": "1.1",
+			"TranDtls": {
+				"TaxSch": "GST",
+				"SupTyp": "B2B",
+				"RegRev": "Y",
+				"IgstOnIntra": "N"
+			},
+			"SellerDtls": {
+				"Gstin":
+				GSP_details['data']['gst'],
+				"LglNm":
+				company_details['data'].legal_name,
+				"TrdNm":
+				company_details['data'].trade_name,
+				"Addr1":
+				company_details['data'].address_1,
+				"Addr2":
+				company_details['data'].address_2,
+				"Loc":
+				company_details['data'].location,
+				"Pin":
+				193502 if company_details['data'].mode == "Testing" else
+				company_details['data'].pincode,
+				"Stcd":
+				"01" if company_details['data'].mode == "Testing" else
+				company_details['data'].state_code,
+				"Ph":
+				company_details['data'].phone_number,
+				"Em":
+				company_details['data'].email
+			},
+			"BuyerDtls": {
+				"Gstin":
+				taxpayer_details['data'].gst_number,
+				"LglNm":
+				taxpayer_details['data'].legal_name,
+				"TrdNm":
+				taxpayer_details['data'].trade_name,
+				"Pos":
+				"01" if company_details['data'].mode == "Testing" else
+				company_details['data'].state_code,
+				"Addr1":
+				taxpayer_details['data'].address_1,
+				"Addr2":
+				taxpayer_details['data'].address_2,
+				"Loc":
+				taxpayer_details['data'].location,
+				"Pin":
+				int(taxpayer_details['data'].pincode),
+				"Stcd":
+				taxpayer_details['data'].state_code,
+				# "Ph": taxpayer_details.phone_number,
+				# "Em": taxpayer_details.
+			},
+			"DocDtls": {
+				"Typ":
+				"INV",
+				"No":
+				invoice.invoice_number + str(random.randint(0, 10000)) +
+				'T' if company_details['data'].mode == 'Testing' else
+				invoice.invoice_number,
+				"Dt":
+				datetime.datetime.strftime(invoice.invoice_date,
+											'%d/%m/%Y')
+			},
+			"ItemList": [],
+		}
+		total_igst_value = 0
+		total_sgst_value = 0
+		total_cgst_value = 0
+		total_cess_value = 0
+		discount_after_value = 0
+		discount_before_value = 0
+		ass_value = 0
+		for index, item in enumerate(invoice.items):
+			# print(item.sac_code,"HsnCD")
+			if item.is_credit_item == "No" and item.taxable == "Yes" and item.type == "Included":
+				total_igst_value += item.igst_amount
+				total_sgst_value += item.sgst_amount
+				total_cgst_value += item.cgst_amount
+				total_cess_value += item.cess_amount
+				ass_value += item.item_value
+				i = {
+					"SlNo":
+					str(index + 1),
+					"PrdDesc":
+					item.item_name,
+					"IsServc":
+					"Y",
+					"HsnCd":
+					item.sac_code if item.sac_code != 'No Sac' else '',
+					"Qty":
+					1,
+					"FreeQty":
+					0,
+					"UnitPrice":
+					round(item.item_value, 1),
+					"TotAmt":
+					round(item.item_value, 1),
+					"Discount":
+					0,
+					"AssAmt":
+					0 if item.sac_code == 'No Sac' else round(
+						item.item_value, 1),
+					"GstRt":
+					item.gst_rate,
+					"IgstAmt":
+					round(item.igst_amount, 1),
+					"CgstAmt":
+					round(item.cgst_amount, 1),
+					"SgstAmt":
+					round(item.sgst_amount, 1),
+					"CesRt":
+					item.cess,
+					"CesAmt":
+					round(item.cess_amount, 2),
+					"CesNonAdvlAmt":
+					0,
+					"StateCesRt":
+					0,
+					"StateCesAmt":
+					0,
+					"StateCesNonAdvlAmt":
+					0,
+					"OthChrg":
+					00,
+					"TotItemVal":
+					round(item.item_value_after_gst, 2),
+				}
+				gst_data['ItemList'].append(i)
 			else:
-				if credit_note_items != [] and company_details['data'].allowance_type=="Credit":
-					CreditgenerateIrn(invoice_number)
-					invoice = frappe.get_doc('Invoices', invoice_number)
-					invoice.irn_process_time = datetime.datetime.utcnow(
-					) - start_time
-					invoice.save(ignore_permissions=True, ignore_version=True)
-					return {"success": True}
-				return {"success": False}
+				if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
+					
+					credit_note_items.append(item)
+				else:
+					discount_before_value +=item.item_value	
+					discount_after_value += item.item_value_after_gst
+					print(discount_before_value,discount_after_value)
+					credit_note_items.append(item)
+		discount_before_value = abs(discount_before_value)	
+		discount_after_value = abs(discount_after_value)
+		print(ass_value,invoice.amount_after_gst,invoice.amount_before_gst)		
+		gst_data["ValDtls"] = {
+			"AssVal": round(ass_value, 2), 
+			"CgstVal": round(total_cgst_value, 2),
+			"SgstVal": round(total_sgst_value, 2),
+			"IgstVal": round(total_igst_value, 2),
+			"CesVal": round(total_cess_value, 2),
+			"StCesVal": 0,
+			"Discount": round(discount_after_value,2),
+			"OthChrg": 0,
+			"RndOffAmt": 0,
+			"TotInvVal": round(invoice.amount_after_gst, 2),
+			"TotInvValFc": round(invoice.amount_after_gst, 2)
+		}
+		print(gst_data['ValDtls'])
+		# return{"success":True}
+		if ass_value > 0:
 
-		except Exception as e:
-			print(str(e), "generate Irn")
+			response = postIrn(gst_data, GSP_details['data'],
+								company_details['data'])
+			if response['success']:
+				invoice = frappe.get_doc('Invoices', invoice_number)
+				invoice.ack_no = response['result']['AckNo']
+				invoice.irn_number = response['result']['Irn']
+				invoice.ack_date = response['result']['AckDt']
+				invoice.signed_invoice = response['result'][
+					'SignedInvoice']
+				invoice.signed_invoice_generated = 'Yes'
+				invoice.irn_generated = 'Success'
+				invoice.qr_code = response['result']['SignedQRCode']
+				invoice.qr_code_generated = 'Success'
+				invoice.irn_cancelled = 'No'
+				invoice.irn_generated_time = datetime.datetime.utcnow()
+				invoice.irn_process_time = datetime.datetime.utcnow(
+				) - start_time
+				invoice.save(ignore_permissions=True, ignore_version=True)
+				create_qr = create_qr_image(invoice_number,
+											GSP_details['data'])
+				if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
+					if credit_note_items != []:
+						CreditgenerateIrn(invoice_number)
+						invoice = frappe.get_doc('Invoices',
+													invoice_number)
+						invoice.irn_process_time = datetime.datetime.utcnow(
+						) - start_time
+						invoice.save(ignore_permissions=True,
+										ignore_version=True)
+				if credit_note_items!=[] and company_details['data'].allowance_type=="Discount":
+					insert = insert_credit_items(credit_note_items,invoice_number)
+					print(insert)
+				return response
+			else:
+				return response
+		else:
+			if credit_note_items != [] and company_details['data'].allowance_type=="Discount":
+				CreditgenerateIrn(invoice_number)
+				invoice = frappe.get_doc('Invoices', invoice_number)
+				invoice.irn_process_time = datetime.datetime.utcnow(
+				) - start_time
+				invoice.save(ignore_permissions=True, ignore_version=True)
+				return {"success": True}
+			return {"success": False}
+
+		# except Exception as e:
+		# 	print(str(e), "generate Irn")
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
-		try:
+		# try:
 			# get invoice details
-			invoice = frappe.get_doc('Invoices', invoice_number)
-			# get seller details
+		invoice = frappe.get_doc('Invoices', invoice_number)
+		# get seller details
 
-			company_details = check_company_exist_for_Irn(invoice.company)
-			# get gsp_details
-			gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
-			GSP_details = gsp_api_data_for_irn(gsp_data)
-			# GSP_details = gsp_api_data(company_details.name,
-			# 						   company_details.mode,
-			# 						   company_details.provider)
-			cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
-			if cancel_response['success']:
-				invoice.cancelled_on = cancel_response['result']['CancelDate']
-				invoice.cancel_message = reason
-				invoice.irn_cancelled = 'Yes'
-				invoice.irn_generated = 'Cancelled'
-				invoice.save()
-				if invoice.has_credit_items=="Yes":
-					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
-					if credit_cancel_response['success']:
-						# invoice.cancelled_on = cancel_response['result']['CancelDate']
-						# invoice.cancel_message = reason
-						invoice.credit_irn_cancelled = 'Yes'
-						invoice.credit_irn_generated = 'Cancelled'
-						invoice.save()
-						return {
-							"success": True,
-							"message": "E-Invoice is cancelled successfully"
-						}
-					return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
-				return {
-					"success": True,
-					"message": "E-Invoice is cancelled successfully"
-					}		
-			else:
-				return {"success": False, "message": "Invoice is not active"}
+		company_details = check_company_exist_for_Irn(invoice.company)
+		# get gsp_details
+		gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
+		GSP_details = gsp_api_data_for_irn(gsp_data)
+		# GSP_details = gsp_api_data(company_details.name,
+		# 						   company_details.mode,
+		# 						   company_details.provider)
+		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
+		if cancel_response['success']:
+			invoice.cancelled_on = cancel_response['result']['CancelDate']
+			invoice.cancel_message = reason
+			invoice.irn_cancelled = 'Yes'
+			invoice.irn_generated = 'Cancelled'
+			invoice.save()
+			if invoice.has_credit_items=="Yes" and company_details['data'].allowance_type == "Credit":
+				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+				if credit_cancel_response['success']:
+					# invoice.cancelled_on = cancel_response['result']['CancelDate']
+					# invoice.cancel_message = reason
+					invoice.credit_irn_cancelled = 'Yes'
+					invoice.credit_irn_generated = 'Cancelled'
+					invoice.save()
+					return {
+						"success": True,
+						"message": "E-Invoice is cancelled successfully"
+					}
+				return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
+			return {
+				"success": True,
+				"message": "E-Invoice is cancelled successfully"
+				}		
+		else:
+			return {"success": False, "message": "Invoice is not active"}
 
-		except Exception as e:
-			print(e,"cancel irn")
+		# except Exception as e:
+		# 	print(e,"cancel irn")
 
 	# def cancelIrn(self, invoice_number, reason='wrong Entry'):
 	# 	# try:
@@ -835,6 +827,8 @@ def insert_invoice(data):
 	'''
 	try:
 		# print(data)
+		company = frappe.get_doc('company',data['company_code'])
+
 		value_before_gst = 0
 		value_after_gst = 0
 		other_charges = 0
@@ -844,6 +838,7 @@ def insert_invoice(data):
 		sgst_amount = 0
 		igst_amount = 0
 		cess_amount = 0
+		discountAmount = 0
 		# print(data['items_data'])
 		if data['guest_data']['invoice_type'] == "B2B":
 			irn_generated = "Pending"
@@ -855,7 +850,8 @@ def insert_invoice(data):
 		for item in data['items_data']:
 			if item['taxable'] == 'No':
 				other_charges += item['item_value']
-
+			elif item['taxable']=="Yes" and item['item_type']=="Discount":
+				discountAmount += item['item_value'] 
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
 					cgst_amount+=item['cgst_amount']
@@ -869,8 +865,18 @@ def insert_invoice(data):
 					credit_value_after_gst += abs(item['item_value_after_gst'])
 			else:
 				pass
-		if (round(value_after_gst, 2) > 0) or (round(credit_value_after_gst, 2)
-											   > 0):
+		print(discountAmount)	
+		if company.allowance_type=="Discount":
+			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
+			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
+			value_after_gst = value_after_gst-discountAfterAmount
+			value_before_gst = value_before_gst-discountBeforeAmount
+			if value_after_gst == 0:
+				
+				credit_value_after_gst = 0
+
+
+		if (value_after_gst > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
@@ -879,6 +885,8 @@ def insert_invoice(data):
 			has_credit_items = "Yes"
 		else:
 			has_credit_items = "No"
+		
+
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -886,6 +894,7 @@ def insert_invoice(data):
 			data['guest_data']['invoice_number'],
 			'guest_name':
 			data['guest_data']['name'],
+			'ready_to_generate_irn':ready_to_generate_irn,
 			'invoice_from':"Pms",
 			'gst_number':
 			data['guest_data']['gstNumber'],
@@ -1095,6 +1104,26 @@ def calulate_items(data):
 
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
+				if sac_code_based_gst_rates.type == "Discount":
+					
+						final_item['sac_code'] = 'No Sac'
+						final_item['sac_code_found'] = 'No'
+						final_item['cgst'] = 0
+						final_item['other_charges'] = 0
+						final_item['cgst_amount'] = 0
+						final_item['sgst'] = 0
+						final_item['sgst_amount'] = 0
+						final_item['igst'] = 0
+						final_item['igst_amount'] = 0
+						final_item['gst_rate'] = 0
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = item['item_value']
+						final_item['taxable'] = sac_code_based_gst_rates.taxble
+						final_item['cess'] = 0
+						final_item['cess_amount'] = 0
+						final_item['type'] = "Excempted"
+						item['item_type'] = "Discount"
+
 				if item['cgst'] == 0:
 					if ("Service" in item['name']) or ("Utility"
 													   in item['name']):

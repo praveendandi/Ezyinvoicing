@@ -52,6 +52,7 @@ def reinitiateInvoice(data):
 	total_invoice_amount = ''
 	conf_number = ''
 	membership = ''
+	print_by = ''
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -93,20 +94,40 @@ def reinitiateInvoice(data):
 		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
+		if "Printed By / On" in i:
+			p = i.split(":")
+			print_by = p[1].replace(" ","")		
 
 	
-
+	paymentTypes = GetPaymentTypes()
+	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
 	original_data = []
-	payment_list = "Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
 	for index, i in enumerate(data):
 	
-		if 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
-			original_data.append(i)
-		if 'XX/XX' in i and i in payment_list:
-			original_data.pop(len(original_data) - 1)
-			original_data.pop(len(original_data) - 1)
+		
+		if 'XX/XX' in i:
+			i = " "
+		if i !=" ":
+			j = i.split(' ')
+			j = j[1:-1]
+			if len(j)>1:
+				ele = j[0]+" "+j[1]
+				if ele not in paymentTypes:
+					original_data.append(i)
+			elif len(j) == 1:
+				if j[0] not in paymentTypes:
+					original_data.append(i)
+	# original_data = []
+	# payment_list = "Misc Debit','Cash','Cheque ( Do not Use )','City Ledger FO','Refund Back to Guest','Deposits Paid','American Express','Visa Card','Master','Master Card','Citi Bank Diners','JCB','Bob Card','Debit Card Visa','Debit Cards (ALL)','Debit Card Master','Cash POS','POS CIty Ledger','Other Credit Cards','RUPAY CARD','Voucher (TA)','DIGITAL WALLET','Cash (Foreign Exchange)','Advance Deposit Checkin'"
+	# for index, i in enumerate(data):
+	
+	# 	if 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
+	# 		original_data.append(i)
+	# 	if 'XX/XX' in i and i in payment_list:
+	# 		original_data.pop(len(original_data) - 1)
+	# 		original_data.pop(len(original_data) - 1)
 
-	items = []
+	items = [] 
 	itemsort = 0
 	for i in original_data:
 		pattern = re.compile(
@@ -169,6 +190,7 @@ def reinitiateInvoice(data):
 				item['sort_order'] =  itemsort+1
 			itemsort+=1
 			items.append(item)
+
 
 
 	finalData = []

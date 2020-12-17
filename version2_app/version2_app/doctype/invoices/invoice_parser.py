@@ -52,6 +52,7 @@ def file_parsing(filepath):
 	total_invoice_amount = ''
 	conf_number = ''
 	membership = ''
+	print_by = ''
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -93,6 +94,9 @@ def file_parsing(filepath):
 		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
+		if "Printed By / On" in i:
+			p = i.split(":")
+			print_by = p[1].replace(" ","")	
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -264,7 +268,8 @@ def file_parsing(filepath):
 	guest['company_code'] = "MHKCP-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
-	
+	guest['print_by'] = print_by
+
 	company_code = {"code":"MHKCP-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath

@@ -70,7 +70,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "HSN\nSAC",
+   "options": "HSN\nSAC\nDiscount",
    "reqd": 1
   },
   {
@@ -103,7 +103,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-07 12:04:49.030630",
+ "modified": "2020-12-16 18:01:40.583367",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
@@ -129,7 +129,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "IT",
+   "role": "ezy-IT",
    "share": 1,
    "write": 1
   },
@@ -141,7 +141,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Finance",
+   "role": "ezy-Finance",
    "share": 1,
    "write": 1
   },
