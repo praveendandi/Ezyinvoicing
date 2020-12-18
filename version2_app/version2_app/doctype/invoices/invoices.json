@@ -92,7 +92,11 @@
   "b2c_qrinvoice",
   "qr_generated",
   "cess_amount",
-  "print_by"
+  "print_by",
+  "discount_items",
+  "has_discount_items",
+  "discount_value_before_gst",
+  "discount_value_after_gst"
  ],
  "fields": [
   {
@@ -601,12 +605,34 @@
    "fieldname": "print_by",
    "fieldtype": "Data",
    "label": "Print By"
+  },
+  {
+   "fieldname": "discount_items",
+   "fieldtype": "Table",
+   "label": "Discount Items",
+   "options": "Discount Items"
+  },
+  {
+   "fieldname": "has_discount_items",
+   "fieldtype": "Select",
+   "label": "Has Discount Items",
+   "options": "No\nYes"
+  },
+  {
+   "fieldname": "discount_value_before_gst",
+   "fieldtype": "Float",
+   "label": "Discount Value Before Gst"
+  },
+  {
+   "fieldname": "discount_value_after_gst",
+   "fieldtype": "Data",
+   "label": "Discount Value After Gst"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-14 17:57:34.191679",
+ "modified": "2020-12-18 10:34:30.800142",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -67,7 +67,8 @@
   "proxy_url",
   "proxy_username",
   "proxy_password",
-  "allowance_type"
+  "allowance_type",
+  "invoice_cancelled_mails"
  ],
  "fields": [
   {
@@ -409,11 +410,17 @@
    "fieldtype": "Select",
    "label": "Allowance Type",
    "options": "Credit\nDiscount"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_cancelled_mails",
+   "fieldtype": "Check",
+   "label": "Invoice Cancelled Mails"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-15 18:08:00.911590",
+ "modified": "2020-12-18 12:27:59.704188",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

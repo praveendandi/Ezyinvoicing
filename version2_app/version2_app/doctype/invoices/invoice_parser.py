@@ -172,14 +172,27 @@ def file_parsing(filepath):
 				if index == 5:
 					if "CompBreakfast" in j or "Beverage" in j:
 						item["name"] = item["name"] + ' ' + j
-				if "Dry" in j:
-					print(j,"*******************888")
+				
 				if "SGST" in j:
-					item['name'] = item['name'] + ' SGST'
+					if "SGST" not in item['name']:
+						item['name'] = item['name'] + ' SGST'
 				if "CGST" in j:
-					item['name'] = item['name'] + ' CGST'
+					if "CGST" not in item['name']:
+						item['name'] = item['name'] + ' CGST'
 				if "IGST" in j:
-					item['name'] = item['name'] + ' IGST'
+					if "IGST" not in item['name']:
+						item['name'] = item['name'] + ' IGST'
+				if 'CESS' in j:
+					if "CESS" not in item['name']:
+						item['name'] = item['name'] + ' CESS'		
+				# if "CESS" in j:
+				# 	v = re.findall("\d+\%", j)
+				# 	if len(v)>0:
+				# 		item['percentage'] = v[0][:-1]
+				# 	else:	
+				# 		ind = i.find("CESS")
+				# 		ind2 = i.find("%")
+				# 		item['percentage'] = i[ind + 6:ind2]		
 
 				if 'SAC' in j:
 					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
