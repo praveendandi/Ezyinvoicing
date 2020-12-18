@@ -10,10 +10,7 @@ import time
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 
-# /home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf
-site = 'http://0.0.0.0:8000/'
-site_folder_path = 'version2_app.com'
-# fontpath= '/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/invoices/Roboto-Black.ttf'
+
 
 def check_company_exist_for_Irn(code):
 	try:
@@ -320,18 +317,38 @@ def gsp_api_data(data):
 		print(e,"gsp api details")
 		return {"success":False,"message":e}
 
-def insert_items(items,invoice_number):
+def insert_credit_items(items,invoice_number):
 	try:
 		for item in items:
-			item = {'doctype': 'Credit Note Items', 'sac_code': item['sac_code'], 'item_name': item['item_name'], 'date': item['date'], 'cgst': item['cgst'], 'cgst_amount': item['cgst_amount'], 'sgst': item['sgst'], 'sgst_amount': item['sgst_amount'], 'igst': item['igst'], 'igst_amount': item['igst_amount'], 'item_value': item['item_value'],
-				 'description': item['description'], 'item_taxable_value': item['item_taxable_value'], 'gst_rate': item['gst_rate'], 'item_value_after_gst': item['item_value_after_gst'], 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
-			
+			# print(item.sac_code,item['sac_code'])
+			# item = {'doctype': 'Credit Note Items', 'sac_code': item['sac_code'], 'item_name': item['item_name'], 'date': item['date'], 'cgst': item['cgst'], 'cgst_amount': item['cgst_amount'], 'sgst': item['sgst'], 'sgst_amount': item['sgst_amount'], 'igst': item['igst'], 'igst_amount': item['igst_amount'], 'item_value': item['item_value'],
+			# 		'description': item['description'], 'item_taxable_value': item['item_taxable_value'], 'gst_rate': item['gst_rate'], 'item_value_after_gst': item['item_value_after_gst'], 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
+			item = {'doctype': 'Credit Note Items', 'sac_code': item.sac_code, 'item_name': item.item_name, 'date': item.date, 'cgst': item.cgst, 'cgst_amount': item.cgst_amount, 'sgst': item.sgst, 'sgst_amount': item.sgst_amount, 'igst': item.igst, 'igst_amount': item.igst_amount, 'item_value': item.item_value,
+					'description': item.description, 'item_taxable_value': item.item_taxable_value, 'gst_rate': item.gst_rate, 'item_value_after_gst': item.item_value_after_gst, 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
 			if item['sac_code'].isdigit():
 				
 				doc = frappe.get_doc(item)
 				doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess":True,"data":doc}
-			# print(doc)
+				# print(doc)
+	except Exception as e:
+		print(e,"insert itemns api")
+		return {"success":False,"message":e}
+
+def insert_discount_items(items,invoice_number):
+	try:
+		for item in items:
+			# print(item.sac_code,item['sac_code'])
+			# item = {'doctype': 'Credit Note Items', 'sac_code': item['sac_code'], 'item_name': item['item_name'], 'date': item['date'], 'cgst': item['cgst'], 'cgst_amount': item['cgst_amount'], 'sgst': item['sgst'], 'sgst_amount': item['sgst_amount'], 'igst': item['igst'], 'igst_amount': item['igst_amount'], 'item_value': item['item_value'],
+			# 		'description': item['description'], 'item_taxable_value': item['item_taxable_value'], 'gst_rate': item['gst_rate'], 'item_value_after_gst': item['item_value_after_gst'], 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
+			item = {'doctype': 'Discount Items', 'sac_code': item.sac_code, 'item_name': item.item_name, 'date': item.date, 'cgst': item.cgst, 'cgst_amount': item.cgst_amount, 'sgst': item.sgst, 'sgst_amount': item.sgst_amount, 'igst': item.igst, 'igst_amount': item.igst_amount, 'item_value': item.item_value,
+					'description': item.description, 'item_taxable_value': item.item_taxable_value, 'gst_rate': item.gst_rate, 'item_value_after_gst': item.item_value_after_gst, 'parent': invoice_number, 'parentfield': 'discount_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
+			if item['sac_code'].isdigit():
+				
+				doc = frappe.get_doc(item)
+				doc.insert(ignore_permissions=True, ignore_links=True)
+		return {"sucess":True,"data":doc}
+				# print(doc)
 	except Exception as e:
 		print(e,"insert itemns api")
 		return {"success":False,"message":e}
@@ -341,14 +358,12 @@ def CreditgenerateIrn(invoice_number):
 	# get invoice details
 	credit_items = []
 	invoice = frappe.get_doc('Invoices', invoice_number)
-	# print(invoice.__dict__,"///")
 
 	# get seller details
 	company_details = check_company_exist_for_Irn(invoice.company)
 	# get gsp_details
 	companyData = {"code":company_details['data'].name,"mode":company_details['data'].mode,"provider":company_details['data'].provider}
 	GSP_details = gsp_api_data(companyData)
-	# print(GSP_details)
 	# get taxpayer details
 	GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data'],"invoice":invoice_number}
 	taxpayer_details = get_tax_payer_details_data(GspData)
@@ -429,8 +444,7 @@ def CreditgenerateIrn(invoice_number):
 	ass_value = 0
 	for index, item in enumerate(invoice.items):
 		# print(item.sac_code,"HsnCD")
-		if item.is_credit_item == "Yes":
-			print("/aaaaaaaaaaaaaaaaaaa")
+		if item.item_mode == "Credit":
 			credit_items.append(item.__dict__)
 			total_igst_value += abs(item.igst_amount)
 			total_sgst_value += abs(item.sgst_amount)
@@ -514,8 +528,8 @@ def CreditgenerateIrn(invoice_number):
 		invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 		invoice.save(ignore_permissions=True,ignore_version=True)
 		create_qr_image(invoice_number, GSP_details['data'])
-		print(credit_items)
-		insert_credit_items = insert_items(credit_items,invoice_number)
+		# print(credit_items)
+		# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 	else:
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		invoice.credit_irn_generated = 'Failed'
