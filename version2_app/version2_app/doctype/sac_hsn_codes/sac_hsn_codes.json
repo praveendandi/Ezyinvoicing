@@ -78,7 +78,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "HSN\nSAC",
+   "options": "HSN\nSAC\nDiscount",
    "reqd": 1
   },
   {
@@ -182,7 +182,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "IT",
+   "role": "ezy-IT",
    "share": 1,
    "write": 1
   },
@@ -194,7 +194,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Finance",
+   "role": "ezy-Finance",
    "share": 1,
    "write": 1
   },

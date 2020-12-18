@@ -320,18 +320,20 @@ def gsp_api_data(data):
 		print(e,"gsp api details")
 		return {"success":False,"message":e}
 
-def insert_items(items,invoice_number):
+def insert_credit_items(items,invoice_number):
 	try:
 		for item in items:
-			item = {'doctype': 'Credit Note Items', 'sac_code': item['sac_code'], 'item_name': item['item_name'], 'date': item['date'], 'cgst': item['cgst'], 'cgst_amount': item['cgst_amount'], 'sgst': item['sgst'], 'sgst_amount': item['sgst_amount'], 'igst': item['igst'], 'igst_amount': item['igst_amount'], 'item_value': item['item_value'],
-				 'description': item['description'], 'item_taxable_value': item['item_taxable_value'], 'gst_rate': item['gst_rate'], 'item_value_after_gst': item['item_value_after_gst'], 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
-			
+			# print(item.sac_code,item['sac_code'])
+			# item = {'doctype': 'Credit Note Items', 'sac_code': item['sac_code'], 'item_name': item['item_name'], 'date': item['date'], 'cgst': item['cgst'], 'cgst_amount': item['cgst_amount'], 'sgst': item['sgst'], 'sgst_amount': item['sgst_amount'], 'igst': item['igst'], 'igst_amount': item['igst_amount'], 'item_value': item['item_value'],
+			# 		'description': item['description'], 'item_taxable_value': item['item_taxable_value'], 'gst_rate': item['gst_rate'], 'item_value_after_gst': item['item_value_after_gst'], 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
+			item = {'doctype': 'Credit Note Items', 'sac_code': item.sac_code, 'item_name': item.item_name, 'date': item.date, 'cgst': item.cgst, 'cgst_amount': item.cgst_amount, 'sgst': item.sgst, 'sgst_amount': item.sgst_amount, 'igst': item.igst, 'igst_amount': item.igst_amount, 'item_value': item.item_value,
+					'description': item.description, 'item_taxable_value': item.item_taxable_value, 'gst_rate': item.gst_rate, 'item_value_after_gst': item.item_value_after_gst, 'parent': invoice_number, 'parentfield': 'credit_note_items', 'parenttype': 'invoices', 'sac_code_found': 'Yes'}
 			if item['sac_code'].isdigit():
 				
 				doc = frappe.get_doc(item)
 				doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess":True,"data":doc}
-			# print(doc)
+				# print(doc)
 	except Exception as e:
 		print(e,"insert itemns api")
 		return {"success":False,"message":e}
@@ -430,6 +432,7 @@ def CreditgenerateIrn(invoice_number):
 	for index, item in enumerate(invoice.items):
 		# print(item.sac_code,"HsnCD")
 		if item.is_credit_item == "Yes":
+			print("/aaaaaaaaaaaaaaaaaaa")
 			credit_items.append(item.__dict__)
 			total_igst_value += abs(item.igst_amount)
 			total_sgst_value += abs(item.sgst_amount)
@@ -513,8 +516,8 @@ def CreditgenerateIrn(invoice_number):
 		invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 		invoice.save(ignore_permissions=True,ignore_version=True)
 		create_qr_image(invoice_number, GSP_details['data'])
-		# print(credit_items)
-		insert_credit_items = insert_items(credit_items,invoice_number)
+		print(credit_items)
+		insert_credit_items = insert_credit_items(credit_items,invoice_number)
 	else:
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		invoice.credit_irn_generated = 'Failed'
