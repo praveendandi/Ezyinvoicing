@@ -24,7 +24,6 @@ import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
-site = 'http://0.0.0.0:8000/'
 
 
 class Invoices(Document):
@@ -144,7 +143,8 @@ class Invoices(Document):
 						"PrdDesc":
 						item.item_name,
 						"IsServc":
-						"Y",
+						"Y" if item.item_type == "SAC" else
+						"N",
 						"HsnCd":
 						item.sac_code if item.sac_code != 'No Sac' else '',
 						"Qty":
@@ -207,9 +207,10 @@ class Invoices(Document):
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
-				"TotInvVal": round(invoice.amount_after_gst, 2),
-				"TotInvValFc": round(invoice.amount_after_gst, 2)
+				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_after_value,2),
+				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			}
+			print(gst_data)
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -552,6 +553,7 @@ class Invoices(Document):
 				"docname": invoice_number,
 				'fieldname': 'b2c_qrimage'
 			}
+			site = company.host
 			upload_qr_image = requests.post(site + "api/method/upload_file",
 											files=files,
 											data=payload)
@@ -676,6 +678,7 @@ def attach_qr_code(invoice_number, gsp, code):
 			"docname": invoice_number,
 			'fieldname': 'invoice_with_gst_details'
 		}
+		site = company.host
 		upload_qr_image = requests.post(site + "api/method/upload_file",
 										files=files,
 										data=payload)
@@ -738,6 +741,7 @@ def create_qr_image(invoice_number, gsp):
 			"docname": invoice_number,
 			'fieldname': 'qr_code_image'
 		}
+		site = company.host
 		upload_qr_image = requests.post(site + "api/method/upload_file",
 										files=files,
 										data=payload)
@@ -876,12 +880,14 @@ def insert_invoice(data):
 					credit_value_after_gst += abs(item['item_value_after_gst'])
 			else:
 				pass
+		# pms_invoice_summary = value_after_gst
+		# pms_invoice_summary_without_gst = value_before_gst
 		if company.allowance_type=="Discount":
 			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			value_after_gst = value_after_gst-discountAfterAmount
-			value_before_gst = value_before_gst-discountBeforeAmount
-			if value_after_gst == 0:
+			pms_invoice_summary = value_after_gst-discountAfterAmount
+			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+			if pms_invoice_summary == 0:
 				
 				credit_value_after_gst = 0
 			if credit_value_before_gst > 0:
@@ -890,21 +896,23 @@ def insert_invoice(data):
 			else:
 				has_discount_items = "No"
 		else:
+			pms_invoice_summary = value_after_gst - credit_value_after_gst
+			pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
 			if credit_value_before_gst > 0:
 
 				has_credit_items = "Yes"
 			else:
 				has_credit_items = "No"			
 
-		if (value_after_gst > 0) or (credit_value_after_gst > 0):
+		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
 
-
+		 
 		#check invoice total
-		if data['total_invoice_amount'] != value_after_gst:
-			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount}
+		if data['total_invoice_amount'] != pms_invoice_summary:
+			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 			if TotalMismatchErrorAPI['success']==True:
 				items = data['items_data']
@@ -970,9 +978,9 @@ def insert_invoice(data):
 			"credit_value_after_gst":
 			round(credit_value_after_gst, 2),
 			"pms_invoice_summary_without_gst":
-			round(value_before_gst, 2) ,
+			round(pms_invoice_summary_without_gst, 2) ,
 			"pms_invoice_summary":
-			round(value_after_gst, 2) ,
+			round(pms_invoice_summary, 2) ,
 			'irn_generated':
 			irn_generated,
 			'irn_cancelled':
@@ -1064,7 +1072,8 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 				'cgst': 0,
 				'sgst': 0,
 				'igst': 0,
-				'total_amount':0,
+				'amount_before_gst':0,
+				'amount_after_gst':0,
 				'sac_hsn_code': sac,
 				'invoice_number': invoice_number,
 				'doctype': "SAC HSN Tax Summaries",
@@ -1079,7 +1088,8 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 					sac_tax['sgst'] += item['sgst_amount']
 					sac_tax['igst'] += item['igst_amount']
 					sac_tax['cess'] += item['cess_amount']
-					sac_tax['total_amount'] += item['item_taxable_value']
+					sac_tax['amount_before_gst'] += item['item_taxable_value']
+					sac_tax['amount_after_gst'] += item['item_value_after_gst']
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
@@ -2330,6 +2340,7 @@ def attach_b2c_qrcode(data):
 			"docname": data["invoice_number"],
 			'fieldname': 'b2c_qrinvoice'
 		}
+		site = company.host
 		upload_qrinvoice_image = requests.post(site + "api/method/upload_file",
 											   files=files_new,
 											   data=payload_new)

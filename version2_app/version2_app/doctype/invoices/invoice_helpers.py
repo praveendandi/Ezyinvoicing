@@ -61,9 +61,9 @@ def TotalMismatchError(data,calculated_data):
                 "credit_value_after_gst":
                 round(calculated_data['credit_value_after_gst'], 2),
                 "pms_invoice_summary_without_gst":
-                round(calculated_data['value_before_gst'], 2) ,
+                round(calculated_data['pms_invoice_summary_without_gst'], 2) ,
                 "pms_invoice_summary":
-                round(calculated_data['value_after_gst'], 2) ,
+                round(calculated_data['pms_invoice_summary'], 2) ,
                 'irn_generated':
                 "Error",
                 'irn_cancelled':

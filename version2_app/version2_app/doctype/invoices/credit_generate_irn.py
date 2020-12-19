@@ -66,6 +66,7 @@ def attach_qr_code(invoice_number, gsp,code):
 			"docname": invoice_number,
 			'fieldname': 'invoice_with_credit_gst_details'
 		}
+		site = company.host
 		upload_qr_image = requests.post(site + "api/method/upload_file",
 										files=files,
 										data=payload)
@@ -125,6 +126,7 @@ def create_qr_image(invoice_number, gsp):
 		"docname": invoice_number,
 		'fieldname': 'credit_qr_code_image'
 	}
+	site = company.host
 	upload_qr_image = requests.post(site + "api/method/upload_file",
 									files=files,
 									data=payload)
