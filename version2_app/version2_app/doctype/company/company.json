@@ -40,28 +40,13 @@
   "irn_text_point1",
   "irn_text_point2",
   "section_break_30",
-  "file_upload_api",
-  "invoice_api",
-  "check_invoice_file_exists_api",
-  "company_check_api",
-  "gsp_api_data",
-  "check_token_is_vaild_api",
-  "get_tax_payer_details_api",
-  "calculate_items_api",
-  "insert_invoice_api",
-  "check_gstnumber_length_api",
-  "error_insert_invoice_api",
-  "payment_types_api",
   "invoice_reinitiate_parsing_file",
-  "invoice_file_path",
-  "reinitiate_invoice_api",
-  "check_invoice_exists",
   "reinitiate_file_path",
   "invoice_parser_file",
+  "invoice_parser_file_path",
   "site_name",
   "irn_details_page",
   "invoice_item_date_format",
-  "invoice_parser_file_path",
   "font_file_path",
   "proxy",
   "proxy_url",
@@ -249,81 +234,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "file_upload_api",
-   "fieldtype": "Data",
-   "label": "File Upload Api"
-  },
-  {
-   "fieldname": "invoice_api",
-   "fieldtype": "Data",
-   "label": "Invoice Api"
-  },
-  {
-   "fieldname": "check_invoice_file_exists_api",
-   "fieldtype": "Data",
-   "label": "Check Invoice File Exists Api"
-  },
-  {
-   "fieldname": "company_check_api",
-   "fieldtype": "Data",
-   "label": "Company Check Api"
-  },
-  {
-   "fieldname": "gsp_api_data",
-   "fieldtype": "Data",
-   "label": "Gsp Api Data"
-  },
-  {
-   "fieldname": "check_token_is_vaild_api",
-   "fieldtype": "Data",
-   "label": "Check Token Is Vaild Api"
-  },
-  {
-   "fieldname": "get_tax_payer_details_api",
-   "fieldtype": "Data",
-   "label": "Get Tax Payer Details Api"
-  },
-  {
-   "fieldname": "calculate_items_api",
-   "fieldtype": "Data",
-   "label": "Calculate Items Api"
-  },
-  {
-   "fieldname": "insert_invoice_api",
-   "fieldtype": "Data",
-   "label": "Insert Invoice Api"
-  },
-  {
-   "fieldname": "check_gstnumber_length_api",
-   "fieldtype": "Data",
-   "label": "Check GstNumber Length Api"
-  },
-  {
-   "fieldname": "error_insert_invoice_api",
-   "fieldtype": "Data",
-   "label": "Error Insert Invoice Api"
-  },
-  {
-   "fieldname": "payment_types_api",
-   "fieldtype": "Data",
-   "label": "Payment Types Api"
-  },
-  {
-   "fieldname": "invoice_file_path",
-   "fieldtype": "Data",
-   "label": "Invoice File Path"
-  },
-  {
-   "fieldname": "reinitiate_invoice_api",
-   "fieldtype": "Data",
-   "label": "ReInitiate Invoice Api"
-  },
-  {
-   "fieldname": "check_invoice_exists",
-   "fieldtype": "Data",
-   "label": "Check Invoice Exists"
-  },
-  {
    "fieldname": "reinitiate_file_path",
    "fieldtype": "Data",
    "label": "Reinitiate File Path"
@@ -426,7 +336,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-19 12:22:29.843747",
+ "modified": "2020-12-19 15:58:25.923916",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
