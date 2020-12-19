@@ -11,7 +11,8 @@
   "sgst",
   "igst",
   "total_amount",
-  "amended_from"
+  "amended_from",
+  "cess"
  ],
  "fields": [
   {
@@ -62,13 +63,18 @@
    "options": "SAC HSN Tax Summaries",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "cess",
+   "fieldtype": "Float",
+   "label": "CESS"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-10-23 12:51:03.604984",
+ "modified": "2020-12-19 11:39:38.731383",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN Tax Summaries",
