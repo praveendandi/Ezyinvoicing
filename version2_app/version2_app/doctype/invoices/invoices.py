@@ -649,7 +649,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		# attacing irn an ack
 		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
-		text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ack_no + "\n" + "ACK DATE: " + invoice.ack_date
+		
 		if company.irn_details_page == "First":
 			page = doc[0]
 		else:
@@ -657,16 +657,23 @@ def attach_qr_code(invoice_number, gsp, code):
 		# page = doc[0]
 		# where = fitz.Point(15, 55)
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + invoice.ack_date
+		# irntext = "IRN: "+ invoice.irn_number
+		# acknotext = "ACK NO: " + invoice.ack_no 
+		# ackdatetext = "ACK DATE: " + invoice.ack_date
+		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
 		page.insertText(
 			where,
 			text,
 			fontname="Roboto-Black",  # arbitrary if fontfile given
 			fontfile=folder_path +
 			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=6,  # default
+			fontsize=7,  # default
 			rotate=0,  # rotate text
 			color=(0, 0, 0),  # some color (blue)
 			overlay=True)
+				
 		doc.save(dst_pdf_text_filename)
 		doc.close()
 
@@ -1625,11 +1632,11 @@ def insert_tax_summaries2(items,invoice_number):
 	df = pd.DataFrame(items)
 
 	df = df.set_index('sgst')
-	df1 = df.groupby(['cgst','cess'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess"]].apply(lambda x : x.astype(float).sum())
+	df['cess_duplicate'] = df['cess']
+	df1 = df.groupby(['cgst','cess_duplicate'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess"]].apply(lambda x : x.astype(float).sum())
 	df1.reset_index(level=0, inplace=True) 
-	
+	df1['cess'] = df1.index.values.tolist()
 	data = df1.to_dict('records')
-	# print(data,"//////a/a/a/a/")
 	for each in data:
 		if each['cgst']>0:
 			
