@@ -282,7 +282,7 @@ def file_parsing(filepath):
 	error_data['state_code'] = "36"
 	error_data['room_number'] = guest['room_number']
 	error_data['pincode'] = "500082"
-	gstNumber = "12345"
+	# gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
