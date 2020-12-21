@@ -10,8 +10,12 @@
   "cgst",
   "sgst",
   "igst",
-  "total_amount",
-  "amended_from"
+  "amount_before_gst",
+  "amended_from",
+  "cess",
+  "amount_after_gst",
+  "state_cess",
+  "vat"
  ],
  "fields": [
   {
@@ -49,12 +53,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "total_amount",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Total Amount"
-  },
-  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -62,13 +60,39 @@
    "options": "SAC HSN Tax Summaries",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "cess",
+   "fieldtype": "Float",
+   "label": "Central CESS"
+  },
+  {
+   "fieldname": "amount_before_gst",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Amount Before Gst"
+  },
+  {
+   "fieldname": "amount_after_gst",
+   "fieldtype": "Float",
+   "label": "Amount After Gst"
+  },
+  {
+   "fieldname": "state_cess",
+   "fieldtype": "Float",
+   "label": "State CESS"
+  },
+  {
+   "fieldname": "vat",
+   "fieldtype": "Float",
+   "label": "VAT"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-10-23 12:51:03.604984",
+ "modified": "2020-12-21 12:10:34.839565",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN Tax Summaries",

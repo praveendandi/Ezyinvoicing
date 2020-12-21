@@ -132,7 +132,7 @@ def file_parsing(filepath):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i:
+		if len(check_date) > 0:
 			item = dict()
 			for index, j in enumerate(i.split(' ')):
 				# print(index,j)
@@ -151,8 +151,6 @@ def file_parsing(filepath):
 						pass
 					else:
 						if re.fullmatch('[A-Za-z]+', j) and '#' not in j and '[' not in j and "Room" not in j and ']' not in j and 'Pkg.' not in j and 'Split' not in j:
-							item["name"] = item["name"] + ' ' + j
-						if re.fullmatch('[-]', j):
 							item["name"] = item["name"] + ' ' + j
 				if j == "Dinner" and "Dinner" not in item['name']:
 					item["name"] = item["name"] + ' ' + j
@@ -179,8 +177,6 @@ def file_parsing(filepath):
 				if index == 5:
 					if "CompBreakfast" in j or "Beverage" in j:
 						item["name"] = item["name"] + ' ' + j
-					if re.fullmatch('[-]{1}[A-Za-z]+',j) or "Transport" in j or "Laundry" in j:
-						item["name"] = item["name"] + ' ' + j
 				
 				if "SGST" in j:
 					item['name'] = item['name'] + ' SGST'
@@ -199,8 +195,6 @@ def file_parsing(filepath):
 					if item['sac_code'].isdigit():
 						if item['sac_code'] not in item['name']:
 							item['name'] = item['name']+' '+item['sac_code']
-				else:
-					item['sac_code'] = 'No Sac'
 				if "CGST" in j:
 					ind = i.find("CGST")
 					ind2 = i.find("%")
@@ -240,88 +234,88 @@ def file_parsing(filepath):
 			items.append(item)
 
 
-	# finalData = []
-	# for item in items:
-	# 	# print(item)
-	# 	if len(item) > 1:
+	finalData = []
+	for item in items:
+		# print(item)
+		if len(item) > 1:
 
-	# 		if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"] and 'Cess' not in item['name']:# and "Service Charge" not in item['name'] and "Utility Charge" not in item['name']:
-	# 			# print(item)
-	# 			if 'sac_code' in item:
-	# 				if item['sac_code']== '':
-	# 					item['sac_code'] = 'No Sac'
-	# 				else:
-	# 					item['sac_code'] = item['sac_code']
-	# 			else:
-	# 				item['sac_code'] = 'No Sac'
-	# 			finalData.append(item)
-	# 		else:
-	# 			itemToUpdate = finalData[len(finalData) - 1]
-	# 			if 'SGST' in item['name']:
-	# 				if "." in item['percentage']:
-	# 					itemToUpdate['sgst'] = float(item['percentage'])
-	# 					itemToUpdate['sgstAmount'] = item['item_value']
-	# 				else:
-	# 					itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
-	# 					itemToUpdate['sgstAmount'] = item['item_value']
-	# 			elif 'CGST' in item['name']:
-	# 				if "." in item['percentage']:
-	# 					itemToUpdate['cgst'] = float(item['percentage'])
-	# 					itemToUpdate['cgstAmount'] = item['item_value']
-	# 				else:
-	# 					print(item)
-	# 					itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
-	# 					itemToUpdate['cgstAmount'] = item['item_value']
-	# 			elif 'IGST' in item['name']:
-	# 				if "." in item['percentage']:
-	# 					itemToUpdate['igst'] = float(item['percentage'])
-	# 					itemToUpdate['igstAmount'] = item['item_value']
-	# 				else:
-	# 					itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
-	# 					itemToUpdate['igstAmount'] = item['item_value']
-	# 			elif 'CESS' in item['name']:
-	# 				if "." in item['percentage']:
-	# 					itemToUpdate['cess'] = float(item['percentage'])
-	# 					itemToUpdate['cessAmount'] = item['item_value']
-	# 				else:
-	# 					print(item)
-	# 					itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-	# 					itemToUpdate['cessAmount'] = item['item_value']	
-	# 			elif 'Cess' in item['name']:
-	# 				if "." in item['percentage']:
-	# 					itemToUpdate['cess'] = float(item['percentage'])
-	# 					itemToUpdate['cessAmount'] = item['item_value']
-	# 				else:
-	# 					itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-	# 					itemToUpdate['cessAmount'] = item['item_value']
-	# 			elif 'Allow ' in item["name"]:
-	# 				if "sgst" in itemToUpdate:
-	# 					itemToUpdate['cgst'] = 9
-	# 					itemToUpdate['cgstAmount'] = item['item_value']
-	# 				else:
-	# 					itemToUpdate['sgst'] = 9
-	# 					itemToUpdate['sgstAmount'] = item['item_value']
+			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"] and 'Cess' not in item['name']:# and "Service Charge" not in item['name'] and "Utility Charge" not in item['name']:
+				# print(item)
+				if 'sac_code' in item:
+					if item['sac_code']== '':
+						item['sac_code'] = 'No Sac'
+					else:
+						item['sac_code'] = item['sac_code']
+				else:
+					item['sac_code'] = 'No Sac'
+				finalData.append(item)
+			else:
+				itemToUpdate = finalData[len(finalData) - 1]
+				if 'SGST' in item['name']:
+					if "." in item['percentage']:
+						itemToUpdate['sgst'] = float(item['percentage'])
+						itemToUpdate['sgstAmount'] = item['item_value']
+					else:
+						itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
+						itemToUpdate['sgstAmount'] = item['item_value']
+				elif 'CGST' in item['name']:
+					if "." in item['percentage']:
+						itemToUpdate['cgst'] = float(item['percentage'])
+						itemToUpdate['cgstAmount'] = item['item_value']
+					else:
+						print(item)
+						itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
+						itemToUpdate['cgstAmount'] = item['item_value']
+				elif 'IGST' in item['name']:
+					if "." in item['percentage']:
+						itemToUpdate['igst'] = float(item['percentage'])
+						itemToUpdate['igstAmount'] = item['item_value']
+					else:
+						itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
+						itemToUpdate['igstAmount'] = item['item_value']
+				elif 'CESS' in item['name']:
+					if "." in item['percentage']:
+						itemToUpdate['cess'] = float(item['percentage'])
+						itemToUpdate['cessAmount'] = item['item_value']
+					else:
+						print(item)
+						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
+						itemToUpdate['cessAmount'] = item['item_value']	
+				elif 'Cess' in item['name']:
+					if "." in item['percentage']:
+						itemToUpdate['cess'] = float(item['percentage'])
+						itemToUpdate['cessAmount'] = item['item_value']
+					else:
+						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
+						itemToUpdate['cessAmount'] = item['item_value']
+				elif 'Allow ' in item["name"]:
+					if "sgst" in itemToUpdate:
+						itemToUpdate['cgst'] = 9
+						itemToUpdate['cgstAmount'] = item['item_value']
+					else:
+						itemToUpdate['sgst'] = 9
+						itemToUpdate['sgstAmount'] = item['item_value']
 							
 
 
-	# invoiceItems = []
-	# for index, i in enumerate(finalData):
-	# 	# i['SlNo'] = index+1
-	# 	# i['name']=i['name']+"99999"
-	# 	if 'cgstAmount' not in i:
-	# 		i['cgst'] = 0
-	# 		i['cgstAmount'] = float(0)
-	# 	if 'sgstAmount' not in i:
-	# 		i['sgst'] = 0
-	# 		i['sgstAmount'] = float(0)
-	# 	if 'igstAmount' not in i:
-	# 		i['igst'] = 0
-	# 		i['igstAmount'] = float(0)
-	# 	if 'cessAmount' not in i:
-	# 		i['cess'] = 0
-	# 		i['cessAmount'] = float(0)    
-	# 	# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
-	# 	invoiceItems.append(i)
+	invoiceItems = []
+	for index, i in enumerate(finalData):
+		# i['SlNo'] = index+1
+		# i['name']=i['name']+"99999"
+		if 'cgstAmount' not in i:
+			i['cgst'] = 0
+			i['cgstAmount'] = float(0)
+		if 'sgstAmount' not in i:
+			i['sgst'] = 0
+			i['sgstAmount'] = float(0)
+		if 'igstAmount' not in i:
+			i['igst'] = 0
+			i['igstAmount'] = float(0)
+		if 'cessAmount' not in i:
+			i['cess'] = 0
+			i['cessAmount'] = float(0)    
+		# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
+		invoiceItems.append(i)
 
 		# print(i)
 	guest = dict()
@@ -338,7 +332,7 @@ def file_parsing(filepath):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = items
+	guest['items'] = invoiceItems
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)

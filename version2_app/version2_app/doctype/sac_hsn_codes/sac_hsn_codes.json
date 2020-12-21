@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "field:code",
+ "autoname": "field:description",
  "creation": "2020-10-08 14:49:38.244242",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -28,7 +28,8 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Description",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "taxble",
@@ -65,8 +66,7 @@
    "fieldname": "code",
    "fieldtype": "Data",
    "label": "Code",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "type",
@@ -121,7 +121,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-21 09:54:33.980266",
+ "modified": "2020-12-21 12:11:13.330781",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

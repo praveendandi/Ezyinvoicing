@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
+from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
 import pandas as pd
 import json
 import qrcode
@@ -23,7 +24,6 @@ import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
-site = 'http://0.0.0.0:8000/'
 
 
 class Invoices(Document):
@@ -32,7 +32,7 @@ class Invoices(Document):
 
 
 	def generateIrn(self, invoice_number):
-		try:
+		# try:
 			# get invoice details
 			start_time = datetime.datetime.utcnow()
 			invoice = frappe.get_doc('Invoices', invoice_number)
@@ -143,7 +143,8 @@ class Invoices(Document):
 						"PrdDesc":
 						item.item_name,
 						"IsServc":
-						"Y",
+						"Y" if item.item_type == "SAC" else
+						"N",
 						"HsnCd":
 						item.sac_code if item.sac_code != 'No Sac' else '',
 						"Qty":
@@ -204,9 +205,10 @@ class Invoices(Document):
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
-				"TotInvVal": round(invoice.amount_after_gst, 2),
-				"TotInvValFc": round(invoice.amount_after_gst, 2)
+				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_after_value,2),
+				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			}
+			print(gst_data)
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -253,8 +255,8 @@ class Invoices(Document):
 			# 		return {"success": True}
 			# 	return {"success": False}
 
-		except Exception as e:
-			print(str(e), "generate Irn")
+		# except Exception as e:
+		# 	print(str(e), "generate Irn")
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
 		# try:
@@ -474,6 +476,7 @@ class Invoices(Document):
 				"docname": invoice_number,
 				'fieldname': 'b2c_qrimage'
 			}
+			site = company.host
 			upload_qr_image = requests.post(site + "api/method/upload_file",
 											files=files,
 											data=payload)
@@ -598,6 +601,7 @@ def attach_qr_code(invoice_number, gsp, code):
 			"docname": invoice_number,
 			'fieldname': 'invoice_with_gst_details'
 		}
+		site = company.host
 		upload_qr_image = requests.post(site + "api/method/upload_file",
 										files=files,
 										data=payload)
@@ -660,6 +664,7 @@ def create_qr_image(invoice_number, gsp):
 			"docname": invoice_number,
 			'fieldname': 'qr_code_image'
 		}
+		site = company.host
 		upload_qr_image = requests.post(site + "api/method/upload_file",
 										files=files,
 										data=payload)
@@ -794,17 +799,18 @@ def insert_invoice(data):
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
 					credit_cess_amount+=abs(item['cess_amount'])
-					print(credit_cgst_amount)
 					credit_value_before_gst += abs(item['item_value'])
 					credit_value_after_gst += abs(item['item_value_after_gst'])
 			else:
 				pass
+		# pms_invoice_summary = value_after_gst
+		# pms_invoice_summary_without_gst = value_before_gst
 		if company.allowance_type=="Discount":
 			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			value_after_gst = value_after_gst-discountAfterAmount
-			value_before_gst = value_before_gst-discountBeforeAmount
-			if value_after_gst == 0:
+			pms_invoice_summary = value_after_gst-discountAfterAmount
+			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+			if pms_invoice_summary == 0:
 				
 				credit_value_after_gst = 0
 			if credit_value_before_gst > 0:
@@ -813,22 +819,36 @@ def insert_invoice(data):
 			else:
 				has_discount_items = "No"
 		else:
+			pms_invoice_summary = value_after_gst - credit_value_after_gst
+			pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
 			if credit_value_before_gst > 0:
 
 				has_credit_items = "Yes"
 			else:
 				has_credit_items = "No"			
 
-		if (value_after_gst > 0) or (credit_value_after_gst > 0):
+		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
-		# if credit_value_before_gst > 0:
 
-		# 	has_credit_items = "Yes"
-		# else:
-		# 	has_credit_items = "No"
-		
+		 
+		#check invoice total
+		if data['total_invoice_amount'] != pms_invoice_summary:
+			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
+			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
+			if TotalMismatchErrorAPI['success']==True:
+				items = data['items_data']
+				
+				itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
+				
+				insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
+				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+					items, TotalMismatchErrorAPI['invoice_number'])
+				return {"success": True}
+
+			return{"success":False,"message":TotalMismatchErrorAPI['message']}
+
 
 		invoice = frappe.get_doc({
 			'doctype':
@@ -849,9 +869,10 @@ def insert_invoice(data):
 			data['guest_data']['confirmation_number'],
 			'invoice_type':
 			data['guest_data']['invoice_type'],
+			'print_by': data['guest_data']['print_by'],
 			'invoice_date':
 			datetime.datetime.strptime(data['guest_data']['invoice_date'],
-									   '%d-%b-%y %H:%M:%S'),
+										'%d-%b-%y %H:%M:%S'),
 			'legal_name':
 			data['taxpayer']['legal_name'],
 			'address_1':
@@ -881,9 +902,9 @@ def insert_invoice(data):
 			"credit_value_after_gst":
 			round(credit_value_after_gst, 2),
 			"pms_invoice_summary_without_gst":
-			round(value_before_gst, 2) ,
+			round(pms_invoice_summary_without_gst, 2) ,
 			"pms_invoice_summary":
-			round(value_after_gst, 2) ,
+			round(pms_invoice_summary, 2) ,
 			'irn_generated':
 			irn_generated,
 			'irn_cancelled':
@@ -945,14 +966,11 @@ def insert_invoice(data):
 
 		itemsInsert = insert_items(data['items_data'], data['invoice_number'])
 
-		# insert tax summaries
-		# insert_tax_summaries(data['items_data'], data['invoice_number'])
-		# insert sac code based taxes
+		
 		# items = [
 		# 	x for x in data['items_data'] if '-' not in str(x['item_value'])
 		# ]
 		items = data['items_data']
-		# print(items,"/a/a/a/a/")
 		insert_tax_summaries2(items, data['invoice_number'])
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'])
@@ -973,18 +991,21 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 		tax_data = []
 		for sac in sac_codes:
-			print(sac)
 			sac_tax = {
 				'cess':0,
 				'cgst': 0,
 				'sgst': 0,
 				'igst': 0,
+				'amount_before_gst':0,
+				'amount_after_gst':0,
 				'sac_hsn_code': sac,
 				'invoice_number': invoice_number,
 				'doctype': "SAC HSN Tax Summaries",
 				'parent': invoice_number,
 				'parentfield': 'sac_hsn_based_taxes',
-				'parenttype': "invoices"
+				'parenttype': "invoices",
+				"state_cess":0,
+				"vat":0
 			}
 			for item in items:
 				# print(item)
@@ -993,10 +1014,14 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 					sac_tax['sgst'] += item['sgst_amount']
 					sac_tax['igst'] += item['igst_amount']
 					sac_tax['cess'] += item['cess_amount']
+					sac_tax["state_cess"] += item["state_cess_amount"]
+					sac_tax["vat"] += item["vat_amount"]
+					sac_tax['amount_before_gst'] += item['item_taxable_value']
+					sac_tax['amount_after_gst'] += item['item_value_after_gst']
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
-			sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
+			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
 			doc = frappe.get_doc(sac)
 			doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess": True, "data": 'doc'}
@@ -1353,7 +1378,9 @@ def calulate_items(data):
 				final_item['other_charges'],
 				'taxable':
 				final_item['taxable'],
-				'item_mode':final_item['item_mode']
+				'item_mode':final_item['item_mode'],
+				"vat_amount":final_item["vat_amount"],
+				"vat":final_item['vat']
 			})
 		return {"success": True, "data": total_items}
 	except Exception as e:
@@ -1425,23 +1452,22 @@ def insert_tax_summaries2(items,invoice_number):
 	df = pd.DataFrame(items)
 
 	df = df.set_index('sgst')
-	df1 = df.groupby(['cgst','cess'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess"]].apply(lambda x : x.astype(float).sum())
+	df['cess_duplicate'] = df['cess']
+	df['state_cess_duplicate'] = df['state_cess']
+	df['vat_duplication'] = df['vat']
+	df1 = df.groupby(['cgst','cess_duplicate','state_cess_duplicate','vat_duplication'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess",'state_cess','vat',"state_cess_amount","vat_amount"]].apply(lambda x : x.astype(float).sum())
 	df1.reset_index(level=0, inplace=True) 
 	
+	df1.reset_index(level=0, inplace=True)
+	df1.reset_index(level=0, inplace=True)
+	df1.reset_index(level=0, inplace=True)
+	df1['cess'] = df1['cess_duplicate']
+	df1['state_cess'] = df1['state_cess_duplicate']
+	df1['vat'] = df1['vat_duplication']
 	data = df1.to_dict('records')
 	for each in data:
 		if each['cgst']>0:
-			doc = frappe.get_doc({
-					'doctype': 'Tax Summaries',
-					'invoce_number': invoice_number,
-					'tax_percentage': each['cgst'],
-					'amount': each['cgst_amount'],
-					'tax_type': "CGST",
-					'parent': invoice_number,
-					'parentfield': 'gst_summary',
-					'parenttype': "Invoices"
-				})
-			doc.insert(ignore_permissions=True)
+			
 			doc = frappe.get_doc({
 				'doctype': 'Tax Summaries',
 				'invoce_number': invoice_number,
@@ -1478,7 +1504,7 @@ def insert_tax_summaries2(items,invoice_number):
 				doc.insert(ignore_permissions=True)
 		if each['cess']>0:
 			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
-			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CESS','tax_percentage':each['cess']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'Central CESS','tax_percentage':each['cess']})
 			if tax_summary_cess is ():
 				if each['cess_amount']>0:
 					doc = frappe.get_doc({
@@ -1486,7 +1512,7 @@ def insert_tax_summaries2(items,invoice_number):
 					'invoce_number': invoice_number,
 					'tax_percentage': each['cess'],
 					'amount': each['cess_amount'],
-					'tax_type': "CESS",
+					'tax_type': "Central CESS",
 					'parent': invoice_number,
 					'parentfield': 'gst_summary',
 					'parenttype': "Invoices"
@@ -1496,6 +1522,46 @@ def insert_tax_summaries2(items,invoice_number):
 				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
 				tax_summary_cess_update.tax_percentage = each['cess_amount']+tax_summary_cess_update.tax_percentage			
 				tax_summary_cess_update.save()
+		if each['state_cess']>0:
+			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'State CESS','tax_percentage':each['state_cess']})
+			if tax_summary_cess is ():
+				if each['state_cess_amount']>0:
+					doc = frappe.get_doc({
+					'doctype': 'Tax Summaries',
+					'invoce_number': invoice_number,
+					'tax_percentage': each['state_cess'],
+					'amount': each['state_cess_amount'],
+					'tax_type': "State CESS",
+					'parent': invoice_number,
+					'parentfield': 'gst_summary',
+					'parenttype': "Invoices"
+						})
+					doc.insert(ignore_permissions=True)	
+			else:
+				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
+				tax_summary_cess_update.tax_percentage = each['state_cess_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_cess_update.save()
+		if each['vat']>0:
+			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'VAT','tax_percentage':each['state_cess']})
+			if tax_summary_cess is ():
+				if each['vat_amount']>0:
+					doc = frappe.get_doc({
+					'doctype': 'Tax Summaries',
+					'invoce_number': invoice_number,
+					'tax_percentage': each['vat'],
+					'amount': each['vat_amount'],
+					'tax_type': "VAT",
+					'parent': invoice_number,
+					'parentfield': 'gst_summary',
+					'parenttype': "Invoices"
+						})
+					doc.insert(ignore_permissions=True)	
+			else:
+				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
+				tax_summary_cess_update.tax_percentage = each['vat_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_cess_update.save()				
 
 def insert_tax_summaries(items, invoice_number):
 	'''
@@ -2150,6 +2216,7 @@ def attach_b2c_qrcode(data):
 			"docname": data["invoice_number"],
 			'fieldname': 'b2c_qrinvoice'
 		}
+		site = company.host
 		upload_qrinvoice_image = requests.post(site + "api/method/upload_file",
 											   files=files_new,
 											   data=payload_new)

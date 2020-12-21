@@ -96,7 +96,11 @@
   "discount_items",
   "has_discount_items",
   "discount_value_before_gst",
-  "discount_value_after_gst"
+  "discount_value_after_gst",
+  "credit_cgst_amount",
+  "credit_sgst_amount",
+  "credit_cess_amount",
+  "credit_gst_amount"
  ],
  "fields": [
   {
@@ -627,12 +631,32 @@
    "fieldname": "discount_value_after_gst",
    "fieldtype": "Data",
    "label": "Discount Value After Gst"
+  },
+  {
+   "fieldname": "credit_cgst_amount",
+   "fieldtype": "Float",
+   "label": "Credit Cgst Amount"
+  },
+  {
+   "fieldname": "credit_sgst_amount",
+   "fieldtype": "Float",
+   "label": "Credit Sgst Amount"
+  },
+  {
+   "fieldname": "credit_cess_amount",
+   "fieldtype": "Float",
+   "label": "Credit Cess Amount"
+  },
+  {
+   "fieldname": "credit_gst_amount",
+   "fieldtype": "Float",
+   "label": "Credit Gst Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-18 10:34:30.800142",
+ "modified": "2020-12-21 10:34:26.712785",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
