@@ -946,6 +946,7 @@ def insert_invoice(data):
 			data['guest_data']['confirmation_number'],
 			'invoice_type':
 			data['guest_data']['invoice_type'],
+			'print_by': data['guest_data']['print_by'],
 			'invoice_date':
 			datetime.datetime.strptime(data['guest_data']['invoice_date'],
 										'%d-%b-%y %H:%M:%S'),

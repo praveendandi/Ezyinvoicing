@@ -96,7 +96,9 @@ def file_parsing(filepath):
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
 			p = i.split(":")
-			print_by = p[1].replace(" ","")	
+			printdate = re.findall(r'\d{2}-[A-Z]{3}-\d{2}', p[1])
+			print_by = p[1].find(printdate[0])
+			print_by = p[1][:print_by]
 
 	
 	paymentTypes = GetPaymentTypes()

@@ -116,6 +116,7 @@ def Reinitiate_invoice(data):
 		doc.qr_code_generated='Pending'
 		doc.signed_invoice_generated='No'
 		doc.company=data['company_code']
+		doc.print_by = data['guest_data']['print_by']
 		doc.save()
 
 		

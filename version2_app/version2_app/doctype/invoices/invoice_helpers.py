@@ -25,6 +25,7 @@ def TotalMismatchError(data,calculated_data):
                 data['guest_data']['invoice_file'],
                 'room_number':
                 data['guest_data']['room_number'],
+                'print_by': data['guest_data']['print_by'],
                 'confirmation_number':
                 data['guest_data']['confirmation_number'],
                 'invoice_type':
