@@ -1101,6 +1101,7 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
+			print(sac)
 			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
 			doc = frappe.get_doc(sac)
 			doc.insert(ignore_permissions=True, ignore_links=True)
