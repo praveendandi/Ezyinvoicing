@@ -16,6 +16,7 @@ import re
 import json
 import sys
 import frappe
+import os
 
 class company(Document):
 	# pass
@@ -54,4 +55,56 @@ def getUserRoles():
         return {"success":True,"data":doc}
     else:
         return {"success":False, "message":"User doesn't exists! please Register"}
+
+@frappe.whitelist(allow_guest=True)
+def createError(title,error):
+	frappe.log_error(error)
+
+@frappe.whitelist(allow_guest=True)
+def getPrinters():
+	raw_printers = os.popen("lpstat -p -d")
+	printers = []
+	for index,i in enumerate(raw_printers):
+		print(index,i)
+		if 'system default destination:' not in i and 'ezy' not in i:
+			printers.append(i.split('is')[0].split('printer')[1].strip())
+
+	return {'success':True,"data":printers,"message":"list of avaliable printers"}
+
+@frappe.whitelist(allow_guest=True)
+def givePrint(invoiceNumber,printer):
+
+	# get invoice details
+	invoice = frappe.get_doc('Invoices',invoiceNumber)
+	
+	invoice_file = invoice.invoice_file
+	if invoice.invoice_type == 'B2B':
+		if invoice.irn_generated == 'Success':
+			invoice_file = invoice.invoice_with_gst_details
+		else:
+			invoice_file = invoice.invoice_file
+	else:
+		invoice_file = invoice.invoice_file
+
+	
+	# get invoice file path 
+	folder_path = frappe.utils.get_bench_path()
+	company = frappe.get_last_doc('company')
+	site_folder_path = company.site_name
+	path = folder_path + '/sites/' + site_folder_path + invoice_file
+
+	# invoicefile = invoice.invoice_file
+	os.system("lpr -P " +printer+" "+path)
+	return {"success":"True","Data":{},"message":"Job Issued to Printer "+printer}
+
+
+
+
+
+
+
+
+
+
+
 
