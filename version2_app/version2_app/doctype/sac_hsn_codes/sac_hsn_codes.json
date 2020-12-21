@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "field:description",
+ "autoname": "field:code",
  "creation": "2020-10-08 14:49:38.244242",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -11,18 +11,13 @@
   "sgst",
   "cgst",
   "igst",
-  "is_service",
   "net",
-  "state_cess",
-  "central_cess",
-  "vat",
   "column_break_5",
   "code",
   "type",
   "status",
   "company",
   "transactioncode",
-  "cess",
   "state_cess_rate",
   "central_cess_rate",
   "vat_rate"
@@ -33,8 +28,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Description",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "taxble",
@@ -71,7 +65,8 @@
    "fieldname": "code",
    "fieldtype": "Data",
    "label": "Code",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "fieldname": "type",
@@ -97,39 +92,15 @@
    "reqd": 1
   },
   {
-   "default": "Yes",
-   "fieldname": "is_service",
-   "fieldtype": "Select",
-   "label": "Is Service",
-   "options": "Yes\nNo"
-  },
-  {
    "fieldname": "transactioncode",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "TransactionCode"
   },
   {
    "fieldname": "net",
    "fieldtype": "Select",
    "label": "Net",
-   "options": "Yes\nNo"
-  },
-  {
-   "fieldname": "cess",
-   "fieldtype": "Select",
-   "label": "Cess",
-   "options": "Yes\nNo"
-  },
-  {
-   "fieldname": "state_cess",
-   "fieldtype": "Select",
-   "label": "State Cess",
-   "options": "Yes\nNo"
-  },
-  {
-   "fieldname": "central_cess",
-   "fieldtype": "Select",
-   "label": "Central Cess",
    "options": "Yes\nNo"
   },
   {
@@ -143,12 +114,6 @@
    "label": "Central Cess Rate"
   },
   {
-   "fieldname": "vat",
-   "fieldtype": "Select",
-   "label": "Vat",
-   "options": "Yes\nNo"
-  },
-  {
    "fieldname": "vat_rate",
    "fieldtype": "Int",
    "label": "Vat Rate"
@@ -156,7 +121,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-17 10:52:04.285811",
+ "modified": "2020-12-21 09:54:33.980266",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
