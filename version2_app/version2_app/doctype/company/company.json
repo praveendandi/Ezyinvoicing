@@ -54,7 +54,8 @@
   "proxy_password",
   "allowance_type",
   "invoice_cancelled_mails",
-  "host"
+  "host",
+  "company_logo"
  ],
  "fields": [
   {
@@ -332,11 +333,16 @@
    "fieldname": "host",
    "fieldtype": "Data",
    "label": "Host"
+  },
+  {
+   "fieldname": "company_logo",
+   "fieldtype": "Attach",
+   "label": "Company Logo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-19 15:58:25.923916",
+ "modified": "2020-12-22 11:54:41.968354",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
