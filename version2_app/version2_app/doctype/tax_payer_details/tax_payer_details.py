@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 # import frappe
 from frappe.model.document import Document
-
+from version2_app.version2_app.doctype.invoices.invoices import gsp_api_data
 host = "http://localhost:8000/api/method/"
 
 class TaxPayerDetails(Document):
@@ -84,7 +84,7 @@ def request_get(api, data,company):
 	try:
 		
 	
-		print(api,data)
+		print(api,data,company,company['proxy'])
 		headerData = {
 			"user_name": data['apidata']["username"],
 			"password": data['apidata']["password"],
@@ -119,91 +119,87 @@ def TaxPayerDetails(data):
 		tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'],fields,as_dict=1)
 		if tay_payer_details is None:
 		
-			companyCheckResponse = requests.post(host+"version2_app.version2_app.doctype.invoices.invoices.check_company_exist",headers=Headers,json={"code":data['code']}).json()
-			companyApis = companyCheckResponse['message']['data']
-			if companyCheckResponse['message']['success'] == True:
-				gspApiDataResponse = requests.post(host+companyApis['gsp_api_data'],headers=Headers,json={"data":{"code":companyCheckResponse['message']['data']['name'],"mode":companyCheckResponse['message']['data']['mode'],"provider":companyCheckResponse['message']['data']['provider']}}).json()
-				if gspApiDataResponse['message']['success'] == True:
-					# print(gspApiDataResponse)
-					GspData = {"gstNumber":data['gstNumber'],"code":data['code'],"apidata":gspApiDataResponse['message']['data']}
-					response = request_get(gspApiDataResponse['message']['data']['get_taxpayer_details']+ data['gstNumber'],
-										GspData,companyApis)
-					if response['success']:
-							
-						details = response['result']
-						if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
-							if (details['AddrBno'] != "") or (details['AddrBno'] != ""):
-								details['AddrBnm'] = details['AddrBno']
-						if (details['AddrBno'] == "") or (details['AddrBno'] == None):
-							if (details['AddrBnm'] != "") or (details['AddrBnm'] != None):
-								details['AddrBno'] = details['AddrBnm']
-						if (details['TradeName'] == "") or (details['TradeName'] == None):
-							if (details['LegalName'] != "") or (details['TradeName'] !=None):
-								details['TradeName'] = details['LegalName']
-						if (details['LegalName'] == "") or (details['LegalName'] == None):
-							if (details['TradeName'] != "") or (details['TradeName'] != None):
-								details['LegalName'] = details['TradeName']
-						if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
-							details['AddrLoc'] = "New Delhi"		
-						
-						if len(details["AddrBnm"]) < 3:
-							details["AddrBnm"] = details["AddrBnm"]+"    "
-						if len(details["AddrBno"]) < 3:
-							details["AddrBno"] = details["AddrBno"] + "    " 		
-						tax_payer = {
-							'doctype':
-							'TaxPayerDetail',
-							"gst_number":
-							details['Gstin'],
-							"email": " ",
-							"phone_number": " ",
-							"legal_name":
-							details['LegalName'],
-							"address_1":
-							details['AddrBnm'],
-							"address_2":
-							details['AddrBno'],
-							"location":
-							details['AddrLoc'],
-							"pincode":
-							details['AddrPncd'],
-							"gst_status":
-							details['Status'],
-							"tax_type":
-							details['TxpType'],
-							"company":
-							data['code'],
-							"trade_name":
-							details['TradeName'],
-							"state_code":
-							details['StateCode'],
-							"last_fetched":
-							datetime.date.today(),
-							"address_floor_number":
-							details['AddrFlno'],
-							"address_street":
-							details['AddrSt'],
-							"block_status":
-							''
-							if details['BlkStatus'] == None else details['BlkStatus'],
-							"status":details['Status']
-							}
-						if details['Status'] == "ACT":
-							tax_payer['status'] = "Active"
-						else:
-							tax_payer['status'] = "In-Active"
-
-
-						
-						return {"success":True,"data":tax_payer,"update":False}
-						
-					else:
-						return {"success":False,"message":response['message'],"response":response}
-
-				else:
-					return {"success":False,"message":gspApiDataResponse['message']}
+			companyApis = frappe.get_doc('company', data['code'])
 			
-			return {"success":False,"message":companyCheckResponse['message']}	
+			gspApiDataResponse = gsp_api_data({"mode":companyApis.mode,"code":companyApis.company_code,"provider":companyApis.provider})
+			
+			if gspApiDataResponse['success'] == True:
+				GspData = {"gstNumber":data['gstNumber'],"code":data['code'],"apidata":gspApiDataResponse['data']}
+				response = request_get(gspApiDataResponse['data']['get_taxpayer_details']+ data['gstNumber'],
+									GspData,companyApis.__dict__)
+				if response['success']:
+						
+					details = response['result']
+					if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
+						if (details['AddrBno'] != "") or (details['AddrBno'] != ""):
+							details['AddrBnm'] = details['AddrBno']
+					if (details['AddrBno'] == "") or (details['AddrBno'] == None):
+						if (details['AddrBnm'] != "") or (details['AddrBnm'] != None):
+							details['AddrBno'] = details['AddrBnm']
+					if (details['TradeName'] == "") or (details['TradeName'] == None):
+						if (details['LegalName'] != "") or (details['TradeName'] !=None):
+							details['TradeName'] = details['LegalName']
+					if (details['LegalName'] == "") or (details['LegalName'] == None):
+						if (details['TradeName'] != "") or (details['TradeName'] != None):
+							details['LegalName'] = details['TradeName']
+					if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
+						details['AddrLoc'] = "New Delhi"		
+					
+					if len(details["AddrBnm"]) < 3:
+						details["AddrBnm"] = details["AddrBnm"]+"    "
+					if len(details["AddrBno"]) < 3:
+						details["AddrBno"] = details["AddrBno"] + "    " 		
+					tax_payer = {
+						'doctype':
+						'TaxPayerDetail',
+						"gst_number":
+						details['Gstin'],
+						"email": " ",
+						"phone_number": " ",
+						"legal_name":
+						details['LegalName'],
+						"address_1":
+						details['AddrBnm'],
+						"address_2":
+						details['AddrBno'],
+						"location":
+						details['AddrLoc'],
+						"pincode":
+						details['AddrPncd'],
+						"gst_status":
+						details['Status'],
+						"tax_type":
+						details['TxpType'],
+						"company":
+						data['code'],
+						"trade_name":
+						details['TradeName'],
+						"state_code":
+						details['StateCode'],
+						"last_fetched":
+						datetime.date.today(),
+						"address_floor_number":
+						details['AddrFlno'],
+						"address_street":
+						details['AddrSt'],
+						"block_status":
+						''
+						if details['BlkStatus'] == None else details['BlkStatus'],
+						"status":details['Status']
+						}
+					if details['Status'] == "ACT":
+						tax_payer['status'] = "Active"
+					else:
+						tax_payer['status'] = "In-Active"
+
+
+					
+					return {"success":True,"data":tax_payer,"update":False}
+					
+				else:
+					return {"success":False,"message":response['message'],"response":response}
+			
+			return {"success":False,"message":gspApiDataResponse['message']}	
 		else:
 			return {"success":True,"data":tay_payer_details,"update":True}
 	except Exception as e:
