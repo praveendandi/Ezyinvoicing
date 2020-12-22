@@ -120,11 +120,7 @@ def file_parsing(filepath):
 
 
 
-		# if 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
-		# 	original_data.append(i)
-		# if 'XX/XX' in i and i in payment_list:
-		# 	original_data.pop(len(original_data) - 1)
-		# 	original_data.pop(len(original_data) - 1)
+		
 
 	items = [] 
 	itemsort = 0
@@ -172,8 +168,8 @@ def file_parsing(filepath):
 				if index == 5:
 					if "CompBreakfast" in j or "Beverage" in j:
 						item["name"] = item["name"] + ' ' + j
-				if "Dry" in j:
-					print(j,"*******************888")
+				# if "Dry" in j:
+				# 	print(j,"*******************888")
 				if "SGST" in j:
 					item['name'] = item['name'] + ' SGST'
 				if "CGST" in j:
