@@ -785,10 +785,10 @@ def insert_invoice(data):
 			data['taxpayer']['legal_name'] = " "
 		#calculat items
 		for item in data['items_data']:
-			if item['taxable'] == 'No':
+			if item['taxable'] == 'No' and item['item_type']!="Discount":
 				other_charges += item['item_value']
-			elif item['taxable']=="Yes" and item['item_type']=="Discount":
-				discountAmount += item['item_value'] 
+			elif item['taxable']=="No" and item['item_type']=="Discount":
+				discountAmount += item['item_value']
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
 					cgst_amount+=item['cgst_amount']
@@ -1192,7 +1192,11 @@ def calulate_items(data):
 						final_item['item_value'] = item['item_value']
 						final_item['taxable'] = sac_code_based_gst_rates.taxble
 						final_item['type'] = "Non-Gst"
-						final_item['item_mode'] = "Debit"
+						# final_item['item_mode'] = "Debit"
+						if "-" in str(item['item_value']):
+							final_item['item_mode'] = ItemMode
+						else:
+							final_item['item_mode'] = "Debit"
 				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
 				if sac_code_based_gst_rates.state_cess_rate > 0:
 					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
