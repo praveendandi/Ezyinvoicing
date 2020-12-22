@@ -29,7 +29,12 @@ import fitz
 class Invoices(Document):
 
 
-
+	def after_insert(self):
+		if self.name:
+			doc = frappe.get_doc('Invoices', self.name)
+			doc.invoice_number = self.name
+			doc.save()
+			# print("*************888")
 
 	def generateIrn(self, invoice_number):
 		try:
@@ -1033,21 +1038,24 @@ def insert_invoice(data):
 			invoice.invoice_number = "Amened" + data['guest_data'][
 				'invoice_number']
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		dupInv = data['guest_data']['invoice_number']
-		if data['amened'] == 'Yes':
-			getInvoiceNUmber = frappe.db.get_value('Invoices', {
-				'invoice_number':
-				"Amened" + data['guest_data']['invoice_number']
-			})
-			# print(getInvoiceNUmber)
-			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
-			# print(updateInvoi)
-			updateInvoi.invoice_number = getInvoiceNUmber
-			# updateInvoi.save()
+		print(v.__dict__)
+		data['invoice_number'] = v.name
+		data['guest_data']['invoice_number'] = v.name
+		# dupInv = data['guest_data']['invoice_number']
+		# if data['amened'] == 'Yes':
+		# 	getInvoiceNUmber = frappe.db.get_value('Invoices', {
+		# 		'invoice_number':
+		# 		"Amened" + data['guest_data']['invoice_number']
+		# 	})
+		# 	# print(getInvoiceNUmber)
+		# 	updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
+		# 	# print(updateInvoi)
+		# 	updateInvoi.invoice_number = getInvoiceNUmber
+		# 	# updateInvoi.save()
 
-			data['invoice_number'] = getInvoiceNUmber
-			data['guest_data']['invoice_number'] = getInvoiceNUmber
-		# insert items
+		# 	data['invoice_number'] = getInvoiceNUmber
+		# 	data['guest_data']['invoice_number'] = getInvoiceNUmber
+		# # insert items
 
 		itemsInsert = insert_items(data['items_data'], data['invoice_number'])
 
@@ -1059,16 +1067,16 @@ def insert_invoice(data):
 		insert_tax_summaries2(items, data['invoice_number'])
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'])
-		if data['amened'] == 'Yes':
-			getInvoiceNUmber = frappe.db.get_value('Invoices', {
-				'invoice_number':
-				"Amened" + dupInv
-			})
-			# print(getInvoiceNUmber)
-			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
-			# print(updateInvoi)
-			updateInvoi.invoice_number = getInvoiceNUmber
-			updateInvoi.save()	
+		# if data['amened'] == 'Yes':
+		# 	getInvoiceNUmber = frappe.db.get_value('Invoices', {
+		# 		'invoice_number':
+		# 		"Amened" + dupInv
+		# 	})
+		# 	# print(getInvoiceNUmber)
+		# 	updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
+		# 	# print(updateInvoi)
+		# 	updateInvoi.invoice_number = getInvoiceNUmber
+		# 	updateInvoi.save()	
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
