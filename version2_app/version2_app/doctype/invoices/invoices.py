@@ -753,11 +753,11 @@ def create_invoice(data):
 
 @frappe.whitelist(allow_guest=True)
 def insert_invoice(data):
-	# '''
-	# insert invoice data     data, company_code, taxpayer,items_data
-	# '''
-	# try:
-		# print(data)
+	'''
+	insert invoice data     data, company_code, taxpayer,items_data
+	'''
+	try:
+		# print(insert)
 		company = frappe.get_doc('company',data['company_code'])
 
 		value_before_gst = 0
@@ -982,9 +982,9 @@ def insert_invoice(data):
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'])
 		return {"success": True}
-	# except Exception as e:
-	# 	print(e, "insert invoice")
-	# 	return {"success": False, "message": str(e)}
+	except Exception as e:
+		print(e, "insert invoice")
+		return {"success": False, "message": str(e)}
 
 
 def insert_hsn_code_based_taxes(items, invoice_number):
