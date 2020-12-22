@@ -96,9 +96,7 @@ def reinitiateInvoice(data):
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
 			p = i.split(":")
-			printdate = re.findall(r'\d{2}-[A-Z]{3}-\d{2}', p[1])
-			print_by = p[1].find(printdate[0])
-			print_by = p[1][:print_by]	
+			print_by = p[1].replace(" ","")		
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -272,7 +270,6 @@ def reinitiateInvoice(data):
 	guest['company_code'] = "MHKCP-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
-	guest['print_by'] = print_by
 	
 	company_code = {"code":"MHKCP-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}

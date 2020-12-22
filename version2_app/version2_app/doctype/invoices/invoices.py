@@ -862,9 +862,9 @@ def insert_invoice(data):
 			data['taxpayer']['legal_name'] = " "
 		#calculat items
 		for item in data['items_data']:
-			if item['taxable'] == 'No':
+			if item['taxable'] == 'No' and item['item_type'] != "Discount":
 				other_charges += item['item_value']
-			elif item['taxable']=="Yes" and item['item_type']=="Discount":
+			elif item['taxable']=="No" and item['item_type']=="Discount":
 				discountAmount += item['item_value'] 
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
