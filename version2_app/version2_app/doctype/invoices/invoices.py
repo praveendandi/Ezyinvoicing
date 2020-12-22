@@ -916,7 +916,7 @@ def insert_invoice(data):
 		else:
 			ready_to_generate_irn = "No"
 
-		 
+			
 		#check invoice total
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
@@ -1033,6 +1033,7 @@ def insert_invoice(data):
 			invoice.invoice_number = "Amened" + data['guest_data'][
 				'invoice_number']
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		dupInv = data['guest_data']['invoice_number']
 		if data['amened'] == 'Yes':
 			getInvoiceNUmber = frappe.db.get_value('Invoices', {
 				'invoice_number':
@@ -1042,7 +1043,7 @@ def insert_invoice(data):
 			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
 			# print(updateInvoi)
 			updateInvoi.invoice_number = getInvoiceNUmber
-			updateInvoi.save()
+			# updateInvoi.save()
 
 			data['invoice_number'] = getInvoiceNUmber
 			data['guest_data']['invoice_number'] = getInvoiceNUmber
@@ -1058,6 +1059,16 @@ def insert_invoice(data):
 		insert_tax_summaries2(items, data['invoice_number'])
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'])
+		if data['amened'] == 'Yes':
+			getInvoiceNUmber = frappe.db.get_value('Invoices', {
+				'invoice_number':
+				"Amened" + dupInv
+			})
+			# print(getInvoiceNUmber)
+			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
+			# print(updateInvoi)
+			updateInvoi.invoice_number = getInvoiceNUmber
+			updateInvoi.save()	
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
