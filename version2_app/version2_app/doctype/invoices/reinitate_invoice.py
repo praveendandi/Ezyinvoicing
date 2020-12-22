@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# Copyright (c) 2020, caratred and contributors
-# For license information, please see license.txt
 
 from __future__ import unicode_literals
 import frappe
@@ -155,6 +152,7 @@ def Reinitiate_invoice(data):
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
 		doc.igst_amount=round(igst_amount,2)
+		doc.total_gst_amount = round(cgst_amount,2) + round(sgst_amount,2) + round(igst_amount,2)
 		doc.irn_generated=irn_generated
 		doc.irn_cancelled='No'
 		doc.qr_code_generated='Pending'
