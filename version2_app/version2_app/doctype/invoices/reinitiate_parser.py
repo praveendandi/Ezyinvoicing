@@ -136,7 +136,7 @@ def reinitiateInvoice(data):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0:
+		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i:
 			item = dict()
 			for index, j in enumerate(i.split(' ')):
 				# print(index,j)
@@ -186,6 +186,8 @@ def reinitiateInvoice(data):
 
 				if 'SAC' in j:
 					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
+				else:
+					item["sac_code"] = "No Sac"
 				if index == len(i.split(' ')) - 1:
 					if index != 0:
 						item['item_value'] = float(j.replace(',', ''))
@@ -195,60 +197,60 @@ def reinitiateInvoice(data):
 
 
 
-	finalData = []
-	for item in items:
+	# finalData = []
+	# for item in items:
 
-		if len(item) > 1:
+	# 	if len(item) > 1:
 
-			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"]:
+	# 		if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"]:
 
-				if 'sac_code' in item:
-					item['sac_code'] = item['sac_code']
-				else:
-					item['sac_code'] = 'No Sac'
-				finalData.append(item)
-			else:
-				itemToUpdate = finalData[len(finalData) - 1]
-				# itemToUpdate[item['name']] = item['TotAmt']
-				if 'SGST' in item['name']:
-					itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['sgstAmount'] = item['item_value']
-				elif 'CGST' in item['name']:
-					itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['cgstAmount'] = item['item_value']
-				elif 'IGST' in item['name']:
-					itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['igstAmount'] = item['item_value']
-				elif 'CESS' in item['name']:
-					itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['cessAmount'] = item['item_value']
-				elif 'Allow ' in item["name"]:
-					if "sgst" in itemToUpdate:
-						itemToUpdate['cgst'] = 9
-						itemToUpdate['cgstAmount'] = item['item_value']
-					else:
-						itemToUpdate['sgst'] = 9
-						itemToUpdate['sgstAmount'] = item['item_value']
+	# 			if 'sac_code' in item:
+	# 				item['sac_code'] = item['sac_code']
+	# 			else:
+	# 				item['sac_code'] = 'No Sac'
+	# 			finalData.append(item)
+	# 		else:
+	# 			itemToUpdate = finalData[len(finalData) - 1]
+	# 			# itemToUpdate[item['name']] = item['TotAmt']
+	# 			if 'SGST' in item['name']:
+	# 				itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['sgstAmount'] = item['item_value']
+	# 			elif 'CGST' in item['name']:
+	# 				itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['cgstAmount'] = item['item_value']
+	# 			elif 'IGST' in item['name']:
+	# 				itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['igstAmount'] = item['item_value']
+	# 			elif 'CESS' in item['name']:
+	# 				itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['cessAmount'] = item['item_value']
+	# 			elif 'Allow ' in item["name"]:
+	# 				if "sgst" in itemToUpdate:
+	# 					itemToUpdate['cgst'] = 9
+	# 					itemToUpdate['cgstAmount'] = item['item_value']
+	# 				else:
+	# 					itemToUpdate['sgst'] = 9
+	# 					itemToUpdate['sgstAmount'] = item['item_value']
 
 
-	invoiceItems = []
-	for index, i in enumerate(finalData):
-		# i['SlNo'] = index+1
-		# i['name']=i['name']+"99999"
-		if 'cgstAmount' not in i:
-			i['cgst'] = 0
-			i['cgstAmount'] = float(0)
-		if 'sgstAmount' not in i:
-			i['sgst'] = 0
-			i['sgstAmount'] = float(0)
-		if 'igstAmount' not in i:
-			i['igst'] = 0
-			i['igstAmount'] = float(0)
-		if 'cessAmount' not in i:
-			i['cess'] = 0
-			i['cessAmount'] = float(0)    
-		# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
-		invoiceItems.append(i)
+	# invoiceItems = []
+	# for index, i in enumerate(finalData):
+	# 	# i['SlNo'] = index+1
+	# 	# i['name']=i['name']+"99999"
+	# 	if 'cgstAmount' not in i:
+	# 		i['cgst'] = 0
+	# 		i['cgstAmount'] = float(0)
+	# 	if 'sgstAmount' not in i:
+	# 		i['sgst'] = 0
+	# 		i['sgstAmount'] = float(0)
+	# 	if 'igstAmount' not in i:
+	# 		i['igst'] = 0
+	# 		i['igstAmount'] = float(0)
+	# 	if 'cessAmount' not in i:
+	# 		i['cess'] = 0
+	# 		i['cessAmount'] = float(0)    
+	# 	# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
+	# 	invoiceItems.append(i)
 
 		# print(i)
 	guest = dict()
@@ -265,7 +267,7 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = invoiceItems
+	guest['items'] = items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
