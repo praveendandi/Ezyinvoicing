@@ -572,7 +572,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		# attacing irn an ack
 		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
-		text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ack_no + "\n" + "ACK DATE: " + invoice.ack_date
+		
 		if company.irn_details_page == "First":
 			page = doc[0]
 		else:
@@ -580,16 +580,23 @@ def attach_qr_code(invoice_number, gsp, code):
 		# page = doc[0]
 		# where = fitz.Point(15, 55)
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + invoice.ack_date
+		# irntext = "IRN: "+ invoice.irn_number
+		# acknotext = "ACK NO: " + invoice.ack_no 
+		# ackdatetext = "ACK DATE: " + invoice.ack_date
+		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
 		page.insertText(
 			where,
 			text,
 			fontname="Roboto-Black",  # arbitrary if fontfile given
 			fontfile=folder_path +
 			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=6,  # default
+			fontsize=7,  # default
 			rotate=0,  # rotate text
 			color=(0, 0, 0),  # some color (blue)
 			overlay=True)
+				
 		doc.save(dst_pdf_text_filename)
 		doc.close()
 
@@ -834,7 +841,7 @@ def insert_invoice(data):
 
 		 
 		#check invoice total
-		if int(data['total_invoice_amount']) != int(pms_invoice_summary):
+		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 			if TotalMismatchErrorAPI['success']==True:
@@ -1021,6 +1028,7 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
+			print(sac)
 			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
 			doc = frappe.get_doc(sac)
 			doc.insert(ignore_permissions=True, ignore_links=True)
