@@ -29,12 +29,12 @@ import fitz
 class Invoices(Document):
 
 
-	def after_insert(self):
-		if self.name:
-			doc = frappe.get_doc('Invoices', self.name)
-			doc.invoice_number = self.name
-			doc.save()
-			# print("*************888")
+	# def after_insert(self):
+	# 	if self.name:
+	# 		doc = frappe.get_doc('Invoices', self.name)
+	# 		doc.invoice_number = self.name
+	# 		doc.save()
+	# 		# print("*************888")
 
 	def generateIrn(self, invoice_number):
 		try:
@@ -1035,26 +1035,21 @@ def insert_invoice(data):
 					['like', '%' + data['guest_data']['invoice_number'] + '%']
 				})
 			invoice.amended_from = invCount[0]['name']
-			invoice.invoice_number = "Amened" + data['guest_data'][
-				'invoice_number']
+			# print(invCount)
+			if "-" in invCount[0]['name']:
+				amenedindex = invCount[0]['name'].find("-")
+				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
+				ameneddigit = ameneddigit+1 
+				invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
+				# pass
+			else:
+				invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
+
+					
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		print(v.__dict__)
 		data['invoice_number'] = v.name
 		data['guest_data']['invoice_number'] = v.name
-		# dupInv = data['guest_data']['invoice_number']
-		# if data['amened'] == 'Yes':
-		# 	getInvoiceNUmber = frappe.db.get_value('Invoices', {
-		# 		'invoice_number':
-		# 		"Amened" + data['guest_data']['invoice_number']
-		# 	})
-		# 	# print(getInvoiceNUmber)
-		# 	updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
-		# 	# print(updateInvoi)
-		# 	updateInvoi.invoice_number = getInvoiceNUmber
-		# 	# updateInvoi.save()
-
-		# 	data['invoice_number'] = getInvoiceNUmber
-		# 	data['guest_data']['invoice_number'] = getInvoiceNUmber
+		
 		# # insert items
 
 		itemsInsert = insert_items(data['items_data'], data['invoice_number'])
@@ -1067,16 +1062,7 @@ def insert_invoice(data):
 		insert_tax_summaries2(items, data['invoice_number'])
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'])
-		# if data['amened'] == 'Yes':
-		# 	getInvoiceNUmber = frappe.db.get_value('Invoices', {
-		# 		'invoice_number':
-		# 		"Amened" + dupInv
-		# 	})
-		# 	# print(getInvoiceNUmber)
-		# 	updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
-		# 	# print(updateInvoi)
-		# 	updateInvoi.invoice_number = getInvoiceNUmber
-		# 	updateInvoi.save()	
+		
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
