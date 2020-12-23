@@ -73,8 +73,8 @@ def reinitiateInvoice(data):
 			print(gstNumber)
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-			if "-" in invoiceNumber:
-				invoiceNumber = invoiceNumber.replace("-"," ")
+			# if "-" in invoiceNumber:
+			# 	invoiceNumber = invoiceNumber.replace("-"," ")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:
@@ -273,6 +273,19 @@ def reinitiateInvoice(data):
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
+
+	check_invoice = check_invoice_exists(guest['invoice_number'])
+	if check_invoice['success']==True:
+		inv_data = check_invoice['data']
+		if inv_data.docstatus==2:
+			amened='Yes'
+			# invoiceNumber = inv_data.name
+			# guest['invoice_number'] = inv_data.name
+		else:
+			invoiceNumber = inv_data.name
+			guest['invoice_number'] = inv_data.name
+			invoiceNumber = inv_data.name
+			amened='No'
 	
 	company_code = {"code":"MHKCP-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}

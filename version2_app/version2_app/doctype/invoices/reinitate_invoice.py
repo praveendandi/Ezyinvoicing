@@ -24,7 +24,6 @@ def Reinitiate_invoice(data):
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
-		print(data)
 		value_before_gst = 0
 		value_after_gst = 0
 		other_charges = 0
@@ -104,7 +103,7 @@ def Reinitiate_invoice(data):
 		else:
 			ready_to_generate_irn = "No"
 
-		 
+			
 		#check invoice total
 		# if int(data['total_invoice_amount']) != int(pms_invoice_summary):
 		# 	calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
@@ -171,10 +170,10 @@ def Reinitiate_invoice(data):
 			doc.ready_to_generate_irn = "No"
 		doc.save()
 
-		
+
 		items = data['items_data']
 		# items = [x for x in items if x['sac_code']!="Liquor"]
-	
+
 		itemsInsert = insert_items(items,data['guest_data']['invoice_number'])
 		# insert tax summaries
 		# insert_tax_summaries(items_data, data['invoice_number'])
@@ -182,7 +181,6 @@ def Reinitiate_invoice(data):
 		# insert sac code based taxes
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'])
 		return {"success":True}
-		# return {"success":False,"message":"calculation doesnot match"}	
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
 		return {"success":False,"message":e}

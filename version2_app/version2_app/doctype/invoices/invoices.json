@@ -100,7 +100,10 @@
   "credit_cgst_amount",
   "credit_sgst_amount",
   "credit_cess_amount",
-  "credit_gst_amount"
+  "credit_gst_amount",
+  "converted_from_b2c",
+  "converted_from_b2c_by",
+  "converted_from_b2c_time"
  ],
  "fields": [
   {
@@ -651,12 +654,29 @@
    "fieldname": "credit_gst_amount",
    "fieldtype": "Float",
    "label": "Credit Gst Amount"
+  },
+  {
+   "default": "No",
+   "fieldname": "converted_from_b2c",
+   "fieldtype": "Select",
+   "label": "Converted From B2C",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "converted_from_b2c_by",
+   "fieldtype": "Data",
+   "label": "Converted From B2C By"
+  },
+  {
+   "fieldname": "converted_from_b2c_time",
+   "fieldtype": "Datetime",
+   "label": "Converted From B2C Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-21 10:34:26.712785",
+ "modified": "2020-12-23 10:46:25.712837",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
