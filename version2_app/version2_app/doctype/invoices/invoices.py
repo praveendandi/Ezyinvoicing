@@ -757,7 +757,6 @@ def insert_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		# print(insert)
 		company = frappe.get_doc('company',data['company_code'])
 
 		value_before_gst = 0
@@ -786,9 +785,9 @@ def insert_invoice(data):
 		#calculat items
 		for item in data['items_data']:
 			if item['taxable'] == 'No' and item['item_type'] != "Discount":
-				other_charges += item['item_value']
+				other_charges += item['item_value_after_gst']
 			elif item['taxable']=="No" and item['item_type']=="Discount":
-				discountAmount += item['item_value'] 
+				discountAmount += item['item_value_after_gst'] 
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
 					cgst_amount+=item['cgst_amount']
@@ -841,6 +840,7 @@ def insert_invoice(data):
 
 		 
 		#check invoice total
+		print(int(data['total_invoice_amount']), int(pms_invoice_summary+other_charges))
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -1140,20 +1140,20 @@ def calulate_items(data):
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
 							final_item['igst'] = float(sac_code_based_gst_rates.igst)
-						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),2)
-						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),2)
-						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),2)
+						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),3)
+						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),3)
+						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),3)
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
 					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),2)
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
 						final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 						final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
-						final_item['cgst_amount'] = round(gst_value / 2,2)
-						final_item['sgst_amount'] = round(gst_value / 2,2)
+						final_item['cgst_amount'] = round(gst_value / 2,3)
+						final_item['sgst_amount'] = round(gst_value / 2,3)
 						final_item['igst'] = float(sac_code_based_gst_rates.igst)
 						if float(sac_code_based_gst_rates.igst) <= 0:
 							final_item['igst_amount'] = 0
@@ -1214,6 +1214,7 @@ def calulate_items(data):
 				else:
 					final_item["vat_amount"] = 0
 				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
+				print("===============", final_item)
 			else:
 				sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',item["sac_code"])
@@ -1267,20 +1268,20 @@ def calulate_items(data):
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
 							final_item['igst'] = float(sac_code_based_gst_rates.igst)
-						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),2)
-						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),2)
-						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),2)
+						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),3)
+						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),3)
+						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),3)
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
 					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),2)
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
 						final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 						final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
-						final_item['cgst_amount'] = round(gst_value / 2,2)
-						final_item['sgst_amount'] = round(gst_value / 2,2)
+						final_item['cgst_amount'] = round(gst_value / 2,3)
+						final_item['sgst_amount'] = round(gst_value / 2,3)
 						final_item['igst'] = float(sac_code_based_gst_rates.igst)
 						if float(sac_code_based_gst_rates.igst) <= 0:
 							final_item['igst_amount'] = 0
