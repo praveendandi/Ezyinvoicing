@@ -72,6 +72,8 @@ def reinitiateInvoice(data):
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+			if "-" in invoiceNumber:
+				invoiceNumber = invoiceNumber.replace("-"," ")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:

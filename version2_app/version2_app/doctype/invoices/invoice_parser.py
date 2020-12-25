@@ -180,6 +180,18 @@ def file_parsing(filepath):
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
 
+	check_invoice = check_invoice_exists(guest['invoice_number'])
+	if check_invoice['success']==True:
+		inv_data = check_invoice['data']
+		# print(inv_data.__dict__)
+		if inv_data.docstatus==2:
+			amened='Yes'
+		
+		else:
+			invoiceNumber = inv_data.name
+			guest['invoice_number'] = inv_data.name
+			amened='No'
+
 	company_code = {"code":"Pullman-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
@@ -194,6 +206,7 @@ def file_parsing(filepath):
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
+		error_data['amened'] = amened
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
 		return {"success":False,"message":"The given gst number is not a vaild one"}
@@ -228,23 +241,27 @@ def file_parsing(filepath):
 						else:
 							
 							error_data['error_message'] = insertInvoiceApiResponse['message']
+							error_data['amened'] = amened
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
 						
 						error_data['error_message'] = calulateItemsApiResponse['message']
+						error_data['amened'] = amened
 						errorInvoice = Error_Insert_invoice(error_data)
 						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
 					# print(error_data)
 					error_data['error_message'] = getTaxPayerDetailsResponse['message']
+					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
 			else:
 				# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
 				error_data['error_message'] = checkTokenIsValidResponse['message']
+				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
@@ -261,17 +278,20 @@ def file_parsing(filepath):
 				else:
 					
 					error_data['error_message'] = insertInvoiceApiResponse['message']
+					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 					return {"success":False,"message":insertInvoiceApiResponse['message']}
 			else:
 						
 				error_data['error_message'] = calulateItemsApiResponse['message']
+				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 				return {"success":False,"message":calulateItemsApiResponse['message']}		
 	else:
 		error_data['error_message'] = gspApiDataResponse['message']
+		error_data['amened'] = amened
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}
