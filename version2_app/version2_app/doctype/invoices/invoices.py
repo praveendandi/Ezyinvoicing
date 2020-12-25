@@ -126,6 +126,7 @@ class Invoices(Document):
 			total_sgst_value = 0
 			total_cgst_value = 0
 			total_cess_value = 0
+			total_state_cess_value = 0
 			discount_after_value = 0
 			discount_before_value = 0
 			ass_value = 0
@@ -136,6 +137,7 @@ class Invoices(Document):
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
 					total_cess_value += item.cess_amount
+					total_state_cess_value += item.state_cess_amount
 					ass_value += item.item_value
 					i = {
 						"SlNo":
@@ -175,7 +177,7 @@ class Invoices(Document):
 						"CesNonAdvlAmt":
 						0,
 						"StateCesRt": item.state_cess,
-						"StateCesAmt": item.state_cess_amount,
+						"StateCesAmt": round(item.state_cess_amount,2),
 						"StateCesNonAdvlAmt":
 						0,
 						"OthChrg":
@@ -201,7 +203,7 @@ class Invoices(Document):
 				"SgstVal": round(total_sgst_value, 2),
 				"IgstVal": round(total_igst_value, 2),
 				"CesVal": round(total_cess_value, 2),
-				"StCesVal": 0,
+				"StCesVal": round(total_state_cess_value,2),
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
@@ -753,10 +755,10 @@ def create_invoice(data):
 
 @frappe.whitelist(allow_guest=True)
 def insert_invoice(data):
-	'''
-	insert invoice data     data, company_code, taxpayer,items_data
-	'''
-	try:
+	# '''
+	# insert invoice data     data, company_code, taxpayer,items_data
+	# '''
+	# try:
 		company = frappe.get_doc('company',data['company_code'])
 
 		value_before_gst = 0
@@ -982,9 +984,9 @@ def insert_invoice(data):
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'])
 		return {"success": True}
-	except Exception as e:
-		print(e, "insert invoice")
-		return {"success": False, "message": str(e)}
+	# except Exception as e:
+	# 	print(e, "insert invoice")
+	# 	return {"success": False, "message": str(e)}
 
 
 def insert_hsn_code_based_taxes(items, invoice_number):
@@ -1078,7 +1080,7 @@ def calulate_items(data):
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
 						filters={'name': ['like', '%' + item['name'] + '%']})
-					
+				print(sac_code_based_gst)
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -1553,8 +1555,9 @@ def insert_tax_summaries2(items,invoice_number):
 						})
 					doc.insert(ignore_permissions=True)	
 			else:
-				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
-				tax_summary_cess_update.tax_percentage = each['state_cess_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_state = [element for tupl in tax_summary_cess for element in tupl]
+				tax_summary_cess_update = frappe.get_doc('Tax Summaries',tax_summary_state[0])
+				tax_summary_cess_update.tax_percentage = each['state_cess_amount']+float(tax_summary_cess_update.tax_percentage)		
 				tax_summary_cess_update.save()
 		if each['vat']>0:
 			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
