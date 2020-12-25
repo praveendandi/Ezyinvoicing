@@ -118,7 +118,7 @@ class Invoices(Document):
 					"Typ":
 					"INV",
 					"No":
-					invoice.invoice_number + str(random.randint(0, 10000)) +
+					invoice.invoice_number + str(random.randint(0, 100)) +
 					'T' if company_details['data'].mode == 'Testing' else
 					invoice.invoice_number,
 					"Dt":
@@ -215,7 +215,6 @@ class Invoices(Document):
 				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_after_value,2),
 				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			}
-			print(gst_data)
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -317,7 +316,6 @@ class Invoices(Document):
 			print(e, "get TaxPayerDetail")
 
 	def updateTaxPayerDetails(self, taxPayerDetails):
-		print(taxPayerDetails)
 		taxPayerDeatilsData = frappe.get_doc('TaxPayerDetail',
 											 taxPayerDetails['gst'])
 		# print(taxPayerDeatils.name)
@@ -517,7 +515,6 @@ class Invoices(Document):
 
 def cancel_irn(irn_number, gsp, reason, company):
 	try:
-		print(gsp['data'])
 
 		headers = {
 			"user_name": gsp['data']['username'],
@@ -555,7 +552,6 @@ def cancel_irn(irn_number, gsp, reason, company):
 
 def attach_qr_code(invoice_number, gsp, code):
 	try:
-		print("attachRqqqqqqqqqqqqqqqq")
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		company = frappe.get_doc('company', invoice.company)
 		folder_path = frappe.utils.get_bench_path()
@@ -760,10 +756,10 @@ def create_invoice(data):
 
 @frappe.whitelist(allow_guest=True)
 def insert_invoice(data):
-	# '''
-	# insert invoice data     data, company_code, taxpayer,items_data
-	# '''
-	# try:
+	'''
+	insert invoice data     data, company_code, taxpayer,items_data
+	'''
+	try:
 		company = frappe.get_doc('company',data['company_code'])
 
 		value_before_gst = 0
@@ -847,7 +843,7 @@ def insert_invoice(data):
 
 			
 		#check invoice total
-		print(int(data['total_invoice_amount']), int(pms_invoice_summary+other_charges))
+		# print(int(data['total_invoice_amount']), int(pms_invoice_summary+other_charges))
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -961,8 +957,8 @@ def insert_invoice(data):
 				})
 			invoice.amended_from = invCount[0]['name']
 			# print(invCount)
-			if "-" in invCount[0]['name']:
-				amenedindex = invCount[0]['name'].find("-")
+			if "-" in invCount[0]['name'][-4:]:
+				amenedindex = invCount[0]['name'].rfind("-")
 				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
 				ameneddigit = ameneddigit+1 
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
@@ -974,7 +970,6 @@ def insert_invoice(data):
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		data['invoice_number'] = v.name
 		data['guest_data']['invoice_number'] = v.name
-		
 		# # insert items
 
 		itemsInsert = insert_items(data['items_data'], data['invoice_number'])
@@ -989,13 +984,16 @@ def insert_invoice(data):
 			items, data['guest_data']['invoice_number'])
 		
 		return {"success": True}
-	# except Exception as e:
-	# 	print(e, "insert invoice")
-	# 	return {"success": False, "message": str(e)}
+	except Exception as e:
+		print(e, "insert invoice")
+		return {"success": False, "message": str(e)}
 
 
 def insert_hsn_code_based_taxes(items, invoice_number):
 	try:
+		frappe.db.delete('SAC HSN Tax Summaries', {
+    		'parent': invoice_number})
+		frappe.db.commit()	
 		sac_codes = []
 		for item in items:
 
@@ -1035,7 +1033,6 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
-			print(sac)
 			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
 			doc = frappe.get_doc(sac)
 			doc.insert(ignore_permissions=True, ignore_links=True)
@@ -1047,6 +1044,9 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 def insert_items(items, invoice_number):
 	try:
+		frappe.db.delete('Items', {
+    		'parent': invoice_number})
+		frappe.db.commit()
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
@@ -1085,7 +1085,6 @@ def calulate_items(data):
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
 						filters={'name': ['like', '%' + item['name'] + '%']})
-				print(sac_code_based_gst)
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -1221,7 +1220,6 @@ def calulate_items(data):
 				else:
 					final_item["vat_amount"] = 0
 				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
-				print("===============", final_item)
 			else:
 				sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',item["sac_code"])
@@ -1469,6 +1467,10 @@ def insert_tax_summariesd(items, invoice_number):
 
 
 def insert_tax_summaries2(items,invoice_number):
+	frappe.db.delete('Tax Summaries', {
+    		'parent': invoice_number})
+	frappe.db.commit()		
+	# print("dddddd ",d)
 	df = pd.DataFrame(items)
 
 	df = df.set_index('sgst')
@@ -1590,9 +1592,9 @@ def insert_tax_summaries(items, invoice_number):
 	insert tax_summaries into tax_summaries table
 	'''
 	try:
+		
 		tax_summaries = []
 		for item in items:
-			print(item)
 			if len(tax_summaries) > 0:
 				found = False
 				for tax in tax_summaries:
@@ -2048,7 +2050,6 @@ def request_get(api, headers, invoice, code):
 			"Authorization": "Bearer " + headers['token']
 		}
 		company = frappe.get_doc('company', code)
-		print(company, "request getttttttt")
 		if company.proxy == 0:
 			raw_response = requests.get(api, headers=headers)
 		else:
@@ -2100,13 +2101,32 @@ def check_invoice_file_exists(data):
 		return {"success": False, "message": str(e)}
 
 
+# @frappe.whitelist(allow_guest=True)
+# def check_invoice_exists(invoice_number):
+# 	try:
+# 		invoiceExists = frappe.get_doc('Invoices', invoice_number)
+# 		if invoiceExists:
+
+# 			return {"success": True, "data": invoiceExists}
+# 		return {"success": False}
+# 	except Exception as e:
+# 		print(e, "check invoice exist")
+# 		return {"success": False, "message": str(e)}
+
 @frappe.whitelist(allow_guest=True)
 def check_invoice_exists(invoice_number):
 	try:
-		invoiceExists = frappe.get_doc('Invoices', invoice_number)
-		if invoiceExists:
-
-			return {"success": True, "data": invoiceExists}
+		
+		invoiceExists = frappe.db.get_list(
+				'Invoices',
+				filters={
+					'invoice_number':
+					['like', '%' + invoice_number + '%']
+				})
+				
+		if len(invoiceExists)>0:
+			invoicedata = frappe.get_doc('Invoices',invoiceExists[0]['name'] )
+			return {"success": True, "data": invoicedata}
 		return {"success": False}
 	except Exception as e:
 		print(e, "check invoice exist")
@@ -2117,7 +2137,25 @@ def check_invoice_exists(invoice_number):
 def Error_Insert_invoice(data):
 	try:
 		# print(data,"8888")
-
+		if data['amened'] == 'Yes':
+			invCount = frappe.db.get_list(
+				'Invoices',
+				filters={
+					'invoice_number':
+					['like', '%' + data['invoice_number'] + '%']
+				})
+			# invoice.amended_from = invCount[0]['name']
+			# print(invCount)
+			if "-" in invCount[0]['name'][-4:]:
+				amenedindex = invCount[0]['name'].rfind("-")
+				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
+				ameneddigit = ameneddigit+1 
+				data['invoice_number'] = data['invoice_number'] + "-"+str(ameneddigit)
+				# pass
+			else:
+				data['invoice_number'] = data['invoice_number'] + "-1"
+		if "SAC Code" in data['error_message']:
+			data['error_message'] = data['error_message'].replace('SAC Code','Transaction ')
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -2137,7 +2175,7 @@ def Error_Insert_invoice(data):
 			"Error",
 			'invoice_date':
 			datetime.datetime.strptime(data['invoice_date'],
-									   '%d-%b-%y %H:%M:%S'),
+										'%d-%b-%y %H:%M:%S'),
 			'legal_name':
 			" ",
 			# data['taxpayer']['legal_name'],

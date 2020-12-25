@@ -112,7 +112,6 @@ def file_parsing(filepath):
 				ele = j[0]
 				if "~" not in j[1]:
 					ele = ele+" "+j[1]
-				print(ele)
 				if ele not in paymentTypes:
 					original_data.append(i)
 			elif len(j) == 1:
@@ -186,7 +185,6 @@ def file_parsing(filepath):
 		# print(inv_data.__dict__)
 		if inv_data.docstatus==2:
 			amened='Yes'
-		
 		else:
 			invoiceNumber = inv_data.name
 			guest['invoice_number'] = inv_data.name
@@ -203,6 +201,8 @@ def file_parsing(filepath):
 	error_data['room_number'] = guest['room_number']
 	error_data['pincode'] = "500082"
 	# gstNumber = "12345"
+	# print(guest['invoice_number'])
+
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
@@ -213,17 +213,10 @@ def file_parsing(filepath):
 
 
 
-	# check_invoice_exists
-	check_invoice = check_invoice_exists(guest['invoice_number'])
-	if check_invoice['success']==True:
-		inv_data = check_invoice['data']
-		if inv_data.docstatus==2:
-			amened='Yes'
-		else:
-			amened='No'    
+	   
 
 
-	print(json.dumps(guest, indent = 1))
+	# print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':
