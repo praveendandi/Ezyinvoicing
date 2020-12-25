@@ -300,6 +300,7 @@ def reinitiateInvoice(data):
 	# gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
+		error_data['amened'] = amened
 		error_data['error_message'] = "The given gst number is not a vaild one"
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
@@ -307,14 +308,7 @@ def reinitiateInvoice(data):
 
 
 
-	# check_invoice_exists
-	check_invoice = check_invoice_exists(guest['invoice_number'])
-	if check_invoice['success']==True:
-		inv_data = check_invoice['data']
-		if inv_data.docstatus==2:
-			amened='Yes'
-		else:
-			amened='No'    
+    
 	# print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
@@ -333,12 +327,14 @@ def reinitiateInvoice(data):
 						else:
 							
 							error_data['error_message'] = insertInvoiceApiResponse['message']
+							error_data['amened'] = amened
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
 						
 						error_data['error_message'] = calulateItemsApiResponse['message']
+						error_data['amened'] = amened
 						errorInvoice = Error_Insert_invoice(error_data)
 						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'],"***********")
 						return {"success":False,"message":calulateItemsApiResponse['message']}
@@ -346,11 +342,13 @@ def reinitiateInvoice(data):
 					# itsindex = getTaxPayerDetailsResponse['message']['message'].index("'")
 					print(error_data)
 					error_data['error_message'] = getTaxPayerDetailsResponse['message']
+					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
 			else:
 				# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
 				error_data['error_message'] = checkTokenIsValidResponse['message']
+				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
@@ -368,17 +366,20 @@ def reinitiateInvoice(data):
 				else:
 					
 					error_data['error_message'] = insertInvoiceApiResponse['message']
+					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 					return {"success":False,"message":insertInvoiceApiResponse['message']}
 			else:
 						
 				error_data['error_message'] = calulateItemsApiResponse['message']
+				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 				return {"success":False,"message":calulateItemsApiResponse['message']}	
 	else:
 		error_data['error_message'] = gspApiDataResponse['message']
+		error_data['amened'] = amened
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}

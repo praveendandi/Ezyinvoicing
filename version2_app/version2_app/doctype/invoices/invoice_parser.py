@@ -274,12 +274,11 @@ def file_parsing(filepath):
 		# print(inv_data.__dict__)
 		if inv_data.docstatus==2:
 			amened='Yes'
-			print("//////////")
 			# invoiceNumber = inv_data.name
 			# guest['invoice_number'] = inv_data.name
 		else:
-			# invoiceNumber = inv_data.name
-			# guest['invoice_number'] = inv_data.name
+			invoiceNumber = inv_data.name
+			guest['invoice_number'] = inv_data.name
 			# invoiceNumber = inv_data.name
 			amened='No' 
 

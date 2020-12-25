@@ -37,7 +37,7 @@ class Invoices(Document):
 	# 		# print("*************888")
 
 	def generateIrn(self, invoice_number):
-		try:
+		# try:
 			# get invoice details
 			start_time = datetime.datetime.utcnow()
 			invoice = frappe.get_doc('Invoices', invoice_number)
@@ -179,10 +179,8 @@ class Invoices(Document):
 						round(item.cess_amount, 2),
 						"CesNonAdvlAmt":
 						0,
-						"StateCesRt":
-						0,
-						"StateCesAmt":
-						0,
+						"StateCesRt": item.state_cess,
+						"StateCesAmt": item.state_cess_amount,
 						"StateCesNonAdvlAmt":
 						0,
 						"OthChrg":
@@ -241,7 +239,8 @@ class Invoices(Document):
 												GSP_details['data'])
 					if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
 						if credit_note_items != []:
-							CreditgenerateIrn(invoice_number)
+							cgetIrn = CreditgenerateIrn(invoice_number)
+							print(cgetIrn)
 							invoice = frappe.get_doc('Invoices',
 														invoice_number)
 							invoice.irn_process_time = datetime.datetime.utcnow(
@@ -262,8 +261,8 @@ class Invoices(Document):
 			# 		return {"success": True}
 			# 	return {"success": False}
 
-		except Exception as e:
-			print(str(e), "generate Irn")
+		# except Exception as e:
+		# 	print(str(e), "generate Irn")
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
 		# try:
@@ -308,81 +307,6 @@ class Invoices(Document):
 		# except Exception as e:
 		# 	print(e,"cancel irn")
 
-	# def cancelIrn(self, invoice_number, reason='wrong Entry'):
-	# 	# try:
-	# 	# get invoice details
-	# 	invoice = frappe.get_doc('Invoices', invoice_number)
-	# 	# get seller details
-	# 	print(invoice)
-	# 	company_details = check_company_exist_for_Irn(invoice.company)
-	# 	# get gsp_details
-		
-	# 	gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
-	# 	GSP_details = gsp_api_data_for_irn(gsp_data)
-	# 	if len(invoice.irn_number)>10: 
-	# 		cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
-	# 		if cancel_response['success']:
-	# 			Cancelledinvoice = frappe.get_doc({
-	# 				'doctype':'Cancelled Invoices Details',
-	# 				'invoices':invoice_number,
-	# 				'invoice_number': invoice_number,
-	# 				'cancelled_on' : cancel_response['result']['CancelDate'],
-	# 				'cancelled_irn_number':cancel_response['result']['Irn'],
-	# 				'cancel_message': reason,
-	# 				'irn_cancelled':'Yes',
-	# 				'irn_generated':'Cancelled'})
-	# 			Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
-
-	# 			if invoice.has_credit_items=="Yes":
-	# 				credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
-	# 				if credit_cancel_response['success']:
-	# 					CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
-	# 					CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
-	# 					CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
-	# 					CancelledCreditinvoice.cancelled_credit_irn_number = credit_cancel_response['result']['Irn']
-	# 					CancelledCreditinvoice.credit_irn = 'Yes'
-	# 					CancelledCreditinvoice.save()
-	# 					return {
-	# 						"success": True,
-	# 						"message": "E-Invoice is cancelled successfully"
-	# 					}
-	# 			return {
-	# 				"success": True,
-	# 				"message": "E-Invoice is cancelled successfully"
-	# 				}
-	# 		else:
-	# 			return {"success": False, "message": "Invoice is not active"}
-	# 	# if invoice.has_credit_items=="Yes" and len(invoice.irn_number)<10:
-	# 	# 	credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
-	# 	# 	if credit_cancel_response['success']:
-	# 	# 		CancelledCreditinvoice = frappe.get_doc('Cancelled Invoices Details',invoice_number)
-	# 	# 		CancelledCreditinvoice.credit_irn_cancelled = 'Yes'
-	# 	# 		CancelledCreditinvoice.credit_irn_generated = 'Cancelled'
-	# 	# 		CancelledCreditinvoice.credit_irn = 'Yes'
-	# 	# 		CancelledCreditinvoice.save()
-	# 	# 		Cancelledinvoice = frappe.get_doc({
-	# 	# 			'doctype':'Cancelled Invoices Details',
-	# 	# 			'invoices':invoice_number,
-	# 	# 			'invoice_number': invoice_number,
-	# 	# 			'cancelled_on' : credit_cancel_response['result']['CancelDate'],
-	# 	# 			'cancelled_irn_number':credit_cancel_response['result']['Irn'],
-	# 	# 			'cancel_message': reason,
-	# 	# 			'credit_irn_cancelled':'Yes',
-	# 	# 			'credit_irn_generated':'Cancelled'})
-	# 	# 		Cancelledinvoice.insert(ignore_permissions=True, ignore_links=True)	
-
-	# 	# 		return {
-	# 	# 			"success": True,
-	# 	# 			"message": "E-Invoice is cancelled successfully"
-	# 	# 		}		
-	# 	else:
-	# 		return {
-	# 				"success": False,
-	# 				"message": "Cance Irn Failed"
-	# 			}
-
-		# except Exception as e:
-		# 	print(e,"cancel irn")		
 
 	def getTaxPayerDetails(self, gstNumber):
 		try:
@@ -839,7 +763,7 @@ def insert_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		# print(data)
+		# print(insert)
 		company = frappe.get_doc('company',data['company_code'])
 
 		value_before_gst = 0
@@ -923,7 +847,7 @@ def insert_invoice(data):
 
 			
 		#check invoice total
-		if int(data['total_invoice_amount']) != int(pms_invoice_summary):
+		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 			if TotalMismatchErrorAPI['success']==True:
@@ -1094,7 +1018,9 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 				'doctype': "SAC HSN Tax Summaries",
 				'parent': invoice_number,
 				'parentfield': 'sac_hsn_based_taxes',
-				'parenttype': "invoices"
+				'parenttype': "invoices",
+				"state_cess":0,
+				"vat":0
 			}
 			for item in items:
 				# print(item)
@@ -1103,6 +1029,8 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 					sac_tax['sgst'] += item['sgst_amount']
 					sac_tax['igst'] += item['igst_amount']
 					sac_tax['cess'] += item['cess_amount']
+					sac_tax["state_cess"] += item["state_cess_amount"]
+					sac_tax["vat"] += item["vat_amount"]
 					sac_tax['amount_before_gst'] += item['item_taxable_value']
 					sac_tax['amount_after_gst'] += item['item_value_after_gst']
 
@@ -1144,7 +1072,6 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	#items, invoice_number,company_code
 	try:
-
 		total_items = []
 		for item in data['items']:
 			final_item = {}
@@ -1192,196 +1119,71 @@ def calulate_items(data):
 						final_item['cess'] = 0
 						final_item['cess_amount'] = 0
 						final_item['type'] = "Excempted"
-						item['item_type'] = "Discount"
-						item['item_mode'] = ItemMode
-
-				if item['cgst'] == 0:
-					if ("Service" in item['name']) or ("Utility"
-													   in item['name']):
-						item['cgst'] = int(sac_code_based_gst_rates.cgst)
-						item['sgst'] = int(sac_code_based_gst_rates.sgst)
-						gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-										  int(sac_code_based_gst_rates.sgst))
-						base_value = item['item_value'] * (
-							100 / (gst_percentage + 100))
+						final_item['item_type'] = "Discount"
+						final_item['item_mode'] = ItemMode
+				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
+					if "-" in str(item['item_value']):
+						final_item['item_mode'] = ItemMode
+					else:
+						final_item['item_mode'] = "Debit"
+					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
+					if sac_code_based_gst_rates.net == "No":
+						if item['sac_code'] == '996311':
+							if item['item_value']>1000 and item['item_value']<=7500:
+								gst_percentage = 12
+							elif item['item_value'] > 7500:
+								gst_percentage = 18
+							elif item['item_value'] == 1000:
+								gst_percentage = 0
+							else:
+								gst_percentage = 0
+							if gst_percentage == 0:
+								final_item['cgst'] = 0
+								final_item['sgst'] = 0
+								final_item['igst'] = 0
+								final_item['type'] = "Excempted"
+							else:
+								final_item['cgst'] = gst_percentage/2
+								final_item['sgst'] = gst_percentage/2
+								final_item['igst'] = 0
+								final_item['type'] = "Included"
+						else:
+							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
+							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
+							final_item['igst'] = float(sac_code_based_gst_rates.igst)
+						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),2)
+						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),2)
+						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),2)
+						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
+						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
+						final_item['item_value'] = item['item_value']
+					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),2)
 						gst_value = item['item_value'] - base_value
-						item['cgstAmount'] = gst_value / 2
-						item['sgstAmount'] = gst_value / 2
-						item['item_value'] = base_value
-				if "-" in str(
-						item['item_value']) and item['sac_code'] == '996311':
-					final_item['sort_order'] = item['sort_order']
-					
-					if item['item_value']>1000 and item['item_value']<=7500:
-						gst_percentage = 12
-					elif item['item_value'] > 7500:
-						gst_percentage = 18
-					elif item['item_value'] == 1000:
-						gst_percentage = 0
-					else:
-						gst_percentage = 0
-					final_item['cgst'] = int(gst_percentage / 2)
-					final_item['sgst'] = int(gst_percentage / 2)
-					gst_value = item['item_value'] * (gst_percentage / 100)
-
-					# gst_value =
-					final_item['cgst_amount'] = gst_value / 2
-					final_item['sgst_amount'] = gst_value / 2
+						final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
+						final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
+						final_item['cgst_amount'] = round(gst_value / 2,2)
+						final_item['sgst_amount'] = round(gst_value / 2,2)
+						final_item['igst'] = float(sac_code_based_gst_rates.igst)
+						if float(sac_code_based_gst_rates.igst) <= 0:
+							final_item['igst_amount'] = 0
+						else:
+							gst_percentage = (float(sac_code_based_gst_rates.cgst) +
+											float(sac_code_based_gst_rates.sgst))
+							base_value = item['item_value'] * (100 / (gst_percentage + 100))
+							final_item['igst_amount'] = item['item_value'] - base_value
+						final_item['gst_rate'] = float(sac_code_based_gst_rates.cgst)+float(sac_code_based_gst_rates.sgst)+float(sac_code_based_gst_rates.igst)
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = base_value
 					final_item['other_charges'] = 0
-					final_item['igst'] = int(sac_code_based_gst_rates.igst)
-					final_item['item_value'] = item['item_value']
-					if int(sac_code_based_gst_rates.igst) <= 0:
-						final_item['igst_amount'] = 0
-
-					final_item['other_charges'] = 0
-					final_item['gst_rate'] = gst_percentage
-
-					final_item['item_value_after_gst'] = item[
-						'item_value'] + gst_value
 					final_item['sac_code_found'] = 'Yes'
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
-					final_item['item_mode'] = ItemMode
-					if gst_percentage == 0:
-						final_item['type'] = "Excempted"
-					else:
-						final_item['type'] = "Included"
-				elif item['sac_code'] == '996311':
-					final_item['sort_order'] = item['sort_order']
-					
-					if item['item_value']>1000 and item['item_value']<=7500:
-						gst_percentage = 12
-					elif item['item_value'] > 7500:
-						gst_percentage = 18
-					elif item['item_value'] == 1000:
-						gst_percentage = 0
-					else:
-						gst_percentage = 0
-					final_item['cgst'] = int(gst_percentage / 2)
-					final_item['sgst'] = int(gst_percentage / 2)
-					gst_value = item['item_value'] * (gst_percentage / 100)
-
-					# gst_value =
-					final_item['cgst_amount'] = gst_value / 2
-					final_item['sgst_amount'] = gst_value / 2
-					final_item['other_charges'] = 0
-					final_item['igst'] = int(sac_code_based_gst_rates.igst)
-					final_item['item_value'] = item['item_value']
-					if int(sac_code_based_gst_rates.igst) <= 0:
-						final_item['igst_amount'] = 0
-
-					final_item['other_charges'] = 0
-					final_item['gst_rate'] = gst_percentage
-
-					final_item['item_value_after_gst'] = item[
-						'item_value'] + gst_value
-					final_item['sac_code_found'] = 'Yes'
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
-					final_item['item_mode'] = "Debit"
-					if gst_percentage == 0:
-						final_item['type'] = "Excempted"
-					else:
-						final_item['type'] = "Included"
-
-				elif "-" in str(
-						item['item_value']
-				) and item['sac_code'].isdigit(
-				) and sac_code_based_gst_rates.taxble == "Yes":  #and item['sac_code'] == '996311':
-					final_item['sort_order'] = item['sort_order']
-					final_item['cgst'] = item['cgst']
-					final_item['cgst_amount'] = round(item['cgstAmount'], 2)
-					final_item['sgst'] = item['sgst']
-					final_item['sgst_amount'] = round(item['sgstAmount'], 2)
-					final_item['igst'] = item['igst']
-					final_item['igst_amount'] = round(item['igstAmount'], 2)
-					final_item['gst_rate'] = item['cgst'] + item[
-						'sgst'] + item['igst']
-					final_item[
-						'item_value_after_gst'] = item['item_value'] + item[
-							'cgstAmount'] + item['sgstAmount'] + item[
-								'igstAmount'] + item['cessAmount']
-					final_item['item_value'] = item['item_value']
-					if item['sac_code'].isdigit():
-						final_item['sac_code_found'] = 'Yes'
-					else:
-						final_item['sac_code_found'] = 'No'
-					final_item['other_charges'] = 0
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
 					final_item['type'] = "Included"
-					final_item['item_mode'] = ItemMode
-
-				elif item['name'] == 'Telephone Local':
 					final_item['sort_order'] = item['sort_order']
-					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
-					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
-					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-									  int(sac_code_based_gst_rates.sgst))
-					base_value = item['item_value'] * (100 /
-													   (gst_percentage + 100))
-					gst_value = item['item_value'] - base_value
-					final_item['cgst_amount'] = gst_value / 2
-					final_item['sgst_amount'] = gst_value / 2
-					final_item['other_charges'] = 0
-					final_item['igst'] = int(sac_code_based_gst_rates.igst)
-					
-
-					if int(sac_code_based_gst_rates.igst) <= 0:
-						final_item['igst_amount'] = 0
-					else:
-						gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-										  int(sac_code_based_gst_rates.sgst))
-						base_value = item['item_value'] * (
-							100 / (gst_percentage + 100))
-						final_item[
-							'igst_amount'] = item['item_value'] - base_value
-						final_item['other_charges'] = 0
-					final_item['gst_rate'] = int(
-						sac_code_based_gst_rates.cgst) + int(
-							sac_code_based_gst_rates.sgst) + int(
-								sac_code_based_gst_rates.igst)
-					final_item['item_value'] = round(
-						item['item_value'] - final_item['cgst_amount'] -
-						final_item['sgst_amount'] - final_item['igst_amount'],
-						2)
-					final_item['item_value_after_gst'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
-					final_item['type'] = "Included"
-					final_item['item_mode'] = "Debit"
-
-				elif sac_code_based_gst_rates.taxble == "Yes" and item[
-						'sac_code'] != "996311":
-					final_item['sort_order'] = item['sort_order']
-					final_item['cgst'] = item['cgst']
-					final_item['cgst_amount'] = round(item['cgstAmount'], 2)
-					final_item['sgst'] = item['sgst']
-					final_item['sgst_amount'] = round(item['sgstAmount'], 2)
-					final_item['igst'] = item['igst']
-					final_item['igst_amount'] = round(item['igstAmount'], 2)
-					final_item['gst_rate'] = item['cgst'] + item[
-						'sgst'] + item['igst']
-					final_item[
-						'item_value_after_gst'] = item['item_value'] + item[
-							'cgstAmount'] + item['sgstAmount'] + item[
-								'igstAmount'] + item['cessAmount']
-					final_item['item_value'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'
-					final_item['other_charges'] = 0
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
-					final_item['type'] = "Included"
-					final_item['item_mode'] = "Debit"
-
 				else:
-					if item['sac_code'] != "996311":
+					# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
+					if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
 						final_item['sort_order'] = item['sort_order']
 						if item['sac_code'].isdigit():
 							final_item['sac_code'] = item['sac_code']
@@ -1400,125 +1202,151 @@ def calulate_items(data):
 						final_item['item_value_after_gst'] = item['item_value']
 						final_item['item_value'] = item['item_value']
 						final_item['taxable'] = sac_code_based_gst_rates.taxble
-						final_item['cess'] = 0
-						final_item['cess_amount'] = 0
 						final_item['type'] = "Non-Gst"
-						final_item['item_mode'] = "Debit"
+						# final_item['item_mode'] = "Debit"
+						if "-" in str(item['item_value']):
+							final_item['item_mode'] = ItemMode
+						else:
+							final_item['item_mode'] = "Debit"
+				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+				if sac_code_based_gst_rates.state_cess_rate > 0:
+					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+				else:
+					final_item["state_cess_amount"] = 0
+
+				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
+				if sac_code_based_gst_rates.central_cess_rate > 0:
+					final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
+				else:
+					final_item["cess_amount"] = 0
+				final_item['vat'] = sac_code_based_gst_rates.vat_rate
+				if sac_code_based_gst_rates.vat_rate > 0:
+					final_item["vat_amount"] = (item["item_value"]*(sac_code_based_gst_rates.vat_rate/100))
+				else:
+					final_item["vat_amount"] = 0
+				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
 			else:
 				sac_code_based_gst_rates = frappe.get_doc(
-					'SAC HSN CODES', item['sac_code'])
-
-				if item['sac_code'].isdigit() and item['sac_code'] == 996311:
-					sac_code_based_gst_rates = frappe.get_doc(
-						'SAC HSN CODES', item['sac_code'])
-					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
-					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
-					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-									int(sac_code_based_gst_rates.sgst))
-					if item['item_value']>1000 and item['item_value']<=7500:
-						gst_percentage = 12
-					elif item['item_value'] > 7500:
-						gst_percentage = 18
-					else:
-						gst_percentage = 0
-
-					base_value = item['item_value'] * (100 /
-													   (gst_percentage + 100))
-					gst_value = item['item_value'] - base_value
-					final_item['cgst_amount'] = gst_value / 2
-					final_item['sgst_amount'] = gst_value / 2
-					final_item['other_charges'] = 0
-					final_item['igst'] = int(sac_code_based_gst_rates.igst)
-					final_item['sort_order'] = item['sort_order']
-
-					if int(sac_code_based_gst_rates.igst) <= 0:
-						final_item['igst_amount'] = 0
-					else:
-						gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-										  int(sac_code_based_gst_rates.sgst))
-						base_value = item['item_value'] * (
-							100 / (gst_percentage + 100))
-						final_item[
-							'igst_amount'] = item['item_value'] - base_value
-
-					final_item['gst_rate'] = int(
-						sac_code_based_gst_rates.cgst) + int(
-							sac_code_based_gst_rates.sgst) + int(
-								sac_code_based_gst_rates.igst)
-					final_item['item_value'] = round(
-						item['item_value'] - final_item['cgst_amount'] -
-						final_item['sgst_amount'] - final_item['igst_amount'],
-						2)
-					final_item['item_value_after_gst'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'
-					final_item['other_charges'] = 0
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
-					final_item['item_mode'] = "Debit"
-				elif item['sac_code'].isdigit():
-					sac_code_based_gst_rates = frappe.get_doc(
-						'SAC HSN CODES', item['sac_code'])
-					final_item['cgst'] = int(sac_code_based_gst_rates.cgst)
-					final_item['sgst'] = int(sac_code_based_gst_rates.sgst)
-					gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-									int(sac_code_based_gst_rates.sgst))
-				
-					base_value = item['item_value'] * (100 /
-													   (gst_percentage + 100))
-					gst_value = item['item_value'] - base_value
-					final_item['cgst_amount'] = gst_value / 2
-					final_item['sgst_amount'] = gst_value / 2
-					final_item['other_charges'] = 0
-					final_item['igst'] = int(sac_code_based_gst_rates.igst)
-					final_item['sort_order'] = item['sort_order']
-
-					if int(sac_code_based_gst_rates.igst) <= 0:
-						final_item['igst_amount'] = 0
-					else:
-						gst_percentage = (int(sac_code_based_gst_rates.cgst) +
-										  int(sac_code_based_gst_rates.sgst))
-						base_value = item['item_value'] * (
-							100 / (gst_percentage + 100))
-						final_item[
-							'igst_amount'] = item['item_value'] - base_value
-
-					final_item['gst_rate'] = int(
-						sac_code_based_gst_rates.cgst) + int(
-							sac_code_based_gst_rates.sgst) + int(
-								sac_code_based_gst_rates.igst)
-					final_item['item_value'] = round(
-						item['item_value'] - final_item['cgst_amount'] -
-						final_item['sgst_amount'] - final_item['igst_amount'],
-						2)
-					final_item['item_value_after_gst'] = item['item_value']
-					final_item['sac_code_found'] = 'Yes'
-					final_item['other_charges'] = 0
-					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = item['cess']
-					final_item['cess_amount'] = item['cessAmount']
-					final_item['item_mode'] = "Debit"
-				else:
-					final_item['sort_order'] = item['sort_order']
-					if item['sac_code'].isdigit():
-						final_item['sac_code'] = item['sac_code']
-						final_item['sac_code_found'] = 'Yes'
-					else:
-						item['sac_code'] = 'No Sac'
+					'SAC HSN CODES',item["sac_code"])
+				item['item_type'] = sac_code_based_gst_rates.type
+				if sac_code_based_gst_rates.type == "Discount":
+						final_item['sac_code'] = 'No Sac'
 						final_item['sac_code_found'] = 'No'
-					final_item['cgst'] = 0
-					final_item['cgst_amount'] = 0
-					final_item['sgst'] = 0
-					final_item['sgst_amount'] = 0
-					final_item['igst'] = 0
-					final_item['igst_amount'] = 0
-					final_item['gst_rate'] = 0
-					final_item['item_value_after_gst'] = item['item_value']
-					final_item['item_value'] = item['item_value']
+						final_item['cgst'] = 0
+						final_item['other_charges'] = 0
+						final_item['cgst_amount'] = 0
+						final_item['sgst'] = 0
+						final_item['sgst_amount'] = 0
+						final_item['igst'] = 0
+						final_item['igst_amount'] = 0
+						final_item['gst_rate'] = 0
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = item['item_value']
+						final_item['taxable'] = sac_code_based_gst_rates.taxble
+						final_item['cess'] = 0
+						final_item['cess_amount'] = 0
+						final_item['type'] = "Excempted"
+						final_item['item_type'] = "Discount"
+						final_item['item_mode'] = ItemMode
+				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
+					if "-" in str(item['item_value']):
+						final_item['item_mode'] = ItemMode
+					else:
+						final_item['item_mode'] = "Debit"
+					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
+					if sac_code_based_gst_rates.net == "No":
+						if item['sac_code'] == '996311':
+							if item['item_value']>1000 and item['item_value']<=7500:
+								gst_percentage = 12
+							elif item['item_value'] > 7500:
+								gst_percentage = 18
+							elif item['item_value'] == 1000:
+								gst_percentage = 0
+							else:
+								gst_percentage = 0
+							if gst_percentage == 0:
+								final_item['cgst'] = 0
+								final_item['sgst'] = 0
+								final_item['igst'] = 0
+								final_item['type'] = "Excempted"
+							else:
+								final_item['cgst'] = gst_percentage/2
+								final_item['sgst'] = gst_percentage/2
+								final_item['igst'] = 0
+								final_item['type'] = "Included"
+						else:
+							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
+							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
+							final_item['igst'] = float(sac_code_based_gst_rates.igst)
+						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),2)
+						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),2)
+						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),2)
+						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
+						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
+						final_item['item_value'] = item['item_value']
+					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),2)
+						gst_value = item['item_value'] - base_value
+						final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
+						final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
+						final_item['cgst_amount'] = round(gst_value / 2,2)
+						final_item['sgst_amount'] = round(gst_value / 2,2)
+						final_item['igst'] = float(sac_code_based_gst_rates.igst)
+						if float(sac_code_based_gst_rates.igst) <= 0:
+							final_item['igst_amount'] = 0
+						else:
+							gst_percentage = (float(sac_code_based_gst_rates.cgst) +
+											float(sac_code_based_gst_rates.sgst))
+							base_value = item['item_value'] * (100 / (gst_percentage + 100))
+							final_item['igst_amount'] = item['item_value'] - base_value
+						final_item['gst_rate'] = float(sac_code_based_gst_rates.cgst)+float(sac_code_based_gst_rates.sgst)+float(sac_code_based_gst_rates.igst)
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = base_value
 					final_item['other_charges'] = 0
+					final_item['sac_code_found'] = 'Yes'
 					final_item['taxable'] = sac_code_based_gst_rates.taxble
-					final_item['cess'] = 0
-					final_item['cess_amount'] = 0
+					final_item['type'] = "Included"
+					final_item['sort_order'] = item['sort_order']
+				else:
+					# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
+					if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
+						final_item['sort_order'] = item['sort_order']
+						if item['sac_code'].isdigit():
+							final_item['sac_code'] = item['sac_code']
+							final_item['sac_code_found'] = 'Yes'
+						else:
+							final_item['sac_code'] = 'No Sac'
+							final_item['sac_code_found'] = 'No'
+						final_item['cgst'] = 0
+						final_item['other_charges'] = 0
+						final_item['cgst_amount'] = 0
+						final_item['sgst'] = 0
+						final_item['sgst_amount'] = 0
+						final_item['igst'] = 0
+						final_item['igst_amount'] = 0
+						final_item['gst_rate'] = 0
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = item['item_value']
+						final_item['taxable'] = sac_code_based_gst_rates.taxble
+						final_item['type'] = "Non-Gst"
+						final_item['item_mode'] = "Debit"
+				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+				if sac_code_based_gst_rates.state_cess_rate > 0:
+					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+				else:
+					final_item["state_cess_amount"] = 0
+				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
+				if sac_code_based_gst_rates.central_cess_rate > 0:
+					final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
+				else:
+					final_item["cess_amount"] = 0
+				final_item['vat'] = sac_code_based_gst_rates.vat_rate
+				if sac_code_based_gst_rates.vat_rate > 0:
+					final_item["vat_amount"] = (item["item_value"]*(sac_code_based_gst_rates.vat_rate/100))
+				else:
+					final_item["vat_amount"] = 0
+				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
 			total_items.append({
 				'doctype':
 				'Items',
@@ -1557,6 +1385,8 @@ def calulate_items(data):
 				final_item['cess'],
 				'cess_amount':
 				final_item['cess_amount'],
+				'state_cess':final_item["state_cess"],
+				"state_cess_amount":final_item["state_cess_amount"],
 				'parent':
 				data['invoice_number'],
 				'parentfield':
@@ -1571,7 +1401,9 @@ def calulate_items(data):
 				final_item['other_charges'],
 				'taxable':
 				final_item['taxable'],
-				'item_mode':final_item['item_mode']
+				'item_mode':final_item['item_mode'],
+				"vat_amount":final_item["vat_amount"],
+				"vat":final_item['vat']
 			})
 		return {"success": True, "data": total_items}
 	except Exception as e:
@@ -1648,9 +1480,17 @@ def insert_tax_summaries2(items,invoice_number):
 
 	df = df.set_index('sgst')
 	df['cess_duplicate'] = df['cess']
-	df1 = df.groupby(['cgst','cess_duplicate'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess"]].apply(lambda x : x.astype(float).sum())
+	df['state_cess_duplicate'] = df['state_cess']
+	df['vat_duplication'] = df['vat']
+	df1 = df.groupby(['cgst','cess_duplicate','state_cess_duplicate','vat_duplication'])[["cgst_amount", "sgst_amount","igst_amount","cess_amount","cess",'state_cess','vat',"state_cess_amount","vat_amount"]].apply(lambda x : x.astype(float).sum())
 	df1.reset_index(level=0, inplace=True) 
-	df1['cess'] = df1.index.values.tolist()
+	
+	df1.reset_index(level=0, inplace=True)
+	df1.reset_index(level=0, inplace=True)
+	df1.reset_index(level=0, inplace=True)
+	df1['cess'] = df1['cess_duplicate']
+	df1['state_cess'] = df1['state_cess_duplicate']
+	df1['vat'] = df1['vat_duplication']
 	data = df1.to_dict('records')
 	for each in data:
 		if each['cgst']>0:
@@ -1691,7 +1531,7 @@ def insert_tax_summaries2(items,invoice_number):
 				doc.insert(ignore_permissions=True)
 		if each['cess']>0:
 			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
-			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CESS','tax_percentage':each['cess']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'Central CESS','tax_percentage':each['cess']})
 			tax_summary_cess = [element for tupl in tax_summary_cess for element in tupl]
 			if len(tax_summary_cess)==0:
 				if each['cess_amount']>0:
@@ -1700,7 +1540,7 @@ def insert_tax_summaries2(items,invoice_number):
 					'invoce_number': invoice_number,
 					'tax_percentage': each['cess'],
 					'amount': each['cess_amount'],
-					'tax_type': "CESS",
+					'tax_type': "Central CESS",
 					'parent': invoice_number,
 					'parentfield': 'gst_summary',
 					'parenttype': "Invoices"
@@ -1708,9 +1548,48 @@ def insert_tax_summaries2(items,invoice_number):
 					doc.insert(ignore_permissions=True)	
 			else:
 				tax_summary_cess_update = frappe.get_doc('Tax Summaries',tax_summary_cess[0])
-				# print(type(each['cess_amount']),type(tax_summary_cess_update.tax_percentage))
 				tax_summary_cess_update.tax_percentage = each['cess_amount']+float(tax_summary_cess_update.tax_percentage)			
 				tax_summary_cess_update.save()
+		if each['state_cess']>0:
+			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'State CESS','tax_percentage':each['state_cess']})
+			if tax_summary_cess is ():
+				if each['state_cess_amount']>0:
+					doc = frappe.get_doc({
+					'doctype': 'Tax Summaries',
+					'invoce_number': invoice_number,
+					'tax_percentage': each['state_cess'],
+					'amount': each['state_cess_amount'],
+					'tax_type': "State CESS",
+					'parent': invoice_number,
+					'parentfield': 'gst_summary',
+					'parenttype': "Invoices"
+						})
+					doc.insert(ignore_permissions=True)	
+			else:
+				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
+				tax_summary_cess_update.tax_percentage = each['state_cess_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_cess_update.save()
+		if each['vat']>0:
+			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
+			tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'VAT','tax_percentage':each['state_cess']})
+			if tax_summary_cess is ():
+				if each['vat_amount']>0:
+					doc = frappe.get_doc({
+					'doctype': 'Tax Summaries',
+					'invoce_number': invoice_number,
+					'tax_percentage': each['vat'],
+					'amount': each['vat_amount'],
+					'tax_type': "VAT",
+					'parent': invoice_number,
+					'parentfield': 'gst_summary',
+					'parenttype': "Invoices"
+						})
+					doc.insert(ignore_permissions=True)	
+			else:
+				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
+				tax_summary_cess_update.tax_percentage = each['vat_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_cess_update.save()				
 
 def insert_tax_summaries(items, invoice_number):
 	'''

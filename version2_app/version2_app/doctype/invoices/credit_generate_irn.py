@@ -435,7 +435,7 @@ def CreditgenerateIrn(invoice_number):
 			"Typ":
 			"CRN",
 			"No":
-			invoice.invoice_number + str(random.randint(0, 10000)) +
+			invoice.invoice_number + str(random.randint(0, 100)) +
 			'T' if company_details['data'].mode == 'Testing' else
 			invoice.invoice_number,
 			"Dt":
