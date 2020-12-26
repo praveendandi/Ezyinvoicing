@@ -18,6 +18,7 @@ from google.cloud import storage
 # from datetime import da
 import datetime
 import random
+import math
 from frappe.utils import get_site_name
 import time
 import os
@@ -842,15 +843,12 @@ def insert_invoice(data):
 
 			
 		#check invoice total
-		print(int(data['total_invoice_amount']),int(round(pms_invoice_summary,2)+other_charges))
-		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
+		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 			if TotalMismatchErrorAPI['success']==True:
 				items = data['items_data']
-				
 				itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-				
 				insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
 				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 					items, TotalMismatchErrorAPI['invoice_number'])
