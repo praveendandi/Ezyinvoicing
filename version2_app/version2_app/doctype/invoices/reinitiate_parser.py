@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("MHKCP-01")
+	companyCheckResponse = check_company_exist("HICC-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -67,7 +67,7 @@ def reinitiateInvoice(data):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "Cust GSTIN" in i:
+		if "GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 			print(gstNumber)
@@ -97,8 +97,8 @@ def reinitiateInvoice(data):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			p = i.split(":")
-			print_by = p[1].replace(" ","")		
+			print_by = i.split(":")
+			print_by = print_by[1].replace(" ","")
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -193,64 +193,11 @@ def reinitiateInvoice(data):
 			itemsort+=1
 			items.append(item)
 
+	total_items = []
+	for each in items:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+			total_items.append(each)
 
-
-	finalData = []
-	for item in items:
-
-		if len(item) > 1:
-
-			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"]:
-
-				if 'sac_code' in item:
-					item['sac_code'] = item['sac_code']
-				else:
-					item['sac_code'] = 'No Sac'
-				finalData.append(item)
-			else:
-				itemToUpdate = finalData[len(finalData) - 1]
-				# itemToUpdate[item['name']] = item['TotAmt']
-				if 'SGST' in item['name']:
-					itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['sgstAmount'] = item['item_value']
-				elif 'CGST' in item['name']:
-					itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['cgstAmount'] = item['item_value']
-				elif 'IGST' in item['name']:
-					itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['igstAmount'] = item['item_value']
-				elif 'CESS' in item['name']:
-					itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-					itemToUpdate['cessAmount'] = item['item_value']
-				elif 'Allow ' in item["name"]:
-					if "sgst" in itemToUpdate:
-						itemToUpdate['cgst'] = 9
-						itemToUpdate['cgstAmount'] = item['item_value']
-					else:
-						itemToUpdate['sgst'] = 9
-						itemToUpdate['sgstAmount'] = item['item_value']
-
-
-	invoiceItems = []
-	for index, i in enumerate(finalData):
-		# i['SlNo'] = index+1
-		# i['name']=i['name']+"99999"
-		if 'cgstAmount' not in i:
-			i['cgst'] = 0
-			i['cgstAmount'] = float(0)
-		if 'sgstAmount' not in i:
-			i['sgst'] = 0
-			i['sgstAmount'] = float(0)
-		if 'igstAmount' not in i:
-			i['igst'] = 0
-			i['igstAmount'] = float(0)
-		if 'cessAmount' not in i:
-			i['cess'] = 0
-			i['cessAmount'] = float(0)    
-		# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
-		invoiceItems.append(i)
-
-		# print(i)
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
@@ -265,11 +212,11 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = invoiceItems
+	guest['items'] = total_items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "MHKCP-01"
+	guest['company_code'] = "HICC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -287,7 +234,7 @@ def reinitiateInvoice(data):
 			invoiceNumber = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"MHKCP-01"}
+	company_code = {"code":"HICC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
