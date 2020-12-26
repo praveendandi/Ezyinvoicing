@@ -14,7 +14,7 @@ def CheckInternetConnection():
         if company.proxy == 1:
             proxyhost = company.proxy_url
             proxyhost = proxyhost.replace("http://","@")
-            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+            proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
             url = "https://google.com"
             print(proxies, "     proxy console")
             res = requests.get(url,proxies=proxies,verify=False)

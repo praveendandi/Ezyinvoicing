@@ -364,7 +364,7 @@ class Invoices(Document):
 				if company.proxy == 1:
 					proxyhost = company.proxy_url
 					proxyhost = proxyhost.replace("http://","@")
-					proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+					proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
 				
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
@@ -445,8 +445,8 @@ class Invoices(Document):
 					proxyhost = company.proxy_url
 					proxyhost = proxyhost.replace("http://", "@")
 					proxies = {
-						'http':
-						'http://' + company.proxy_username + ":" +
+						'https':
+						'https://' + company.proxy_username + ":" +
 						company.proxy_password + proxyhost}
 					print(proxies, "     proxy console")
 					generate_qr = requests.post(
@@ -529,8 +529,8 @@ def cancel_irn(irn_number, gsp, reason, company):
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
 			proxies = {
-				'http':
-				'http://' + company.proxy_username + ":" +
+				'https':
+				'https://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
 			print(proxies, "     proxy console")
 			cancel_response = requests.post(gsp['data']['cancel_irn'],
@@ -642,8 +642,8 @@ def create_qr_image(invoice_number, gsp):
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
 			proxies = {
-				'http':
-				'http://' + company.proxy_username + ":" +
+				'https':
+				'https://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
 			print(proxies, "     proxy console")
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -699,8 +699,8 @@ def postIrn(gst_data, gsp, company):
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
 			proxies = {
-				'http':
-				'http://' + company.proxy_username + ":" +
+				'https':
+				'https://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
 			print(proxies, "     proxy console")
 			irn_response = requests.post(gsp['generate_irn'],
@@ -1992,8 +1992,8 @@ def request_post(url, code, headers=None):
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
 			proxies = {
-				'http':
-				'http://' + company.proxy_username + ":" +
+				'https':
+				'https://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
 			print(proxies, "     proxy console")
 			data = requests.post(url, headers=headers, proxies=proxies,verify=False)
@@ -2025,8 +2025,8 @@ def request_get(api, headers, invoice, code):
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
 			proxies = {
-				'http':
-				'http://' + company.proxy_username + ":" +
+				'https':
+				'https://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost
 			}
 			print(proxies, "     proxy console")
