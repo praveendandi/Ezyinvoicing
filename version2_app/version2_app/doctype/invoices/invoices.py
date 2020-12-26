@@ -395,6 +395,7 @@ class Invoices(Document):
 							"message": response["message"]
 						}
 				else:
+					print(proxies, "     proxy console")
 					json_response = requests.post(
 						"https://gst.caratred.in/ezy/api/addJsonToGcb",
 						headers=headers,
@@ -447,6 +448,7 @@ class Invoices(Document):
 						'http':
 						'http://' + company.proxy_username + ":" +
 						company.proxy_password + proxyhost}
+					print(proxies, "     proxy console")
 					generate_qr = requests.post(
 						"https://upiqr.in/api/qr?format=png",
 						headers=headers,
@@ -530,6 +532,7 @@ def cancel_irn(irn_number, gsp, reason, company):
 				'http':
 				'http://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
+			print(proxies, "     proxy console")
 			cancel_response = requests.post(gsp['data']['cancel_irn'],
 											headers=headers,
 											json=payload,
@@ -642,6 +645,7 @@ def create_qr_image(invoice_number, gsp):
 				'http':
 				'http://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
+			print(proxies, "     proxy console")
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,
 									   stream=True,
@@ -698,6 +702,7 @@ def postIrn(gst_data, gsp, company):
 				'http':
 				'http://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
+			print(proxies, "     proxy console")
 			irn_response = requests.post(gsp['generate_irn'],
 										 headers=headers,
 										 json=gst_data,
@@ -1990,6 +1995,7 @@ def request_post(url, code, headers=None):
 				'http':
 				'http://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost}
+			print(proxies, "     proxy console")
 			data = requests.post(url, headers=headers, proxies=proxies,verify=False)
 		if data.status_code == 200:
 			response_data = data.json()
@@ -2023,6 +2029,7 @@ def request_get(api, headers, invoice, code):
 				'http://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost
 			}
+			print(proxies, "     proxy console")
 			raw_response = requests.get(api, headers=headers, proxies=proxies,verify=False)
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
