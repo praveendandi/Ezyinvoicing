@@ -37,7 +37,8 @@ def attach_qr_code(invoice_number, gsp,code):
 		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1, company.qr_rect_y0, company.qr_rect_y1)
 		document = fitz.open(src_pdf_filename)
 		page = document[0]
-		page.insertImage(img_rect, filename=img_filename)
+		im = open(img_filename,"rb").read()
+		page.insertImage(img_rect, stream=im)
 		document.save(dst_pdf_filename)
 		document.close()
 		# attacing irn an ack
@@ -101,7 +102,9 @@ def create_qr_image(invoice_number, gsp):
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.credit_irn_number
+			"Irn": invoice.credit_irn_number,
+			"height":"25",
+			"width":"25"
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],

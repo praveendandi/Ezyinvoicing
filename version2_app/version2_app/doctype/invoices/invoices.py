@@ -18,6 +18,7 @@ from google.cloud import storage
 # from datetime import da
 import datetime
 import random
+import math
 from frappe.utils import get_site_name
 import time
 import os
@@ -28,13 +29,6 @@ import fitz
 
 class Invoices(Document):
 
-
-	# def after_insert(self):
-	# 	if self.name:
-	# 		doc = frappe.get_doc('Invoices', self.name)
-	# 		doc.invoice_number = self.name
-	# 		doc.save()
-	# 		# print("*************888")
 
 	def generateIrn(self, invoice_number):
 		# try:
@@ -635,7 +629,9 @@ def create_qr_image(invoice_number, gsp):
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.irn_number
+			"Irn": invoice.irn_number,
+			"height":"100",
+			"width":"100"
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -839,15 +835,12 @@ def insert_invoice(data):
 
 			
 		#check invoice total
-		print(int(data['total_invoice_amount']),int(round(pms_invoice_summary,2)+other_charges))
-		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
+		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 			if TotalMismatchErrorAPI['success']==True:
 				items = data['items_data']
-				
 				itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-				
 				insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
 				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 					items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
@@ -1061,6 +1054,7 @@ def calulate_items(data):
 	#items, invoice_number,company_code
 	try:
 		total_items = []
+		second_list = []
 		for item in data['items']:
 			final_item = {}
 			companyDetails = frappe.get_doc('company', data['company_code'])
@@ -1085,7 +1079,17 @@ def calulate_items(data):
 				else:
 					
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
+				print(sac_code_based_gst_rates.__dict__,"**********")
+				# if sac_code_based_gst_rates.service_charge == "Yes":
+				# 	if sac_code_based_gst_rates.net == "Yes":
+				# 		scharge = companyDetails.service_charge_percentage
+				# 		base_value = round(item['item_value'] * (100 / (scharge + 100)),3)
+				# 		print(base_value)
+						# scharge_value = item['item_value'] - base_value
+						# gst_percentage = 18
+						
 
+					# second_list	
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if sac_code_based_gst_rates.type == "Discount":
