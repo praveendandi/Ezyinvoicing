@@ -364,9 +364,7 @@ class Invoices(Document):
 				if company.proxy == 1:
 					proxyhost = company.proxy_url
 					proxyhost = proxyhost.replace("http://","@")
-					proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-							'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-								}
+					proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost}
 				
 				for xyz in items:
 					if xyz.sac_code not in hsn_code:
@@ -401,7 +399,7 @@ class Invoices(Document):
 						"https://gst.caratred.in/ezy/api/addJsonToGcb",
 						headers=headers,
 						json=b2c_data,
-						proxies=proxies)
+						proxies=proxies,verify=False)
 					response = json_response.json()
 					if response["success"] == False:
 						return {
@@ -448,11 +446,7 @@ class Invoices(Document):
 					proxies = {
 						'http':
 						'http://' + company.proxy_username + ":" +
-						company.proxy_password + proxyhost,
-						'https':
-						'https://' + company.proxy_username + ":" +
-						company.proxy_password + proxyhost
-					}
+						company.proxy_password + proxyhost}
 					generate_qr = requests.post(
 						"https://upiqr.in/api/qr?format=png",
 						headers=headers,
@@ -462,7 +456,7 @@ class Invoices(Document):
 							"txnReference": invoice_number,
 							"amount": '%.2f' % doc.pms_invoice_summary
 						},
-						proxies=proxies)
+						proxies=proxies,verify=False)
 				if generate_qr.status_code == 200:
 					with open(dst_pdf_filename, "wb") as f:
 						f.write(generate_qr.content)
@@ -535,15 +529,11 @@ def cancel_irn(irn_number, gsp, reason, company):
 			proxies = {
 				'http':
 				'http://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost,
-				'https':
-				'https://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost
-			}
+				company.proxy_password + proxyhost}
 			cancel_response = requests.post(gsp['data']['cancel_irn'],
 											headers=headers,
 											json=payload,
-											proxies=proxies)
+											proxies=proxies,verify=False)
 		repsone = cancel_response.json()
 		return repsone
 	except Exception as e:
@@ -651,15 +641,11 @@ def create_qr_image(invoice_number, gsp):
 			proxies = {
 				'http':
 				'http://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost,
-				'https':
-				'https://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost
-			}
+				company.proxy_password + proxyhost}
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,
 									   stream=True,
-									   proxies=proxies)
+									   proxies=proxies,verify=False)
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -711,15 +697,11 @@ def postIrn(gst_data, gsp, company):
 			proxies = {
 				'http':
 				'http://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost,
-				'https':
-				'https://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost
-			}
+				company.proxy_password + proxyhost}
 			irn_response = requests.post(gsp['generate_irn'],
 										 headers=headers,
 										 json=gst_data,
-										 proxies=proxies)
+										 proxies=proxies,verify=False)
 
 		# print(irn_response.text)
 		if irn_response.status_code == 200:
@@ -2007,12 +1989,8 @@ def request_post(url, code, headers=None):
 			proxies = {
 				'http':
 				'http://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost,
-				'https':
-				'https://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost
-			}
-			data = requests.post(url, headers=headers, proxies=proxies)
+				company.proxy_password + proxyhost}
+			data = requests.post(url, headers=headers, proxies=proxies,verify=False)
 		if data.status_code == 200:
 			response_data = data.json()
 			if 'access_token' in response_data:
@@ -2043,12 +2021,9 @@ def request_get(api, headers, invoice, code):
 			proxies = {
 				'http':
 				'http://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost,
-				'https':
-				'https://' + company.proxy_username + ":" +
 				company.proxy_password + proxyhost
 			}
-			raw_response = requests.get(api, headers=headers, proxies=proxies)
+			raw_response = requests.get(api, headers=headers, proxies=proxies,verify=False)
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
 			return raw_response.json()

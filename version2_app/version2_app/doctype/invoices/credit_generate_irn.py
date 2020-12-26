@@ -111,12 +111,10 @@ def create_qr_image(invoice_number, gsp):
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-						'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-						}
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost}
 			qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,
-										stream=True,proxies=proxies)
+										stream=True,proxies=proxies,verify=False)
 
 		file_name = invoice_number + "creditqr.png"
 		full_file_path = path + file_name
@@ -161,10 +159,8 @@ def request_get_data(api, headers,invoice,code):
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-						}
-			raw_response = requests.get(api, headers=headers,proxies=proxies)
+			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+			raw_response = requests.get(api, headers=headers,proxies=proxies,verify=False)
 	
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
@@ -564,12 +560,10 @@ def postIrn(gst_data, gsp,company):
 			
 			proxyhost = company['data'].proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
-					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
-						}
+			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost}
 			irn_response = requests.post(gsp['generate_irn'],
 											headers=headers,
-											json=gst_data,proxies=proxies)									
+											json=gst_data,proxies=proxies,verify=False)									
 		if irn_response.status_code == 200:
 			return irn_response.json()
 		else:
