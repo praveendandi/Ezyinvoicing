@@ -248,7 +248,6 @@ class Invoices(Document):
 							) - start_time
 							invoice.save(ignore_permissions=True,
 											ignore_version=True)
-					
 					return response
 				else:
 					return response
@@ -482,6 +481,7 @@ class Invoices(Document):
 											files=files,
 											data=payload)
 			response = upload_qr_image.json()
+			print(response, "b2c qr code upload")
 			if 'message' in response:
 				doc.b2c_qrimage = response['message']['file_url']
 				doc.name = invoice_number
@@ -650,6 +650,7 @@ def create_qr_image(invoice_number, gsp):
 									   headers=headers,
 									   stream=True,
 									   proxies=proxies,verify=False)
+			print(qr_response, "qr_response from gsp8*********88")
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
