@@ -37,7 +37,7 @@ class Invoices(Document):
 	# 		# print("*************888")
 
 	def generateIrn(self, invoice_number):
-		# try:
+		try:
 			# get invoice details
 			start_time = datetime.datetime.utcnow()
 			invoice = frappe.get_doc('Invoices', invoice_number)
@@ -240,7 +240,6 @@ class Invoices(Document):
 					if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
 						if credit_note_items != []:
 							cgetIrn = CreditgenerateIrn(invoice_number)
-							print(cgetIrn)
 							invoice = frappe.get_doc('Invoices',
 														invoice_number)
 							invoice.irn_process_time = datetime.datetime.utcnow(
@@ -261,8 +260,8 @@ class Invoices(Document):
 			# 		return {"success": True}
 			# 	return {"success": False}
 
-		# except Exception as e:
-		# 	print(str(e), "generate Irn")
+		except Exception as e:
+			print(str(e), "generate Irn")
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
 		# try:
@@ -1829,8 +1828,11 @@ def check_token_is_valid(data):
 		return {"success": False, "message": str(e)}
 
 
-def login_gsp(code, mode):
+def login_gsp(code,mode):
 	try:
+		# code = "MHKCP-01"
+		# mode = "Testing"
+		print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -1862,6 +1864,42 @@ def login_gsp(code, mode):
 	except Exception as e:
 		print(e, "login gsp")
 
+
+def login_gsp2():
+	try:
+		code = "MHKCP-01"
+		mode = "Testing"
+		print("********** scheduler")
+		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
+			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
+			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
+		],
+								  as_dict=1)
+		if mode == 'Testing':
+			headers = {
+				"gspappid": gsp["gsp_test_app_id"],
+				"gspappsecret": gsp["gsp_test_app_secret"],
+			}
+			login_response = request_post(gsp['auth_test'], code, headers)
+
+			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
+			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.save(ignore_permissions=True)
+			return True
+		elif mode == 'Production':
+			headers = {
+				"gspappid": gsp["gsp_prod_app_id"],
+				"gspappsecret": gsp["gsp_prod_app_secret"]
+			}
+			login_response = request_post(gsp['auth_prod'], code, headers)
+			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
+			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.save(ignore_permissions=True)
+			return True
+	except Exception as e:
+		print(e, "login gsp")
 
 @frappe.whitelist(allow_guest=True)
 def gsp_api_data(data):
