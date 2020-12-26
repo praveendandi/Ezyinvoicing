@@ -43,7 +43,6 @@ def attach_qr_code(invoice_number, gsp,code):
 		# attacing irn an ack
 		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withCreditQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
-		# text = "IRN: " + invoice.credit_irn_number + "      " + "ACK NO: " + invoice.credit_ack_no + "\n" + "ACK DATE: " + invoice.credit_ack_date
 		text = "IRN: " + invoice.credit_irn_number +"          "+ "ACK NO: " + invoice.credit_ack_no + "       " + "ACK DATE: " + invoice.credit_ack_date
 		if company.irn_details_page == "First":
 			page = doc[0]

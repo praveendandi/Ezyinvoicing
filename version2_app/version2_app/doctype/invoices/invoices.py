@@ -131,6 +131,7 @@ class Invoices(Document):
 			total_sgst_value = 0
 			total_cgst_value = 0
 			total_cess_value = 0
+			total_state_cess_value = 0
 			discount_after_value = 0
 			discount_before_value = 0
 			ass_value = 0
@@ -141,6 +142,7 @@ class Invoices(Document):
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
 					total_cess_value += item.cess_amount
+					total_state_cess_value += item.state_cess_amount
 					ass_value += item.item_value
 					i = {
 						"SlNo":
@@ -180,7 +182,7 @@ class Invoices(Document):
 						"CesNonAdvlAmt":
 						0,
 						"StateCesRt": item.state_cess,
-						"StateCesAmt": item.state_cess_amount,
+						"StateCesAmt": round(item.state_cess_amount,2),
 						"StateCesNonAdvlAmt":
 						0,
 						"OthChrg":
@@ -206,14 +208,13 @@ class Invoices(Document):
 				"SgstVal": round(total_sgst_value, 2),
 				"IgstVal": round(total_igst_value, 2),
 				"CesVal": round(total_cess_value, 2),
-				"StCesVal": 0,
+				"StCesVal": round(total_state_cess_value,2),
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
 				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_after_value,2),
 				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			}
-			print(gst_data)
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -315,7 +316,6 @@ class Invoices(Document):
 			print(e, "get TaxPayerDetail")
 
 	def updateTaxPayerDetails(self, taxPayerDetails):
-		print(taxPayerDetails)
 		taxPayerDeatilsData = frappe.get_doc('TaxPayerDetail',
 											 taxPayerDetails['gst'])
 		# print(taxPayerDeatils.name)
@@ -515,7 +515,6 @@ class Invoices(Document):
 
 def cancel_irn(irn_number, gsp, reason, company):
 	try:
-		print(gsp['data'])
 
 		headers = {
 			"user_name": gsp['data']['username'],
@@ -553,7 +552,6 @@ def cancel_irn(irn_number, gsp, reason, company):
 
 def attach_qr_code(invoice_number, gsp, code):
 	try:
-		print("attachRqqqqqqqqqqqqqqqq")
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		company = frappe.get_doc('company', invoice.company)
 		folder_path = frappe.utils.get_bench_path()
@@ -586,11 +584,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		# where = fitz.Point(15, 55)
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
 		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + invoice.ack_date
-		# irntext = "IRN: "+ invoice.irn_number
-		# acknotext = "ACK NO: " + invoice.ack_no 
-		# ackdatetext = "ACK DATE: " + invoice.ack_date
-		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
+		
 		page.insertText(
 			where,
 			text,
@@ -762,7 +756,6 @@ def insert_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		# print(insert)
 		company = frappe.get_doc('company',data['company_code'])
 
 		value_before_gst = 0
@@ -791,9 +784,9 @@ def insert_invoice(data):
 		#calculat items
 		for item in data['items_data']:
 			if item['taxable'] == 'No' and item['item_type'] != "Discount":
-				other_charges += item['item_value']
+				other_charges += item['item_value_after_gst']
 			elif item['taxable']=="No" and item['item_type']=="Discount":
-				discountAmount += item['item_value'] 
+				discountAmount += item['item_value_after_gst'] 
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
 					cgst_amount+=item['cgst_amount']
@@ -846,6 +839,7 @@ def insert_invoice(data):
 
 			
 		#check invoice total
+		# print(int(data['total_invoice_amount']), int(pms_invoice_summary+other_charges))
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -1035,7 +1029,6 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
-			print(sac)
 			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
 			doc = frappe.get_doc(sac)
 			doc.insert(ignore_permissions=True, ignore_links=True)
@@ -1088,7 +1081,6 @@ def calulate_items(data):
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
 						filters={'name': ['like', '%' + item['name'] + '%']})
-					
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -1150,20 +1142,20 @@ def calulate_items(data):
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
 							final_item['igst'] = float(sac_code_based_gst_rates.igst)
-						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),2)
-						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),2)
-						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),2)
+						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),3)
+						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),3)
+						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),3)
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
 					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),2)
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
 						final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 						final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
-						final_item['cgst_amount'] = round(gst_value / 2,2)
-						final_item['sgst_amount'] = round(gst_value / 2,2)
+						final_item['cgst_amount'] = round(gst_value / 2,3)
+						final_item['sgst_amount'] = round(gst_value / 2,3)
 						final_item['igst'] = float(sac_code_based_gst_rates.igst)
 						if float(sac_code_based_gst_rates.igst) <= 0:
 							final_item['igst_amount'] = 0
@@ -1277,20 +1269,20 @@ def calulate_items(data):
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
 							final_item['igst'] = float(sac_code_based_gst_rates.igst)
-						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),2)
-						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),2)
-						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),2)
+						final_item['cgst_amount'] = round((item["item_value"]*(final_item['cgst']/100)),3)
+						final_item['sgst_amount'] = round((item["item_value"]*(final_item['sgst']/100)),3)
+						final_item['igst_amount'] = round((item["item_value"]*(final_item['igst']/100)),3)
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
 					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),2)
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
 						final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 						final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
-						final_item['cgst_amount'] = round(gst_value / 2,2)
-						final_item['sgst_amount'] = round(gst_value / 2,2)
+						final_item['cgst_amount'] = round(gst_value / 2,3)
+						final_item['sgst_amount'] = round(gst_value / 2,3)
 						final_item['igst'] = float(sac_code_based_gst_rates.igst)
 						if float(sac_code_based_gst_rates.igst) <= 0:
 							final_item['igst_amount'] = 0
@@ -1566,8 +1558,9 @@ def insert_tax_summaries2(items,invoice_number):
 						})
 					doc.insert(ignore_permissions=True)	
 			else:
-				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
-				tax_summary_cess_update.tax_percentage = each['state_cess_amount']+tax_summary_cess_update.tax_percentage			
+				tax_summary_state = [element for tupl in tax_summary_cess for element in tupl]
+				tax_summary_cess_update = frappe.get_doc('Tax Summaries',tax_summary_state[0])
+				tax_summary_cess_update.tax_percentage = each['state_cess_amount']+float(tax_summary_cess_update.tax_percentage)		
 				tax_summary_cess_update.save()
 		if each['vat']>0:
 			# tax_summary_cess = frappe.db.get_list('Tax Summaries', filters={'parent': ['==', '']})
@@ -1598,7 +1591,6 @@ def insert_tax_summaries(items, invoice_number):
 		
 		tax_summaries = []
 		for item in items:
-			print(item)
 			if len(tax_summaries) > 0:
 				found = False
 				for tax in tax_summaries:
@@ -1832,7 +1824,7 @@ def login_gsp(code,mode):
 	try:
 		# code = "MHKCP-01"
 		# mode = "Testing"
-		print("********** scheduler")
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -2093,7 +2085,6 @@ def request_get(api, headers, invoice, code):
 			"Authorization": "Bearer " + headers['token']
 		}
 		company = frappe.get_doc('company', code)
-		print(company, "request getttttttt")
 		if company.proxy == 0:
 			raw_response = requests.get(api, headers=headers)
 		else:
@@ -2297,8 +2288,11 @@ def attach_b2c_qrcode(data):
 						  string.digits) for _ in range(50))
 		ack_no = str(randint(100000000000, 9999999999999))
 		ack_date = str(datetime.datetime.now())
-		text = "IRN: " + irn_number + "\n" + "ACK NO: " + ack_no + "\n" + "ACK DATE: " + ack_date
-		page = doc[0]
+		if company.irn_details_page == "First":
+			page = doc[0]
+		else:
+			page = doc[-1]
+		text = "IRN: " + irn_number + "          " + "ACK NO: " + ack_no + "        " + "ACK DATE: " + ack_date
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
 		page.insertText(
 			where,
