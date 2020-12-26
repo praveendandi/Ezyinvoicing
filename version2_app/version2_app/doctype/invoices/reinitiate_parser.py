@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("Pullman-01")
+	companyCheckResponse = check_company_exist("HICC-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -64,11 +64,11 @@ def reinitiateInvoice(data):
 		if "Departure :" in i:
 			depatureDateIndex = i.index('Departure')
 			date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-		if "Room No." in i or "Room No" in i:
+		if "Room No." in i:
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST ID" in i and "Confirmation No." in i:
+		if "GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
@@ -95,8 +95,8 @@ def reinitiateInvoice(data):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			p = i.split(":")
-			print_by = p[1].replace(" ","")
+			print_by = i.split(":")
+			print_by = print_by[1].replace(" ","")
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -125,7 +125,7 @@ def reinitiateInvoice(data):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i and "Vat" not in i and "VAT" not in i:
+		if len(check_date) > 0:
 			item = dict()
 			item_value = ""
 			dt = i.strip()
@@ -155,6 +155,11 @@ def reinitiateInvoice(data):
 			itemsort+=1
 			items.append(item)
 
+	total_items = []
+	for each in items:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+			total_items.append(each)
+
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
@@ -169,11 +174,11 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = items
+	guest['items'] = total_items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "Pullman-01"
+	guest['company_code'] = "HICC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -188,7 +193,7 @@ def reinitiateInvoice(data):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"Pullman-01"}
+	company_code = {"code":"HICC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
