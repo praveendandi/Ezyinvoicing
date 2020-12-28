@@ -98,6 +98,14 @@ app_license = "MIT"
 # 		"on_trash": "method"
 #	}
 # }
+doc_events = {
+	"Invoices": {
+        "after_insert":"version2_app.events.invoiceCreated",
+		# "on_update": "version2_app.events.invoiceUpdate",
+		# "on_cancel": "method",
+		# "on_trash": "method"
+	}
+}
 
 # Scheduled Tasks
 # ---------------

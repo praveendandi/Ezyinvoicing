@@ -11,13 +11,16 @@
   "sgst",
   "cgst",
   "igst",
+  "net",
   "column_break_5",
   "code",
   "type",
   "status",
   "company",
-  "is_service",
-  "transactioncode"
+  "transactioncode",
+  "state_cess_rate",
+  "central_cess_rate",
+  "vat_rate"
  ],
  "fields": [
   {
@@ -89,21 +92,37 @@
    "reqd": 1
   },
   {
-   "default": "Yes",
-   "fieldname": "is_service",
+   "fieldname": "transactioncode",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "TransactionCode"
+  },
+  {
+   "default": "No",
+   "fieldname": "net",
    "fieldtype": "Select",
-   "label": "Is Service",
+   "label": "Net",
    "options": "Yes\nNo"
   },
   {
-   "fieldname": "transactioncode",
-   "fieldtype": "Data",
-   "label": "TransactionCode"
+   "fieldname": "state_cess_rate",
+   "fieldtype": "Float",
+   "label": "State Cess Rate"
+  },
+  {
+   "fieldname": "central_cess_rate",
+   "fieldtype": "Float",
+   "label": "Central Cess Rate"
+  },
+  {
+   "fieldname": "vat_rate",
+   "fieldtype": "Int",
+   "label": "Vat Rate"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-16 18:01:40.583367",
+ "modified": "2020-12-23 19:44:20.049342",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

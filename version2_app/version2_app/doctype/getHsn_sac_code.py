@@ -8,7 +8,7 @@ def getTotalamount():
         dateformat = '%Y-%m-%d'
         startdate = getdate(data["start_date"])
         enddate = getdate(data["end_date"])
-        sql_filter=frappe.db.get_all('SAC HSN Tax Summaries',filters={'creation': ['between', (startdate,enddate)]},fields=['sac_hsn_code','sum(igst) as igst','sum(cgst) as cgst','sum(sgst) as sgst','sum(total_amount) as total_amount','creation'],group_by='sac_hsn_code')
+        sql_filter=frappe.db.get_all('SAC HSN Tax Summaries',filters={'creation': ['between', (startdate,enddate)]},fields=['sac_hsn_code','sum(igst) as igst','sum(cgst) as cgst','sum(sgst) as sgst','sum(sgst+igst+cgst) as total_amount','creation'],group_by='sac_hsn_code')
         if sql_filter != []:
             return {"success":True,"data":sql_filter}
         else:
