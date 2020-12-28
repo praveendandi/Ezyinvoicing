@@ -197,6 +197,8 @@ class Invoices(Document):
 			print(gst_data["ItemList"])
 			discount_before_value = abs(discount_before_value)	
 			discount_after_value = abs(discount_after_value)
+			TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+			TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2), 
 				"CgstVal": round(total_cgst_value, 2),
@@ -207,8 +209,8 @@ class Invoices(Document):
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
-				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_after_value,2),
-				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+				"TotInvVal": round(TotInnVal,2),
+				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			# return{"success":True}
 			if ass_value > 0:
@@ -1119,7 +1121,7 @@ def calulate_items(data):
 						service_dict['item_value_after_gst'] = scharge_value + gst_value
 						service_dict['item_taxable_value'] = scharge_value 
 						service_dict['item_value'] = scharge_value
-						service_dict['taxable'] = 'Yes'#sac_code_based_gst_rates.taxble
+						service_dict['taxable'] = sac_code_based_gst_rates.taxble
 						service_dict['cess'] = 0
 						service_dict['cess_amount'] = 0
 						service_dict['state_cess'] = 0
