@@ -53,7 +53,6 @@ def reinitiateInvoice(data):
 	conf_number = ''
 	membership = ''
 	print_by = ''
-	roomNumber = ""
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -71,6 +70,7 @@ def reinitiateInvoice(data):
 		if "Cust. GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			print(gstNumber)
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
@@ -95,14 +95,16 @@ def reinitiateInvoice(data):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			print_by = i.split(":")
-			print_by = print_by[1].replace(" ","")
+			p = i.split(":")
+			print_by = p[1].replace(" ","")		
 
 	
 	paymentTypes = GetPaymentTypes()
 	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
 	original_data = []
 	for index, i in enumerate(data):
+	
+		
 		if 'XX/XX' in i:
 			i = " "
 		if i !=" ":
@@ -135,41 +137,123 @@ def reinitiateInvoice(data):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0:
+		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i:
 			item = dict()
-			item_value = ""
-			dt = i.strip()
 			for index, j in enumerate(i.split(' ')):
+				# print(index,j)
 				if index == 0:
 					item['date'] = j
-				val = dt.split(" ")
-				if val != "":
-					item_value = val[-1]
-					item['item_value'] = float(item_value.replace(',', ''))
-				else:
-					item_value = val[-2]
-					item['item_value'] = float(item_value.replace(',', ''))
 				if index == 1:
-					starting_index = i.index(j)
-					if "~" in i:
-						ending_index = i.find("~")
-						item["name"] = (i[starting_index:ending_index]).strip()
+					item['name'] = j
+				if index == 2:
+					if len(i.split(" "))>3:
+						item['name'] = item['name'] + ' ' + j
+				if index == 3:
+					if "#" not in j and '[' not in j and ']' not in j and '.' not in j and ',' not in j and 'Pkg.' not in j:
+						item["name"] = item["name"] + ' ' + j
+				if index == 4:
+					if ".00" in j:
+						pass
+						# item['item_value'] = float(j.replace(',', ''))
 					else:
-						ending_index = i.find(item_value)
-						item["name"] = (i[starting_index:ending_index]).strip()
+						if re.fullmatch(
+						  '[A-Za-z]+', j
+						) and '#' not in j and '[' not in j and "Room" not in j and ']' not in j and 'Pkg.' not in j and 'Split' not in j:
+							item["name"] = item["name"] + ' ' + j
+				if '%' in j:
+					if "(" not in j and "." not in j:
+						item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
+						item["name"] = item["name"] + ' ' + j
+				if index>4 and index<5:
+					if ".00" in j:
+						pass
+						# print(j,"0000000000000000000000")
+						# item['item_value'] = float(j.replace(',', ''))
+
+					else:
+						if "#" not in j and '[' not in j and "Room" not in j and "615" not in j and ":" not in j and not j.isdigit() and ']' not in j and 'Pkg.' not in j and '(' not in j and 'into' not in j and '.' not in j and 'Split' not in j:
+							item["name"] = item["name"] + ' ' + j
+				if index == 5:
+					if "CompBreakfast" in j or "Beverage" in j:
+						item["name"] = item["name"] + ' ' + j
+				if "Dry" in j:
+					print(j,"*******************888")
+				if "SGST" in j:
+					item['name'] = item['name'] + ' SGST'
+				if "CGST" in j:
+					item['name'] = item['name'] + ' CGST'
+				if "IGST" in j:
+					item['name'] = item['name'] + ' IGST'
+
 				if 'SAC' in j:
 					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
 				else:
-					item['sac_code'] = "No Sac"
+					item["sac_code"] = "No Sac"
+				if index == len(i.split(' ')) - 1:
+					if index != 0:
+						item['item_value'] = float(j.replace(',', ''))
 				item['sort_order'] =  itemsort+1
 			itemsort+=1
 			items.append(item)
 
-	total_items = []
-	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
-			total_items.append(each)
 
+
+	# finalData = []
+	# for item in items:
+
+	# 	if len(item) > 1:
+
+	# 		if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"]:
+
+	# 			if 'sac_code' in item:
+	# 				item['sac_code'] = item['sac_code']
+	# 			else:
+	# 				item['sac_code'] = 'No Sac'
+	# 			finalData.append(item)
+	# 		else:
+	# 			itemToUpdate = finalData[len(finalData) - 1]
+	# 			# itemToUpdate[item['name']] = item['TotAmt']
+	# 			if 'SGST' in item['name']:
+	# 				itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['sgstAmount'] = item['item_value']
+	# 			elif 'CGST' in item['name']:
+	# 				itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['cgstAmount'] = item['item_value']
+	# 			elif 'IGST' in item['name']:
+	# 				itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['igstAmount'] = item['item_value']
+	# 			elif 'CESS' in item['name']:
+	# 				itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
+	# 				itemToUpdate['cessAmount'] = item['item_value']
+	# 			elif 'Allow ' in item["name"]:
+	# 				if "sgst" in itemToUpdate:
+	# 					itemToUpdate['cgst'] = 9
+	# 					itemToUpdate['cgstAmount'] = item['item_value']
+	# 				else:
+	# 					itemToUpdate['sgst'] = 9
+	# 					itemToUpdate['sgstAmount'] = item['item_value']
+
+
+	# invoiceItems = []
+	# for index, i in enumerate(finalData):
+	# 	# i['SlNo'] = index+1
+	# 	# i['name']=i['name']+"99999"
+	# 	if 'cgstAmount' not in i:
+	# 		i['cgst'] = 0
+	# 		i['cgstAmount'] = float(0)
+	# 	if 'sgstAmount' not in i:
+	# 		i['sgst'] = 0
+	# 		i['sgstAmount'] = float(0)
+	# 	if 'igstAmount' not in i:
+	# 		i['igst'] = 0
+	# 		i['igstAmount'] = float(0)
+	# 	if 'cessAmount' not in i:
+	# 		i['cess'] = 0
+	# 		i['cessAmount'] = float(0)    
+	# 	# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
+	# 	invoiceItems.append(i)
+
+		# print(i)
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
@@ -184,7 +268,7 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = total_items
+	guest['items'] = items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
@@ -192,16 +276,6 @@ def reinitiateInvoice(data):
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
-
-	check_invoice = check_invoice_exists(guest['invoice_number'])
-	if check_invoice['success']==True:
-		inv_data = check_invoice['data']
-		if inv_data.docstatus==2:
-			amened='Yes'
-		else:
-			invoiceNumber = inv_data.name
-			guest['invoice_number'] = inv_data.name
-			amened='No'
 	
 	company_code = {"code":"IBISCCC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
@@ -217,7 +291,6 @@ def reinitiateInvoice(data):
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
-		error_data['amened'] = amened
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
 		return {"success":False,"message":"The given gst number is not a vaild one"}
@@ -241,27 +314,24 @@ def reinitiateInvoice(data):
 						else:
 							
 							error_data['error_message'] = insertInvoiceApiResponse['message']
-							error_data['amened'] = amened
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
 						
 						error_data['error_message'] = calulateItemsApiResponse['message']
-						error_data['amened'] = amened
 						errorInvoice = Error_Insert_invoice(error_data)
 						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'],"***********")
 						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
 					# itsindex = getTaxPayerDetailsResponse['message']['message'].index("'")
+					print(error_data)
 					error_data['error_message'] = getTaxPayerDetailsResponse['message']
-					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
 			else:
 				# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
 				error_data['error_message'] = checkTokenIsValidResponse['message']
-				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
@@ -279,20 +349,17 @@ def reinitiateInvoice(data):
 				else:
 					
 					error_data['error_message'] = insertInvoiceApiResponse['message']
-					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 					return {"success":False,"message":insertInvoiceApiResponse['message']}
 			else:
 						
 				error_data['error_message'] = calulateItemsApiResponse['message']
-				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 				return {"success":False,"message":calulateItemsApiResponse['message']}	
 	else:
 		error_data['error_message'] = gspApiDataResponse['message']
-		error_data['amened'] = amened
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}

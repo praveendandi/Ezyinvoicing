@@ -37,7 +37,8 @@ def attach_qr_code(invoice_number, gsp,code):
 		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1, company.qr_rect_y0, company.qr_rect_y1)
 		document = fitz.open(src_pdf_filename)
 		page = document[0]
-		page.insertImage(img_rect, filename=img_filename)
+		im = open(img_filename,"rb").read()
+		page.insertImage(img_rect, stream=im)
 		document.save(dst_pdf_filename)
 		document.close()
 		# attacing irn an ack
@@ -104,7 +105,9 @@ def create_qr_image(invoice_number, gsp):
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.credit_irn_number
+			"Irn": invoice.credit_irn_number,
+			"height":"25",
+			"width":"25"
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -542,7 +545,7 @@ def CreditgenerateIrn(invoice_number):
 		invoice.credit_irn_generated = 'Failed'
 		invoice.credit_irn_error_message = response['message'][6:]
 		invoice.save(ignore_permissions=True,ignore_version=True)
-
+	insert_hsn_code_based_taxes(credit_items,invoice_number,"Credit")
 	return response
 
 def postIrn(gst_data, gsp,company):
@@ -577,3 +580,54 @@ def postIrn(gst_data, gsp,company):
 	except Exception as e:
 		print(e, "post irn credit")
 		return {"success": False, 'message':str(e)}
+
+def insert_hsn_code_based_taxes(items, invoice_number,sacType):
+	try:
+	
+		sac_codes = []
+		for item in items:
+			if item['item_mode'] == "Credit":
+				if item['sac_code'] not in sac_codes and item['sac_code'].isdigit(
+				):
+					sac_codes.append(item['sac_code'])
+
+		tax_data = []
+		for sac in sac_codes:
+			sac_tax = {
+				'cess':0,
+				'cgst': 0,
+				'sgst': 0,
+				'igst': 0,
+				'amount_before_gst':0,
+				'amount_after_gst':0,
+				'sac_hsn_code': sac,
+				'invoice_number': invoice_number,
+				'doctype': "SAC HSN Tax Summaries",
+				'parent': invoice_number,
+				'parentfield': 'sac_hsn_based_taxes',
+				'parenttype': "invoices",
+				"state_cess":0,
+				"vat":0,
+				"type":sacType
+			}
+			for item in items:
+				# print(item)
+				if item['sac_code'] == sac:
+					sac_tax['cgst'] += item['cgst_amount']
+					sac_tax['sgst'] += item['sgst_amount']
+					sac_tax['igst'] += item['igst_amount']
+					sac_tax['cess'] += item['cess_amount']
+					sac_tax["state_cess"] += item["state_cess_amount"]
+					sac_tax["vat"] += item["vat_amount"]
+					sac_tax['amount_before_gst'] += item['item_taxable_value']
+					sac_tax['amount_after_gst'] += item['item_value_after_gst']
+
+			tax_data.append(sac_tax)
+		for sac in tax_data:
+			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
+			doc = frappe.get_doc(sac)
+			doc.insert(ignore_permissions=True, ignore_links=True)
+		return {"sucess": True, "data": 'doc'}
+	except Exception as e:
+		print(e, "insert hsn")
+		return {"success": False, "message": str(e)}		
