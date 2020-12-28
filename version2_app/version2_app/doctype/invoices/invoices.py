@@ -1184,14 +1184,11 @@ def calulate_items(data):
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
-				if data["state_code"] != "32":
-					final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-					if sac_code_based_gst_rates.state_cess_rate > 0:
-						final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
-					else:
-						final_item["state_cess_amount"] = 0
+				
+				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+				if sac_code_based_gst_rates.state_cess_rate > 0:
+					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
 				else:
-					final_item['state_cess'] = 0
 					final_item["state_cess_amount"] = 0
 				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
 				if sac_code_based_gst_rates.central_cess_rate > 0:
