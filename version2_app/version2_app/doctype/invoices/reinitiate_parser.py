@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("FAIRMONT-01")
+	companyCheckResponse = check_company_exist("IBISKCC-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -68,7 +68,7 @@ def reinitiateInvoice(data):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST ID" in i:
+		if "GST ID" in i and "Confirmation No." not in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
@@ -113,7 +113,15 @@ def reinitiateInvoice(data):
 				if len(j)>1:
 					if "~" not in j[1] and "." not in j[1] and "," not in j[1]:
 						ele = ele+" "+j[1]
-				print(ele)
+						if len(j)>2:
+							if "~" not in j[2] and "." not in j[2] and "," not in j[2]:
+								ele = ele+" "+j[2]
+								if len(j)>3:
+									if "~" not in j[3] and "." not in j[3] and "," not in j[3]:
+										ele = ele+" "+j[3]
+										if len(j)>4:
+											if "~" not in j[4] and "." not in j[4] and "," not in j[4]:
+												ele = ele+" "+j[4]
 				if ele not in paymentTypes:
 					original_data.append(i)
 			elif len(j) == 1:
@@ -180,7 +188,7 @@ def reinitiateInvoice(data):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "FAIRMONT-01"
+	guest['company_code'] = "IBISKCC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -195,7 +203,7 @@ def reinitiateInvoice(data):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"FAIRMONT-01"}
+	company_code = {"code":"IBISKCC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
@@ -223,7 +231,8 @@ def reinitiateInvoice(data):
 			if checkTokenIsValidResponse['success'] == True:
 				getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":guest['gstNumber'],"code":company_code['code'],"invoice":guest['invoice_number'],"apidata":gspApiDataResponse['data']})
 				if getTaxPayerDetailsResponse['success'] == True:
-					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+					gst_data = frappe.get_doc('TaxPayerDetail', guest['gstNumber'])
+					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format,"state_code":gst_data.state_code})
 					if calulateItemsApiResponse['success'] == True:
 						guest['invoice_file'] = filepath
 						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})

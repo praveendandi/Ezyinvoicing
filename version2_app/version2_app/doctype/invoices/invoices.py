@@ -201,6 +201,7 @@ class Invoices(Document):
 							discount_before_value +=item.item_value	
 							discount_after_value += item.item_value_after_gst
 							credit_note_items.append(item)
+			print(gst_data["ItemList"])
 			discount_before_value = abs(discount_before_value)	
 			discount_after_value = abs(discount_after_value)
 			gst_data["ValDtls"] = {
@@ -1035,7 +1036,6 @@ def insert_items(items, invoice_number):
 				item['is_credit_item'] = "Yes"
 			else:
 				item['is_credit_item'] = "No"
-
 			doc = frappe.get_doc(item)
 			doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess": True, "data": doc}
@@ -1184,12 +1184,15 @@ def calulate_items(data):
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
-				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-				if sac_code_based_gst_rates.state_cess_rate > 0:
-					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+				if data["state_code"] != "32":
+					final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+					if sac_code_based_gst_rates.state_cess_rate > 0:
+						final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+					else:
+						final_item["state_cess_amount"] = 0
 				else:
+					final_item['state_cess'] = 0
 					final_item["state_cess_amount"] = 0
-
 				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
 				if sac_code_based_gst_rates.central_cess_rate > 0:
 					final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
@@ -1449,7 +1452,6 @@ def insert_tax_summariesd(items, invoice_number):
 
 def insert_tax_summaries2(items,invoice_number):
 	df = pd.DataFrame(items)
-
 	df = df.set_index('sgst')
 	df['cess_duplicate'] = df['cess']
 	df['state_cess_duplicate'] = df['state_cess']
