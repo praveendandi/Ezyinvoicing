@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("IBISCCC-01")
+	companyCheckResponse = check_company_exist("NNDA-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -64,16 +64,15 @@ def file_parsing(filepath):
 		if "Departure :" in i:
 			depatureDateIndex = i.index('Departure')
 			date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-		if "Room No." in i:
+		if "Room No." in i or "Room No" in i:
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "Cust. GST ID" in i:
+		if "GST ID" in i and "Confirmation No." in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
-			invoice_Number = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-			invoiceNumber = invoice_Number.replace("/","-")
+			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:
@@ -96,8 +95,8 @@ def file_parsing(filepath):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			print_by = i.split(":")
-			print_by = print_by[1].replace(" ","")
+			p = i.split(":")
+			print_by = p[1].replace(" ","")
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -169,7 +168,7 @@ def file_parsing(filepath):
 
 	total_items = []
 	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
 			total_items.append(each)
 
 	guest = dict()
@@ -190,7 +189,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "IBISCCC-01"
+	guest['company_code'] = "NNDA-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -206,7 +205,7 @@ def file_parsing(filepath):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 
-	company_code = {"code":"IBISCCC-01"}
+	company_code = {"code":"NNDA-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
