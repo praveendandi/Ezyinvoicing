@@ -19,7 +19,7 @@ import frappe
 import os
 
 class company(Document):
-	# pass
+        #  pass
 	def on_update(self):
 		if self.name:
 			folder_path = frappe.utils.get_bench_path()
