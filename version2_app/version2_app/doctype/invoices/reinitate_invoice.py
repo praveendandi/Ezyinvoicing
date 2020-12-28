@@ -98,31 +98,17 @@ def Reinitiate_invoice(data):
 			else:
 				has_credit_items = "No"			
 
-		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
-			ready_to_generate_irn = "Yes"
-		else:
-			ready_to_generate_irn = "No"
+		# if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
+		# 	ready_to_generate_irn = "Yes"
+		# else:
+		# 	ready_to_generate_irn = "No"
 
 			
-		#check invoice total
-		# if int(data['total_invoice_amount']) != int(pms_invoice_summary):
-		# 	calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
-		# 	TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
-		# 	if TotalMismatchErrorAPI['success']==True:
-		# 		items = data['items_data']
-				
-		# 		itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-				
-		# 		insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
-		# 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-		# 			items, TotalMismatchErrorAPI['invoice_number'])
-		# 		return {"success": True}
-
-		# 	return{"success":False,"message":TotalMismatchErrorAPI['message']}
+		
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
-			
+		doc.total_inovice_amount = data['total_invoice_amount']	
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
@@ -164,10 +150,13 @@ def Reinitiate_invoice(data):
 		doc.credit_igst_amount = round(credit_igst_amount,2)
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
-		if int(data['total_invoice_amount']) != int(pms_invoice_summary) + int(other_charges):
-			doc.error_message = " Invoice Total Mismatch"
-			doc.irn_generated = "Error"
-			doc.ready_to_generate_irn = "No"
+		if data['total_invoice_amount'] == 0:
+			ready_to_generate_irn = "No"
+		else:
+			if int(data['total_invoice_amount']) != int(pms_invoice_summary) + int(other_charges):
+				doc.error_message = " Invoice Total Mismatch"
+				doc.irn_generated = "Error"
+				doc.ready_to_generate_irn = "No"
 		doc.save()
 
 
