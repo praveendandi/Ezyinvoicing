@@ -64,7 +64,7 @@ def reinitiateInvoice(data):
 		if "Departure :" in i:
 			depatureDateIndex = i.index('Departure')
 			date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-		if "Room No." in i:
+		if "Room No." in i or "Room No" in i:
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
@@ -95,8 +95,8 @@ def reinitiateInvoice(data):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			print_by = i.split(":")
-			print_by = print_by[1].replace(" ","")
+			p = i.split(":")
+			print_by = p[1].replace(" ","")
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -125,7 +125,7 @@ def reinitiateInvoice(data):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0:
+		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i and "Vat" not in i and "VAT" not in i:
 			item = dict()
 			item_value = ""
 			dt = i.strip()
@@ -155,11 +155,6 @@ def reinitiateInvoice(data):
 			itemsort+=1
 			items.append(item)
 
-	total_items = []
-	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
-			total_items.append(each)
-
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
@@ -174,7 +169,7 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = total_items
+	guest['items'] = items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
