@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HICC-01")
+	companyCheckResponse = check_company_exist("FAIRMONT-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -108,10 +108,12 @@ def reinitiateInvoice(data):
 		if i !=" ":
 			j = i.split(' ')
 			j = j[1:-1]
-			if len(j)>1:
+			if len(j)>0:
 				ele = j[0]
-				if "~" not in j[1]:
-					ele = ele+" "+j[1]
+				if len(j)>1:
+					if "~" not in j[1] and "." not in j[1] and "," not in j[1]:
+						ele = ele+" "+j[1]
+				print(ele)
 				if ele not in paymentTypes:
 					original_data.append(i)
 			elif len(j) == 1:
@@ -178,7 +180,7 @@ def reinitiateInvoice(data):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HICC-01"
+	guest['company_code'] = "FAIRMONT-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -193,7 +195,7 @@ def reinitiateInvoice(data):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"HICC-01"}
+	company_code = {"code":"FAIRMONT-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
@@ -213,7 +215,7 @@ def reinitiateInvoice(data):
 		return {"success":False,"message":"The given gst number is not a vaild one"}
 
 
-	# print(json.dumps(guest, indent = 1))
+	print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':
