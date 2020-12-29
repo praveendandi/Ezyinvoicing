@@ -1089,7 +1089,6 @@ def calulate_items(data):
 				else:
 					
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
-				print(item)	
 				if sac_code_based_gst_rates.service_charge == "Yes":
 					service_dict = {}
 
