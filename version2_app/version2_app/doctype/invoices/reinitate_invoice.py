@@ -12,7 +12,7 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
-
+import math
 
 
 @frappe.whitelist(allow_guest=True)
@@ -98,10 +98,10 @@ def Reinitiate_invoice(data):
 			else:
 				has_credit_items = "No"			
 
-		# if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
-		# 	ready_to_generate_irn = "Yes"
-		# else:
-		# 	ready_to_generate_irn = "No"
+		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
+			ready_to_generate_irn = "Yes"
+		else:
+			ready_to_generate_irn = "No"
 
 			
 		
@@ -153,7 +153,8 @@ def Reinitiate_invoice(data):
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
 		else:
-			if int(data['total_invoice_amount']) != int(pms_invoice_summary) + int(other_charges):
+			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+			# if int(data['total_invoice_amount']) != int(pms_invoice_summary) + int(other_charges):
 				doc.error_message = " Invoice Total Mismatch"
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
@@ -168,11 +169,11 @@ def Reinitiate_invoice(data):
 		# insert_tax_summaries(items_data, data['invoice_number'])
 		taxSummariesInsert = insert_tax_summaries2(items, data['guest_data']['invoice_number'])
 		# insert sac code based taxes
-		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'])
+		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 

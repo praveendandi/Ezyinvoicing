@@ -971,60 +971,67 @@ def insert_invoice(data):
 
 
 def insert_hsn_code_based_taxes(items, invoice_number,sacType):
-	# try:
-	
-	sac_codes = []
-	for item in items:
-		# if sacType == "Credit":
-		# 	item = item.__dict__
-		if item['sac_code'] not in sac_codes and item['sac_code'].isdigit(
-		):
-			sac_codes.append(item['sac_code'])
+	try:
+		frappe.db.delete('SAC HSN Tax Summaries', {
+				'parent': invoice_number})
+		frappe.db.commit()
 
-	tax_data = []
-	for sac in sac_codes:
-		sac_tax = {
-			'cess':0,
-			'cgst': 0,
-			'sgst': 0,
-			'igst': 0,
-			'amount_before_gst':0,
-			'amount_after_gst':0,
-			'sac_hsn_code': sac,
-			'invoice_number': invoice_number,
-			'doctype': "SAC HSN Tax Summaries",
-			'parent': invoice_number,
-			'parentfield': 'sac_hsn_based_taxes',
-			'parenttype': "invoices",
-			"state_cess":0,
-			"vat":0,
-			"type":sacType
-		}
+		sac_codes = []
 		for item in items:
-			# print(item)
-			if item['sac_code'] == sac:
-				sac_tax['cgst'] += item['cgst_amount']
-				sac_tax['sgst'] += item['sgst_amount']
-				sac_tax['igst'] += item['igst_amount']
-				sac_tax['cess'] += item['cess_amount']
-				sac_tax["state_cess"] += item["state_cess_amount"]
-				sac_tax["vat"] += item["vat_amount"]
-				sac_tax['amount_before_gst'] += item['item_taxable_value']
-				sac_tax['amount_after_gst'] += item['item_value_after_gst']
+			# if sacType == "Credit":
+			# 	item = item.__dict__
+			if item['sac_code'] not in sac_codes and item['sac_code'].isdigit(
+			):
+				sac_codes.append(item['sac_code'])
 
-		tax_data.append(sac_tax)
-	for sac in tax_data:
-		# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
-		doc = frappe.get_doc(sac)
-		doc.insert(ignore_permissions=True, ignore_links=True)
-	return {"sucess": True, "data": 'doc'}
-	# except Exception as e:
-	# 	print(e, "insert hsn")
-	# 	return {"success": False, "message": str(e)}
+		tax_data = []
+		for sac in sac_codes:
+			sac_tax = {
+				'cess':0,
+				'cgst': 0,
+				'sgst': 0,
+				'igst': 0,
+				'amount_before_gst':0,
+				'amount_after_gst':0,
+				'sac_hsn_code': sac,
+				'invoice_number': invoice_number,
+				'doctype': "SAC HSN Tax Summaries",
+				'parent': invoice_number,
+				'parentfield': 'sac_hsn_based_taxes',
+				'parenttype': "invoices",
+				"state_cess":0,
+				"vat":0,
+				"type":sacType
+			}
+			for item in items:
+				# print(item)
+				if item['sac_code'] == sac:
+					sac_tax['cgst'] += item['cgst_amount']
+					sac_tax['sgst'] += item['sgst_amount']
+					sac_tax['igst'] += item['igst_amount']
+					sac_tax['cess'] += item['cess_amount']
+					sac_tax["state_cess"] += item["state_cess_amount"]
+					sac_tax["vat"] += item["vat_amount"]
+					sac_tax['amount_before_gst'] += item['item_taxable_value']
+					sac_tax['amount_after_gst'] += item['item_value_after_gst']
+
+			tax_data.append(sac_tax)
+		for sac in tax_data:
+			# sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
+			doc = frappe.get_doc(sac)
+			doc.insert(ignore_permissions=True, ignore_links=True)
+		return {"sucess": True, "data": 'doc'}
+	except Exception as e:
+		print(e, "insert hsn")
+		return {"success": False, "message": str(e)}
 
 
 def insert_items(items, invoice_number):
 	try:
+		frappe.db.delete('Items', {
+    		'parent': invoice_number})
+		frappe.db.commit()
+		# print("//////////",len(items))
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
@@ -1533,6 +1540,10 @@ def insert_tax_summariesd(items, invoice_number):
 
 
 def insert_tax_summaries2(items,invoice_number):
+	frappe.db.delete('Tax Summaries', {
+    		'parent': invoice_number})
+	frappe.db.commit()	
+
 	df = pd.DataFrame(items)
 	df = df.set_index('sgst')
 	df['cess_duplicate'] = df['cess']
