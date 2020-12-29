@@ -44,7 +44,10 @@ def attach_qr_code(invoice_number, gsp,code):
 		# attacing irn an ack
 		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withCreditQrIrn.pdf'
 		doc = fitz.open(dst_pdf_filename)
-		text = "IRN: " + invoice.credit_irn_number +"          "+ "ACK NO: " + invoice.credit_ack_no + "       " + "ACK DATE: " + invoice.credit_ack_date
+		# text = "IRN: " + invoice.credit_irn_number + "      " + "ACK NO: " + invoice.credit_ack_no + "\n" + "ACK DATE: " + invoice.credit_ack_date
+		ackdate = invoice.credit_ack_date
+		ack_date = ackdate.split(" ")
+		text = "IRN: " + invoice.credit_irn_number +"          "+ "ACK NO: " + invoice.credit_ack_no + "       " + "ACK DATE: " + ack_date[0]
 		if company.irn_details_page == "First":
 			page = doc[0]
 		else:
@@ -102,9 +105,8 @@ def create_qr_image(invoice_number, gsp):
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.credit_irn_number,
-			"height":"25",
-			"width":"25"
+			"Irn": invoice.credit_irn_number
+			
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -113,12 +115,11 @@ def create_qr_image(invoice_number, gsp):
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-						'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-						}
+			proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+			print(proxies, "     proxy console")
 			qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,
-										stream=True,proxies=proxies)
+										stream=True,proxies=proxies,verify=False)
 
 		file_name = invoice_number + "creditqr.png"
 		full_file_path = path + file_name
@@ -163,10 +164,9 @@ def request_get_data(api, headers,invoice,code):
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-						}
-			raw_response = requests.get(api, headers=headers,proxies=proxies)
+			proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+			print(proxies, "     proxy console")
+			raw_response = requests.get(api, headers=headers,proxies=proxies,verify=False)
 	
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
@@ -566,12 +566,11 @@ def postIrn(gst_data, gsp,company):
 			
 			proxyhost = company['data'].proxy_url
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost,
-					   'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost
-						}
+			proxies = {'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost}
+			print(proxies, "     proxy console")
 			irn_response = requests.post(gsp['generate_irn'],
 											headers=headers,
-											json=gst_data,proxies=proxies)									
+											json=gst_data,proxies=proxies,verify=False)									
 		if irn_response.status_code == 200:
 			return irn_response.json()
 		else:

@@ -117,7 +117,7 @@
   },
   {
    "fieldname": "vat_rate",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Vat Rate"
   },
   {
@@ -130,7 +130,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-26 17:59:51.389890",
+ "modified": "2020-12-28 18:40:49.202783",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
