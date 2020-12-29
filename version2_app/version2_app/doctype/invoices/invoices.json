@@ -688,7 +688,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-29 16:08:45.440001",
+ "modified": "2020-12-29 20:41:43.715019",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -707,6 +707,7 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -714,9 +715,11 @@
    "report": 1,
    "role": "ezy-IT",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "cancel": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -724,13 +727,12 @@
    "report": 1,
    "role": "ezy-Finance",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
    "amend": 1,
    "cancel": 1,
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
