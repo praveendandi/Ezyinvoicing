@@ -1109,8 +1109,31 @@ def calulate_items(data):
 					
 						scharge_value = (scharge * item['item_value']) / 100.0
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						if gst_percentage == 0:
-							gst_percentage = 18
+						
+						if sac_code_based_gst_rates.vat_rate>0:
+							vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
+							service_dict['vat_amount'] = vatamount
+							service_dict['vat'] = sac_code_based_gst_rates.vat_rate	
+						else:
+							vatamount = 0
+							service_dict['vat_amount'] = 0
+							service_dict['vat'] = 0	
+						if sac_code_based_gst_rates.central_cess_rate>0:
+							centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
+							service_dict['cess_amount'] = centralcessamount
+							service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
+						else:
+							centralcessamount = 0
+							service_dict['cess_amount'] = 0
+							service_dict['cess'] = 0
+						if sac_code_based_gst_rates.state_cess_rate>0:
+							statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
+							service_dict['state_cess_amount'] = statecessamount
+							service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+						else:
+							statecessamount = 0
+							service_dict['state_cess_amount'] = 0
+							service_dict['state_cess'] = 0	
 						gst_value = (gst_percentage* scharge_value)/100.0
 						service_dict['item_name'] = item['name']+"-SC "
 						service_dict['description'] = item['name']+"-SC "
@@ -1125,7 +1148,7 @@ def calulate_items(data):
 						service_dict['igst'] = 0
 						service_dict['igst_amount'] = 0
 						service_dict['gst_rate'] = gst_percentage
-						service_dict['item_value_after_gst'] = scharge_value + gst_value
+						service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount
 						service_dict['item_taxable_value'] = scharge_value 
 						service_dict['item_value'] = scharge_value
 						service_dict['taxable'] = sac_code_based_gst_rates.taxble
@@ -1136,8 +1159,8 @@ def calulate_items(data):
 						service_dict['type'] = "Included"
 						service_dict['item_mode'] = "Debit"
 						service_dict['item_type'] = sac_code_based_gst_rates.type
-						service_dict['vat_amount'] = 0
-						service_dict['vat'] = 0
+						# service_dict['vat_amount'] = 0
+						# service_dict['vat'] = 0
 						service_dict['sort_order'] = item['sort_order']
 						service_dict['doctype'] = 'Items'
 						service_dict['parentfield'] = 'items'
@@ -1270,9 +1293,9 @@ def calulate_items(data):
 					
 						
 					final_item["vat_amount"] = (item["item_value"]*(sac_code_based_gst_rates.vat_rate/100))
-					if sac_code_based_gst_rates.service_charge == "Yes":
-						vatservicecharge = (scharge * final_item["vat_amount"]) / 100.0	
-						final_item["vat_amount"] = final_item["vat_amount"]+vatservicecharge
+					# if sac_code_based_gst_rates.service_charge == "Yes":
+					# 	vatservicecharge = (scharge * final_item["vat_amount"]) / 100.0	
+					# 	final_item["vat_amount"] = final_item["vat_amount"]+vatservicecharge
 				else:
 					final_item["vat_amount"] = 0
 				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
@@ -1396,9 +1419,9 @@ def calulate_items(data):
 				final_item['vat'] = sac_code_based_gst_rates.vat_rate
 				if sac_code_based_gst_rates.vat_rate > 0:
 					final_item["vat_amount"] = (item["item_value"]*(sac_code_based_gst_rates.vat_rate/100))
-					if sac_code_based_gst_rates.service_charge == "Yes":
-						vatservicecharge = (scharge * final_item["vat_amount"]) / 100.0	
-						final_item["vat_amount"] = final_item["vat_amount"]+vatservicecharge
+					# if sac_code_based_gst_rates.service_charge == "Yes":
+						# vatservicecharge = (scharge * final_item["vat_amount"]) / 100.0	
+						# final_item["vat_amount"] = final_item["vat_amount"]+vatservicecharge
 				else:
 					final_item["vat_amount"] = 0
 				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
