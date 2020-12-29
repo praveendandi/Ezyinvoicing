@@ -17,6 +17,7 @@ def TotalMismatchError(data,calculated_data):
                 data['guest_data']['invoice_number'],
                 'guest_name':
                 data['guest_data']['name'],
+                'invoice_round_off_amount': data['invoice_round_off_amount'],
                 'ready_to_generate_irn':"No",
                 'invoice_from':"Pms",
                 'gst_number':

@@ -84,7 +84,6 @@ def request_get(api, data,company):
 	try:
 		
 	
-		# print(api,data,company,company['proxy'])
 		headerData = {
 			"user_name": data['apidata']["username"],
 			"password": data['apidata']["password"],

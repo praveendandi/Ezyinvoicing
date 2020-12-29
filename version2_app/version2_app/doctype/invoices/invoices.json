@@ -104,7 +104,8 @@
   "total_inovice_amount",
   "converted_from_b2c",
   "converted_from_b2c_by",
-  "converted_from_b2c_time"
+  "converted_from_b2c_time",
+  "invoice_round_off_amount"
  ],
  "fields": [
   {
@@ -677,12 +678,17 @@
    "fieldname": "converted_from_b2c_time",
    "fieldtype": "Datetime",
    "label": "Converted From B2C Time"
+  },
+  {
+   "fieldname": "invoice_round_off_amount",
+   "fieldtype": "Float",
+   "label": "Invoice Round Off Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-29 15:56:21.973664",
+ "modified": "2020-12-29 16:08:45.440001",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

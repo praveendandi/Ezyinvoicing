@@ -103,7 +103,7 @@ def Reinitiate_invoice(data):
 		else:
 			ready_to_generate_irn = "No"
 
-			
+		invoice_round_off_amount = 0	
 		
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
@@ -150,14 +150,16 @@ def Reinitiate_invoice(data):
 		doc.credit_igst_amount = round(credit_igst_amount,2)
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
+		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-			# if int(data['total_invoice_amount']) != int(pms_invoice_summary) + int(other_charges):
+			
 				doc.error_message = " Invoice Total Mismatch"
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
+		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 
 

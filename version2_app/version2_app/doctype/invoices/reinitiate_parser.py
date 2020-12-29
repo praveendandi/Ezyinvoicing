@@ -225,7 +225,7 @@ def reinitiateInvoice(data):
 
 
 	# print(json.dumps(guest, indent = 1))
-	print(guest['items'],len(guest['items']))
+	# print(guest['items'],len(guest['items']))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':

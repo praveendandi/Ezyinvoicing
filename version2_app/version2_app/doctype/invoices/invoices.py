@@ -819,14 +819,16 @@ def insert_invoice(data):
 		ready_to_generate_irn = "Yes"
 	else:
 		ready_to_generate_irn = "No"
-
+	roundoff_amount = 0
 	# print(int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)))	
 	#check invoice total
 	if data['total_invoice_amount'] == 0:
 		ready_to_generate_irn = "No"
+	
 		
 	else:
-		print(int(data['total_invoice_amount']),int(pms_invoice_summary+other_charges))
+		roundoff_amount = data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
+		data['invoice_round_off_amount'] = roundoff_amount
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -852,6 +854,7 @@ def insert_invoice(data):
 		'invoice_from':"Pms",
 		'gst_number':
 		data['guest_data']['gstNumber'],
+		'invoice_round_off_amount': data['invoice_round_off_amount'],
 		'invoice_file':
 		data['guest_data']['invoice_file'],
 		'room_number':
@@ -1031,7 +1034,6 @@ def insert_items(items, invoice_number):
 		frappe.db.delete('Items', {
     		'parent': invoice_number})
 		frappe.db.commit()
-		# print("//////////",len(items))
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
