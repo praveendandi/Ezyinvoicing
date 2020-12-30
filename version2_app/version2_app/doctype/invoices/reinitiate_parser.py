@@ -108,10 +108,20 @@ def reinitiateInvoice(data):
 		if i !=" ":
 			j = i.split(' ')
 			j = j[1:-1]
-			if len(j)>1:
+			if len(j)>0:
 				ele = j[0]
-				if "~" not in j[1]:
-					ele = ele+" "+j[1]
+				if len(j)>1:
+					if "~" not in j[1] and "." not in j[1] and "," not in j[1]:
+						ele = ele+" "+j[1]
+						if len(j)>2:
+							if "~" not in j[2] and "." not in j[2] and "," not in j[2]:
+								ele = ele+" "+j[2]
+								if len(j)>3:
+									if "~" not in j[3] and "." not in j[3] and "," not in j[3]:
+										ele = ele+" "+j[3]
+										if len(j)>4:
+											if "~" not in j[4] and "." not in j[4] and "," not in j[4]:
+												ele = ele+" "+j[4]
 				if ele not in paymentTypes:
 					original_data.append(i)
 			elif len(j) == 1:
@@ -125,7 +135,7 @@ def reinitiateInvoice(data):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i and "Vat" not in i and "VAT" not in i:
+		if len(check_date) > 0:
 			item = dict()
 			item_value = ""
 			dt = i.strip()
@@ -155,6 +165,11 @@ def reinitiateInvoice(data):
 			itemsort+=1
 			items.append(item)
 
+	total_items = []
+	for each in items:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+			total_items.append(each)
+
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
@@ -169,7 +184,7 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = items
+	guest['items'] = total_items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
@@ -208,7 +223,7 @@ def reinitiateInvoice(data):
 		return {"success":False,"message":"The given gst number is not a vaild one"}
 
 
-	# print(json.dumps(guest, indent = 1))
+	print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':
@@ -252,8 +267,6 @@ def reinitiateInvoice(data):
 		else:
 			
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-
-
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath

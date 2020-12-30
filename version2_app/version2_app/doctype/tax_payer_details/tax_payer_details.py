@@ -96,10 +96,10 @@ def request_get(api, data,company):
 		if company['proxy'] == 0:
 			raw_response = requests.get(api, headers=headerData)
 		else:
-			proxyhost = company.proxy_url
+			proxyhost = company['proxy_url']
 			proxyhost = proxyhost.replace("http://","@")
-			proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-					   'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+			proxies = {'http':'http://'+company['proxy_username']+":"+company['proxy_password']+proxyhost,
+					   'https':'https://'+company['proxy_username']+":"+company['proxy_password']+proxyhost
 						}
 			raw_response = requests.get(api, headers=headerData,proxies=proxies)				
 		if raw_response.status_code == 200:

@@ -201,6 +201,7 @@ class Invoices(Document):
 							discount_before_value +=item.item_value	
 							discount_after_value += item.item_value_after_gst
 							credit_note_items.append(item)
+			print(gst_data["ItemList"])
 			discount_before_value = abs(discount_before_value)	
 			discount_after_value = abs(discount_after_value)
 			gst_data["ValDtls"] = {
@@ -576,7 +577,9 @@ def attach_qr_code(invoice_number, gsp, code):
 		# page = doc[0]
 		# where = fitz.Point(15, 55)
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + invoice.ack_date
+		ackdate = invoice.ack_date
+		ack_date = ackdate.split(" ")
+		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
 		# irntext = "IRN: "+ invoice.irn_number
 		# acknotext = "ACK NO: " + invoice.ack_no 
 		# ackdatetext = "ACK DATE: " + invoice.ack_date
@@ -831,6 +834,7 @@ def insert_invoice(data):
 
 			
 		#check invoice total
+		print(int(data['total_invoice_amount']),int(pms_invoice_summary+other_charges))
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -1032,7 +1036,6 @@ def insert_items(items, invoice_number):
 				item['is_credit_item'] = "Yes"
 			else:
 				item['is_credit_item'] = "No"
-
 			doc = frappe.get_doc(item)
 			doc.insert(ignore_permissions=True, ignore_links=True)
 		return {"sucess": True, "data": doc}
@@ -1102,24 +1105,38 @@ def calulate_items(data):
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
 						if item['sac_code'] == '996311':
-							if item['item_value']>1000 and item['item_value']<=7500:
-								gst_percentage = 12
-							elif item['item_value'] > 7500:
-								gst_percentage = 18
-							elif item['item_value'] == 1000:
-								gst_percentage = 0
+							if "Upgrade / Upsell" in item['name'] or "Accommodation manual" in item["name"]:
+								if "%" in item["name"]:
+									itemname = item["name"]
+									percent = int(''.join(filter(lambda i: i.isdigit(), itemname)))
+									final_item['cgst'] = percent/2
+									final_item['sgst'] = percent/2
+									final_item["igst"] = 0
+									final_item['type'] = "Included"
+								else:
+									final_item['cgst'] = 0
+									final_item['sgst'] = 0
+									final_item['igst'] = 0
+									final_item['type'] = "Excempted"
 							else:
-								gst_percentage = 0
-							if gst_percentage == 0:
-								final_item['cgst'] = 0
-								final_item['sgst'] = 0
-								final_item['igst'] = 0
-								final_item['type'] = "Excempted"
-							else:
-								final_item['cgst'] = gst_percentage/2
-								final_item['sgst'] = gst_percentage/2
-								final_item['igst'] = 0
-								final_item['type'] = "Included"
+								if item['item_value']>1000 and item['item_value']<=7500:
+									gst_percentage = 12
+								elif item['item_value'] > 7500:
+									gst_percentage = 18
+								elif item['item_value'] == 1000:
+									gst_percentage = 0
+								else:
+									gst_percentage = 0
+								if gst_percentage == 0:
+									final_item['cgst'] = 0
+									final_item['sgst'] = 0
+									final_item['igst'] = 0
+									final_item['type'] = "Excempted"
+								else:
+									final_item['cgst'] = gst_percentage/2
+									final_item['sgst'] = gst_percentage/2
+									final_item['igst'] = 0
+									final_item['type'] = "Included"
 						else:
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
@@ -1181,12 +1198,12 @@ def calulate_items(data):
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
+				
 				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
 				if sac_code_based_gst_rates.state_cess_rate > 0:
 					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
 				else:
 					final_item["state_cess_amount"] = 0
-
 				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
 				if sac_code_based_gst_rates.central_cess_rate > 0:
 					final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
@@ -1229,24 +1246,38 @@ def calulate_items(data):
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
 						if item['sac_code'] == '996311':
-							if item['item_value']>1000 and item['item_value']<=7500:
-								gst_percentage = 12
-							elif item['item_value'] > 7500:
-								gst_percentage = 18
-							elif item['item_value'] == 1000:
-								gst_percentage = 0
+							if "Upgrade / Upsell" in item['name'] or "Accommodation manual" in item["name"]:
+								if "%" in item["name"]:
+									itemname = item["name"]
+									percent = int(''.join(filter(lambda i: i.isdigit(), itemname)))
+									final_item['cgst'] = percent/2
+									final_item['sgst'] = percent/2
+									final_item["igst"] = 0
+									final_item['type'] = "Included"
+								else:
+									final_item['cgst'] = 0
+									final_item['sgst'] = 0
+									final_item['igst'] = 0
+									final_item['type'] = "Excempted"
 							else:
-								gst_percentage = 0
-							if gst_percentage == 0:
-								final_item['cgst'] = 0
-								final_item['sgst'] = 0
-								final_item['igst'] = 0
-								final_item['type'] = "Excempted"
-							else:
-								final_item['cgst'] = gst_percentage/2
-								final_item['sgst'] = gst_percentage/2
-								final_item['igst'] = 0
-								final_item['type'] = "Included"
+								if item['item_value']>1000 and item['item_value']<=7500:
+									gst_percentage = 12
+								elif item['item_value'] > 7500:
+									gst_percentage = 18
+								elif item['item_value'] == 1000:
+									gst_percentage = 0
+								else:
+									gst_percentage = 0
+								if gst_percentage == 0:
+									final_item['cgst'] = 0
+									final_item['sgst'] = 0
+									final_item['igst'] = 0
+									final_item['type'] = "Excempted"
+								else:
+									final_item['cgst'] = gst_percentage/2
+									final_item['sgst'] = gst_percentage/2
+									final_item['igst'] = 0
+									final_item['type'] = "Included"
 						else:
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
@@ -1446,7 +1477,6 @@ def insert_tax_summariesd(items, invoice_number):
 
 def insert_tax_summaries2(items,invoice_number):
 	df = pd.DataFrame(items)
-
 	df = df.set_index('sgst')
 	df['cess_duplicate'] = df['cess']
 	df['state_cess_duplicate'] = df['state_cess']
@@ -2182,8 +2212,9 @@ def attach_b2c_qrcode(data):
 			random.choice(string.ascii_uppercase + string.ascii_lowercase +
 						  string.digits) for _ in range(50))
 		ack_no = str(randint(100000000000, 9999999999999))
-		ack_date = str(datetime.datetime.now())
-		text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date
+		ackdate = str(datetime.datetime.now())
+		ack_date = ackdate.split(" ")
+		text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date[0]
 		if company.irn_details_page == "First":
 			page = doc[0]
 		else:
