@@ -67,7 +67,7 @@ def getPrinters():
 	printers = []
 	for index,i in enumerate(raw_printers):
 		print(index,i)
-		if 'system default destination' not in i and 'ezy' not in i and 'EZY' not in i:
+		if 'system default destination' not in i and 'ezy' not in i and 'EZY' not in i and "reason unknown" not in i:
 			printers.append(i.split('is')[0].split('printer')[1].strip())
 
 	return {'success':True,"data":printers,"message":"list of avaliable printers"}
