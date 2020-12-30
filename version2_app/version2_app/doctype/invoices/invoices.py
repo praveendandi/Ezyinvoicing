@@ -1031,6 +1031,7 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 
 def insert_items(items, invoice_number):
 	try:
+		print("..............")
 		frappe.db.delete('Items', {
     		'parent': invoice_number})
 		frappe.db.commit()
