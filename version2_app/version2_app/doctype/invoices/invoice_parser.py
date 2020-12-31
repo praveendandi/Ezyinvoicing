@@ -69,6 +69,7 @@ def file_parsing(filepath):
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 		if "Cust GST ID" in i:
+		if "GST ID" in i and "Confirmation No." in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:

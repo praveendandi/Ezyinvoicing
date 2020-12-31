@@ -91,7 +91,9 @@
   "b2c_qrimage",
   "b2c_qrinvoice",
   "qr_generated",
-  "cess_amount",
+  "total_central_cess_amount",
+  "total_state_cess_amount",
+  "total_vat_amount",
   "print_by",
   "discount_items",
   "has_discount_items",
@@ -99,8 +101,18 @@
   "discount_value_after_gst",
   "credit_cgst_amount",
   "credit_sgst_amount",
-  "credit_cess_amount",
-  "credit_gst_amount"
+  "total_credit_central_cess_amount",
+  "total_credit_state_cess_amount",
+  "total_credit_vat_amount",
+  "credit_gst_amount",
+  "total_inovice_amount",
+  "converted_from_b2c",
+  "converted_from_b2c_by",
+  "converted_from_b2c_time",
+  "invoice_round_off_amount",
+  "other_charges_before_tax",
+  "sales_amount_before_tax",
+  "sales_amount_after_tax"
  ],
  "fields": [
   {
@@ -601,11 +613,6 @@
    "label": "QR Generated"
   },
   {
-   "fieldname": "cess_amount",
-   "fieldtype": "Float",
-   "label": "CESS Amount"
-  },
-  {
    "fieldname": "print_by",
    "fieldtype": "Data",
    "label": "Print By"
@@ -643,20 +650,87 @@
    "label": "Credit Sgst Amount"
   },
   {
-   "fieldname": "credit_cess_amount",
-   "fieldtype": "Float",
-   "label": "Credit Cess Amount"
-  },
-  {
    "fieldname": "credit_gst_amount",
    "fieldtype": "Float",
    "label": "Credit Gst Amount"
+  },
+  {
+   "fieldname": "total_inovice_amount",
+   "fieldtype": "Float",
+   "label": "Total Inovice Amount"
+  },
+  {
+   "default": "No",
+   "fieldname": "converted_from_b2c",
+   "fieldtype": "Select",
+   "label": "Converted From B2C",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "converted_from_b2c_by",
+   "fieldtype": "Data",
+   "label": "Converted From B2C By"
+  },
+  {
+   "fieldname": "converted_from_b2c_time",
+   "fieldtype": "Datetime",
+   "label": "Converted From B2C Time"
+  },
+  {
+   "fieldname": "invoice_round_off_amount",
+   "fieldtype": "Float",
+   "label": "Invoice Round Off Amount"
+  },
+  {
+   "fieldname": "total_central_cess_amount",
+   "fieldtype": "Float",
+   "label": "Total Central CESS Amount"
+  },
+  {
+   "fieldname": "total_state_cess_amount",
+   "fieldtype": "Float",
+   "label": "Total State Cess Amount"
+  },
+  {
+   "fieldname": "total_vat_amount",
+   "fieldtype": "Float",
+   "label": "Total Vat Amount"
+  },
+  {
+   "fieldname": "total_credit_central_cess_amount",
+   "fieldtype": "Float",
+   "label": "Total Credit Central Cess Amount"
+  },
+  {
+   "fieldname": "total_credit_state_cess_amount",
+   "fieldtype": "Float",
+   "label": "Total Credit State Cess Amount"
+  },
+  {
+   "fieldname": "total_credit_vat_amount",
+   "fieldtype": "Float",
+   "label": "Total Credit Vat Amount"
+  },
+  {
+   "fieldname": "other_charges_before_tax",
+   "fieldtype": "Float",
+   "label": "Other charges Before tax"
+  },
+  {
+   "fieldname": "sales_amount_before_tax",
+   "fieldtype": "Float",
+   "label": "Sales Amount Before tax"
+  },
+  {
+   "fieldname": "sales_amount_after_tax",
+   "fieldtype": "Float",
+   "label": "Sales Amount After tax"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-27 16:05:59.948589",
+ "modified": "2020-12-31 11:06:09.728404",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -675,6 +749,7 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -682,9 +757,11 @@
    "report": 1,
    "role": "ezy-IT",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "cancel": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -692,13 +769,12 @@
    "report": 1,
    "role": "ezy-Finance",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
    "amend": 1,
    "cancel": 1,
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -747,6 +823,18 @@
    "read": 1,
    "report": 1,
    "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
    "share": 1,
    "write": 1
   }
