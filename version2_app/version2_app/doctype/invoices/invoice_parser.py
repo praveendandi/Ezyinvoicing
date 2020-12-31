@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("IBISChennaiCC-01")
+	companyCheckResponse = check_company_exist("IBISGGCR-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -68,7 +68,7 @@ def file_parsing(filepath):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST ID" in i:
+		if "C GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
@@ -162,7 +162,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "IBISChennaiCC-01"
+	guest['company_code'] = "IBISGGCR-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -178,16 +178,16 @@ def file_parsing(filepath):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 
-	company_code = {"code":"IBISChennaiCC-01"}
+	company_code = {"code":"IBISGGCR-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "33"
+	error_data['state_code'] = "6"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "603103"
+	error_data['pincode'] = "122002"
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
 
