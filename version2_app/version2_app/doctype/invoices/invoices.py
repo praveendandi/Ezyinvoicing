@@ -1190,7 +1190,7 @@ def calulate_items(data):
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
-						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 0:
+						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
 							if item['item_value']>1000 and item['item_value']<=7500:
 								gst_percentage = 12
 							elif item['item_value'] > 7500:
@@ -1323,7 +1323,7 @@ def calulate_items(data):
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
-						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 0:
+						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
 							if item['item_value']>1000 and item['item_value']<=7500:
 								gst_percentage = 12
 							elif item['item_value'] > 7500:
