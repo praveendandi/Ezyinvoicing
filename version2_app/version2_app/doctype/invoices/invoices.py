@@ -1324,44 +1324,24 @@ def calulate_items(data):
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
 						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 0:
-							if "Room Charge-Early" in item['name']:
-								if "%" in item["name"]:
-									itemname = item["name"]
-									percent = int(''.join(filter(lambda i: i.isdigit(), itemname)))
-									if percent != 0:
-										final_item['cgst'] = percent/2
-										final_item['sgst'] = percent/2
-										final_item["igst"] = 0
-										final_item['type'] = "Included"
-									else:
-										final_item['cgst'] = 0
-										final_item['sgst'] = 0
-										final_item['igst'] = 0
-										final_item['type'] = "Excempted"
-								else:
-									final_item['cgst'] = 0
-									final_item['sgst'] = 0
-									final_item['igst'] = 0
-									final_item['type'] = "Excempted"
+							if item['item_value']>1000 and item['item_value']<=7500:
+								gst_percentage = 12
+							elif item['item_value'] > 7500:
+								gst_percentage = 18
+							elif item['item_value'] == 1000:
+								gst_percentage = 0
 							else:
-								if item['item_value']>1000 and item['item_value']<=7500:
-									gst_percentage = 12
-								elif item['item_value'] > 7500:
-									gst_percentage = 18
-								elif item['item_value'] == 1000:
-									gst_percentage = 0
-								else:
-									gst_percentage = 0
-								if gst_percentage == 0:
-									final_item['cgst'] = 0
-									final_item['sgst'] = 0
-									final_item['igst'] = 0
-									final_item['type'] = "Excempted"
-								else:
-									final_item['cgst'] = gst_percentage/2
-									final_item['sgst'] = gst_percentage/2
-									final_item['igst'] = 0
-									final_item['type'] = "Included"
+								gst_percentage = 0
+							if gst_percentage == 0:
+								final_item['cgst'] = 0
+								final_item['sgst'] = 0
+								final_item['igst'] = 0
+								final_item['type'] = "Excempted"
+							else:
+								final_item['cgst'] = gst_percentage/2
+								final_item['sgst'] = gst_percentage/2
+								final_item['igst'] = 0
+								final_item['type'] = "Included"
 						else:
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
