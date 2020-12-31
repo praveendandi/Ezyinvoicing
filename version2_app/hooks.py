@@ -110,7 +110,17 @@ doc_events = {
 # Scheduled Tasks
 # ---------------
 
+scheduler_events = {
+	"all": [
+		"version2_app.doctype.invoices.invoices.login_gsp2"
+	],
+	"cron": {
+        "0/1 * * *": [
+            "version2_app.doctype.invoices.invoices.login_gsp2"
+        ]}
+}
 # scheduler_events = {
+	
 # 	"all": [
 # 		"version2_app.tasks.all"
 # 	],

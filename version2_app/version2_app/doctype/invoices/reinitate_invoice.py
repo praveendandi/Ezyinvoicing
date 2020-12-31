@@ -12,7 +12,7 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
-
+import math
 
 
 @frappe.whitelist(allow_guest=True)
@@ -103,26 +103,12 @@ def Reinitiate_invoice(data):
 		else:
 			ready_to_generate_irn = "No"
 
-			
-		#check invoice total
-		# if int(data['total_invoice_amount']) != int(pms_invoice_summary):
-		# 	calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
-		# 	TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
-		# 	if TotalMismatchErrorAPI['success']==True:
-		# 		items = data['items_data']
-				
-		# 		itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-				
-		# 		insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
-		# 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-		# 			items, TotalMismatchErrorAPI['invoice_number'])
-		# 		return {"success": True}
-
-		# 	return{"success":False,"message":TotalMismatchErrorAPI['message']}
+		invoice_round_off_amount = 0	
+		
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
-			
+		doc.total_inovice_amount = data['total_invoice_amount']	
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
@@ -164,10 +150,16 @@ def Reinitiate_invoice(data):
 		doc.credit_igst_amount = round(credit_igst_amount,2)
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
-		if int(data['total_invoice_amount']) != int(pms_invoice_summary) + int(other_charges):
-			doc.error_message = " Invoice Total Mismatch"
-			doc.irn_generated = "Error"
-			doc.ready_to_generate_irn = "No"
+		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
+		if data['total_invoice_amount'] == 0:
+			ready_to_generate_irn = "No"
+		else:
+			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+			
+				doc.error_message = " Invoice Total Mismatch"
+				doc.irn_generated = "Error"
+				doc.ready_to_generate_irn = "No"
+		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 
 
@@ -179,11 +171,11 @@ def Reinitiate_invoice(data):
 		# insert_tax_summaries(items_data, data['invoice_number'])
 		taxSummariesInsert = insert_tax_summaries2(items, data['guest_data']['invoice_number'])
 		# insert sac code based taxes
-		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'])
+		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 		
 
 

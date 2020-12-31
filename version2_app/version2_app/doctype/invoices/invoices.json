@@ -100,7 +100,12 @@
   "credit_cgst_amount",
   "credit_sgst_amount",
   "credit_cess_amount",
-  "credit_gst_amount"
+  "credit_gst_amount",
+  "total_inovice_amount",
+  "converted_from_b2c",
+  "converted_from_b2c_by",
+  "converted_from_b2c_time",
+  "invoice_round_off_amount"
  ],
  "fields": [
   {
@@ -651,12 +656,39 @@
    "fieldname": "credit_gst_amount",
    "fieldtype": "Float",
    "label": "Credit Gst Amount"
+  },
+  {
+   "fieldname": "total_inovice_amount",
+   "fieldtype": "Float",
+   "label": "Total Inovice Amount"
+  },
+  {
+   "default": "No",
+   "fieldname": "converted_from_b2c",
+   "fieldtype": "Select",
+   "label": "Converted From B2C",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "converted_from_b2c_by",
+   "fieldtype": "Data",
+   "label": "Converted From B2C By"
+  },
+  {
+   "fieldname": "converted_from_b2c_time",
+   "fieldtype": "Datetime",
+   "label": "Converted From B2C Time"
+  },
+  {
+   "fieldname": "invoice_round_off_amount",
+   "fieldtype": "Float",
+   "label": "Invoice Round Off Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-27 16:05:59.948589",
+ "modified": "2020-12-29 20:41:43.715019",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -675,6 +707,7 @@
    "write": 1
   },
   {
+   "cancel": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -682,9 +715,11 @@
    "report": 1,
    "role": "ezy-IT",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
+   "cancel": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -692,13 +727,12 @@
    "report": 1,
    "role": "ezy-Finance",
    "share": 1,
+   "submit": 1,
    "write": 1
   },
   {
    "amend": 1,
    "cancel": 1,
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
@@ -747,6 +781,18 @@
    "read": 1,
    "report": 1,
    "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
    "share": 1,
    "write": 1
   }
