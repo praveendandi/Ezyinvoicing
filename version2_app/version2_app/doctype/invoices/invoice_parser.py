@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("IBISChennaiCC-01")
+	companyCheckResponse = check_company_exist("IBISPV-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -110,16 +110,13 @@ def file_parsing(filepath):
 			item_value = ""
 			dt = i.strip()
 			for index, j in enumerate(i.split(' ')):
-				if index == 0:
-					item['date'] = j
 				val = dt.split(" ")
-				if val != "":
+				if index == 0 and len(val)>1:
+					item['date'] = j
+				if len(val)>1:
 					item_value = val[-1]
 					item['item_value'] = float(item_value.replace(',', ''))
-				else:
-					item_value = val[-2]
-					item['item_value'] = float(item_value.replace(',', ''))
-				if index == 1:
+				if index == 1 and len(val)>1:
 					starting_index = i.index(j)
 					if "~" in i:
 						ending_index = i.find("~")
@@ -127,14 +124,16 @@ def file_parsing(filepath):
 					else:
 						ending_index = i.find(item_value)
 						item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
-						
-				if 'SAC' in j:
-					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
-				else:
-					item['sac_code'] = "No Sac"
-				item['sort_order'] =  itemsort+1
+				if len(val)>1:		
+					if 'SAC' in j:
+						item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
+					else:
+						item['sac_code'] = "No Sac"
+				if len(val)>1:		
+					item['sort_order'] =  itemsort+1
 			itemsort+=1
-			items.append(item)
+			if item !={}:
+				items.append(item)
 
 	total_items = []
 	paymentTypes = GetPaymentTypes()
@@ -162,7 +161,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "IBISChennaiCC-01"
+	guest['company_code'] = "IBISPV-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -178,16 +177,16 @@ def file_parsing(filepath):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 
-	company_code = {"code":"IBISChennaiCC-01"}
+	company_code = {"code":"IBISPV-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "33"
+	error_data['state_code'] = "27"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "603103"
+	error_data['pincode'] = "400099"
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
 
