@@ -79,7 +79,7 @@ def Reinitiate_invoice(data):
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
-					cess_amount+=item['cess_amount']
+					# cess_amount+=item['cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -125,7 +125,8 @@ def Reinitiate_invoice(data):
 			ready_to_generate_irn = "No"
 
 		invoice_round_off_amount = 0	
-		
+		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
+		sales_amount_after_tax = value_after_gst + other_charges
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
