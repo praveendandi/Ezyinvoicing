@@ -248,7 +248,6 @@ class Invoices(Document):
 							) - start_time
 							invoice.save(ignore_permissions=True,
 											ignore_version=True)
-					
 					return response
 				else:
 					return response
@@ -482,6 +481,7 @@ class Invoices(Document):
 											files=files,
 											data=payload)
 			response = upload_qr_image.json()
+			print(response, "b2c qr code upload")
 			if 'message' in response:
 				doc.b2c_qrimage = response['message']['file_url']
 				doc.name = invoice_number
@@ -576,7 +576,9 @@ def attach_qr_code(invoice_number, gsp, code):
 		# page = doc[0]
 		# where = fitz.Point(15, 55)
 		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + invoice.ack_date
+		ackdate = invoice.ack_date
+		ack_date = ackdate.split(" ")
+		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
 		# irntext = "IRN: "+ invoice.irn_number
 		# acknotext = "ACK NO: " + invoice.ack_no 
 		# ackdatetext = "ACK DATE: " + invoice.ack_date
@@ -650,6 +652,7 @@ def create_qr_image(invoice_number, gsp):
 									   headers=headers,
 									   stream=True,
 									   proxies=proxies,verify=False)
+			print(qr_response, "qr_response from gsp8*********88")
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -830,6 +833,7 @@ def insert_invoice(data):
 
 			
 		#check invoice total
+		print(int(data['total_invoice_amount']),int(pms_invoice_summary+other_charges))
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -2181,8 +2185,9 @@ def attach_b2c_qrcode(data):
 			random.choice(string.ascii_uppercase + string.ascii_lowercase +
 						  string.digits) for _ in range(50))
 		ack_no = str(randint(100000000000, 9999999999999))
-		ack_date = str(datetime.datetime.now())
-		text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date
+		ackdate = str(datetime.datetime.now())
+		ack_date = ackdate.split(" ")
+		text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date[0]
 		if company.irn_details_page == "First":
 			page = doc[0]
 		else:
