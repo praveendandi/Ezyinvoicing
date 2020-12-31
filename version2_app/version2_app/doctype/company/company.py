@@ -63,11 +63,11 @@ def createError(title,error):
 @frappe.whitelist(allow_guest=True)
 def getPrinters():
 	raw_printers = os.popen("lpstat -p -d")
-	print(raw_printers)
+	print(raw_printers.__dict__)
 	printers = []
 	for index,i in enumerate(raw_printers):
 		print(index,i)
-		if 'system default destination' not in i and 'ezy' not in i and 'EZY' not in i:
+		if 'system default destination' not in i and 'ezy' not in i and 'EZY' not in i and "reason unknown" not in i:
 			printers.append(i.split('is')[0].split('printer')[1].strip())
 
 	return {'success':True,"data":printers,"message":"list of avaliable printers"}
@@ -103,6 +103,19 @@ def givePrint(invoiceNumber,printer):
 
 
 
+# @frappe.whitelist(allow_guest=True)
+# def CheckInternetConnection():
+#     try:
+#         # connect to the host -- tells us if the host is actually
+#         # reachable
+#     sock = socket.create_connection(("www.google.com", 80))
+#     if sock is not None:
+#         print('Clossing socket')
+#         sock.close
+#         return True
+#     except OSError:
+#         pass
+#     return False
 
 
 

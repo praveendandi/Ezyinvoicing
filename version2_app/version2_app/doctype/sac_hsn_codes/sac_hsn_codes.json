@@ -20,7 +20,9 @@
   "transactioncode",
   "state_cess_rate",
   "central_cess_rate",
-  "vat_rate"
+  "vat_rate",
+  "service_charge",
+  "accommodation_slab"
  ],
  "fields": [
   {
@@ -118,11 +120,24 @@
    "fieldname": "vat_rate",
    "fieldtype": "Float",
    "label": "Vat Rate"
+  },
+  {
+   "default": "No",
+   "fieldname": "service_charge",
+   "fieldtype": "Select",
+   "label": "Service Charge",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "0",
+   "fieldname": "accommodation_slab",
+   "fieldtype": "Check",
+   "label": " Accommodation Slab"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-28 17:51:51.810565",
+ "modified": "2020-12-31 08:59:29.749738",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

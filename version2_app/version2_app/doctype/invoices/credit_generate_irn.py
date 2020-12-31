@@ -37,7 +37,8 @@ def attach_qr_code(invoice_number, gsp,code):
 		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1, company.qr_rect_y0, company.qr_rect_y1)
 		document = fitz.open(src_pdf_filename)
 		page = document[0]
-		page.insertImage(img_rect, filename=img_filename)
+		im = open(img_filename,"rb").read()
+		page.insertImage(img_rect, stream=im)
 		document.save(dst_pdf_filename)
 		document.close()
 		# attacing irn an ack
@@ -105,6 +106,7 @@ def create_qr_image(invoice_number, gsp):
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
 			"Irn": invoice.credit_irn_number
+			
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -260,7 +262,7 @@ def get_tax_payer_details_data(data):
 		return {"success":False,"message":e}
 	   
 
-def gsp_api_data(data):
+def creditgsp_api_data(data):
 	try:
 		mode = data['mode']
 		gsp_apis = frappe.db.get_value('GSP APIS', {
@@ -322,7 +324,7 @@ def gsp_api_data(data):
 		return {"success":True,"data":api_details}
 	except Exception as e:
 		print(e,"gsp api details")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 
 def insert_credit_items(items,invoice_number):
 	try:
@@ -370,7 +372,7 @@ def CreditgenerateIrn(invoice_number):
 	company_details = check_company_exist_for_Irn(invoice.company)
 	# get gsp_details
 	companyData = {"code":company_details['data'].name,"mode":company_details['data'].mode,"provider":company_details['data'].provider}
-	GSP_details = gsp_api_data(companyData)
+	GSP_details = creditgsp_api_data(companyData)
 	# get taxpayer details
 	GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data'],"invoice":invoice_number}
 	taxpayer_details = get_tax_payer_details_data(GspData)
@@ -542,7 +544,6 @@ def CreditgenerateIrn(invoice_number):
 		invoice.credit_irn_generated = 'Failed'
 		invoice.credit_irn_error_message = response['message'][6:]
 		invoice.save(ignore_permissions=True,ignore_version=True)
-
 	return response
 
 def postIrn(gst_data, gsp,company):
@@ -577,3 +578,4 @@ def postIrn(gst_data, gsp,company):
 	except Exception as e:
 		print(e, "post irn credit")
 		return {"success": False, 'message':str(e)}
+

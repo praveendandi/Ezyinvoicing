@@ -30,13 +30,6 @@ import fitz
 class Invoices(Document):
 
 
-	# def after_insert(self):
-	# 	if self.name:
-	# 		doc = frappe.get_doc('Invoices', self.name)
-	# 		doc.invoice_number = self.name
-	# 		doc.save()
-	# 		# print("*************888")
-
 	def generateIrn(self, invoice_number):
 		try:
 			# get invoice details
@@ -201,9 +194,11 @@ class Invoices(Document):
 							discount_before_value +=item.item_value	
 							discount_after_value += item.item_value_after_gst
 							credit_note_items.append(item)
-			print(gst_data["ItemList"])
+			# print(gst_data["ItemList"])
 			discount_before_value = abs(discount_before_value)	
 			discount_after_value = abs(discount_after_value)
+			TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+			TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2), 
 				"CgstVal": round(total_cgst_value, 2),
@@ -214,8 +209,8 @@ class Invoices(Document):
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
 				"RndOffAmt": 0,
-				"TotInvVal": round(invoice.amount_after_gst, 2) - round(discount_after_value,2),
-				"TotInvValFc": round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+				"TotInvVal": round(TotInnVal,2),
+				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			# return{"success":True}
 			if ass_value > 0:
@@ -252,18 +247,10 @@ class Invoices(Document):
 					return response
 				else:
 					return response
-			# else:
-			# 	if credit_note_items != [] and company_details['data'].allowance_type=="Discount":
-			# 		CreditgenerateIrn(invoice_number)
-			# 		invoice = frappe.get_doc('Invoices', invoice_number)
-			# 		invoice.irn_process_time = datetime.datetime.utcnow(
-			# 		) - start_time
-			# 		invoice.save(ignore_permissions=True, ignore_version=True)
-			# 		return {"success": True}
-			# 	return {"success": False}
-
 		except Exception as e:
 			print(str(e), "generate Irn")
+
+
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
 		try:
@@ -750,91 +737,99 @@ def insert_invoice(data):
 	'''
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
-	try:
-		company = frappe.get_doc('company',data['company_code'])
+	# try:
+	company = frappe.get_doc('company',data['company_code'])
 
-		value_before_gst = 0
-		value_after_gst = 0
-		other_charges = 0
-		credit_value_before_gst = 0
-		credit_value_after_gst = 0
-		cgst_amount = 0
-		sgst_amount = 0
-		igst_amount = 0
-		cess_amount = 0
-		discountAmount = 0
-		credit_cgst_amount = 0
-		credit_sgst_amount = 0
-		credit_igst_amount = 0
-		credit_cess_amount = 0
-		has_discount_items = "No"
-		has_credit_items = "No"
-		# print(data['items_data'])
-		if data['guest_data']['invoice_type'] == "B2B":
-			irn_generated = "Pending"
-		else:
-			irn_generated = "NA"
-		if "legal_name" not in data['taxpayer']:
-			data['taxpayer']['legal_name'] = " "
-		#calculat items
-		for item in data['items_data']:
-			if item['taxable'] == 'No' and item['item_type'] != "Discount":
-				other_charges += item['item_value_after_gst']
-			elif item['taxable']=="No" and item['item_type']=="Discount":
-				discountAmount += item['item_value_after_gst'] 
-			elif item['sac_code'].isdigit():
-				if "-" not in str(item['item_value']):
-					cgst_amount+=item['cgst_amount']
-					sgst_amount+=item['sgst_amount']
-					igst_amount+=item['igst_amount']
-					cess_amount+=item['cess_amount']
-					value_before_gst += item['item_value']
-					value_after_gst += item['item_value_after_gst']
-				else:
-					cgst_amount+=item['cgst_amount']
-					sgst_amount+=item['sgst_amount']
-					igst_amount+=item['igst_amount']
-					cess_amount+=item['cess_amount']
-					credit_cgst_amount+=abs(item['cgst_amount'])
-					credit_sgst_amount+=abs(item['sgst_amount'])
-					credit_igst_amount+=abs(item['igst_amount'])
-					credit_cess_amount+=abs(item['cess_amount'])
-					credit_value_before_gst += abs(item['item_value'])
-					credit_value_after_gst += abs(item['item_value_after_gst'])
+	value_before_gst = 0
+	value_after_gst = 0
+	other_charges = 0
+	credit_value_before_gst = 0
+	credit_value_after_gst = 0
+	cgst_amount = 0
+	sgst_amount = 0
+	igst_amount = 0
+	cess_amount = 0
+	discountAmount = 0
+	credit_cgst_amount = 0
+	credit_sgst_amount = 0
+	credit_igst_amount = 0
+	credit_cess_amount = 0
+	has_discount_items = "No"
+	has_credit_items = "No"
+	# print(data['items_data'])
+	if data['guest_data']['invoice_type'] == "B2B":
+		irn_generated = "Pending"
+	else:
+		irn_generated = "NA"
+	if "legal_name" not in data['taxpayer']:
+		data['taxpayer']['legal_name'] = " "
+	#calculat items
+	for item in data['items_data']:
+		if item['taxable'] == 'No' and item['item_type'] != "Discount":
+			other_charges += item['item_value_after_gst']
+		elif item['taxable']=="No" and item['item_type']=="Discount":
+			discountAmount += item['item_value_after_gst'] 
+		elif item['sac_code'].isdigit():
+			if "-" not in str(item['item_value']):
+				cgst_amount+=item['cgst_amount']
+				sgst_amount+=item['sgst_amount']
+				igst_amount+=item['igst_amount']
+				cess_amount+=item['cess_amount']
+				value_before_gst += item['item_value']
+				value_after_gst += item['item_value_after_gst']
+				# print(value_before_gst,value_after_gst," ******")
 			else:
-				pass
-		# pms_invoice_summary = value_after_gst
-		# pms_invoice_summary_without_gst = value_before_gst
-		if company.allowance_type=="Discount":
-			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
-			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			pms_invoice_summary = value_after_gst-discountAfterAmount
-			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
-			if pms_invoice_summary == 0:
-				
-				credit_value_after_gst = 0
-			if credit_value_before_gst > 0:
-
-				has_discount_items = "Yes"
-			else:
-				has_discount_items = "No"
+				cgst_amount+=item['cgst_amount']
+				sgst_amount+=item['sgst_amount']
+				igst_amount+=item['igst_amount']
+				cess_amount+=item['cess_amount']
+				credit_cgst_amount+=abs(item['cgst_amount'])
+				credit_sgst_amount+=abs(item['sgst_amount'])
+				credit_igst_amount+=abs(item['igst_amount'])
+				credit_cess_amount+=abs(item['cess_amount'])
+				credit_value_before_gst += abs(item['item_value'])
+				credit_value_after_gst += abs(item['item_value_after_gst'])
 		else:
-			pms_invoice_summary = value_after_gst - credit_value_after_gst
-			pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
-			if credit_value_before_gst > 0:
-
-				has_credit_items = "Yes"
-			else:
-				has_credit_items = "No"			
-
-		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
-			ready_to_generate_irn = "Yes"
-		else:
-			ready_to_generate_irn = "No"
-
+			pass
+	# pms_invoice_summary = value_after_gst
+	# pms_invoice_summary_without_gst = value_before_gst
+	if company.allowance_type=="Discount":
+		discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
+		discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
+		pms_invoice_summary = value_after_gst-discountAfterAmount
+		pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+		if pms_invoice_summary == 0:
 			
-		#check invoice total
-		print(int(data['total_invoice_amount']),int(pms_invoice_summary+other_charges))
+			credit_value_after_gst = 0
+		if credit_value_before_gst > 0:
+
+			has_discount_items = "Yes"
+		else:
+			has_discount_items = "No"
+	else:
+		pms_invoice_summary = value_after_gst - credit_value_after_gst
+		pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
+		if credit_value_before_gst > 0:
+
+			has_credit_items = "Yes"
+		else:
+			has_credit_items = "No"			
+
+	if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
+		ready_to_generate_irn = "Yes"
+	else:
+		ready_to_generate_irn = "No"
+	roundoff_amount = 0
+	data['invoice_round_off_amount'] = roundoff_amount
+	# print(int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)))	
+	#check invoice total
+	if data['total_invoice_amount'] == 0:
+		ready_to_generate_irn = "No"
+	
+		
+	else:
+		roundoff_amount = data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
+		data['invoice_round_off_amount'] = roundoff_amount
 		if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 			calculated_data = {"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,"cess_amount":cess_amount,"credit_cess_amount":credit_cess_amount,"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
 			TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -843,145 +838,152 @@ def insert_invoice(data):
 				itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
 				insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
 				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-					items, TotalMismatchErrorAPI['invoice_number'])
+					items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
 				return {"success": True}
 
 			return{"success":False,"message":TotalMismatchErrorAPI['message']}
 
 
-		invoice = frappe.get_doc({
-			'doctype':
+	invoice = frappe.get_doc({
+		'doctype':
+		'Invoices',
+		'invoice_number':
+		data['guest_data']['invoice_number'],
+		'guest_name':
+		data['guest_data']['name'],
+		'ready_to_generate_irn':ready_to_generate_irn,
+		'invoice_from':"Pms",
+		'gst_number':
+		data['guest_data']['gstNumber'],
+		'invoice_round_off_amount': data['invoice_round_off_amount'],
+		'invoice_file':
+		data['guest_data']['invoice_file'],
+		'room_number':
+		data['guest_data']['room_number'],
+		'confirmation_number':
+		data['guest_data']['confirmation_number'],
+		'invoice_type':
+		data['guest_data']['invoice_type'],
+		'print_by': data['guest_data']['print_by'],
+		'invoice_date':
+		datetime.datetime.strptime(data['guest_data']['invoice_date'],
+									'%d-%b-%y %H:%M:%S'),
+		'legal_name':
+		data['taxpayer']['legal_name'],
+		'address_1':
+		data['taxpayer']['address_1'],
+		'email':
+		data['taxpayer']['email'],
+		'trade_name':
+		data['taxpayer']['trade_name'],
+		'address_2':
+		data['taxpayer']['address_2'],
+		'phone_number':
+		data['taxpayer']['phone_number'],
+		'location':
+		data['taxpayer']['location'],
+		'pincode':
+		data['taxpayer']['pincode'],
+		'state_code':
+		data['taxpayer']['state_code'],
+		'amount_before_gst':
+		round(value_before_gst, 2),
+		"amount_after_gst":
+		round(value_after_gst, 2),
+		"other_charges":
+		round(other_charges, 2),
+		"credit_value_before_gst":
+		round(credit_value_before_gst, 2),
+		"credit_value_after_gst":
+		round(credit_value_after_gst, 2),
+		"pms_invoice_summary_without_gst":
+		round(pms_invoice_summary_without_gst, 2) ,
+		"pms_invoice_summary":
+		round(pms_invoice_summary, 2) ,
+		'irn_generated':
+		irn_generated,
+		'irn_cancelled':
+		'No',
+		'qr_code_generated':
+		'Pending',
+		'signed_invoice_generated':
+		'No',
+		'company':
+		data['company_code'],
+		'cgst_amount':
+		round(cgst_amount, 2),
+		'sgst_amount':
+		round(sgst_amount, 2),
+		'igst_amount':
+		round(igst_amount, 2),
+		'cess_amount':
+		round(cess_amount, 2),
+		'total_gst_amount':
+		round(cgst_amount, 2) + round(sgst_amount, 2) +
+		round(igst_amount, 2),
+		'has_credit_items':
+		has_credit_items,
+		'total_inovice_amount': data['total_invoice_amount'],
+		'has_discount_items':has_discount_items,
+		'invoice_process_time':
+		datetime.datetime.utcnow() - datetime.datetime.strptime(
+			data['guest_data']['start_time'], "%Y-%m-%d %H:%M:%S.%f"),
+		'credit_cgst_amount':round(credit_cgst_amount,2),
+		'credit_sgst_amount':round(credit_sgst_amount,2),
+		'credit_igst_amount':round(credit_igst_amount,2),
+		'credit_cess_amount':round(credit_cess_amount,2),
+		'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
+	})
+	if data['amened'] == 'Yes':
+		invCount = frappe.db.get_list(
 			'Invoices',
-			'invoice_number':
-			data['guest_data']['invoice_number'],
-			'guest_name':
-			data['guest_data']['name'],
-			'ready_to_generate_irn':ready_to_generate_irn,
-			'invoice_from':"Pms",
-			'gst_number':
-			data['guest_data']['gstNumber'],
-			'invoice_file':
-			data['guest_data']['invoice_file'],
-			'room_number':
-			data['guest_data']['room_number'],
-			'confirmation_number':
-			data['guest_data']['confirmation_number'],
-			'invoice_type':
-			data['guest_data']['invoice_type'],
-			'print_by': data['guest_data']['print_by'],
-			'invoice_date':
-			datetime.datetime.strptime(data['guest_data']['invoice_date'],
-										'%d-%b-%y %H:%M:%S'),
-			'legal_name':
-			data['taxpayer']['legal_name'],
-			'address_1':
-			data['taxpayer']['address_1'],
-			'email':
-			data['taxpayer']['email'],
-			'trade_name':
-			data['taxpayer']['trade_name'],
-			'address_2':
-			data['taxpayer']['address_2'],
-			'phone_number':
-			data['taxpayer']['phone_number'],
-			'location':
-			data['taxpayer']['location'],
-			'pincode':
-			data['taxpayer']['pincode'],
-			'state_code':
-			data['taxpayer']['state_code'],
-			'amount_before_gst':
-			round(value_before_gst, 2),
-			"amount_after_gst":
-			round(value_after_gst, 2),
-			"other_charges":
-			round(other_charges, 2),
-			"credit_value_before_gst":
-			round(credit_value_before_gst, 2),
-			"credit_value_after_gst":
-			round(credit_value_after_gst, 2),
-			"pms_invoice_summary_without_gst":
-			round(pms_invoice_summary_without_gst, 2) ,
-			"pms_invoice_summary":
-			round(pms_invoice_summary, 2) ,
-			'irn_generated':
-			irn_generated,
-			'irn_cancelled':
-			'No',
-			'qr_code_generated':
-			'Pending',
-			'signed_invoice_generated':
-			'No',
-			'company':
-			data['company_code'],
-			'cgst_amount':
-			round(cgst_amount, 2),
-			'sgst_amount':
-			round(sgst_amount, 2),
-			'igst_amount':
-			round(igst_amount, 2),
-			'cess_amount':
-			round(cess_amount, 2),
-			'total_gst_amount':
-			round(cgst_amount, 2) + round(sgst_amount, 2) +
-			round(igst_amount, 2),
-			'has_credit_items':
-			has_credit_items,
-			'has_discount_items':has_discount_items,
-			'invoice_process_time':
-			datetime.datetime.utcnow() - datetime.datetime.strptime(
-				data['guest_data']['start_time'], "%Y-%m-%d %H:%M:%S.%f"),
-			'credit_cgst_amount':round(credit_cgst_amount,2),
-			'credit_sgst_amount':round(credit_sgst_amount,2),
-			'credit_igst_amount':round(credit_igst_amount,2),
-			'credit_cess_amount':round(credit_cess_amount,2),
-			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
-		})
-		if data['amened'] == 'Yes':
-			invCount = frappe.db.get_list(
-				'Invoices',
-				filters={
-					'invoice_number':
-					['like', '%' + data['guest_data']['invoice_number'] + '%']
-				})
-			invoice.amended_from = invCount[0]['name']
-			if "-" in invCount[0]['name'][-4:]:
-				amenedindex = invCount[0]['name'].rfind("-")
-				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
-				ameneddigit = ameneddigit+1 
-				invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
-				# pass
-			else:
-				invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
+			filters={
+				'invoice_number':
+				['like', '%' + data['guest_data']['invoice_number'] + '%']
+			})
+		invoice.amended_from = invCount[0]['name']
+		if "-" in invCount[0]['name'][-4:]:
+			amenedindex = invCount[0]['name'].rfind("-")
+			ameneddigit = int(invCount[0]['name'][amenedindex+1:])
+			ameneddigit = ameneddigit+1 
+			invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
+			# pass
+		else:
+			invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
 
-					
-		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		data['invoice_number'] = v.name
-		data['guest_data']['invoice_number'] = v.name
-		# # insert items
+				
+	v = invoice.insert(ignore_permissions=True, ignore_links=True)
+	data['invoice_number'] = v.name
+	data['guest_data']['invoice_number'] = v.name
+	# # insert items
 
-		itemsInsert = insert_items(data['items_data'], data['invoice_number'])
+	itemsInsert = insert_items(data['items_data'], data['invoice_number'])
 
-		
-		# items = [
-		# 	x for x in data['items_data'] if '-' not in str(x['item_value'])
-		# ]
-		items = data['items_data']
-		insert_tax_summaries2(items, data['invoice_number'])
-		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-			items, data['guest_data']['invoice_number'])
-		
-		return {"success": True}
-	except Exception as e:
-		print(e, "insert invoice")
-		return {"success": False, "message": str(e)}
+	
+	# items = [
+	# 	x for x in data['items_data'] if '-' not in str(x['item_value'])
+	# ]
+	items = data['items_data']
+	insert_tax_summaries2(items, data['invoice_number'])
+	hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+		items, data['guest_data']['invoice_number'],"Invoice")
+	
+	return {"success": True}
+	# except Exception as e:
+	# 	print(e, "insert invoice")
+	# 	return {"success": False, "message": str(e)}
 
 
-def insert_hsn_code_based_taxes(items, invoice_number):
+def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 	try:
+		frappe.db.delete('SAC HSN Tax Summaries', {
+				'parent': invoice_number})
+		frappe.db.commit()
+
 		sac_codes = []
 		for item in items:
-
+			# if sacType == "Credit":
+			# 	item = item.__dict__
 			if item['sac_code'] not in sac_codes and item['sac_code'].isdigit(
 			):
 				sac_codes.append(item['sac_code'])
@@ -1002,7 +1004,8 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 				'parentfield': 'sac_hsn_based_taxes',
 				'parenttype': "invoices",
 				"state_cess":0,
-				"vat":0
+				"vat":0,
+				"type":sacType
 			}
 			for item in items:
 				# print(item)
@@ -1029,6 +1032,10 @@ def insert_hsn_code_based_taxes(items, invoice_number):
 
 def insert_items(items, invoice_number):
 	try:
+		print("..............")
+		frappe.db.delete('Items', {
+    		'parent': invoice_number})
+		frappe.db.commit()
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
@@ -1050,9 +1057,11 @@ def calulate_items(data):
 	#items, invoice_number,company_code
 	try:
 		total_items = []
+		second_list = []
 		for item in data['items']:
 			final_item = {}
 			companyDetails = frappe.get_doc('company', data['company_code'])
+			scharge = companyDetails.service_charge_percentage
 			if companyDetails.allowance_type == "Credit":
 				ItemMode = "Credit"
 			else:
@@ -1074,7 +1083,84 @@ def calulate_items(data):
 				else:
 					
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
+				if sac_code_based_gst_rates.service_charge == "Yes":
+					service_dict = {}
 
+					if sac_code_based_gst_rates.net == "Yes":
+						scharge = companyDetails.service_charge_percentage
+						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						total_gst_amount = (gstpercentage * item['item_value']) / 100.0
+						scharge_value = item['item_value'] - total_gst_amount
+						scharge_value = (scharge * item['item_value']) / 100.0
+						base_value = round(item['item_value'] * (100 / (scharge + 100)),3)
+						scharge_value = item['item_value'] - base_value
+						gst_percentage = 18
+					else:
+						
+						scharge = companyDetails.service_charge_percentage
+						base_value = item['item_value']
+					
+						scharge_value = (scharge * item['item_value']) / 100.0
+						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						
+						if sac_code_based_gst_rates.vat_rate>0:
+							vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
+							service_dict['vat_amount'] = vatamount
+							service_dict['vat'] = sac_code_based_gst_rates.vat_rate	
+						else:
+							vatamount = 0
+							service_dict['vat_amount'] = 0
+							service_dict['vat'] = 0	
+						if sac_code_based_gst_rates.central_cess_rate>0:
+							centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
+							service_dict['cess_amount'] = centralcessamount
+							service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
+						else:
+							centralcessamount = 0
+							service_dict['cess_amount'] = 0
+							service_dict['cess'] = 0
+						if sac_code_based_gst_rates.state_cess_rate>0:
+							statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
+							service_dict['state_cess_amount'] = statecessamount
+							service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+						else:
+							statecessamount = 0
+							service_dict['state_cess_amount'] = 0
+							service_dict['state_cess'] = 0	
+						gst_value = (gst_percentage* scharge_value)/100.0
+						service_dict['item_name'] = item['name']+"-SC "
+						service_dict['description'] = item['name']+"-SC "
+						service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
+						service_dict['sac_code'] = sac_code_based_gst_rates.code
+						service_dict['sac_code_found'] = 'Yes'
+						service_dict['cgst'] = gst_percentage/2
+						service_dict['other_charges'] = 0
+						service_dict['cgst_amount'] = gst_value/2
+						service_dict['sgst'] = gst_percentage/2
+						service_dict['sgst_amount'] = gst_value/2
+						service_dict['igst'] = 0
+						service_dict['igst_amount'] = 0
+						service_dict['gst_rate'] = gst_percentage
+						service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount
+						service_dict['item_taxable_value'] = scharge_value 
+						service_dict['item_value'] = scharge_value
+						service_dict['taxable'] = sac_code_based_gst_rates.taxble
+						service_dict['cess'] = 0
+						service_dict['cess_amount'] = 0
+						service_dict['state_cess'] = 0
+						service_dict['state_cess_amount'] = 0
+						service_dict['type'] = "Included"
+						service_dict['item_mode'] = "Debit"
+						service_dict['item_type'] = sac_code_based_gst_rates.type
+						# service_dict['vat_amount'] = 0
+						# service_dict['vat'] = 0
+						service_dict['sort_order'] = item['sort_order']
+						service_dict['doctype'] = 'Items'
+						service_dict['parentfield'] = 'items'
+						service_dict['parenttype'] = 'invoices'
+						second_list.append(service_dict)
+					# second_list	
+				# print(item)	
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if sac_code_based_gst_rates.type == "Discount":
@@ -1104,45 +1190,25 @@ def calulate_items(data):
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
-						if item['sac_code'] == '996311':
-							if "Room Charge-Early" in item['name'] or "Room Charge 12%" in item["name"]:
-								if "%" in item["name"]:
-									itemname = item["name"]
-									percent = int(''.join(filter(lambda i: i.isdigit(), itemname)))
-									if percent != 0:
-										final_item['cgst'] = percent/2
-										final_item['sgst'] = percent/2
-										final_item["igst"] = 0
-										final_item['type'] = "Included"
-									else:
-										final_item['cgst'] = 0
-										final_item['sgst'] = 0
-										final_item['igst'] = 0
-										final_item['type'] = "Excempted"
-								else:
-									final_item['cgst'] = 0
-									final_item['sgst'] = 0
-									final_item['igst'] = 0
-									final_item['type'] = "Excempted"
+						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 0:
+							if item['item_value']>1000 and item['item_value']<=7500:
+								gst_percentage = 12
+							elif item['item_value'] > 7500:
+								gst_percentage = 18
+							elif item['item_value'] == 1000:
+								gst_percentage = 0
 							else:
-								if item['item_value']>1000 and item['item_value']<=7500:
-									gst_percentage = 12
-								elif item['item_value'] > 7500:
-									gst_percentage = 18
-								elif item['item_value'] == 1000:
-									gst_percentage = 0
-								else:
-									gst_percentage = 0
-								if gst_percentage == 0:
-									final_item['cgst'] = 0
-									final_item['sgst'] = 0
-									final_item['igst'] = 0
-									final_item['type'] = "Excempted"
-								else:
-									final_item['cgst'] = gst_percentage/2
-									final_item['sgst'] = gst_percentage/2
-									final_item['igst'] = 0
-									final_item['type'] = "Included"
+								gst_percentage = 0
+							if gst_percentage == 0:
+								final_item['cgst'] = 0
+								final_item['sgst'] = 0
+								final_item['igst'] = 0
+								final_item['type'] = "Excempted"
+							else:
+								final_item['cgst'] = gst_percentage/2
+								final_item['sgst'] = gst_percentage/2
+								final_item['igst'] = 0
+								final_item['type'] = "Included"
 						else:
 							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
@@ -1217,7 +1283,12 @@ def calulate_items(data):
 					final_item["cess_amount"] = 0
 				final_item['vat'] = sac_code_based_gst_rates.vat_rate
 				if sac_code_based_gst_rates.vat_rate > 0:
+					
+						
 					final_item["vat_amount"] = (item["item_value"]*(sac_code_based_gst_rates.vat_rate/100))
+					# if sac_code_based_gst_rates.service_charge == "Yes":
+					# 	vatservicecharge = (scharge * final_item["vat_amount"]) / 100.0	
+					# 	final_item["vat_amount"] = final_item["vat_amount"]+vatservicecharge
 				else:
 					final_item["vat_amount"] = 0
 				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
@@ -1244,6 +1315,7 @@ def calulate_items(data):
 						final_item['type'] = "Excempted"
 						final_item['item_type'] = "Discount"
 						final_item['item_mode'] = ItemMode
+						final['']
 				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
 					if "-" in str(item['item_value']):
 						final_item['item_mode'] = ItemMode
@@ -1251,7 +1323,7 @@ def calulate_items(data):
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
-						if item['sac_code'] == '996311':
+						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 0:
 							if "Room Charge-Early" in item['name']:
 								if "%" in item["name"]:
 									itemname = item["name"]
@@ -1360,6 +1432,9 @@ def calulate_items(data):
 				final_item['vat'] = sac_code_based_gst_rates.vat_rate
 				if sac_code_based_gst_rates.vat_rate > 0:
 					final_item["vat_amount"] = (item["item_value"]*(sac_code_based_gst_rates.vat_rate/100))
+					# if sac_code_based_gst_rates.service_charge == "Yes":
+						# vatservicecharge = (scharge * final_item["vat_amount"]) / 100.0	
+						# final_item["vat_amount"] = final_item["vat_amount"]+vatservicecharge
 				else:
 					final_item["vat_amount"] = 0
 				final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
@@ -1374,7 +1449,7 @@ def calulate_items(data):
 				"item_type":item['item_type'],
 				'date':
 				datetime.datetime.strptime(item['date'],
-										   data['invoice_item_date_format']),
+											data['invoice_item_date_format']),
 				'cgst':
 				final_item['cgst'],
 				'cgst_amount':
@@ -1421,6 +1496,7 @@ def calulate_items(data):
 				"vat_amount":final_item["vat_amount"],
 				"vat":final_item['vat']
 			})
+		total_items.extend(second_list)	
 		return {"success": True, "data": total_items}
 	except Exception as e:
 		print(e, "calculation api")
@@ -1488,6 +1564,10 @@ def insert_tax_summariesd(items, invoice_number):
 
 
 def insert_tax_summaries2(items,invoice_number):
+	frappe.db.delete('Tax Summaries', {
+    		'parent': invoice_number})
+	frappe.db.commit()	
+
 	df = pd.DataFrame(items)
 	df = df.set_index('sgst')
 	df['cess_duplicate'] = df['cess']
@@ -1839,8 +1919,11 @@ def check_token_is_valid(data):
 		return {"success": False, "message": str(e)}
 
 
-def login_gsp(code, mode):
+def login_gsp(code,mode):
 	try:
+		# code = "MHKCP-01"
+		# mode = "Testing"
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -1872,6 +1955,42 @@ def login_gsp(code, mode):
 	except Exception as e:
 		print(e, "login gsp")
 
+
+def login_gsp2():
+	try:
+		code = "MHKCP-01"
+		mode = "Testing"
+		print("********** scheduler")
+		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
+			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
+			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
+		],
+								  as_dict=1)
+		if mode == 'Testing':
+			headers = {
+				"gspappid": gsp["gsp_test_app_id"],
+				"gspappsecret": gsp["gsp_test_app_secret"],
+			}
+			login_response = request_post(gsp['auth_test'], code, headers)
+
+			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
+			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.save(ignore_permissions=True)
+			return True
+		elif mode == 'Production':
+			headers = {
+				"gspappid": gsp["gsp_prod_app_id"],
+				"gspappsecret": gsp["gsp_prod_app_secret"]
+			}
+			login_response = request_post(gsp['auth_prod'], code, headers)
+			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
+			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.save(ignore_permissions=True)
+			return True
+	except Exception as e:
+		print(e, "login gsp")
 
 @frappe.whitelist(allow_guest=True)
 def gsp_api_data(data):
