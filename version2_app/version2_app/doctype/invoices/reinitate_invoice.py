@@ -24,20 +24,29 @@ def Reinitiate_invoice(data):
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
+		sales_amount_before_tax = 0
+		sales_amount_after_tax = 0
 		value_before_gst = 0
 		value_after_gst = 0
+		other_charges_before_tax = 0
 		other_charges = 0
 		credit_value_before_gst = 0
 		credit_value_after_gst = 0
 		cgst_amount = 0
 		sgst_amount = 0
 		igst_amount = 0
-		cess_amount = 0
+		# cess_amount = 0
+		total_central_cess_amount = 0
+		total_state_cess_amount = 0
+		total_vat_amount =0
 		discountAmount = 0
 		credit_cgst_amount = 0
 		credit_sgst_amount = 0
 		credit_igst_amount = 0
-		credit_cess_amount = 0
+		# credit_cess_amount = 0
+		total_credit_central_cess_amount = 0
+		total_credit_state_cess_amount = 0
+		total_credit_vat_amount =0
 		has_discount_items = "No"
 		has_credit_items = "No"
 		# print(data['items_data'])
@@ -50,17 +59,22 @@ def Reinitiate_invoice(data):
 		#calculat items
 		for item in data['items_data']:
 			if item['taxable'] == 'No' and item['item_type'] != "Discount":
-				other_charges += item['item_value']
+				other_charges += item['item_value_after_gst']
+				other_charges_before_tax += item['item_value']
+				total_vat_amount += item['vat_amount']
 			elif item['taxable']=="No" and item['item_type']=="Discount":
-				discountAmount += item['item_value'] 
+				discountAmount += item['item_value_after_gst'] 
 			elif item['sac_code'].isdigit():
 				if "-" not in str(item['item_value']):
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
-					cess_amount+=item['cess_amount']
+					total_central_cess_amount+=item['cess_amount']
+					total_state_cess_amount +=item['state_cess_amount']
 					value_before_gst += item['item_value']
 					value_after_gst += item['item_value_after_gst']
+					total_vat_amount += item['vat_amount']
+					# print(value_before_gst,value_after_gst," ******")
 				else:
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
@@ -69,9 +83,11 @@ def Reinitiate_invoice(data):
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
-					credit_cess_amount+=abs(item['cess_amount'])
+					total_credit_central_cess_amount+=item['cess_amount']
+					total_credit_state_cess_amount +=item['state_cess_amount']
 					credit_value_before_gst += abs(item['item_value'])
 					credit_value_after_gst += abs(item['item_value_after_gst'])
+					total_credit_vat_amount += item['vat_amount']
 			else:
 				pass
 		# pms_invoice_summary = value_after_gst
@@ -97,7 +113,12 @@ def Reinitiate_invoice(data):
 				has_credit_items = "Yes"
 			else:
 				has_credit_items = "No"			
-
+		cgst_amount = cgst_amount - credit_cgst_amount
+		sgst_amount = sgst_amount - credit_sgst_amount
+		igst_amount	= igst_amount - credit_igst_amount	
+		total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
+		total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
+		total_vat_amount =  total_vat_amount - total_credit_vat_amount
 		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
@@ -133,6 +154,12 @@ def Reinitiate_invoice(data):
 		doc.pms_invoice_summary_without_gst=pms_invoice_summary_without_gst
 		doc.pms_invoice_summary= pms_invoice_summary
 		doc.other_charges= other_charges
+		doc.other_charges_before_tax = other_charges_before_tax
+		doc.sales_amount_after_tax = sales_amount_after_tax
+		doc.sales_amount_before_tax = sales_amount_before_tax
+		doc.total_central_cess_amount= total_central_cess_amount
+		doc.total_state_cess_amount = total_state_cess_amount
+		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
@@ -144,7 +171,9 @@ def Reinitiate_invoice(data):
 		doc.signed_invoice_generated='No'
 		doc.company=data['company_code']
 		doc.print_by = data['guest_data']['print_by']
-		doc.credit_cess_amount = round(credit_cess_amount,2)
+		doc.total_credit_central_cess_amount =  round(total_credit_central_cess_amount,2)
+		doc.total_credit_state_cess_amount = round(total_credit_state_cess_amount,2)
+		doc.total_credit_vat_amount = round(total_credit_vat_amount,2)
 		doc.credit_cgst_amount = round(credit_cgst_amount,2)
 		doc.credit_sgst_amount = round(credit_sgst_amount,2)
 		doc.credit_igst_amount = round(credit_igst_amount,2)

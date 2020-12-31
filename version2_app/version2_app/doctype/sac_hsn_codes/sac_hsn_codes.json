@@ -21,7 +21,8 @@
   "state_cess_rate",
   "central_cess_rate",
   "vat_rate",
-  "service_charge"
+  "service_charge",
+  "accommodation_slab"
  ],
  "fields": [
   {
@@ -126,11 +127,17 @@
    "fieldtype": "Select",
    "label": "Service Charge",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "0",
+   "fieldname": "accommodation_slab",
+   "fieldtype": "Check",
+   "label": " Accommodation Slab"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-12-28 18:40:49.202783",
+ "modified": "2020-12-31 08:59:29.749738",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
