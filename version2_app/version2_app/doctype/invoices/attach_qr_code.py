@@ -1,6 +1,10 @@
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 import frappe
+import requests
+import os
+
+
 
 @frappe.whitelist(allow_guest=True)
 def AttachQrCodeInInvoice(invoice_number):
@@ -69,13 +73,12 @@ def AttachQrCodeInInvoice(invoice_number):
             if response['message']['file_url']:
                 invoice.invoice_with_gst_details = response['message']['file_url']
                 invoice.save()
-                return {"message":True,"success":True}
+                return {"message":"Qr Redo Succesfull","success":True}
             return{"message":response['message'],"success":False}    
         else:
             folder_path = frappe.utils.get_bench_path()
             path = folder_path + '/sites/' + company.site_name
-            attach_qrpath = path + "/private/files/" + data[
-                "invoice_number"] + "attachb2cqr.pdf"
+            attach_qrpath = path + "/private/files/" + invoice_number + "attachb2cqr.pdf"
             src_pdf_filename = path + invoice.invoice_file
             img_filename = path + invoice.b2c_qrimage
             img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
@@ -91,7 +94,7 @@ def AttachQrCodeInInvoice(invoice_number):
                 "is_private": 1,
                 "folder": "Home",
                 "doctype": "Invoices",
-                "docname": data["invoice_number"],
+                "docname": invoice_number,
                 'fieldname': 'b2c_qrinvoice'
             }
             site = company.host
@@ -101,7 +104,7 @@ def AttachQrCodeInInvoice(invoice_number):
             attach_response = upload_qrinvoice_image.json()
             if attach_response['message']['file_url']:
                 invoice.b2c_qrinvoice = attach_response['message']['file_url']
-                invoice.name = data["invoice_number"]
+                invoice.name = invoice_number
                 invoice.qr_generated = "Success"
                 invoice.qr_code_generated = "Success"
                 invoice.save(ignore_permissions=True, ignore_version=True)
