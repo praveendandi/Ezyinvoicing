@@ -863,12 +863,13 @@ def insert_invoice(data):
 				TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 				if TotalMismatchErrorAPI['success']==True:
 					# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
-					items = data['items_data']
-					itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-					insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
-					hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-						items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
-					return {"success": True}
+					if data['total_invoice_amount'] !=0:
+						items = data['items_data']
+						itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
+						insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
+						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+							items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+						return {"success": True}
 
 				return{"success":False,"message":TotalMismatchErrorAPI['message']}
 
@@ -997,13 +998,11 @@ def insert_invoice(data):
 		# items = [x for x in data['items_data'] if '-' not in str(x['item_value'])]
 		items = data['items_data']
 		# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
-		itemsInsert = insert_items(items, data['invoice_number'])
-
-		
-		
-		insert_tax_summaries2(items, data['invoice_number'])
-		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-			items, data['guest_data']['invoice_number'],"Invoice")
+		if data['total_invoice_amount'] != 0:
+			itemsInsert = insert_items(items, data['invoice_number'])
+			insert_tax_summaries2(items, data['invoice_number'])
+			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+				items, data['guest_data']['invoice_number'],"Invoice")
 		
 		return {"success": True}
 	except Exception as e:
@@ -1069,9 +1068,9 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 
 def insert_items(items, invoice_number):
 	try:
-		frappe.db.delete('Items', {
-    		'parent': invoice_number})
-		frappe.db.commit()
+		a = frappe.db.delete('Items', {'parent': invoice_number})
+		b = frappe.db.commit()
+		print("/aaaaaaa**********",a,b,invoice_number)
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
@@ -1081,7 +1080,7 @@ def insert_items(items, invoice_number):
 				item['is_credit_item'] = "No"
 			doc = frappe.get_doc(item)
 			doc.insert(ignore_permissions=True, ignore_links=True)
-		return {"sucess": True, "data": doc}
+		return {"sucess": True, "data": 'doc'}
 		# print(doc)
 	except Exception as e:
 		print(e,"**********  insert itemns api")
