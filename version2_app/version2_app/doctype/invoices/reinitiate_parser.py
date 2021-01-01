@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HIBR-01")
+	companyCheckResponse = check_company_exist("IBISNDA-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -96,7 +96,7 @@ def reinitiateInvoice(data):
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
 			p = i.split(":")
-			print_by = p[2].replace(" ","")
+			print_by = p[1].replace(" ","")
 
 	items = [] 
 	itemsort = 0
@@ -161,7 +161,7 @@ def reinitiateInvoice(data):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HIBR-01"
+	guest['company_code'] = "IBISNDA-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -176,16 +176,16 @@ def reinitiateInvoice(data):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"HIBR-01"}
+	company_code = {"code":"IBISNDA-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "29"
+	error_data['state_code'] = "8"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "560055"
+	error_data['pincode'] = "303101"
 	# gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
