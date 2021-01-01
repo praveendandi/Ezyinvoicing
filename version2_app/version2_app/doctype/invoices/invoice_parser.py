@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("IBISPV-01")
+	companyCheckResponse = check_company_exist("HIBR-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -70,7 +70,7 @@ def file_parsing(filepath):
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 		if "GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			gstNumber = gstNumber.replace("TAXINVOICE","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
@@ -96,7 +96,7 @@ def file_parsing(filepath):
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
 			p = i.split(":")
-			print_by = p[1].replace(" ","")
+			print_by = p[2].replace(" ","")
 
 	items = [] 
 	itemsort = 0
@@ -139,7 +139,7 @@ def file_parsing(filepath):
 	paymentTypes = GetPaymentTypes()
 	payment_Types  = [''.join(each) for each in paymentTypes['data']]
 	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each["name"]:
 			if each["name"] not in payment_Types:
 				total_items.append(each)
 
@@ -161,7 +161,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "IBISPV-01"
+	guest['company_code'] = "HIBR-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -177,16 +177,16 @@ def file_parsing(filepath):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 
-	company_code = {"code":"IBISPV-01"}
+	company_code = {"code":"HIBR-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "27"
+	error_data['state_code'] = "29"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "400099"
+	error_data['pincode'] = "560055"
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
 

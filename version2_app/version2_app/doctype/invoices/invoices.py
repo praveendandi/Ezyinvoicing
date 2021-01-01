@@ -782,7 +782,7 @@ def insert_invoice(data):
 				cgst_amount+=item['cgst_amount']
 				sgst_amount+=item['sgst_amount']
 				igst_amount+=item['igst_amount']
-				cess_amount+=item['cess_amount']
+				total_central_cess_amount+=item['cess_amount']
 				credit_cgst_amount+=abs(item['cgst_amount'])
 				credit_sgst_amount+=abs(item['sgst_amount'])
 				credit_igst_amount+=abs(item['igst_amount'])
@@ -1111,6 +1111,8 @@ def calulate_items(data):
 							vatamount = 0
 							service_dict['vat_amount'] = 0
 							service_dict['vat'] = 0	
+						if sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.vat_rate==0:
+							gst_percentage = 18	
 						if sac_code_based_gst_rates.central_cess_rate>0:
 							centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
 							service_dict['cess_amount'] = centralcessamount
