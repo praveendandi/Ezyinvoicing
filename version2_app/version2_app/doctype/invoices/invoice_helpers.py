@@ -58,6 +58,7 @@ def TotalMismatchError(data,calculated_data):
                 round(calculated_data['value_after_gst'], 2),
                 "other_charges":
                 round(calculated_data['other_charges'], 2),
+                "other_charges_before_tax":round(calculated_data['other_charges_before_tax'],2),
                 "credit_value_before_gst":
                 round(calculated_data['credit_value_before_gst'], 2),
                 "credit_value_after_gst":
@@ -83,11 +84,17 @@ def TotalMismatchError(data,calculated_data):
                 round(calculated_data['sgst_amount'], 2),
                 'igst_amount':
                 round(calculated_data['igst_amount'], 2),
-                'cess_amount':
-                round(calculated_data['cess_amount'], 2),
+                'total_central_cess_amount':
+                round(calculated_data['total_central_cess_amount'], 2),
+                'total_state_cess_amount':
+                round(calculated_data['total_state_cess_amount'], 2),
+                'total_vat_amount':
+                round(calculated_data['total_vat_amount'], 2),
                 'total_gst_amount':
                 round(calculated_data['cgst_amount'], 2) + round(calculated_data['sgst_amount'], 2) +
                 round(calculated_data['igst_amount'], 2),
+                'sales_amount_after_tax':round(calculated_data['sales_amount_after_tax'],2),
+                'sales_amount_before_tax': round(calculated_data['sales_amount_before_tax'],2),
                 'has_credit_items':
                 "No",
                 'has_discount_items':'No',
@@ -97,7 +104,9 @@ def TotalMismatchError(data,calculated_data):
                 'credit_cgst_amount':round(calculated_data['credit_cgst_amount'],2),
                 'credit_sgst_amount':round(calculated_data['credit_sgst_amount'],2),
                 'credit_igst_amount':round(calculated_data['credit_igst_amount'],2),
-                'credit_cess_amount':round(calculated_data['credit_cess_amount'],2),
+                'total_credit_state_cess_amount':round(calculated_data['total_credit_state_cess_amount'],2),
+                'total_credit_central_cess_amount':round(calculated_data['total_credit_central_cess_amount'],2),
+                'total_credit_vat_amount': round(calculated_data['total_credit_vat_amount'],2),
                 'credit_gst_amount': round(calculated_data['credit_cgst_amount'],2) + round(calculated_data['credit_sgst_amount'],2) + round(calculated_data['credit_igst_amount'],2),	
                 'error_message':" Invoice Total Mismatch"
             })
