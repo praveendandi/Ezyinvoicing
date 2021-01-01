@@ -795,6 +795,7 @@ def insert_invoice(data):
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
 					total_central_cess_amount+=item['cess_amount']
+					total_state_cess_amount +=item['state_cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -1068,7 +1069,6 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 
 def insert_items(items, invoice_number):
 	try:
-		print("..............")
 		frappe.db.delete('Items', {
     		'parent': invoice_number})
 		frappe.db.commit()
