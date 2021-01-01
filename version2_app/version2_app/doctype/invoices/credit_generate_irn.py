@@ -262,7 +262,7 @@ def get_tax_payer_details_data(data):
 		return {"success":False,"message":e}
 	   
 
-def gsp_api_data(data):
+def creditgsp_api_data(data):
 	try:
 		mode = data['mode']
 		gsp_apis = frappe.db.get_value('GSP APIS', {
@@ -324,7 +324,7 @@ def gsp_api_data(data):
 		return {"success":True,"data":api_details}
 	except Exception as e:
 		print(e,"gsp api details")
-		return {"success":False,"message":e}
+		return {"success":False,"message":str(e)}
 
 def insert_credit_items(items,invoice_number):
 	try:
@@ -372,7 +372,7 @@ def CreditgenerateIrn(invoice_number):
 	company_details = check_company_exist_for_Irn(invoice.company)
 	# get gsp_details
 	companyData = {"code":company_details['data'].name,"mode":company_details['data'].mode,"provider":company_details['data'].provider}
-	GSP_details = gsp_api_data(companyData)
+	GSP_details = creditgsp_api_data(companyData)
 	# get taxpayer details
 	GspData = {"gstNumber":invoice.gst_number,"code":invoice.company,"apidata":GSP_details['data'],"invoice":invoice_number}
 	taxpayer_details = get_tax_payer_details_data(GspData)

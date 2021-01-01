@@ -26,20 +26,26 @@ class company(Document):
 			site_folder_path = self.site_name
 			folder_path = frappe.utils.get_bench_path()
 			path = folder_path + '/sites/' + site_folder_path
+			if self.invoice_reinitiate_parsing_file:
+				reinitatefilepath = path+self.invoice_reinitiate_parsing_file
+				destination_path = folder_path+self.reinitiate_file_path
+				try:
+					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+					shutil.copy(reinitatefilepath, destination_path)
+				except Exception as e:
+					print(str(e),"************on_update company")
+					frappe.throw("file updated Failed")
+			if self.invoice_parser_file:
+				# invoice_parser_file_path
+				invoicefilepath = path+self.invoice_parser_file
+				destination_path2 = folder_path+self.invoice_parser_file_path
+				try:
+					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+					shutil.copy(invoicefilepath,destination_path2)
+				except Exception as e:
+					print(str(e),"************on_update company")
+					frappe.throw("file updated Failed")
 
-			reinitatefilepath = path+self.invoice_reinitiate_parsing_file
-			destination_path = folder_path+self.reinitiate_file_path
-			# invoice_parser_file_path
-			invoicefilepath = path+self.invoice_parser_file
-			destination_path2 = folder_path+self.invoice_parser_file_path
-			try:
-				print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-				
-				shutil.copy(reinitatefilepath, destination_path)
-				shutil.copy(invoicefilepath,destination_path2)
-			except Exception as e:
-				print(str(e),"************on_update company")
-				frappe.throw("file updated Failed")
 
 
 
@@ -67,7 +73,7 @@ def getPrinters():
 	printers = []
 	for index,i in enumerate(raw_printers):
 		print(index,i)
-		if 'system default destination' not in i and 'ezy' not in i and 'EZY' not in i:
+		if 'system default destination' not in i and 'ezy' not in i and 'EZY' not in i and "reason unknown" not in i:
 			printers.append(i.split('is')[0].split('printer')[1].strip())
 
 	return {'success':True,"data":printers,"message":"list of avaliable printers"}
