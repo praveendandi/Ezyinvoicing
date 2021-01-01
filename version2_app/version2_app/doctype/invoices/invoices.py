@@ -58,7 +58,7 @@ class Invoices(Document):
 				"TranDtls": {
 					"TaxSch": "GST",
 					"SupTyp": "B2B",
-					"RegRev": "Y",
+					"RegRev": "N",
 					"IgstOnIntra": "N"
 				},
 				"SellerDtls": {
