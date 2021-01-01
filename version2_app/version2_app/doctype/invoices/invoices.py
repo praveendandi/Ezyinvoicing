@@ -2355,34 +2355,34 @@ def attach_b2c_qrcode(data):
 		page.insertImage(img_rect, filename=img_filename)
 		document.save(attach_qrpath)
 		document.close()
-		dst_pdf_text_filename = path + "/private/files/" + data[
-			"invoice_number"] + 'withattachqr.pdf'
-		doc = fitz.open(attach_qrpath)
-		irn_number = ''.join(
-			random.choice(string.ascii_uppercase + string.ascii_lowercase +
-						  string.digits) for _ in range(50))
-		ack_no = str(randint(100000000000, 9999999999999))
-		ackdate = str(datetime.datetime.now())
-		ack_date = ackdate.split(" ")
-		text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date[0]
-		if company.irn_details_page == "First":
-			page = doc[0]
-		else:
-			page = doc[-1]
-		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		page.insertText(
-			where,
-			text,
-			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=folder_path +
-			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=6,  # default
-			rotate=0,  # rotate text
-			color=(0, 0, 0),  # some color (blue)
-			overlay=True)
-		doc.save(dst_pdf_text_filename)
-		doc.close()
-		files_new = {"file": open(dst_pdf_text_filename, 'rb')}
+		# dst_pdf_text_filename = path + "/private/files/" + data[
+		# 	"invoice_number"] + 'withattachqr.pdf'
+		# doc = fitz.open(attach_qrpath)
+		# irn_number = ''.join(
+		# 	random.choice(string.ascii_uppercase + string.ascii_lowercase +
+		# 				  string.digits) for _ in range(50))
+		# ack_no = str(randint(100000000000, 9999999999999))
+		# ackdate = str(datetime.datetime.now())
+		# ack_date = ackdate.split(" ")
+		# text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date[0]
+		# if company.irn_details_page == "First":
+		# 	page = doc[0]
+		# else:
+		# 	page = doc[-1]
+		# where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		# page.insertText(
+		# 	where,
+		# 	text,
+		# 	fontname="Roboto-Black",  # arbitrary if fontfile given
+		# 	fontfile=folder_path +
+		# 	company.font_file_path,  #fontpath,  # any file containing a font
+		# 	fontsize=6,  # default
+		# 	rotate=0,  # rotate text
+		# 	color=(0, 0, 0),  # some color (blue)
+		# 	overlay=True)
+		# doc.save(dst_pdf_text_filename)
+		# doc.close()
+		files_new = {"file": open(src_pdf_filename, 'rb')}
 		payload_new = {
 			"is_private": 1,
 			"folder": "Home",
