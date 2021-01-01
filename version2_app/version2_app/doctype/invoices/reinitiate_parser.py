@@ -159,7 +159,6 @@ def reinitiateInvoice(data):
 	for each in items:
 		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name']:
 			total_items.append(each)
-			total_items.append(each)
 
 	guest = dict()
 	# print(guestDeatils)

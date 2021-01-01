@@ -1070,7 +1070,10 @@ def insert_items(items, invoice_number):
 	try:
 		a = frappe.db.delete('Items', {'parent': invoice_number})
 		b = frappe.db.commit()
-		print("/aaaaaaa**********",a,b,invoice_number)
+		
+		# a = frappe.db.sql("""delete from tabItems where parent=%s""", invoice_number)
+		# b= frappe.db.commit()
+		# print("/aaaaaaa**********",a,b,invoice_number)
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
