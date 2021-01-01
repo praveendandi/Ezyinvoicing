@@ -58,7 +58,7 @@ class Invoices(Document):
 				"TranDtls": {
 					"TaxSch": "GST",
 					"SupTyp": "B2B",
-					"RegRev": "Y",
+					"RegRev": "N",
 					"IgstOnIntra": "N"
 				},
 				"SellerDtls": {
@@ -2390,7 +2390,7 @@ def attach_b2c_qrcode(data):
 		# 	overlay=True)
 		# doc.save(dst_pdf_text_filename)
 		# doc.close()
-		files_new = {"file": open(src_pdf_filename, 'rb')}
+		files_new = {"file": open(attach_qrpath, 'rb')}
 		payload_new = {
 			"is_private": 1,
 			"folder": "Home",
