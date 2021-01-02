@@ -212,6 +212,7 @@ class Invoices(Document):
 				"TotInvVal": round(TotInnVal,2),
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
+			print(gst_data,"         //////")
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -1047,14 +1048,14 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 			for item in items:
 				# print(item)
 				if item['sac_code'] == sac:
-					sac_tax['cgst'] += item['cgst_amount']
-					sac_tax['sgst'] += item['sgst_amount']
-					sac_tax['igst'] += item['igst_amount']
-					sac_tax['cess'] += item['cess_amount']
-					sac_tax["state_cess"] += item["state_cess_amount"]
-					sac_tax["vat"] += item["vat_amount"]
-					sac_tax['amount_before_gst'] += item['item_taxable_value']
-					sac_tax['amount_after_gst'] += item['item_value_after_gst']
+					sac_tax['cgst'] += round(item['cgst_amount'],2)
+					sac_tax['sgst'] += round(item['sgst_amount'],2)
+					sac_tax['igst'] += round(item['igst_amount'],2)
+					sac_tax['cess'] += round(item['cess_amount'],2)
+					sac_tax["state_cess"] += round(item["state_cess_amount"],2)
+					sac_tax["vat"] += round(item["vat_amount"],2)
+					sac_tax['amount_before_gst'] += round(item['item_taxable_value'],2)
+					sac_tax['amount_after_gst'] += round(item['item_value_after_gst'],2)
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
@@ -2266,82 +2267,78 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	try:
-		# print(data,"8888")
-		# # invdata = frappe.get_doc("Invoices",data['invoice_number'])
-		# # print(invdata,"////////")
-		# # if invdata:
-		# # 	invdata.error_message = data['error_message']
-		# # 	invdata.irn_generated = "Error"
-		# # 	invdata.save()
-		# else:
-
-		invoice = frappe.get_doc({
-			'doctype':
-			'Invoices',
-			'invoice_number':
-			data['invoice_number'],
-			'guest_name':
-			data['guest_name'],
-			'gst_number':
-			data['gst_number'],
-			'invoice_file':
-			data['invoice_file'],
-			'room_number':
-			data['room_number'],
-			'invoice_type':
-			data['invoice_type'],
-			'irn_generated':
-			"Error",
-			'invoice_date':
-			datetime.datetime.strptime(data['invoice_date'],
-									'%d-%b-%y %H:%M:%S'),
-			'legal_name':
-			" ",
-			# data['taxpayer']['legal_name'],
-			'address_1':
-			" ",
-			# data['taxpayer']['address_1'],
-			'email':
-			" ",
-			# data['taxpayer']['email'],
-			'trade_name':
-			" ",
-			# data['taxpayer']['trade_name'],
-			'address_2':
-			" ",
-			# data['taxpayer']['address_2'],
-			'phone_number':
-			" ",
-			# data['taxpayer']['phone_number'],
-			'location':
-			" ",
-			# data['taxpayer']['location'],
-			'pincode':
-			data['pincode'],
-			'state_code':
-			data['state_code'],
-			'amount_before_gst':
-			0,
-			# round(value_before_gst, 2),
-			"amount_after_gst":
-			0,
-			# round(value_after_gst, 2),
-			"other_charges":
-			0,  # round(other_charges,2),
-			'irn_cancelled':
-			'No',
-			'qr_code_generated':
-			'Pending',
-			'signed_invoice_generated':
-			'No',
-			'company':
-			data['company_code'],
-			'ready_to_generate_irn':
-			"No",
-			'error_message':
-			data['error_message']
-		})
-		v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
+		if invoiceExists:
+			invoiceExists.error_message = data['error_message']
+			invoiceExists.irn_generated = "Error"
+			invoiceExists.save()
+			# return {"success":False,"message":"error"}
+		else:
+			invoice = frappe.get_doc({
+				'doctype':
+				'Invoices',
+				'invoice_number':
+				data['invoice_number'],
+				'guest_name':
+				data['guest_name'],
+				'gst_number':
+				data['gst_number'],
+				'invoice_file':
+				data['invoice_file'],
+				'room_number':
+				data['room_number'],
+				'invoice_type':
+				data['invoice_type'],
+				'irn_generated':
+				"Error",
+				'invoice_date':
+				datetime.datetime.strptime(data['invoice_date'],
+										'%d-%b-%y %H:%M:%S'),
+				'legal_name':
+				" ",
+				'address_1':
+				" ",
+				'email':
+				" ",
+				'trade_name':
+				" ",
+				'address_2':
+				" ",
+				'phone_number':
+				" ",
+				'location':
+				" ",
+				'pincode':
+				data['pincode'],
+				'state_code':
+				data['state_code'],
+				'amount_before_gst':
+				0,
+				"amount_after_gst":
+				0,
+				"other_charges":
+				0,  
+				'irn_cancelled':
+				'No',
+				'qr_code_generated':
+				'Pending',
+				'signed_invoice_generated':
+				'No',
+				'company':
+				data['company_code'],
+				'ready_to_generate_irn':
+				"No",
+				'error_message':
+				data['error_message']
+			})
+			v = invoice.insert(ignore_permissions=True, ignore_links=True)
+			# return {"success":False,"message":"error"}
+		if data['items_data']:
+			items = data['items_data']
+			itemsInsert = insert_items(items,data['invoice_number'])
+			insert_tax_summaries2(items,data['invoice_number'])
+			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+				items, data['invoice_number'],"Invoice")
 	except Exception as e:
 		print(e, "  Error insert Invoice")
 		return {"success": False, "message": str(e)}
