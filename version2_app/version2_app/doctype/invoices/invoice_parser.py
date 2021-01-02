@@ -58,7 +58,7 @@ def file_parsing(filepath):
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
 			conf_number = confirmation_number[-1].replace(" ", "")
-		if "Total" in i:
+		if "Total" in i and "Sub Total" not in i:
 			total_invoice = i.split(" ")
 			total_invoice_amount = float(total_invoice[-2].replace(",", ""))
 		if "Departure :" in i:
@@ -69,10 +69,11 @@ def file_parsing(filepath):
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 		if "GST No" in i:
-			print(i)
-			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("TAXINVOICE","")
-		if "Bill  No." in i:
+			gst_split = i.split(" ")
+			gst_regex = re.compile('[a-zA-Z0-9]{15,}$')
+			gst_num =  list(filter(gst_regex.match, gst_split))
+			gstNumber =  gst_num[0] if len(gst_num) > 0 else ""
+		if "Invoice No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
 			guestDetailsEntered = True
@@ -86,7 +87,7 @@ def file_parsing(filepath):
 			entered = False
 		if 'Billing' in i:
 			entered = False
-		if 'Total' in i:
+		if 'Total' in i and "Sub Total" not in i:
 			entered = False
 		if entered == True:
 			data.append(i)
@@ -97,7 +98,7 @@ def file_parsing(filepath):
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
 			p = i.split(":")
-			print_by = p[1].replace(" ","")
+			print_by = p[2].replace(" ","")
 
 	items = [] 
 	itemsort = 0
@@ -149,6 +150,7 @@ def file_parsing(filepath):
 	for index, i in enumerate(guestDeatils):
 		if index == 0:
 			guest['name'] = i.split(':')[1]
+			guest["name"] = (guest["name"].replace("Departure","")).strip()
 		if index == 1:
 			guest['address1'] = i
 		if index == 2:
