@@ -1122,9 +1122,12 @@ def calulate_items(data):
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
 				if sac_code_based_gst_rates.service_charge == "Yes":
 					service_dict = {}
-
-					if sac_code_based_gst_rates.net == "Yes":
+					if sac_code_based_gst_rates.one_sc_applies_to_all == 1:
 						scharge = companyDetails.service_charge_percentage
+					else:
+						scharge = sac_code_based_gst_rates.service_charge_rate
+					if sac_code_based_gst_rates.net == "Yes":
+						
 						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						total_gst_amount = (gstpercentage * item['item_value']) / 100.0
 						scharge_value = item['item_value'] - total_gst_amount
@@ -1134,10 +1137,9 @@ def calulate_items(data):
 						gst_percentage = 18
 					else:
 						
-						scharge = companyDetails.service_charge_percentage
+						
 						base_value = item['item_value']
 					
-						scharge_value = (scharge * item['item_value']) / 100.0
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						
 						if sac_code_based_gst_rates.vat_rate>0:
