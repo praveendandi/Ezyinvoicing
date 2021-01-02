@@ -1000,7 +1000,8 @@ def insert_invoice(data):
 		# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
 		if data['total_invoice_amount'] != 0:
 			itemsInsert = insert_items(items, data['invoice_number'])
-			insert_tax_summaries2(items, data['invoice_number'])
+			# insert_tax_summaries2(items, data['invoice_number'])
+			TaxSummariesInsert(items,data['invoice_number'])
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 				items, data['guest_data']['invoice_number'],"Invoice")
 		
