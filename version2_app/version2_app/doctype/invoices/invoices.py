@@ -1069,7 +1069,6 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 
 def insert_items(items, invoice_number):
 	try:
-		print("..............")
 		frappe.db.delete('Items', {
     		'parent': invoice_number})
 		frappe.db.commit()
@@ -1092,7 +1091,7 @@ def insert_items(items, invoice_number):
 @frappe.whitelist(allow_guest=True)
 def calulate_items(data):
 	#items, invoice_number,company_code
-	try:
+	# try:
 		total_items = []
 		second_list = []
 		for item in data['items']:
@@ -1168,6 +1167,7 @@ def calulate_items(data):
 							statecessamount = 0
 							service_dict['state_cess_amount'] = 0
 							service_dict['state_cess'] = 0	
+						# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.	
 						gst_value = (gst_percentage* scharge_value)/100.0
 						service_dict['item_name'] = item['name']+"-SC "
 						service_dict['description'] = item['name']+"-SC "
@@ -1199,6 +1199,7 @@ def calulate_items(data):
 						service_dict['doctype'] = 'Items'
 						service_dict['parentfield'] = 'items'
 						service_dict['parenttype'] = 'invoices'
+						print(service_dict)
 						second_list.append(service_dict)
 					# second_list	
 				# print(item)	
@@ -1519,9 +1520,9 @@ def calulate_items(data):
 			})
 		total_items.extend(second_list)	
 		return {"success": True, "data": total_items}
-	except Exception as e:
-		print(e, "calculation api")
-		return {"success": False, "message": str(e)}
+	# except Exception as e:
+	# 	print(e, "calculation api")
+	# 	return {"success": False, "message": str(e)}
 
 
 def insert_tax_summariesd(items, invoice_number):
@@ -2268,6 +2269,14 @@ def check_invoice_exists(invoice_number):
 def Error_Insert_invoice(data):
 	try:
 		# print(data,"8888")
+		# # invdata = frappe.get_doc("Invoices",data['invoice_number'])
+		# # print(invdata,"////////")
+		# # if invdata:
+		# # 	invdata.error_message = data['error_message']
+		# # 	invdata.irn_generated = "Error"
+		# # 	invdata.save()
+		# else:
+
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -2287,7 +2296,7 @@ def Error_Insert_invoice(data):
 			"Error",
 			'invoice_date':
 			datetime.datetime.strptime(data['invoice_date'],
-									   '%d-%b-%y %H:%M:%S'),
+									'%d-%b-%y %H:%M:%S'),
 			'legal_name':
 			" ",
 			# data['taxpayer']['legal_name'],
