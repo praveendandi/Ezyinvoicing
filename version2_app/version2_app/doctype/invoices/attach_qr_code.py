@@ -3,7 +3,7 @@ import fitz
 import frappe
 import requests
 import os
-
+from version2_app.version2_app.doctype.invoices.invoices import create_qr_image, gsp_api_data
 
 
 @frappe.whitelist(allow_guest=True)
@@ -12,6 +12,11 @@ def AttachQrCodeInInvoice(invoice_number):
         invoice = frappe.get_doc('Invoices', invoice_number)
         company = frappe.get_doc('company',invoice.company)
         if invoice.invoice_type == "B2B":
+            if invoice.qr_code_image == "":
+                companyData = {"code":company.name,"mode":company.mode,"provider":company.provider}
+                GSP_details = gsp_api_data(companyData)
+                create = create_qr_image(invoice_number,GSP_details['data'])
+                return {"message":"Qr Redo Succesfull","success":True}
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
             path = folder_path + '/sites/' + site_folder_path

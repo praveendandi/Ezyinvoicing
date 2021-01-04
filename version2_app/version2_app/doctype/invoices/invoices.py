@@ -602,7 +602,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		if 'message' in response:
 			invoice.invoice_with_gst_details = response['message']['file_url']
 			invoice.save()
-		return
+		return True
 	except Exception as e:
 		print(e, "attach qr code")
 
