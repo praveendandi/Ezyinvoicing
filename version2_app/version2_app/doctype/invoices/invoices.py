@@ -791,11 +791,11 @@ def insert_invoice(data):
 					total_vat_amount += item['vat_amount']
 					# print(value_before_gst,value_after_gst," ******")
 				else:
-					cgst_amount+=item['cgst_amount']
-					sgst_amount+=item['sgst_amount']
-					igst_amount+=item['igst_amount']
-					total_central_cess_amount+=item['cess_amount']
-					total_state_cess_amount +=item['state_cess_amount']
+					# cgst_amount+=item['cgst_amount']
+					# sgst_amount+=item['sgst_amount']
+					# igst_amount+=item['igst_amount']
+					# total_central_cess_amount+=item['cess_amount']
+					# total_state_cess_amount +=item['state_cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -844,6 +844,8 @@ def insert_invoice(data):
 		
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
+		sales_amount_before_tax = sales_amount_before_tax -credit_value_after_gst
+		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
 		else:
