@@ -218,7 +218,7 @@ def file_parsing(filepath):
 
 
 
-	   adasd
+	   
 
 
 	print(json.dumps(guest, indent = 1))

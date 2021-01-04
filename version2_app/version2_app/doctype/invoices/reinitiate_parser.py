@@ -117,7 +117,7 @@ def reinitiateInvoice(data):
 			elif len(j) == 1:
 				if j[0] not in paymentTypes:
 					original_data.append(i)
-                         
+
 	items = [] 
 	itemsort = 0
 	for i in original_data:
