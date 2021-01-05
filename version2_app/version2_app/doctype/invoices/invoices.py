@@ -8,6 +8,7 @@ from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
+from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
 import json
 import qrcode
@@ -164,11 +165,11 @@ class Invoices(Document):
 						"GstRt":
 						item.gst_rate,
 						"IgstAmt":
-						round(item.igst_amount, 1),
+						round(item.igst_amount, 2),
 						"CgstAmt":
-						round(item.cgst_amount, 1),
+						round(item.cgst_amount, 2),
 						"SgstAmt":
-						round(item.sgst_amount, 1),
+						round(item.sgst_amount, 2),
 						"CesRt":
 						item.cess,
 						"CesAmt":
@@ -845,8 +846,8 @@ def insert_invoice(data):
 		
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
-		sales_amount_before_tax = sales_amount_before_tax -credit_value_after_gst
 		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
 		else:
@@ -860,7 +861,7 @@ def insert_invoice(data):
 						"total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
 						"total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
 						"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
-						"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst}
+						"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
 				
 				
 				TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
@@ -903,6 +904,7 @@ def insert_invoice(data):
 										'%d-%b-%y %H:%M:%S'),
 			'legal_name':
 			data['taxpayer']['legal_name'],
+			'mode':company.mode,
 			'address_1':
 			data['taxpayer']['address_1'],
 			'email':
@@ -974,7 +976,8 @@ def insert_invoice(data):
 			'total_credit_state_cess_amount':round(total_credit_state_cess_amount,2),
 			'total_credit_central_cess_amount':round(total_credit_central_cess_amount,2),
 			'total_credit_vat_amount': round(total_credit_vat_amount,2),
-			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
+			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
+			"mode": company.mode
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.db.get_list(
@@ -1003,6 +1006,7 @@ def insert_invoice(data):
 		# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
 		if data['total_invoice_amount'] != 0:
 			itemsInsert = insert_items(items, data['invoice_number'])
+			# insert_t
 			insert_tax_summaries2(items, data['invoice_number'])
 			# TaxSummariesInsert(items,data['invoice_number'])
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
@@ -1075,10 +1079,9 @@ def insert_items(items, invoice_number):
 		a = frappe.db.delete('Items', {'parent': invoice_number})
 		b = frappe.db.commit()
 		
-		# a = frappe.db.sql("""delete from tabItems where parent=%s""", invoice_number)
-		# b= frappe.db.commit()
-		# print("/aaaaaaa**********",a,b,invoice_number)
 		for item in items:
+			item['item_value'] = round(item['item_value'],2)
+			item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
 			if "-" in str(item['item_value']):
@@ -1108,7 +1111,7 @@ def calulate_items(data):
 				ItemMode = "Credit"
 			else:
 				ItemMode = "Discount"
-					
+
 			if companyDetails.calculation_by == "Description":
 				sac_code_based_gst = frappe.db.get_list(
 					'SAC HSN CODES',
@@ -1123,13 +1126,22 @@ def calulate_items(data):
 					SAC_CODE = sac_code_based_gst_rates.code 
 					item['item_type'] = sac_code_based_gst_rates.type
 				else:
-					
-					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
+					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}
+				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
+					item['sac_code'] = sac_code_based_gst_rates.code
+				if item['sac_code'] == '996311':
+					percentage_gst = CheckRatePercentages(item)
+					if percentage_gst["success"] == True:
+						acc_gst_percentage = percentage_gst["gst_percentage"]	
+					else:
+						{"success": False, "message": "error in slab helper function"}
 				if sac_code_based_gst_rates.service_charge == "Yes":
 					service_dict = {}
-					if sac_code_based_gst_rates.net == "Yes":
-						
+					if sac_code_based_gst_rates.one_sc_applies_to_all == 1:
 						scharge = companyDetails.service_charge_percentage
+					else:
+						scharge = sac_code_based_gst_rates.service_charge_rate
+					if sac_code_based_gst_rates.net == "Yes":
 						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						total_gst_amount = (gstpercentage * item['item_value']) / 100.0
 						base_value = item['item_value'] - total_gst_amount
@@ -1137,13 +1149,12 @@ def calulate_items(data):
 						item['base_value'] = base_value
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					else:
-						
-						scharge = companyDetails.service_charge_percentage
 						base_value = item['item_value']
-					
 						scharge_value = (scharge * item['item_value']) / 100.0
-						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						
+						if item['sac_code'] == '996311':
+							gst_percentage = acc_gst_percentage
+						else:
+							gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					if sac_code_based_gst_rates.vat_rate>0:
 						vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
 						service_dict['vat_amount'] = vatamount
@@ -1170,7 +1181,7 @@ def calulate_items(data):
 						statecessamount = 0
 						service_dict['state_cess_amount'] = 0
 						service_dict['state_cess'] = 0	
-					# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.	
+					# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.
 					gst_value = (gst_percentage* scharge_value)/100.0
 					service_dict['item_name'] = item['name']+"-SC "
 					service_dict['description'] = item['name']+"-SC "
@@ -1202,12 +1213,9 @@ def calulate_items(data):
 					service_dict['doctype'] = 'Items'
 					service_dict['parentfield'] = 'items'
 					service_dict['parenttype'] = 'invoices'
-					print(service_dict)
 					second_list.append(service_dict)
 					# second_list	
-				# print(item)	
-				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
-					item['sac_code'] = sac_code_based_gst_rates.code
+				# print(item)
 				if sac_code_based_gst_rates.type == "Discount":
 					
 						final_item['sac_code'] = 'No Sac'
@@ -1236,22 +1244,14 @@ def calulate_items(data):
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
 						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
-							if item['item_value']>1000 and item['item_value']<=7500:
-								gst_percentage = 12
-							elif item['item_value'] > 7500:
-								gst_percentage = 18
-							elif item['item_value'] == 1000:
-								gst_percentage = 0
-							else:
-								gst_percentage = 0
-							if gst_percentage == 0:
+							if acc_gst_percentage == 0:
 								final_item['cgst'] = 0
 								final_item['sgst'] = 0
 								final_item['igst'] = 0
 								final_item['type'] = "Excempted"
 							else:
-								final_item['cgst'] = gst_percentage/2
-								final_item['sgst'] = gst_percentage/2
+								final_item['cgst'] = acc_gst_percentage/2
+								final_item['sgst'] = acc_gst_percentage/2
 								final_item['igst'] = 0
 								final_item['type'] = "Included"
 						else:
@@ -1360,7 +1360,12 @@ def calulate_items(data):
 						final_item['type'] = "Excempted"
 						final_item['item_type'] = "Discount"
 						final_item['item_mode'] = ItemMode
-						final['']
+				if item['sac_code'] == '996311':
+					percentage_gst = CheckRatePercentages(item)
+					if percentage_gst["success"] == True:
+						acc_gst_percentage = percentage_gst["gst_percentage"]	
+					else:
+						{"success": False, "message": "error in slab helper function"}
 				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
 					if "-" in str(item['item_value']):
 						final_item['item_mode'] = ItemMode
@@ -1369,22 +1374,14 @@ def calulate_items(data):
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
 						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
-							if item['item_value']>1000 and item['item_value']<=7500:
-								gst_percentage = 12
-							elif item['item_value'] > 7500:
-								gst_percentage = 18
-							elif item['item_value'] == 1000:
-								gst_percentage = 0
-							else:
-								gst_percentage = 0
-							if gst_percentage == 0:
+							if acc_gst_percentage == 0:
 								final_item['cgst'] = 0
 								final_item['sgst'] = 0
 								final_item['igst'] = 0
 								final_item['type'] = "Excempted"
 							else:
-								final_item['cgst'] = gst_percentage/2
-								final_item['sgst'] = gst_percentage/2
+								final_item['cgst'] = acc_gst_percentage/2
+								final_item['sgst'] = acc_gst_percentage/2
 								final_item['igst'] = 0
 								final_item['type'] = "Included"
 						else:
@@ -1528,6 +1525,7 @@ def calulate_items(data):
 		return {"success": False, "message": str(e)}
 
 
+
 def insert_tax_summariesd(items, invoice_number):
 	try:
 		tax_list = []
@@ -1617,7 +1615,6 @@ def TaxSummariesInsert(items,invoice_number):
 					tax_summary_sgst_update.save()
 			if each['cgst']>0:
 				tax_summary_cgst = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CGST','tax_percentage':each['cgst']})
-				print(tax_summary_cgst,"//////")
 				tax_summary_cgst = [element for tupl in tax_summary_cgst for element in tupl]
 				if len(tax_summary_cgst)==0 or tax_summary_cgst==():
 					doc = frappe.get_doc({
@@ -1636,7 +1633,6 @@ def TaxSummariesInsert(items,invoice_number):
 					tax_summary_cgst_update.save()
 			if each['igst']>0:
 				tax_summary_igst = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'IGST','tax_percentage':each['igst']})
-				print(tax_summary_igst,"//////")
 				tax_summary_igst = [element for tupl in tax_summary_igst for element in tupl]
 				if len(tax_summary_igst)==0 or tax_summary_igst==():
 					doc = frappe.get_doc({
@@ -1655,7 +1651,6 @@ def TaxSummariesInsert(items,invoice_number):
 					tax_summary_Igst_update.save()
 			if each['vat']>0:
 				tax_summary_vat = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'VAT','tax_percentage':each['vat']})
-				print(tax_summary_vat,"//////")
 				tax_summary_vat = [element for tupl in tax_summary_vat for element in tupl]
 				if len(tax_summary_vat)==0 or tax_summary_vat==():
 					doc = frappe.get_doc({
@@ -1674,7 +1669,6 @@ def TaxSummariesInsert(items,invoice_number):
 					tax_summary_vat_update.save()
 			if each['cess']>0:
 				tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CENTRAL CESS','tax_percentage':each['cess']})
-				print(tax_summary_cess,"//////")
 				tax_summary_cess = [element for tupl in tax_summary_cess for element in tupl]
 				if len(tax_summary_cess)==0 or tax_summary_cess==():
 					doc = frappe.get_doc({
@@ -1693,7 +1687,6 @@ def TaxSummariesInsert(items,invoice_number):
 					tax_summary_cess_update.save()	
 			if each['state_cess']>0:
 				tax_summary_state_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'STATE CESS','tax_percentage':each['state_cess']})
-				print(tax_summary_state_cess,"//////")
 				tax_summary_state_cess = [element for tupl in tax_summary_state_cess for element in tupl]
 				if len(tax_summary_state_cess)==0 or tax_summary_state_cess==():
 					doc = frappe.get_doc({
@@ -1836,7 +1829,7 @@ def insert_tax_summaries2(items,invoice_number):
 			else:
 				tax_summary_cess_update = frappe.db.get_doc('Tax Summaries',tax_summary_cess[0])
 				tax_summary_cess_update.tax_percentage = each['vat_amount']+tax_summary_cess_update.tax_percentage			
-				tax_summary_cess_update.save()				
+				tax_summary_cess_update.save()	
 
 def insert_tax_summaries(items, invoice_number):
 	'''
@@ -2408,6 +2401,7 @@ def Error_Insert_invoice(data):
 		# 	invoiceExists.save()
 		# 	# return {"success":False,"message":"error"}
 		# else:
+		company = frappe.get_doc('company',data['company_code'])
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -2452,6 +2446,7 @@ def Error_Insert_invoice(data):
 			0,
 			"other_charges":
 			0,  
+			'mode':company.mode,
 			'irn_cancelled':
 			'No',
 			'qr_code_generated':

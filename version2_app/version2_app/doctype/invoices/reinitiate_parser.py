@@ -23,8 +23,9 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
 	filepath = data['filepath']
+	reupload_inv_number = data['invoice_number']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("IBISNDA-01")
+	companyCheckResponse = check_company_exist("ISGC-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -68,11 +69,13 @@ def reinitiateInvoice(data):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "Cust GST ID" in i:
+		if "GST ID" in i and "PAN No" not in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			# gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+			if "/" in invoiceNumber:
+				invoiceNumber = invoiceNumber.replace("/","")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:
@@ -98,62 +101,57 @@ def reinitiateInvoice(data):
 			p = i.split(":")
 			print_by = p[1].replace(" ","")
 
-	
-	paymentTypes = GetPaymentTypes()
-	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
-	original_data = []
-	for index, i in enumerate(data):
-		if 'XX/XX' in i:
-			i = " "
-		if i !=" ":
-			j = i.split(' ')
-			j = j[1:-1]
-			if len(j)>1:
-				ele = j[0]
-				if "~" not in j[1]:
-					ele = ele+" "+j[1]
-				if ele not in paymentTypes:
-					original_data.append(i)
-			elif len(j) == 1:
-				if j[0] not in paymentTypes:
-					original_data.append(i)
-
+	if invoiceNumber != reupload_inv_number:
+		return {"success":False,"message":"Incorrect Invoice Attempted"}
 	items = [] 
 	itemsort = 0
-	for i in original_data:
+	for i in data:
 		pattern = re.compile(
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i and "Vat" not in i and "VAT" not in i:
+		if len(check_date) > 0:
 			item = dict()
 			item_value = ""
 			dt = i.strip()
 			for index, j in enumerate(i.split(' ')):
-				if index == 0:
-					item['date'] = j
 				val = dt.split(" ")
-				if val != "":
+				# print(val,"*********")
+				if index == 0 and len(val)>1:
+					item['date'] = j
+				
+				if len(val)>1:
 					item_value = val[-1]
 					item['item_value'] = float(item_value.replace(',', ''))
-				else:
-					item_value = val[-2]
-					item['item_value'] = float(item_value.replace(',', ''))
-				if index == 1:
+				# else:
+				# 	item_value = val[-2]
+				# 	item['item_value'] = float(item_value.replace(',', ''))
+				if index == 1 and len(val)>1:
 					starting_index = i.index(j)
 					if "~" in i:
 						ending_index = i.find("~")
-						item["name"] = (i[starting_index:ending_index]).strip()
+						item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
 					else:
 						ending_index = i.find(item_value)
-						item["name"] = (i[starting_index:ending_index]).strip()
-				if 'SAC' in j:
-					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
-				else:
-					item['sac_code'] = "No Sac"
-				item['sort_order'] =  itemsort+1
+						item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+				if len(val)>1:		
+					if 'SAC' in j:
+						item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
+					else:
+						item['sac_code'] = "No Sac"
+				if len(val)>1:		
+					item['sort_order'] =  itemsort+1
 			itemsort+=1
-			items.append(item)
+			if item !={}:
+				items.append(item)
+
+	total_items = []
+	paymentTypes = GetPaymentTypes()
+	payment_Types  = [''.join(each) for each in paymentTypes['data']]
+	for each in items:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+			if each["name"] not in payment_Types:
+				total_items.append(each)
 
 	guest = dict()
 	# print(guestDeatils)
@@ -169,11 +167,11 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = items
+	guest['items'] = total_items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "IBISNDA-01"
+	guest['company_code'] = "ISGC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -188,16 +186,16 @@ def reinitiateInvoice(data):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"IBISNDA-01"}
+	company_code = {"code":"ISGC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "36"
+	error_data['state_code'] = "33"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "500082"
+	error_data['pincode'] = "603103"
 	# gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
@@ -208,7 +206,7 @@ def reinitiateInvoice(data):
 		return {"success":False,"message":"The given gst number is not a vaild one"}
 
 
-	# print(json.dumps(guest, indent = 1))
+	print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':
@@ -252,8 +250,6 @@ def reinitiateInvoice(data):
 		else:
 			
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-
-
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath

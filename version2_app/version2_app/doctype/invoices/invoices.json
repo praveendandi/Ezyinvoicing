@@ -737,7 +737,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-05 09:23:06.589664",
+ "modified": "2021-01-05 11:11:46.466336",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -844,6 +844,15 @@
    "role": "All",
    "share": 1,
    "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Inbox",
+   "share": 1
   }
  ],
  "quick_entry": 1,

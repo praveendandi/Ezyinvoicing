@@ -76,9 +76,9 @@ def Reinitiate_invoice(data):
 					total_vat_amount += item['vat_amount']
 					# print(value_before_gst,value_after_gst," ******")
 				else:
-					cgst_amount+=item['cgst_amount']
-					sgst_amount+=item['sgst_amount']
-					igst_amount+=item['igst_amount']
+					# cgst_amount+=item['cgst_amount']
+					# sgst_amount+=item['sgst_amount']
+					# igst_amount+=item['igst_amount']
 					# cess_amount+=item['cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
@@ -127,6 +127,8 @@ def Reinitiate_invoice(data):
 		invoice_round_off_amount = 0	
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
+		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -144,9 +146,10 @@ def Reinitiate_invoice(data):
 		doc.confirmation_number = data['guest_data']['confirmation_number']
 		doc.trade_name=data['taxpayer']['trade_name']
 		doc.address_2=data['taxpayer']['address_2']
-		phone_number=data['taxpayer']['phone_number']
-		location=data['taxpayer']['location']
-		pincode=data['taxpayer']['pincode']
+		doc.phone_number=data['taxpayer']['phone_number']
+		doc.mode = company.mode
+		doc.location=data['taxpayer']['location']
+		doc.pincode=data['taxpayer']['pincode']
 		state_code=data['taxpayer']['state_code']
 		doc.amount_before_gst=round(value_before_gst, 2)
 		doc.amount_after_gst=round(value_after_gst, 2)
