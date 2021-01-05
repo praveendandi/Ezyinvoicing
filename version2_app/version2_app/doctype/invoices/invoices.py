@@ -212,6 +212,7 @@ class Invoices(Document):
 				"TotInvVal": round(TotInnVal,2),
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
+			print(gst_data,"         //////")
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -1047,14 +1048,14 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 			for item in items:
 				# print(item)
 				if item['sac_code'] == sac:
-					sac_tax['cgst'] += item['cgst_amount']
-					sac_tax['sgst'] += item['sgst_amount']
-					sac_tax['igst'] += item['igst_amount']
-					sac_tax['cess'] += item['cess_amount']
-					sac_tax["state_cess"] += item["state_cess_amount"]
-					sac_tax["vat"] += item["vat_amount"]
-					sac_tax['amount_before_gst'] += item['item_taxable_value']
-					sac_tax['amount_after_gst'] += item['item_value_after_gst']
+					sac_tax['cgst'] += round(item['cgst_amount'],2)
+					sac_tax['sgst'] += round(item['sgst_amount'],2)
+					sac_tax['igst'] += round(item['igst_amount'],2)
+					sac_tax['cess'] += round(item['cess_amount'],2)
+					sac_tax["state_cess"] += round(item["state_cess_amount"],2)
+					sac_tax["vat"] += round(item["vat_amount"],2)
+					sac_tax['amount_before_gst'] += round(item['item_taxable_value'],2)
+					sac_tax['amount_after_gst'] += round(item['item_value_after_gst'],2)
 
 			tax_data.append(sac_tax)
 		for sac in tax_data:
@@ -1126,11 +1127,10 @@ def calulate_items(data):
 						scharge = companyDetails.service_charge_percentage
 						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						total_gst_amount = (gstpercentage * item['item_value']) / 100.0
-						scharge_value = item['item_value'] - total_gst_amount
-						scharge_value = (scharge * item['item_value']) / 100.0
-						base_value = round(item['item_value'] * (100 / (scharge + 100)),3)
-						scharge_value = item['item_value'] - base_value
-						gst_percentage = 18
+						base_value = item['item_value'] - total_gst_amount
+						scharge_value = (scharge * base_value) / 100.0
+						item['base_value'] = base_value
+						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					else:
 						
 						scharge = companyDetails.service_charge_percentage
@@ -1139,66 +1139,66 @@ def calulate_items(data):
 						scharge_value = (scharge * item['item_value']) / 100.0
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						
-						if sac_code_based_gst_rates.vat_rate>0:
-							vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
-							service_dict['vat_amount'] = vatamount
-							service_dict['vat'] = sac_code_based_gst_rates.vat_rate	
-						else:
-							vatamount = 0
-							service_dict['vat_amount'] = 0
-							service_dict['vat'] = 0	
-						if sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.vat_rate==0:
-							gst_percentage = 18	
-						if sac_code_based_gst_rates.central_cess_rate>0:
-							centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
-							service_dict['cess_amount'] = centralcessamount
-							service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
-						else:
-							centralcessamount = 0
-							service_dict['cess_amount'] = 0
-							service_dict['cess'] = 0
-						if sac_code_based_gst_rates.state_cess_rate>0:
-							statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
-							service_dict['state_cess_amount'] = statecessamount
-							service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-						else:
-							statecessamount = 0
-							service_dict['state_cess_amount'] = 0
-							service_dict['state_cess'] = 0	
-						# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.	
-						gst_value = (gst_percentage* scharge_value)/100.0
-						service_dict['item_name'] = item['name']+"-SC "
-						service_dict['description'] = item['name']+"-SC "
-						service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
-						service_dict['sac_code'] = sac_code_based_gst_rates.code
-						service_dict['sac_code_found'] = 'Yes'
-						service_dict['cgst'] = gst_percentage/2
-						service_dict['other_charges'] = 0
-						service_dict['cgst_amount'] = gst_value/2
-						service_dict['sgst'] = gst_percentage/2
-						service_dict['sgst_amount'] = gst_value/2
-						service_dict['igst'] = 0
-						service_dict['igst_amount'] = 0
-						service_dict['gst_rate'] = gst_percentage
-						service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount
-						service_dict['item_taxable_value'] = scharge_value 
-						service_dict['item_value'] = scharge_value
-						service_dict['taxable'] = sac_code_based_gst_rates.taxble
-						service_dict['cess'] = 0
+					if sac_code_based_gst_rates.vat_rate>0:
+						vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
+						service_dict['vat_amount'] = vatamount
+						service_dict['vat'] = sac_code_based_gst_rates.vat_rate	
+					else:
+						vatamount = 0
+						service_dict['vat_amount'] = 0
+						service_dict['vat'] = 0	
+					if sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.vat_rate==0:
+						gst_percentage = 18	
+					if sac_code_based_gst_rates.central_cess_rate>0:
+						centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
+						service_dict['cess_amount'] = centralcessamount
+						service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
+					else:
+						centralcessamount = 0
 						service_dict['cess_amount'] = 0
-						service_dict['state_cess'] = 0
+						service_dict['cess'] = 0
+					if sac_code_based_gst_rates.state_cess_rate>0:
+						statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
+						service_dict['state_cess_amount'] = statecessamount
+						service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+					else:
+						statecessamount = 0
 						service_dict['state_cess_amount'] = 0
-						service_dict['type'] = "Included"
-						service_dict['item_mode'] = "Debit"
-						service_dict['item_type'] = sac_code_based_gst_rates.type
-						# service_dict['vat_amount'] = 0
-						# service_dict['vat'] = 0
-						service_dict['sort_order'] = item['sort_order']
-						service_dict['doctype'] = 'Items'
-						service_dict['parentfield'] = 'items'
-						service_dict['parenttype'] = 'invoices'
-						print(service_dict)
-						second_list.append(service_dict)
+						service_dict['state_cess'] = 0	
+					# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.	
+					gst_value = (gst_percentage* scharge_value)/100.0
+					service_dict['item_name'] = item['name']+"-SC "
+					service_dict['description'] = item['name']+"-SC "
+					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
+					service_dict['sac_code'] = sac_code_based_gst_rates.code
+					service_dict['sac_code_found'] = 'Yes'
+					service_dict['cgst'] = gst_percentage/2
+					service_dict['other_charges'] = 0
+					service_dict['cgst_amount'] = gst_value/2
+					service_dict['sgst'] = gst_percentage/2
+					service_dict['sgst_amount'] = gst_value/2
+					service_dict['igst'] = 0
+					service_dict['igst_amount'] = 0
+					service_dict['gst_rate'] = gst_percentage
+					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount
+					service_dict['item_taxable_value'] = scharge_value 
+					service_dict['item_value'] = scharge_value
+					service_dict['taxable'] = sac_code_based_gst_rates.taxble
+					service_dict['cess'] = 0
+					service_dict['cess_amount'] = 0
+					service_dict['state_cess'] = 0
+					service_dict['state_cess_amount'] = 0
+					service_dict['type'] = "Included"
+					service_dict['item_mode'] = "Debit"
+					service_dict['item_type'] = sac_code_based_gst_rates.type
+					# service_dict['vat_amount'] = 0
+					# service_dict['vat'] = 0
+					service_dict['sort_order'] = item['sort_order']
+					service_dict['doctype'] = 'Items'
+					service_dict['parentfield'] = 'items'
+					service_dict['parenttype'] = 'invoices'
+					print(service_dict)
+					second_list.append(service_dict)
 					# second_list	
 				# print(item)	
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
@@ -2266,15 +2266,13 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	try:
-		# print(data,"8888")
-		# # invdata = frappe.get_doc("Invoices",data['invoice_number'])
-		# # print(invdata,"////////")
-		# # if invdata:
-		# # 	invdata.error_message = data['error_message']
-		# # 	invdata.irn_generated = "Error"
-		# # 	invdata.save()
+		# invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
+		# if invoiceExists:
+		# 	invoiceExists.error_message = data['error_message']
+		# 	invoiceExists.irn_generated = "Error"
+		# 	invoiceExists.save()
+		# 	# return {"success":False,"message":"error"}
 		# else:
-
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -2297,37 +2295,28 @@ def Error_Insert_invoice(data):
 									'%d-%b-%y %H:%M:%S'),
 			'legal_name':
 			" ",
-			# data['taxpayer']['legal_name'],
 			'address_1':
 			" ",
-			# data['taxpayer']['address_1'],
 			'email':
 			" ",
-			# data['taxpayer']['email'],
 			'trade_name':
 			" ",
-			# data['taxpayer']['trade_name'],
 			'address_2':
 			" ",
-			# data['taxpayer']['address_2'],
 			'phone_number':
 			" ",
-			# data['taxpayer']['phone_number'],
 			'location':
 			" ",
-			# data['taxpayer']['location'],
 			'pincode':
 			data['pincode'],
 			'state_code':
 			data['state_code'],
 			'amount_before_gst':
 			0,
-			# round(value_before_gst, 2),
 			"amount_after_gst":
 			0,
-			# round(value_after_gst, 2),
 			"other_charges":
-			0,  # round(other_charges,2),
+			0,  
 			'irn_cancelled':
 			'No',
 			'qr_code_generated':
@@ -2342,6 +2331,14 @@ def Error_Insert_invoice(data):
 			data['error_message']
 		})
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		
+		if data['items_data']:
+			items = data['items_data']
+			itemsInsert = insert_items(items,data['invoice_number'])
+			insert_tax_summaries2(items,data['invoice_number'])
+			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+				items, data['invoice_number'],"Invoice")
+		return {"success":False,"message":"error"} 		
 	except Exception as e:
 		print(e, "  Error insert Invoice")
 		return {"success": False, "message": str(e)}
