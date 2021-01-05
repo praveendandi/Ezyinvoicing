@@ -792,11 +792,11 @@ def insert_invoice(data):
 					total_vat_amount += item['vat_amount']
 					# print(value_before_gst,value_after_gst," ******")
 				else:
-					cgst_amount+=item['cgst_amount']
-					sgst_amount+=item['sgst_amount']
-					igst_amount+=item['igst_amount']
-					total_central_cess_amount+=item['cess_amount']
-					total_state_cess_amount +=item['state_cess_amount']
+					# cgst_amount+=item['cgst_amount']
+					# sgst_amount+=item['sgst_amount']
+					# igst_amount+=item['igst_amount']
+					# total_central_cess_amount+=item['cess_amount']
+					# total_state_cess_amount +=item['state_cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -845,6 +845,8 @@ def insert_invoice(data):
 		
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
+		sales_amount_before_tax = sales_amount_before_tax -credit_value_after_gst
+		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
 		else:
@@ -864,12 +866,13 @@ def insert_invoice(data):
 				TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
 				if TotalMismatchErrorAPI['success']==True:
 					# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
-					items = data['items_data']
-					itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-					insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
-					hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-						items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
-					return {"success": True}
+					if data['total_invoice_amount'] !=0:
+						items = data['items_data']
+						itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
+						insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
+						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+							items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+						return {"success": True}
 
 				return{"success":False,"message":TotalMismatchErrorAPI['message']}
 
@@ -998,13 +1001,12 @@ def insert_invoice(data):
 		# items = [x for x in data['items_data'] if '-' not in str(x['item_value'])]
 		items = data['items_data']
 		# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
-		itemsInsert = insert_items(items, data['invoice_number'])
-
-		
-		
-		insert_tax_summaries2(items, data['invoice_number'])
-		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-			items, data['guest_data']['invoice_number'],"Invoice")
+		if data['total_invoice_amount'] != 0:
+			itemsInsert = insert_items(items, data['invoice_number'])
+			# insert_tax_summaries2(items, data['invoice_number'])
+			TaxSummariesInsert(items,data['invoice_number'])
+			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+				items, data['guest_data']['invoice_number'],"Invoice")
 		
 		return {"success": True}
 	except Exception as e:
@@ -1070,9 +1072,12 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 
 def insert_items(items, invoice_number):
 	try:
-		frappe.db.delete('Items', {
-    		'parent': invoice_number})
-		frappe.db.commit()
+		a = frappe.db.delete('Items', {'parent': invoice_number})
+		b = frappe.db.commit()
+		
+		# a = frappe.db.sql("""delete from tabItems where parent=%s""", invoice_number)
+		# b= frappe.db.commit()
+		# print("/aaaaaaa**********",a,b,invoice_number)
 		for item in items:
 			item['parent'] = invoice_number
 			# if item['sac_code'].isdigit():
@@ -1082,7 +1087,7 @@ def insert_items(items, invoice_number):
 				item['is_credit_item'] = "No"
 			doc = frappe.get_doc(item)
 			doc.insert(ignore_permissions=True, ignore_links=True)
-		return {"sucess": True, "data": doc}
+		return {"sucess": True, "data": 'doc'}
 		# print(doc)
 	except Exception as e:
 		print(e,"**********  insert itemns api")
@@ -1581,6 +1586,136 @@ def insert_tax_summariesd(items, invoice_number):
 	except Exception as e:
 		print('tax', e)
 		return {'succes': False, "message": str(e)}
+
+
+
+
+def TaxSummariesInsert(items,invoice_number):
+	try:
+		frappe.db.delete('Tax Summaries', {
+				'parent': invoice_number})
+		frappe.db.commit()
+		for each in items:
+			if each['sgst']>0:
+				tax_summary_sgst = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'SGST','tax_percentage':each['sgst']})
+				# print(tax_summary_sgst,"//////")
+				tax_summary_sgst = [element for tupl in tax_summary_sgst for element in tupl]
+				if len(tax_summary_sgst)==0 or tax_summary_sgst == ():
+					doc = frappe.get_doc({
+						'doctype': 'Tax Summaries',
+						'invoce_number': invoice_number,
+						'tax_percentage': each['sgst'],
+						'amount': each['sgst_amount'],
+						'tax_type': "SGST",
+						'parent': invoice_number,
+						'parentfield': 'gst_summary',
+						'parenttype': "Invoices"
+					})
+				else:
+					tax_summary_sgst_update = frappe.get_doc('Tax Summaries',tax_summary_sgst[0])
+					tax_summary_sgst_update.amount = each['sgst_amount']+float(tax_summary_sgst_update.amount)			
+					tax_summary_sgst_update.save()
+			if each['cgst']>0:
+				tax_summary_cgst = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CGST','tax_percentage':each['cgst']})
+				print(tax_summary_cgst,"//////")
+				tax_summary_cgst = [element for tupl in tax_summary_cgst for element in tupl]
+				if len(tax_summary_cgst)==0 or tax_summary_cgst==():
+					doc = frappe.get_doc({
+						'doctype': 'Tax Summaries',
+						'invoce_number': invoice_number,
+						'tax_percentage': each['cgst'],
+						'amount': each['cgst_amount'],
+						'tax_type': "CGST",
+						'parent': invoice_number,
+						'parentfield': 'gst_summary',
+						'parenttype': "Invoices"
+					})
+				else:
+					tax_summary_cgst_update = frappe.get_doc('Tax Summaries',tax_summary_cgst[0])
+					tax_summary_cgst_update.amount = each['cgst_amount']+float(tax_summary_cgst_update.amount)			
+					tax_summary_cgst_update.save()
+			if each['igst']>0:
+				tax_summary_igst = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'IGST','tax_percentage':each['igst']})
+				print(tax_summary_igst,"//////")
+				tax_summary_igst = [element for tupl in tax_summary_igst for element in tupl]
+				if len(tax_summary_igst)==0 or tax_summary_igst==():
+					doc = frappe.get_doc({
+						'doctype': 'Tax Summaries',
+						'invoce_number': invoice_number,
+						'tax_percentage': each['igst'],
+						'amount': each['igst_amount'],
+						'tax_type': "IGST",
+						'parent': invoice_number,
+						'parentfield': 'gst_summary',
+						'parenttype': "Invoices"
+					})
+				else:
+					tax_summary_Igst_update = frappe.get_doc('Tax Summaries',tax_summary_igst[0])
+					tax_summary_Igst_update.amount = each['igst_amount']+float(tax_summary_Igst_update.amount)			
+					tax_summary_Igst_update.save()
+			if each['vat']>0:
+				tax_summary_vat = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'VAT','tax_percentage':each['vat']})
+				print(tax_summary_vat,"//////")
+				tax_summary_vat = [element for tupl in tax_summary_vat for element in tupl]
+				if len(tax_summary_vat)==0 or tax_summary_vat==():
+					doc = frappe.get_doc({
+						'doctype': 'Tax Summaries',
+						'invoce_number': invoice_number,
+						'tax_percentage': each['vat'],
+						'amount': each['vat_amount'],
+						'tax_type': "VAT",
+						'parent': invoice_number,
+						'parentfield': 'gst_summary',
+						'parenttype': "Invoices"
+					})
+				else:
+					tax_summary_vat_update = frappe.get_doc('Tax Summaries',tax_summary_vat[0])
+					tax_summary_vat_update.amount = each['vat_amount']+float(tax_summary_vat_update.amount)			
+					tax_summary_vat_update.save()
+			if each['cess']>0:
+				tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CENTRAL CESS','tax_percentage':each['cess']})
+				print(tax_summary_cess,"//////")
+				tax_summary_cess = [element for tupl in tax_summary_cess for element in tupl]
+				if len(tax_summary_cess)==0 or tax_summary_cess==():
+					doc = frappe.get_doc({
+						'doctype': 'Tax Summaries',
+						'invoce_number': invoice_number,
+						'tax_percentage': each['cess'],
+						'amount': each['cess_amount'],
+						'tax_type': "CENTRAL CESS",
+						'parent': invoice_number,
+						'parentfield': 'gst_summary',
+						'parenttype': "Invoices"
+					})
+				else:
+					tax_summary_cess_update = frappe.get_doc('Tax Summaries',tax_summary_cess[0])
+					tax_summary_cess_update.amount = each['vat_amount']+float(tax_summary_cess_update.amount)			
+					tax_summary_cess_update.save()	
+			if each['state_cess']>0:
+				tax_summary_state_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'STATE CESS','tax_percentage':each['state_cess']})
+				print(tax_summary_state_cess,"//////")
+				tax_summary_state_cess = [element for tupl in tax_summary_state_cess for element in tupl]
+				if len(tax_summary_state_cess)==0 or tax_summary_state_cess==():
+					doc = frappe.get_doc({
+						'doctype': 'Tax Summaries',
+						'invoce_number': invoice_number,
+						'tax_percentage': each['state_cess'],
+						'amount': each['state_cess_amount'],
+						'tax_type': "STATE CESS",
+						'parent': invoice_number,
+						'parentfield': 'gst_summary',
+						'parenttype': "Invoices"
+					})
+				else:
+					tax_summary_state_cess_update = frappe.get_doc('Tax Summaries',tax_summary_state_cess[0])
+					tax_summary_state_cess_update.amount = each['vat_amount']+float(tax_summary_state_cess_update.amount)			
+					tax_summary_state_cess_update.save()
+		return {"message": True,"success":True}
+	except Exception as e:
+		print(str(e),"      Insert Sac summaries")
+		return {"message":str(e),"success":False}
+
+
 
 
 def insert_tax_summaries2(items,invoice_number):
