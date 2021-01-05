@@ -11,7 +11,7 @@ import itertools
 from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
-# from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
+from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
@@ -185,6 +185,7 @@ def file_parsing(filepath):
 			invoiceNumber = inv_data.name
 			guest['invoice_number'] = inv_data.name
 			amened='No'
+			print("/aaaaaaaaaa")
 			if inv_data.invoice_type == "B2B":
 				if inv_data.irn_generated=="Pending" or inv_data.irn_generated == "Error":
 					reupload = True
@@ -307,7 +308,7 @@ def file_parsing(filepath):
 						return {"success":False,"message":insertInvoiceApiResponse['message']}
 
 			else:
-						
+				 		
 				error_data['error_message'] = calulateItemsApiResponse['message']
 				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)

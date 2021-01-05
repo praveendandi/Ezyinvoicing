@@ -1007,8 +1007,8 @@ def insert_invoice(data):
 		if data['total_invoice_amount'] != 0:
 			itemsInsert = insert_items(items, data['invoice_number'])
 			# insert_t
-			insert_tax_summaries2(items, data['invoice_number'])
-			# TaxSummariesInsert(items,data['invoice_number'])
+			# insert_tax_summaries2(items, data['invoice_number'])
+			TaxSummariesInsert(items,data['invoice_number'])
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 				items, data['guest_data']['invoice_number'],"Invoice")
 		
@@ -1596,7 +1596,6 @@ def TaxSummariesInsert(items,invoice_number):
 		for each in items:
 			if each['sgst']>0:
 				tax_summary_sgst = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'SGST','tax_percentage':each['sgst']})
-				# print(tax_summary_sgst,"//////")
 				tax_summary_sgst = [element for tupl in tax_summary_sgst for element in tupl]
 				if len(tax_summary_sgst)==0 or tax_summary_sgst == ():
 					doc = frappe.get_doc({
@@ -1609,6 +1608,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
 					})
+					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_sgst_update = frappe.get_doc('Tax Summaries',tax_summary_sgst[0])
 					tax_summary_sgst_update.amount = each['sgst_amount']+float(tax_summary_sgst_update.amount)			
@@ -1627,6 +1627,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
 					})
+					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_cgst_update = frappe.get_doc('Tax Summaries',tax_summary_cgst[0])
 					tax_summary_cgst_update.amount = each['cgst_amount']+float(tax_summary_cgst_update.amount)			
@@ -1645,6 +1646,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
 					})
+					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_Igst_update = frappe.get_doc('Tax Summaries',tax_summary_igst[0])
 					tax_summary_Igst_update.amount = each['igst_amount']+float(tax_summary_Igst_update.amount)			
@@ -1663,6 +1665,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
 					})
+					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_vat_update = frappe.get_doc('Tax Summaries',tax_summary_vat[0])
 					tax_summary_vat_update.amount = each['vat_amount']+float(tax_summary_vat_update.amount)			
@@ -1681,6 +1684,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
 					})
+					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_cess_update = frappe.get_doc('Tax Summaries',tax_summary_cess[0])
 					tax_summary_cess_update.amount = each['vat_amount']+float(tax_summary_cess_update.amount)			
@@ -1699,6 +1703,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
 					})
+					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_state_cess_update = frappe.get_doc('Tax Summaries',tax_summary_state_cess[0])
 					tax_summary_state_cess_update.amount = each['vat_amount']+float(tax_summary_state_cess_update.amount)			
@@ -2381,6 +2386,13 @@ def check_invoice_file_exists(data):
 @frappe.whitelist(allow_guest=True)
 def check_invoice_exists(invoice_number):
 	try:
+		invCount = frappe.db.get_list(
+				'Invoices',
+				filters={
+					'invoice_number':
+					['like', '%' + invoice_number + '%']
+				})
+		invoice_number = invCount[0]['name']		
 		invoiceExists = frappe.get_doc('Invoices', invoice_number)
 		if invoiceExists:
 
