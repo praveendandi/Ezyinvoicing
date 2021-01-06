@@ -22,6 +22,7 @@ def AttachQrCodeInInvoice(invoice_number):
                 return {"message":"Qr Redo Succesfull","success":True}
             
             site_folder_path = company.site_name
+            print("/aaaaaaaaaaaaaaa")
             path = folder_path + '/sites/' + site_folder_path
             src_pdf_filename = path + invoice.invoice_file
             dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
@@ -146,11 +147,15 @@ def AttachQrCodeInInvoice(invoice_number):
                                                     data=payload)
                     response = upload_qr_image.json()
                     if response['message']['file_url']:
+                        
                         invoice.invoice_with_gst_details = response['message']['file_url']
                         invoice.save()
                         return {"message":"Qr Redo Succesfull","success":True}
+                    print("111111111111111111")    
                     return{"message":response['message'],"success":False}    
-                return{"message":response['message'],"success":False}    
+                # print("222222222222222222222222222")
+                return {"message":"Qr Redo Succesfull","success":True}
+            return{"message":response['message'],"success":False}    
         else:
             folder_path = frappe.utils.get_bench_path()
             path = folder_path + '/sites/' + company.site_name
