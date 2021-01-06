@@ -16,7 +16,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 folder_path = frappe.utils.get_bench_path()
 
-# site_folder_path = "mhkcp_local.com/"
+site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
 
@@ -116,7 +116,6 @@ def reinitiateInvoice(data):
 			dt = i.strip()
 			for index, j in enumerate(i.split(' ')):
 				val = dt.split(" ")
-				# print(val,"*********")
 				if index == 0 and len(val)>1:
 					item['date'] = j
 				
@@ -187,7 +186,7 @@ def reinitiateInvoice(data):
 			amened='No'
 	
 	company_code = {"code":"ISGC-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"ISGC-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber

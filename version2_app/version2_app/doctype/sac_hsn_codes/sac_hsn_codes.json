@@ -150,7 +150,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-02 15:53:14.144259",
+ "modified": "2021-01-06 11:19:25.132139",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
@@ -225,6 +225,18 @@
    "read": 1,
    "report": 1,
    "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dashboard Manager",
    "share": 1,
    "write": 1
   }
