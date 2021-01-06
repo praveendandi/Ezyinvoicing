@@ -15,8 +15,8 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
 folder_path = frappe.utils.get_bench_path()
-
-site_folder_path = "mhkcp_local.com/"
+    
+# site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
 
