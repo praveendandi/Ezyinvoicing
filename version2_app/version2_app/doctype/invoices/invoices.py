@@ -21,12 +21,15 @@ import datetime
 import random
 import math
 from frappe.utils import get_site_name
+from frappe.utils import logger
 import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 
+frappe.utils.logger.set_log_level("DEBUG")
+logger = frappe.logger("api", allow_site=True, file_count=50)
 
 class Invoices(Document):
 
@@ -247,14 +250,18 @@ class Invoices(Document):
 												ignore_version=True)
 						return response
 					else:
+						irn_error_message = response["message"]
+						logger.error(f"{invoice_number},     postIrn,   {irn_error_message}")
 						return response
 				except Exception as e:
 					print(str(e), "generate Irn")
 					frappe.log_error(frappe.get_traceback(), invoice_number)
+					logger.error(f"{invoice_number},     generateIrn,   {str(e)}")
 					return {"success": False, "message": str(e)}
 		except Exception as e:
 			print(str(e), "generate Irn")
 			frappe.log_error(frappe.get_traceback(),invoice_number)
+			logger.error(f"{invoice_number},     generateIrn,   {str(e)}")
 			return {"success": False, "message": str(e)}
 
 
@@ -290,16 +297,24 @@ class Invoices(Document):
 							"success": True,
 							"message": "E-Invoice is cancelled successfully"
 						}
-					return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
+						return {"success":True,"message":"E-Invoice is cancelled successfully and credit notes failed"}	
+					else:
+						credit_error_message = credit_cancel_response["message"]
+						logger.error(f"{invoice_number},     cancel_irn,   {credit_error_message}")
+						return {"success": False, "message": credit_error_message}
 				return {
 					"success": True,
 					"message": "E-Invoice is cancelled successfully"
 					}		
 			else:
+				error_message = cancel_response["message"]
+				frappe.log_error(frappe.get_traceback(), invoice_number)
+				logger.error(f"{invoice_number},     cancel_irn,   {error_message}")
 				return {"success": False, "message": cancel_response["message"]}
 		except Exception as e:
 			print(e,"cancel irn")
 			frappe.log_error(frappe.get_traceback(), invoice_number)
+			logger.error(f"{invoice_number},     cancelIrn,   {str(e)}")
 			return {"success": False, "message": str(e)}
 
 
@@ -538,6 +553,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 	except Exception as e:
 		print("cancel irn", e)
 		frappe.log_error(frappe.get_traceback(), invoice_number)
+		logger.error(f"{invoice_number},     cancel_irn,   {str(e)}")
 		return {"success": False, "message": str(e)}
 
 
@@ -679,6 +695,7 @@ def create_qr_image(invoice_number, gsp):
 	except Exception as e:
 		print(e, "qr image")
 		frappe.log_error(frappe.get_traceback(),invoice_number)
+		logger.error(f"{invoice_number},     create_qr_image,   {str(e)}")
 		return {"success": False, "message": str(e)}
 
 def postIrn(gst_data, gsp, company, invoice_number):
@@ -713,11 +730,14 @@ def postIrn(gst_data, gsp, company, invoice_number):
 		if irn_response.status_code == 200:
 			return irn_response.json()
 		else:
+			message_error = str(irn_response.text)
+			logger.error(f"{invoice_number},     postIrn,   {message_error}")
 			return {"success": False, 'message': irn_response.text}
 		# print(irn_response.text)
 	except Exception as e:
 		print(e, "post irn")
 		frappe.log_error(frappe.get_traceback(), invoice_number)
+		logger.error(f"{invoice_number},     postIrn,   {str(e)}")
 		return {"success": False, "message": str(e)}
 
 
