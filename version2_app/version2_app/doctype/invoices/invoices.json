@@ -112,7 +112,8 @@
   "invoice_round_off_amount",
   "other_charges_before_tax",
   "sales_amount_before_tax",
-  "sales_amount_after_tax"
+  "sales_amount_after_tax",
+  "mode"
  ],
  "fields": [
   {
@@ -362,7 +363,7 @@
   },
   {
    "fieldname": "signed_invoice",
-   "fieldtype": "Text",
+   "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Signed Invoice",
    "read_only": 1
@@ -725,12 +726,18 @@
    "fieldname": "sales_amount_after_tax",
    "fieldtype": "Float",
    "label": "Sales Amount After tax"
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "Testing\nUat\nProduction"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-12-31 11:06:09.728404",
+ "modified": "2021-01-04 18:45:45.476987",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

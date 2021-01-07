@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HICC-01")
+	companyCheckResponse = check_company_exist("IBISCS-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -64,13 +64,13 @@ def file_parsing(filepath):
 		if "Departure :" in i:
 			depatureDateIndex = i.index('Departure')
 			date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-		if "Room No." in i:
+		if "Room No." in i or "Room No" in i:
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "Guest GST ID" in i:
+		if "GST NO" in i and "STATE CODE" not in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			gstNumber = gstNumber.replace("Membership","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
@@ -95,8 +95,8 @@ def file_parsing(filepath):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			print_by = i.split(":")
-			print_by = print_by[1].replace(" ","")
+			p = i.split(":")
+			print_by = p[1].replace(" ","")
 
 	
 	paymentTypes = GetPaymentTypes()
@@ -108,10 +108,20 @@ def file_parsing(filepath):
 		if i !=" ":
 			j = i.split(' ')
 			j = j[1:-1]
-			if len(j)>1:
+			if len(j)>0:
 				ele = j[0]
-				if "~" not in j[1]:
-					ele = ele+" "+j[1]
+				if len(j)>1:
+					if "~" not in j[1] and "." not in j[1] and "," not in j[1]:
+						ele = ele+" "+j[1]
+						if len(j)>2:
+							if "~" not in j[2] and "." not in j[2] and "," not in j[2]:
+								ele = ele+" "+j[2]
+								if len(j)>3:
+									if "~" not in j[3] and "." not in j[3] and "," not in j[3]:
+										ele = ele+" "+j[3]
+										if len(j)>4:
+											if "~" not in j[4] and "." not in j[4] and "," not in j[4]:
+												ele = ele+" "+j[4]
 				if ele not in paymentTypes:
 					original_data.append(i)
 			elif len(j) == 1:
@@ -158,7 +168,7 @@ def file_parsing(filepath):
 
 	total_items = []
 	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name']:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
 			total_items.append(each)
 
 	guest = dict()
@@ -179,7 +189,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HICC-01"
+	guest['company_code'] = "IBISCS-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -195,16 +205,16 @@ def file_parsing(filepath):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 
-	company_code = {"code":"HICC-01"}
+	company_code = {"code":"IBISCS-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "36"
+	error_data['state_code'] = "27"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "500082"
+	error_data['pincode'] = "410203"
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
 
@@ -264,8 +274,6 @@ def file_parsing(filepath):
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-
-
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
