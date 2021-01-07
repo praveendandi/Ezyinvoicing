@@ -24,7 +24,8 @@
   "service_charge",
   "accommodation_slab",
   "one_sc_applies_to_all",
-  "service_charge_rate"
+  "service_charge_rate",
+  "ignore"
  ],
  "fields": [
   {
@@ -146,11 +147,17 @@
    "fieldname": "service_charge_rate",
    "fieldtype": "Float",
    "label": "Service Charge Rate"
+  },
+  {
+   "default": "0",
+   "fieldname": "ignore",
+   "fieldtype": "Check",
+   "label": "Ignore"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-07 11:13:13.748554",
+ "modified": "2021-01-07 15:49:23.333955",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
@@ -237,18 +244,6 @@
    "read": 1,
    "report": 1,
    "role": "Dashboard Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
    "share": 1,
    "write": 1
   }

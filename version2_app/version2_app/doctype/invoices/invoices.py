@@ -1220,6 +1220,8 @@ def calulate_items(data):
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
 					SAC_CODE = sac_code_based_gst_rates.code 
+					if sac_code_based_gst_rates.ignore == 1:
+						continue 
 					item['item_type'] = sac_code_based_gst_rates.type
 				else:
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}
@@ -2512,66 +2514,83 @@ def Error_Insert_invoice(data):
 		# 	# return {"success":False,"message":"error"}
 		# else:
 		company = frappe.get_doc('company',data['company_code'])
-		invoice = frappe.get_doc({
-			'doctype':
-			'Invoices',
-			'invoice_number':
-			data['invoice_number'],
-			'guest_name':
-			data['guest_name'],
-			'gst_number':
-			data['gst_number'],
-			'invoice_file':
-			data['invoice_file'],
-			'room_number':
-			data['room_number'],
-			'invoice_type':
-			data['invoice_type'],
-			'irn_generated':
-			"Error",
-			'invoice_date':
-			datetime.datetime.strptime(data['invoice_date'],
-									'%d-%b-%y %H:%M:%S'),
-			'legal_name':
-			" ",
-			'address_1':
-			" ",
-			'email':
-			" ",
-			'trade_name':
-			" ",
-			'address_2':
-			" ",
-			'phone_number':
-			" ",
-			'location':
-			" ",
-			'pincode':
-			data['pincode'],
-			'state_code':
-			data['state_code'],
-			'amount_before_gst':
-			0,
-			"amount_after_gst":
-			0,
-			"other_charges":
-			0,  
-			'mode':company.mode,
-			'irn_cancelled':
-			'No',
-			'qr_code_generated':
-			'Pending',
-			'signed_invoice_generated':
-			'No',
-			'company':
-			data['company_code'],
-			'ready_to_generate_irn':
-			"No",
-			'error_message':
-			data['error_message']
-		})
-		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		
+		if not frappe.db.exists('Invoices', data['invoice_number']):
+
+			print("/////////")
+			invoice = frappe.get_doc({
+				'doctype':
+				'Invoices',
+				'invoice_number':
+				data['invoice_number'],
+				'guest_name':
+				data['guest_name'],
+				'gst_number':
+				data['gst_number'],
+				'invoice_file':
+				data['invoice_file'],
+				'room_number':
+				data['room_number'],
+				'invoice_type':
+				data['invoice_type'],
+				'irn_generated':
+				"Error",
+				'invoice_date':
+				datetime.datetime.strptime(data['invoice_date'],
+										'%d-%b-%y %H:%M:%S'),
+				'legal_name':
+				" ",
+				'address_1':
+				" ",
+				'email':
+				" ",
+				'trade_name':
+				" ",
+				'address_2':
+				" ",
+				'phone_number':
+				" ",
+				'location':
+				" ",
+				'pincode':
+				data['pincode'],
+				'state_code':
+				data['state_code'],
+				'amount_before_gst':
+				0,
+				"amount_after_gst":
+				0,
+				"other_charges":
+				0,  
+				'mode':company.mode,
+				'irn_cancelled':
+				'No',
+				'qr_code_generated':
+				'Pending',
+				'signed_invoice_generated':
+				'No',
+				'company':
+				data['company_code'],
+				'ready_to_generate_irn':
+				"No",
+				'error_message':
+				data['error_message']
+			})
+			v = invoice.insert(ignore_permissions=True, ignore_links=True)
+			
+			if 'items_data' in list(data.keys()):
+				items = data['items_data']
+				itemsInsert = insert_items(items,data['invoice_number'])
+				insert_tax_summaries2(items,data['invoice_number'])
+				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+					items, data['invoice_number'],"Invoice")
+					
+				# return {"success": True}	
+
+			return {"success":False,"message":"Error"} 
+		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])			
+		invoiceExists.error_message = data['error_message']
+		invoiceExists.irn_generated = "Error"
+		invoiceExists.save()
 		if 'items_data' in list(data.keys()):
 			items = data['items_data']
 			itemsInsert = insert_items(items,data['invoice_number'])
@@ -2579,9 +2598,7 @@ def Error_Insert_invoice(data):
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 				items, data['invoice_number'],"Invoice")
 				
-			# return {"success": True}	
-
-		return {"success":False,"message":"Error"} 		
+		return {"success":False,"message":"error"}
 	except Exception as e:
 		print(e, "  Error insert Invoice")
 		return {"success": False, "message": str(e)}
