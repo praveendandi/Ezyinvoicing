@@ -215,42 +215,47 @@ class Invoices(Document):
 			}
 			# return{"success":True}
 			if ass_value > 0:
-
-				response = postIrn(gst_data, GSP_details['data'],
-									company_details['data'])
-				if response['success']:
-					invoice = frappe.get_doc('Invoices', invoice_number)
-					invoice.ack_no = response['result']['AckNo']
-					invoice.irn_number = response['result']['Irn']
-					invoice.ack_date = response['result']['AckDt']
-					invoice.signed_invoice = response['result'][
-						'SignedInvoice']
-					invoice.signed_invoice_generated = 'Yes'
-					invoice.irn_generated = 'Success'
-					invoice.qr_code = response['result']['SignedQRCode']
-					invoice.qr_code_generated = 'Success'
-					invoice.irn_cancelled = 'No'
-					invoice.irn_generated_time = datetime.datetime.utcnow()
-					invoice.irn_process_time = datetime.datetime.utcnow(
-					) - start_time
-					invoice.save(ignore_permissions=True, ignore_version=True)
-					create_qr = create_qr_image(invoice_number,
-												GSP_details['data'])
-					if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
-						if credit_note_items != []:
-							CreditgenerateIrn(invoice_number)
-							invoice = frappe.get_doc('Invoices',
-														invoice_number)
-							invoice.irn_process_time = datetime.datetime.utcnow(
-							) - start_time
-							invoice.save(ignore_permissions=True,
-											ignore_version=True)
-					return response
-				else:
-					return response
+				try:
+					response = postIrn(gst_data, GSP_details['data'],
+										company_details['data'], invoice_number)
+					if response['success']:
+						invoice = frappe.get_doc('Invoices', invoice_number)
+						invoice.ack_no = response['result']['AckNo']
+						invoice.irn_number = response['result']['Irn']
+						invoice.ack_date = response['result']['AckDt']
+						invoice.signed_invoice = response['result'][
+							'SignedInvoice']
+						invoice.signed_invoice_generated = 'Yes'
+						invoice.irn_generated = 'Success'
+						invoice.qr_code = response['result']['SignedQRCode']
+						invoice.qr_code_generated = 'Success'
+						invoice.irn_cancelled = 'No'
+						invoice.irn_generated_time = datetime.datetime.utcnow()
+						invoice.irn_process_time = datetime.datetime.utcnow(
+						) - start_time
+						invoice.save(ignore_permissions=True, ignore_version=True)
+						create_qr = create_qr_image(invoice_number,
+													GSP_details['data'])
+						if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
+							if credit_note_items != []:
+								CreditgenerateIrn(invoice_number)
+								invoice = frappe.get_doc('Invoices',
+															invoice_number)
+								invoice.irn_process_time = datetime.datetime.utcnow(
+								) - start_time
+								invoice.save(ignore_permissions=True,
+												ignore_version=True)
+						return response
+					else:
+						return response
+				except Exception as e:
+					print(str(e), "generate Irn")
+					frappe.log_error(frappe.get_traceback(), invoice_number)
+					return {"success": False, "message": str(e)}
 		except Exception as e:
 			print(str(e), "generate Irn")
-
+			frappe.log_error(frappe.get_traceback(),invoice_number)
+			return {"success": False, "message": str(e)}
 
 
 	def cancelIrn(self, invoice_number, reason='wrong Entry'):
@@ -266,7 +271,7 @@ class Invoices(Document):
 			# GSP_details = gsp_api_data(company_details.name,
 			# 						   company_details.mode,
 			# 						   company_details.provider)
-			cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'])
+			cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'],invoice_number)
 			if cancel_response['success']:
 				invoice.cancelled_on = cancel_response['result']['CancelDate']
 				invoice.cancel_message = reason
@@ -274,7 +279,7 @@ class Invoices(Document):
 				invoice.irn_generated = 'Cancelled'
 				invoice.save()
 				if invoice.has_credit_items=="Yes" and company_details['data'].allowance_type == "Credit":
-					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'])
+					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'],invoice_number)
 					if credit_cancel_response['success']:
 						# invoice.cancelled_on = cancel_response['result']['CancelDate']
 						# invoice.cancel_message = reason
@@ -291,9 +296,11 @@ class Invoices(Document):
 					"message": "E-Invoice is cancelled successfully"
 					}		
 			else:
-				return {"success": False, "message": "Invoice is not active"}
+				return {"success": False, "message": cancel_response["message"]}
 		except Exception as e:
 			print(e,"cancel irn")
+			frappe.log_error(frappe.get_traceback(), invoice_number)
+			return {"success": False, "message": str(e)}
 
 
 	def getTaxPayerDetails(self, gstNumber):
@@ -498,7 +505,7 @@ class Invoices(Document):
 			return {"success": False, "message": str(e)}
 
 
-def cancel_irn(irn_number, gsp, reason, company):
+def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 	try:
 
 		headers = {
@@ -530,6 +537,8 @@ def cancel_irn(irn_number, gsp, reason, company):
 		return repsone
 	except Exception as e:
 		print("cancel irn", e)
+		frappe.log_error(frappe.get_traceback(), invoice_number)
+		return {"success": False, "message": str(e)}
 
 
 def attach_qr_code(invoice_number, gsp, code):
@@ -669,10 +678,10 @@ def create_qr_image(invoice_number, gsp):
 		return {"success": True}
 	except Exception as e:
 		print(e, "qr image")
-		return {"success": False}
+		frappe.log_error(frappe.get_traceback(),invoice_number)
+		return {"success": False, "message": str(e)}
 
-
-def postIrn(gst_data, gsp, company):
+def postIrn(gst_data, gsp, company, invoice_number):
 	try:
 		# print(gst_data)
 		headers = {
@@ -708,6 +717,8 @@ def postIrn(gst_data, gsp, company):
 		# print(irn_response.text)
 	except Exception as e:
 		print(e, "post irn")
+		frappe.log_error(frappe.get_traceback(), invoice_number)
+		return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
