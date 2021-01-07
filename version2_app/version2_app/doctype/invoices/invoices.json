@@ -737,24 +737,12 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-05 16:29:05.652134",
+ "modified": "2021-01-06 11:39:47.520031",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
   {
    "cancel": 1,
    "email": 1,
@@ -841,6 +829,10 @@
    "report": 1,
    "role": "ezy-Inbox",
    "share": 1
+  },
+  {
+   "read": 1,
+   "role": "System Manager"
   }
  ],
  "quick_entry": 1,

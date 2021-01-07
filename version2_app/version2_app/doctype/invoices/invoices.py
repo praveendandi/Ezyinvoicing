@@ -213,7 +213,6 @@ class Invoices(Document):
 				"TotInvVal": round(TotInnVal,2),
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
-			print(gst_data,"         //////")
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -318,7 +317,123 @@ class Invoices(Document):
 		taxPayerDeatilsData.save()
 		return True
 
-	def send_invoicedata_to_gcb(self, invoice_number):
+	
+
+	
+
+
+def cancel_irn(irn_number, gsp, reason, company):
+	try:
+
+		headers = {
+			"user_name": gsp['data']['username'],
+			"password": gsp['data']['password'],
+			"gstin": gsp['data']['gst'],
+			"requestid": str(random.randint(0, 1000000000000000000)),
+			"Authorization": "Bearer " + gsp['data']['token'],
+		}
+		payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
+		if company.proxy == 0:
+
+			cancel_response = requests.post(gsp['data']['cancel_irn'],
+											headers=headers,
+											json=payload)
+		else:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://", "@")
+			proxies = {
+				'https':
+				'https://' + company.proxy_username + ":" +
+				company.proxy_password + proxyhost}
+			print(proxies, "     proxy console")
+			cancel_response = requests.post(gsp['data']['cancel_irn'],
+											headers=headers,
+											json=payload,
+											proxies=proxies,verify=False)
+		repsone = cancel_response.json()
+		return repsone
+	except Exception as e:
+		print("cancel irn", e)
+
+
+def attach_qr_code(invoice_number, gsp, code):
+	try:
+		invoice = frappe.get_doc('Invoices', invoice_number)
+		company = frappe.get_doc('company', invoice.company)
+		folder_path = frappe.utils.get_bench_path()
+		site_folder_path = company.site_name
+		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
+		path = folder_path + '/sites/' + site_folder_path
+		src_pdf_filename = path + invoice.invoice_file
+		dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
+		# attaching qr code
+		img_filename = path + invoice.qr_code_image
+		# img_rect = fitz.Rect(250, 200, 340, 270)
+		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
+							 company.qr_rect_y0, company.qr_rect_y1)
+		document = fitz.open(src_pdf_filename)
+
+		page = document[0]
+
+		page.insertImage(img_rect, filename=img_filename)
+		document.save(dst_pdf_filename)
+		document.close()
+		# attacing irn an ack
+		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
+		doc = fitz.open(dst_pdf_filename)
+		
+		if company.irn_details_page == "First":
+			page = doc[0]
+		else:
+			page = doc[-1]
+		# page = doc[0]
+		# where = fitz.Point(15, 55)
+		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		ackdate = invoice.ack_date
+		ack_date = ackdate.split(" ")
+		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
+		# irntext = "IRN: "+ invoice.irn_number
+		# acknotext = "ACK NO: " + invoice.ack_no 
+		# ackdatetext = "ACK DATE: " + invoice.ack_date
+		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
+		page.insertText(
+			where,
+			text,
+			fontname="Roboto-Black",  # arbitrary if fontfile given
+			fontfile=folder_path +
+			company.font_file_path,  #fontpath,  # any file containing a font
+			fontsize=7,  # default
+			rotate=0,  # rotate text
+			color=(0, 0, 0),  # some color (blue)
+			overlay=True)
+				
+		doc.save(dst_pdf_text_filename)
+		doc.close()
+
+		files = {"file": open(dst_pdf_text_filename, 'rb')}
+		payload = {
+			"is_private": 1,
+			"folder": "Home",
+			"doctype": "Invoices",
+			"docname": invoice_number,
+			'fieldname': 'invoice_with_gst_details'
+		}
+		site = company.host
+		upload_qr_image = requests.post(site + "api/method/upload_file",
+										files=files,
+										data=payload)
+		response = upload_qr_image.json()
+		if 'message' in response:
+			invoice.invoice_with_gst_details = response['message']['file_url']
+			invoice.save()
+		return {"message":"Qr Generated Succesfull","success":True}
+	except Exception as e:
+		print(e, "attach qr code")
+
+
+@frappe.whitelist(allow_guest=True)
+def send_invoicedata_to_gcb(invoice_number):
 		try:
 			folder_path = frappe.utils.get_bench_path()
 
@@ -471,7 +586,6 @@ class Invoices(Document):
 											files=files,
 											data=payload)
 			response = upload_qr_image.json()
-			print(response, "b2c qr code upload")
 			if 'message' in response:
 				doc.b2c_qrimage = response['message']['file_url']
 				doc.name = invoice_number
@@ -497,117 +611,6 @@ class Invoices(Document):
 		except Exception as e:
 			print(e, "send invoicedata to gcb")
 			return {"success": False, "message": str(e)}
-
-
-def cancel_irn(irn_number, gsp, reason, company):
-	try:
-
-		headers = {
-			"user_name": gsp['data']['username'],
-			"password": gsp['data']['password'],
-			"gstin": gsp['data']['gst'],
-			"requestid": str(random.randint(0, 1000000000000000000)),
-			"Authorization": "Bearer " + gsp['data']['token'],
-		}
-		payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
-		if company.proxy == 0:
-
-			cancel_response = requests.post(gsp['data']['cancel_irn'],
-											headers=headers,
-											json=payload)
-		else:
-			proxyhost = company.proxy_url
-			proxyhost = proxyhost.replace("http://", "@")
-			proxies = {
-				'https':
-				'https://' + company.proxy_username + ":" +
-				company.proxy_password + proxyhost}
-			print(proxies, "     proxy console")
-			cancel_response = requests.post(gsp['data']['cancel_irn'],
-											headers=headers,
-											json=payload,
-											proxies=proxies,verify=False)
-		repsone = cancel_response.json()
-		return repsone
-	except Exception as e:
-		print("cancel irn", e)
-
-
-def attach_qr_code(invoice_number, gsp, code):
-	try:
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		company = frappe.get_doc('company', invoice.company)
-		folder_path = frappe.utils.get_bench_path()
-		site_folder_path = company.site_name
-		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
-		path = folder_path + '/sites/' + site_folder_path
-		src_pdf_filename = path + invoice.invoice_file
-		dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
-		# attaching qr code
-		img_filename = path + invoice.qr_code_image
-		# img_rect = fitz.Rect(250, 200, 340, 270)
-		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
-							 company.qr_rect_y0, company.qr_rect_y1)
-		document = fitz.open(src_pdf_filename)
-
-		page = document[0]
-
-		page.insertImage(img_rect, filename=img_filename)
-		document.save(dst_pdf_filename)
-		document.close()
-		# attacing irn an ack
-		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
-		doc = fitz.open(dst_pdf_filename)
-		
-		if company.irn_details_page == "First":
-			page = doc[0]
-		else:
-			page = doc[-1]
-		# page = doc[0]
-		# where = fitz.Point(15, 55)
-		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		ackdate = invoice.ack_date
-		ack_date = ackdate.split(" ")
-		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
-		# irntext = "IRN: "+ invoice.irn_number
-		# acknotext = "ACK NO: " + invoice.ack_no 
-		# ackdatetext = "ACK DATE: " + invoice.ack_date
-		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
-		page.insertText(
-			where,
-			text,
-			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=folder_path +
-			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=7,  # default
-			rotate=0,  # rotate text
-			color=(0, 0, 0),  # some color (blue)
-			overlay=True)
-				
-		doc.save(dst_pdf_text_filename)
-		doc.close()
-
-		files = {"file": open(dst_pdf_text_filename, 'rb')}
-		payload = {
-			"is_private": 1,
-			"folder": "Home",
-			"doctype": "Invoices",
-			"docname": invoice_number,
-			'fieldname': 'invoice_with_gst_details'
-		}
-		site = company.host
-		upload_qr_image = requests.post(site + "api/method/upload_file",
-										files=files,
-										data=payload)
-		response = upload_qr_image.json()
-		if 'message' in response:
-			invoice.invoice_with_gst_details = response['message']['file_url']
-			invoice.save()
-		return {"message":"Qr Generated Succesfull","success":True}
-	except Exception as e:
-		print(e, "attach qr code")
-
 
 def create_qr_image(invoice_number, gsp):
 	try:
@@ -642,7 +645,6 @@ def create_qr_image(invoice_number, gsp):
 									   headers=headers,
 									   stream=True,
 									   proxies=proxies,verify=False)
-			print(qr_response, "qr_response from gsp8*********88")
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -1006,12 +1008,13 @@ def insert_invoice(data):
 		# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
 		if data['total_invoice_amount'] != 0:
 			itemsInsert = insert_items(items, data['invoice_number'])
-			# insert_t
 			# insert_tax_summaries2(items, data['invoice_number'])
 			TaxSummariesInsert(items,data['invoice_number'])
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 				items, data['guest_data']['invoice_number'],"Invoice")
-		
+		# b2cattach = Invoices()	
+		b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
+		print(b2cAttachQrcode)
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
@@ -2392,7 +2395,9 @@ def check_invoice_exists(invoice_number):
 					'invoice_number':
 					['like', '%' + invoice_number + '%']
 				})
-		invoice_number = invCount[0]['name']		
+		if len(invCount)>0:		
+			invoice_number = invCount[0]['name']	
+		
 		invoiceExists = frappe.get_doc('Invoices', invoice_number)
 		if invoiceExists:
 
@@ -2474,13 +2479,16 @@ def Error_Insert_invoice(data):
 		})
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		
-		if data['items_data']:
+		if 'items_data' in list(data.keys()):
 			items = data['items_data']
 			itemsInsert = insert_items(items,data['invoice_number'])
 			insert_tax_summaries2(items,data['invoice_number'])
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 				items, data['invoice_number'],"Invoice")
-		return {"success":False,"message":"error"} 		
+				
+			# return {"success": True}	
+
+		return {"success":False,"message":"Error"} 		
 	except Exception as e:
 		print(e, "  Error insert Invoice")
 		return {"success": False, "message": str(e)}

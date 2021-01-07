@@ -9,7 +9,7 @@ import traceback
 from frappe.utils import get_site_name
 import time
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
-from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes
+from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes,send_invoicedata_to_gcb
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 import math
@@ -21,6 +21,7 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
+		generateb2cQr = True
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
@@ -188,13 +189,13 @@ def Reinitiate_invoice(data):
 			ready_to_generate_irn = "No"
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-			
+				generateb2cQr = False
 				doc.error_message = " Invoice Total Mismatch"
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
-
+		
 
 		items = data['items_data']
 		# items = [x for x in items if x['sac_code']!="Liquor"]
@@ -205,6 +206,8 @@ def Reinitiate_invoice(data):
 		taxSummariesInsert = insert_tax_summaries2(items, data['guest_data']['invoice_number'])
 		# insert sac code based taxes
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
+		if data['guest_data']['invoice_type'] == "B2C" and generateb2cQr == True:
+			send_invoicedata_to_gcb(data['guest_data']['invoice_number'])
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())

@@ -11,7 +11,7 @@ import itertools
 from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
-from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
+# from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("ISGC-01")
+	companyCheckResponse = check_company_exist("GMGN-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -69,9 +69,11 @@ def file_parsing(filepath):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST ID" in i and "PAN No" not in i:
+		if "GST ID" in i:				
+	
 			gstNumber = i.split(':')[1].replace(' ', '')
-			# gstNumber = gstNumber.replace("ConfirmationNo.","")
+			if "ConfirmationNo." in gstNumber:
+				gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "/" in invoiceNumber:
@@ -148,7 +150,7 @@ def file_parsing(filepath):
 	paymentTypes = GetPaymentTypes()
 	payment_Types  = [''.join(each) for each in paymentTypes['data']]
 	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service charge" not in each['name']:
 			if each["name"] not in payment_Types:
 				total_items.append(each)
 
@@ -170,7 +172,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "ISGC-01"
+	guest['company_code'] = "GMGN-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -185,7 +187,6 @@ def file_parsing(filepath):
 			invoiceNumber = inv_data.name
 			guest['invoice_number'] = inv_data.name
 			amened='No'
-			print("/aaaaaaaaaa")
 			if inv_data.invoice_type == "B2B":
 				if inv_data.irn_generated=="Pending" or inv_data.irn_generated == "Error":
 					reupload = True
@@ -193,8 +194,8 @@ def file_parsing(filepath):
 				if inv_data.qr_generated=="Pending" or inv_data.irn_generated=="Error":
 					reupload = True
 
-	company_code = {"code":"ISGC-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
+	company_code = {"code":"GMGN-01"}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"GMGN-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
