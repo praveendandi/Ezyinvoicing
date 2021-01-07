@@ -213,7 +213,6 @@ class Invoices(Document):
 				"TotInvVal": round(TotInnVal,2),
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
-			print(gst_data,"         //////")
 			# return{"success":True}
 			if ass_value > 0:
 
@@ -317,6 +316,8 @@ class Invoices(Document):
 		taxPayerDeatilsData.location = taxPayerDetails['location']
 		taxPayerDeatilsData.save()
 		return True
+
+	
 
 	
 
@@ -431,6 +432,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		print(e, "attach qr code")
 
 
+@frappe.whitelist(allow_guest=True)
 def send_invoicedata_to_gcb(invoice_number):
 		try:
 			folder_path = frappe.utils.get_bench_path()
@@ -584,7 +586,6 @@ def send_invoicedata_to_gcb(invoice_number):
 											files=files,
 											data=payload)
 			response = upload_qr_image.json()
-			print(response, "b2c qr code upload")
 			if 'message' in response:
 				doc.b2c_qrimage = response['message']['file_url']
 				doc.name = invoice_number
@@ -644,7 +645,6 @@ def create_qr_image(invoice_number, gsp):
 									   headers=headers,
 									   stream=True,
 									   proxies=proxies,verify=False)
-			print(qr_response, "qr_response from gsp8*********88")
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -1012,9 +1012,9 @@ def insert_invoice(data):
 			TaxSummariesInsert(items,data['invoice_number'])
 			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 				items, data['guest_data']['invoice_number'],"Invoice")
-			
-			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
-			print(b2cAttachQrcode)
+		# b2cattach = Invoices()	
+		b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
+		print(b2cAttachQrcode)
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
@@ -2479,7 +2479,7 @@ def Error_Insert_invoice(data):
 		})
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		
-		if data['items_data']:
+		if 'items_data' in list(data.keys()):
 			items = data['items_data']
 			itemsInsert = insert_items(items,data['invoice_number'])
 			insert_tax_summaries2(items,data['invoice_number'])

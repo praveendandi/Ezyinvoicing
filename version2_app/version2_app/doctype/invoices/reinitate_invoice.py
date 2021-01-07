@@ -195,7 +195,7 @@ def Reinitiate_invoice(data):
 				doc.ready_to_generate_irn = "No"
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
-
+		
 
 		items = data['items_data']
 		# items = [x for x in items if x['sac_code']!="Liquor"]
