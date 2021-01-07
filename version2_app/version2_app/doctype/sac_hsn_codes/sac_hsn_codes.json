@@ -25,7 +25,8 @@
   "accommodation_slab",
   "one_sc_applies_to_all",
   "service_charge_rate",
-  "ignore"
+  "ignore",
+  "service_charge_net"
  ],
  "fields": [
   {
@@ -153,11 +154,18 @@
    "fieldname": "ignore",
    "fieldtype": "Check",
    "label": "Ignore"
+  },
+  {
+   "default": "No",
+   "fieldname": "service_charge_net",
+   "fieldtype": "Select",
+   "label": "Service Charge Net",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-07 15:49:23.333955",
+ "modified": "2021-01-07 17:22:11.223383",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

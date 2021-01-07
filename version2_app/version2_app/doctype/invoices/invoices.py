@@ -1234,6 +1234,7 @@ def calulate_items(data):
 					else:
 						{"success": False, "message": "error in slab helper function"}
 				if sac_code_based_gst_rates.service_charge == "Yes":
+					gst_value = 0
 					service_dict = {}
 					if sac_code_based_gst_rates.one_sc_applies_to_all == 1:
 						scharge = companyDetails.service_charge_percentage
@@ -1241,9 +1242,15 @@ def calulate_items(data):
 						scharge = sac_code_based_gst_rates.service_charge_rate
 					if sac_code_based_gst_rates.net == "Yes":
 						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						total_gst_amount = (gstpercentage * item['item_value']) / 100.0
-						base_value = item['item_value'] - total_gst_amount
+						
+						base_value = round(item['item_value'] * (100 / (gstpercentage + 100)),3) 
+						gst_value = item['item_value']- base_value
 						scharge_value = (scharge * base_value) / 100.0
+						if sac_code_based_gst_rates.service_charge_net == "Yes":
+							scharge_value_base = round(scharge_value * (100 / (gst_percentage + 100)),3)
+							gst_value = scharge_value- scharge_value_base
+							scharge_value = scharge_value_base
+						
 						item['base_value'] = base_value
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					else:
@@ -1253,6 +1260,12 @@ def calulate_items(data):
 							gst_percentage = acc_gst_percentage
 						else:
 							gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+					
+					if sac_code_based_gst_rates.service_charge_net == "Yes":
+						scharge_value_base = round(scharge_value * (100 / (gst_percentage + 100)),3)
+						gst_value = scharge_value- scharge_value_base
+						scharge_value = scharge_value_base
+						
 					if sac_code_based_gst_rates.vat_rate>0:
 						vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
 						service_dict['vat_amount'] = vatamount
@@ -1280,7 +1293,8 @@ def calulate_items(data):
 						service_dict['state_cess_amount'] = 0
 						service_dict['state_cess'] = 0	
 					# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.
-					gst_value = (gst_percentage* scharge_value)/100.0
+					if gst_value==0:
+						gst_value = (gst_percentage* scharge_value)/100.0
 					service_dict['item_name'] = item['name']+"-SC "
 					service_dict['description'] = item['name']+"-SC "
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
@@ -2516,7 +2530,6 @@ def Error_Insert_invoice(data):
 		company = frappe.get_doc('company',data['company_code'])
 		if not frappe.db.exists('Invoices', data['invoice_number']):
 
-			print("/////////")
 			invoice = frappe.get_doc({
 				'doctype':
 				'Invoices',
