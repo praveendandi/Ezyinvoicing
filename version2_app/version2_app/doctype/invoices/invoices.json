@@ -737,7 +737,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-06 11:39:47.520031",
+ "modified": "2021-01-07 11:12:51.913288",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -831,8 +831,11 @@
    "share": 1
   },
   {
+   "create": 1,
+   "delete": 1,
    "read": 1,
-   "role": "System Manager"
+   "role": "System Manager",
+   "write": 1
   }
  ],
  "quick_entry": 1,
