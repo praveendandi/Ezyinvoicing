@@ -25,7 +25,6 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	try:
 		filepath = data['filepath']
-		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
 		companyCheckResponse = check_company_exist("GMGN-01")
 		site_folder_path = companyCheckResponse['data'].site_name
@@ -74,8 +73,7 @@ def reinitiateInvoice(data):
 			if "GST ID" in i:				
 		
 				gstNumber = i.split(':')[1].replace(' ', '')
-				if "ConfirmationNo." in gstNumber:
-					gstNumber = gstNumber.replace("ConfirmationNo.","")
+				gstNumber = gstNumber.replace("ConfirmationNo.","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
@@ -105,8 +103,7 @@ def reinitiateInvoice(data):
 				p = i.split(":")
 				print_by = p[1].replace(" ","")
 
-		if invoiceNumber != reupload_inv_number:
-			return {"success":False,"message":"Incorrect Invoice Attempted"}
+
 		items = [] 
 		itemsort = 0
 		for i in data:
