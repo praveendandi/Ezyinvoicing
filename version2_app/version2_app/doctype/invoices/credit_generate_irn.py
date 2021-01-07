@@ -203,7 +203,7 @@ def get_tax_payer_details_data(data):
 					if (details['TradeName'] != "") or (details['TradeName'] != None):
 						details['LegalName'] = details['TradeName']
 				if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
-					details['AddrLoc'] = "Uttarakhand"	
+					details['AddrLoc'] = "       "	
 				if len(details["AddrBnm"]) < 3:
 					details["AddrBnm"] = details["AddrBnm"]+"    "
 				if len(details["AddrBno"]) < 3:
@@ -540,6 +540,12 @@ def CreditgenerateIrn(invoice_number):
 		# print(credit_items)
 		# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 	else:
+		if response['result']['InfCd'] == "DUPIRN":
+			invoice = frappe.get_doc('Invoices', invoice_number)
+			invoice.credit_duplicate_ack_date = response['result']['Desc']['AckDt']
+			invoice.credit_duplicate_ack_no = response['result']['Desc']['AckNo']
+			invoice.credit_duplicate_irn_number = response['result']['Desc']['Irn']
+			invoice.save(ignore_permissions=True, ignore_version=True)
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		invoice.credit_irn_generated = 'Failed'
 		invoice.credit_irn_error_message = response['message'][6:]

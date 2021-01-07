@@ -247,6 +247,12 @@ class Invoices(Document):
 												ignore_version=True)
 						return response
 					else:
+						if response['result']['InfCd'] == "DUPIRN":
+							invoice = frappe.get_doc('Invoices', invoice_number)
+							invoice.duplicate_ack_date = response['result']['Desc']['AckDt']
+							invoice.duplicate_ack_no = response['result']['Desc']['AckNo']
+							invoice.duplicate_irn_number = response['result']['Desc']['Irn']
+							invoice.save(ignore_permissions=True, ignore_version=True)
 						return response
 				except Exception as e:
 					print(str(e), "generate Irn")
@@ -1098,9 +1104,10 @@ def insert_invoice(data):
 		TaxSummariesInsert(items,data['invoice_number'])
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'],"Invoice")
-		# b2cattach = Invoices()	
-		b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
-		print(b2cAttachQrcode)
+		# b2cattach = Invoices()
+		if data['guest_data']['invoice_type'] == "B2C":
+			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
+			return {"success":True}
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")

@@ -25,6 +25,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	try:
 		filepath = data['filepath']
+		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
 		companyCheckResponse = check_company_exist("GMGN-01")
 		site_folder_path = companyCheckResponse['data'].site_name
@@ -73,7 +74,8 @@ def reinitiateInvoice(data):
 			if "GST ID" in i:				
 		
 				gstNumber = i.split(':')[1].replace(' ', '')
-				gstNumber = gstNumber.replace("ConfirmationNo.","")
+				if "ConfirmationNo." in gstNumber:
+					gstNumber = gstNumber.replace("ConfirmationNo.","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
@@ -103,7 +105,8 @@ def reinitiateInvoice(data):
 				p = i.split(":")
 				print_by = p[1].replace(" ","")
 
-
+		if invoiceNumber != reupload_inv_number:
+			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		items = [] 
 		itemsort = 0
 		for i in data:
@@ -194,9 +197,9 @@ def reinitiateInvoice(data):
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
-		error_data['state_code'] = "33"
+		error_data['state_code'] = "00"
 		error_data['room_number'] = guest['room_number']
-		error_data['pincode'] = "603103"
+		error_data['pincode'] = "000000"
 		# gstNumber = "12345"
 		if len(gstNumber) < 15 and len(gstNumber)>0:
 			error_data['invoice_file'] = filepath

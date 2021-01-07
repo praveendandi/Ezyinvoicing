@@ -113,7 +113,13 @@
   "other_charges_before_tax",
   "sales_amount_before_tax",
   "sales_amount_after_tax",
-  "mode"
+  "mode",
+  "duplicate_ack_date",
+  "duplicate_ack_no",
+  "duplicate_irn_number",
+  "credit_duplicate_ack_date",
+  "credit_duplicate_ack_no",
+  "credit_duplicate_irn_number"
  ],
  "fields": [
   {
@@ -732,12 +738,42 @@
    "fieldtype": "Select",
    "label": "Mode",
    "options": "Uat\nProduction\nTesting"
+  },
+  {
+   "fieldname": "duplicate_ack_date",
+   "fieldtype": "Datetime",
+   "label": "Duplicate Ack Date"
+  },
+  {
+   "fieldname": "duplicate_ack_no",
+   "fieldtype": "Data",
+   "label": "Duplicate Ack No"
+  },
+  {
+   "fieldname": "duplicate_irn_number",
+   "fieldtype": "Data",
+   "label": "Duplicate Irn Number"
+  },
+  {
+   "fieldname": "credit_duplicate_ack_date",
+   "fieldtype": "Datetime",
+   "label": "Credit Duplicate Ack Date"
+  },
+  {
+   "fieldname": "credit_duplicate_ack_no",
+   "fieldtype": "Data",
+   "label": "Credit Duplicate Ack No"
+  },
+  {
+   "fieldname": "credit_duplicate_irn_number",
+   "fieldtype": "Data",
+   "label": "Credit Duplicate Irn Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-07 11:12:51.913288",
+ "modified": "2021-01-07 13:03:58.440961",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
