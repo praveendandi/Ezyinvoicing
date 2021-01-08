@@ -45,7 +45,6 @@
   "section_break_9",
   "sac_hsn_based_taxes",
   "e_invoice_details_section",
-  "credit_note_items",
   "irn_number",
   "irn_cancelled",
   "qr_code_generated",
@@ -95,7 +94,6 @@
   "total_state_cess_amount",
   "total_vat_amount",
   "print_by",
-  "discount_items",
   "has_discount_items",
   "discount_value_before_gst",
   "discount_value_after_gst",
@@ -119,7 +117,8 @@
   "duplicate_irn_number",
   "credit_duplicate_ack_date",
   "credit_duplicate_ack_no",
-  "credit_duplicate_irn_number"
+  "credit_duplicate_irn_number",
+  "invoice_category"
  ],
  "fields": [
   {
@@ -465,12 +464,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "credit_note_items",
-   "fieldtype": "Table",
-   "label": "Credit Note Items",
-   "options": "Credit Note Items"
-  },
-  {
    "fieldname": "ready_to_generate_irn",
    "fieldtype": "Select",
    "label": "Ready To Generate IRN",
@@ -625,12 +618,6 @@
    "label": "Print By"
   },
   {
-   "fieldname": "discount_items",
-   "fieldtype": "Table",
-   "label": "Discount Items",
-   "options": "Discount Items"
-  },
-  {
    "fieldname": "has_discount_items",
    "fieldtype": "Select",
    "label": "Has Discount Items",
@@ -768,12 +755,18 @@
    "fieldname": "credit_duplicate_irn_number",
    "fieldtype": "Data",
    "label": "Credit Duplicate Irn Number"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "label": "Invoice Category",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-07 13:03:58.440961",
+ "modified": "2021-01-08 10:01:46.560427",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
