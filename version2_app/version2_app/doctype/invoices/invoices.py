@@ -2259,7 +2259,7 @@ def login_gsp2():
 
 @frappe.whitelist(allow_guest=True)
 def gsp_api_data(data):
-	# try:
+	try:
 		mode = data['mode']
 		gsp_apis = frappe.db.get_value('GSP APIS', {
 			"company": data['code'],
@@ -2316,11 +2316,10 @@ def gsp_api_data(data):
 		api_details['gst'] = gsp_apis[
 			'gst_test_number'] if mode == 'Testing' else gsp_apis[
 				'gst_prod_number']
-		# print(api_details,"//////")
 		return {"success":True,"data":api_details}
-	# except Exception as e:
-	# 	print(e,"gsp api details")
-	# 	return {"success":False,"message":str(e)}
+	except Exception as e:
+		print(e,"gsp api details")
+		return {"success":False,"message":str(e)}
 		
 
 
