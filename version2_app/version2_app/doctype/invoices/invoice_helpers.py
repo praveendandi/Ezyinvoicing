@@ -78,6 +78,7 @@ def TotalMismatchError(data,calculated_data):
                 'total_inovice_amount':data['total_invoice_amount'],
                 'company':
                 data['company_code'],
+                'mode': calculated_data['company'].mode,
                 'cgst_amount':
                 round(calculated_data['cgst_amount'], 2),
                 'sgst_amount':
@@ -138,6 +139,7 @@ def TotalMismatchError(data,calculated_data):
         return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data']}
     except Exception as e:
         return {"success":False,"message":str(e)}    
+        
 
 def CheckRatePercentages(data):
     try:

@@ -28,7 +28,7 @@
   },
   {
    "fieldname": "amount",
-   "fieldtype": "Data",
+   "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount",
    "reqd": 1
@@ -42,7 +42,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-12-21 12:40:19.505938",
+ "modified": "2021-01-05 13:57:46.987272",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Tax Summaries",
