@@ -1913,17 +1913,21 @@ def get_tax_payer_details(data):
 			else:
 				print("Unknown error in get taxpayer details get call  ",
 					  response)
+				error_message = str(response['message'])
+				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
+				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {error_message}")
 				return {
 					"success": False,
 					"message": response['message'],
 					"response": response
 				}
-
 		else:
 			doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
 			return {"success": True, "data": doc}
 	except Exception as e:
 		print(e, "get tax payers")
+		frappe.log_error(frappe.get_traceback())
+		logger.error(f"get_tax_payer_details,   {str(e)}")
 		return {"success": False, "message": str(e)}
 
 
