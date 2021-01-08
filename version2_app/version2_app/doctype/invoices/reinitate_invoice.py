@@ -170,7 +170,7 @@ def Reinitiate_invoice(data):
 		doc.sgst_amount=round(sgst_amount,2)
 		doc.igst_amount=round(igst_amount,2)
 		doc.total_gst_amount = round(cgst_amount,2) + round(sgst_amount,2) + round(igst_amount,2)
-		doc.irn_generated=irn_generated
+		
 		doc.irn_cancelled='No'
 		doc.qr_code_generated='Pending'
 		doc.signed_invoice_generated='No'
@@ -185,15 +185,20 @@ def Reinitiate_invoice(data):
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
 		doc.mode = company.mode
+		if data['total_invoice_amount'] == 0:
+			irn_generated = "Zero Invoice"
+		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
+			
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 				generateb2cQr = False
 				doc.error_message = " Invoice Total Mismatch"
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
+
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		

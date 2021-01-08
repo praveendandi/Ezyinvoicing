@@ -997,6 +997,8 @@ def insert_invoice(data):
 
 				return{"success":False,"message":TotalMismatchErrorAPI['message']}
 
+		if data['total_invoice_amount'] == 0:
+			irn_generated = "Zero Invoice"
 
 		invoice = frappe.get_doc({
 			'doctype':
@@ -2559,7 +2561,6 @@ def Error_Insert_invoice(data):
 		# else:
 		company = frappe.get_doc('company',data['company_code'])
 		if not frappe.db.exists('Invoices', data['invoice_number']):
-
 			invoice = frappe.get_doc({
 				'doctype':
 				'Invoices',
@@ -2630,7 +2631,7 @@ def Error_Insert_invoice(data):
 				# return {"success": True}	
 
 			return {"success":False,"message":"Error"} 
-		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])			
+		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
 		invoiceExists.error_message = data['error_message']
 		invoiceExists.irn_generated = "Error"
 		invoiceExists.save()
