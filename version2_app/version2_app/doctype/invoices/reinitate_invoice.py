@@ -59,6 +59,7 @@ def Reinitiate_invoice(data):
 			data['taxpayer']['legal_name'] = " "
 		#calculat items
 		for item in data['items_data']:
+			print(item, "    ********8")
 			if item['taxable'] == 'No' and item['item_type'] != "Discount":
 				other_charges += item['item_value_after_gst']
 				other_charges_before_tax += item['item_value']
@@ -81,6 +82,7 @@ def Reinitiate_invoice(data):
 					# sgst_amount+=item['sgst_amount']
 					# igst_amount+=item['igst_amount']
 					# cess_amount+=item['cess_amount']
+					print("///////// mm")
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -91,6 +93,7 @@ def Reinitiate_invoice(data):
 					total_credit_vat_amount += item['vat_amount']
 			else:
 				pass
+		print(credit_cgst_amount)	
 		# pms_invoice_summary = value_after_gst
 		# pms_invoice_summary_without_gst = value_before_gst
 		if company.allowance_type=="Discount":
@@ -113,18 +116,28 @@ def Reinitiate_invoice(data):
 
 				has_credit_items = "Yes"
 			else:
-				has_credit_items = "No"			
-		cgst_amount = cgst_amount - credit_cgst_amount
-		sgst_amount = sgst_amount - credit_sgst_amount
-		igst_amount	= igst_amount - credit_igst_amount	
-		total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
-		total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
-		total_vat_amount =  total_vat_amount - total_credit_vat_amount
+				has_credit_items = "No"	
+		if data['guest_data']['invoice_category'] == "Tax Invoice":				
+			cgst_amount = cgst_amount - credit_cgst_amount
+			sgst_amount = sgst_amount - credit_sgst_amount
+			igst_amount	= igst_amount - credit_igst_amount	
+			total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
+			total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
+			total_vat_amount =  total_vat_amount - total_credit_vat_amount
+		if data['guest_data']['invoice_category'] == "Credit Invoice":
+			credit_cgst_amount= -credit_cgst_amount
+			credit_sgst_amount= -credit_sgst_amount
+			credit_igst_amount= -credit_igst_amount
+			total_credit_central_cess_amount= -total_credit_central_cess_amount
+			total_credit_state_cess_amount= -total_credit_state_cess_amount
+			# credit_value_before_gst= credit_value_before_gst
+			# credit_value_after_gst= credit_value_after_gst
+			total_credit_vat_amount = -total_credit_vat_amount
+			print(credit_cgst_amount)	
 		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
-
 		invoice_round_off_amount = 0	
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
@@ -137,6 +150,7 @@ def Reinitiate_invoice(data):
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
+		doc.invoice_category=data['guest_data']['invoice_category']
 		doc.invoice_file=data['guest_data']['invoice_file']
 		doc.room_number=data['guest_data']['room_number']
 		doc.invoice_type=data['guest_data']['invoice_type']

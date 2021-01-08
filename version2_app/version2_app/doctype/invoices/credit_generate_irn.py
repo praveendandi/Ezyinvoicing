@@ -524,7 +524,7 @@ def CreditgenerateIrn(invoice_number):
 			"TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
 			"TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
 		}
-		# print(gst_data)
+		print(gst_data)
 		response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
 		if response['success']==True:
 			invoice = frappe.get_doc('Invoices', invoice_number)
@@ -539,7 +539,7 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_irn_cancelled = 'No'
 			invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 			invoice.save(ignore_permissions=True,ignore_version=True)
-			create_qr_image(invoice_number, GSP_details['data'])
+			create_credit_qr_image(invoice_number, GSP_details['data'])
 			# print(credit_items)
 			# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 		else:

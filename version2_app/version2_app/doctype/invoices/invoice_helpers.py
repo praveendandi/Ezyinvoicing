@@ -52,6 +52,7 @@ def TotalMismatchError(data,calculated_data):
                 data['taxpayer']['pincode'],
                 'state_code':
                 data['taxpayer']['state_code'],
+                'invoice_category':data['guest_data']['invoice_category'],
                 'amount_before_gst':
                 round(calculated_data['value_before_gst'], 2),
                 "amount_after_gst":

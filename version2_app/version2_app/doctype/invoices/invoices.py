@@ -190,15 +190,22 @@ class Invoices(Document):
 					}
 					gst_data['ItemList'].append(i)
 				else:
-					if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
-						
-						credit_note_items.append(item)
-					else:
+					if invoice.invoice_category == "Credit Invoice":
 						if item.type == "Included":
-							discount_before_value +=item.item_value	
-							discount_after_value += item.item_value_after_gst
-							credit_note_items.append(item)
+							credit_note_items.append(item.__dict__)
+					elif invoice.invoice_category == "Tax Invoice":
+						if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
+							
+							credit_note_items.append(item.__dict__)
+						else:
+							if item.type == "Included":
+								discount_before_value +=item.item_value	
+								discount_after_value += item.item_value_after_gst
+								credit_note_items.append(item.__dict__)
 			# print(gst_data["ItemList"])
+			if invoice.invoice_category == "Credit Invoice":
+				creditIrn = CreditgenerateIrn(invoice_number)
+				return creditIrn
 			discount_before_value = abs(discount_before_value)	
 			discount_after_value = abs(discount_after_value)
 			TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
@@ -872,7 +879,6 @@ def insert_invoice(data):
 		cgst_amount = 0
 		sgst_amount = 0
 		igst_amount = 0
-		# cess_amount = 0
 		total_central_cess_amount = 0
 		total_state_cess_amount = 0
 		total_vat_amount =0
@@ -880,13 +886,11 @@ def insert_invoice(data):
 		credit_cgst_amount = 0
 		credit_sgst_amount = 0
 		credit_igst_amount = 0
-		# credit_cess_amount = 0
 		total_credit_central_cess_amount = 0
 		total_credit_state_cess_amount = 0
 		total_credit_vat_amount =0
 		has_discount_items = "No"
 		has_credit_items = "No"
-		# print(data['items_data'])
 		if data['guest_data']['invoice_type'] == "B2B":
 			irn_generated = "Pending"
 		else:
@@ -930,33 +934,46 @@ def insert_invoice(data):
 				pass
 		# pms_invoice_summary = value_after_gst
 		# pms_invoice_summary_without_gst = value_before_gst
-		if company.allowance_type=="Discount":
-			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
-			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			pms_invoice_summary = value_after_gst-discountAfterAmount
-			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
-			if pms_invoice_summary == 0:
-				
-				credit_value_after_gst = 0
-			if credit_value_before_gst > 0:
+		if data['guest_data']['invoice_category'] == "Tax Invoice":
+			if company.allowance_type=="Discount":
+				discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
+				discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
+				pms_invoice_summary = value_after_gst-discountAfterAmount
+				pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+				if pms_invoice_summary == 0:
+					
+					credit_value_after_gst = 0
+				if credit_value_before_gst > 0:
 
-				has_discount_items = "Yes"
+					has_discount_items = "Yes"
+				else:
+					has_discount_items = "No"
 			else:
-				has_discount_items = "No"
-		else:
-			pms_invoice_summary = value_after_gst - credit_value_after_gst
-			pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
-			if credit_value_before_gst > 0:
+				pms_invoice_summary = value_after_gst - credit_value_after_gst
+				pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
+				if credit_value_before_gst > 0:
 
-				has_credit_items = "Yes"
-			else:
-				has_credit_items = "No"	
-		cgst_amount = cgst_amount - credit_cgst_amount
-		sgst_amount = sgst_amount - credit_sgst_amount
-		igst_amount	= igst_amount - credit_igst_amount	
-		total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
-		total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
-		total_vat_amount =  total_vat_amount - total_credit_vat_amount
+					has_credit_items = "Yes"
+				else:
+					has_credit_items = "No"	
+					
+			cgst_amount = cgst_amount - credit_cgst_amount
+			sgst_amount = sgst_amount - credit_sgst_amount
+			igst_amount	= igst_amount - credit_igst_amount	
+			total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
+			total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
+			total_vat_amount =  total_vat_amount - total_credit_vat_amount
+		if data['guest_data']['invoice_category'] == "Credit Invoice":
+			credit_cgst_amount= -credit_cgst_amount
+			credit_sgst_amount= -credit_sgst_amount
+			credit_igst_amount= -credit_igst_amount
+			total_credit_central_cess_amount= -total_credit_central_cess_amount
+			total_credit_state_cess_amount= -total_credit_state_cess_amount
+			# credit_value_before_gst= credit_value_before_gst
+			# credit_value_after_gst= credit_value_after_gst
+			total_credit_vat_amount = -total_credit_vat_amount
+			print(credit_cgst_amount)
+
 		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
@@ -1020,6 +1037,7 @@ def insert_invoice(data):
 			data['guest_data']['confirmation_number'],
 			'invoice_type':
 			data['guest_data']['invoice_type'],
+			'invoice_category':data['guest_data']['invoice_category'],
 			'print_by': data['guest_data']['print_by'],
 			'invoice_date':
 			datetime.datetime.strptime(data['guest_data']['invoice_date'],
