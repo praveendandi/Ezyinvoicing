@@ -180,6 +180,7 @@ def Reinitiate_invoice(data):
 		doc.credit_igst_amount = round(credit_igst_amount,2)
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
+		doc.mode = company.mode
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"

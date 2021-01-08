@@ -11,12 +11,12 @@ from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-# from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
+from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
 folder_path = frappe.utils.get_bench_path()
 
-# site_folder_path = "HICC_local.com/"
+# site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
 
@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HICC-01")
+	companyCheckResponse = check_company_exist("IBISCCC-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -67,12 +67,12 @@ def reinitiateInvoice(data):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST ID" in i and "Telangana" not in i:
+		if "Cust. GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace(" ","")
-			gstNumber = gstNumber[:15]
+			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
-			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+			invoice_Number = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+			invoiceNumber = invoice_Number.replace("/","-")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:
@@ -95,231 +95,66 @@ def reinitiateInvoice(data):
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
-			p = i.split(":")
-			print_by = p[1].replace(" ","")
-	
-	paymentTypes = GetPaymentTypes()
-	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
-	original_data = []
-	for index, i in enumerate(data):
-	
-		
-		if ('XX/XX' in i) or ("Cash" in i):
-			i = " "
-		if i !=" ":
-			j = i.split(' ')
-			j = j[1:-1]
-			if len(j)>1:
-				ele = j[0]+" "+j[1]
-				if ele not in paymentTypes:
-					original_data.append(i)
-			elif len(j) == 1:
-				if j[0] not in paymentTypes:
-					original_data.append(i)
-
-
-
-		# if 'Deposit Bank' not in i and 'Amex Card' not in i and 'Deposit Transfer at' not in i and 'Other Credit Cards' not in i and "Date Description Reference Debit Credit" not in i and 'City Ledger' not in i and 'Visa Card' not in i and 'Cash' not in i and 'Bill To Company' not in i and i not in payment_list and 'Master' not in i and 'ZZZ POS Visa Card' not in i and 'Debit Cards (ALL)' not in i and "Refund Back to Guest" not in i:
-		# 	original_data.append(i)
-		# if 'XX/XX' in i and i in payment_list:
-		# 	original_data.pop(len(original_data) - 1)
-		# 	original_data.pop(len(original_data) - 1)
+			print_by = i.split(":")
+			print_by = print_by[1].replace(" ","")
 
 	items = [] 
 	itemsort = 0
-	for i in original_data:
+	for i in data:
 		pattern = re.compile(
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
 		if len(check_date) > 0:
 			item = dict()
+			item_value = ""
+			dt = i.strip()
 			for index, j in enumerate(i.split(' ')):
-				# print(index,j)
 				if index == 0:
 					item['date'] = j
+				val = dt.split(" ")
+				if val != "":
+					item_value = val[-1]
+					item['item_value'] = float(item_value.replace(',', ''))
+				else:
+					item_value = val[-2]
+					item['item_value'] = float(item_value.replace(',', ''))
 				if index == 1:
-					item['name'] = j
-				if index == 2:
-					if len(i.split(" "))>3:
-						item['name'] = item['name'] + ' ' + j
-				if index == 3:
-					if "#" not in j and '[' not in j and ']' not in j and '.' not in j and ',' not in j and 'Pkg.' not in j:
-						item["name"] = item["name"] + ' ' + j
-				if index == 4:
-					if ".00" in j:
-						pass
+					starting_index = i.index(j)
+					if "~" in i:
+						ending_index = i.find("~")
+						item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+						item_name = (item["name"].split(" ")[-1]).strip()
+						if len(item_name) == 1:
+							item["name"] = (item["name"][:-1]).strip()
 					else:
-						if re.fullmatch('[A-Za-z]+', j) and '#' not in j and '[' not in j and "Room" not in j and ']' not in j and 'Pkg.' not in j and 'Split' not in j:
-							item["name"] = item["name"] + ' ' + j
-				if j == "Dinner" and "Dinner" not in item['name']:
-					item["name"] = item["name"] + ' ' + j
-
-				if '%' in j:
-					if j not in item['name']:
-						v = re.findall("\d+\.\d+\%", j)
-						if len(v)==1:
-							item['percentage'] = v[0][:-1]
-
-						if "(" not in j and "." not in j:
-							
-							item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
-							item["name"] = item["name"] + ' ' + j
-				if '%' in j:
-					
-					v = re.findall("\d+\.\d+\%", j)
-					if len(v)==1:
-						item['percentage'] = v[0][:-1]
-					if "(" not in j and "." not in j:
-						item['percentage'] = ''.join(filter(lambda j: j.isdigit(), j))
-
-				
-				if index == 5:
-					if "CompBreakfast" in j or "Beverage" in j:
-						item["name"] = item["name"] + ' ' + j
-				
-				if "SGST" in j:
-					item['name'] = item['name'] + ' SGST'
-				if "CGST" in j:
-					item['name'] = item['name'] + ' CGST'
-				if "IGST" in j:
-					item['name'] = item['name'] + ' IGST'
-				
-				if "HICC" in j:
-					if "HICC" not in item['name']:
-						item['name'] = item['name']+' HICC'
+						ending_index = i.find(item_value)
+						item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+						item_name = (item["name"].split(" ")[-1]).strip()
+						if len(item_name) == 1:
+							item["name"] = (item["name"][:-1]).strip()
 				if 'SAC' in j:
 					item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
-					if "SAC" not in item['name']:
-						item['name'] = item['name']+ ' SAC'
-					if item['sac_code'].isdigit():
-						if item['sac_code'] not in item['name']:
-							item['name'] = item['name']+' '+item['sac_code']
-				if "CGST" in j:
-					ind = i.find("CGST")
-					ind2 = i.find("%")
-					item['percentage'] = i[ind + 6:ind2]
-				if "SGST" in j:  # or ("SGST" in j):
-					ind = i.find("SGST")
-					ind2 = i.find("%")
-					item['percentage'] = i[ind + 7:ind2]
-
-				if "CESS" in j:
-					v = re.findall("\d+\%", j)
-					if len(v)>0:
-						item['percentage'] = v[0][:-1]
-					else:	
-						ind = i.find("CESS")
-						ind2 = i.find("%")
-						item['percentage'] = i[ind + 6:ind2]		
-				if len(j)==6 and j.isdigit():
-					if j not in item['name'] and j[0]!="0":
-						item['name'] = item['name']+' '+j
-						item['sac_code'] = j
-				if len(j)==8 and j.isdigit():
-					if j not in item['name'] and j[0]!="0":
-						item['name'] = item['name']+' '+j
-						item['sac_code'] = j	
-				if '@' in i and '%' in i:
-					if 'name' in list(item.keys()):
-						if ("GST" in item['name']) or ("CESS" in item['name']):
-							ind = i.find("@")
-							ind2 = i.find("%")
-							item['percentage'] = i[ind+1:ind2]	
-				if index == len(i.split(' ')) - 1:
-					if index != 0:
-						item['item_value'] = float(j.replace(',', ''))
+				else:
+					item['sac_code'] = "No Sac"
 				item['sort_order'] =  itemsort+1
 			itemsort+=1
 			items.append(item)
 
-	finalData = []
-	for item in items:
-		# print(item)
-		if len(item) > 1:
+	total_items = []
+	paymentTypes = GetPaymentTypes()
+	payment_Types  = [''.join(each) for each in paymentTypes['data']]
+	for each in items:
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each["name"]:
+			if each["name"] not in payment_Types:
+				total_items.append(each)
 
-			if 'CGST' not in item['name'] and 'SGST' not in item['name'] and 'CESS' not in item['name'] and "Allow " not in item["name"] and 'Cess' not in item['name']:# and "Service Charge" not in item['name'] and "Utility Charge" not in item['name']:
-				# print(item)
-				if 'sac_code' in item:
-					if item['sac_code']== '':
-						item['sac_code'] = 'No Sac'
-					else:
-						item['sac_code'] = item['sac_code']
-				else:
-					item['sac_code'] = 'No Sac'
-				finalData.append(item)
-			else:
-				itemToUpdate = finalData[len(finalData) - 1]
-				if 'SGST' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['sgst'] = float(item['percentage'])
-						itemToUpdate['sgstAmount'] = item['item_value']
-					else:
-						itemToUpdate['sgst'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['sgstAmount'] = item['item_value']
-				elif 'CGST' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['cgst'] = float(item['percentage'])
-						itemToUpdate['cgstAmount'] = item['item_value']
-					else:
-						print(item)
-						itemToUpdate['cgst'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['cgstAmount'] = item['item_value']
-				elif 'IGST' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['igst'] = float(item['percentage'])
-						itemToUpdate['igstAmount'] = item['item_value']
-					else:
-						itemToUpdate['igst'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['igstAmount'] = item['item_value']
-				elif 'CESS' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['cess'] = float(item['percentage'])
-						itemToUpdate['cessAmount'] = item['item_value']
-					else:
-						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['cessAmount'] = item['item_value']	
-				elif 'Cess' in item['name']:
-					if "." in item['percentage']:
-						itemToUpdate['cess'] = float(item['percentage'])
-						itemToUpdate['cessAmount'] = item['item_value']
-					else:
-						itemToUpdate['cess'] = int(item['percentage'].replace(',', ''))
-						itemToUpdate['cessAmount'] = item['item_value']
-				elif 'Allow ' in item["name"]:
-					if "sgst" in itemToUpdate:
-						itemToUpdate['cgst'] = 9
-						itemToUpdate['cgstAmount'] = item['item_value']
-					else:
-						itemToUpdate['sgst'] = 9
-						itemToUpdate['sgstAmount'] = item['item_value']
-							
-
-	invoiceItems = []
-	for index, i in enumerate(finalData):
-		# i['SlNo'] = index+1
-		# i['name']=i['name']+"99999"
-		if 'cgstAmount' not in i:
-			i['cgst'] = 0
-			i['cgstAmount'] = float(0)
-		if 'sgstAmount' not in i:
-			i['sgst'] = 0
-			i['sgstAmount'] = float(0)
-		if 'igstAmount' not in i:
-			i['igst'] = 0
-			i['igstAmount'] = float(0)
-		if 'cessAmount' not in i:
-			i['cess'] = 0
-			i['cessAmount'] = float(0)    
-		# i['total_item_value'] = float(i['sgstAmount'])+float(i['cgstAmount'])+float(i['item_value'])+float(i['igstAmount'])
-		invoiceItems.append(i)
-
-		# print(i)
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
 		if index == 0:
 			guest['name'] = i.split(':')[1]
+			guest["name"] = guest["name"].replace("Arrival","")
 		if index == 1:
 			guest['address1'] = i
 		if index == 2:
@@ -329,16 +164,27 @@ def reinitiateInvoice(data):
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
-	guest['items'] = invoiceItems
+	guest['items'] = total_items
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HICC-01"
+	guest['company_code'] = "IBISCCC-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
-	
-	company_code = {"code":"HICC-01"}
+
+	check_invoice = check_invoice_exists(guest['invoice_number'])
+	if check_invoice['success']==True:
+		inv_data = check_invoice['data']
+		# print(inv_data.__dict__)
+		if inv_data.docstatus==2:
+			amened='Yes'
+		else:
+			invoiceNumber = inv_data.name
+			guest['invoice_number'] = inv_data.name
+			amened='No'
+
+	company_code = {"code":"IBISCCC-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
@@ -352,21 +198,13 @@ def reinitiateInvoice(data):
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
 		error_data['error_message'] = "The given gst number is not a vaild one"
+		error_data['amened'] = amened
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
 		return {"success":False,"message":"The given gst number is not a vaild one"}
 
 
-
-	# check_invoice_exists
-	check_invoice = check_invoice_exists(guest['invoice_number'])
-	if check_invoice['success']==True:
-		inv_data = check_invoice['data']
-		if inv_data.docstatus==2:
-			amened='Yes'
-		else:
-			amened='No'    
-	# print(json.dumps(guest, indent = 1))
+	print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':
@@ -433,5 +271,3 @@ def reinitiateInvoice(data):
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}
-	
-
