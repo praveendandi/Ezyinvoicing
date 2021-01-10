@@ -58,7 +58,7 @@ class Invoices(Document):
 				"TranDtls": {
 					"TaxSch": "GST",
 					"SupTyp": "B2B",
-					"RegRev": "Y",
+					"RegRev": "N",
 					"IgstOnIntra": "N"
 				},
 				"SellerDtls": {
@@ -794,7 +794,8 @@ def insert_invoice(data):
 					cgst_amount+=item['cgst_amount']
 					sgst_amount+=item['sgst_amount']
 					igst_amount+=item['igst_amount']
-					cess_amount+=item['cess_amount']
+					total_central_cess_amount+=item['cess_amount']
+					total_state_cess_amount +=item['state_cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -1068,7 +1069,6 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 
 def insert_items(items, invoice_number):
 	try:
-		print("..............")
 		frappe.db.delete('Items', {
     		'parent': invoice_number})
 		frappe.db.commit()
@@ -1121,8 +1121,8 @@ def calulate_items(data):
 					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}	
 				if sac_code_based_gst_rates.service_charge == "Yes":
 					service_dict = {}
-
 					if sac_code_based_gst_rates.net == "Yes":
+						
 						scharge = companyDetails.service_charge_percentage
 						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						total_gst_amount = (gstpercentage * item['item_value']) / 100.0
@@ -1147,6 +1147,8 @@ def calulate_items(data):
 							vatamount = 0
 							service_dict['vat_amount'] = 0
 							service_dict['vat'] = 0	
+						if sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.vat_rate==0:
+							gst_percentage = 18	
 						if sac_code_based_gst_rates.central_cess_rate>0:
 							centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
 							service_dict['cess_amount'] = centralcessamount
@@ -1163,6 +1165,7 @@ def calulate_items(data):
 							statecessamount = 0
 							service_dict['state_cess_amount'] = 0
 							service_dict['state_cess'] = 0	
+						# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.	
 						gst_value = (gst_percentage* scharge_value)/100.0
 						service_dict['item_name'] = item['name']+"-SC "
 						service_dict['description'] = item['name']+"-SC "
@@ -1194,6 +1197,7 @@ def calulate_items(data):
 						service_dict['doctype'] = 'Items'
 						service_dict['parentfield'] = 'items'
 						service_dict['parenttype'] = 'invoices'
+						print(service_dict)
 						second_list.append(service_dict)
 					# second_list	
 				# print(item)	
@@ -2263,6 +2267,14 @@ def check_invoice_exists(invoice_number):
 def Error_Insert_invoice(data):
 	try:
 		# print(data,"8888")
+		# # invdata = frappe.get_doc("Invoices",data['invoice_number'])
+		# # print(invdata,"////////")
+		# # if invdata:
+		# # 	invdata.error_message = data['error_message']
+		# # 	invdata.irn_generated = "Error"
+		# # 	invdata.save()
+		# else:
+
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -2282,7 +2294,7 @@ def Error_Insert_invoice(data):
 			"Error",
 			'invoice_date':
 			datetime.datetime.strptime(data['invoice_date'],
-									   '%d-%b-%y %H:%M:%S'),
+									'%d-%b-%y %H:%M:%S'),
 			'legal_name':
 			" ",
 			# data['taxpayer']['legal_name'],
@@ -2352,34 +2364,34 @@ def attach_b2c_qrcode(data):
 		page.insertImage(img_rect, filename=img_filename)
 		document.save(attach_qrpath)
 		document.close()
-		dst_pdf_text_filename = path + "/private/files/" + data[
-			"invoice_number"] + 'withattachqr.pdf'
-		doc = fitz.open(attach_qrpath)
-		irn_number = ''.join(
-			random.choice(string.ascii_uppercase + string.ascii_lowercase +
-						  string.digits) for _ in range(50))
-		ack_no = str(randint(100000000000, 9999999999999))
-		ackdate = str(datetime.datetime.now())
-		ack_date = ackdate.split(" ")
-		text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date[0]
-		if company.irn_details_page == "First":
-			page = doc[0]
-		else:
-			page = doc[-1]
-		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		page.insertText(
-			where,
-			text,
-			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=folder_path +
-			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=6,  # default
-			rotate=0,  # rotate text
-			color=(0, 0, 0),  # some color (blue)
-			overlay=True)
-		doc.save(dst_pdf_text_filename)
-		doc.close()
-		files_new = {"file": open(dst_pdf_text_filename, 'rb')}
+		# dst_pdf_text_filename = path + "/private/files/" + data[
+		# 	"invoice_number"] + 'withattachqr.pdf'
+		# doc = fitz.open(attach_qrpath)
+		# irn_number = ''.join(
+		# 	random.choice(string.ascii_uppercase + string.ascii_lowercase +
+		# 				  string.digits) for _ in range(50))
+		# ack_no = str(randint(100000000000, 9999999999999))
+		# ackdate = str(datetime.datetime.now())
+		# ack_date = ackdate.split(" ")
+		# text = "IRN: " + irn_number + "      " + "ACK NO: " + ack_no + "    " + "ACK DATE: " + ack_date[0]
+		# if company.irn_details_page == "First":
+		# 	page = doc[0]
+		# else:
+		# 	page = doc[-1]
+		# where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+		# page.insertText(
+		# 	where,
+		# 	text,
+		# 	fontname="Roboto-Black",  # arbitrary if fontfile given
+		# 	fontfile=folder_path +
+		# 	company.font_file_path,  #fontpath,  # any file containing a font
+		# 	fontsize=6,  # default
+		# 	rotate=0,  # rotate text
+		# 	color=(0, 0, 0),  # some color (blue)
+		# 	overlay=True)
+		# doc.save(dst_pdf_text_filename)
+		# doc.close()
+		files_new = {"file": open(attach_qrpath, 'rb')}
 		payload_new = {
 			"is_private": 1,
 			"folder": "Home",
