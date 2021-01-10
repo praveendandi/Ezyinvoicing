@@ -107,21 +107,17 @@ def givePrint(invoiceNumber,printer):
 
 
 
+@frappe.whitelist(allow_guest=True)
+def gitCurrentBranchCommit():
+	try:
+		folder_path = frappe.utils.get_bench_path()
+		b = os.popen("git --git-dir="+folder_path+"/apps/version2_app/.git rev-parse HEAD")
+		return {"success":True,"message":b} 
+	except Exception as e:
+		print("git branch commit id:  ", str(e))
+		return {"success":False,"message":str(e)}	
 
 
-# @frappe.whitelist(allow_guest=True)
-# def CheckInternetConnection():
-#     try:
-#         # connect to the host -- tells us if the host is actually
-#         # reachable
-#     sock = socket.create_connection(("www.google.com", 80))
-#     if sock is not None:
-#         print('Clossing socket')
-#         sock.close
-#         return True
-#     except OSError:
-#         pass
-#     return False
 
 
 

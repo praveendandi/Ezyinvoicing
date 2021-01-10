@@ -1,4 +1,4 @@
-frappe.query_reports["Convert From B2C"] = 
+frappe.query_reports["Duplicate Outwards Supplies"] = 
 {
     "filters": [
 
