@@ -539,7 +539,7 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_irn_cancelled = 'No'
 			invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 			invoice.save(ignore_permissions=True,ignore_version=True)
-			create_qr_image(invoice_number, GSP_details['data'])
+			create_credit_qr_image(invoice_number, GSP_details['data'])
 			# print(credit_items)
 			# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 		else:
