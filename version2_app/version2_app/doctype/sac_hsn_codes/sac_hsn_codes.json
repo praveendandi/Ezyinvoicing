@@ -165,7 +165,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-07 17:22:11.223383",
+ "modified": "2021-01-11 14:25:54.331086",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
@@ -252,6 +252,30 @@
    "read": 1,
    "report": 1,
    "role": "Dashboard Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Inbox",
    "share": 1,
    "write": 1
   }
