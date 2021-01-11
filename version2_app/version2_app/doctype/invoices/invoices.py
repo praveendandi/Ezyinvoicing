@@ -928,13 +928,16 @@ def insert_invoice(data):
 					total_credit_vat_amount += item['vat_amount']
 			else:
 				pass
+		print(value_after_gst,value_before_gst,"//////")	
 		# pms_invoice_summary = value_after_gst
 		# pms_invoice_summary_without_gst = value_before_gst
 		if company.allowance_type=="Discount":
 			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			pms_invoice_summary = value_after_gst-discountAfterAmount
-			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+			pms_invoice_summary = value_after_gst -discountAfterAmount
+			pms_invoice_summary_without_gst = value_before_gst -discountBeforeAmount
+			# credit_value_after_gst = 0
+			# credit_value_before_gst = 0
 			if pms_invoice_summary == 0:
 				
 				credit_value_after_gst = 0
@@ -943,6 +946,7 @@ def insert_invoice(data):
 				has_discount_items = "Yes"
 			else:
 				has_discount_items = "No"
+				
 		else:
 			pms_invoice_summary = value_after_gst - credit_value_after_gst
 			pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
@@ -996,9 +1000,14 @@ def insert_invoice(data):
 					return {"success": True}
 
 				return{"success":False,"message":TotalMismatchErrorAPI['message']}
-
+		qr_generated = "Pending"
 		if data['total_invoice_amount'] == 0:
-			irn_generated = "Zero Invoice"
+			if data['guest_data']['invoice_type']=="B2B":
+				irn_generated = "Zero Invoice"
+				qr_generated = "Pending"
+			else:
+				qr_generated = "Zero Invoice"
+				irn_generated = "NA"
 
 		invoice = frappe.get_doc({
 			'doctype':
@@ -1062,6 +1071,7 @@ def insert_invoice(data):
 			"sales_amount_before_tax":round(sales_amount_before_tax,2),
 			'irn_generated':
 			irn_generated,
+			'qr_generated':qr_generated,
 			'irn_cancelled':
 			'No',
 			'qr_code_generated':
@@ -1133,7 +1143,7 @@ def insert_invoice(data):
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'],"Invoice")
 		# b2cattach = Invoices()
-		if data['guest_data']['invoice_type'] == "B2C":
+		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 			return {"success":True}
 		return {"success": True}
@@ -2561,11 +2571,20 @@ def Error_Insert_invoice(data):
 		# else:
 		company = frappe.get_doc('company',data['company_code'])
 		if not frappe.db.exists('Invoices', data['invoice_number']):
+			invType = data['invoice_type']
+			if invType == "B2B":
+				irn_generated = "Error"
+				qr_generated = "Pending"
+			else:
+				irn_generated = "NA"
+				qr_generated = "Error"
+
 			invoice = frappe.get_doc({
 				'doctype':
 				'Invoices',
 				'invoice_number':
 				data['invoice_number'],
+				'invoice_type':data['invoice_type'],
 				'guest_name':
 				data['guest_name'],
 				'gst_number':
@@ -2574,10 +2593,8 @@ def Error_Insert_invoice(data):
 				data['invoice_file'],
 				'room_number':
 				data['room_number'],
-				'invoice_type':
-				data['invoice_type'],
-				'irn_generated':
-				"Error",
+				'irn_generated':irn_generated,
+				'qr_generated':qr_generated,
 				'invoice_date':
 				datetime.datetime.strptime(data['invoice_date'],
 										'%d-%b-%y %H:%M:%S'),
@@ -2631,9 +2648,16 @@ def Error_Insert_invoice(data):
 				# return {"success": True}	
 
 			return {"success":False,"message":"Error"} 
+		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
 		invoiceExists.error_message = data['error_message']
-		invoiceExists.irn_generated = "Error"
+		if invoiceExists.invoice_type == "B2B":
+			invoiceExists.irn_generated = "Error"
+			invoiceExists.qr_generated = "Pending"
+		else:
+			invoiceExists.irn_generated = "NA"
+			invoiceExists.qr_generated = "Error"
+
 		invoiceExists.save()
 		if 'items_data' in list(data.keys()):
 			items = data['items_data']
