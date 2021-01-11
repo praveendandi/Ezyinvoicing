@@ -1269,9 +1269,9 @@ def calulate_items(data):
 					else:
 						scharge = sac_code_based_gst_rates.service_charge_rate
 					if sac_code_based_gst_rates.net == "Yes":
-						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						
-						base_value = round(item['item_value'] * (100 / (gstpercentage + 100)),3) 
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3) 
 						gst_value = item['item_value']- base_value
 						scharge_value = (scharge * base_value) / 100.0
 						if sac_code_based_gst_rates.service_charge_net == "Yes":
