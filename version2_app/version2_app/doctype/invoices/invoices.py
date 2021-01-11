@@ -1812,7 +1812,7 @@ def TaxSummariesInsert(items,invoice_number):
 					tax_summary_vat_update.amount = each['vat_amount']+float(tax_summary_vat_update.amount)			
 					tax_summary_vat_update.save()
 			if each['cess']>0:
-				tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'CENTRAL CESS','tax_percentage':each['cess']})
+				tax_summary_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'Central CESS','tax_percentage':each['cess']})
 				tax_summary_cess = [element for tupl in tax_summary_cess for element in tupl]
 				if len(tax_summary_cess)==0 or tax_summary_cess==():
 					doc = frappe.get_doc({
@@ -1820,7 +1820,7 @@ def TaxSummariesInsert(items,invoice_number):
 						'invoce_number': invoice_number,
 						'tax_percentage': each['cess'],
 						'amount': each['cess_amount'],
-						'tax_type': "CENTRAL CESS",
+						'tax_type': "Central CESS",
 						'parent': invoice_number,
 						'parentfield': 'gst_summary',
 						'parenttype': "Invoices"
@@ -1828,7 +1828,7 @@ def TaxSummariesInsert(items,invoice_number):
 					doc.insert(ignore_permissions=True)
 				else:
 					tax_summary_cess_update = frappe.get_doc('Tax Summaries',tax_summary_cess[0])
-					tax_summary_cess_update.amount = each['vat_amount']+float(tax_summary_cess_update.amount)			
+					tax_summary_cess_update.amount = each['cess_amount']+float(tax_summary_cess_update.amount)			
 					tax_summary_cess_update.save()	
 			if each['state_cess']>0:
 				tax_summary_state_cess = frappe.db.exists({'doctype': 'Tax Summaries','parent': invoice_number,'tax_type': 'STATE CESS','tax_percentage':each['state_cess']})
