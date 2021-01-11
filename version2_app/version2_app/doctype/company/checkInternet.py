@@ -4,7 +4,6 @@ import requests
 def CheckInternetConnection():
     try:
         company = frappe.get_last_doc('company')
-        # print(company.__dict__)
         if company.proxy == 1:
             proxyhost = company.proxy_url
             proxyhost = proxyhost.replace("http://","@")
@@ -13,7 +12,7 @@ def CheckInternetConnection():
                                 }
             url = "https://google.com"
             print(proxies)
-            res = requests.get(url,proxies=proxies)
+            res = requests.get(url,proxies=proxies,verify=False)
         else:
             url = "https://google.com"
             res = requests.get(url)
