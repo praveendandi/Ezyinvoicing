@@ -138,4 +138,17 @@ def TotalMismatchError(data,calculated_data):
         return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data']}
     except Exception as e:
         return {"success":False,"message":str(e)}    
-        
+
+def CheckRatePercentages(data):
+    try:
+        if data['item_value']>1000 and data['item_value']<=7500:
+            gst_percentage = 12
+        elif data['item_value'] > 7500:
+            gst_percentage = 18
+        elif data['item_value'] == 1000:
+            gst_percentage = 0
+        else:
+            gst_percentage = 0
+        return {"success":True,"gst_percentage":gst_percentage}
+    except Exception as e:
+        return {"success":False,"message":str(e)}
