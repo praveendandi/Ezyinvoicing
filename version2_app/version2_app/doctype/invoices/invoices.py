@@ -258,6 +258,7 @@ class Invoices(Document):
 						return response
 					else:
 						if "result" in list(response.keys()):
+							print(result)
 							if response['result']['InfCd'] == "DUPIRN":
 								invoice = frappe.get_doc('Invoices', invoice_number)
 								invoice.duplicate_ack_date = response['result']['Desc']['AckDt']
@@ -932,14 +933,14 @@ def insert_invoice(data):
 					total_credit_vat_amount += item['vat_amount']
 			else:
 				pass
-		# pms_invoice_summary = value_after_gst
-		# pms_invoice_summary_without_gst = value_before_gst
+		pms_invoice_summary = value_after_gst
+		pms_invoice_summary_without_gst = value_before_gst
 		if data['guest_data']['invoice_category'] == "Tax Invoice":
 			if company.allowance_type=="Discount":
 				discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 				discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-				pms_invoice_summary = value_after_gst-discountAfterAmount
-				pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+				# pms_invoice_summary = value_after_gst-discountAfterAmount
+				# pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
 				if pms_invoice_summary == 0:
 					
 					credit_value_after_gst = 0
@@ -949,8 +950,8 @@ def insert_invoice(data):
 				else:
 					has_discount_items = "No"
 			else:
-				pms_invoice_summary = value_after_gst - credit_value_after_gst
-				pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
+				# pms_invoice_summary = value_after_gst - credit_value_after_gst
+				# pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
 				if credit_value_before_gst > 0:
 
 					has_credit_items = "Yes"
@@ -963,6 +964,11 @@ def insert_invoice(data):
 			total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
 			total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
 			total_vat_amount =  total_vat_amount - total_credit_vat_amount
+			sales_amount_before_tax = value_before_gst + other_charges_before_tax 
+			sales_amount_after_tax = value_after_gst + other_charges
+			print(sales_amount_after_tax,sales_amount_before_tax,pms_invoice_summary,pms_invoice_summary_without_gst)
+			# sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+			# sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if data['guest_data']['invoice_category'] == "Credit Invoice":
 			credit_cgst_amount= -credit_cgst_amount
 			credit_sgst_amount= -credit_sgst_amount
@@ -972,8 +978,13 @@ def insert_invoice(data):
 			# credit_value_before_gst= credit_value_before_gst
 			# credit_value_after_gst= credit_value_after_gst
 			total_credit_vat_amount = -total_credit_vat_amount
-			print(credit_cgst_amount)
-
+			# print(credit_cgst_amount)
+			pms_invoice_summary = - credit_value_after_gst
+			pms_invoice_summary_without_gst = - credit_value_before_gst
+			sales_amount_before_tax = value_before_gst + other_charges_before_tax 
+			sales_amount_after_tax = value_after_gst + other_charges
+			sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+			sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
@@ -981,10 +992,7 @@ def insert_invoice(data):
 		roundoff_amount = 0
 		data['invoice_round_off_amount'] = roundoff_amount
 		
-		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
-		sales_amount_after_tax = value_after_gst + other_charges
-		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
-		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
+		
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
 		else:
@@ -1249,10 +1257,15 @@ def calulate_items(data):
 			final_item = {}
 			companyDetails = frappe.get_doc('company', data['company_code'])
 			scharge = companyDetails.service_charge_percentage
-			if companyDetails.allowance_type == "Credit":
+			print(data['guest_data']['invoice_category'],"/.//////////////",data)
+			if data['guest_data']['invoice_category'] == "Tax Invoice":
+				if companyDetails.allowance_type == "Credit":
+					ItemMode = "Credit"
+				else:
+					ItemMode = "Discount"
+			elif data['guest_data']['invoice_category'] == "Credit Invoice":
 				ItemMode = "Credit"
-			else:
-				ItemMode = "Discount"
+					
 			acc_gst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":
 				sac_code_based_gst = frappe.db.get_list(
@@ -1375,6 +1388,7 @@ def calulate_items(data):
 					second_list.append(service_dict)
 					# second_list	
 				# print(item)
+				print(ItemMode,"///////aaaaaaaa")
 				if sac_code_based_gst_rates.type == "Discount":
 					
 						final_item['sac_code'] = 'No Sac'

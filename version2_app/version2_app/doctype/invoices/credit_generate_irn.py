@@ -534,21 +534,21 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_signed_invoice = response['result']['SignedInvoice']
 			invoice.credit_signed_invoice_generated = 'Yes'
 			invoice.credit_irn_generated = 'Success'
+			invoice.irn_generated = "Success"
 			invoice.credit_qr_code = response['result']['SignedQRCode']
 			invoice.credit_qr_code_generated = 'Success'
 			invoice.credit_irn_cancelled = 'No'
 			invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 			invoice.save(ignore_permissions=True,ignore_version=True)
 			create_credit_qr_image(invoice_number, GSP_details['data'])
-			# print(credit_items)
-			# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 		else:
-			if response['result']['InfCd'] == "DUPIRN":
-				invoice = frappe.get_doc('Invoices', invoice_number)
-				invoice.credit_duplicate_ack_date = response['result']['Desc']['AckDt']
-				invoice.credit_duplicate_ack_no = response['result']['Desc']['AckNo']
-				invoice.credit_duplicate_irn_number = response['result']['Desc']['Irn']
-				invoice.save(ignore_permissions=True, ignore_version=True)
+			if "result" in list(response.keys()):
+				if response['result']['InfCd'] == "DUPIRN":
+					invoice = frappe.get_doc('Invoices', invoice_number)
+					invoice.credit_duplicate_ack_date = response['result']['Desc']['AckDt']
+					invoice.credit_duplicate_ack_no = response['result']['Desc']['AckNo']
+					invoice.credit_duplicate_irn_number = response['result']['Desc']['Irn']
+					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'
 			invoice.credit_irn_error_message = response['message'][6:]

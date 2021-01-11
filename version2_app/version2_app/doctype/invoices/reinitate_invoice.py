@@ -93,37 +93,40 @@ def Reinitiate_invoice(data):
 					total_credit_vat_amount += item['vat_amount']
 			else:
 				pass
-		print(credit_cgst_amount)	
-		# pms_invoice_summary = value_after_gst
-		# pms_invoice_summary_without_gst = value_before_gst
-		if company.allowance_type=="Discount":
-			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
-			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			pms_invoice_summary = value_after_gst-discountAfterAmount
-			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
-			if pms_invoice_summary == 0:
-				
-				credit_value_after_gst = 0
-			if credit_value_before_gst > 0:
+		
+		if data['guest_data']['invoice_category'] == "Tax Invoice":
+			if company.allowance_type=="Discount":
+				discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
+				discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
+				pms_invoice_summary = value_after_gst-discountAfterAmount
+				pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+				if pms_invoice_summary == 0:
+					
+					credit_value_after_gst = 0
+				if credit_value_before_gst > 0:
 
-				has_discount_items = "Yes"
+					has_discount_items = "Yes"
+				else:
+					has_discount_items = "No"
 			else:
-				has_discount_items = "No"
-		else:
-			pms_invoice_summary = value_after_gst - credit_value_after_gst
-			pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
-			if credit_value_before_gst > 0:
+				pms_invoice_summary = value_after_gst - credit_value_after_gst
+				pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
+				if credit_value_before_gst > 0:
 
-				has_credit_items = "Yes"
-			else:
-				has_credit_items = "No"	
-		if data['guest_data']['invoice_category'] == "Tax Invoice":				
+					has_credit_items = "Yes"
+				else:
+					has_credit_items = "No"	
+					
 			cgst_amount = cgst_amount - credit_cgst_amount
 			sgst_amount = sgst_amount - credit_sgst_amount
 			igst_amount	= igst_amount - credit_igst_amount	
 			total_central_cess_amount = total_central_cess_amount - total_credit_state_cess_amount
 			total_state_cess_amount = total_state_cess_amount - total_credit_state_cess_amount
 			total_vat_amount =  total_vat_amount - total_credit_vat_amount
+			sales_amount_before_tax = value_before_gst + other_charges_before_tax 
+			sales_amount_after_tax = value_after_gst + other_charges
+			sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+			sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if data['guest_data']['invoice_category'] == "Credit Invoice":
 			credit_cgst_amount= -credit_cgst_amount
 			credit_sgst_amount= -credit_sgst_amount
@@ -133,16 +136,22 @@ def Reinitiate_invoice(data):
 			# credit_value_before_gst= credit_value_before_gst
 			# credit_value_after_gst= credit_value_after_gst
 			total_credit_vat_amount = -total_credit_vat_amount
-			print(credit_cgst_amount)	
+			# print(credit_cgst_amount)
+			pms_invoice_summary = - credit_value_after_gst
+			pms_invoice_summary_without_gst = - credit_value_before_gst
+			sales_amount_before_tax = value_before_gst + other_charges_before_tax 
+			sales_amount_after_tax = value_after_gst + other_charges
+			sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+			sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if (pms_invoice_summary > 0) or (credit_value_after_gst > 0):
 			ready_to_generate_irn = "Yes"
 		else:
 			ready_to_generate_irn = "No"
 		invoice_round_off_amount = 0	
-		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
-		sales_amount_after_tax = value_after_gst + other_charges
-		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
-		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
+		# sales_amount_before_tax = value_before_gst + other_charges_before_tax 
+		# sales_amount_after_tax = value_after_gst + other_charges
+		# sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+		# sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])

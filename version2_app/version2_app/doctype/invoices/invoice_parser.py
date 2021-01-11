@@ -54,7 +54,7 @@ def file_parsing(filepath):
 	print_by = ''
 	roomNumber = ""
 	reupload = False
-	category = ''
+	category = 'Tax Invoice'
 	for i in raw_data:
 		if "TAX INVOICE" in i:
 			category = "Tax Invoice"
@@ -219,7 +219,7 @@ def file_parsing(filepath):
 					reupload = True
 
 	company_code = {"code":"NIK-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"NIK-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
@@ -252,7 +252,7 @@ def file_parsing(filepath):
 			if checkTokenIsValidResponse['success'] == True:
 				getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":guest['gstNumber'],"code":company_code['code'],"invoice":guest['invoice_number'],"apidata":gspApiDataResponse['data']})
 				if getTaxPayerDetailsResponse['success'] == True:
-					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+					calulateItemsApiResponse = calulate_items({'guest_data':guest,'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 					if calulateItemsApiResponse['success'] == True:
 						guest['invoice_file'] = filepath
 						if reupload == False:
@@ -305,7 +305,7 @@ def file_parsing(filepath):
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 
 
-			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+			calulateItemsApiResponse = calulate_items({'guest_data':guest,'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
 				if reupload == False:
