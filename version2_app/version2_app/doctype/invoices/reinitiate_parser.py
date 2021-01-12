@@ -23,6 +23,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
 	filepath = data['filepath']
+	reupload_inv_number = data['invoice_number']
 	start_time = datetime.datetime.utcnow()
 	companyCheckResponse = check_company_exist("EHNDNP-01")
 	site_folder_path = companyCheckResponse['data'].site_name
@@ -99,6 +100,8 @@ def reinitiateInvoice(data):
 		if "Printed By / On" in i:
 			p = i.split(":")
 			print_by = p[2].replace(" ","")
+	if invoiceNumber != reupload_inv_number:
+		return {"success":False,"message":"Incorrect Invoice Attempted"}
 
 	items = [] 
 	itemsort = 0
@@ -180,7 +183,7 @@ def reinitiateInvoice(data):
 			amened='No'
 	
 	company_code = {"code":"EHNDNP-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"EHNDNP-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
