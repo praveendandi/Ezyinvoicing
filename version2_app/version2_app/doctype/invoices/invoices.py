@@ -928,7 +928,6 @@ def insert_invoice(data):
 					total_credit_vat_amount += item['vat_amount']
 			else:
 				pass
-		print(value_after_gst,value_before_gst,"//////")	
 		# pms_invoice_summary = value_after_gst
 		# pms_invoice_summary_without_gst = value_before_gst
 		if company.allowance_type=="Discount":
@@ -1143,9 +1142,9 @@ def insert_invoice(data):
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'],"Invoice")
 		# b2cattach = Invoices()
-		# if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
-		# 	b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
-		# 	return {"success":True}
+		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
+			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
+			return {"success":True}
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
@@ -1279,9 +1278,9 @@ def calulate_items(data):
 					else:
 						scharge = sac_code_based_gst_rates.service_charge_rate
 					if sac_code_based_gst_rates.net == "Yes":
-						gstpercentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						
-						base_value = round(item['item_value'] * (100 / (gstpercentage + 100)),3) 
+						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3) 
 						gst_value = item['item_value']- base_value
 						scharge_value = (scharge * base_value) / 100.0
 						if sac_code_based_gst_rates.service_charge_net == "Yes":
