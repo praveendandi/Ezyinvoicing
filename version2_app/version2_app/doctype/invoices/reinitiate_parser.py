@@ -37,10 +37,10 @@ def reinitiateInvoice(data):
 			first_page = pdf.pages[index]
 			content.append(first_page.extract_text())
 
-raw_data = []
-for i in content:
-	for j in i.splitlines():
-		raw_data.append(j)
+	raw_data = []
+	for i in content:
+		for j in i.splitlines():
+			raw_data.append(j)
 
 	data = []
 	amened = ''
@@ -148,17 +148,16 @@ for i in content:
 			if each["name"] not in payment_Types:
 				total_items.append(each)
 
-guest = dict()
-# print(guestDeatils)
-for index, i in enumerate(guestDeatils):
-	if index == 0:
-		guest['name'] = i.split(':')[1]
-	if index == 1:
-		guest['address1'] = i
-	if index == 2:
-		guest['address2'] = i
-
-guest['invoice_number'] = invoiceNumber.replace(' ', '')
+	guest = dict()
+	# print(guestDeatils)
+	for index, i in enumerate(guestDeatils):
+		if index == 0:
+			guest['name'] = i.split(':')[1]
+		if index == 1:
+			guest['address1'] = i
+		if index == 2:
+			guest['address2'] = i
+	guest['invoice_number'] = invoiceNumber.replace(' ', '')
 
 	guest['membership'] = membership
 	guest['invoice_date'] = date_time_obj
@@ -201,60 +200,67 @@ guest['invoice_number'] = invoiceNumber.replace(' ', '')
 		return {"success":False,"message":"The given gst number is not a vaild one"}
 
 
-print(json.dumps(guest, indent = 1))
-gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
-if gspApiDataResponse['success'] == True:
-	if guest['invoice_type'] == 'B2B':
-		checkTokenIsValidResponse = check_token_is_valid({"code":company_code['code'],"mode":companyCheckResponse['data'].mode})
-		if checkTokenIsValidResponse['success'] == True:
-			getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":guest['gstNumber'],"code":company_code['code'],"invoice":guest['invoice_number'],"apidata":gspApiDataResponse['data']})
-			if getTaxPayerDetailsResponse['success'] == True:
-				calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-				if calulateItemsApiResponse['success'] == True:
-					guest['invoice_file'] = filepath
-					insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
-					if insertInvoiceApiResponse['success']== True:
-						print("Invoice Created",insertInvoiceApiResponse)
-						return {"success":True,"message":"Invoice Created"}
+	print(json.dumps(guest, indent = 1))
+	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
+	if gspApiDataResponse['success'] == True:
+		if guest['invoice_type'] == 'B2B':
+			checkTokenIsValidResponse = check_token_is_valid({"code":company_code['code'],"mode":companyCheckResponse['data'].mode})
+			if checkTokenIsValidResponse['success'] == True:
+				getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":guest['gstNumber'],"code":company_code['code'],"invoice":guest['invoice_number'],"apidata":gspApiDataResponse['data']})
+				if getTaxPayerDetailsResponse['success'] == True:
+					calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+					if calulateItemsApiResponse['success'] == True:
+						guest['invoice_file'] = filepath
+						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
+						if insertInvoiceApiResponse['success']== True:
+							print("Invoice Created",insertInvoiceApiResponse)
+							return {"success":True,"message":"Invoice Created"}
+						else:
+							
+							error_data['error_message'] = insertInvoiceApiResponse['message']
+							error_data['amened'] = amened
+							errorInvoice = Error_Insert_invoice(error_data)
+							print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
 						
-						error_data['error_message'] = insertInvoiceApiResponse['message']
+						error_data['error_message'] = calulateItemsApiResponse['message']
 						error_data['amened'] = amened
 						errorInvoice = Error_Insert_invoice(error_data)
-						print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-						return {"success":False,"message":insertInvoiceApiResponse['message']}
+						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'],"***********")
+						return {"success":False,"message":calulateItemsApiResponse['message']}
 				else:
-					
-					error_data['error_message'] = calulateItemsApiResponse['message']
+					# itsindex = getTaxPayerDetailsResponse['message']['message'].index("'")
+					error_data['error_message'] = getTaxPayerDetailsResponse['message']
 					error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
-					print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'],"***********")
-					return {"success":False,"message":calulateItemsApiResponse['message']}
+					return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
 			else:
-				# itsindex = getTaxPayerDetailsResponse['message']['message'].index("'")
-				error_data['error_message'] = getTaxPayerDetailsResponse['message']
+				# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
+				error_data['error_message'] = checkTokenIsValidResponse['message']
 				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
-				return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
+				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
-			# itsindex = checkTokenIsValidResponse['message']['message'].index("'")
-			error_data['error_message'] = checkTokenIsValidResponse['message']
-			error_data['amened'] = amened
-			errorInvoice = Error_Insert_invoice(error_data)
-			return {"success":False,"message":checkTokenIsValidResponse['message']} 
-	else:
-		
-		taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-		calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-		if calulateItemsApiResponse['success'] == True:
-			guest['invoice_file'] = filepath
-			insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
-			if insertInvoiceApiResponse['success']== True:
-				print("B2C Invoice Created",insertInvoiceApiResponse)
-				return {"success":True,"message":"Invoice Created"}
+			
+			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+			if calulateItemsApiResponse['success'] == True:
+				guest['invoice_file'] = filepath
+				insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
+				if insertInvoiceApiResponse['success']== True:
+					print("B2C Invoice Created",insertInvoiceApiResponse)
+					return {"success":True,"message":"Invoice Created"}
+				else:
+					
+					error_data['error_message'] = insertInvoiceApiResponse['message']
+					error_data['amened'] = amened
+					errorInvoice = Error_Insert_invoice(error_data)
+					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+					return {"success":False,"message":insertInvoiceApiResponse['message']}
 			else:
-				
-				error_data['error_message'] = insertInvoiceApiResponse['message']
+						
+				error_data['error_message'] = calulateItemsApiResponse['message']
 				error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
@@ -265,4 +271,3 @@ if gspApiDataResponse['success'] == True:
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("gspApiData fialed:  ",gspApiDataResponse['message'])
 		return {"success":False,"message":gspApiDataResponse['message']}
-	
