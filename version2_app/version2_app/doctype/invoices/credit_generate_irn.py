@@ -543,12 +543,16 @@ def CreditgenerateIrn(invoice_number):
 			# print(credit_items)
 			# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 		else:
-			if response['result']['InfCd'] == "DUPIRN":
-				invoice = frappe.get_doc('Invoices', invoice_number)
-				invoice.credit_duplicate_ack_date = response['result']['Desc']['AckDt']
-				invoice.credit_duplicate_ack_no = response['result']['Desc']['AckNo']
-				invoice.credit_duplicate_irn_number = response['result']['Desc']['Irn']
-				invoice.save(ignore_permissions=True, ignore_version=True)
+			if "result" in list(response.keys()):
+				if response['result'][0]['InfCd'] == "DUPIRN":
+					invoice = frappe.get_doc('Invoices', invoice_number)
+					invoice.credit_duplicate_ack_date = response['result'][0]['Desc']['AckDt']
+					invoice.credit_duplicate_ack_no = response['result'][0]['Desc']['AckNo']
+					invoice.credit_duplicate_irn_number = response['result'][0]['Desc']['Irn']
+					invoice.credit_ack_no = response['result'][0]['Desc']['AckNo']
+					invoice.credit_irn_number = response['result'][0]['Desc']['Irn']
+					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
+					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'
 			invoice.credit_irn_error_message = response['message'][6:]

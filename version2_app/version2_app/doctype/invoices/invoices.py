@@ -117,8 +117,8 @@ class Invoices(Document):
 					"INV",
 					"No":
 					invoice.invoice_number + str(random.randint(0, 100)) +
-					'T' if company_details['data'].mode == 'Testing' else
-					invoice.invoice_number,
+						'T' if company_details['data'].mode == 'Testing' else
+						invoice.invoice_number,
 					"Dt":
 					datetime.datetime.strftime(invoice.invoice_date,
 												'%d/%m/%Y')
@@ -251,12 +251,16 @@ class Invoices(Document):
 						return response
 					else:
 						if "result" in list(response.keys()):
-							if response['result']['InfCd'] == "DUPIRN":
+							if response['result'][0]['InfCd'] == "DUPIRN":
 								invoice = frappe.get_doc('Invoices', invoice_number)
-								invoice.duplicate_ack_date = response['result']['Desc']['AckDt']
-								invoice.duplicate_ack_no = response['result']['Desc']['AckNo']
-								invoice.duplicate_irn_number = response['result']['Desc']['Irn']
+								invoice.duplicate_ack_date = response['result'][0]['Desc']['AckDt']
+								invoice.duplicate_ack_no = response['result'][0]['Desc']['AckNo']
+								invoice.duplicate_irn_number = response['result'][0]['Desc']['Irn']
+								invoice.ack_no = response['result'][0]['Desc']['AckNo']
+								invoice.irn_number = response['result'][0]['Desc']['Irn']
+								invoice.ack_date = response['result'][0]['Desc']['AckDt']
 								invoice.save(ignore_permissions=True, ignore_version=True)
+							
 							irn_error_message = response["message"]
 							frappe.log_error(frappe.get_traceback(),invoice_number)
 							logger.error(f"{invoice_number},     postIrn,   {irn_error_message}")
