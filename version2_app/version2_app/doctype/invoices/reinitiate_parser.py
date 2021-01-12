@@ -166,10 +166,6 @@ def reinitiateInvoice(data):
 			guest['address1'] = i
 		if index == 2:
 			guest['address2'] = i
-<<<<<<< HEAD
-
-=======
->>>>>>> service-charge-taxrates
 	guest['invoice_number'] = invoiceNumber.replace(' ', '')
 
 	guest['membership'] = membership
@@ -257,11 +253,6 @@ def reinitiateInvoice(data):
 		else:
 			
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-<<<<<<< HEAD
-
-
-=======
->>>>>>> service-charge-taxrates
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
