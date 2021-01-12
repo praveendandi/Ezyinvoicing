@@ -1143,9 +1143,9 @@ def insert_invoice(data):
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 			items, data['guest_data']['invoice_number'],"Invoice")
 		# b2cattach = Invoices()
-		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
-			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
-			return {"success":True}
+		# if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
+		# 	b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
+		# 	return {"success":True}
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")

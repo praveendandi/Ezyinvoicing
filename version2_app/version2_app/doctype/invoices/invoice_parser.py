@@ -213,7 +213,7 @@ def file_parsing(filepath):
 	error_data['state_code'] = "36"
 	error_data['room_number'] = guest['room_number']
 	error_data['pincode'] = "500082"
-	# gstNumber = "27AACCK4395B1ZM"
+	# gstNumber = "27A4395B1ZM"
 	# print(guest['invoice_number'])
 
 	if len(gstNumber) < 15 and len(gstNumber)>0:
