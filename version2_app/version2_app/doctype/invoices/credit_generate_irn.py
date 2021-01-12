@@ -508,7 +508,7 @@ def CreditgenerateIrn(invoice_number):
 					"OthChrg":
 					00,
 					"TotItemVal":
-					abs(round(item.item_value_after_gst, 1)),
+					abs(round(item.item_value_after_gst, 2)),
 				}
 				gst_data['ItemList'].append(i)
 		gst_data["ValDtls"] = {

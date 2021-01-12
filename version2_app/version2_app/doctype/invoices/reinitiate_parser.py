@@ -23,7 +23,6 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
 	filepath = data['filepath']
-	reupload_inv_number = data['invoice_number']
 	start_time = datetime.datetime.utcnow()
 	companyCheckResponse = check_company_exist("NVBV-01")
 	site_folder_path = companyCheckResponse['data'].site_name
