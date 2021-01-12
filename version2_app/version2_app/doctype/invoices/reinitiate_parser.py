@@ -152,7 +152,6 @@ def reinitiateInvoice(data):
 			guest['address1'] = i
 		if index == 2:
 			guest['address2'] = i
-
 	guest['invoice_number'] = invoiceNumber.replace(' ', '')
 
 	guest['membership'] = membership

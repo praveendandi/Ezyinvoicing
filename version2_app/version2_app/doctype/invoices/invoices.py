@@ -1284,9 +1284,17 @@ def calulate_items(data):
 						scharge = companyDetails.service_charge_percentage
 					else:
 						scharge = sac_code_based_gst_rates.service_charge_rate
-					if sac_code_based_gst_rates.net == "Yes":
+					if sac_code_based_gst_rates.service_charge_tax_applies == "Apply From Parent":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-						
+						sac_code_new = sac_code_based_gst_rates.code
+					elif sac_code_based_gst_rates.service_charge_tax_applies == "Separate GST":
+						gst_percentage = sac_code_based_gst_rates.sc_gst_tax_rate
+						sac_code_new = sac_code_based_gst_rates.sc_sac_code
+					else:
+						gst_percentage = 0
+						sac_code_new = sac_code_based_gst_rates.code
+					if sac_code_based_gst_rates.net == "Yes":
+						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3) 
 						gst_value = item['item_value']- base_value
 						scharge_value = (scharge * base_value) / 100.0
@@ -1296,15 +1304,12 @@ def calulate_items(data):
 							scharge_value = scharge_value_base
 						
 						item['base_value'] = base_value
-						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
+						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					else:
 						base_value = item['item_value']
 						scharge_value = (scharge * item['item_value']) / 100.0
 						if item['sac_code'] == '996311':
 							gst_percentage = acc_gst_percentage
-						else:
-							gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
-					
 					if sac_code_based_gst_rates.service_charge_net == "Yes":
 						scharge_value_base = round(scharge_value * (100 / (gst_percentage + 100)),3)
 						gst_value = scharge_value- scharge_value_base
@@ -1317,9 +1322,7 @@ def calulate_items(data):
 					else:
 						vatamount = 0
 						service_dict['vat_amount'] = 0
-						service_dict['vat'] = 0	
-					if sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.vat_rate==0:
-						gst_percentage = 18	
+						service_dict['vat'] = 0
 					if sac_code_based_gst_rates.central_cess_rate>0:
 						centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
 						service_dict['cess_amount'] = centralcessamount
@@ -1342,7 +1345,7 @@ def calulate_items(data):
 					service_dict['item_name'] = item['name']+"-SC "
 					service_dict['description'] = item['name']+"-SC "
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
-					service_dict['sac_code'] = sac_code_based_gst_rates.code
+					service_dict['sac_code'] = sac_code_new
 					service_dict['sac_code_found'] = 'Yes'
 					service_dict['cgst'] = gst_percentage/2
 					service_dict['other_charges'] = 0
