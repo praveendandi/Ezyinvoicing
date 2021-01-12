@@ -157,14 +157,14 @@ class Invoices(Document):
 						"FreeQty":
 						0,
 						"UnitPrice":
-						round(item.item_value, 1),
+						round(item.item_value, 2),
 						"TotAmt":
-						round(item.item_value, 1),
+						round(item.item_value, 2),
 						"Discount":
 						0,
 						"AssAmt":
 						0 if item.sac_code == 'No Sac' else round(
-							item.item_value, 1),
+							item.item_value, 2),
 						"GstRt":
 						item.gst_rate,
 						"IgstAmt":
@@ -217,6 +217,8 @@ class Invoices(Document):
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			# return{"success":True}
+			print(TotInvValFc,TotInnVal)
+			print(ass_value,total_cgst_value,total_sgst_value)
 			if ass_value > 0:
 				try:
 					response = postIrn(gst_data, GSP_details['data'],
