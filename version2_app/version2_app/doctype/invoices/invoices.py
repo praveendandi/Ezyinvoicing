@@ -157,14 +157,14 @@ class Invoices(Document):
 						"FreeQty":
 						0,
 						"UnitPrice":
-						round(item.item_value, 1),
+						round(item.item_value, 2),
 						"TotAmt":
-						round(item.item_value, 1),
+						round(item.item_value, 2),
 						"Discount":
 						0,
 						"AssAmt":
 						0 if item.sac_code == 'No Sac' else round(
-							item.item_value, 1),
+							item.item_value, 2),
 						"GstRt":
 						item.gst_rate,
 						"IgstAmt":
@@ -217,6 +217,8 @@ class Invoices(Document):
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			# return{"success":True}
+			print(TotInvValFc,TotInnVal)
+			print(ass_value,total_cgst_value,total_sgst_value)
 			if ass_value > 0:
 				try:
 					response = postIrn(gst_data, GSP_details['data'],
@@ -1285,12 +1287,15 @@ def calulate_items(data):
 					if sac_code_based_gst_rates.service_charge_tax_applies == "Apply From Parent":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						sac_code_new = sac_code_based_gst_rates.code
+						vat_rate_percentage = sac_code_based_gst_rates.vat_rate
 					elif sac_code_based_gst_rates.service_charge_tax_applies == "Separate GST":
 						gst_percentage = sac_code_based_gst_rates.sc_gst_tax_rate
 						sac_code_new = sac_code_based_gst_rates.sc_sac_code
+						vat_rate_percentage = 0
 					else:
 						gst_percentage = 0
 						sac_code_new = sac_code_based_gst_rates.code
+						vat_rate_percentage = 0
 					if sac_code_based_gst_rates.net == "Yes":
 						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3) 
@@ -1313,10 +1318,10 @@ def calulate_items(data):
 						gst_value = scharge_value- scharge_value_base
 						scharge_value = scharge_value_base
 						
-					if sac_code_based_gst_rates.vat_rate>0:
-						vatamount = (sac_code_based_gst_rates.vat_rate * scharge_value) / 100.0
+					if vat_rate_percentage>0:
+						vatamount = (vat_rate_percentage * scharge_value) / 100.0
 						service_dict['vat_amount'] = vatamount
-						service_dict['vat'] = sac_code_based_gst_rates.vat_rate	
+						service_dict['vat'] = vat_rate_percentage
 					else:
 						vatamount = 0
 						service_dict['vat_amount'] = 0
