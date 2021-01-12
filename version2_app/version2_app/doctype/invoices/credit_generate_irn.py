@@ -552,6 +552,7 @@ def CreditgenerateIrn(invoice_number):
 					invoice.credit_ack_no = response['result'][0]['Desc']['AckNo']
 					invoice.credit_irn_number = response['result'][0]['Desc']['Irn']
 					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
+					invoice.credit_irn_generated = "Success"
 					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'

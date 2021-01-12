@@ -259,6 +259,7 @@ class Invoices(Document):
 								invoice.ack_no = response['result'][0]['Desc']['AckNo']
 								invoice.irn_number = response['result'][0]['Desc']['Irn']
 								invoice.ack_date = response['result'][0]['Desc']['AckDt']
+								invoice.irn_generated = "Success"
 								invoice.save(ignore_permissions=True, ignore_version=True)
 							
 							irn_error_message = response["message"]
