@@ -10,6 +10,13 @@ import datetime
 
 def TotalMismatchError(data,calculated_data):
     try:
+        invType = data['guest_data']['invoice_type']
+        if invType == "B2B":
+            irn_generated = "Error"
+            qr_generated = "Pending"
+        else:
+            irn_generated = "NA"
+            qr_generated = "Error"    
         invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -68,8 +75,8 @@ def TotalMismatchError(data,calculated_data):
                 round(calculated_data['pms_invoice_summary_without_gst'], 2) ,
                 "pms_invoice_summary":
                 round(calculated_data['pms_invoice_summary'], 2) ,
-                'irn_generated':
-                "Error",
+                'irn_generated':irn_generated,
+                'qr_generated':qr_generated,
                 'irn_cancelled':
                 'No',
                 'qr_code_generated':
@@ -155,3 +162,6 @@ def CheckRatePercentages(data):
         return {"success":True,"gst_percentage":gst_percentage}
     except Exception as e:
         return {"success":False,"message":str(e)}
+
+
+

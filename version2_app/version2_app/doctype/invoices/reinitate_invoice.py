@@ -1,4 +1,3 @@
-
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
@@ -214,13 +213,20 @@ def Reinitiate_invoice(data):
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
-			
+			generateb2cQr = False
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 				generateb2cQr = False
 				doc.error_message = " Invoice Total Mismatch"
-				doc.irn_generated = "Error"
-				doc.ready_to_generate_irn = "No"
+				if data['guest_data']['invoice_type'] == "B2B":
+					doc.irn_generated = "Error"
+					doc.ready_to_generate_irn = "No"
+					doc.qr_generated = "Pending"
+				else:
+					doc.irn_generated = "NA"
+					doc.ready_to_generate_irn = "No"
+					doc.qr_generated = "Error"
+
 
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
@@ -241,6 +247,3 @@ def Reinitiate_invoice(data):
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
 		return {"success":False,"message":str(e)}
-		
-
-

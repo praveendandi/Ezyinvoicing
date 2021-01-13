@@ -609,8 +609,9 @@
   {
    "default": "Pending",
    "fieldname": "qr_generated",
-   "fieldtype": "Data",
-   "label": "QR Generated"
+   "fieldtype": "Select",
+   "label": "QR Generated",
+   "options": "Pending\nSuccess\nError\nZero Invoice"
   },
   {
    "fieldname": "print_by",
@@ -766,7 +767,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-08 16:25:38.368431",
+ "modified": "2021-01-11 13:49:23.627889",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -508,7 +508,7 @@ def CreditgenerateIrn(invoice_number):
 					"OthChrg":
 					00,
 					"TotItemVal":
-					abs(round(item.item_value_after_gst, 1)),
+					abs(round(item.item_value_after_gst, 2)),
 				}
 				gst_data['ItemList'].append(i)
 		gst_data["ValDtls"] = {
@@ -541,13 +541,19 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_irn_generated_time = datetime.datetime.utcnow()
 			invoice.save(ignore_permissions=True,ignore_version=True)
 			create_credit_qr_image(invoice_number, GSP_details['data'])
+			# print(credit_items)
+			# insert_credit_items = insert_credit_items(credit_items,invoice_number)
 		else:
 			if "result" in list(response.keys()):
-				if response['result']['InfCd'] == "DUPIRN":
+				if response['result'][0]['InfCd'] == "DUPIRN":
 					invoice = frappe.get_doc('Invoices', invoice_number)
-					invoice.credit_duplicate_ack_date = response['result']['Desc']['AckDt']
-					invoice.credit_duplicate_ack_no = response['result']['Desc']['AckNo']
-					invoice.credit_duplicate_irn_number = response['result']['Desc']['Irn']
+					invoice.credit_duplicate_ack_date = response['result'][0]['Desc']['AckDt']
+					invoice.credit_duplicate_ack_no = response['result'][0]['Desc']['AckNo']
+					invoice.credit_duplicate_irn_number = response['result'][0]['Desc']['Irn']
+					invoice.credit_ack_no = response['result'][0]['Desc']['AckNo']
+					invoice.credit_irn_number = response['result'][0]['Desc']['Irn']
+					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
+					invoice.credit_irn_generated = "Success"
 					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'
