@@ -7,4 +7,3 @@ google-cloud-storage
 XlsxWriter
 wget
 fitz
-mysql-connector-python-rf
