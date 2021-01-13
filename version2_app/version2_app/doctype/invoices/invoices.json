@@ -142,7 +142,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled\nError\nNA\nZero Invoice",
+   "options": "Draft\nPending\nSuccess\nCancelled\nError\nNA\nZero Invoice",
    "read_only": 1
   },
   {
@@ -767,7 +767,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-11 13:49:23.627889",
+ "modified": "2021-01-13 15:57:48.234986",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -10,7 +10,7 @@ import time
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes,send_invoicedata_to_gcb
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 import math
 
 
