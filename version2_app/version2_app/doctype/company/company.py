@@ -10,6 +10,7 @@ import shutil
 import os
 import pdfplumber
 from datetime import date, datetime
+import mysql.connector as mysql
 import requests
 import pandas as pd
 import re
@@ -118,9 +119,40 @@ def gitCurrentBranchCommit():
 		return {"success":False,"message":str(e)}	
 
 
-
-
-
-
-
-
+@frappe.whitelist(allow_guest=True)
+def b2cstatusupdate():
+	try:
+		db = mysql.connect(
+			host = "127.0.0.1",
+			user = "root",
+			passwd = "root",
+			database = "_ae17eaceb43e7f9c"
+		)
+		cursor = db.cursor()
+		query = "SELECT name,invoice_number,qr_generated,irn_generated,b2c_qrimage FROM tabInvoices where invoice_type='B2C';"
+		cursor.execute(query)
+		records = cursor.fetchall()
+		for each in records:
+			if each[3] == "NA" and each[2] == "Pending":
+				print(1)
+				update = "Update tabInvoices set qr_generated = 'Success' where name = '"+each[0]+"';"
+			elif each[3] == "Zero Invoice" and each[2] == "Pending":
+				print(2)
+				update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each[3] == "Error" and each[2] == "Pending":
+				print(2)
+				update = "Update tabInvoices set qr_generated = 'Error', irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each[3] == "Error" and each[2] == "Success":
+				print(4)
+				update = "Update tabInvoices set irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each[3] == "Zero Invoice" and each[2] == "Success":
+				update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
+			else:
+				update = ""
+			cursor.execute(update)
+			commit_changes = db.commit()
+			print(commit_changes)
+		return True
+	except Exception as e:
+		print("b2cstatusupdate", str(e))
+		return {"success":False,"message":str(e)}

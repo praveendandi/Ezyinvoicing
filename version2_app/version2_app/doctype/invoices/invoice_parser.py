@@ -283,8 +283,11 @@ def file_parsing(filepath):
 				return {"success":False,"message":checkTokenIsValidResponse['message']} 
 		else:
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> ec5f620fa12cec1f6f128605be09341a5ccf11cb
 			calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 			if calulateItemsApiResponse['success'] == True:
 				guest['invoice_file'] = filepath
