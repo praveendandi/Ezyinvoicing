@@ -125,8 +125,8 @@ def b2cstatusupdate():
 		db = mysql.connect(
 			host = "127.0.0.1",
 			user = "root",
-			passwd = "Welcome@123",
-			database = "_d203ef9639f7e96d"
+			passwd = "root",
+			database = "_ae17eaceb43e7f9c"
 		)
 		cursor = db.cursor()
 		query = "SELECT name,invoice_number,qr_generated,irn_generated,b2c_qrimage FROM tabInvoices where invoice_type='B2C';"
@@ -154,5 +154,5 @@ def b2cstatusupdate():
 			print(commit_changes)
 		return True
 	except Exception as e:
-		print("git branch commit id:  ", str(e))
+		print("b2cstatusupdate", str(e))
 		return {"success":False,"message":str(e)}
