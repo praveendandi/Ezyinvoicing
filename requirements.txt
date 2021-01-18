@@ -1,8 +1,9 @@
 frappe
+PyMuPDF==1.16.14
 pdfplumber
 pandas
 qrcode
 google-cloud-storage
 XlsxWriter
 wget
-mysql-connector-python-rf
+fitz==0.0.1.dev2
