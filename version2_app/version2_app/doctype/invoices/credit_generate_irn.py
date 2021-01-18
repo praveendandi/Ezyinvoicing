@@ -9,7 +9,7 @@ from frappe.utils import get_site_name
 import time
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -554,7 +554,7 @@ def CreditgenerateIrn(invoice_number):
 					invoice.credit_irn_number = response['result'][0]['Desc']['Irn']
 					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
 					invoice.credit_irn_generated = "Success"
-					invoices.credit_qr_code_generated = "Success"
+					invoice.credit_qr_code_generated = "Success"
 					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'

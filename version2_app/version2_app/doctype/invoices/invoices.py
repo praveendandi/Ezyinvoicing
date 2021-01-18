@@ -26,7 +26,7 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -1127,7 +1127,7 @@ def insert_invoice(data):
 			round(igst_amount, 2),
 			'has_credit_items':
 			has_credit_items,
-			'total_inovice_amount': data['total_invoice_amount'],
+			'total_invoice_amount': data['total_invoice_amount'],
 			'has_discount_items':has_discount_items,
 			'invoice_process_time':
 			datetime.datetime.utcnow() - datetime.datetime.strptime(
@@ -1267,7 +1267,7 @@ def calulate_items(data):
 	# try:
 	total_items = []
 	second_list = []
-	# print(data['items'])
+	print(data['items'])
 	for item in data['items']:
 		final_item = {}
 		companyDetails = frappe.get_doc('company', data['company_code'])
@@ -1409,7 +1409,6 @@ def calulate_items(data):
 				second_list.append(service_dict)
 				# second_list	
 			# print(item)
-			print(ItemMode,"///////aaaaaaaa")
 			if sac_code_based_gst_rates.type == "Discount":
 				
 					final_item['sac_code'] = 'No Sac'
@@ -1431,11 +1430,14 @@ def calulate_items(data):
 					final_item['item_type'] = "Discount"
 					final_item['item_mode'] = ItemMode
 			if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
-				if "-" in str(item['item_value']):
+				if "-" in str(item['item_value']) and data['guest_data']['invoice_category'] == "Tax Invoice":
 					final_item['item_mode'] = ItemMode
+				elif data['guest_data']['invoice_category'] == "Credit Invoice":	
+					final_item['item_mode'] = "Credit"
 				else:
 					final_item['item_mode'] = "Debit"
 				# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
+				print(acc_gst_percentage,"//////")
 				if sac_code_based_gst_rates.net == "No":
 					if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
 						if acc_gst_percentage == 0:

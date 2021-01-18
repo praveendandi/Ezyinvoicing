@@ -20,6 +20,7 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
+		print(data)
 		generateb2cQr = True
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
@@ -154,7 +155,7 @@ def Reinitiate_invoice(data):
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
-		doc.total_inovice_amount = data['total_invoice_amount']	
+		doc.total_invoice_amount = data['total_invoice_amount']	
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
