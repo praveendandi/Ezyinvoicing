@@ -6,4 +6,8 @@ qrcode
 google-cloud-storage
 XlsxWriter
 wget
+<<<<<<< HEAD
 fitz==0.0.1.dev2
+=======
+fitz
+>>>>>>> stable-version

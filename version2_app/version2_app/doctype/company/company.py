@@ -10,7 +10,6 @@ import shutil
 import os
 import pdfplumber
 from datetime import date, datetime
-import mysql.connector as mysql
 import requests
 import pandas as pd
 import re
@@ -20,32 +19,32 @@ import frappe
 import os
 
 class company(Document):
-	pass
-	# def on_update(self):
-	# 	if self.name:
-	# 		folder_path = frappe.utils.get_bench_path()
-	# 		site_folder_path = self.site_name
-	# 		folder_path = frappe.utils.get_bench_path()
-	# 		path = folder_path + '/sites/' + site_folder_path
-	# 		if self.invoice_reinitiate_parsing_file:
-	# 			reinitatefilepath = path+self.invoice_reinitiate_parsing_file
-	# 			destination_path = folder_path+self.reinitiate_file_path
-	# 			try:
-	# 				print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-	# 				shutil.copy(reinitatefilepath, destination_path)
-	# 			except Exception as e:
-	# 				print(str(e),"************on_update company")
-	# 				frappe.throw("file updated Failed")
-	# 		if self.invoice_parser_file:
-	# 			# invoice_parser_file_path
-	# 			invoicefilepath = path+self.invoice_parser_file
-	# 			destination_path2 = folder_path+self.invoice_parser_file_path
-	# 			try:
-	# 				print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-	# 				shutil.copy(invoicefilepath,destination_path2)
-	# 			except Exception as e:
-	# 				print(str(e),"************on_update company")
-	# 				frappe.throw("file updated Failed")
+	# pass
+	def on_update(self):
+		if self.name:
+			folder_path = frappe.utils.get_bench_path()
+			site_folder_path = self.site_name
+			folder_path = frappe.utils.get_bench_path()
+			path = folder_path + '/sites/' + site_folder_path
+			if self.invoice_reinitiate_parsing_file:
+				reinitatefilepath = path+self.invoice_reinitiate_parsing_file
+				destination_path = folder_path+self.reinitiate_file_path
+				try:
+					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+					shutil.copy(reinitatefilepath, destination_path)
+				except Exception as e:
+					print(str(e),"************on_update company")
+					frappe.throw("file updated Failed")
+			if self.invoice_parser_file:
+				# invoice_parser_file_path
+				invoicefilepath = path+self.invoice_parser_file
+				destination_path2 = folder_path+self.invoice_parser_file_path
+				try:
+					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+					shutil.copy(invoicefilepath,destination_path2)
+				except Exception as e:
+					print(str(e),"************on_update company")
+					frappe.throw("file updated Failed")
 
 
 
@@ -122,36 +121,37 @@ def gitCurrentBranchCommit():
 @frappe.whitelist(allow_guest=True)
 def b2cstatusupdate():
 	try:
-		db = mysql.connect(
-			host = "127.0.0.1",
-			user = "root",
-			passwd = "root",
-			database = "_ae17eaceb43e7f9c"
-		)
-		cursor = db.cursor()
-		query = "SELECT name,invoice_number,qr_generated,irn_generated,b2c_qrimage FROM tabInvoices where invoice_type='B2C';"
-		cursor.execute(query)
-		records = cursor.fetchall()
-		for each in records:
-			if each[3] == "NA" and each[2] == "Pending":
-				print(1)
-				update = "Update tabInvoices set qr_generated = 'Success' where name = '"+each[0]+"';"
-			elif each[3] == "Zero Invoice" and each[2] == "Pending":
-				print(2)
-				update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
-			elif each[3] == "Error" and each[2] == "Pending":
-				print(2)
-				update = "Update tabInvoices set qr_generated = 'Error', irn_generated = 'NA' where name = '"+each[0]+"';"
-			elif each[3] == "Error" and each[2] == "Success":
-				print(4)
-				update = "Update tabInvoices set irn_generated = 'NA' where name = '"+each[0]+"';"
-			elif each[3] == "Zero Invoice" and each[2] == "Success":
-				update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
+		data = frappe.db.get_list('Invoices',filters={'invoice_type': 'B2C'},fields=["name","invoice_number","qr_generated","irn_generated","b2c_qrimage"])
+		for each in data:
+			print(each)
+			if each["irn_generated"] == "NA" and each["qr_generated"] == "Pending":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Success"
+			elif each["irn_generated"] == "Zero Invoice" and each["qr_generated"] == "Pending":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Zero Invoice"
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each["irn_generated"] == "Error" and each["qr_generated"] == "Pending":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Error"
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set qr_generated = 'Error', irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each["irn_generated"] == "Error" and each["qr_generated"] == "Success":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each["irn_generated"] == "Zero Invoice" and each["qr_generated"] == "Success":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Zero Invoice"
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
 			else:
-				update = ""
-			cursor.execute(update)
-			commit_changes = db.commit()
-			print(commit_changes)
+				doc = None
+			if doc == None:
+				continue
+			doc.save()
+			frappe.db.commit()
 		return True
 	except Exception as e:
 		print("b2cstatusupdate", str(e))
