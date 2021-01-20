@@ -24,7 +24,12 @@
   "service_charge",
   "accommodation_slab",
   "one_sc_applies_to_all",
-  "service_charge_rate"
+  "service_charge_rate",
+  "ignore",
+  "service_charge_net",
+  "service_charge_tax_applies",
+  "sc_gst_tax_rate",
+  "sc_sac_code"
  ],
  "fields": [
   {
@@ -146,11 +151,41 @@
    "fieldname": "service_charge_rate",
    "fieldtype": "Float",
    "label": "Service Charge Rate"
+  },
+  {
+   "default": "0",
+   "fieldname": "ignore",
+   "fieldtype": "Check",
+   "label": "Ignore"
+  },
+  {
+   "default": "No",
+   "fieldname": "service_charge_net",
+   "fieldtype": "Select",
+   "label": "Service Charge Net",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "Apply From Parent",
+   "fieldname": "service_charge_tax_applies",
+   "fieldtype": "Select",
+   "label": "Service Charge Tax Applies",
+   "options": "Apply From Parent\nSeparate GST\nNo Tax"
+  },
+  {
+   "fieldname": "sc_gst_tax_rate",
+   "fieldtype": "Float",
+   "label": "SC GST Tax Rate"
+  },
+  {
+   "fieldname": "sc_sac_code",
+   "fieldtype": "Data",
+   "label": "SC SAC Code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-02 15:53:14.144259",
+ "modified": "2021-01-11 18:51:15.059641",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
@@ -225,6 +260,42 @@
    "read": 1,
    "report": 1,
    "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Dashboard Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Inbox",
    "share": 1,
    "write": 1
   }

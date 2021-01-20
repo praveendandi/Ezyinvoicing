@@ -45,7 +45,6 @@
   "section_break_9",
   "sac_hsn_based_taxes",
   "e_invoice_details_section",
-  "credit_note_items",
   "irn_number",
   "irn_cancelled",
   "qr_code_generated",
@@ -95,7 +94,6 @@
   "total_state_cess_amount",
   "total_vat_amount",
   "print_by",
-  "discount_items",
   "has_discount_items",
   "discount_value_before_gst",
   "discount_value_after_gst",
@@ -113,7 +111,14 @@
   "other_charges_before_tax",
   "sales_amount_before_tax",
   "sales_amount_after_tax",
-  "mode"
+  "mode",
+  "duplicate_ack_date",
+  "duplicate_ack_no",
+  "duplicate_irn_number",
+  "credit_duplicate_ack_date",
+  "credit_duplicate_ack_no",
+  "credit_duplicate_irn_number",
+  "invoice_category"
  ],
  "fields": [
   {
@@ -137,7 +142,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled\nError\nNA",
+   "options": "Pending\nSuccess\nCancelled\nError\nNA\nZero Invoice",
    "read_only": 1
   },
   {
@@ -363,7 +368,7 @@
   },
   {
    "fieldname": "signed_invoice",
-   "fieldtype": "Long Text",
+   "fieldtype": "Text",
    "hidden": 1,
    "label": "Signed Invoice",
    "read_only": 1
@@ -457,12 +462,6 @@
   {
    "fieldname": "column_break_32",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "credit_note_items",
-   "fieldtype": "Table",
-   "label": "Credit Note Items",
-   "options": "Credit Note Items"
   },
   {
    "fieldname": "ready_to_generate_irn",
@@ -565,7 +564,7 @@
    "fieldname": "invoice_from",
    "fieldtype": "Select",
    "label": "Invoice From",
-   "options": "Manual\nPms"
+   "options": "Manual\nPms\nWeb"
   },
   {
    "fieldname": "invoice_process_time",
@@ -610,19 +609,14 @@
   {
    "default": "Pending",
    "fieldname": "qr_generated",
-   "fieldtype": "Data",
-   "label": "QR Generated"
+   "fieldtype": "Select",
+   "label": "QR Generated",
+   "options": "Pending\nSuccess\nError\nZero Invoice"
   },
   {
    "fieldname": "print_by",
    "fieldtype": "Data",
    "label": "Print By"
-  },
-  {
-   "fieldname": "discount_items",
-   "fieldtype": "Table",
-   "label": "Discount Items",
-   "options": "Discount Items"
   },
   {
    "fieldname": "has_discount_items",
@@ -731,30 +725,54 @@
    "fieldname": "mode",
    "fieldtype": "Select",
    "label": "Mode",
-   "options": "Testing\nUat\nProduction"
+   "options": "Uat\nProduction\nTesting"
+  },
+  {
+   "fieldname": "duplicate_ack_date",
+   "fieldtype": "Datetime",
+   "label": "Duplicate Ack Date"
+  },
+  {
+   "fieldname": "duplicate_ack_no",
+   "fieldtype": "Data",
+   "label": "Duplicate Ack No"
+  },
+  {
+   "fieldname": "duplicate_irn_number",
+   "fieldtype": "Data",
+   "label": "Duplicate Irn Number"
+  },
+  {
+   "fieldname": "credit_duplicate_ack_date",
+   "fieldtype": "Datetime",
+   "label": "Credit Duplicate Ack Date"
+  },
+  {
+   "fieldname": "credit_duplicate_ack_no",
+   "fieldtype": "Data",
+   "label": "Credit Duplicate Ack No"
+  },
+  {
+   "fieldname": "credit_duplicate_irn_number",
+   "fieldtype": "Data",
+   "label": "Credit Duplicate Irn Number"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "label": "Invoice Category",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-04 18:45:45.476987",
+ "modified": "2021-01-11 13:49:23.627889",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
  "owner": "Administrator",
  "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
   {
    "cancel": 1,
    "email": 1,
@@ -834,15 +852,19 @@
    "write": 1
   },
   {
-   "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "All",
-   "share": 1,
+   "role": "ezy-Inbox",
+   "share": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
    "write": 1
   }
  ],

@@ -1,4 +1,3 @@
-
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
@@ -9,7 +8,7 @@ import traceback
 from frappe.utils import get_site_name
 import time
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
-from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes
+from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes,send_invoicedata_to_gcb
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 import math
@@ -21,6 +20,7 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
+		generateb2cQr = True
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
@@ -76,9 +76,9 @@ def Reinitiate_invoice(data):
 					total_vat_amount += item['vat_amount']
 					# print(value_before_gst,value_after_gst," ******")
 				else:
-					cgst_amount+=item['cgst_amount']
-					sgst_amount+=item['sgst_amount']
-					igst_amount+=item['igst_amount']
+					# cgst_amount+=item['cgst_amount']
+					# sgst_amount+=item['sgst_amount']
+					# igst_amount+=item['igst_amount']
 					# cess_amount+=item['cess_amount']
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
@@ -95,8 +95,8 @@ def Reinitiate_invoice(data):
 		if company.allowance_type=="Discount":
 			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
-			pms_invoice_summary = value_after_gst-discountAfterAmount
-			pms_invoice_summary_without_gst = value_before_gst-discountBeforeAmount
+			pms_invoice_summary = value_after_gst - discountAfterAmount
+			pms_invoice_summary_without_gst = value_before_gst - discountBeforeAmount
 			if pms_invoice_summary == 0:
 				
 				credit_value_after_gst = 0
@@ -127,6 +127,8 @@ def Reinitiate_invoice(data):
 		invoice_round_off_amount = 0	
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
+		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
+		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -144,9 +146,10 @@ def Reinitiate_invoice(data):
 		doc.confirmation_number = data['guest_data']['confirmation_number']
 		doc.trade_name=data['taxpayer']['trade_name']
 		doc.address_2=data['taxpayer']['address_2']
-		phone_number=data['taxpayer']['phone_number']
-		location=data['taxpayer']['location']
-		pincode=data['taxpayer']['pincode']
+		doc.phone_number=data['taxpayer']['phone_number']
+		doc.mode = company.mode
+		doc.location=data['taxpayer']['location']
+		doc.pincode=data['taxpayer']['pincode']
 		state_code=data['taxpayer']['state_code']
 		doc.amount_before_gst=round(value_before_gst, 2)
 		doc.amount_after_gst=round(value_after_gst, 2)
@@ -166,7 +169,7 @@ def Reinitiate_invoice(data):
 		doc.sgst_amount=round(sgst_amount,2)
 		doc.igst_amount=round(igst_amount,2)
 		doc.total_gst_amount = round(cgst_amount,2) + round(sgst_amount,2) + round(igst_amount,2)
-		doc.irn_generated=irn_generated
+		
 		doc.irn_cancelled='No'
 		doc.qr_code_generated='Pending'
 		doc.signed_invoice_generated='No'
@@ -180,18 +183,31 @@ def Reinitiate_invoice(data):
 		doc.credit_igst_amount = round(credit_igst_amount,2)
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
+		doc.mode = company.mode
+		if data['total_invoice_amount'] == 0:
+			irn_generated = "Zero Invoice"
+		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		if data['total_invoice_amount'] == 0:
 			ready_to_generate_irn = "No"
+			generateb2cQr = False
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-			
+				generateb2cQr = False
 				doc.error_message = " Invoice Total Mismatch"
-				doc.irn_generated = "Error"
-				doc.ready_to_generate_irn = "No"
+				if data['guest_data']['invoice_type'] == "B2B":
+					doc.irn_generated = "Error"
+					doc.ready_to_generate_irn = "No"
+					doc.qr_generated = "Pending"
+				else:
+					doc.irn_generated = "NA"
+					doc.ready_to_generate_irn = "No"
+					doc.qr_generated = "Error"
+
+
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
-
+		
 
 		items = data['items_data']
 		# items = [x for x in items if x['sac_code']!="Liquor"]
@@ -202,10 +218,9 @@ def Reinitiate_invoice(data):
 		taxSummariesInsert = insert_tax_summaries2(items, data['guest_data']['invoice_number'])
 		# insert sac code based taxes
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
+		if data['guest_data']['invoice_type'] == "B2C" and generateb2cQr == True:
+			send_invoicedata_to_gcb(data['guest_data']['invoice_number'])
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
 		return {"success":False,"message":str(e)}
-		
-
-

@@ -9,13 +9,13 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2020-12-23 15:04:31.532793",
+ "modified": "2021-01-05 12:25:47.601742",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Convert From B2C",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "select tabInvoices.invoice_date as 'Date',tabInvoices.name as 'Invoice Number',tabInvoices.room_number as 'Room No.',tabInvoices.guest_name as 'Guest Name',tabInvoices.confirmation_number as 'Confirmation No.',tabInvoices.gst_number as 'GST No.',tabInvoices.irn_generated as 'IRN Generated',tabInvoices.converted_from_b2c_by as 'Converted By',tabInvoices.converted_from_b2c_time as 'Converted Time' from tabInvoices where tabInvoices.converted_from_b2c= 'Yes' and (DATE(tabInvoices.creation) between %(from_date)s and %(to_date)s) order by tabInvoices.name",
+ "query": "select tabInvoices.invoice_date as 'Check Out Date', tabInvoices.name as 'Invoice Number',tabInvoices.guest_name as 'Guest Name',tabInvoices.confirmation_number as 'Confirmation No.',tabInvoices.gst_number as 'GST No.',tabInvoices.room_number as 'Room No.',tabInvoices.invoice_type as 'Invoice Type',tabInvoices.sales_amount_before_tax as 'Sales Amount',tabInvoices.cgst_amount as \"Add CGST\",tabInvoices.sgst_amount as \"Add SGST\",tabInvoices.igst_amount as \"Add IGST\",tabInvoices.total_gst_amount as \"Total Gst Amount\",tabInvoices.sales_amount_after_tax as \"Invoice Total\",tabInvoices.irn_generated as 'IRN Generated',tabInvoices.has_credit_items as 'Credit Invoice',tabInvoices.credit_irn_generated as \"Credit IRN Generated\",date(tabInvoices.creation) as 'Printed Date',date(tabInvoices.modified) as 'Last Modified Date',DATEDIFF(CURDATE(),DATE(tabInvoices.creation)) as \"Pending For (day's)\",tabInvoices.converted_from_b2c_by as 'Converted By',tabInvoices.converted_from_b2c_time as 'Converted Time' from tabInvoices where tabInvoices.converted_from_b2c= 'Yes' and (DATE(tabInvoices.creation) between %(from_date)s and %(to_date)s) order by tabInvoices.name",
  "ref_doctype": "Invoices",
  "report_name": "Convert From B2C",
  "report_type": "Query Report",
@@ -28,9 +28,6 @@
   },
   {
    "role": "IT"
-  },
-  {
-   "role": "Finance"
   },
   {
    "role": "Guest"
