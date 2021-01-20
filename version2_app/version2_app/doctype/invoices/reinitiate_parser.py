@@ -25,7 +25,7 @@ def reinitiateInvoice(data):
 	filepath = data['filepath']
 	reupload_inv_number = data['invoice_number']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HRBF-01")
+	companyCheckResponse = check_company_exist("IBISCS-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -62,16 +62,15 @@ def reinitiateInvoice(data):
 		if "Total" in i:
 			total_invoice = i.split(" ")
 			total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-		if "Departure" in i:
+		if "Departure :" in i:
 			depatureDateIndex = i.index('Departure')
-			date_time_obj = (':'.join(i[depatureDateIndex:].split(':')[1:])[1:]).strip()
+			date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
 		if "Room No." in i or "Room No" in i:
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST No." in i:
+		if "GST NO" in i and "ST No" not in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
 			gstNumber = gstNumber.replace("Membership","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
@@ -81,7 +80,7 @@ def reinitiateInvoice(data):
 			guestDetailsEntered = False
 		if guestDetailsEntered == True:
 			guestDeatils.append(i)
-		if i.strip() in "Date Description Reference Debit Credit" or i.strip() in "Date  Description  Reference  Debit  Credit" or i.strip() in "Date Description Reference Debit (Rs) Credit (Rs)":
+		if i in "Date Description Reference Debit Credit":
 			entered = True
 		if 'CGST 6%=' in i:
 			entered = False
@@ -93,12 +92,12 @@ def reinitiateInvoice(data):
 			data.append(i)
 		if "Guest Name" in i:
 			guestDeatils.append(i)
-		if "Membership" in i and "~" not in i:
+		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
 			p = i.split(":")
-			print_by = p[2].replace(" ","")
+			print_by = p[1].replace(" ","")
 
 	if invoiceNumber != reupload_inv_number:
 		return {"success":False,"message":"Incorrect Invoice Attempted"}
@@ -114,16 +113,13 @@ def reinitiateInvoice(data):
 			item = dict()
 			item_value = ""
 			dt = i.strip()
-			for index, j in enumerate(i.replace("  "," ").split(' ')):
+			for index, j in enumerate(i.split(' ')):
 				val = dt.split(" ")
 				if index == 0 and len(val)>1:
 					item['date'] = j
 				if len(val)>1:
 					item_value = val[-1]
 					item['item_value'] = float(item_value.replace(',', ''))
-				# else:
-				# 	item_value = val[-2]
-				# 	item['item_value'] = float(item_value.replace(',', ''))
 				if index == 1 and len(val)>1:
 					starting_index = i.index(j)
 					if "~" in i:
@@ -156,6 +152,7 @@ def reinitiateInvoice(data):
 	for index, i in enumerate(guestDeatils):
 		if index == 0:
 			guest['name'] = i.split(':')[1]
+			guest["name"] = (guest["name"].replace("Arrival","")).strip()
 		if index == 1:
 			guest['address1'] = i
 		if index == 2:
@@ -169,7 +166,7 @@ def reinitiateInvoice(data):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HRBF-01"
+	guest['company_code'] = "IBISCS-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -183,17 +180,16 @@ def reinitiateInvoice(data):
 			invoiceNumber = inv_data.name
 			guest['invoice_number'] = inv_data.name
 			amened='No'
-	
-	company_code = {"code":"HRBF-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"HRBF-01","invoice_date":date_time_obj}
+	company_code = {"code":"IBISCS-01"}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"IBISCS-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "6"
+	error_data['state_code'] = "33"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "121001"
+	error_data['pincode'] = "603103"
 	# gstNumber = "12345"
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
