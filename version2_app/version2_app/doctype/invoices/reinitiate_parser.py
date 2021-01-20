@@ -70,7 +70,8 @@ def reinitiateInvoice(data):
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 		if "GST NO" in i and "ST No" not in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			gstNumber = gstNumber.replace("Membership","")
+			gstNumber = (''.join([w for w in gstNumber.split() if len(w)>1])).strip()
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
@@ -175,6 +176,7 @@ def reinitiateInvoice(data):
 	for index, i in enumerate(guestDeatils):
 		if index == 0:
 			guest['name'] = i.split(':')[1]
+			guest["name"] = (guest["name"].replace("Arrival","")).strip()
 		if index == 1:
 			guest['address1'] = i
 		if index == 2:
@@ -204,7 +206,7 @@ def reinitiateInvoice(data):
 			amened='No'
 	
 	company_code = {"code":"IBISCS-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JP-2022","invoice_date":date_time_obj}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"IBISCS-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
