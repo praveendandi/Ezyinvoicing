@@ -84,7 +84,7 @@ def request_get(api, data,company):
 	try:
 		
 	
-		print(api,data,company,company['proxy'])
+		# print(api,data,company,company['proxy'])
 		# print(company.proxy)
 		headerData = {
 			"user_name": data['apidata']["username"],
@@ -102,7 +102,7 @@ def request_get(api, data,company):
 			proxies = {'http':'http://'+company['proxy_username']+":"+company['proxy_password']+proxyhost,
 					   'https':'https://'+company['proxy_username']+":"+company['proxy_password']+proxyhost
 						}
-			raw_response = requests.get(api, headers=headerData,proxies=proxies)				
+			raw_response = requests.get(api, headers=headerData,proxies=proxies,verify=False)				
 		if raw_response.status_code == 200:
 			return raw_response.json()
 		else:
