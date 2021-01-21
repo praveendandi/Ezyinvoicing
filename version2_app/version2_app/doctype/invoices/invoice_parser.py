@@ -80,6 +80,8 @@ def file_parsing(filepath):
 			gstNumber = i.split(':')[1].replace(' ', '')
 			if "ConfirmationNo." in gstNumber:
 				gstNumber = gstNumber.replace("ConfirmationNo.","")
+			if "," in gstNumber:
+				gstNumber = gstNumber.replace(",","")	
 		# gstNumber = "07AABCI2732H1ZU"
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
@@ -108,7 +110,6 @@ def file_parsing(filepath):
 		if "Printed By / On" in i:
 			p = i.split(":")
 			print_by = p[1].replace(" ","")
-
 	paymentTypes = GetPaymentTypes()
 	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
 	original_data = []
@@ -185,8 +186,15 @@ def file_parsing(filepath):
 	guest = dict()
 	# print(guestDeatils)
 	for index, i in enumerate(guestDeatils):
+		print(index,i,"gu")
 		if index == 0:
-			guest['name'] = i.split(':')[1]
+			name = i.split(':')[1]
+			name = name.strip()
+			print(name,len(name))
+			if len(name)>0:
+				guest['name'] = i.split(':')[1]
+			else:
+				guest['name'] = "Not Found"
 		if index == 1:
 			guest['address1'] = i
 		if index == 2:

@@ -20,7 +20,7 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		print(data)
+		# print(data,"   /////")
 		generateb2cQr = True
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
@@ -59,7 +59,6 @@ def Reinitiate_invoice(data):
 			data['taxpayer']['legal_name'] = " "
 		#calculat items
 		for item in data['items_data']:
-			print(item, "    ********8")
 			if item['taxable'] == 'No' and item['item_type'] != "Discount":
 				other_charges += item['item_value_after_gst']
 				other_charges_before_tax += item['item_value']
@@ -82,7 +81,6 @@ def Reinitiate_invoice(data):
 					# sgst_amount+=item['sgst_amount']
 					# igst_amount+=item['igst_amount']
 					# cess_amount+=item['cess_amount']
-					print("///////// mm")
 					credit_cgst_amount+=abs(item['cgst_amount'])
 					credit_sgst_amount+=abs(item['sgst_amount'])
 					credit_igst_amount+=abs(item['igst_amount'])
@@ -94,7 +92,7 @@ def Reinitiate_invoice(data):
 			else:
 				pass
 		
-		if data['guest_data']['invoice_category'] == "Tax Invoice":
+		if data['guest_data']['invoice_category'] == "Tax Invoice" or data['guest_data']['invoice_category'] == "Debit Invoice" :
 			if company.allowance_type=="Discount":
 				discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 				discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)

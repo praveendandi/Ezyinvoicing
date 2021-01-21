@@ -381,6 +381,11 @@ def CreditgenerateIrn(invoice_number):
 		taxpayer_details = get_tax_payer_details_data(GspData)
 		#gst data
 		# print(taxpayer_details,"taxxxxxx")
+		if invoice.invoice_category == "Credit Invoice":
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
+		else:
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
+		# irnInvoiceNumber = 
 		gst_data = {
 			"Version": "1.1",
 			"TranDtls": {
@@ -440,9 +445,7 @@ def CreditgenerateIrn(invoice_number):
 				"Typ":
 				"CRN",
 				"No":
-				invoice.invoice_number + str(random.randint(0, 100)) +
-				'T' if company_details['data'].mode == 'Testing' else
-				invoice.invoice_number,
+				invoice_numberIrn,
 				"Dt":
 				datetime.datetime.strftime(invoice.invoice_date,
 											'%d/%m/%Y')
@@ -535,6 +538,7 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_signed_invoice_generated = 'Yes'
 			invoice.credit_irn_generated = 'Success'
 			invoice.irn_generated = "Success"
+			invoice.irn_number = " "
 			invoice.credit_qr_code = response['result']['SignedQRCode']
 			invoice.credit_qr_code_generated = 'Success'
 			invoice.credit_irn_cancelled = 'No'

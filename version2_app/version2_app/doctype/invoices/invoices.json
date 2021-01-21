@@ -118,7 +118,10 @@
   "credit_duplicate_ack_date",
   "credit_duplicate_ack_no",
   "credit_duplicate_irn_number",
-  "invoice_category"
+  "invoice_category",
+  "place_of_supply",
+  "credit_igst_amount",
+  "sez"
  ],
  "fields": [
   {
@@ -762,12 +765,28 @@
    "fieldname": "total_invoice_amount",
    "fieldtype": "Float",
    "label": "Total Invoice Amount"
+  },
+  {
+   "fieldname": "place_of_supply",
+   "fieldtype": "Data",
+   "label": "Place Of Supply"
+  },
+  {
+   "fieldname": "credit_igst_amount",
+   "fieldtype": "Float",
+   "label": "Credit IGST Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "sez",
+   "fieldtype": "Check",
+   "label": "SEZ"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-18 18:17:03.559358",
+ "modified": "2021-01-21 11:34:00.093337",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
