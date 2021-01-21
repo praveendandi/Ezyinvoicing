@@ -14,7 +14,7 @@ def AttachQrCodeInInvoice(invoice_number):
         company = frappe.get_doc('company',invoice.company)
         if invoice.invoice_type == "B2B":
             folder_path = frappe.utils.get_bench_path()
-            if invoice.qr_code_image == "":
+            if len(invoice.qr_code_image)==0:
                 companyData = {"code":company.name,"mode":company.mode,"provider":company.provider}
                 GSP_details = gsp_api_data(companyData)
                 gsp=GSP_details['data']
@@ -22,7 +22,6 @@ def AttachQrCodeInInvoice(invoice_number):
                 return {"message":"Qr Redo Succesfull","success":True}
             
             site_folder_path = company.site_name
-            print("/aaaaaaaaaaaaaaa")
             path = folder_path + '/sites/' + site_folder_path
             src_pdf_filename = path + invoice.invoice_file
             dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
@@ -34,7 +33,6 @@ def AttachQrCodeInInvoice(invoice_number):
             document = fitz.open(src_pdf_filename)
 
             page = document[0]
-
             page.insertImage(img_rect, filename=img_filename)
             document.save(dst_pdf_filename)
             document.close()

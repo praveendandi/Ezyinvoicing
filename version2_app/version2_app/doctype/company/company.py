@@ -118,9 +118,41 @@ def gitCurrentBranchCommit():
 		return {"success":False,"message":str(e)}	
 
 
-
-
-
-
-
-
+@frappe.whitelist(allow_guest=True)
+def b2cstatusupdate():
+	try:
+		data = frappe.db.get_list('Invoices',filters={'invoice_type': 'B2C'},fields=["name","invoice_number","qr_generated","irn_generated","b2c_qrimage"])
+		for each in data:
+			print(each)
+			if each["irn_generated"] == "NA" and each["qr_generated"] == "Pending":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Success"
+			elif each["irn_generated"] == "Zero Invoice" and each["qr_generated"] == "Pending":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Zero Invoice"
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each["irn_generated"] == "Error" and each["qr_generated"] == "Pending":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Error"
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set qr_generated = 'Error', irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each["irn_generated"] == "Error" and each["qr_generated"] == "Success":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set irn_generated = 'NA' where name = '"+each[0]+"';"
+			elif each["irn_generated"] == "Zero Invoice" and each["qr_generated"] == "Success":
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.qr_generated = "Zero Invoice"
+				doc.irn_generated = "NA"
+				# update = "Update tabInvoices set qr_generated = 'Zero Invoice', irn_generated = 'NA' where name = '"+each[0]+"';"
+			else:
+				doc = None
+			if doc == None:
+				continue
+			doc.save()
+			frappe.db.commit()
+		return True
+	except Exception as e:
+		print("b2cstatusupdate", str(e))
+		return {"success":False,"message":str(e)}
