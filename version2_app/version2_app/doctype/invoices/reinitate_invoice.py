@@ -185,7 +185,14 @@ def Reinitiate_invoice(data):
 		doc.has_credit_items = has_credit_items
 		doc.mode = company.mode
 		if data['total_invoice_amount'] == 0:
-			irn_generated = "Zero Invoice"
+			if data['guest_data']['invoice_type'] == "B2B":
+				irn_generated = "Zero Invoice"
+				qr_generated = "Pending"
+				doc.qr_generated = qr_generated
+			else:
+				irn_generated = "NA"
+				qr_generated = "Zero Invoice"
+				doc.qr_generated = qr_generated
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		if data['total_invoice_amount'] == 0:
