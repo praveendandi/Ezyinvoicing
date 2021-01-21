@@ -911,7 +911,7 @@ def insert_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		# print(data,"/////")
+		print(data,"/////")
 		company = frappe.get_doc('company',data['company_code'])
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
@@ -1278,6 +1278,7 @@ def insert_items(items, invoice_number):
 	try:
 		a = frappe.db.delete('Items', {'parent': invoice_number})
 		b = frappe.db.commit()
+		print(items,"////////")
 		if len(items)>0:
 			for item in items:
 				item['item_value'] = round(item['item_value'],2)
@@ -1291,6 +1292,7 @@ def insert_items(items, invoice_number):
 				doc = frappe.get_doc(item)
 				doc.insert(ignore_permissions=True, ignore_links=True)
 			return {"sucess": True, "data": 'doc'}
+		print("***********")	
 		return {"sucess": True, "data": 'doc'}
 		# print(doc)
 	except Exception as e:
