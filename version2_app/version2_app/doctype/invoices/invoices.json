@@ -176,11 +176,11 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "0",
    "fieldname": "room_number",
    "fieldtype": "Int",
    "in_standard_filter": 1,
-   "label": "Room Number",
-   "reqd": 1
+   "label": "Room Number"
   },
   {
    "fieldname": "invoice_type",
@@ -371,7 +371,7 @@
   },
   {
    "fieldname": "signed_invoice",
-   "fieldtype": "Text",
+   "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Signed Invoice",
    "read_only": 1
@@ -564,6 +564,7 @@
    "label": "Confirmation Number"
   },
   {
+   "default": "Pms",
    "fieldname": "invoice_from",
    "fieldtype": "Select",
    "label": "Invoice From",
@@ -786,7 +787,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-21 11:34:00.093337",
+ "modified": "2021-01-22 17:50:29.790320",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

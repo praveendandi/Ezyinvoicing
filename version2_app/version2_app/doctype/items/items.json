@@ -24,7 +24,6 @@
   "is_credit_item",
   "taxable",
   "item_type",
-  "quantity",
   "sort_order",
   "cess",
   "cess_amount",
@@ -33,7 +32,10 @@
   "state_cess",
   "state_cess_amount",
   "vat",
-  "vat_amount"
+  "vat_amount",
+  "unit_of_measurement",
+  "unit_of_measurement_description",
+  "quantity"
  ],
  "fields": [
   {
@@ -155,12 +157,6 @@
    "options": "SAC\nHSN\nDiscount"
   },
   {
-   "fieldname": "quantity",
-   "fieldtype": "Select",
-   "label": "Quantity",
-   "options": "Units\nOthers"
-  },
-  {
    "fieldname": "sort_order",
    "fieldtype": "Float",
    "label": "Sort Order"
@@ -206,12 +202,29 @@
    "fieldname": "state_cess_amount",
    "fieldtype": "Float",
    "label": "State Cess Amount"
+  },
+  {
+   "fieldname": "unit_of_measurement",
+   "fieldtype": "Select",
+   "label": "Unit Of Measurement",
+   "options": "BAG\nBAL\nBDL\nBKL\nBOU\nBOX\nBTL\nBUN\nCAN\nCBM\nCCM\nCMS\nCTN\nDOZ\nDRM\nGGK\nGMS\nGRS\nGYD\nKGS\nKLR\nKME\nMLT\nMTR\nMTS\nNOS\nPAC\nPCS\nPRS\nQTL\nROL\nSET\nSQF\nSQM\nSQY\nTBS\nTGM\nTHD\nTON\nTUB\nUGS\nUNT\nYDS\nOTH"
+  },
+  {
+   "fieldname": "unit_of_measurement_description",
+   "fieldtype": "Select",
+   "label": "Unit Of Measurement Description",
+   "options": "BAGS\nBALE\nBUNDLES\nBUCKLES\nBILLION OF UNITS\nBOX\nBOTTLES\nBUNCHES\nCANS\nCUBIC METERS\nCUBIC CENTIMETERS\nCENTIMETERS\nCARTONS\nDOZENS\nDRUMS\nGREAT GROSS\nGRAMMES\nGROSS\nGROSS YARDS\nKILOGRAMS\nKILOLITRE\nKILOMETRE\nMILILITRE\nMETERS\nMETRIC TON\nNUMBERS\nPACKS\nPIECES\nPAIRS\nQUINTAL\nROLLS\nSETS\nSQUARE FEET\nSQUARE METERS\nSQUARE YARDS\nTABLETS\nTEN GROSS\nTHOUSANDS\nTONNES\nTUBES\nUS GALLONS\nUNITS\nYARDS\nOTHERS"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Data",
+   "label": "Quantity"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-01-08 11:26:42.556407",
+ "modified": "2021-01-23 13:09:12.461752",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
