@@ -5,11 +5,11 @@ import requests
 import datetime
 import random
 import traceback 
-from math import floor
 from frappe.utils import get_site_name
 import time
-from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
+from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert
+from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 import math
@@ -21,9 +21,6 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		# print(data,"   /////")
-		if "invoice_category" not in list(data['guest_data']):
-			data['guest_data']['invoice_category'] = "Tax Invoice"
 		generateb2cQr = True
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
@@ -129,21 +126,18 @@ def Reinitiate_invoice(data):
 		else:
 			ready_to_generate_irn = "No"
 
-		invoice_round_off_amount = 0
-	
+		invoice_round_off_amount = 0	
 		sales_amount_before_tax = value_before_gst + other_charges_before_tax 
 		sales_amount_after_tax = value_after_gst + other_charges
 		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
-
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
-		doc.total_invoice_amount = data['total_invoice_amount']	
+		doc.total_inovice_amount = data['total_invoice_amount']	
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
-		doc.invoice_category=data['guest_data']['invoice_category']
 		doc.invoice_file=data['guest_data']['invoice_file']
 		doc.room_number=data['guest_data']['room_number']
 		doc.invoice_type=data['guest_data']['invoice_type']
@@ -194,24 +188,12 @@ def Reinitiate_invoice(data):
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
 		doc.mode = company.mode
-		doc.irn_generated = "Pending"
-		doc.qr_generated = "Pending"
-		doc.ready_to_generate_irn = "Yes"
 		if data['total_invoice_amount'] == 0:
 			irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
-		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
-			if data['guest_data']['invoice_type'] == "B2B":
-				doc.irn_generated = "Zero Invoice"
-				doc.ready_to_generate_irn = "No"
-				doc.qr_generated = "Pending"
-			else:
-				doc.irn_generated = "NA"
-				doc.ready_to_generate_irn = "No"
-				doc.qr_generated = "Zero Invoice"
-
-			# ready_to_generate_irn = "No"
+		if data['total_invoice_amount'] == 0:
+			ready_to_generate_irn = "No"
 			generateb2cQr = False
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
@@ -230,7 +212,6 @@ def Reinitiate_invoice(data):
 		itemsInsert = insert_items(items,data['guest_data']['invoice_number'])
 		# insert tax summaries
 		# insert_tax_summaries(items_data, data['invoice_number'])
-		# taxSummariesInsert = insert_tax_summaries2(items, data['guest_data']['invoice_number'])
 		taxSummariesInsert = TaxSummariesInsert(items, data['guest_data']['invoice_number'])
 		# insert sac code based taxes
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
@@ -746,7 +727,7 @@ def reprocess_calulate_items(data):
 				"sac_index": sac_code_based_gst_rates.sac_index
 			})
 		total_items.extend(second_list)
-		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
+		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_invoice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
 		reinitiate = Reinitiate_invoice(final_data)
 		if reinitiate["success"] == True:
 			return {"success": True}

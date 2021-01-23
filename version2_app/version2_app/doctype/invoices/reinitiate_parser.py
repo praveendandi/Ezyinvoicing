@@ -128,7 +128,7 @@ def reinitiateInvoice(data):
 		 "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 		)
 		check_date = re.findall(pattern, i)
-		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Allow " not in i and "Vat" not in i and "VAT" not in i:
+		if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Vat" not in i and "VAT" not in i:
 			item = dict()
 			item_value = ""
 			dt = i.strip()
