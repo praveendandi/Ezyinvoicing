@@ -2731,7 +2731,6 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	# try:
-	
 	if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 		data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
 		if not frappe.db.exists('Invoices', data['invoice_number']):
@@ -2804,6 +2803,7 @@ def Error_Insert_invoice(data):
 			"other_charges":
 			0,  
 			'mode':company.mode,
+			'total_invoice_amount':data['total_invoice_amount'],
 			'irn_cancelled':
 			'No',
 			'qr_code_generated':
@@ -2839,6 +2839,7 @@ def Error_Insert_invoice(data):
 	# if invoiceExists.invoice_type == "B2B":
 	invoiceExists.ready_to_generate_irn = "No"
 	invoiceExists.irn_generated = "Error"
+	invoiceExists.total_invoice_amount = data['total_invoice_amount']
 	# invoiceExists.qr_generated = "Pending"
 
 
