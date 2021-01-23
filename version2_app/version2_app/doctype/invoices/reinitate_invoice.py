@@ -134,7 +134,7 @@ def Reinitiate_invoice(data):
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
-		doc.total_inovice_amount = data['total_invoice_amount']	
+		doc.total_inovice_amount = total_invoice_amount
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
@@ -192,8 +192,9 @@ def Reinitiate_invoice(data):
 			irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
-		if data['total_invoice_amount'] == 0:
+		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
+			irn_generated = "Zero Invoice"
 			generateb2cQr = False
 		else:
 			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
@@ -389,6 +390,9 @@ def reprocess_calulate_items(data):
 				total_items_data["sort_order"] = each_item["sort_order"]
 				total_items_data["item_name"] = each_item['item_name']
 				total_items_data["item_value"] = each_item["item_value"]
+				total_items_data["unit_of_measurement_description"] = each_item["unit_of_measurement_description"]
+				total_items_data["quantity"] = each_item["quantity"]
+				total_items_data["unit_of_measurement"] = each_item["unit_of_measurement"]
 				total_items_data["sac_index"] = sac_code_based_gst_rates.sac_index
 				item_list.append(total_items_data)
 		for item in item_list:
@@ -511,6 +515,9 @@ def reprocess_calulate_items(data):
 				service_dict['item_taxable_value'] = scharge_value 
 				service_dict['item_value'] = scharge_value
 				service_dict['taxable'] = sac_code_based_gst_rates.taxble
+				service_dict['unit_of_measurement']= item["unit_of_measurement"]
+				service_dict['quantity'] = item["quantity"]
+				service_dict['unit_of_measurement_description'] = item["unit_of_measurement_description"]
 				# service_dict['cess'] = 0
 				# service_dict['cess_amount'] = 0
 				# service_dict['state_cess'] = 0
@@ -724,10 +731,13 @@ def reprocess_calulate_items(data):
 				"is_manual_edit":item["manual_edit"],
 				"is_service_charge_item": "No",
 				"exempted":sac_code_based_gst_rates.exempted,
-				"sac_index": sac_code_based_gst_rates.sac_index
+				"sac_index": sac_code_based_gst_rates.sac_index,
+				'unit_of_measurement': item["unit_of_measurement"],
+				'quantity': item["quantity"],
+				'unit_of_measurement_description': item["unit_of_measurement_description"]
 			})
 		total_items.extend(second_list)
-		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_invoice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
+		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
 		reinitiate = Reinitiate_invoice(final_data)
 		if reinitiate["success"] == True:
 			return {"success": True}
