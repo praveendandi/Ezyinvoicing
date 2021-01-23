@@ -8,13 +8,8 @@ import traceback
 from math import floor
 from frappe.utils import get_site_name
 import time
-<<<<<<< HEAD
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert
-=======
-from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
-from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_tax_summaries2,insert_hsn_code_based_taxes,send_invoicedata_to_gcb
->>>>>>> SEZ-TemporarySAC-Calulations
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 import math
@@ -27,6 +22,8 @@ def Reinitiate_invoice(data):
 	'''
 	try:
 		# print(data,"   /////")
+		if "invoice_category" not in list(data['guest_data']):
+			data['guest_data']['invoice_category'] = "Tax Invoice"
 		generateb2cQr = True
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']

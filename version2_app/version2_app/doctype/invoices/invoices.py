@@ -911,6 +911,8 @@ def insert_invoice(data):
 	'''
 	try:
 		# print(data,"/////")
+		if "invoice_category" not in list(data['guest_data']):
+			data['guest_data']['invoice_category'] = "Tax Invoice"
 		company = frappe.get_doc('company',data['company_code'])
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
