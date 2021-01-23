@@ -55,7 +55,6 @@ def reinitiateInvoice(data):
 	membership = ''
 	print_by = ''
 	roomNumber = ""
-	invoice_category = "Tax Invoice"
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -174,7 +173,6 @@ def reinitiateInvoice(data):
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
-	guest['invoice_category'] = invoice_category
 
 	check_invoice = check_invoice_exists(guest['invoice_number'])
 	if check_invoice['success']==True:
@@ -195,23 +193,18 @@ def reinitiateInvoice(data):
 		error_data['gst_number'] == " "
 	error_data['state_code'] = "37"
 	error_data['room_number'] = guest['room_number']
-	error_data['total_invoice_amount'] = total_invoice_amount
+	error_data['pincode'] = "520008"
 	# gstNumber = "12345"
-	# print(guest['invoice_number'])
-
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
-		error_data['error_message'] = "Invalid GstNumber"
+		error_data['error_message'] = "The given gst number is not a vaild one"
 		error_data['amened'] = amened
-		
-		errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-		error_data['items_data'] = errorcalulateItemsApiResponse['data']
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
-		return {"success":False,"message":"Invalid GstNumber"}
+		return {"success":False,"message":"The given gst number is not a vaild one"}
 
 
-
+	print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':

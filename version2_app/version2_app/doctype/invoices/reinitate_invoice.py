@@ -226,7 +226,7 @@ def Reinitiate_invoice(data):
 @frappe.whitelist(allow_guest=True)
 def reprocess_calulate_items(data):
 	#items, invoice_number,company_code
-	try:
+	# try:
 		final_data = {}
 		total_items = []
 		second_list = []
@@ -305,11 +305,11 @@ def reprocess_calulate_items(data):
 						total_items_data["date"] = each_item['date']
 						total_items_data["manual_edit"] = each_item["manual_edit"]
 						if total_items_data["service_charge"] == "Yes":
-							total_items_data["service_charge_rate"] = each_item["service_charge_rate"]
+							total_items_data["service_charge_rate"] = float(each_item["service_charge_rate"])
 							total_items_data["service_charge_tax_applies"] = each_item["service_charge_tax_applies"]
 							if total_items_data["service_charge_tax_applies"] == "Seperate GST":
 								total_items_data["service_charge_tax_applies"] = "Separate GST"
-								total_items_data["sc_gst_tax_rate"] = each_item["sc_gst_tax_rate"]
+								total_items_data["sc_gst_tax_rate"] = float(each_item["sc_gst_tax_rate"])
 								total_items_data["sc_sac_code"] = each_item["sc_sac_code"]
 					else:
 						# total_items_data["cgst"] = sac_code_based_gst_rates.cgst
@@ -427,17 +427,17 @@ def reprocess_calulate_items(data):
 						igst_percentage = item["sc_gst_tax_rate"]
 						gst_percentage = 0
 						sac_code_new = item["sc_sac_code"]
-						vat_rate_percentage = 0
+						vat_rate_percentage = item["vat"]
 					elif sez == 1 and sac_code_based_gst_rates.exempted == 1:
 						igst_percentage = 0
 						gst_percentage = 0
 						sac_code_new = item["sc_sac_code"]
-						vat_rate_percentage = 0
+						vat_rate_percentage = item["vat"]
 					else:
 						gst_percentage = item["sc_gst_tax_rate"]
 						igst_percentage = 0
 						sac_code_new = item["sc_sac_code"]
-						vat_rate_percentage = 0
+						vat_rate_percentage = item["vat"]
 				else:
 					gst_percentage = 0
 					igst_percentage = 0
@@ -743,6 +743,6 @@ def reprocess_calulate_items(data):
 			return {"success": True}
 		else:
 			return {"success": False}
-	except Exception as e:
-		print(e, "calculation api")
-		return {"success": False, "message": str(e)}
+	# except Exception as e:
+	# 	print(e, "calculation api")
+	# 	return {"success": False, "message": str(e)}

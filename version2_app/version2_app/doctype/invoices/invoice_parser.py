@@ -12,7 +12,7 @@ from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
+# from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
@@ -56,7 +56,6 @@ def file_parsing(filepath):
 	print_by = ''
 	roomNumber = ""
 	reupload = False
-	invoice_category = "Tax Invoice"
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -172,7 +171,6 @@ def file_parsing(filepath):
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
-	guest['invoice_category'] = invoice_category
 
 	check_invoice = check_invoice_exists(guest['invoice_number'])
 	if check_invoice['success']==True:
@@ -188,7 +186,8 @@ def file_parsing(filepath):
 				if inv_data.irn_generated=="Pending" or inv_data.irn_generated == "Error":
 					reupload = True
 			else:
-				reupload = True
+				if inv_data.qr_generated=="Pending" or inv_data.irn_generated=="Error":
+					reupload = True
 	company_code = {"code":"NVV-01"}
 	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"NVV-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
@@ -199,20 +198,17 @@ def file_parsing(filepath):
 	error_data['state_code'] = "37"
 	error_data['room_number'] = guest['room_number']
 	error_data['pincode'] = "520008"
-	error_data['total_invoice_amount'] = total_invoice_amount
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
 
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
-		error_data['error_message'] = "Invalid GstNumber"
+		error_data['error_message'] = "The given gst number is not a vaild one"
 		error_data['amened'] = amened
-		
-		errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-		error_data['items_data'] = errorcalulateItemsApiResponse['data']
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
-		return {"success":False,"message":"Invalid GstNumber"}
+		return {"success":False,"message":"The given gst number is not a vaild one"}
+
 
 
 	   
@@ -234,6 +230,7 @@ def file_parsing(filepath):
 							if insertInvoiceApiResponse['success']== True:
 								print("Invoice Created",insertInvoiceApiResponse)
 								return {"success":True,"message":"Invoice Created"}
+					
 							else:
 								error_data['error_message'] = insertInvoiceApiResponse['message']
 								error_data['amened'] = amened

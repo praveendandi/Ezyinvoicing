@@ -1840,6 +1840,7 @@ def calulate_items(data):
 		print(e, "calculation api")
 		return {"success": False, "message": str(e)}
 
+
 def insert_tax_summariesd(items, invoice_number):
 	try:
 		tax_list = []
