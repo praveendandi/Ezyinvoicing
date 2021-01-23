@@ -33,7 +33,10 @@
   "state_cess",
   "state_cess_amount",
   "vat",
-  "vat_amount"
+  "vat_amount",
+  "is_manual_edit",
+  "is_service_charge_item",
+  "sac_index"
  ],
  "fields": [
   {
@@ -206,12 +209,31 @@
    "fieldname": "state_cess_amount",
    "fieldtype": "Float",
    "label": "State Cess Amount"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_service_charge_item",
+   "fieldtype": "Select",
+   "label": "Is Service Charge Item",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_manual_edit",
+   "fieldtype": "Select",
+   "label": "Is Manual Edit",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "sac_index",
+   "fieldtype": "Data",
+   "label": "SAC Index"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-01-08 11:26:42.556407",
+ "modified": "2021-01-23 10:01:32.356702",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
