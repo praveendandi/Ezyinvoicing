@@ -763,14 +763,11 @@
    "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
   },
   {
-<<<<<<< HEAD
    "fieldname": "total_invoice_amount",
    "fieldtype": "Float",
    "label": "Total Invoice Amount"
   },
   {
-=======
->>>>>>> SEZ-TemporarySAC-Calulations
    "fieldname": "place_of_supply",
    "fieldtype": "Data",
    "label": "Place Of Supply"
@@ -790,11 +787,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
-<<<<<<< HEAD
  "modified": "2021-01-22 17:50:29.790320",
-=======
- "modified": "2021-01-22 09:33:40.433206",
->>>>>>> SEZ-TemporarySAC-Calulations
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
