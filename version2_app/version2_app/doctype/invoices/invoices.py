@@ -26,7 +26,7 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
+import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -1299,7 +1299,7 @@ def insert_items(items, invoice_number):
 
 @frappe.whitelist(allow_guest=True)
 def calulate_items(data):
-	#items, invoice_number,company_code
+	# items, invoice_number,company_code
 	try:
 		# print(data)
 		total_items = []
@@ -1307,17 +1307,7 @@ def calulate_items(data):
 		if "guest_data" in list(data.keys()):
 			invoice_category = data['guest_data']['invoice_category']
 		else:
-			invoice_category = "Tax Invoice"	
-		for item in data['items']:
-			final_item = {}
-			if "quantity" in list(item.keys()):
-				final_item['unit_of_measurement']=item['unit_of_measurement']
-				final_item['unit_of_measurement_description'] = item['unit_of_measurement_description']
-				final_item['quantity'] = item['quantity']
-			else:
-				final_item['unit_of_measurement']= "OTH"
-				final_item['unit_of_measurement_description'] = "OTHERS"
-				final_item['quantity'] = 1
+			invoice_category = "Tax Invoice"
 		companyDetails = frappe.get_doc('company', data['company_code'])
 		data['invoice_item_date_format'] = companyDetails.invoice_item_date_format
 		# companyDetails = frappe.get_doc('company', data['company_code'])
@@ -1341,6 +1331,14 @@ def calulate_items(data):
 				placeofsupply = companyDetails.state_code
 		for item in data['items']:
 			final_item = {}
+			if "quantity" in list(item.keys()):
+				final_item['unit_of_measurement']=item['unit_of_measurement']
+				final_item['unit_of_measurement_description'] = item['unit_of_measurement_description']
+				final_item['quantity'] = item['quantity']
+			else:
+				final_item['unit_of_measurement']= "OTH"
+				final_item['unit_of_measurement_description'] = "OTHERS"
+				final_item['quantity'] = 1
 			scharge = companyDetails.service_charge_percentage
 			if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
 				if companyDetails.allowance_type == "Credit":

@@ -9,7 +9,7 @@ from frappe.utils import get_site_name
 import time
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
+import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)

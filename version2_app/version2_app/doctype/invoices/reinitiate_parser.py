@@ -186,8 +186,8 @@ def reinitiateInvoice(data):
 			guest['invoice_number'] = inv_data.name
 			amened='No'
 	
-	company_code = {"code":"Pullman-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"Pullman-01","invoice_date":date_time_obj}
+	company_code = {"code":"NVV-01"}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"NVV-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
