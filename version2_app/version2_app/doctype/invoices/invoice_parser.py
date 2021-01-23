@@ -12,7 +12,7 @@ from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-# from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
+from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
@@ -56,6 +56,7 @@ def file_parsing(filepath):
 	print_by = ''
 	roomNumber = ""
 	reupload = False
+	invoice_category = "Tax Invoice"
 	for i in raw_data:
 		if "Confirmation No." in i:
 			confirmation_number = i.split(":")
@@ -171,6 +172,7 @@ def file_parsing(filepath):
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
+	guest['invoice_category'] = invoice_category
 
 	check_invoice = check_invoice_exists(guest['invoice_number'])
 	if check_invoice['success']==True:
@@ -203,12 +205,14 @@ def file_parsing(filepath):
 
 	if len(gstNumber) < 15 and len(gstNumber)>0:
 		error_data['invoice_file'] = filepath
-		error_data['error_message'] = "The given gst number is not a vaild one"
+		error_data['error_message'] = "Invalid GstNumber"
 		error_data['amened'] = amened
+		
+		errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+		error_data['items_data'] = errorcalulateItemsApiResponse['data']
 		errorInvoice = Error_Insert_invoice(error_data)
 		print("Error:  *******The given gst number is not a vaild one**********")
-		return {"success":False,"message":"The given gst number is not a vaild one"}
-
+		return {"success":False,"message":"Invalid GstNumber"}
 
 
 	   

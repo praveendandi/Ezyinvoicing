@@ -1,5 +1,5 @@
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 import frappe
 import requests
 import os
