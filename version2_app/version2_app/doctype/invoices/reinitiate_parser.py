@@ -25,7 +25,7 @@ def reinitiateInvoice(data):
 	filepath = data['filepath']
 	reupload_inv_number = data['invoice_number']
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HRBF-01")
+	companyCheckResponse = check_company_exist("NVV-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -70,19 +70,19 @@ def reinitiateInvoice(data):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST No." in i:
+		if "GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
-			gstNumber = gstNumber.replace("Membership","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+			invoiceNumber = invoiceNumber.replace("HA0L1","HA0L")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:
 			guestDetailsEntered = False
 		if guestDetailsEntered == True:
 			guestDeatils.append(i)
-		if i.strip() in "Date Description Reference Debit Credit" or i.strip() in "Date  Description  Reference  Debit  Credit" or i.strip() in "Date Description Reference Debit (Rs) Credit (Rs)":
+		if i.strip() in "Date Description Reference Debit Credit" or i.strip() in "Date  Description  Reference  Debit  Credit":
 			entered = True
 		if 'CGST 6%=' in i:
 			entered = False
@@ -94,7 +94,7 @@ def reinitiateInvoice(data):
 			data.append(i)
 		if "Guest Name" in i:
 			guestDeatils.append(i)
-		if "Membership" in i and "~" not in i:
+		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
@@ -170,7 +170,7 @@ def reinitiateInvoice(data):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HRBF-01"
+	guest['company_code'] = "NVV-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -193,7 +193,7 @@ def reinitiateInvoice(data):
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "6"
+	error_data['state_code'] = "37"
 	error_data['room_number'] = guest['room_number']
 	error_data['total_invoice_amount'] = total_invoice_amount
 	# gstNumber = "12345"
@@ -212,7 +212,6 @@ def reinitiateInvoice(data):
 
 
 
-	print(json.dumps(guest, indent = 1))
 	gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 	if gspApiDataResponse['success'] == True:
 		if guest['invoice_type'] == 'B2B':

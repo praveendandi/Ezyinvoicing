@@ -25,7 +25,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	start_time = datetime.datetime.utcnow()
-	companyCheckResponse = check_company_exist("HRBF-01")
+	companyCheckResponse = check_company_exist("NVV-01")
 	site_folder_path = companyCheckResponse['data'].site_name
 	file_path = folder_path+'/sites/'+site_folder_path+filepath
 	today = date.today()
@@ -71,19 +71,19 @@ def file_parsing(filepath):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "GST No." in i:
+		if "GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
-			gstNumber = gstNumber.replace("Membership","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+			invoiceNumber = invoiceNumber.replace("HA0L1","HA0L")
 		if "Bill To" in i:
 			guestDetailsEntered = True
 		if "Checkout By:" in i:
 			guestDetailsEntered = False
 		if guestDetailsEntered == True:
 			guestDeatils.append(i)
-		if i.strip() in "Date Description Reference Debit Credit" or i.strip() in "Date  Description  Reference  Debit  Credit" or i.strip() in "Date Description Reference Debit (Rs) Credit (Rs)":
+		if i.strip() in "Date Description Reference Debit Credit" or i.strip() in "Date  Description  Reference  Debit  Credit":
 			entered = True
 		if 'CGST 6%=' in i:
 			entered = False
@@ -95,7 +95,7 @@ def file_parsing(filepath):
 			data.append(i)
 		if "Guest Name" in i:
 			guestDeatils.append(i)
-		if "Membership" in i and "~" not in i:
+		if "Membership" in i:
 			Membership = i.split(":")
 			membership = Membership[-1].replace(" ", "")
 		if "Printed By / On" in i:
@@ -168,7 +168,7 @@ def file_parsing(filepath):
 	guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 	guest['gstNumber'] = gstNumber
 	guest['room_number'] = int(roomNumber)
-	guest['company_code'] = "HRBF-01"
+	guest['company_code'] = "NVV-01"
 	guest['confirmation_number'] = conf_number
 	guest['start_time'] = str(start_time)
 	guest['print_by'] = print_by
@@ -188,18 +188,17 @@ def file_parsing(filepath):
 				if inv_data.irn_generated=="Pending" or inv_data.irn_generated == "Error":
 					reupload = True
 			else:
-				if inv_data.qr_generated=="Pending" or inv_data.irn_generated=="Error":
-					reupload = True
-	company_code = {"code":"HRBF-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"HRBF-01","invoice_date":date_time_obj}
+				reupload = True
+	company_code = {"code":"NVV-01"}
+	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"NVV-01","invoice_date":date_time_obj}
 	error_data['invoice_file'] = filepath
 	error_data['guest_name'] = guest['name']
 	error_data['gst_number'] = gstNumber
 	if guest['invoice_type'] == "B2C":
 		error_data['gst_number'] == " "
-	error_data['state_code'] = "6"
+	error_data['state_code'] = "37"
 	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = "121001"
+	error_data['pincode'] = "520008"
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
 
@@ -234,7 +233,6 @@ def file_parsing(filepath):
 							if insertInvoiceApiResponse['success']== True:
 								print("Invoice Created",insertInvoiceApiResponse)
 								return {"success":True,"message":"Invoice Created"}
-					
 							else:
 								error_data['error_message'] = insertInvoiceApiResponse['message']
 								error_data['amened'] = amened

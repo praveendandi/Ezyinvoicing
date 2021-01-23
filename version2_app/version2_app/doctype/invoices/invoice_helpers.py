@@ -11,12 +11,7 @@ import datetime
 def TotalMismatchError(data,calculated_data):
     try:
         invType = data['guest_data']['invoice_type']
-        if invType == "B2B":
-            irn_generated = "Error"
-            qr_generated = "Pending"
-        else:
-            irn_generated = "NA"
-            qr_generated = "Error"    
+        irn_generated = "Error"   
         invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -76,7 +71,7 @@ def TotalMismatchError(data,calculated_data):
                 "pms_invoice_summary":
                 round(calculated_data['pms_invoice_summary'], 2) ,
                 'irn_generated':irn_generated,
-                'qr_generated':qr_generated,
+                # 'qr_generated':qr_generated,
                 'irn_cancelled':
                 'No',
                 'qr_code_generated':
@@ -149,7 +144,7 @@ def TotalMismatchError(data,calculated_data):
         return {"success":False,"message":str(e)}    
         
 
-def CheckRatePercentages(data):
+def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
     try:
         if data['item_value']>1000 and data['item_value']<=7500:
             gst_percentage = 12
@@ -159,7 +154,20 @@ def CheckRatePercentages(data):
             gst_percentage = 0
         else:
             gst_percentage = 0
-        return {"success":True,"gst_percentage":gst_percentage}
+        if placeofsupply != state_code:
+            igst_percentage = gst_percentage
+            gst_percentage = 0
+        elif sez == 1:
+            if exempted == 1:
+                gst_percentage = 0
+                igst_percentage = 0
+            else:
+                igst_percentage = gst_percentage
+                gst_percentage = 0
+        else:
+            gst_percentage = gst_percentage
+            igst_percentage = 0
+        return {"success":True,"gst_percentage":gst_percentage,"igst_percentage":igst_percentage}
     except Exception as e:
         return {"success":False,"message":str(e)}
 
@@ -169,12 +177,10 @@ def error_invoice_calculation(data,data1):
     # print(data1)
     company = frappe.get_doc('company',data['company_code'])
     invType = data1['invoice_type']
-    if invType == "B2B":
-        irn_generated = "Error"
-        qr_generated = "Pending"
-    else:
-        irn_generated = "NA"
-        qr_generated = "Error"
+    # if invType == "B2B":
+    irn_generated = "Error"
+    # qr_generated = "Pending"
+
 
     invoice = frappe.get_doc({
         'doctype':
@@ -193,7 +199,7 @@ def error_invoice_calculation(data,data1):
         'room_number':
         data1['room_number'],
         'irn_generated':irn_generated,
-        'qr_generated':qr_generated,
+        # 'qr_generated':qr_generated,
         'invoice_date':
         datetime.datetime.strptime(data1['invoice_date'],
                                 '%d-%b-%y %H:%M:%S'),
@@ -394,7 +400,7 @@ def error_invoice_calculation(data,data1):
     doc.igst_amount=round(igst_amount,2)
     doc.total_gst_amount = round(cgst_amount,2) + round(sgst_amount,2) + round(igst_amount,2)
     doc.irn_cancelled='No'
-    doc.qr_code_generated='Pending'
+    # doc.qr_code_generated='Pending'
     doc.signed_invoice_generated='No'
     # doc.company=data['company_code']
     # doc.print_by = data['guest_data']['print_by']
