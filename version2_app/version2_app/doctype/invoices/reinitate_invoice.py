@@ -254,7 +254,7 @@ def reprocess_calulate_items(data):
 						total_items.append(each_item)
 						continue
 					else:
-						if manual_edit == "No":
+						if each_item["manual_edit"] == "No":
 							total_items.append(each_item)
 							continue
 			else:
@@ -263,7 +263,7 @@ def reprocess_calulate_items(data):
 							total_items.append(each_item)
 							continue
 					else:
-						if manual_edit == "No":
+						if each_item["manual_edit"] == "No":
 							total_items.append(each_item)
 							continue
 			if each_item["is_service_charge_item"] == "No" and isinstance(each_item["sort_order"], int):
