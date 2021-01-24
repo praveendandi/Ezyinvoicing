@@ -248,10 +248,11 @@ def reprocess_calulate_items(data):
 		else:
 			sez = 0
 		for each_item in data['items_data']:
-			if sez == 0 and "manual_edit" in each_item:
-				if (each_item["is_manual_edit"] == "Yes" and each_item["manual_edit"] == "No") or (each_item["is_manual_edit"] == "No" and each_item["manual_edit"] == "No"):
-					total_items.append(each_item)
-					continue
+			if sez == 0:
+				if  "manual_edit" in each_item:
+					if (each_item["is_manual_edit"] == "Yes" and each_item["manual_edit"] == "No") or (each_item["is_manual_edit"] == "No" and each_item["manual_edit"] == "No"):
+						total_items.append(each_item)
+						continue
 			else:
 				if invoice_details.sez == 1 and sez != 0:
 					if (each_item["is_manual_edit"] == "Yes" and each_item["manual_edit"] == "No") or (each_item["is_manual_edit"] == "No" and each_item["manual_edit"] == "No"):
