@@ -230,14 +230,15 @@ def Reinitiate_invoice(data):
 
 @frappe.whitelist(allow_guest=True)
 def reprocess_calulate_items(data):
-	#items, invoice_number,company_code
-	# try:
+	# items, invoice_number,company_code
+	try:
 		final_data = {}
 		total_items = []
 		second_list = []
 		item_list = []
 		data['guest_data']['invoice_date'] = datetime.datetime.strptime(data['guest_data']['invoice_date'],"%Y-%m-%d").strftime('%d-%b-%y %H:%M:%S')
 		companyDetails = frappe.get_doc('company', data["guest_data"]['company_code'])
+		invoice_details = frappe.get_doc('Invoices', data["invoice_number"])
 		if "place_of_supply" in data:
 			placeofsupply = data["place_of_supply"]
 		else:
@@ -247,6 +248,15 @@ def reprocess_calulate_items(data):
 		else:
 			sez = 0
 		for each_item in data['items_data']:
+			if sez == 0:
+				if (each_item["is_manual_edit"] == "Yes" and each_item["manual_edit"] == "No") or (each_item["is_manual_edit"] == "No" and each_item["manual_edit"] == "No"):
+					total_items.append(each_item)
+					continue
+			else:
+				if invoice_details.sez == 1:
+					if (each_item["is_manual_edit"] == "Yes" and each_item["manual_edit"] == "No") or (each_item["is_manual_edit"] == "No" and each_item["manual_edit"] == "No"):
+						total_items.append(each_item)
+						continue
 			if each_item["is_service_charge_item"] == "No" and isinstance(each_item["sort_order"], int):
 				final_item = {}
 				if companyDetails.allowance_type == "Credit":
@@ -748,6 +758,6 @@ def reprocess_calulate_items(data):
 			return {"success": True}
 		else:
 			return {"success": False}
-	# except Exception as e:
-	# 	print(e, "calculation api")
-	# 	return {"success": False, "message": str(e)}
+	except Exception as e:
+		print(e, "calculation api")
+		return {"success": False, "message": str(e)}

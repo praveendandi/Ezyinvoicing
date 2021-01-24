@@ -37,7 +37,8 @@
   "unit_of_measurement_description",
   "quantity",
   "sac_index",
-  "is_service_charge_item"
+  "is_service_charge_item",
+  "is_manual_edit"
  ],
  "fields": [
   {
@@ -233,12 +234,19 @@
    "fieldtype": "Select",
    "label": "Is Service Charge Item",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_manual_edit",
+   "fieldtype": "Select",
+   "label": "is_manual_edit",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-01-23 17:24:00.979049",
+ "modified": "2021-01-24 11:29:55.306836",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
