@@ -249,23 +249,23 @@ def reprocess_calulate_items(data):
 			sez = 0
 		for each_item in data['items_data']:
 			if sez == 0:
-					if each_item["is_manual_edit"] == "Yes":
-						if "manual_edit" not in each_item:
+				if each_item["is_manual_edit"] == "Yes":
+					if "manual_edit" not in each_item:
+						total_items.append(each_item)
+						continue
+					else:
+						if manual_edit == "No":
 							total_items.append(each_item)
 							continue
-						else:
-							if manual_edit == "No":
-								total_items.append(each_item)
-								continue
 			else:
 				if invoice_details.sez == 1 and sez != 0:
 					if "manual_edit" not in each_item:
 							total_items.append(each_item)
 							continue
-						else:
-							if manual_edit == "No":
-								total_items.append(each_item)
-								continue
+					else:
+						if manual_edit == "No":
+							total_items.append(each_item)
+							continue
 			if each_item["is_service_charge_item"] == "No" and isinstance(each_item["sort_order"], int):
 				final_item = {}
 				if companyDetails.allowance_type == "Credit":
