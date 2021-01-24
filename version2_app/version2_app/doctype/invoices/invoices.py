@@ -1056,14 +1056,15 @@ def insert_invoice(data):
 						return {"success": True}
 
 					return{"success":False,"message":TotalMismatchErrorAPI['message']}
-		qr_generated = "Pending"
+		# qr_generated = "Pending"
 		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
-			if data['guest_data']['invoice_type']=="B2B":
-				irn_generated = "Zero Invoice"
-				qr_generated = "Pending"
-			else:
-				qr_generated = "Zero Invoice"
-				irn_generated = "NA"
+			irn_generated = "Zero Invoice"
+			# if data['guest_data']['invoice_type']=="B2B":
+			# 	irn_generated = "Zero Invoice"
+			# 	qr_generated = "Pending"
+			# else:
+			# 	qr_generated = "Zero Invoice"
+			# 	irn_generated = "NA"
 
 		invoice = frappe.get_doc({
 			'doctype':

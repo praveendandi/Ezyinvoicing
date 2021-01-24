@@ -56,10 +56,7 @@ def Reinitiate_invoice(data):
 		has_discount_items = "No"
 		has_credit_items = "No"
 		# print(data['items_data'])
-		if data['guest_data']['invoice_type'] == "B2B":
-			irn_generated = "Pending"
-		else:
-			irn_generated = "NA"
+		irn_generated = "Pending"
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
 		#calculat items
