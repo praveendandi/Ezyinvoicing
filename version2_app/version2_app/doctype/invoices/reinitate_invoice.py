@@ -228,7 +228,7 @@ def Reinitiate_invoice(data):
 @frappe.whitelist(allow_guest=True)
 def reprocess_calulate_items(data):
 	# items, invoice_number,company_code
-	# try:
+	try:
 		final_data = {}
 		total_items = []
 		second_list = []
@@ -769,6 +769,6 @@ def reprocess_calulate_items(data):
 			return {"success": True}
 		else:
 			return {"success": False}
-	# except Exception as e:
-	# 	print(e, "calculation api")
-	# 	return {"success": False, "message": str(e)}
+	except Exception as e:
+		print(e, "calculation api")
+		return {"success": False, "message": str(e)}
