@@ -239,14 +239,14 @@
    "default": "No",
    "fieldname": "is_manual_edit",
    "fieldtype": "Select",
-   "label": "is_manual_edit",
+   "label": "Is Manual Edit",
    "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-01-24 11:29:55.306836",
+ "modified": "2021-01-24 13:06:51.643654",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",

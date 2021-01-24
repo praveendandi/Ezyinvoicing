@@ -248,7 +248,7 @@ def reprocess_calulate_items(data):
 		else:
 			sez = 0
 		for each_item in data['items_data']:
-			if sez == 0:
+			if sez == 0 and "manual_edit" in each_item:
 				if (each_item["is_manual_edit"] == "Yes" and each_item["manual_edit"] == "No") or (each_item["is_manual_edit"] == "No" and each_item["manual_edit"] == "No"):
 					total_items.append(each_item)
 					continue
@@ -410,6 +410,11 @@ def reprocess_calulate_items(data):
 				total_items_data["unit_of_measurement"] = each_item["unit_of_measurement"]
 				total_items_data["sac_index"] = sac_code_based_gst_rates.sac_index
 				item_list.append(total_items_data)
+		for service_charge_items in total_items:
+			if service_charge_items["is_service_charge_item"] == "Yes":
+				for new in item_list:
+					if int(new["sort_order"]) == int(service_charge_items["sort_order"]):
+						del total_items[total_items.index(service_charge_items)]
 		for item in item_list:
 			sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',item['item_name']]})
 			if not sac_code_based_gst:
