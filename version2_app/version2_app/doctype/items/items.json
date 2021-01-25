@@ -38,7 +38,8 @@
   "quantity",
   "sac_index",
   "is_service_charge_item",
-  "is_manual_edit"
+  "is_manual_edit",
+  "discount_value"
  ],
  "fields": [
   {
@@ -241,12 +242,17 @@
    "fieldtype": "Select",
    "label": "Is Manual Edit",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "discount_value",
+   "fieldtype": "Float",
+   "label": "Discount Value"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-01-24 13:06:51.643654",
+ "modified": "2021-01-25 20:30:36.973268",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
