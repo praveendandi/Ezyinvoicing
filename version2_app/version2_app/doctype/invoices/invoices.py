@@ -936,10 +936,7 @@ def insert_invoice(data):
 		total_credit_vat_amount =0
 		has_discount_items = "No"
 		has_credit_items = "No"
-		if data['guest_data']['invoice_type'] == "B2B":
-			irn_generated = "Pending"
-		else:
-			irn_generated = "NA"
+		irn_generated = "Pending"
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
 		#calculat items
@@ -1301,7 +1298,6 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
-		# print(data)
 		total_items = []
 		second_list = []
 		if "guest_data" in list(data.keys()):
@@ -1466,8 +1462,8 @@ def calulate_items(data):
 					if gst_value==0:
 						gst_value = (gst_percentage* scharge_value)/100.0
 						igst_value = (igst_percentage* scharge_value)/100.0
-					service_dict['item_name'] = item['name']+"-SC "
-					service_dict['description'] = item['name']+"-SC "
+					service_dict['item_name'] = item['name']+"-SC " + str(scharge)
+					service_dict['description'] = item['name']+"-SC " + str(scharge)
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
 					service_dict['sac_code'] = sac_code_new
 					service_dict['sac_code_found'] = 'Yes'
@@ -2816,7 +2812,8 @@ def Error_Insert_invoice(data):
 			'ready_to_generate_irn':
 			"No",
 			'error_message':
-			data['error_message']
+			data['error_message'],
+			"place_of_supply":company.state_code
 		})
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		

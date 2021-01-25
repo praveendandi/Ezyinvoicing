@@ -12,6 +12,7 @@ def TotalMismatchError(data,calculated_data):
     try:
         invType = data['guest_data']['invoice_type']
         irn_generated = "Error"   
+        companyDetails = frappe.get_doc("company",data['company_code'])
         invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -112,7 +113,8 @@ def TotalMismatchError(data,calculated_data):
                 'total_credit_central_cess_amount':round(calculated_data['total_credit_central_cess_amount'],2),
                 'total_credit_vat_amount': round(calculated_data['total_credit_vat_amount'],2),
                 'credit_gst_amount': round(calculated_data['credit_cgst_amount'],2) + round(calculated_data['credit_sgst_amount'],2) + round(calculated_data['credit_igst_amount'],2),	
-                'error_message':" Invoice Total Mismatch"
+                'error_message':" Invoice Total Mismatch",
+                "place_of_supply":companyDetails.state_code
             })
         if data['amened'] == 'Yes':
             invCount = frappe.db.get_list(

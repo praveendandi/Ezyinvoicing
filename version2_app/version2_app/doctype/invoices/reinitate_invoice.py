@@ -205,6 +205,7 @@ def Reinitiate_invoice(data):
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
 				doc.total_invoice_amount = data["total_invoice_amount"]
+				doc.place_of_supply = company.state_code
 
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
@@ -530,8 +531,8 @@ def reprocess_calulate_items(data):
 					type_item = "Excempted"
 				else:
 					type_item = "Included"
-				service_dict['item_name'] = item['item_name']+"-SC "
-				service_dict['description'] = item['item_name']+"-SC "
+				service_dict['item_name'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
+				service_dict['description'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
 				service_dict['date'] = date_item
 				service_dict['sac_code'] = sac_code_new
 				service_dict['sac_code_found'] = 'Yes'
