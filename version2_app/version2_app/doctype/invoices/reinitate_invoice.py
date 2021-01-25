@@ -26,10 +26,14 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		generateb2cQr = True
+		generateb2cQr = True	
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
+		if "place_of_supply" in data:
+			place_of_supply = data['place_of_supply']
+		else:
+			place_of_supply = company.place_of_supply
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
@@ -169,7 +173,7 @@ def Reinitiate_invoice(data):
 		doc.total_state_cess_amount = total_state_cess_amount
 		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
-		doc.place_of_supply = data["place_of_supply"] if "place_of_supply" in data else company.state_code
+		doc.place_of_supply = place_of_supply
 		doc.sez = data["sez"] if "sez" in data else doc.sez
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
@@ -206,7 +210,7 @@ def Reinitiate_invoice(data):
 				doc.ready_to_generate_irn = "No"
 		
 		doc.total_invoice_amount = data["total_invoice_amount"]
-		doc.place_of_supply = company.state_code
+		doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		
