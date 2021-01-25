@@ -318,10 +318,7 @@ def reprocess_calulate_items(data):
 						else:
 							total_items_data["discount_value"] = 0
 						if "net" in each_item:
-							if each_item["net"] == True:
-								total_items_data["net"] = "Yes"
-							else:
-								total_items_data["net"] = "No"
+							total_items_data["net"] = each_item["net"]
 						else:
 							total_items_data["net"] =  sac_code_based_gst_rates.net
 						if "quantity" in each_item:
@@ -642,7 +639,7 @@ def reprocess_calulate_items(data):
 					final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 					final_item['item_value'] = item['item_value']
 				elif item["net"] == "Yes" and item['sac_code'] != "996311":
-					gst_percentage = (float(item["cgst"]) + float(item["sgst"]) + float(item["igst"]))
+					gst_percentage = (float(item["cgst"]) + float(item["sgst"]))
 					base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 					gst_value = item['item_value'] - base_value
 					final_item['cgst'] = float(item["cgst"])
@@ -653,7 +650,7 @@ def reprocess_calulate_items(data):
 					if float(item["igst"]) <= 0:
 						final_item['igst_amount'] = 0
 					else:
-						base_value = item['item_value'] * (100 / (gst_percentage + 100))
+						base_value = item['item_value'] * (100 / (float(item["igst"]) + 100))
 						final_item['igst_amount'] = item['item_value'] - base_value
 					final_item['gst_rate'] = gst_percentage+final_item['igst']
 					final_item['item_value_after_gst'] = item['item_value']
