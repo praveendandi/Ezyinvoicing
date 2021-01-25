@@ -1478,7 +1478,7 @@ def calulate_items(data):
 					service_dict['sgst_amount'] = gst_value/2
 					service_dict['igst'] = igst_percentage
 					service_dict['igst_amount'] = igst_value
-					service_dict['gst_rate'] = gst_percentage
+					service_dict['gst_rate'] = gst_percentage + igst_percentage
 					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 					service_dict['item_taxable_value'] = scharge_value 
 					service_dict['item_value'] = scharge_value
