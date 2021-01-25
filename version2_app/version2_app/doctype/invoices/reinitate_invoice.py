@@ -204,9 +204,9 @@ def Reinitiate_invoice(data):
 				doc.error_message = " Invoice Total Mismatch"
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
-				doc.total_invoice_amount = data["total_invoice_amount"]
-				doc.place_of_supply = company.state_code
-
+		
+		doc.total_invoice_amount = data["total_invoice_amount"]
+		doc.place_of_supply = company.state_code
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		
