@@ -532,7 +532,7 @@ def reprocess_calulate_items(data):
 					type_item = "Included"
 				service_dict['item_name'] = item['item_name']+"-SC "
 				service_dict['description'] = item['item_name']+"-SC "
-				service_dict['date'] = datetime.datetime.strptime(date_item,companyDetails.invoice_item_date_format)
+				service_dict['date'] = date_item
 				service_dict['sac_code'] = sac_code_new
 				service_dict['sac_code_found'] = 'Yes'
 				service_dict['cgst'] = int(gst_percentage)/2
@@ -714,7 +714,7 @@ def reprocess_calulate_items(data):
 				item['item_name'],
 				'sort_order':final_item['sort_order'],
 				"item_type":sac_code_based_gst_rates.type,
-				'date':datetime.datetime.strptime(date_item,companyDetails.invoice_item_date_format),
+				'date':date_item,
 				'cgst':
 				final_item['cgst'],
 				'cgst_amount':
