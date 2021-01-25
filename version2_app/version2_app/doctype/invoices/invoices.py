@@ -70,7 +70,7 @@ class Invoices(Document):
 					"TaxSch": "GST",
 					"SupTyp": "B2B",
 					"RegRev": "N",
-					"IgstOnIntra": "N"
+					"IgstOnIntra": "Y" if invoice.place_of_supply == company_details['data'].state_code and invoice.sez == 1 else "N"
 				},
 				"SellerDtls": {
 					"Gstin":
@@ -210,7 +210,6 @@ class Invoices(Document):
 								discount_before_value +=item.item_value	
 								discount_after_value += item.item_value_after_gst
 								credit_note_items.append(item.__dict__)
-			# print(gst_data["ItemList"])
 			if invoice.invoice_category == "Credit Invoice":
 				creditIrn = CreditgenerateIrn(invoice_number)
 				return creditIrn
