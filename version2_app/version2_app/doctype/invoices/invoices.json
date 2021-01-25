@@ -121,7 +121,10 @@
   "invoice_category",
   "place_of_supply",
   "credit_igst_amount",
-  "sez"
+  "sez",
+  "converted_from_b2b",
+  "converted_from_b2b_time",
+  "converted_from_b2b_by"
  ],
  "fields": [
   {
@@ -782,12 +785,29 @@
    "fieldname": "sez",
    "fieldtype": "Check",
    "label": "SEZ"
+  },
+  {
+   "default": "No",
+   "fieldname": "converted_from_b2b",
+   "fieldtype": "Select",
+   "label": "Converted From B2B",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "converted_from_b2b_time",
+   "fieldtype": "Datetime",
+   "label": "Converted From B2B Time"
+  },
+  {
+   "fieldname": "converted_from_b2b_by",
+   "fieldtype": "Data",
+   "label": "Converted From B2B By"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-22 17:50:29.790320",
+ "modified": "2021-01-25 12:10:43.309725",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

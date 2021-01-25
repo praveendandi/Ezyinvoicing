@@ -197,6 +197,7 @@ def file_parsing(filepath):
 		error_data['gst_number'] == " "
 	error_data['state_code'] = "37"
 	error_data['room_number'] = guest['room_number']
+	error_data["total_invoice_amount"] = total_invoice_amount
 	error_data['pincode'] = "520008"
 	# gstNumber = "12345"
 	# print(guest['invoice_number'])
