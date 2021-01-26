@@ -943,21 +943,21 @@ def insert_invoice(data):
 		if len(data['items_data'])>0:
 			for item in data['items_data']:
 				if item['taxable'] == 'No' and item['item_type'] != "Discount":
-					other_charges += round(item['item_value_after_gst'],2)
-					other_charges_before_tax += round(item['item_value'],2)
-					total_vat_amount += round(item['vat_amount'],2)
+					other_charges += item['item_value_after_gst']
+					other_charges_before_tax += item['item_value']
+					total_vat_amount += item['vat_amount']
 				elif item['taxable']=="No" and item['item_type']=="Discount":
 					discountAmount += item['item_value_after_gst'] 
 				elif item['sac_code'].isdigit():
 					if "-" not in str(item['item_value']):
-						cgst_amount+=round(item['cgst_amount'],2)
-						sgst_amount+=round(item['sgst_amount'],2)
-						igst_amount+=round(item['igst_amount'],2)
-						total_central_cess_amount+=round(item['cess_amount'],2)
-						total_state_cess_amount +=round(item['state_cess_amount'],2)
-						value_before_gst += round(item['item_value'],2)
-						value_after_gst += round(item['item_value_after_gst'],2)
-						total_vat_amount += round(item['vat_amount'],2)
+						cgst_amount+=item['cgst_amount']
+						sgst_amount+=item['sgst_amount']
+						igst_amount+=item['igst_amount']
+						total_central_cess_amount+=item['cess_amount']
+						total_state_cess_amount +=item['state_cess_amount']
+						value_before_gst += item['item_value']
+						value_after_gst += item['item_value_after_gst']
+						total_vat_amount += item['vat_amount']
 						# print(value_before_gst,value_after_gst," ******")
 					else:
 						# cgst_amount+=item['cgst_amount']
@@ -965,14 +965,14 @@ def insert_invoice(data):
 						# igst_amount+=item['igst_amount']
 						# total_central_cess_amount+=item['cess_amount']
 						# total_state_cess_amount +=item['state_cess_amount']
-						credit_cgst_amount+=round(abs(item['cgst_amount']),2)
-						credit_sgst_amount+=round(abs(item['sgst_amount']),2)
-						credit_igst_amount+=round(abs(item['igst_amount']),2)
-						total_credit_central_cess_amount+=round(item['cess_amount'],2)
-						total_credit_state_cess_amount +=round(item['state_cess_amount'],2)
-						credit_value_before_gst += round(abs(item['item_value']),2)
-						credit_value_after_gst += round(abs(item['item_value_after_gst']),2)
-						total_credit_vat_amount += round(item['vat_amount'],2)
+						credit_cgst_amount+=abs(item['cgst_amount'])
+						credit_sgst_amount+=abs(item['sgst_amount'])
+						credit_igst_amount+=abs(item['igst_amount'])
+						total_credit_central_cess_amount+=item['cess_amount']
+						total_credit_state_cess_amount +=item['state_cess_amount']
+						credit_value_before_gst += abs(item['item_value'])
+						credit_value_after_gst += abs(item['item_value_after_gst'])
+						total_credit_vat_amount += item['vat_amount']
 				else:
 					pass
 		# pms_invoice_summary = value_after_gst
