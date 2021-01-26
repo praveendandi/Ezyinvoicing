@@ -1578,7 +1578,7 @@ def calulate_items(data):
 							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
 							final_item["igst"] = 0
 							final_item['type'] = "Included"
-						gst_percentage = final_item["cgst"]+final_item["sgst"]+final_item["igst"]
+						gst_percentage = final_item["cgst"]+final_item["sgst"]
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
 						final_item['cgst_amount'] = round(gst_value / 2,3)
@@ -1587,9 +1587,9 @@ def calulate_items(data):
 						if float(sac_code_based_gst_rates.igst) <= 0:
 							final_item['igst_amount'] = 0
 						else:
-							base_value = item['item_value'] * (100 / (gst_percentage + 100))
+							base_value = item['item_value'] * (100 / (final_item["igst"] + 100))
 							final_item['igst_amount'] = item['item_value'] - base_value
-						final_item['gst_rate'] = gst_percentage
+						final_item['gst_rate'] = gst_percentage + final_item["igst"]
 						final_item['item_value_after_gst'] = item['item_value']
 						final_item['item_value'] = base_value
 					final_item['other_charges'] = 0

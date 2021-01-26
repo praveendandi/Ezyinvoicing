@@ -26,10 +26,14 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
-		generateb2cQr = True
+		generateb2cQr = True	
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
+		if "place_of_supply" in data:
+			place_of_supply = data['place_of_supply']
+		else:
+			place_of_supply = company.place_of_supply
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
@@ -169,7 +173,7 @@ def Reinitiate_invoice(data):
 		doc.total_state_cess_amount = total_state_cess_amount
 		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
-		doc.place_of_supply = data["place_of_supply"] if "place_of_supply" in data else company.state_code
+		doc.place_of_supply = place_of_supply
 		doc.sez = data["sez"] if "sez" in data else doc.sez
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
@@ -206,7 +210,7 @@ def Reinitiate_invoice(data):
 				doc.ready_to_generate_irn = "No"
 		
 		doc.total_invoice_amount = data["total_invoice_amount"]
-		doc.place_of_supply = company.state_code
+		doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		
@@ -313,6 +317,18 @@ def reprocess_calulate_items(data):
 						total_items_data["vat"] = float(each_item["vat"])
 						total_items_data["state_cess"] = float(each_item["state_cess"])
 						total_items_data["cess"] = float(each_item["cess"])
+						if "discount_value" in each_item:
+							total_items_data["discount_value"] = float(each_item["discount_value"])
+						else:
+							total_items_data["discount_value"] = 0
+						if "net" in each_item:
+							total_items_data["net"] = each_item["net"]
+						else:
+							total_items_data["net"] =  sac_code_based_gst_rates.net
+						if "quantity" in each_item:
+							total_items_data["quantity"] = each_item["quantity"]
+						else:
+							total_items_data["quantity"] = 1
 						if "service_chargeEdit" in each_item:
 							total_items_data["service_charge"] = "Yes" if each_item["service_chargeEdit"] == True else "No"
 						else:
@@ -365,6 +381,9 @@ def reprocess_calulate_items(data):
 						total_items_data["service_charge"] = sac_code_based_gst_rates.service_charge
 						total_items_data["date"] = each_item['date']
 						total_items_data["manual_edit"] = "No"
+						total_items_data["discount_value"] = 0
+						total_items_data["net"] =  sac_code_based_gst_rates.net
+						total_items_data["quantity"] = 1
 						if sac_code_based_gst_rates.service_charge == "Yes":
 							if sac_code_based_gst_rates.one_sc_applies_to_all == 1:
 								total_items_data["service_charge_rate"] = companyDetails.service_charge_percentage
@@ -401,6 +420,9 @@ def reprocess_calulate_items(data):
 					total_items_data["service_charge"] = sac_code_based_gst_rates.service_charge
 					total_items_data["date"] = each_item['date']
 					total_items_data["manual_edit"] = "No"
+					total_items_data["discount_value"] = 0
+					total_items_data["net"] =  sac_code_based_gst_rates.net
+					total_items_data["quantity"] = 1
 					if sac_code_based_gst_rates.service_charge == "Yes":
 						if sac_code_based_gst_rates.one_sc_applies_to_all == 1:
 							total_items_data["service_charge_rate"] = companyDetails.service_charge_percentage
@@ -414,7 +436,6 @@ def reprocess_calulate_items(data):
 				total_items_data["item_name"] = each_item['item_name']
 				total_items_data["item_value"] = each_item["item_value"]
 				total_items_data["unit_of_measurement_description"] = each_item["unit_of_measurement_description"]
-				total_items_data["quantity"] = each_item["quantity"]
 				total_items_data["unit_of_measurement"] = each_item["unit_of_measurement"]
 				total_items_data["sac_index"] = sac_code_based_gst_rates.sac_index
 				item_list.append(total_items_data)
@@ -428,6 +449,7 @@ def reprocess_calulate_items(data):
 			day = item_date[8:]
 			year = item_date[2:4]
 			month = item_date[4:8]
+			item["item_value"] = item["item_value"]-item["discount_value"]
 			date_item = day+month+year
 			sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',item['item_name']]})
 			if not sac_code_based_gst:
@@ -476,7 +498,7 @@ def reprocess_calulate_items(data):
 					igst_percentage = 0
 					sac_code_new = sac_code_based_gst_rates.code
 					vat_rate_percentage = 0
-				if sac_code_based_gst_rates.net == "Yes":
+				if item["net"] == "Yes":
 					base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
 					gst_value = item['item_value']- base_value
 					scharge_value = (item["service_charge_rate"] * base_value) / 100.0
@@ -485,6 +507,7 @@ def reprocess_calulate_items(data):
 						gst_value = scharge_value- scharge_value_base
 						scharge_value = scharge_value_base
 					item['base_value'] = base_value
+					igst_value = igst_percentage
 				else:
 					base_value = item['item_value']
 					scharge_value = (item["service_charge_rate"] * item['item_value']) / 100.0
@@ -569,6 +592,7 @@ def reprocess_calulate_items(data):
 				service_dict["is_manual_edit"] = item["manual_edit"]
 				service_dict["is_service_charge_item"] = item["service_charge"]
 				service_dict["exempted"] = sac_code_based_gst_rates.exempted
+				service_dict["discount_value"] = 0
 				second_list.append(service_dict)
 			if sac_code_based_gst_rates.type == "Discount":
 				final_item['sac_code'] = 'No Sac'
@@ -595,7 +619,7 @@ def reprocess_calulate_items(data):
 				else:
 					final_item['item_mode'] = "Debit"
 				# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
-				if sac_code_based_gst_rates.net == "No":
+				if item["net"] == "No":
 					if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1 and item["manual_edit"] != "Yes":
 						if acc_gst_percentage == 0 and acc_igst_percentage == 0:
 							final_item['cgst'] = 0
@@ -618,8 +642,8 @@ def reprocess_calulate_items(data):
 					final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 					final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 					final_item['item_value'] = item['item_value']
-				elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
-					gst_percentage = (float(item["cgst"]) + float(item["sgst"]) + float(item["igst"]))
+				elif item["net"] == "Yes" and item['sac_code'] != "996311":
+					gst_percentage = (float(item["cgst"]) + float(item["sgst"]))
 					base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 					gst_value = item['item_value'] - base_value
 					final_item['cgst'] = float(item["cgst"])
@@ -630,11 +654,15 @@ def reprocess_calulate_items(data):
 					if float(item["igst"]) <= 0:
 						final_item['igst_amount'] = 0
 					else:
-						base_value = item['item_value'] * (100 / (gst_percentage + 100))
+						base_value = item['item_value'] * (100 / (float(item["igst"]) + 100))
 						final_item['igst_amount'] = item['item_value'] - base_value
 					final_item['gst_rate'] = gst_percentage+final_item['igst']
 					final_item['item_value_after_gst'] = item['item_value']
 					final_item['item_value'] = base_value
+					if sez == 1 and sac_code_based_gst_rates.exempted == 1:
+						final_item["type"] = "Included"
+					else:
+						final_item['type'] = "Excempted"
 				final_item['other_charges'] = 0
 				final_item['sac_code_found'] = 'Yes'
 				final_item['taxable'] = sac_code_based_gst_rates.taxble
@@ -767,7 +795,8 @@ def reprocess_calulate_items(data):
 				"sac_index": sac_code_based_gst_rates.sac_index,
 				'unit_of_measurement': item["unit_of_measurement"],
 				'quantity': item["quantity"],
-				'unit_of_measurement_description': item["unit_of_measurement_description"]
+				'unit_of_measurement_description': item["unit_of_measurement_description"],
+				"discount_value" : item["discount_value"]
 			})
 		total_items.extend(second_list)
 		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
