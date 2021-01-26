@@ -33,7 +33,7 @@ def Reinitiate_invoice(data):
 		if "place_of_supply" in data:
 			place_of_supply = data['place_of_supply']
 		else:
-			place_of_supply = company.place_of_supply
+			place_of_supply = company.state_code
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
