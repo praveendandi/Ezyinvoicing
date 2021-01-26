@@ -17,6 +17,7 @@ import json
 import sys
 import frappe
 import os
+from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
 class company(Document):
 	# pass
@@ -190,4 +191,37 @@ def qr_generatedtoirn_generated():
 			return {"success":False, "message":"no data found"}
 	except Exception as e:
 		print("addsacindex", str(e))
+		return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def reprocess_error_inoices():
+	try:
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
+		print(data)
+		if len(data)>0:
+			for each in data:
+				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+				reinitiate = reinitiateInvoice(obj)
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("reprocess_error_inoices", str(e))
+		return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def reprocess_pending_inoices():
+	try:
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending'},fields=["name","invoice_number","invoice_file"])
+		if len(data)>0:
+			for each in data:
+				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+				reinitiate = reinitiateInvoice(obj)
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("reprocess_pending_inoices", str(e))
 		return {"success":False,"message":str(e)}

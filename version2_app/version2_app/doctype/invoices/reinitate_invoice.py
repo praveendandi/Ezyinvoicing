@@ -204,7 +204,9 @@ def Reinitiate_invoice(data):
 				doc.error_message = " Invoice Total Mismatch"
 				doc.irn_generated = "Error"
 				doc.ready_to_generate_irn = "No"
-
+		
+		doc.total_invoice_amount = data["total_invoice_amount"]
+		doc.place_of_supply = company.state_code
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		
@@ -422,6 +424,11 @@ def reprocess_calulate_items(data):
 					if int(new["sort_order"]) == int(service_charge_items["sort_order"]):
 						del total_items[total_items.index(service_charge_items)]
 		for item in item_list:
+			item_date = item['date']
+			day = item_date[8:]
+			year = item_date[2:4]
+			month = item_date[4:8]
+			date_item = day+month+year
 			sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',item['item_name']]})
 			if not sac_code_based_gst:
 				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['like', '%' + item['item_name'].strip() + '%']})
@@ -524,9 +531,9 @@ def reprocess_calulate_items(data):
 					type_item = "Excempted"
 				else:
 					type_item = "Included"
-				service_dict['item_name'] = item['item_name']+"-SC "
-				service_dict['description'] = item['item_name']+"-SC "
-				service_dict['date'] = datetime.datetime.strptime(item['date'],"%Y-%m-%d").strftime(companyDetails.invoice_item_date_format)
+				service_dict['item_name'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
+				service_dict['description'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
+				service_dict['date'] = date_item
 				service_dict['sac_code'] = sac_code_new
 				service_dict['sac_code_found'] = 'Yes'
 				service_dict['cgst'] = int(gst_percentage)/2
@@ -536,7 +543,7 @@ def reprocess_calulate_items(data):
 				service_dict['sgst_amount'] = gst_value/2
 				service_dict['igst'] = igst_percentage
 				service_dict['igst_amount'] = igst_value
-				service_dict['gst_rate'] = int(gst_percentage)
+				service_dict['gst_rate'] = int(gst_percentage)+int(igst_percentage)
 				service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 				service_dict['item_taxable_value'] = scharge_value 
 				service_dict['item_value'] = scharge_value
@@ -708,7 +715,7 @@ def reprocess_calulate_items(data):
 				item['item_name'],
 				'sort_order':final_item['sort_order'],
 				"item_type":sac_code_based_gst_rates.type,
-				'date':datetime.datetime.strptime(item['date'],"%Y-%m-%d").strftime(companyDetails.invoice_item_date_format),
+				'date':date_item,
 				'cgst':
 				final_item['cgst'],
 				'cgst_amount':
