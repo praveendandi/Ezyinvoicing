@@ -23,10 +23,15 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
 	try:
+		company = "SEROS-01"
 		filepath = data['filepath']
 		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
+<<<<<<< HEAD
 		companyCheckResponse = check_company_exist("HIBR-01")
+=======
+		companyCheckResponse = check_company_exist(company)
+>>>>>>> f8199872eb42f71c3b64033cb4e21b4392811b62
 		site_folder_path = companyCheckResponse['data'].site_name
 		file_path = folder_path+'/sites/'+site_folder_path+filepath
 		today = date.today()
@@ -56,6 +61,7 @@ def reinitiateInvoice(data):
 		membership = ''
 		print_by = ''
 		roomNumber = ""
+		invoice_category = "Tax Invoice"
 		for i in raw_data:
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
@@ -65,15 +71,22 @@ def reinitiateInvoice(data):
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
 			if "Departure :" in i:
 				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
+				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:] + " 00:00:00"
+				inv_date = datetime.datetime.strptime(date_time_obj, '%d/%m/%y %H:%M:%S')
+				date_time_obj = inv_date.strftime("%d-%b-%y %H:%M:%S")
 			if "Room No." in i or "Room No" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
+<<<<<<< HEAD
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 			if "GST ID" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("CREDITINVOICE","")
 				gstNumber = gstNumber.replace("TAXINVOICE","")
+=======
+			if "GST ID" in i:				
+				gstNumber = i.split(':')[1].replace(' ', '')
+>>>>>>> f8199872eb42f71c3b64033cb4e21b4392811b62
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "Bill To" in i:
@@ -167,10 +180,15 @@ def reinitiateInvoice(data):
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
 		guest['room_number'] = int(roomNumber)
+<<<<<<< HEAD
 		guest['company_code'] = "HIBR-01"
+=======
+		guest['company_code'] = company
+>>>>>>> f8199872eb42f71c3b64033cb4e21b4392811b62
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
+		guest['invoice_category'] = invoice_category
 
 		check_invoice = check_invoice_exists(guest['invoice_number'])
 		if check_invoice['success']==True:
@@ -182,25 +200,41 @@ def reinitiateInvoice(data):
 				guest['invoice_number'] = inv_data.name
 				amened='No'
 		
+<<<<<<< HEAD
 		company_code = {"code":"HIBR-01"}
 		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"HIBR-01","invoice_date":date_time_obj}
+=======
+		company_code = {"code":company}
+		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":company,"invoice_date":date_time_obj}
+>>>>>>> f8199872eb42f71c3b64033cb4e21b4392811b62
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
+<<<<<<< HEAD
 		error_data['state_code'] = "29"
 		error_data['room_number'] = guest['room_number']
 		error_data['pincode'] = "560055"
+=======
+		error_data['state_code'] = " "
+		error_data['room_number'] = guest['room_number']
+		error_data['pincode'] = " "
+		error_data['total_invoice_amount'] = total_invoice_amount
+>>>>>>> f8199872eb42f71c3b64033cb4e21b4392811b62
 		# gstNumber = "12345"
+		# print(guest['invoice_number'])
+
 		if len(gstNumber) < 15 and len(gstNumber)>0:
 			error_data['invoice_file'] = filepath
-			error_data['error_message'] = "The given gst number is not a vaild one"
+			error_data['error_message'] = "Invalid GstNumber"
 			error_data['amened'] = amened
+			
+			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+			error_data['items_data'] = errorcalulateItemsApiResponse['data']
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
-			return {"success":False,"message":"The given gst number is not a vaild one"}
-
+			return {"success":False,"message":"Invalid GstNumber"}
 
 		print(json.dumps(guest, indent = 1))
 		gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
