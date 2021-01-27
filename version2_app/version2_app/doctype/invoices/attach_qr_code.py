@@ -182,7 +182,7 @@ def AttachQrCodeInInvoice(invoice_number):
             if attach_response['message']['file_url']:
                 invoice.b2c_qrinvoice = attach_response['message']['file_url']
                 invoice.name = invoice_number
-                invoice.qr_generated = "Success"
+                invoice.irn_generated = "Success"
                 invoice.qr_code_generated = "Success"
                 invoice.save(ignore_permissions=True, ignore_version=True)
                 if os.path.exists(attach_qrpath):

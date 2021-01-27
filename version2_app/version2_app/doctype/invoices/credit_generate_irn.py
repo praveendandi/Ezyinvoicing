@@ -381,13 +381,18 @@ def CreditgenerateIrn(invoice_number):
 		taxpayer_details = get_tax_payer_details_data(GspData)
 		#gst data
 		# print(taxpayer_details,"taxxxxxx")
+		if invoice.invoice_category == "Credit Invoice":
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
+		else:
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
+		# irnInvoiceNumber = 
 		gst_data = {
 			"Version": "1.1",
 			"TranDtls": {
 				"TaxSch": "GST",
 				"SupTyp": "B2B",
 				"RegRev": "N",
-				"IgstOnIntra": "N"
+				"IgstOnIntra": "Y" if invoice.place_of_supply == company_details['data'].state_code and invoice.sez == 1 else "N"
 			},
 			"SellerDtls": {
 				"Gstin":
@@ -440,9 +445,7 @@ def CreditgenerateIrn(invoice_number):
 				"Typ":
 				"CRN",
 				"No":
-				invoice.invoice_number + str(random.randint(0, 100)) +
-				'T' if company_details['data'].mode == 'Testing' else
-				invoice.invoice_number,
+				invoice_numberIrn,
 				"Dt":
 				datetime.datetime.strftime(invoice.invoice_date,
 											'%d/%m/%Y')
@@ -524,7 +527,7 @@ def CreditgenerateIrn(invoice_number):
 			"TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
 			"TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
 		}
-		# print(gst_data)
+		print(gst_data)
 		response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
 		if response['success']==True:
 			invoice = frappe.get_doc('Invoices', invoice_number)
@@ -534,10 +537,15 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_signed_invoice = response['result']['SignedInvoice']
 			invoice.credit_signed_invoice_generated = 'Yes'
 			invoice.credit_irn_generated = 'Success'
+			invoice.irn_generated = "Success"
+			# invoice.irn_number = " "
+			if not invoice.irn_number:
+				invoice.irn_number = " "
 			invoice.credit_qr_code = response['result']['SignedQRCode']
 			invoice.credit_qr_code_generated = 'Success'
 			invoice.credit_irn_cancelled = 'No'
 			invoice.credit_irn_generated_time = datetime.datetime.utcnow()
+			invoice.irn_generated_time = datetime.datetime.utcnow()
 			invoice.save(ignore_permissions=True,ignore_version=True)
 			create_credit_qr_image(invoice_number, GSP_details['data'])
 			# print(credit_items)
@@ -554,6 +562,7 @@ def CreditgenerateIrn(invoice_number):
 					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
 					invoice.credit_irn_generated = "Success"
 					invoice.credit_qr_code_generated = "Success"
+					invoice.credit_qr_code_image = ""
 					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'
