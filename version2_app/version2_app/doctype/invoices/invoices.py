@@ -217,6 +217,7 @@ class Invoices(Document):
 			discount_after_value = abs(discount_after_value)
 			TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+			roundoffAmount = invoice.invoice_round_off_amount
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2), 
 				"CgstVal": round(total_cgst_value, 2),
@@ -226,7 +227,7 @@ class Invoices(Document):
 				"StCesVal": round(total_state_cess_value,2),
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
-				"RndOffAmt": 0,
+				"RndOffAmt": round(roundoffAmount,2),
 				"TotInvVal": round(TotInnVal,2),
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
@@ -941,30 +942,31 @@ def insert_invoice(data):
 			if len(data['items_data'])>0:
 				roundoff_amount = data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 				data['invoice_round_off_amount'] = roundoff_amount
-				if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-					
-					calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
-							"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,
-							"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,
-							"total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
-							"total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
-							"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
-							"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
-					
-					
-					TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
-					if TotalMismatchErrorAPI['success']==True:
-						# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
-						# if data['total_invoice_amount'] !=0:
-						items = data['items_data']
-						itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-						# insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
-						TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
-						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-							items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
-						return {"success": True}
+				if abs(roundoff_amount)>6:
+					if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+						
+						calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
+								"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,
+								"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,
+								"total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
+								"total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
+								"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
+								"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
+						
+						
+						TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
+						if TotalMismatchErrorAPI['success']==True:
+							# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
+							# if data['total_invoice_amount'] !=0:
+							items = data['items_data']
+							itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
+							# insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
+							TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
+							hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+								items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+							return {"success": True}
 
-					return{"success":False,"message":TotalMismatchErrorAPI['message']}
+						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
 		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
 			irn_generated = "Zero Invoice"

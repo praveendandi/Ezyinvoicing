@@ -203,11 +203,12 @@ def Reinitiate_invoice(data):
 			irn_generated = "Zero Invoice"
 			generateb2cQr = False
 		else:
-			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-				generateb2cQr = False
-				doc.error_message = " Invoice Total Mismatch"
-				doc.irn_generated = "Error"
-				doc.ready_to_generate_irn = "No"
+			if abs(invoice_round_off_amount)>6:
+				if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+					generateb2cQr = False
+					doc.error_message = " Invoice Total Mismatch"
+					doc.irn_generated = "Error"
+					doc.ready_to_generate_irn = "No"
 		
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		doc.place_of_supply = place_of_supply
