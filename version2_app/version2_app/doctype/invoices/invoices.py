@@ -1562,7 +1562,14 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
+						if item['sac_code'] == '996311':
+							percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+							if percentage_gst["success"] == True:
+								acc_gst_percentage = percentage_gst["gst_percentage"]	
+								acc_igst_percentage = percentage_gst["igst_percentage"]
+							else:
+								{"success": False, "message": "error in slab helper function"}
 						if (sez == 1 and sac_code_based_gst_rates.exempted == 0) or placeofsupply != companyDetails.state_code:
 							final_item["sgst"] = 0
 							final_item["cgst"] = 0
@@ -1701,7 +1708,7 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
