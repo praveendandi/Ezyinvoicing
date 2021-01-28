@@ -11,7 +11,7 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 import math
 
 

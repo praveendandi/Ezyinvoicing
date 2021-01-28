@@ -9,7 +9,7 @@ from frappe.utils import get_site_name
 import time
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -145,7 +145,7 @@ def create_credit_qr_image(invoice_number, gsp):
 		if 'message' in response:
 			invoice.credit_qr_code_image = response['message']['file_url']
 			invoice.save()
-			attach_qr_code(invoice_number, gsp,invoice.company)
+			# attach_qr_code(invoice_number, gsp,invoice.company)
 
 		return True
 	except Exception as e:
@@ -370,7 +370,6 @@ def CreditgenerateIrn(invoice_number):
 		# get invoice details
 		credit_items = []
 		invoice = frappe.get_doc('Invoices', invoice_number)
-
 		# get seller details
 		company_details = check_company_exist_for_Irn(invoice.company)
 		# get gsp_details
@@ -527,7 +526,7 @@ def CreditgenerateIrn(invoice_number):
 			"TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
 			"TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
 		}
-		print(gst_data)
+		# print(gst_data)
 		response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
 		if response['success']==True:
 			invoice = frappe.get_doc('Invoices', invoice_number)
@@ -562,7 +561,7 @@ def CreditgenerateIrn(invoice_number):
 					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
 					invoice.credit_irn_generated = "Success"
 					invoice.credit_qr_code_generated = "Success"
-					invoice.credit_qr_code_image = ""
+					# invoice.credit_qr_code_image = ""
 					invoice.save(ignore_permissions=True, ignore_version=True)
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'

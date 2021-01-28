@@ -26,7 +26,7 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -231,7 +231,7 @@ class Invoices(Document):
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			
-			print(gst_data)
+			# print(gst_data)
 			if ass_value > 0:
 				try:
 					response = postIrn(gst_data, GSP_details['data'],
@@ -278,8 +278,8 @@ class Invoices(Document):
 								invoice.irn_number = response['result'][0]['Desc']['Irn']
 								invoice.ack_date = response['result'][0]['Desc']['AckDt']
 								invoice.irn_generated = "Success"
-								invoice.qr_code_image = ""
-								invoice.qr_code_generated = "Success"
+								# invoice.qr_code_image = ""
+								# invoice.qr_code_generated = "Success"
 								invoice.save(ignore_permissions=True, ignore_version=True)
 							
 							irn_error_message = response["message"]
@@ -436,11 +436,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		ackdate = invoice.ack_date
 		ack_date = ackdate.split(" ")
 		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
-		# irntext = "IRN: "+ invoice.irn_number
-		# acknotext = "ACK NO: " + invoice.ack_no 
-		# ackdatetext = "ACK DATE: " + invoice.ack_date
-		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
+		
 		page.insertText(
 			where,
 			text,
@@ -486,7 +482,6 @@ def send_invoicedata_to_gcb(invoice_number):
 			path = folder_path + '/sites/' + company.site_name
 			file_name = invoice_number + 'b2cqr.png'
 			dst_pdf_filename = path + "/private/files/" + file_name
-
 			if doc.b2c_qrimage:
 				attach_qr = attach_b2c_qrcode({
 					"invoice_number": invoice_number,
@@ -556,16 +551,7 @@ def send_invoicedata_to_gcb(invoice_number):
 							"message": response["message"]
 						}
 
-				# storage_client = storage.Client.from_service_account_json(
-				# 	folder_path +"/apps/version2_app/version2_app/version2_app/doctype/invoices/jaypee-group-a9b672ada582.json"
-				# )
-				# bucket = storage_client.get_bucket("ezyinvoices-b2c")
-				# with open(b2c_file, "w") as outfile:
-				# 	json.dump(b2c_data, outfile)
-				# blob = bucket.blob(filename)
-				# with open(b2c_file, 'rb') as img_data:
-				# 	blob.upload_from_file(img_data)
-
+				
 				qr = qrcode.QRCode(
 					version=1,
 					error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -633,21 +619,23 @@ def send_invoicedata_to_gcb(invoice_number):
 			if 'message' in response:
 				doc.b2c_qrimage = response['message']['file_url']
 				doc.name = invoice_number
+				doc.irn_generated = "Success"
+				doc.qr_code_generated = "Success"
 				doc.save(ignore_permissions=True, ignore_version=True)
-				attach_qr = attach_b2c_qrcode({
-					"invoice_number": invoice_number,
-					"company": doc.company
-				})
-				if attach_qr["success"] == False:
-					if os.path.exists(b2c_file):
-						os.remove(b2c_file)
-					if os.path.exists(dst_pdf_filename):
-						os.remove(dst_pdf_filename)
-					return {"success": False, "message": attach_qr["message"]}
-				if os.path.exists(b2c_file):
-					os.remove(b2c_file)
-				if os.path.exists(dst_pdf_filename):
-					os.remove(dst_pdf_filename)
+				# attach_qr = attach_b2c_qrcode({
+				# 	"invoice_number": invoice_number,
+				# 	"company": doc.company
+				# })
+				# if attach_qr["success"] == False:
+				# 	if os.path.exists(b2c_file):
+				# 		os.remove(b2c_file)
+				# 	if os.path.exists(dst_pdf_filename):
+				# 		os.remove(dst_pdf_filename)
+				# 	return {"success": False, "message": attach_qr["message"]}
+				# if os.path.exists(b2c_file):
+				# 	os.remove(b2c_file)
+				# if os.path.exists(dst_pdf_filename):
+				# 	os.remove(dst_pdf_filename)
 				return {
 					"success": True,
 					"message": "QR-Code generated successfully"
@@ -695,80 +683,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 
 
 
-def attach_qr_code(invoice_number, gsp, code):
-	try:
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		company = frappe.get_doc('company', invoice.company)
-		folder_path = frappe.utils.get_bench_path()
-		site_folder_path = company.site_name
-		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
-		path = folder_path + '/sites/' + site_folder_path
-		src_pdf_filename = path + invoice.invoice_file
-		dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
-		# attaching qr code
-		img_filename = path + invoice.qr_code_image
-		# img_rect = fitz.Rect(250, 200, 340, 270)
-		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
-							 company.qr_rect_y0, company.qr_rect_y1)
-		document = fitz.open(src_pdf_filename)
 
-		page = document[0]
-
-		page.insertImage(img_rect, filename=img_filename)
-		document.save(dst_pdf_filename)
-		document.close()
-		# attacing irn an ack
-		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
-		doc = fitz.open(dst_pdf_filename)
-		
-		if company.irn_details_page == "First":
-			page = doc[0]
-		else:
-			page = doc[-1]
-		# page = doc[0]
-		# where = fitz.Point(15, 55)
-		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		ackdate = invoice.ack_date
-		ack_date = ackdate.split(" ")
-		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
-		# irntext = "IRN: "+ invoice.irn_number
-		# acknotext = "ACK NO: " + invoice.ack_no 
-		# ackdatetext = "ACK DATE: " + invoice.ack_date
-		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
-		page.insertText(
-			where,
-			text,
-			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=folder_path +
-			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=7,  # default
-			rotate=0,  # rotate text
-			color=(0, 0, 0),  # some color (blue)
-			overlay=True)
-				
-		doc.save(dst_pdf_text_filename)
-		doc.close()
-
-		files = {"file": open(dst_pdf_text_filename, 'rb')}
-		payload = {
-			"is_private": 1,
-			"folder": "Home",
-			"doctype": "Invoices",
-			"docname": invoice_number,
-			'fieldname': 'invoice_with_gst_details'
-		}
-		site = company.host
-		upload_qr_image = requests.post(site + "api/method/upload_file",
-										files=files,
-										data=payload)
-		response = upload_qr_image.json()
-		if 'message' in response:
-			invoice.invoice_with_gst_details = response['message']['file_url']
-			invoice.save()
-		return
-	except Exception as e:
-		print(e, "attach qr code")
 
 
 def create_qr_image(invoice_number, gsp):
@@ -803,9 +718,7 @@ def create_qr_image(invoice_number, gsp):
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,
 									   stream=True,
-									   proxies=proxies,verify=False)
-		# print(headers,"//////")								   
-		# print(qr_response.content,"////////")							   
+									   proxies=proxies,verify=False)						   
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -828,7 +741,7 @@ def create_qr_image(invoice_number, gsp):
 		if 'message' in response:
 			invoice.qr_code_image = response['message']['file_url']
 			invoice.save()
-			attach_qr_code(invoice_number, gsp, invoice.company)
+			# attach_qr_code(invoice_number, gsp, invoice.company)
 			return {"success": True}
 		return {"success": True}
 	except Exception as e:
