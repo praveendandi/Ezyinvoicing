@@ -1323,15 +1323,16 @@ def calulate_items(data):
 						sac_code_new = sac_code_based_gst_rates.code
 						vat_rate_percentage = 0
 					if sac_code_based_gst_rates.net == "Yes":
-						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
-						gst_value = item['item_value']- base_value
 						scharge_value = (scharge * base_value) / 100.0
+						gst_value = round((gst_percentage+igst_percentage)*scharge_value )/ 100.0
 						if sac_code_based_gst_rates.service_charge_net == "Yes":
 							scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
 							gst_value = scharge_value- scharge_value_base
 							scharge_value = scharge_value_base
 						item['base_value'] = base_value
+
+
 						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					else:
 						base_value = item['item_value']
