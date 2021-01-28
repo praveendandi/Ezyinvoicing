@@ -2921,6 +2921,7 @@ def attach_b2c_qrcode(data):
 			invoice.irn_generated = "Success"
 			invoice.qr_code_generated = "Success"
 			invoice.save(ignore_permissions=True, ignore_version=True)
+			frappe.db.commit()
 			if os.path.exists(attach_qrpath):
 				os.remove(attach_qrpath)
 			return {"success": True, "message": "Qr Attached successfully"}
