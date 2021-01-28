@@ -1520,6 +1520,7 @@ def calulate_items(data):
 						final_item['type'] = "Excempted"
 						final_item['item_type'] = "Discount"
 						final_item['item_mode'] = ItemMode
+						final_item['sort_order'] = item['sort_order']
 				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
 					if "-" in str(item['item_value']) and invoice_category == "Tax Invoice":
 						final_item['item_mode'] = ItemMode
