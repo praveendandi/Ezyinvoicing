@@ -68,10 +68,9 @@ def file_parsing(filepath):
 			room = i.split(":")
 			roomNumber = room[-1]
 			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "Cust GST ID" in i:
-		if "GST ID" in i and "Confirmation No." in i:
+		if "Guest GST ID" in i:
 			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
+			gstNumber = gstNumber.replace("Membership","")
 		if "Bill  No." in i:
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 		if "Bill To" in i:
@@ -162,6 +161,7 @@ def file_parsing(filepath):
 	for index, i in enumerate(guestDeatils):
 		if index == 0:
 			guest['name'] = i.split(':')[1]
+			guest["name"] = guest["name"].replace("Arrival","")
 		if index == 1:
 			guest['address1'] = i
 		if index == 2:
