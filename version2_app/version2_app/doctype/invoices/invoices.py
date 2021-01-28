@@ -217,7 +217,8 @@ class Invoices(Document):
 			discount_after_value = abs(discount_after_value)
 			TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
-			roundoffAmount = invoice.invoice_round_off_amount
+			
+			# print(TotInnVal,TotInvValFc)
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2), 
 				"CgstVal": round(total_cgst_value, 2),
@@ -227,12 +228,12 @@ class Invoices(Document):
 				"StCesVal": round(total_state_cess_value,2),
 				"Discount": round(discount_after_value,2),
 				"OthChrg": 0,
-				"RndOffAmt": round(roundoffAmount,2),
+				"RndOffAmt": 0,
 				"TotInvVal": round(TotInnVal,2),
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			
-			# print(gst_data)
+			# print(gst_data['ValDtls'])
 			if ass_value > 0:
 				try:
 					response = postIrn(gst_data, GSP_details['data'],
