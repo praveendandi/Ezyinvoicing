@@ -12,6 +12,7 @@ import pdfplumber
 from datetime import date, datetime
 import requests
 import pandas as pd
+import random, string
 import re
 import json
 import sys
@@ -162,13 +163,14 @@ def b2cstatusupdate():
 @frappe.whitelist(allow_guest=True)
 def addsacindex():
 	try:
-		data = frappe.db.get_all('SAC HSN CODES',fields=["name"], order_by = 'modified')
+		data = frappe.db.get_all('SAC HSN CODES',fields=["name","sac_index"], order_by = 'modified')
 		if len(data)>0:
 			for index, j in enumerate(data):
-				doc = frappe.get_doc("SAC HSN CODES",j["name"])
-				doc.sac_index = index
-				doc.save()
-				frappe.db.commit()
+				if j["sac_index"] == None:
+					doc = frappe.get_doc("SAC HSN CODES",j["name"])
+					doc.sac_index = ''.join(random.choice(string.digits) for _ in range(7))
+					doc.save()
+					frappe.db.commit()
 			return {"success":True}
 		else:
 			return {"success":False, "message":"no data found"}
