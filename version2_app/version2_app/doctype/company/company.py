@@ -12,11 +12,13 @@ import pdfplumber
 from datetime import date, datetime
 import requests
 import pandas as pd
+import random, string
 import re
 import json
 import sys
 import frappe
 import os
+from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
 class company(Document):
 	# pass
@@ -155,4 +157,73 @@ def b2cstatusupdate():
 		return True
 	except Exception as e:
 		print("b2cstatusupdate", str(e))
+		return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def addsacindex():
+	try:
+		data = frappe.db.get_all('SAC HSN CODES',fields=["name","sac_index"], order_by = 'modified')
+		if len(data)>0:
+			for index, j in enumerate(data):
+				if j["sac_index"] == None:
+					doc = frappe.get_doc("SAC HSN CODES",j["name"])
+					doc.sac_index = ''.join(random.choice(string.digits) for _ in range(7))
+					doc.save()
+					frappe.db.commit()
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("addsacindex", str(e))
+		return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def qr_generatedtoirn_generated():
+	try:
+		data = frappe.db.get_list('Invoices',filters={'invoice_type': 'B2C'},fields=["name","invoice_number","qr_generated","irn_generated","b2c_qrimage"])
+		if len(data)>0:
+			for each in data:
+				doc = frappe.get_doc("Invoices",each["name"])
+				doc.irn_generated = each["qr_generated"]
+				doc.save()
+				frappe.db.commit()
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("addsacindex", str(e))
+		return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def reprocess_error_inoices():
+	try:
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
+		print(data)
+		if len(data)>0:
+			for each in data:
+				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+				reinitiate = reinitiateInvoice(obj)
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("reprocess_error_inoices", str(e))
+		return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def reprocess_pending_inoices():
+	try:
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending'},fields=["name","invoice_number","invoice_file"])
+		if len(data)>0:
+			for each in data:
+				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+				reinitiate = reinitiateInvoice(obj)
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("reprocess_pending_inoices", str(e))
 		return {"success":False,"message":str(e)}
