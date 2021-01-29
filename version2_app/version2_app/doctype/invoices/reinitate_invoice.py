@@ -198,7 +198,7 @@ def Reinitiate_invoice(data):
 				if data['guest_data']['invoice_type'] == "B2B":
 					doc.irn_generated = "Error"
 					doc.ready_to_generate_irn = "No"
-					doc.qr_generated = "pending"
+					doc.qr_generated = "Pending"
 				else:
 					doc.irn_generated = "NA"
 					doc.ready_to_generate_irn = "No"
