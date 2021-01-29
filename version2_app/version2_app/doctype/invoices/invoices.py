@@ -1438,6 +1438,7 @@ def calulate_items(data):
 						final_item['type'] = "Excempted"
 						final_item['item_type'] = "Discount"
 						final_item['item_mode'] = ItemMode
+						final_item['sort_order'] = item['sort_order']
 				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
 					if "-" in str(item['item_value']) and invoice_category == "Tax Invoice":
 						final_item['item_mode'] = ItemMode
@@ -2841,6 +2842,7 @@ def attach_b2c_qrcode(data):
 			invoice.irn_generated = "Success"
 			invoice.qr_code_generated = "Success"
 			invoice.save(ignore_permissions=True, ignore_version=True)
+			frappe.db.commit()
 			if os.path.exists(attach_qrpath):
 				os.remove(attach_qrpath)
 			return {"success": True, "message": "Qr Attached successfully"}
