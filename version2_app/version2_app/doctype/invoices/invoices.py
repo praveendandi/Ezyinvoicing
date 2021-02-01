@@ -1379,6 +1379,8 @@ def calulate_items(data):
 					if gst_value==0:
 						gst_value = (gst_percentage* scharge_value)/100.0
 						igst_value = (igst_percentage* scharge_value)/100.0
+					else:
+						igst_value = 0
 					service_dict['item_name'] = item['name']+"-SC " + str(scharge)
 					service_dict['description'] = item['name']+"-SC " + str(scharge)
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
