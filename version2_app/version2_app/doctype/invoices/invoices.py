@@ -484,18 +484,18 @@ def send_invoicedata_to_gcb(invoice_number):
 			path = folder_path + '/sites/' + company.site_name
 			file_name = invoice_number + 'b2cqr.png'
 			dst_pdf_filename = path + "/private/files/" + file_name
-			if doc.b2c_qrimage:
-				attach_qr = attach_b2c_qrcode({
-					"invoice_number": invoice_number,
-					"company": doc.company
-				})
-				if attach_qr["success"] == False:
-					return {"success": False, "message": attach_qr["message"]}
-				else:
-					return {
-						"success": True,
-						"message": "QR-Code generated successfully"
-					}
+			# if doc.b2c_qrimage:
+			# 	attach_qr = attach_b2c_qrcode({
+			# 		"invoice_number": invoice_number,
+			# 		"company": doc.company
+			# 	})
+			# 	if attach_qr["success"] == False:
+			# 		return {"success": False, "message": attach_qr["message"]}
+			# 	else:
+			# 		return {
+			# 			"success": True,
+			# 			"message": "QR-Code generated successfully"
+			# 		}
 
 			filename = invoice_number + doc.company + ".json"
 			b2c_file = path + "/private/files/" + filename
@@ -624,6 +624,7 @@ def send_invoicedata_to_gcb(invoice_number):
 				doc.irn_generated = "Success"
 				doc.qr_code_generated = "Success"
 				doc.save(ignore_permissions=True, ignore_version=True)
+				frappe.db.commit()
 				# attach_qr = attach_b2c_qrcode({
 				# 	"invoice_number": invoice_number,
 				# 	"company": doc.company

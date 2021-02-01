@@ -1,10 +1,9 @@
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
 import frappe
 import requests
 import os
 import random
-from version2_app.version2_app.doctype.invoices.invoices import create_qr_image, gsp_api_data
+from version2_app.version2_app.doctype.invoices.invoices import create_qr_image, gsp_api_data,send_invoicedata_to_gcb
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import create_credit_qr_image
 
 @frappe.whitelist(allow_guest=True)
@@ -30,42 +29,8 @@ def AttachQrCodeInInvoice(invoice_number):
             
               
         else:
-            folder_path = frappe.utils.get_bench_path()
-            path = folder_path + '/sites/' + company.site_name
-            attach_qrpath = path + "/private/files/" + invoice_number + "attachb2cqr.pdf"
-            src_pdf_filename = path + invoice.invoice_file
-            img_filename = path + invoice.b2c_qrimage
-            img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
-                                company.qr_rect_y0, company.qr_rect_y1)
-            document = fitz.open(src_pdf_filename)
-            page = document[0]
-            page.insertImage(img_rect, filename=img_filename)
-            document.save(attach_qrpath)
-            document.close()
-            
-            files_new = {"file": open(attach_qrpath, 'rb')}
-            payload_new = {
-                "is_private": 1,
-                "folder": "Home",
-                "doctype": "Invoices",
-                "docname": invoice_number,
-                'fieldname': 'b2c_qrinvoice'
-            }
-            site = company.host
-            upload_qrinvoice_image = requests.post(site + "api/method/upload_file",
-                                                files=files_new,
-                                                data=payload_new)
-            attach_response = upload_qrinvoice_image.json()
-            if attach_response['message']['file_url']:
-                invoice.b2c_qrinvoice = attach_response['message']['file_url']
-                invoice.name = invoice_number
-                invoice.irn_generated = "Success"
-                invoice.qr_code_generated = "Success"
-                invoice.save(ignore_permissions=True, ignore_version=True)
-                if os.path.exists(attach_qrpath):
-                    os.remove(attach_qrpath)
-                return {"success": True, "message": "Qr Attached successfully"}
-            return {"success":False,"message":attach_response['message']}
+            attachb2cqr = send_invoicedata_to_gcb(invoice_number)
+            return attachb2cqr
     except Exception as e:
         print(str(e),"      Api attach qr code")
         return {"success":False,"message":str(e)}            
