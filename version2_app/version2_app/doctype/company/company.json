@@ -57,7 +57,8 @@
   "host",
   "company_logo",
   "service_charge_percentage",
-  "b2c_to_b2b"
+  "b2c_to_b2b",
+  "number_in_description"
  ],
  "fields": [
   {
@@ -351,11 +352,17 @@
    "fieldname": "b2c_to_b2b",
    "fieldtype": "Check",
    "label": "B2C To B2B"
+  },
+  {
+   "default": "0",
+   "fieldname": "number_in_description",
+   "fieldtype": "Check",
+   "label": "Number In Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-22 16:37:51.639608",
+ "modified": "2021-02-01 11:32:56.984706",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
