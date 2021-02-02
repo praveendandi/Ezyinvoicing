@@ -147,7 +147,7 @@ def create_credit_qr_image(invoice_number, gsp):
 			invoice.save()
 			# attach_qr_code(invoice_number, gsp,invoice.company)
 
-		return True
+		return {"succes":True,"message":"QR Generated Successfully"}
 	except Exception as e:
 		print(e, " credit qr image")
 

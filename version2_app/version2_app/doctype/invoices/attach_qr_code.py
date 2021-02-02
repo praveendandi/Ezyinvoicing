@@ -21,10 +21,16 @@ def AttachQrCodeInInvoice(invoice_number):
                 create = create_qr_image(invoice_number,GSP_details['data'])
                 if invoice.has_credit_items == "Yes":
                     if invoice.credit_qr_code_image == None: 
-                        create_create = create_credit_qr_image(invoice_number,GSP_details['data'])   
-                        return {"message":"Qr Redo Successful","success":True}
-                return {"message":"Qr Redo Successful","success":True}    
-            return {"message":"Qr Redo Failed","success":False}
+                        credit_create = create_credit_qr_image(invoice_number,GSP_details['data']) 
+                        if credit_create['success'] ==True:
+                            return {"message":credit_create['message'],"success":True}
+                        else:
+                            return {"message":credit_create['message'],"success":False}   
+                if create['success'] == True:         
+                    return {"message":create['message'],"success":True}    
+                else:
+                    return {"message":create['message'],"success":False}   
+            return {"message":"Already Generated","success":False}
                 
             
               

@@ -746,8 +746,8 @@ def create_qr_image(invoice_number, gsp):
 			invoice.qr_code_image = response['message']['file_url']
 			invoice.save()
 			# attach_qr_code(invoice_number, gsp, invoice.company)
-			return {"success": True}
-		return {"success": True}
+			return {"success": True,"message":"Qr Generated Successfully"}
+		return {"success": True,"message":"Qr Generated Successfully"}
 	except Exception as e:
 		print(e, "qr image")
 		frappe.log_error(frappe.get_traceback(),invoice_number)
