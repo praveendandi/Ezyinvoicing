@@ -22,9 +22,9 @@ def AttachQrCodeInInvoice(invoice_number):
                 if invoice.has_credit_items == "Yes":
                     if invoice.credit_qr_code_image == None: 
                         create_create = create_credit_qr_image(invoice_number,GSP_details['data'])   
-                        return {"message":"Qr Redo Succesfull","success":True}
-                return {"message":"Qr Redo Succesfull","success":True}    
-            return {"message":"Qr Redo Failed","success":True}
+                        return {"message":"Qr Redo Successful","success":True}
+                return {"message":"Qr Redo Successful","success":True}    
+            return {"message":"Qr Redo Failed","success":False}
                 
             
               
