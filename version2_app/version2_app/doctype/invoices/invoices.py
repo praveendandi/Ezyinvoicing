@@ -144,7 +144,7 @@ class Invoices(Document):
 			ass_value = 0
 			for index, item in enumerate(invoice.items):
 				# print(item.sac_code,"HsnCD")
-				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type == "Included":
+				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
 					total_igst_value += item.igst_amount
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
@@ -200,17 +200,17 @@ class Invoices(Document):
 					gst_data['ItemList'].append(i)
 				else:
 					if invoice.invoice_category == "Credit Invoice":
-						if item.type == "Included":
+						if item.type != "Non-Gst":
 							credit_note_items.append(item.__dict__)
 					elif invoice.invoice_category == "Tax Invoice":
-						if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
+						if item.taxable=="Yes" and item.type!="Non-Gst" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
 							
 							credit_note_items.append(item.__dict__)
 						else:
-							if item.type == "Included":
+							if item.type != "Non-Gst" and company_details['data'].allowance_type=="Discount" and item.table=="yes" and item.is_credit_item=="Yes":
 								discount_before_value +=item.item_value	
 								discount_after_value += item.item_value_after_gst
-								credit_note_items.append(item.__dict__)
+								# credit_note_items.append(item.__dict__)
 			if invoice.invoice_category == "Credit Invoice":
 				creditIrn = CreditgenerateIrn(invoice_number)
 				return creditIrn
@@ -1387,6 +1387,10 @@ def calulate_items(data):
 						igst_value = (igst_percentage* scharge_value)/100.0
 					else:
 						igst_value = 0
+					if gst_percentage>0 or igst_percentage>0:
+						scTaxble = "Yes"
+					else:
+						scTaxble = sac_code_based_gst_rates.taxble		
 					service_dict['item_name'] = item['name']+"-SC " + str(scharge)
 					service_dict['description'] = item['name']+"-SC " + str(scharge)
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
@@ -1403,7 +1407,7 @@ def calulate_items(data):
 					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 					service_dict['item_taxable_value'] = scharge_value 
 					service_dict['item_value'] = scharge_value
-					service_dict['taxable'] = sac_code_based_gst_rates.taxble
+					service_dict['taxable'] = scTaxble#"Yes" if gst_percentage>0 else "No"
 					service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
 					# service_dict['cess'] = 0
 					# service_dict['cess_amount'] = 0

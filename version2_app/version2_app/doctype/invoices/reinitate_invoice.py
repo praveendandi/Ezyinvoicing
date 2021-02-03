@@ -564,6 +564,10 @@ def reprocess_calulate_items(data):
 					type_item = "Excempted"
 				else:
 					type_item = "Included"
+				if gst_percentage>0 or igst_percentage>0:
+					scTaxble = "Yes"
+				else:
+					scTaxble = sac_code_based_gst_rates.taxble	
 				service_dict['item_name'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
 				service_dict['description'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
 				service_dict['date'] = date_item
@@ -580,7 +584,7 @@ def reprocess_calulate_items(data):
 				service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 				service_dict['item_taxable_value'] = scharge_value 
 				service_dict['item_value'] = scharge_value
-				service_dict['taxable'] = sac_code_based_gst_rates.taxble
+				service_dict['taxable'] = "Yes" if gst_percentage>0 else "No"
 				service_dict['unit_of_measurement']= item["unit_of_measurement"]
 				service_dict['quantity'] = item["quantity"]
 				service_dict['unit_of_measurement_description'] = item["unit_of_measurement_description"]
