@@ -634,7 +634,7 @@ def reprocess_calulate_items(data):
 					final_item['item_mode'] = "Debit"
 				# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 				if item["net"] == "No":
-					if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1 and item["manual_edit"] != "Yes":
+					if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
 						if acc_gst_percentage == 0 and acc_igst_percentage == 0:
 							final_item['cgst'] = 0
 							final_item['sgst'] = 0
