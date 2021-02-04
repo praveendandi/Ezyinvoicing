@@ -2274,7 +2274,7 @@ def get_tax_payer_details(data):
 				}
 		else:
 			doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
-			return {"success": True, "data": doc}
+			return {"success": True, "data": doc.__dict__}
 	except Exception as e:
 		print(e, "get tax payers")
 		frappe.log_error(frappe.get_traceback())
