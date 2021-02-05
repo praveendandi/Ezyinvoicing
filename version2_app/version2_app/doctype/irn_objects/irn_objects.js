@@ -1,7 +1,7 @@
-// Copyright (c) 2020, ganesh and contributors
+// Copyright (c) 2021, caratred and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Credit Note Items', {
+frappe.ui.form.on('IRN Objects', {
 	// refresh: function(frm) {
 
 	// }
