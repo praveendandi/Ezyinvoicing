@@ -2268,12 +2268,12 @@ def get_tax_payer_details(data):
 			else:
 				print("Unknown error in get taxpayer details get call  ",
 					  response)
-				error_message = str(response['message'])
+				error_message = "Invalid GstNumber "+data['gstNumber']
 				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
-				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {error_message}")
+				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
 				return {
 					"success": False,
-					"message": response['message'],
+					"message": error_message,
 					"response": response
 				}
 		else:
