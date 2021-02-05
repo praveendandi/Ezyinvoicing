@@ -16,8 +16,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
 folder_path = frappe.utils.get_bench_path()
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+
 # site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
@@ -139,10 +138,6 @@ def reinitiateInvoice(data):
 			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Central GST" not in each["name"] and "State GST" not in each["name"]:
 				if each["name"] not in payment_Types:
 					total_items.append(each)
-				else:
-					if "-" in str(each["item_value"]):
-						total_invoice_amount = total_invoice_amount+abs(each["item_value"])
-						print(total_invoice_amount, each["item_value"])
 
 		guest = dict()
 		# print(guestDeatils)
@@ -279,6 +274,6 @@ def reinitiateInvoice(data):
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
-		frappe.log_error(frappe.get_traceback())
-		logger.error(f"reinitiateInvoice,   {str(e)}")
+		print(str(e),"       invoice parsing")
+		print(traceback.print_exc())
 		return {"success":False,"message":str(e)}		
