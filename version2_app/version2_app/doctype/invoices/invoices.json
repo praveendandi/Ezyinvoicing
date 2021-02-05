@@ -125,7 +125,8 @@
   "converted_from_b2b",
   "converted_from_b2b_time",
   "converted_from_b2b_by",
-  "tax_invoice_referrence_number"
+  "tax_invoice_referrence_number",
+  "tax_invoice_referrence_date"
  ],
  "fields": [
   {
@@ -808,12 +809,17 @@
    "fieldname": "tax_invoice_referrence_number",
    "fieldtype": "Data",
    "label": "Tax Invoice Referrence Number"
+  },
+  {
+   "fieldname": "tax_invoice_referrence_date",
+   "fieldtype": "Date",
+   "label": "Tax Invoice Referrence Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-02-03 11:11:01.168375",
+ "modified": "2021-02-04 17:03:52.780022",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
