@@ -138,6 +138,10 @@ def reinitiateInvoice(data):
 			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Central GST" not in each["name"] and "State GST" not in each["name"]:
 				if each["name"] not in payment_Types:
 					total_items.append(each)
+				else:
+					if "-" in str(each["item_value"]):
+						total_invoice_amount = total_invoice_amount+abs(each["item_value"])
+
 
 		guest = dict()
 		# print(guestDeatils)
