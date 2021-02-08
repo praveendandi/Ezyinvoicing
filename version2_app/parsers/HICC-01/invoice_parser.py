@@ -63,9 +63,8 @@ def file_parsing(filepath):
 		if "Total" in i:
 			total_invoice = i.split(" ")
 			total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-		if "Invoice Date:" in i:
-			depatureDateIndex = i.index('Invoice Date:')
-			date_time_obj = (i[depatureDateIndex:].split(':')[1]).replace("State","").strip()
+		if "Invoice Date" in i:
+			date_time_obj = i.split(":")[-1].strip()
 			date_time_obj = datetime.datetime.strptime(date_time_obj,"%d-%m-%y").strftime('%d-%b-%y %H:%M:%S')
 		if "Room No." in i:
 			room = i.split(":")
