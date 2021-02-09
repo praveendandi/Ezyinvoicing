@@ -16,8 +16,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
 folder_path = frappe.utils.get_bench_path()
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+
 # site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
@@ -28,7 +27,7 @@ def reinitiateInvoice(data):
 		filepath = data['filepath']
 		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
-		companyCheckResponse = check_company_exist("PHC-01")
+		companyCheckResponse = check_company_exist("PHB-01")
 		site_folder_path = companyCheckResponse['data'].site_name
 		file_path = folder_path+'/sites/'+site_folder_path+filepath
 		today = date.today()
@@ -142,7 +141,7 @@ def reinitiateInvoice(data):
 				else:
 					if "-" in str(each["item_value"]):
 						total_invoice_amount = total_invoice_amount+abs(each["item_value"])
-						print(total_invoice_amount, each["item_value"])
+
 
 		guest = dict()
 		# print(guestDeatils)
@@ -164,7 +163,7 @@ def reinitiateInvoice(data):
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
 		guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
-		guest['company_code'] = "PHC-01"
+		guest['company_code'] = "PHB-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
@@ -182,8 +181,8 @@ def reinitiateInvoice(data):
 				guest['invoice_number'] = inv_data.name
 				amened='No'
 		
-		company_code = {"code":"PHC-01"}
-		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"PHC-01","invoice_date":date_time_obj}
+		company_code = {"code":"PHB-01"}
+		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"PHB-01","invoice_date":date_time_obj}
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber
@@ -279,6 +278,6 @@ def reinitiateInvoice(data):
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
-		frappe.log_error(frappe.get_traceback())
-		logger.error(f"reinitiateInvoice,   {str(e)}")
+		print(str(e),"       invoice parsing")
+		print(traceback.print_exc())
 		return {"success":False,"message":str(e)}		
