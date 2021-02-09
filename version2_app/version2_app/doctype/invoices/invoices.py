@@ -211,8 +211,8 @@ class Invoices(Document):
                                 discount_before_value +=item.item_value	
                                 discount_after_value += item.item_value_after_gst
                                 # credit_note_items.append(item.__dict__)
-            # if len(gst_data['ItemList']) == 0 and invoice.has_credit_items=="Yes" and invoice.invoice_category == "Tax Invoice":
-            #     return {"success":False,"message":"Please convert Tax invoice to Credit invoice"}
+            if len(gst_data['ItemList']) == 0 and invoice.has_credit_items=="Yes" and invoice.invoice_category == "Tax Invoice":
+                return {"success":False,"message":"Please convert Tax invoice to Credit invoice"}
             if invoice.invoice_category == "Credit Invoice":
                 creditIrn = CreditgenerateIrn(invoice_number)
                 return creditIrn
