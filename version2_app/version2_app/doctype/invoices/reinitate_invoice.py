@@ -140,6 +140,7 @@ def Reinitiate_invoice(data):
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 		if total_invoice_amount==0 and len(data['items_data'])>0:
 			total_invoice_amount = sales_amount_after_tax
+			data['total_invoice_amount'] = sales_amount_after_tax
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
