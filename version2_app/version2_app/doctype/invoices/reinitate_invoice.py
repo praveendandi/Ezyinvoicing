@@ -4,14 +4,15 @@ from frappe.model.document import Document
 import requests
 import datetime
 import random
-import traceback 
+import traceback
+import string
 from frappe.utils import get_site_name
 import time
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 import math
 
 
@@ -203,11 +204,12 @@ def Reinitiate_invoice(data):
 			irn_generated = "Zero Invoice"
 			generateb2cQr = False
 		else:
-			if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-				generateb2cQr = False
-				doc.error_message = " Invoice Total Mismatch"
-				doc.irn_generated = "Error"
-				doc.ready_to_generate_irn = "No"
+			if abs(invoice_round_off_amount)>6:
+				if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+					generateb2cQr = False
+					doc.error_message = " Invoice Total Mismatch"
+					doc.irn_generated = "Error"
+					doc.ready_to_generate_irn = "No"
 		
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		doc.place_of_supply = place_of_supply
@@ -278,9 +280,13 @@ def reprocess_calulate_items(data):
 				acc_gst_percentage = 0.00
 				acc_igst_percentage = 0.00
 				total_items_data = {}
-				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',each_item['item_name']]})
+				if companyDetails.number_in_description == 1:
+					item_description_each = (each_item['item_name'].rstrip(string.digits)).strip()
+				else:
+					item_description_each = each_item['item_name']
+				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',item_description_each]})
 				if not sac_code_based_gst:
-					sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['like', '%' + each_item['item_name'].strip() + '%']})
+					sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['like', '%' + item_description_each.strip() + '%']})
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -289,7 +295,7 @@ def reprocess_calulate_items(data):
 						continue 
 					each_item['item_type'] = sac_code_based_gst_rates.type
 				else:
-					return{"success":False,"message":"SAC Code "+ each_item['name']+" not found"}
+					return{"success":False,"message":"SAC Code "+ item_description_each+" not found"}
 				# sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',each_item['item_name'])
 				if "manual_edit" in each_item:
 					if each_item["manual_edit"] == "Yes":
@@ -451,9 +457,13 @@ def reprocess_calulate_items(data):
 			month = item_date[4:8]
 			item["item_value"] = item["item_value"]-item["discount_value"]
 			date_item = day+month+year
-			sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',item['item_name']]})
+			if companyDetails.number_in_description == 1:
+				item_description = (item['item_name'].rstrip(string.digits)).strip()
+			else:
+				item_description = item['item_name']
+			sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['=',item_description]})
 			if not sac_code_based_gst:
-				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['like', '%' + item['item_name'].strip() + '%']})
+				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES', filters={'name': ['like', '%' + item_description.strip() + '%']})
 			if len(sac_code_based_gst)>0:
 				sac_code_based_gst_rates = frappe.get_doc(
 				'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -461,7 +471,7 @@ def reprocess_calulate_items(data):
 				if sac_code_based_gst_rates.ignore == 1:
 					continue
 			else:
-				return{"success":False,"message":"SAC Code "+ item['name']+" not found"}
+				return{"success":False,"message":"SAC Code "+ item_description+" not found"}
 			if sac_code_based_gst_rates.code == '996311':
 				percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
 				if percentage_gst["success"] == True:
@@ -554,6 +564,10 @@ def reprocess_calulate_items(data):
 					type_item = "Excempted"
 				else:
 					type_item = "Included"
+				if gst_percentage>0 or igst_percentage>0:
+					scTaxble = "Yes"
+				else:
+					scTaxble = sac_code_based_gst_rates.taxble	
 				service_dict['item_name'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
 				service_dict['description'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
 				service_dict['date'] = date_item
@@ -570,7 +584,7 @@ def reprocess_calulate_items(data):
 				service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 				service_dict['item_taxable_value'] = scharge_value 
 				service_dict['item_value'] = scharge_value
-				service_dict['taxable'] = sac_code_based_gst_rates.taxble
+				service_dict['taxable'] = "Yes" if gst_percentage>0 else "No"
 				service_dict['unit_of_measurement']= item["unit_of_measurement"]
 				service_dict['quantity'] = item["quantity"]
 				service_dict['unit_of_measurement_description'] = item["unit_of_measurement_description"]

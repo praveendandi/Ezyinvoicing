@@ -124,7 +124,8 @@
   "sez",
   "converted_from_b2b",
   "converted_from_b2b_time",
-  "converted_from_b2b_by"
+  "converted_from_b2b_by",
+  "tax_invoice_referrence_number"
  ],
  "fields": [
   {
@@ -802,12 +803,17 @@
    "fieldname": "converted_from_b2b_by",
    "fieldtype": "Data",
    "label": "Converted From B2B By"
+  },
+  {
+   "fieldname": "tax_invoice_referrence_number",
+   "fieldtype": "Data",
+   "label": "Tax Invoice Referrence Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-25 12:10:43.309725",
+ "modified": "2021-02-03 11:11:01.168375",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -905,6 +911,19 @@
    "delete": 1,
    "read": 1,
    "role": "System Manager",
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
    "write": 1
   }
  ],
