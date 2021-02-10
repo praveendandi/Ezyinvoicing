@@ -939,8 +939,9 @@ def insert_invoice(data):
         sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 
 
-
-        if data['total_invoice_amount'] == 0:
+        if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
+            data['total_invoice_amount'] = sales_amount_after_tax
+        if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
         
         else:
@@ -973,7 +974,7 @@ def insert_invoice(data):
 
                         return{"success":False,"message":TotalMismatchErrorAPI['message']}
         # qr_generated = "Pending"
-        if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
+        if len(data['items_data'])==0:
             irn_generated = "Zero Invoice"
             # if data['guest_data']['invoice_type']=="B2B":
             # 	irn_generated = "Zero Invoice"
