@@ -1093,7 +1093,7 @@ def insert_invoice(data):
                 'Invoices',
                 filters={
                     'invoice_number':
-                    ['like', '%' + data['guest_data']['invoice_number'] + '%']
+                    ['like', data['guest_data']['invoice_number'] + '-%']
                 })
             invoice.amended_from = invCount[0]['name']
             if "-" in invCount[0]['name'][-4:]:
@@ -2645,14 +2645,20 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
     try:
         if len(invoice_number)>0:
-            invCount = frappe.db.get_list(
+            invCount = frappe.get_doc('Invoices',invoice_number)
+
+            if invCount:	
+                invoice_number = invCount.name
+                if invCount.docstatus==2:
+                    AmenedinvCount = frappe.db.get_list(
                     'Invoices',
                     filters={
                         'invoice_number':
-                        ['like', '%' + invoice_number + '%']
+                        ['like', invoice_number+'-%']
                     })
-            if len(invCount)>0:		
-                invoice_number = invCount[0]['name']	
+                    if len(AmenedinvCount)>0:
+                        invoice_number = AmenedinvCount[0]['name']
+                	
             
             invoiceExists = frappe.get_doc('Invoices', invoice_number)
             if invoiceExists:
