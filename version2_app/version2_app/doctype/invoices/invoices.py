@@ -2651,6 +2651,7 @@ def check_invoice_exists(invoice_number):
                         'invoice_number':
                         ['like', '%' + invoice_number + '%']
                     })
+            print(invCount,"/////////")        
             if len(invCount)>0:		
                 invoice_number = invCount[0]['name']	
             
