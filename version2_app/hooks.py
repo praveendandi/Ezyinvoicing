@@ -104,6 +104,10 @@ doc_events = {
 		# "on_update": "version2_app.events.invoiceUpdate",
 		# "on_cancel": "method",
 		# "on_trash": "method"
+	},
+	"File":{
+		# 'after_save':"version2_app.events.fileCreated",
+		'after_insert':"version2_app.events.fileCreated"
 	}
 }
 
