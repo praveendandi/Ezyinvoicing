@@ -167,7 +167,7 @@ def file_parsing(filepath):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
+		guest['room_number'] = int(roomNumber) if roomNumber != "" else " "
 		guest['company_code'] = "Pullman-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
@@ -188,8 +188,7 @@ def file_parsing(filepath):
 					if inv_data.irn_generated=="Pending" or inv_data.irn_generated == "Error":
 						reupload = True
 				else:
-					if inv_data.qr_generated=="Pending" or inv_data.irn_generated=="Error":
-						reupload = True
+					reupload = True
 
 		company_code = {"code":"Pullman-01"}
 		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"Pullman-01","invoice_date":date_time_obj}
