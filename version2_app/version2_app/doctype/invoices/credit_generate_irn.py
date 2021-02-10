@@ -147,7 +147,7 @@ def create_credit_qr_image(invoice_number, gsp):
 			invoice.save()
 			# attach_qr_code(invoice_number, gsp,invoice.company)
 
-		return True
+		return {"succes":True,"message":"QR Generated Successfully"}
 	except Exception as e:
 		print(e, " credit qr image")
 
@@ -381,9 +381,9 @@ def CreditgenerateIrn(invoice_number):
 		#gst data
 		# print(taxpayer_details,"taxxxxxx")
 		if invoice.invoice_category == "Credit Invoice":
-			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
-		else:
 			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
+		else:
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
 		# irnInvoiceNumber = 
 		gst_data = {
 			"Version": "1.1",
@@ -458,7 +458,7 @@ def CreditgenerateIrn(invoice_number):
 		ass_value = 0
 		for index, item in enumerate(invoice.items):
 			# print(item.sac_code,"HsnCD")
-			if item.item_mode == "Credit":
+			if item.item_mode == "Credit" and item.type!="Non-Gst":
 				credit_items.append(item.__dict__)
 				total_igst_value += abs(item.igst_amount)
 				total_sgst_value += abs(item.sgst_amount)
