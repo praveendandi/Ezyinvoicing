@@ -11,6 +11,7 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
 import json
+import string
 import qrcode
 import os, os.path
 import random, string
@@ -143,7 +144,7 @@ class Invoices(Document):
 			ass_value = 0
 			for index, item in enumerate(invoice.items):
 				# print(item.sac_code,"HsnCD")
-				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type == "Included":
+				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
 					total_igst_value += item.igst_amount
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
@@ -199,17 +200,17 @@ class Invoices(Document):
 					gst_data['ItemList'].append(i)
 				else:
 					if invoice.invoice_category == "Credit Invoice":
-						if item.type == "Included":
+						if item.type != "Non-Gst":
 							credit_note_items.append(item.__dict__)
 					elif invoice.invoice_category == "Tax Invoice":
-						if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
+						if item.taxable=="Yes" and item.type!="Non-Gst" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
 							
 							credit_note_items.append(item.__dict__)
 						else:
-							if item.type == "Included":
+							if item.type != "Non-Gst" and company_details['data'].allowance_type=="Discount" and item.table=="yes" and item.is_credit_item=="Yes":
 								discount_before_value +=item.item_value	
 								discount_after_value += item.item_value_after_gst
-								credit_note_items.append(item.__dict__)
+								# credit_note_items.append(item.__dict__)
 			if invoice.invoice_category == "Credit Invoice":
 				creditIrn = CreditgenerateIrn(invoice_number)
 				return creditIrn
@@ -745,8 +746,8 @@ def create_qr_image(invoice_number, gsp):
 			invoice.qr_code_image = response['message']['file_url']
 			invoice.save()
 			# attach_qr_code(invoice_number, gsp, invoice.company)
-			return {"success": True}
-		return {"success": True}
+			return {"success": True,"message":"Qr Generated Successfully"}
+		return {"success": True,"message":"Qr Generated Successfully"}
 	except Exception as e:
 		print(e, "qr image")
 		frappe.log_error(frappe.get_traceback(),invoice_number)
@@ -1264,13 +1265,17 @@ def calulate_items(data):
 			acc_gst_percentage = 0.00
 			acc_igst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":
+				if companyDetails.number_in_description == 1:
+					item_description = (item['name'].rstrip(string.digits)).strip()
+				else:
+					item_description = item['name']
 				sac_code_based_gst = frappe.db.get_list(
 					'SAC HSN CODES',
-					filters={'name': ['=',item['name']]})
+					filters={'name': ['=',item_description]})
 				if not sac_code_based_gst:
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
-						filters={'name': ['like', '%' + item['name'] + '%']})
+						filters={'name': ['like', '%' + item_description + '%']})
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -1279,7 +1284,7 @@ def calulate_items(data):
 						continue 
 					item['item_type'] = sac_code_based_gst_rates.type
 				else:
-					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}
+					return{"success":False,"message":"SAC Code "+ item_description +" not found"}
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if item['sac_code'] == '996311':
@@ -1380,6 +1385,12 @@ def calulate_items(data):
 					if gst_value==0:
 						gst_value = (gst_percentage* scharge_value)/100.0
 						igst_value = (igst_percentage* scharge_value)/100.0
+					else:
+						igst_value = 0
+					if gst_percentage>0 or igst_percentage>0:
+						scTaxble = "Yes"
+					else:
+						scTaxble = sac_code_based_gst_rates.taxble		
 					service_dict['item_name'] = item['name']+"-SC " + str(scharge)
 					service_dict['description'] = item['name']+"-SC " + str(scharge)
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
@@ -1396,7 +1407,7 @@ def calulate_items(data):
 					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 					service_dict['item_taxable_value'] = scharge_value 
 					service_dict['item_value'] = scharge_value
-					service_dict['taxable'] = sac_code_based_gst_rates.taxble
+					service_dict['taxable'] = scTaxble#"Yes" if gst_percentage>0 else "No"
 					service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
 					# service_dict['cess'] = 0
 					# service_dict['cess_amount'] = 0
@@ -1481,7 +1492,14 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
+						if item['sac_code'] == '996311':
+							percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+							if percentage_gst["success"] == True:
+								acc_gst_percentage = percentage_gst["gst_percentage"]	
+								acc_igst_percentage = percentage_gst["igst_percentage"]
+							else:
+								{"success": False, "message": "error in slab helper function"}
 						if (sez == 1 and sac_code_based_gst_rates.exempted == 0) or placeofsupply != companyDetails.state_code:
 							final_item["sgst"] = 0
 							final_item["cgst"] = 0
@@ -1620,7 +1638,7 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
@@ -2250,12 +2268,12 @@ def get_tax_payer_details(data):
 			else:
 				print("Unknown error in get taxpayer details get call  ",
 					  response)
-				error_message = str(response['message'])
+				error_message = "Invalid GstNumber "+data['gstNumber']
 				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
-				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {error_message}")
+				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
 				return {
 					"success": False,
-					"message": response['message'],
+					"message": error_message,
 					"response": response
 				}
 		else:
