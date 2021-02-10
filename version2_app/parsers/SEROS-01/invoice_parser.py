@@ -44,7 +44,6 @@ def file_parsing(filepath):
 			for j in i.splitlines():
 				raw_data.append(j)
 
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 		data = []
 		amened = ''
 		entered = False
@@ -64,69 +63,6 @@ def file_parsing(filepath):
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-=======
-	data = []
-	amened = ''
-	entered = False
-	guestDetailsEntered = False
-	guestDeatils = []
-	invoiceNumber = ''
-	gstNumber = ''
-	date_time_obj = ''
-	total_invoice_amount = ''
-	conf_number = ''
-	membership = ''
-	print_by = ''
-	roomNumber = ""
-	reupload = False
-	invoice_category = "Tax Invoice"
-	for i in raw_data:
-		if "CREDIT TAX INVOICE" in i:
-			invoice_category = "Credit Invoice"
-		if "Confirmation No." in i:
-			confirmation_number = i.split(":")
-			conf_number = confirmation_number[-1].replace(" ", "")
-		if "Total" in i:
-			total_invoice = i.split(" ")
-			total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-		if "Invoice Date" in i:
-			date_time_obj = i.split(":")[-1].strip()
-			date_time_obj = datetime.datetime.strptime(date_time_obj,"%d-%m-%y").strftime('%d-%b-%y %H:%M:%S')
-		if "Room No." in i:
-			room = i.split(":")
-			roomNumber = room[-1]
-			# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-		if "Guest GST ID" in i and "Pan No" not in i:
-			gstNumber = i.split(':')[1].replace(' ', '')
-			gstNumber = gstNumber.replace("ConfirmationNo.","")
-		if "Bill  No." in i:
-			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-			invoiceNumber = ''.join(filter(lambda i: i.isdigit(), invoiceNumber))
-		if "Bill To" in i:
-			guestDetailsEntered = True
-		if "Checkout By:" in i:
-			guestDetailsEntered = False
-		if guestDetailsEntered == True:
-			guestDeatils.append(i)
-		if i in "Date Description Reference Debit Credit" or i in "Date Description Reference c Debit Credit":
-			entered = True
-		if 'CGST 6%=' in i:
-			entered = False
-		if 'Billing' in i:
-			entered = False
-		if 'Total' in i:
-			entered = False
-		if entered == True:
-			data.append(i)
-		if "Guest Name" in i:
-			guestDeatils.append(i)
-		if "Membership" in i:
-			Membership = i.split(":")
-			membership = Membership[-1].replace(" ", "")
-		if "Printed By / On" in i:
-			print_by = i.split(":")
-			print_by = print_by[1].replace(" ","")
->>>>>>> ca660f303dff41f379fc61f9bc29fa2ea19b9449:version2_app/parsers/HICC-01/invoice_parser.py
 
 			if "Total" in i:
 				total_invoice = i.split(" ")
@@ -255,7 +191,6 @@ def file_parsing(filepath):
 			if inv_data.docstatus==2:
 				amened='Yes'
 			else:
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 				invoiceNumber = inv_data.name
 				guest['invoice_number'] = inv_data.name
 				amened='No'
@@ -267,25 +202,6 @@ def file_parsing(filepath):
 
 		company_code = {"code":company}
 		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":company,"invoice_date":date_time_obj}
-=======
-				reupload = True
-
-	company_code = {"code":"HICC-01"}
-	error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"HICC-01","invoice_date":date_time_obj}
-	error_data['invoice_file'] = filepath
-	error_data['guest_name'] = guest['name']
-	error_data['gst_number'] = gstNumber
-	if guest['invoice_type'] == "B2C":
-		error_data['gst_number'] == " "
-	error_data['state_code'] = " "
-	error_data['room_number'] = guest['room_number']
-	error_data['pincode'] = " "
-	error_data['total_invoice_amount'] = total_invoice_amount
-	# gstNumber = "12345"
-	# print(guest['invoice_number'])
-
-	if len(gstNumber) < 15 and len(gstNumber)>0:
->>>>>>> ca660f303dff41f379fc61f9bc29fa2ea19b9449:version2_app/parsers/HICC-01/invoice_parser.py
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber
@@ -390,7 +306,6 @@ def file_parsing(filepath):
 							print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
 						if insertInvoiceApiResponse['success']== True:
 							print("B2C Invoice Created",insertInvoiceApiResponse)
@@ -418,24 +333,3 @@ def file_parsing(filepath):
 	except Exception as e:
 		print(e)
 		print(traceback.print_exc())		
-=======
-						error_data['error_message'] = insertInvoiceApiResponse['message']
-						error_data['amened'] = amened
-						errorInvoice = Error_Insert_invoice(error_data)
-						print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-						return {"success":False,"message":insertInvoiceApiResponse['message']}
-
-			else:
-						
-				error_data['error_message'] = calulateItemsApiResponse['message']
-				error_data['amened'] = amened
-				errorInvoice = Error_Insert_invoice(error_data)
-				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-				return {"success":False,"message":calulateItemsApiResponse['message']}		
-	else:
-		error_data['error_message'] = gspApiDataResponse['message']
-		error_data['amened'] = amened
-		errorInvoice = Error_Insert_invoice(error_data)
-		print("gspApiData fialed:  ",gspApiDataResponse['message'])
-		return {"success":False,"message":gspApiDataResponse['message']}
->>>>>>> ca660f303dff41f379fc61f9bc29fa2ea19b9449:version2_app/parsers/HICC-01/invoice_parser.py
