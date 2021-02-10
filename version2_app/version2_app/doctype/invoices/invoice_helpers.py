@@ -79,7 +79,7 @@ def TotalMismatchError(data,calculated_data):
                 'Pending',
                 'signed_invoice_generated':
                 'No',
-                'total_inovice_amount':data['total_invoice_amount'],
+                'total_invoice_amount':data['total_invoice_amount'],
                 'company':
                 data['company_code'],
                 'mode': calculated_data['company'].mode,
