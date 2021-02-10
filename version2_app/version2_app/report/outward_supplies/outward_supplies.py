@@ -14,7 +14,9 @@ def execute(filters=None):
 		fields = ['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','place_of_supply']
 		doc = frappe.db.get_list('Invoices', filters={'Creation': ['>', filters['from_date']],'Creation':['<',filters['to_date']],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
 		if len(doc) == 0:
-			return {"success":False,"Message":"No data found"}
+			data = []
+			columns = []
+			return columns,data
 		doc_list = [list(x) for x in doc]
 		# print(doc_list)
 		invoice_names = [x[0] for x in doc_list]
