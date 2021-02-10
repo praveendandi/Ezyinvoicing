@@ -25,13 +25,8 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
 	try:
-		company = "SEROS-01"
 		start_time = datetime.datetime.utcnow()
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 		companyCheckResponse = check_company_exist("Pullman-01")
-=======
-		companyCheckResponse = check_company_exist(company)
->>>>>>> 32488ebc62a4f94233d4f35054d771c8a792c800:version2_app/parsers/SEROS-01/invoice_parser.py
 		site_folder_path = companyCheckResponse['data'].site_name
 		file_path = folder_path+'/sites/'+site_folder_path+filepath
 		today = date.today()
@@ -67,26 +62,19 @@ def file_parsing(filepath):
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-
 			if "Departure :" in i:
 				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:] + " 00:00:00"
-				inv_date = datetime.datetime.strptime(date_time_obj, '%d/%m/%y %H:%M:%S')
-				date_time_obj = inv_date.strftime("%d-%b-%y %H:%M:%S")
+				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
 			if "Room No." in i or "Room No" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 			if "GST ID" in i and "Confirmation No." in i:
-=======
-			if "GST ID" in i:
->>>>>>> 32488ebc62a4f94233d4f35054d771c8a792c800:version2_app/parsers/SEROS-01/invoice_parser.py
 				gstNumber = i.split(':')[1].replace(' ', '')
+				gstNumber = gstNumber.replace("ConfirmationNo.","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "Bill To" in i:
@@ -114,8 +102,7 @@ def file_parsing(filepath):
 				p = i.split(":")
 				print_by = p[1].replace(" ","")
 
-		
-		
+
 		items = [] 
 		itemsort = 0
 		for i in data:
@@ -153,6 +140,7 @@ def file_parsing(filepath):
 				itemsort+=1
 				if item !={}:
 					items.append(item)
+
 		total_items = []
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
@@ -167,9 +155,6 @@ def file_parsing(filepath):
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
-				if "Arrival" in guest['name']:
-					guest['name'] = guest['name'].replace("Arrival","")
-
 			if index == 1:
 				guest['address1'] = i
 			if index == 2:
@@ -182,13 +167,8 @@ def file_parsing(filepath):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 		guest['room_number'] = int(roomNumber) if roomNumber != "" else " "
 		guest['company_code'] = "Pullman-01"
-=======
-		guest['room_number'] = int(roomNumber)
-		guest['company_code'] = company
->>>>>>> 32488ebc62a4f94233d4f35054d771c8a792c800:version2_app/parsers/SEROS-01/invoice_parser.py
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
@@ -210,13 +190,8 @@ def file_parsing(filepath):
 				else:
 					reupload = True
 
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 		company_code = {"code":"Pullman-01"}
 		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"Pullman-01","invoice_date":date_time_obj}
-=======
-		company_code = {"code":company}
-		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":company,"invoice_date":date_time_obj}
->>>>>>> 32488ebc62a4f94233d4f35054d771c8a792c800:version2_app/parsers/SEROS-01/invoice_parser.py
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber
@@ -224,11 +199,7 @@ def file_parsing(filepath):
 			error_data['gst_number'] == " "
 		error_data['state_code'] = "7"
 		error_data['room_number'] = guest['room_number']
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 		error_data['pincode'] = "110037"
-=======
-		error_data['pincode'] = " "
->>>>>>> 32488ebc62a4f94233d4f35054d771c8a792c800:version2_app/parsers/SEROS-01/invoice_parser.py
 		error_data['total_invoice_amount'] = total_invoice_amount
 		# gstNumber = "12345"
 		# print(guest['invoice_number'])
@@ -304,8 +275,6 @@ def file_parsing(filepath):
 					return {"success":False,"message":checkTokenIsValidResponse['message']} 
 			else:
 				taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-
-
 				calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
 				if calulateItemsApiResponse['success'] == True:
 					guest['invoice_file'] = filepath
@@ -330,7 +299,7 @@ def file_parsing(filepath):
 							error_data['error_message'] = insertInvoiceApiResponse['message']
 							error_data['amened'] = amened
 							errorInvoice = Error_Insert_invoice(error_data)
-							print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+							print("B2C re insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 
 				else:
@@ -347,13 +316,8 @@ def file_parsing(filepath):
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
-<<<<<<< HEAD:version2_app/version2_app/doctype/invoices/invoice_parser.py
 		print(str(e),"       invoice parsing")
 		print(traceback.print_exc())
 		return {"success":False,"message":str(e)}
 	
 
-=======
-		print(e)
-		print(traceback.print_exc())		
->>>>>>> 32488ebc62a4f94233d4f35054d771c8a792c800:version2_app/parsers/SEROS-01/invoice_parser.py

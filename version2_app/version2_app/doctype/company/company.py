@@ -21,32 +21,32 @@ import os
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
 class company(Document):
-    # pass
-    def on_update(self):
-        if self.name:
-            folder_path = frappe.utils.get_bench_path()
-            site_folder_path = self.site_name
-            folder_path = frappe.utils.get_bench_path()
-            path = folder_path + '/sites/' + site_folder_path
-            if self.invoice_reinitiate_parsing_file:
-                reinitatefilepath = path+self.invoice_reinitiate_parsing_file
-                destination_path = folder_path+self.reinitiate_file_path
-                try:
-                    print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-                    shutil.copy(reinitatefilepath, destination_path)
-                except Exception as e:
-                    print(str(e),"************on_update company")
-                    frappe.throw("file updated Failed")
-            if self.invoice_parser_file:
-                # invoice_parser_file_path
-                invoicefilepath = path+self.invoice_parser_file
-                destination_path2 = folder_path+self.invoice_parser_file_path
-                try:
-                    print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-                    shutil.copy(invoicefilepath,destination_path2)
-                except Exception as e:
-                    print(str(e),"************on_update company")
-                    frappe.throw("file updated Failed")
+        #  pass
+	def on_update(self):
+		if self.name:
+			folder_path = frappe.utils.get_bench_path()
+			site_folder_path = self.site_name
+			folder_path = frappe.utils.get_bench_path()
+			path = folder_path + '/sites/' + site_folder_path
+			if self.invoice_reinitiate_parsing_file:
+				reinitatefilepath = path+self.invoice_reinitiate_parsing_file
+				destination_path = folder_path+self.reinitiate_file_path
+				try:
+					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+					shutil.copy(reinitatefilepath, destination_path)
+				except Exception as e:
+					print(str(e),"************on_update company")
+					frappe.throw("file updated Failed")
+			if self.invoice_parser_file:
+				# invoice_parser_file_path
+				invoicefilepath = path+self.invoice_parser_file
+				destination_path2 = folder_path+self.invoice_parser_file_path
+				try:
+					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+					shutil.copy(invoicefilepath,destination_path2)
+				except Exception as e:
+					print(str(e),"************on_update company")
+					frappe.throw("file updated Failed")
 
 
 
