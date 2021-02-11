@@ -65,6 +65,7 @@ def execute(filters=None):
 		mergedDf['place_of_supply'] = mergedDf['place_of_supply'].fillna(company.state_code)
 		mergedDf.loc[(mergedDf.invoice_type=="B2C"),'Gst Check'] = ' '
 		mergedDf.rename(columns={'invoice_number': 'Invoice Number', 'invoice_date': 'Invoice Date','gst_number':'Gst Number','invoice_type':'Invoice Type','trade_name':'Registered Name','place_of_supply':'Place of Supply (POS)','sac_code':'SAC / HSN CODE','gst_rate':'Gst Number','gst_rate':'Total GST RATE %','item_value':'Taxable Value','item_value_after_gst':'Original Invoice Value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount'}, inplace=True)
+		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
 		mergedDf = mergedDf[columns]
 		data = mergedDf.values.tolist()
 		
