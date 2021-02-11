@@ -33,7 +33,7 @@ io.on('connection', (sock) => {
  io.on('connect_error', (err) => { 
     console.log(`connect error due to ${err.message}`)
  });
-server.listen(3001);
+server.listen(5000);
 subscriber.on("message", function (channel, message) {
     // console.log("leyetettetetetetetetetetetetetet")
     message = JSON.parse(message);
