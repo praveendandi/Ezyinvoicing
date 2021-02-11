@@ -2371,12 +2371,12 @@ def login_gsp(code,mode):
 	except Exception as e:
 		print(e, "login gsp")
 
-
-def login_gsp2():
+@frappe.whitelist(allow_guest=True)
+def updatelogin_gsp(data):
 	try:
-		code = "MHKCP-01"
-		mode = "Testing"
-		print("********** scheduler")
+		code = data['code']
+		mode = data['mode']
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -2392,6 +2392,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.test_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 		elif mode == 'Production':
@@ -2403,6 +2404,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.prod_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:
