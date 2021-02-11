@@ -173,6 +173,8 @@ def file_parsing(filepath):
 			inv_data = check_invoice['data']
 			if inv_data.docstatus==2:
 				amened='Yes'
+				invoiceNumber = inv_data.name
+				guest['invoice_number'] = inv_data.name
 			else:
 				invoiceNumber = inv_data.name
 				guest['invoice_number'] = inv_data.name

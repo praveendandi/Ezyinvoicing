@@ -177,6 +177,8 @@ def file_parsing(filepath):
 			# print(inv_data.__dict__)
 			if inv_data.docstatus==2:
 				amened='Yes'
+				invoiceNumber = inv_data.name
+				guest['invoice_number'] = inv_data.name
 			else:
 				invoiceNumber = inv_data.name
 				guest['invoice_number'] = inv_data.name
@@ -194,9 +196,9 @@ def file_parsing(filepath):
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
-		error_data['state_code'] = "29"
+		error_data['state_code'] = " "
 		error_data['room_number'] = guest['room_number']
-		error_data['pincode'] = "560009"
+		error_data['pincode'] = " "
 		error_data['total_invoice_amount'] = total_invoice_amount
 		# gstNumber = "12345"
 		# print(guest['invoice_number'])
