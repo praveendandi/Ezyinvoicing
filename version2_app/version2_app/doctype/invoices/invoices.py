@@ -941,6 +941,10 @@ def insert_invoice(data):
 
 		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
 			data['total_invoice_amount'] = sales_amount_after_tax
+		if '-' in str(sales_amount_after_tax):
+			allowance_invoice = "Yes"
+		else:
+			allowance_invoice = "No"	 	
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
@@ -1086,7 +1090,8 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": 0
+			"sez": 0,
+			"allowance_invoice":allowance_invoice
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
