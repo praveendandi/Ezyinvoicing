@@ -941,6 +941,10 @@ def insert_invoice(data):
 
 		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
 			data['total_invoice_amount'] = sales_amount_after_tax
+		if '-' in str(sales_amount_after_tax):
+			allowance_invoice = "Yes"
+		else:
+			allowance_invoice = "No"	 	
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
@@ -1086,7 +1090,7 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": data["sez"]
+			"sez": data["sez"] if "sez" in data else 0
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -2366,12 +2370,12 @@ def login_gsp(code,mode):
 	except Exception as e:
 		print(e, "login gsp")
 
-
-def login_gsp2():
+@frappe.whitelist(allow_guest=True)
+def updatelogin_gsp(data):
 	try:
-		code = "MHKCP-01"
-		mode = "Testing"
-		print("********** scheduler")
+		code = data['code']
+		mode = data['mode']
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -2387,6 +2391,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.test_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 		elif mode == 'Production':
@@ -2398,6 +2403,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.prod_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:

@@ -14,12 +14,15 @@ from urllib.request import pathname2url
 from os.path import expanduser
 home = expanduser("~")
 
-host = "http://0.0.0.0:8000/"
+# host = "http://0.0.0.0:8000/"
 @frappe.whitelist(allow_guest=True)
 def Report_Download(data):
     
     try:
         if data['file_type']=="Excel":
+            # print(data)
+            company = frappe.get_doc('company',data['company'])
+            host = company.host
             folder_path = frappe.utils.get_bench_path()
             fileName = data['report_name'].replace(" ","")
             workbook = xlsxwriter.Workbook(home+'/'+fileName+'.xlsx')
