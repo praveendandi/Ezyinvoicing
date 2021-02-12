@@ -72,7 +72,7 @@ def file_parsing(filepath):
 				total_invoice_amount = float(total_invoice.replace(",",""))
 			if "Bill Date" in i:
 				date_time_obj = i.split(':')[-1]
-				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%Y').strftime('%d-%b-%y %H:%M:%S')
+				date_time_obj = datetime.datetime.strptime(date_time_obj, '%m/%d/%Y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
 				room = i.split(" ")
 				roomNumber = room[-1]
@@ -176,6 +176,8 @@ def file_parsing(filepath):
 			inv_data = check_invoice['data']
 			if inv_data.docstatus==2:
 				amened='Yes'
+				invoiceNumber = inv_data.name
+				guest['invoice_number'] = inv_data.name
 			else:
 				invoiceNumber = inv_data.name
 				guest['invoice_number'] = inv_data.name
