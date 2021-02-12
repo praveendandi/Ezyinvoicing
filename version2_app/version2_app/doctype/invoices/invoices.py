@@ -1086,7 +1086,7 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": 0
+			"sez": data["sez"]
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -2674,6 +2674,15 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	try:
+		if "sez" in data:
+			sez = data["sez"]
+		else:
+			doc = frappe.db.exists("Invoices",data["invoice_number"])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+				sez = invoice_doc.sez
+			else:
+				sez = 0
 		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 			data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
 			if not frappe.db.exists('Invoices', data['invoice_number']):
@@ -2759,7 +2768,8 @@ def Error_Insert_invoice(data):
 				"No",
 				'error_message':
 				data['error_message'],
-				"place_of_supply":company.state_code
+				"place_of_supply":company.state_code,
+				"sez":data["sez"]
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			
