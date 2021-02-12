@@ -21,11 +21,7 @@ import os
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
 class company(Document):
-<<<<<<< HEAD
         # pass
-=======
-        #  pass
->>>>>>> ddaacde833ee8103570f1c38c6ae9a28c041ccf4
 	def on_update(self):
 		if self.name:
 			folder_path = frappe.utils.get_bench_path()
