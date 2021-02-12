@@ -19,7 +19,7 @@ import importlib.util
 def invoiceCreated(doc, method=None):
     print("Invoice Created",doc.name)
     # frappe.publish_realtime("invoice_created", "message")
-    frappe.publish_realtime("custom_socket", "{'message':'Invoices Created','data':'doc.name'}")
+    frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':{"name":doc.name, "irn_generated":doc.irn_generated,"invoice_type":doc.invoice_type,"invoice_from":doc.invoice_from}})
 
 
     # frappe.subscriber.on("invoice_created", function (channel, message) {  etc, etc })
