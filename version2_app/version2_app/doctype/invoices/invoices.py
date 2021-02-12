@@ -2775,7 +2775,7 @@ def Error_Insert_invoice(data):
 				'error_message':
 				data['error_message'],
 				"place_of_supply":company.state_code,
-				"sez":data["sez"]
+				"sez":sez
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			

@@ -115,7 +115,7 @@ def TotalMismatchError(data,calculated_data):
                 'credit_gst_amount': round(calculated_data['credit_cgst_amount'],2) + round(calculated_data['credit_sgst_amount'],2) + round(calculated_data['credit_igst_amount'],2),	
                 'error_message':" Invoice Total Mismatch",
                 "place_of_supply":companyDetails.state_code,
-                "sez":data["sez"]
+                "sez":data["sez"] if "sez" in data else 0
             })
         if data['amened'] == 'Yes':
             invCount = frappe.db.get_list(
