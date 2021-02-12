@@ -13,7 +13,7 @@ def execute(filters=None):
 		columns = ["Invoice Number","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","Place of Supply (POS)","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","UQC","Quantity","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value"]
 		
 		fields = ['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','place_of_supply']
-		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['>=', filters['from_date']],'invoice_date':['<=',filters['to_date']],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
+		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['>=', filters['from_date']],'invoice_date':['<=',filters['to_date']],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
 		if len(doc) == 0:
 			data = []
 			columns = []

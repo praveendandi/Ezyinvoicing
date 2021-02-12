@@ -240,3 +240,15 @@ def manual_to_pms():
     except Exception as e:
         return{"success":False}
 
+@frappe.whitelist(allow_guest=True)
+def manulaTax_credit_to_debit():
+    try:
+        data = frappe.db.get_list('Items',filters={'item_mode': 'Credit','is_credit_item':'Yes'},fields=["name","parent"])
+        if len(data)>0:
+            updatetax = frappe.db.sql("""update tabItems set item_mode='Debit' where item_mode='credit' and is_credit_item='No'""")
+            frappe.db.commit()
+        # print(data)
+        return True
+    except Exception as e:
+        return{"success":False,"message":str(e)}
+
