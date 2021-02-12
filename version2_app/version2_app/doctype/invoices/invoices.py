@@ -11,6 +11,7 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
 import json
+import string
 import qrcode
 import os, os.path
 import random, string
@@ -26,7 +27,7 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import fitz
+# import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -143,7 +144,7 @@ class Invoices(Document):
 			ass_value = 0
 			for index, item in enumerate(invoice.items):
 				# print(item.sac_code,"HsnCD")
-				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type == "Included":
+				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
 					total_igst_value += item.igst_amount
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
@@ -199,17 +200,19 @@ class Invoices(Document):
 					gst_data['ItemList'].append(i)
 				else:
 					if invoice.invoice_category == "Credit Invoice":
-						if item.type == "Included":
+						if item.type != "Non-Gst":
 							credit_note_items.append(item.__dict__)
 					elif invoice.invoice_category == "Tax Invoice":
-						if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
+						if item.taxable=="Yes" and item.type!="Non-Gst" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
 							
 							credit_note_items.append(item.__dict__)
 						else:
-							if item.type == "Included":
+							if item.type != "Non-Gst" and company_details['data'].allowance_type=="Discount" and item.table=="yes" and item.is_credit_item=="Yes":
 								discount_before_value +=item.item_value	
 								discount_after_value += item.item_value_after_gst
-								credit_note_items.append(item.__dict__)
+								# credit_note_items.append(item.__dict__)
+			if len(gst_data['ItemList']) == 0 and invoice.has_credit_items=="Yes" and invoice.invoice_category == "Tax Invoice":
+				return {"success":False,"message":"Please convert Tax invoice to Credit invoice"}
 			if invoice.invoice_category == "Credit Invoice":
 				creditIrn = CreditgenerateIrn(invoice_number)
 				return creditIrn
@@ -217,6 +220,8 @@ class Invoices(Document):
 			discount_after_value = abs(discount_after_value)
 			TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
 			TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+			
+			# print(TotInnVal,TotInvValFc)
 			gst_data["ValDtls"] = {
 				"AssVal": round(ass_value, 2), 
 				"CgstVal": round(total_cgst_value, 2),
@@ -231,7 +236,7 @@ class Invoices(Document):
 				"TotInvValFc": round(TotInvValFc, 2)
 			}
 			
-			print(gst_data)
+			# print(gst_data['ValDtls'])
 			if ass_value > 0:
 				try:
 					response = postIrn(gst_data, GSP_details['data'],
@@ -278,8 +283,8 @@ class Invoices(Document):
 								invoice.irn_number = response['result'][0]['Desc']['Irn']
 								invoice.ack_date = response['result'][0]['Desc']['AckDt']
 								invoice.irn_generated = "Success"
-								invoice.qr_code_image = ""
-								invoice.qr_code_generated = "Success"
+								# invoice.qr_code_image = ""
+								# invoice.qr_code_generated = "Success"
 								invoice.save(ignore_permissions=True, ignore_version=True)
 							
 							irn_error_message = response["message"]
@@ -436,11 +441,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		ackdate = invoice.ack_date
 		ack_date = ackdate.split(" ")
 		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
-		# irntext = "IRN: "+ invoice.irn_number
-		# acknotext = "ACK NO: " + invoice.ack_no 
-		# ackdatetext = "ACK DATE: " + invoice.ack_date
-		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
+		
 		page.insertText(
 			where,
 			text,
@@ -486,19 +487,18 @@ def send_invoicedata_to_gcb(invoice_number):
 			path = folder_path + '/sites/' + company.site_name
 			file_name = invoice_number + 'b2cqr.png'
 			dst_pdf_filename = path + "/private/files/" + file_name
-
-			if doc.b2c_qrimage:
-				attach_qr = attach_b2c_qrcode({
-					"invoice_number": invoice_number,
-					"company": doc.company
-				})
-				if attach_qr["success"] == False:
-					return {"success": False, "message": attach_qr["message"]}
-				else:
-					return {
-						"success": True,
-						"message": "QR-Code generated successfully"
-					}
+			# if doc.b2c_qrimage:
+			# 	attach_qr = attach_b2c_qrcode({
+			# 		"invoice_number": invoice_number,
+			# 		"company": doc.company
+			# 	})
+			# 	if attach_qr["success"] == False:
+			# 		return {"success": False, "message": attach_qr["message"]}
+			# 	else:
+			# 		return {
+			# 			"success": True,
+			# 			"message": "QR-Code generated successfully"
+			# 		}
 
 			filename = invoice_number + doc.company + ".json"
 			b2c_file = path + "/private/files/" + filename
@@ -556,16 +556,7 @@ def send_invoicedata_to_gcb(invoice_number):
 							"message": response["message"]
 						}
 
-				# storage_client = storage.Client.from_service_account_json(
-				# 	folder_path +"/apps/version2_app/version2_app/version2_app/doctype/invoices/jaypee-group-a9b672ada582.json"
-				# )
-				# bucket = storage_client.get_bucket("ezyinvoices-b2c")
-				# with open(b2c_file, "w") as outfile:
-				# 	json.dump(b2c_data, outfile)
-				# blob = bucket.blob(filename)
-				# with open(b2c_file, 'rb') as img_data:
-				# 	blob.upload_from_file(img_data)
-
+				
 				qr = qrcode.QRCode(
 					version=1,
 					error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -633,21 +624,24 @@ def send_invoicedata_to_gcb(invoice_number):
 			if 'message' in response:
 				doc.b2c_qrimage = response['message']['file_url']
 				doc.name = invoice_number
+				doc.irn_generated = "Success"
+				doc.qr_code_generated = "Success"
 				doc.save(ignore_permissions=True, ignore_version=True)
-				attach_qr = attach_b2c_qrcode({
-					"invoice_number": invoice_number,
-					"company": doc.company
-				})
-				if attach_qr["success"] == False:
-					if os.path.exists(b2c_file):
-						os.remove(b2c_file)
-					if os.path.exists(dst_pdf_filename):
-						os.remove(dst_pdf_filename)
-					return {"success": False, "message": attach_qr["message"]}
-				if os.path.exists(b2c_file):
-					os.remove(b2c_file)
-				if os.path.exists(dst_pdf_filename):
-					os.remove(dst_pdf_filename)
+				frappe.db.commit()
+				# attach_qr = attach_b2c_qrcode({
+				# 	"invoice_number": invoice_number,
+				# 	"company": doc.company
+				# })
+				# if attach_qr["success"] == False:
+				# 	if os.path.exists(b2c_file):
+				# 		os.remove(b2c_file)
+				# 	if os.path.exists(dst_pdf_filename):
+				# 		os.remove(dst_pdf_filename)
+				# 	return {"success": False, "message": attach_qr["message"]}
+				# if os.path.exists(b2c_file):
+				# 	os.remove(b2c_file)
+				# if os.path.exists(dst_pdf_filename):
+				# 	os.remove(dst_pdf_filename)
 				return {
 					"success": True,
 					"message": "QR-Code generated successfully"
@@ -695,80 +689,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 
 
 
-def attach_qr_code(invoice_number, gsp, code):
-	try:
-		invoice = frappe.get_doc('Invoices', invoice_number)
-		company = frappe.get_doc('company', invoice.company)
-		folder_path = frappe.utils.get_bench_path()
-		site_folder_path = company.site_name
-		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host)
-		path = folder_path + '/sites/' + site_folder_path
-		src_pdf_filename = path + invoice.invoice_file
-		dst_pdf_filename = path + "/private/files/" + invoice_number + 'withQr.pdf'
-		# attaching qr code
-		img_filename = path + invoice.qr_code_image
-		# img_rect = fitz.Rect(250, 200, 340, 270)
-		img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1,
-							 company.qr_rect_y0, company.qr_rect_y1)
-		document = fitz.open(src_pdf_filename)
 
-		page = document[0]
-
-		page.insertImage(img_rect, filename=img_filename)
-		document.save(dst_pdf_filename)
-		document.close()
-		# attacing irn an ack
-		dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withQrIrn.pdf'
-		doc = fitz.open(dst_pdf_filename)
-		
-		if company.irn_details_page == "First":
-			page = doc[0]
-		else:
-			page = doc[-1]
-		# page = doc[0]
-		# where = fitz.Point(15, 55)
-		where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		ackdate = invoice.ack_date
-		ack_date = ackdate.split(" ")
-		text = "IRN: " + invoice.irn_number +"          "+ "ACK NO: " + invoice.ack_no + "       " + "ACK DATE: " + ack_date[0]
-		# irntext = "IRN: "+ invoice.irn_number
-		# acknotext = "ACK NO: " + invoice.ack_no 
-		# ackdatetext = "ACK DATE: " + invoice.ack_date
-		# where1 = fitz.Point(company.irn_text_point1, company.irn_text_point2)
-		# text = "IRN: " + invoice.irn_number + "\n" + "ACK NO: " + invoice.ac
-		page.insertText(
-			where,
-			text,
-			fontname="Roboto-Black",  # arbitrary if fontfile given
-			fontfile=folder_path +
-			company.font_file_path,  #fontpath,  # any file containing a font
-			fontsize=7,  # default
-			rotate=0,  # rotate text
-			color=(0, 0, 0),  # some color (blue)
-			overlay=True)
-				
-		doc.save(dst_pdf_text_filename)
-		doc.close()
-
-		files = {"file": open(dst_pdf_text_filename, 'rb')}
-		payload = {
-			"is_private": 1,
-			"folder": "Home",
-			"doctype": "Invoices",
-			"docname": invoice_number,
-			'fieldname': 'invoice_with_gst_details'
-		}
-		site = company.host
-		upload_qr_image = requests.post(site + "api/method/upload_file",
-										files=files,
-										data=payload)
-		response = upload_qr_image.json()
-		if 'message' in response:
-			invoice.invoice_with_gst_details = response['message']['file_url']
-			invoice.save()
-		return
-	except Exception as e:
-		print(e, "attach qr code")
 
 
 def create_qr_image(invoice_number, gsp):
@@ -803,9 +724,7 @@ def create_qr_image(invoice_number, gsp):
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,
 									   stream=True,
-									   proxies=proxies,verify=False)
-		# print(headers,"//////")								   
-		# print(qr_response.content,"////////")							   
+									   proxies=proxies,verify=False)						   
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -828,9 +747,9 @@ def create_qr_image(invoice_number, gsp):
 		if 'message' in response:
 			invoice.qr_code_image = response['message']['file_url']
 			invoice.save()
-			attach_qr_code(invoice_number, gsp, invoice.company)
-			return {"success": True}
-		return {"success": True}
+			# attach_qr_code(invoice_number, gsp, invoice.company)
+			return {"success": True,"message":"Qr Generated Successfully"}
+		return {"success": True,"message":"Qr Generated Successfully"}
 	except Exception as e:
 		print(e, "qr image")
 		frappe.log_error(frappe.get_traceback(),invoice_number)
@@ -1020,40 +939,46 @@ def insert_invoice(data):
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 
 
-
-		if data['total_invoice_amount'] == 0:
+		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
+			data['total_invoice_amount'] = sales_amount_after_tax
+		if '-' in str(sales_amount_after_tax):
+			allowance_invoice = "Yes"
+		else:
+			allowance_invoice = "No"	 	
+		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
 		else:
 			if len(data['items_data'])>0:
 				roundoff_amount = data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 				data['invoice_round_off_amount'] = roundoff_amount
-				if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-					
-					calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
-							"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,
-							"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,
-							"total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
-							"total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
-							"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
-							"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
-					
-					
-					TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
-					if TotalMismatchErrorAPI['success']==True:
-						# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
-						# if data['total_invoice_amount'] !=0:
-						items = data['items_data']
-						itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
-						# insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
-						TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
-						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-							items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
-						return {"success": True}
+				if abs(roundoff_amount)>6:
+					if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+						
+						calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
+								"value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,
+								"credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,
+								"total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
+								"total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
+								"credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
+								"pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
+						
+						
+						TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
+						if TotalMismatchErrorAPI['success']==True:
+							# items = [x for x in data['items_data'] if x['item_mode'] == "Debit"]
+							# if data['total_invoice_amount'] !=0:
+							items = data['items_data']
+							itemsInsert = insert_items(items, TotalMismatchErrorAPI['invoice_number'])
+							# insert_tax_summaries2(items, TotalMismatchErrorAPI['invoice_number'])
+							TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
+							hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+								items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+							return {"success": True}
 
-					return{"success":False,"message":TotalMismatchErrorAPI['message']}
+						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
-		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
+		if len(data['items_data'])==0:
 			irn_generated = "Zero Invoice"
 			# if data['guest_data']['invoice_type']=="B2B":
 			# 	irn_generated = "Zero Invoice"
@@ -1165,19 +1090,19 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": 0
+			"sez": 0,
+			"allowance_invoice":allowance_invoice
 		})
 		if data['amened'] == 'Yes':
-			invCount = frappe.db.get_list(
-				'Invoices',
-				filters={
-					'invoice_number':
-					['like', '%' + data['guest_data']['invoice_number'] + '%']
-				})
-			invoice.amended_from = invCount[0]['name']
-			if "-" in invCount[0]['name'][-4:]:
-				amenedindex = invCount[0]['name'].rfind("-")
-				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
+			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+				# filters={
+				#     'invoice_number':
+				#     ['like', data['guest_data']['invoice_number'] + '-%']
+				# })
+			invoice.amended_from = invCount.name
+			if "-" in invCount.name[-4:]:
+				amenedindex = invCount.name.rfind("-")
+				ameneddigit = int(invCount.name[amenedindex+1:])
 				ameneddigit = ameneddigit+1 
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
 				# pass
@@ -1347,13 +1272,17 @@ def calulate_items(data):
 			acc_gst_percentage = 0.00
 			acc_igst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":
+				if companyDetails.number_in_description == 1:
+					item_description = (item['name'].rstrip(string.digits)).strip()
+				else:
+					item_description = item['name']
 				sac_code_based_gst = frappe.db.get_list(
 					'SAC HSN CODES',
-					filters={'name': ['=',item['name']]})
+					filters={'name': ['=',item_description]})
 				if not sac_code_based_gst:
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
-						filters={'name': ['like', '%' + item['name'] + '%']})
+						filters={'name': ['like', '%' + item_description + '%']})
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -1362,7 +1291,7 @@ def calulate_items(data):
 						continue 
 					item['item_type'] = sac_code_based_gst_rates.type
 				else:
-					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}
+					return{"success":False,"message":"SAC Code "+ item_description +" not found"}
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if item['sac_code'] == '996311':
@@ -1410,15 +1339,16 @@ def calulate_items(data):
 						sac_code_new = sac_code_based_gst_rates.code
 						vat_rate_percentage = 0
 					if sac_code_based_gst_rates.net == "Yes":
-						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
-						gst_value = item['item_value']- base_value
 						scharge_value = (scharge * base_value) / 100.0
+						gst_value = round((gst_percentage+igst_percentage)*scharge_value )/ 100.0
 						if sac_code_based_gst_rates.service_charge_net == "Yes":
 							scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
 							gst_value = scharge_value- scharge_value_base
 							scharge_value = scharge_value_base
 						item['base_value'] = base_value
+
+
 						# gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 					else:
 						base_value = item['item_value']
@@ -1462,6 +1392,12 @@ def calulate_items(data):
 					if gst_value==0:
 						gst_value = (gst_percentage* scharge_value)/100.0
 						igst_value = (igst_percentage* scharge_value)/100.0
+					else:
+						igst_value = 0
+					if gst_percentage>0 or igst_percentage>0:
+						scTaxble = "Yes"
+					else:
+						scTaxble = sac_code_based_gst_rates.taxble		
 					service_dict['item_name'] = item['name']+"-SC " + str(scharge)
 					service_dict['description'] = item['name']+"-SC " + str(scharge)
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
@@ -1478,7 +1414,7 @@ def calulate_items(data):
 					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 					service_dict['item_taxable_value'] = scharge_value 
 					service_dict['item_value'] = scharge_value
-					service_dict['taxable'] = sac_code_based_gst_rates.taxble
+					service_dict['taxable'] = scTaxble#"Yes" if gst_percentage>0 else "No"
 					service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
 					# service_dict['cess'] = 0
 					# service_dict['cess_amount'] = 0
@@ -1520,6 +1456,7 @@ def calulate_items(data):
 						final_item['type'] = "Excempted"
 						final_item['item_type'] = "Discount"
 						final_item['item_mode'] = ItemMode
+						final_item['sort_order'] = item['sort_order']
 				if sac_code_based_gst_rates.taxble == "Yes" and sac_code_based_gst_rates.type != "Discount":
 					if "-" in str(item['item_value']) and invoice_category == "Tax Invoice":
 						final_item['item_mode'] = ItemMode
@@ -1562,7 +1499,14 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
+						if item['sac_code'] == '996311':
+							percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+							if percentage_gst["success"] == True:
+								acc_gst_percentage = percentage_gst["gst_percentage"]	
+								acc_igst_percentage = percentage_gst["igst_percentage"]
+							else:
+								{"success": False, "message": "error in slab helper function"}
 						if (sez == 1 and sac_code_based_gst_rates.exempted == 0) or placeofsupply != companyDetails.state_code:
 							final_item["sgst"] = 0
 							final_item["cgst"] = 0
@@ -1701,7 +1645,7 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
@@ -2331,12 +2275,12 @@ def get_tax_payer_details(data):
 			else:
 				print("Unknown error in get taxpayer details get call  ",
 					  response)
-				error_message = str(response['message'])
+				error_message = "Invalid GstNumber "+data['gstNumber']
 				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
-				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {error_message}")
+				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
 				return {
 					"success": False,
-					"message": response['message'],
+					"message": error_message,
 					"response": response
 				}
 		else:
@@ -2427,12 +2371,12 @@ def login_gsp(code,mode):
 	except Exception as e:
 		print(e, "login gsp")
 
-
-def login_gsp2():
+@frappe.whitelist(allow_guest=True)
+def updatelogin_gsp(data):
 	try:
-		code = "MHKCP-01"
-		mode = "Testing"
-		print("********** scheduler")
+		code = data['code']
+		mode = data['mode']
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -2448,6 +2392,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.test_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 		elif mode == 'Production':
@@ -2459,6 +2404,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.prod_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:
@@ -2705,14 +2651,21 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
 	try:
 		if len(invoice_number)>0:
-			invCount = frappe.db.get_list(
+			invCount = frappe.get_doc('Invoices',invoice_number)
+
+			if invCount:	
+				invoice_number = invCount.name
+				if invCount.docstatus==2:
+					AmenedinvCount = frappe.db.get_list(
 					'Invoices',
 					filters={
 						'invoice_number':
-						['like', '%' + invoice_number + '%']
+						['like', invoice_number+'-%']
 					})
-			if len(invCount)>0:		
-				invoice_number = invCount[0]['name']	
+					print(AmenedinvCount)
+					if len(AmenedinvCount)>0:
+						invoice_number = AmenedinvCount[0]['name']
+					
 			
 			invoiceExists = frappe.get_doc('Invoices', invoice_number)
 			if invoiceExists:
@@ -2727,135 +2680,137 @@ def check_invoice_exists(invoice_number):
 
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
-	# try:
-	if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-		data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
+	try:
+		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+			data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
+			if not frappe.db.exists('Invoices', data['invoice_number']):
+				data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
+				if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+					error_invoice_calculation(data_error,data)
+					if 'items_data' in list(data.keys()):
+						items = data['items_data']
+						itemsInsert = insert_items(items,data['invoice_number'])
+						# insert_tax_summaries2(items,data['invoice_number'])
+						TaxSummariesInsert(items,data['invoice_number'])
+						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+							items, data['invoice_number'],"Invoice")
+					
+				# return {"success": True}	
+
+					return {"success":False,"message":"Error"} 
+		
+		company = frappe.get_doc('company',data['company_code'])
 		if not frappe.db.exists('Invoices', data['invoice_number']):
+			invType = data['invoice_type']
+			
+			irn_generated = "Error"
+			# qr_generated = "Error"
+			
+
+			invoice = frappe.get_doc({
+				'doctype':
+				'Invoices',
+				'invoice_number':
+				data['invoice_number'],
+				'invoice_type':data['invoice_type'],
+				'guest_name':
+				data['guest_name'],
+				# if len(data['gst_number'])==15:
+				# 	'gst_number': data['gst_number'],
+
+
+				'invoice_file':
+				data['invoice_file'],
+				'room_number':
+				data['room_number'],
+				'irn_generated':irn_generated,
+				# 'qr_generated':qr_generated,
+				'invoice_date':
+				datetime.datetime.strptime(data['invoice_date'],
+										'%d-%b-%y %H:%M:%S'),
+				'legal_name':
+				" ",
+				'address_1':
+				" ",
+				'email':
+				" ",
+				'trade_name':
+				" ",
+				'address_2':
+				" ",
+				'phone_number':
+				" ",
+				'location':
+				" ",
+				'pincode':
+				data['pincode'],
+				'state_code':
+				data['state_code'],
+				'amount_before_gst':
+				0,
+				"amount_after_gst":
+				0,
+				"other_charges":
+				0,  
+				'mode':company.mode,
+				'total_invoice_amount':data['total_invoice_amount'],
+				'irn_cancelled':
+				'No',
+				'qr_code_generated':
+				'Pending',
+				'signed_invoice_generated':
+				'No',
+				'company':
+				data['company_code'],
+				'ready_to_generate_irn':
+				"No",
+				'error_message':
+				data['error_message'],
+				"place_of_supply":company.state_code
+			})
+			v = invoice.insert(ignore_permissions=True, ignore_links=True)
+			
+			if 'items_data' in list(data.keys()):
+				items = data['items_data']
+				itemsInsert = insert_items(items,data['invoice_number'])
+				# insert_tax_summaries2(items,data['invoice_number'])
+				TaxSummariesInsert(items,data['invoice_number'])
+				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+					items, data['invoice_number'],"Invoice")
+					
+				# return {"success": True}	
+
+			return {"success":False,"message":"Error"} 
+		
+		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
+		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 			data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
-			if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-				error_invoice_calculation(data_error,data)
-				if 'items_data' in list(data.keys()):
-					items = data['items_data']
-					itemsInsert = insert_items(items,data['invoice_number'])
-					# insert_tax_summaries2(items,data['invoice_number'])
-					TaxSummariesInsert(items,data['invoice_number'])
-					hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-						items, data['invoice_number'],"Invoice")
-				
-			# return {"success": True}	
-
-				return {"success":False,"message":"Error"} 
-	
-	company = frappe.get_doc('company',data['company_code'])
-	if not frappe.db.exists('Invoices', data['invoice_number']):
-		invType = data['invoice_type']
-		
-		irn_generated = "Error"
-		# qr_generated = "Error"
-		
-
-		invoice = frappe.get_doc({
-			'doctype':
-			'Invoices',
-			'invoice_number':
-			data['invoice_number'],
-			'invoice_type':data['invoice_type'],
-			'guest_name':
-			data['guest_name'],
-			# if len(data['gst_number'])==15:
-			# 	'gst_number': data['gst_number'],
+		if invoiceExists.invoice_type == "B2B" and	invoiceExists.irn_generated == "Success":
+			return True 	
+		else:
+			invoiceExists.error_message = data['error_message']
+			# if invoiceExists.invoice_type == "B2B":
+			invoiceExists.ready_to_generate_irn = "No"
+			invoiceExists.irn_generated = "Error"
+			invoiceExists.total_invoice_amount = data['total_invoice_amount']
+			# invoiceExists.qr_generated = "Pending"
 
 
-			'invoice_file':
-			data['invoice_file'],
-			'room_number':
-			data['room_number'],
-			'irn_generated':irn_generated,
-			# 'qr_generated':qr_generated,
-			'invoice_date':
-			datetime.datetime.strptime(data['invoice_date'],
-									'%d-%b-%y %H:%M:%S'),
-			'legal_name':
-			" ",
-			'address_1':
-			" ",
-			'email':
-			" ",
-			'trade_name':
-			" ",
-			'address_2':
-			" ",
-			'phone_number':
-			" ",
-			'location':
-			" ",
-			'pincode':
-			data['pincode'],
-			'state_code':
-			data['state_code'],
-			'amount_before_gst':
-			0,
-			"amount_after_gst":
-			0,
-			"other_charges":
-			0,  
-			'mode':company.mode,
-			'total_invoice_amount':data['total_invoice_amount'],
-			'irn_cancelled':
-			'No',
-			'qr_code_generated':
-			'Pending',
-			'signed_invoice_generated':
-			'No',
-			'company':
-			data['company_code'],
-			'ready_to_generate_irn':
-			"No",
-			'error_message':
-			data['error_message'],
-			"place_of_supply":company.state_code
-		})
-		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		
-		if 'items_data' in list(data.keys()):
-			items = data['items_data']
-			itemsInsert = insert_items(items,data['invoice_number'])
-			# insert_tax_summaries2(items,data['invoice_number'])
-			TaxSummariesInsert(items,data['invoice_number'])
-			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-				items, data['invoice_number'],"Invoice")
-				
-			# return {"success": True}	
-
-		return {"success":False,"message":"Error"} 
-	
-	invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
-	if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-		data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
-			
-	invoiceExists.error_message = data['error_message']
-	# if invoiceExists.invoice_type == "B2B":
-	invoiceExists.ready_to_generate_irn = "No"
-	invoiceExists.irn_generated = "Error"
-	invoiceExists.total_invoice_amount = data['total_invoice_amount']
-	# invoiceExists.qr_generated = "Pending"
-
-
-	invoiceExists.save()
-	# if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-	# 	error_invoice_calculation(data_error)
-	if 'items_data' in list(data.keys()):
-		items = data['items_data']
-		itemsInsert = insert_items(items,data['invoice_number'])
-		# insert_tax_summaries2(items,data['invoice_number'])
-		TaxSummariesInsert(items,data['invoice_number'])
-		hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-			items, data['invoice_number'],"Invoice")
-			
-	return {"success":False,"message":"error"}
-	# except Exception as e:
-	# 	print(e, "  Error insert Invoice")
-	# 	return {"success": False, "message": str(e)}
+			invoiceExists.save()
+			# if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+			# 	error_invoice_calculation(data_error)
+			if 'items_data' in list(data.keys()):
+				items = data['items_data']
+				itemsInsert = insert_items(items,data['invoice_number'])
+				# insert_tax_summaries2(items,data['invoice_number'])
+				TaxSummariesInsert(items,data['invoice_number'])
+				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+					items, data['invoice_number'],"Invoice")
+					
+			return {"success":False,"message":"error"}
+	except Exception as e:
+		print(e, "  Error insert Invoice")
+		return {"success": False, "message": str(e)}
 
 
 def attach_b2c_qrcode(data):
@@ -2921,6 +2876,7 @@ def attach_b2c_qrcode(data):
 			invoice.irn_generated = "Success"
 			invoice.qr_code_generated = "Success"
 			invoice.save(ignore_permissions=True, ignore_version=True)
+			frappe.db.commit()
 			if os.path.exists(attach_qrpath):
 				os.remove(attach_qrpath)
 			return {"success": True, "message": "Qr Attached successfully"}

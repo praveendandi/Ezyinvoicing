@@ -79,7 +79,7 @@ def TotalMismatchError(data,calculated_data):
                 'Pending',
                 'signed_invoice_generated':
                 'No',
-                'total_inovice_amount':data['total_invoice_amount'],
+                'total_invoice_amount':data['total_invoice_amount'],
                 'company':
                 data['company_code'],
                 'mode': calculated_data['company'].mode,
@@ -148,7 +148,7 @@ def TotalMismatchError(data,calculated_data):
 
 def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
     try:
-        if data['item_value']>1000 and data['item_value']<=7500:
+        if data['item_value']>=1000 and data['item_value']<=7500:
             gst_percentage = 12
         elif data['item_value'] > 7500:
             gst_percentage = 18
