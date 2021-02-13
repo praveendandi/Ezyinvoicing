@@ -71,7 +71,7 @@ def reinitiateInvoice(data):
 			if "Room No" in i:
 				room = i.split(" ")
 				roomNumber = room[-1]
-			if "GSTN Number" in i:
+			if "GSTN Number" in i or "Billing Instructions" in i:
 				gstNumber = i.split(':')[-1].replace(' ', '')
 			if "Bill Number" in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
