@@ -109,6 +109,12 @@ doc_events = {
 		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
 	}
+	# "Bench Manager Command":{
+	# 	# 'after_save':"version2_app.events.updateManager",
+	# 	'after_insert':"version2_app.events.updateManager",
+	# 	# 'on_update':"version2_app.events.updateManager"
+	# }
+
 }
 
 # Scheduled Tasks
