@@ -88,8 +88,8 @@ def updateManager(doc, method=None):
                 console_dump += c
         logged_command = " && ".join(commands)
         frappe.publish_realtime("custom_socket", {'message':'bench  update completed','type':"bench start",'data':doc.__dict__})
-        frappe.log_error("Angular project pull", console_dump)
-        frappe.log_error("Angular project pull data",doc.__dict__)
+        # frappe.log_error("Angular project pull", console_dump)
+        frappe.log_error("Angular project pull data","sample")
 
         # if terminal.wait():
         # 	_close_the_doc(start_time, key, console_dump, status='Failed', user=frappe.session.user)
