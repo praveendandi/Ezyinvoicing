@@ -521,7 +521,7 @@ def CreditgenerateIrn(invoice_number):
 			"SgstVal": round(total_sgst_value, 2),
 			"IgstVal": round(total_igst_value, 2),
 			"CesVal": round(total_cess_calue,2),
-			"StCesVal": 0,
+			"StCesVal": round(total_state_cess_value,2),
 			"Discount": 0,
 			"OthChrg": 0,
 			"RndOffAmt": 0,
