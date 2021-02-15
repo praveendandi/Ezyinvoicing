@@ -455,7 +455,7 @@ def CreditgenerateIrn(invoice_number):
 		total_sgst_value = 0
 		total_cgst_value = 0
 		total_cess_calue = 0
-		total_state_cess_value
+		total_state_cess_value = 0
 		ass_value = 0
 		for index, item in enumerate(invoice.items):
 			# print(item.sac_code,"HsnCD")
