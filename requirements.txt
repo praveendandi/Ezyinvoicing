@@ -5,6 +5,5 @@ qrcode
 google-cloud-storage
 XlsxWriter
 wget
-pyipp
-dataclasses
+watchdog
 ippserver

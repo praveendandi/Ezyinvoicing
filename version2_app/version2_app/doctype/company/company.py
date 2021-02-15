@@ -253,3 +253,6 @@ def manulaTax_credit_to_debit():
     except Exception as e:
         return{"success":False,"message":str(e)}
 
+def getcompany():
+    company = frappe.db.get_list('company',['name','ipp_port','folios_folder_path'])
+    return company
