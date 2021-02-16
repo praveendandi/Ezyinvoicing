@@ -4,4 +4,4 @@ version 2 features
 
 #### License
 
-MIT
+MIT License

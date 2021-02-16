@@ -147,7 +147,7 @@ def create_credit_qr_image(invoice_number, gsp):
 			invoice.save()
 			# attach_qr_code(invoice_number, gsp,invoice.company)
 
-		return True
+		return {"succes":True,"message":"QR Generated Successfully"}
 	except Exception as e:
 		print(e, " credit qr image")
 
@@ -381,9 +381,9 @@ def CreditgenerateIrn(invoice_number):
 		#gst data
 		# print(taxpayer_details,"taxxxxxx")
 		if invoice.invoice_category == "Credit Invoice":
-			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
-		else:
 			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
+		else:
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
 		# irnInvoiceNumber = 
 		gst_data = {
 			"Version": "1.1",
@@ -455,15 +455,17 @@ def CreditgenerateIrn(invoice_number):
 		total_sgst_value = 0
 		total_cgst_value = 0
 		total_cess_calue = 0
+		total_state_cess_value = 0
 		ass_value = 0
 		for index, item in enumerate(invoice.items):
 			# print(item.sac_code,"HsnCD")
-			if item.item_mode == "Credit":
+			if item.item_mode == "Credit" and item.type!="Non-Gst":
 				credit_items.append(item.__dict__)
 				total_igst_value += abs(item.igst_amount)
 				total_sgst_value += abs(item.sgst_amount)
 				total_cgst_value += abs(item.cgst_amount)
 				total_cess_calue += abs(item.cess_amount)
+				total_state_cess_value += abs(item.state_cess_amount)
 				ass_value += abs(item.item_value)
 				i = {
 					"SlNo":
@@ -498,13 +500,13 @@ def CreditgenerateIrn(invoice_number):
 					"CesRt":
 					item.cess,
 					"CesAmt":
-					item.cess_amount,
+					abs(item.cess_amount),
 					"CesNonAdvlAmt":
 					0,
 					"StateCesRt":
-					0,
+					item.state_cess,
 					"StateCesAmt":
-					0,
+					abs(item.state_cess_amount),
 					"StateCesNonAdvlAmt":
 					0,
 					"OthChrg":
@@ -519,7 +521,7 @@ def CreditgenerateIrn(invoice_number):
 			"SgstVal": round(total_sgst_value, 2),
 			"IgstVal": round(total_igst_value, 2),
 			"CesVal": round(total_cess_calue,2),
-			"StCesVal": 0,
+			"StCesVal": round(total_state_cess_value,2),
 			"Discount": 0,
 			"OthChrg": 0,
 			"RndOffAmt": 0,

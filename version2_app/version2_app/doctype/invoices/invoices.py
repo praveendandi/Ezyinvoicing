@@ -11,6 +11,7 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
 import json
+import string
 import qrcode
 import os, os.path
 import random, string
@@ -143,7 +144,7 @@ class Invoices(Document):
 			ass_value = 0
 			for index, item in enumerate(invoice.items):
 				# print(item.sac_code,"HsnCD")
-				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type == "Included":
+				if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
 					total_igst_value += item.igst_amount
 					total_sgst_value += item.sgst_amount
 					total_cgst_value += item.cgst_amount
@@ -199,17 +200,19 @@ class Invoices(Document):
 					gst_data['ItemList'].append(i)
 				else:
 					if invoice.invoice_category == "Credit Invoice":
-						if item.type == "Included":
+						if item.type != "Non-Gst":
 							credit_note_items.append(item.__dict__)
 					elif invoice.invoice_category == "Tax Invoice":
-						if item.taxable=="Yes" and item.type=="Included" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
+						if item.taxable=="Yes" and item.type!="Non-Gst" and item.is_credit_item=="Yes" and company_details['data'].allowance_type=="Credit":
 							
 							credit_note_items.append(item.__dict__)
 						else:
-							if item.type == "Included":
+							if item.type != "Non-Gst" and company_details['data'].allowance_type=="Discount" and item.table=="yes" and item.is_credit_item=="Yes":
 								discount_before_value +=item.item_value	
 								discount_after_value += item.item_value_after_gst
-								credit_note_items.append(item.__dict__)
+								# credit_note_items.append(item.__dict__)
+			if len(gst_data['ItemList']) == 0 and invoice.has_credit_items=="Yes" and invoice.invoice_category == "Tax Invoice":
+				return {"success":False,"message":"Please convert Tax invoice to Credit invoice"}
 			if invoice.invoice_category == "Credit Invoice":
 				creditIrn = CreditgenerateIrn(invoice_number)
 				return creditIrn
@@ -745,8 +748,8 @@ def create_qr_image(invoice_number, gsp):
 			invoice.qr_code_image = response['message']['file_url']
 			invoice.save()
 			# attach_qr_code(invoice_number, gsp, invoice.company)
-			return {"success": True}
-		return {"success": True}
+			return {"success": True,"message":"Qr Generated Successfully"}
+		return {"success": True,"message":"Qr Generated Successfully"}
 	except Exception as e:
 		print(e, "qr image")
 		frappe.log_error(frappe.get_traceback(),invoice_number)
@@ -936,8 +939,13 @@ def insert_invoice(data):
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 
 
-
-		if data['total_invoice_amount'] == 0:
+		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
+			data['total_invoice_amount'] = sales_amount_after_tax
+		if '-' in str(sales_amount_after_tax):
+			allowance_invoice = "Yes"
+		else:
+			allowance_invoice = "No"	 	
+		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
 		else:
@@ -970,7 +978,7 @@ def insert_invoice(data):
 
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
-		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
+		if len(data['items_data'])==0:
 			irn_generated = "Zero Invoice"
 			# if data['guest_data']['invoice_type']=="B2B":
 			# 	irn_generated = "Zero Invoice"
@@ -1082,19 +1090,18 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": 0
+			"sez": data["sez"] if "sez" in data else 0
 		})
 		if data['amened'] == 'Yes':
-			invCount = frappe.db.get_list(
-				'Invoices',
-				filters={
-					'invoice_number':
-					['like', '%' + data['guest_data']['invoice_number'] + '%']
-				})
-			invoice.amended_from = invCount[0]['name']
-			if "-" in invCount[0]['name'][-4:]:
-				amenedindex = invCount[0]['name'].rfind("-")
-				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
+			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+				# filters={
+				#     'invoice_number':
+				#     ['like', data['guest_data']['invoice_number'] + '-%']
+				# })
+			invoice.amended_from = invCount.name
+			if "-" in invCount.name[-4:]:
+				amenedindex = invCount.name.rfind("-")
+				ameneddigit = int(invCount.name[amenedindex+1:])
 				ameneddigit = ameneddigit+1 
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
 				# pass
@@ -1264,13 +1271,17 @@ def calulate_items(data):
 			acc_gst_percentage = 0.00
 			acc_igst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":
+				if companyDetails.number_in_description == 1:
+					item_description = (item['name'].rstrip(string.digits)).strip()
+				else:
+					item_description = item['name']
 				sac_code_based_gst = frappe.db.get_list(
 					'SAC HSN CODES',
-					filters={'name': ['=',item['name']]})
+					filters={'name': ['=',item_description]})
 				if not sac_code_based_gst:
 					sac_code_based_gst = frappe.db.get_list(
 						'SAC HSN CODES',
-						filters={'name': ['like', '%' + item['name'] + '%']})
+						filters={'name': ['like', '%' + item_description + '%']})
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc(
 					'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -1279,7 +1290,7 @@ def calulate_items(data):
 						continue 
 					item['item_type'] = sac_code_based_gst_rates.type
 				else:
-					return{"success":False,"message":"SAC Code "+ item['name']+" not found"}
+					return{"success":False,"message":"SAC Code "+ item_description +" not found"}
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if item['sac_code'] == '996311':
@@ -1380,6 +1391,12 @@ def calulate_items(data):
 					if gst_value==0:
 						gst_value = (gst_percentage* scharge_value)/100.0
 						igst_value = (igst_percentage* scharge_value)/100.0
+					else:
+						igst_value = 0
+					if gst_percentage>0 or igst_percentage>0:
+						scTaxble = "Yes"
+					else:
+						scTaxble = sac_code_based_gst_rates.taxble		
 					service_dict['item_name'] = item['name']+"-SC " + str(scharge)
 					service_dict['description'] = item['name']+"-SC " + str(scharge)
 					service_dict['date'] = datetime.datetime.strptime(item['date'],data['invoice_item_date_format'])
@@ -1396,7 +1413,7 @@ def calulate_items(data):
 					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
 					service_dict['item_taxable_value'] = scharge_value 
 					service_dict['item_value'] = scharge_value
-					service_dict['taxable'] = sac_code_based_gst_rates.taxble
+					service_dict['taxable'] = scTaxble#"Yes" if gst_percentage>0 else "No"
 					service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
 					# service_dict['cess'] = 0
 					# service_dict['cess_amount'] = 0
@@ -1481,7 +1498,14 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
+						if item['sac_code'] == '996311':
+							percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+							if percentage_gst["success"] == True:
+								acc_gst_percentage = percentage_gst["gst_percentage"]	
+								acc_igst_percentage = percentage_gst["igst_percentage"]
+							else:
+								{"success": False, "message": "error in slab helper function"}
 						if (sez == 1 and sac_code_based_gst_rates.exempted == 0) or placeofsupply != companyDetails.state_code:
 							final_item["sgst"] = 0
 							final_item["cgst"] = 0
@@ -1620,7 +1644,7 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif sac_code_based_gst_rates.net == "Yes" and item['sac_code'] != "996311":
+					elif sac_code_based_gst_rates.net == "Yes":
 						gst_percentage = (float(sac_code_based_gst_rates.cgst) + float(sac_code_based_gst_rates.sgst))
 						base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 						gst_value = item['item_value'] - base_value
@@ -2250,12 +2274,12 @@ def get_tax_payer_details(data):
 			else:
 				print("Unknown error in get taxpayer details get call  ",
 					  response)
-				error_message = str(response['message'])
+				error_message = "Invalid GstNumber "+data['gstNumber']
 				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
-				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {error_message}")
+				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
 				return {
 					"success": False,
-					"message": response['message'],
+					"message": error_message,
 					"response": response
 				}
 		else:
@@ -2346,12 +2370,12 @@ def login_gsp(code,mode):
 	except Exception as e:
 		print(e, "login gsp")
 
-
-def login_gsp2():
+@frappe.whitelist(allow_guest=True)
+def updatelogin_gsp(data):
 	try:
-		code = "MHKCP-01"
-		mode = "Testing"
-		print("********** scheduler")
+		code = data['code']
+		mode = data['mode']
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -2367,6 +2391,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.test_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 		elif mode == 'Production':
@@ -2378,6 +2403,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.prod_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:
@@ -2624,14 +2650,21 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
 	try:
 		if len(invoice_number)>0:
-			invCount = frappe.db.get_list(
+			invCount = frappe.get_doc('Invoices',invoice_number)
+
+			if invCount:	
+				invoice_number = invCount.name
+				if invCount.docstatus==2:
+					AmenedinvCount = frappe.db.get_list(
 					'Invoices',
 					filters={
 						'invoice_number':
-						['like', '%' + invoice_number + '%']
+						['like', invoice_number+'-%']
 					})
-			if len(invCount)>0:		
-				invoice_number = invCount[0]['name']	
+					print(AmenedinvCount)
+					if len(AmenedinvCount)>0:
+						invoice_number = AmenedinvCount[0]['name']
+					
 			
 			invoiceExists = frappe.get_doc('Invoices', invoice_number)
 			if invoiceExists:
@@ -2647,6 +2680,15 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	try:
+		if "sez" in data:
+			sez = data["sez"]
+		else:
+			doc = frappe.db.exists("Invoices",data["invoice_number"])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+				sez = invoice_doc.sez
+			else:
+				sez = 0
 		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 			data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
 			if not frappe.db.exists('Invoices', data['invoice_number']):
@@ -2732,7 +2774,8 @@ def Error_Insert_invoice(data):
 				"No",
 				'error_message':
 				data['error_message'],
-				"place_of_supply":company.state_code
+				"place_of_supply":company.state_code,
+				"sez":sez
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			
