@@ -23,6 +23,7 @@ import importlib.util
 
 #sample
 #sample
+#sample
 
 
 def invoiceCreated(doc, method=None):
