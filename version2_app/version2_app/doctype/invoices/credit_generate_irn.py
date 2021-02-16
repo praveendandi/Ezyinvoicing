@@ -455,6 +455,7 @@ def CreditgenerateIrn(invoice_number):
 		total_sgst_value = 0
 		total_cgst_value = 0
 		total_cess_calue = 0
+		total_state_cess_value = 0
 		ass_value = 0
 		for index, item in enumerate(invoice.items):
 			# print(item.sac_code,"HsnCD")
@@ -464,6 +465,7 @@ def CreditgenerateIrn(invoice_number):
 				total_sgst_value += abs(item.sgst_amount)
 				total_cgst_value += abs(item.cgst_amount)
 				total_cess_calue += abs(item.cess_amount)
+				total_state_cess_value += abs(item.state_cess_amount)
 				ass_value += abs(item.item_value)
 				i = {
 					"SlNo":
@@ -498,13 +500,13 @@ def CreditgenerateIrn(invoice_number):
 					"CesRt":
 					item.cess,
 					"CesAmt":
-					item.cess_amount,
+					abs(item.cess_amount),
 					"CesNonAdvlAmt":
 					0,
 					"StateCesRt":
-					0,
+					item.state_cess,
 					"StateCesAmt":
-					0,
+					abs(item.state_cess_amount),
 					"StateCesNonAdvlAmt":
 					0,
 					"OthChrg":
@@ -519,7 +521,7 @@ def CreditgenerateIrn(invoice_number):
 			"SgstVal": round(total_sgst_value, 2),
 			"IgstVal": round(total_igst_value, 2),
 			"CesVal": round(total_cess_calue,2),
-			"StCesVal": 0,
+			"StCesVal": round(total_state_cess_value,2),
 			"Discount": 0,
 			"OthChrg": 0,
 			"RndOffAmt": 0,

@@ -101,7 +101,11 @@ def reinitiateInvoice(data):
 			if "Printed By / On" in i:
 				p = i.split(":")
 				print_by = p[1].replace(" ","")
-
+				
+		check_invoice = check_invoice_exists(invoiceNumber)
+		if check_invoice['success']==True:
+			inv_data = check_invoice['data']
+			invoiceNumber = inv_data.name
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		
