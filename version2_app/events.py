@@ -1,6 +1,8 @@
 import frappe
 
 from version2_app.parsers import *
+import json, shlex, time, re
+from subprocess import Popen, PIPE, STDOUT
 import os
 import sys
 import importlib.util
@@ -39,22 +41,10 @@ def fileCreated(doc, method=None):
         print('Normal File')
     
 
-    # check if it's all there..
-    # def bla(mod):
-    #     print(dir(mod))
-    # bla(module)
 
 
 
-    # from p
-    # print("Invoice Created",doc.name,"Hey am created *****************8")
-    # doc.comapnay
-    # from parsers import 
 
-
-
-import json, os, shlex, time, re
-from subprocess import Popen, PIPE, STDOUT
 
 def emitsocket(doc,method=None):
     frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
@@ -62,20 +52,16 @@ def emitsocket(doc,method=None):
 
 
 def updateManager(doc, method=None):
-    # print(
-    #     "am logged here buddy",
-    #     '****************************************************************************8'
-    # )
-    # frappe.log_error("log error", doc.__dict__)
-    # d = run_command('pwd', doc.doctype, str(time.time()))
-    # frappe.log_error("log error", d)
-    # print(doc)
+  
     if doc.status!="Ongoing":
         commands = ['git pull','service nginx reload','service nginx restart']
         console_dump = ''
         # cwd = '/home/caratred/Desktop/ezy-invoice-production'
-        cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
+        company = frappe.get_last_doc('compnay')
+        cwd = company.angular_project_production_path
+        # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
         key = str(time.time())
+        # count = 0
         for command in commands:
             terminal = Popen(shlex.split(command),
                             stdin=PIPE,
@@ -84,28 +70,13 @@ def updateManager(doc, method=None):
                             cwd=cwd)
             # frappe.log_error("log error", terminal.stdout.read(1))
             for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-                frappe.publish_realtime(key, c, user=frappe.session.user)
                 console_dump += c
         logged_command = " && ".join(commands)
-        frappe.publish_realtime("custom_socket", {'message':'bench  update completed','type':"bench start",'data':doc.__dict__})
+        frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
         # frappe.log_error("Angular project pull", console_dump)
         frappe.log_error("Angular project pull data","sample")
 
-        # if terminal.wait():
-        # 	_close_the_doc(start_time, key, console_dump, status='Failed', user=frappe.session.user)
-        # else:
-        # 	_close_the_doc(start_time, key, console_dump, status='Success', user=frappe.session.user
-        # manager = frappe.get_doc({
-        #     'doctype': 'Bench Manager Command',
-        #     'key': key,
-        #     'source': "tesing",
-        #     'command': logged_command,
-        #     'console': console_dump,
-        #     'status': 'Ongoing'
-        # })
-        # manager.insert()
-        # frappe.db.commit()
-
+        
 
 def safe_decode(string, encoding='utf-8'):
     try:
