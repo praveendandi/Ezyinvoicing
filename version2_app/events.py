@@ -19,6 +19,9 @@ import importlib.util
 
 #sample
 
+
+
+
 def invoiceCreated(doc, method=None):
     print("Invoice Created",doc.name,"")
     # frappe.publish_realtime("invoice_created", "message")
