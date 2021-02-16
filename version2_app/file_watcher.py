@@ -1,9 +1,10 @@
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import os
+import frappe
 
 abs_path = os.path.dirname(os.getcwd())
-company = getcompany
+company = frappe.db.get_list('company',['name','ipp_port','folios_folder_path'])
 print(company)
 folder_path = abs_path+company[0]["folios_folder_path"]+company[0]["name"]
 class MyHandler(PatternMatchingEventHandler):
