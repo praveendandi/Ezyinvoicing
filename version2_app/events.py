@@ -51,6 +51,8 @@ def emitsocket(doc,method=None):
     frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
 
 
+
+
 def updateManager(doc, method=None):
   
     if doc.status!="Ongoing":
