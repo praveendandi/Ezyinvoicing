@@ -17,6 +17,7 @@ import importlib.util
 
 # command_module.run()
 
+#sample
 
 def invoiceCreated(doc, method=None):
     print("Invoice Created",doc.name,"")
