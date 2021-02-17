@@ -114,7 +114,8 @@ def TotalMismatchError(data,calculated_data):
                 'total_credit_vat_amount': round(calculated_data['total_credit_vat_amount'],2),
                 'credit_gst_amount': round(calculated_data['credit_cgst_amount'],2) + round(calculated_data['credit_sgst_amount'],2) + round(calculated_data['credit_igst_amount'],2),	
                 'error_message':" Invoice Total Mismatch",
-                "place_of_supply":companyDetails.state_code
+                "place_of_supply":companyDetails.state_code,
+                "sez":data["sez"] if "sez" in data else 0
             })
         if data['amened'] == 'Yes':
             invCount = frappe.db.get_list(
@@ -148,7 +149,7 @@ def TotalMismatchError(data,calculated_data):
 
 def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
     try:
-        if data['item_value']>1000 and data['item_value']<=7500:
+        if data['item_value']>=1000 and data['item_value']<=7500:
             gst_percentage = 12
         elif data['item_value'] > 7500:
             gst_percentage = 18

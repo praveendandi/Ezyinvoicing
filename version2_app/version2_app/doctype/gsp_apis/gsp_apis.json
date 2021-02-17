@@ -51,7 +51,9 @@
   "column_break_27",
   "gsp_test_token",
   "gsp_test_token_expired_on",
-  "gst_test_number"
+  "gst_test_number",
+  "prod_token_generated_on",
+  "test_token_generated_on"
  ],
  "fields": [
   {
@@ -290,11 +292,21 @@
    "fieldname": "gst_test_number",
    "fieldtype": "Data",
    "label": "GST TEST Number"
+  },
+  {
+   "fieldname": "prod_token_generated_on",
+   "fieldtype": "Datetime",
+   "label": "Prod Token Generated On "
+  },
+  {
+   "fieldname": "test_token_generated_on",
+   "fieldtype": "Datetime",
+   "label": "Test Token Generated On "
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-10-23 12:51:22.593289",
+ "modified": "2021-02-11 12:06:27.083431",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "GSP APIS",
@@ -309,6 +321,66 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1,
    "write": 1
   }

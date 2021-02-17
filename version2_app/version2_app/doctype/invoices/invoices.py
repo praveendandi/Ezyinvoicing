@@ -211,6 +211,8 @@ class Invoices(Document):
 								discount_before_value +=item.item_value	
 								discount_after_value += item.item_value_after_gst
 								# credit_note_items.append(item.__dict__)
+			if len(gst_data['ItemList']) == 0 and invoice.has_credit_items=="Yes" and invoice.invoice_category == "Tax Invoice":
+				return {"success":False,"message":"Please convert Tax invoice to Credit invoice"}
 			if invoice.invoice_category == "Credit Invoice":
 				creditIrn = CreditgenerateIrn(invoice_number)
 				return creditIrn
@@ -937,8 +939,13 @@ def insert_invoice(data):
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 
 
-
-		if data['total_invoice_amount'] == 0:
+		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
+			data['total_invoice_amount'] = sales_amount_after_tax
+		if '-' in str(sales_amount_after_tax):
+			allowance_invoice = "Yes"
+		else:
+			allowance_invoice = "No"	 	
+		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
 		else:
@@ -971,7 +978,7 @@ def insert_invoice(data):
 
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
-		if data['total_invoice_amount'] == 0 or len(data['items_data'])==0:
+		if len(data['items_data'])==0:
 			irn_generated = "Zero Invoice"
 			# if data['guest_data']['invoice_type']=="B2B":
 			# 	irn_generated = "Zero Invoice"
@@ -1083,19 +1090,18 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": 0
+			"sez": data["sez"] if "sez" in data else 0
 		})
 		if data['amened'] == 'Yes':
-			invCount = frappe.db.get_list(
-				'Invoices',
-				filters={
-					'invoice_number':
-					['like', '%' + data['guest_data']['invoice_number'] + '%']
-				})
-			invoice.amended_from = invCount[0]['name']
-			if "-" in invCount[0]['name'][-4:]:
-				amenedindex = invCount[0]['name'].rfind("-")
-				ameneddigit = int(invCount[0]['name'][amenedindex+1:])
+			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+				# filters={
+				#     'invoice_number':
+				#     ['like', data['guest_data']['invoice_number'] + '-%']
+				# })
+			invoice.amended_from = invCount.name
+			if "-" in invCount.name[-4:]:
+				amenedindex = invCount.name.rfind("-")
+				ameneddigit = int(invCount.name[amenedindex+1:])
 				ameneddigit = ameneddigit+1 
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
 				# pass
@@ -2364,12 +2370,12 @@ def login_gsp(code,mode):
 	except Exception as e:
 		print(e, "login gsp")
 
-
-def login_gsp2():
+@frappe.whitelist(allow_guest=True)
+def updatelogin_gsp(data):
 	try:
-		code = "MHKCP-01"
-		mode = "Testing"
-		print("********** scheduler")
+		code = data['code']
+		mode = data['mode']
+		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
@@ -2385,6 +2391,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
+			gsp_update.test_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 		elif mode == 'Production':
@@ -2396,6 +2403,7 @@ def login_gsp2():
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
+			gsp_update.prod_token_generated_on = datetime.datetime.now()
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:
@@ -2642,14 +2650,21 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
 	try:
 		if len(invoice_number)>0:
-			invCount = frappe.db.get_list(
+			invCount = frappe.get_doc('Invoices',invoice_number)
+
+			if invCount:	
+				invoice_number = invCount.name
+				if invCount.docstatus==2:
+					AmenedinvCount = frappe.db.get_list(
 					'Invoices',
 					filters={
 						'invoice_number':
-						['like', '%' + invoice_number + '%']
+						['like', invoice_number+'-%']
 					})
-			if len(invCount)>0:		
-				invoice_number = invCount[0]['name']	
+					print(AmenedinvCount)
+					if len(AmenedinvCount)>0:
+						invoice_number = AmenedinvCount[0]['name']
+					
 			
 			invoiceExists = frappe.get_doc('Invoices', invoice_number)
 			if invoiceExists:
@@ -2665,6 +2680,15 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist(allow_guest=True)
 def Error_Insert_invoice(data):
 	try:
+		if "sez" in data:
+			sez = data["sez"]
+		else:
+			doc = frappe.db.exists("Invoices",data["invoice_number"])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+				sez = invoice_doc.sez
+			else:
+				sez = 0
 		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 			data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
 			if not frappe.db.exists('Invoices', data['invoice_number']):
@@ -2750,7 +2774,8 @@ def Error_Insert_invoice(data):
 				"No",
 				'error_message':
 				data['error_message'],
-				"place_of_supply":company.state_code
+				"place_of_supply":company.state_code,
+				"sez":sez
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			
