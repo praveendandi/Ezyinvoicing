@@ -77,6 +77,8 @@ def reinitiateInvoice(data):
 				gst_regex = re.compile('[a-zA-Z0-9]{15,}$')
 				gst_num =  list(filter(gst_regex.match, gst_split))
 				gstNumber =  gst_num[0] if len(gst_num) > 0 else ""
+				if len(gstNumber) >= 15:
+					gstNumber = gstNumber[-15:]
 			if "Invoice No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "Bill To" in i:
