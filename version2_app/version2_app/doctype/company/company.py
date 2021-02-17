@@ -259,7 +259,7 @@ def console_command(key=None, caller='bench_update_pull', app_name=None, branch_
         "bench_update": ["bench update"],
         "switch_branch": [""],
         "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
-        "bench_update_pull":["bench update --pull"]
+        "bench_update_pull":["bench update --pull",]
     }
     frappe.enqueue('bench_manager.bench_manager.utils.run_command',
         commands=commands[caller],
