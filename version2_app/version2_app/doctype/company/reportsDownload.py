@@ -17,6 +17,7 @@ home = expanduser("~")
 host = "http://0.0.0.0:8000/"
 @frappe.whitelist(allow_guest=True)
 def Report_Download(data):
+    
     try:
         if data['file_type']=="Excel":
             folder_path = frappe.utils.get_bench_path()

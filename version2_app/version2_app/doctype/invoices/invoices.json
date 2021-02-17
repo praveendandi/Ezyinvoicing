@@ -103,7 +103,7 @@
   "total_credit_state_cess_amount",
   "total_credit_vat_amount",
   "credit_gst_amount",
-  "total_inovice_amount",
+  "total_invoice_amount",
   "converted_from_b2c",
   "converted_from_b2c_by",
   "converted_from_b2c_time",
@@ -118,7 +118,15 @@
   "credit_duplicate_ack_date",
   "credit_duplicate_ack_no",
   "credit_duplicate_irn_number",
-  "invoice_category"
+  "invoice_category",
+  "place_of_supply",
+  "credit_igst_amount",
+  "sez",
+  "converted_from_b2b",
+  "converted_from_b2b_time",
+  "converted_from_b2b_by",
+  "tax_invoice_referrence_number",
+  "tax_invoice_referrence_date"
  ],
  "fields": [
   {
@@ -173,11 +181,11 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "0",
    "fieldname": "room_number",
    "fieldtype": "Int",
    "in_standard_filter": 1,
-   "label": "Room Number",
-   "reqd": 1
+   "label": "Room Number"
   },
   {
    "fieldname": "invoice_type",
@@ -368,7 +376,7 @@
   },
   {
    "fieldname": "signed_invoice",
-   "fieldtype": "Text",
+   "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Signed Invoice",
    "read_only": 1
@@ -561,6 +569,7 @@
    "label": "Confirmation Number"
   },
   {
+   "default": "Pms",
    "fieldname": "invoice_from",
    "fieldtype": "Select",
    "label": "Invoice From",
@@ -648,11 +657,6 @@
    "fieldname": "credit_gst_amount",
    "fieldtype": "Float",
    "label": "Credit Gst Amount"
-  },
-  {
-   "fieldname": "total_inovice_amount",
-   "fieldtype": "Float",
-   "label": "Total Inovice Amount"
   },
   {
    "default": "No",
@@ -762,12 +766,60 @@
    "fieldtype": "Select",
    "label": "Invoice Category",
    "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+  },
+  {
+   "fieldname": "total_invoice_amount",
+   "fieldtype": "Float",
+   "label": "Total Invoice Amount"
+  },
+  {
+   "fieldname": "place_of_supply",
+   "fieldtype": "Data",
+   "label": "Place Of Supply"
+  },
+  {
+   "fieldname": "credit_igst_amount",
+   "fieldtype": "Float",
+   "label": "Credit IGST Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "sez",
+   "fieldtype": "Check",
+   "label": "SEZ"
+  },
+  {
+   "default": "No",
+   "fieldname": "converted_from_b2b",
+   "fieldtype": "Select",
+   "label": "Converted From B2B",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "converted_from_b2b_time",
+   "fieldtype": "Datetime",
+   "label": "Converted From B2B Time"
+  },
+  {
+   "fieldname": "converted_from_b2b_by",
+   "fieldtype": "Data",
+   "label": "Converted From B2B By"
+  },
+  {
+   "fieldname": "tax_invoice_referrence_number",
+   "fieldtype": "Data",
+   "label": "Tax Invoice Referrence Number"
+  },
+  {
+   "fieldname": "tax_invoice_referrence_date",
+   "fieldtype": "Date",
+   "label": "Tax Invoice Referrence Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-01-13 17:27:00.939726",
+ "modified": "2021-02-04 17:03:52.780022",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -865,6 +917,19 @@
    "delete": 1,
    "read": 1,
    "role": "System Manager",
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
    "write": 1
   }
  ],
