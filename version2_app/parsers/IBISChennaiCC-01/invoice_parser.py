@@ -62,7 +62,7 @@ def file_parsing(filepath):
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-			if "Total" in i:
+			if "Total" in i and "INR" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
 			if "Departure :" in i:
@@ -106,7 +106,7 @@ def file_parsing(filepath):
 		itemsort = 0
 		for i in data:
 			pattern = re.compile(
-			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
+			"^([0-9]{2}\-[0-9]{2}\-[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
 			if len(check_date) > 0:
