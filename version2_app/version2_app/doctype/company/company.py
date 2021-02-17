@@ -17,36 +17,39 @@ import re
 import json
 import sys
 import frappe
-import os
+import os, importlib.util
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
+
+abs_path = os.path.dirname(os.getcwd())
+module_name = 'reinitiateInvoice'
 
 class company(Document):
         # pass
-	def on_update(self):
-		if self.name:
-			folder_path = frappe.utils.get_bench_path()
-			site_folder_path = self.site_name
-			folder_path = frappe.utils.get_bench_path()
-			path = folder_path + '/sites/' + site_folder_path
-			if self.invoice_reinitiate_parsing_file:
-				reinitatefilepath = path+self.invoice_reinitiate_parsing_file
-				destination_path = folder_path+self.reinitiate_file_path
-				try:
-					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-					shutil.copy(reinitatefilepath, destination_path)
-				except Exception as e:
-					print(str(e),"************on_update company")
-					frappe.throw("file updated Failed")
-			if self.invoice_parser_file:
-				# invoice_parser_file_path
-				invoicefilepath = path+self.invoice_parser_file
-				destination_path2 = folder_path+self.invoice_parser_file_path
-				try:
-					print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
-					shutil.copy(invoicefilepath,destination_path2)
-				except Exception as e:
-					print(str(e),"************on_update company")
-					frappe.throw("file updated Failed")
+    def on_update(self):
+        if self.name:
+            folder_path = frappe.utils.get_bench_path()
+            site_folder_path = self.site_name
+            folder_path = frappe.utils.get_bench_path()
+            path = folder_path + '/sites/' + site_folder_path
+            if self.invoice_reinitiate_parsing_file:
+                reinitatefilepath = path+self.invoice_reinitiate_parsing_file
+                destination_path = folder_path+self.reinitiate_file_path
+                try:
+                    print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+                    shutil.copy(reinitatefilepath, destination_path)
+                except Exception as e:
+                    print(str(e),"************on_update company")
+                    frappe.throw("file updated Failed")
+            if self.invoice_parser_file:
+                # invoice_parser_file_path
+                invoicefilepath = path+self.invoice_parser_file
+                destination_path2 = folder_path+self.invoice_parser_file_path
+                try:
+                    print(self.name,"$$$$$$$$$$$$$$$$$$$$$$$")
+                    shutil.copy(invoicefilepath,destination_path2)
+                except Exception as e:
+                    print(str(e),"************on_update company")
+                    frappe.throw("file updated Failed")
 
 
 
@@ -196,37 +199,46 @@ def qr_generatedtoirn_generated():
         return {"success":False,"message":str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
-# def reprocess_error_inoices():
-# 	try:
-# 		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
-# 		print(data)
-# 		if len(data)>0:
-# 			for each in data:
-# 				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
-# 				reinitiate = reinitiateInvoice(obj)
-# 			return {"success":True}
-# 		else:
-# 			return {"success":False, "message":"no data found"}
-# 	except Exception as e:
-# 		print("reprocess_error_inoices", str(e))
-# 		return {"success":False,"message":str(e)}
+@frappe.whitelist(allow_guest=True)
+def reprocess_error_inoices():
+    try:
+        doc = frappe.db.get_list('company',fields=['name'])
+        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
+        if len(data)>0:
+            for each in data:
+                obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+                reinitiate = module.reinitiateInvoice(obj)
+            return {"success":True}
+        else:
+            return {"success":False, "message":"no data found"}
+    except Exception as e:
+        print("reprocess_error_inoices", str(e))
+        return {"success":False,"message":str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
-# def reprocess_pending_inoices():
-# 	try:
-# 		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending'},fields=["name","invoice_number","invoice_file"])
-# 		if len(data)>0:
-# 			for each in data:
-# 				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
-# 				reinitiate = reinitiateInvoice(obj)
-# 			return {"success":True}
-# 		else:
-# 			return {"success":False, "message":"no data found"}
-# 	except Exception as e:
-# 		print("reprocess_pending_inoices", str(e))
-# 		return {"success":False,"message":str(e)}
+@frappe.whitelist(allow_guest=True)
+def reprocess_pending_inoices():
+    try:
+        doc = frappe.db.get_list('company',fields=['name'])
+        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending'},fields=["name","invoice_number","invoice_file"])
+        if len(data)>0:
+            for each in data:
+                obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+                reinitiate = module.reinitiateInvoice(obj)
+            return {"success":True}
+        else:
+            return {"success":False, "message":"no data found"}
+    except Exception as e:
+        print("reprocess_pending_inoices", str(e))
+        return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def manual_to_pms():
