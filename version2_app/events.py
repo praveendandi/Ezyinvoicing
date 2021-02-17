@@ -64,26 +64,26 @@ def emitsocket(doc,method=None):
 def updateManager(doc, method=None):
   
     if doc.status!="Ongoing":
-        commands = ['git pull','service nginx reload','service nginx restart']
-        console_dump = ''
-        # cwd = '/home/caratred/Desktop/ezy-invoice-production'
-        company = frappe.get_last_doc('company')
-        cwd = company.angular_project_production_path
-        # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
-        key = str(time.time())
-        # count = 0
-        for command in commands:
-            terminal = Popen(shlex.split(command),
-                            stdin=PIPE,
-                            stdout=PIPE,
-                            stderr=STDOUT,
-                            cwd=cwd)
-            # frappe.log_error("log error", terminal.stdout.read(1))
-            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-                console_dump += c
-        logged_command = " && ".join(commands)
-        frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
-        # frappe.log_error("Angular project pull", console_dump)
+        # commands = ['git pull','service nginx reload','service nginx restart']
+        # console_dump = ''
+        # # cwd = '/home/caratred/Desktop/ezy-invoice-production'
+        # company = frappe.get_last_doc('company')
+        # cwd = company.angular_project_production_path
+        # # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
+        # key = str(time.time())
+        # # count = 0
+        # for command in commands:
+        #     terminal = Popen(shlex.split(command),
+        #                     stdin=PIPE,
+        #                     stdout=PIPE,
+        #                     stderr=STDOUT,
+        #                     cwd=cwd)
+        #     # frappe.log_error("log error", terminal.stdout.read(1))
+        #     for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+        #         console_dump += c
+        # logged_command = " && ".join(commands)
+        # frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
+        # # frappe.log_error("Angular project pull", console_dump)
         frappe.log_error("Angular project pull data","sample")
 
         
