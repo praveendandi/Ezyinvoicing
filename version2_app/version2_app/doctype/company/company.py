@@ -253,6 +253,7 @@ def manulaTax_credit_to_debit():
         return{"success":False,"message":str(e)}
 
 import time
+from bench_manager.bench_manager.utils import run_command
 @frappe.whitelist(allow_guest=True)
 def console_command(key=None, caller='bench_update_pull', app_name=None, branch_name=None):
     commands = {
@@ -261,7 +262,7 @@ def console_command(key=None, caller='bench_update_pull', app_name=None, branch_
         "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
         "bench_update_pull":["bench update --pull","bench migrate"]
     }
-    frappe.enqueue('bench_manager.bench_manager.utils.run_command',
+    run_command(
         commands=commands[caller],
         doctype='Bench Settings',
         key=str(time.time()),
