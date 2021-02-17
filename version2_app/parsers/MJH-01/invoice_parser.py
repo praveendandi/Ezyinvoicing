@@ -207,9 +207,9 @@ def file_parsing(filepath):
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
-		error_data['state_code'] = "33"
+		error_data['state_code'] = " "
 		error_data['room_number'] = guest['room_number']
-		error_data['pincode'] = "603103"
+		error_data['pincode'] = " "
 		error_data['total_invoice_amount'] = total_invoice_amount
 		# gstNumber = "12345"
 		# print(guest['invoice_number'])
