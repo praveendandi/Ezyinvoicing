@@ -1128,12 +1128,24 @@ def insert_invoice(data):
 			return {"success":True}
 		# if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
 		# 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
-		# 	Error_Insert_invoice(error_data)	
+		# 	Error_Insert_invoice(error_data)
+		# document_bin = update_document_bin(data['guest_data']['print_by'], data['guest_data']['invoice_type'],data['guest_data']['invoice_number'],data['guest_data']['invoice_file'])	
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
 		return {"success": False, "message": str(e)}
 
+def update_document_bin(print_by, invoice_type, invoice_number, invoice_file):
+	try:
+		bin_doc = frappe.get_doc("Document Bin")
+		bin_doc.print_by = print_by
+		bin_doc.invoice_status = "Yes"
+		bin_doc.invoice_type = invoice_type
+		bin_doc.invoice_number = invoice_number
+		bin_doc.save(ignore_permissions=True,ignore_version=True)
+	except Exception as e:
+		print(e, "Update Document Bin")
+		return {"success": False, "message": str(e)}
 
 def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 	try:

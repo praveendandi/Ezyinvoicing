@@ -1,0 +1,105 @@
+{
+ "actions": [],
+ "creation": "2021-02-18 10:34:42.232701",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_file",
+  "print_by",
+  "invoice_status",
+  "printed_at",
+  "invoice_type",
+  "invoice_number",
+  "error_log"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoice_file",
+   "fieldtype": "Attach",
+   "label": "Invoice File"
+  },
+  {
+   "fieldname": "print_by",
+   "fieldtype": "Data",
+   "label": "Print By"
+  },
+  {
+   "default": "No",
+   "fieldname": "invoice_status",
+   "fieldtype": "Select",
+   "label": "Document Printed",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "printed_at",
+   "fieldtype": "Datetime",
+   "label": "Printed At"
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "label": "Invoice Type",
+   "options": "B2B\nB2C"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  },
+  {
+   "fieldname": "error_log",
+   "fieldtype": "Data",
+   "label": "Error Log"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-02-18 12:14:16.761208",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Document Bin",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
