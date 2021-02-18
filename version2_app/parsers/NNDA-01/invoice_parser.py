@@ -25,7 +25,7 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
-	try:
+	# try:
 		start_time = datetime.datetime.utcnow()
 		companyCheckResponse = check_company_exist("NNDA-01")
 		site_folder_path = companyCheckResponse['data'].site_name
@@ -66,9 +66,9 @@ def file_parsing(filepath):
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-			if "Departure :" in i:
-				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
+			if "Invoice Date" in i:
+				date_time_obj = (i.split(":")[-1]).strip()
+				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No." in i or "Room No" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
@@ -326,6 +326,6 @@ def file_parsing(filepath):
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
-	except Exception as e:
-		print(str(e),"       invoice parsing")
-		return {"success":False,"message":str(e)}
+	# except Exception as e:
+	# 	print(str(e),"       invoice parsing")
+	# 	return {"success":False,"message":str(e)}
