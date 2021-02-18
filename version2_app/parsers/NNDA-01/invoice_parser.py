@@ -25,7 +25,7 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
-	# try:
+	try:
 		start_time = datetime.datetime.utcnow()
 		companyCheckResponse = check_company_exist("NNDA-01")
 		site_folder_path = companyCheckResponse['data'].site_name
@@ -60,6 +60,8 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			if "CREDIT TAX INVOICE" in i:
+				invoice_category = "Credit Invoice"
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -235,11 +237,12 @@ def file_parsing(filepath):
 				if checkTokenIsValidResponse['success'] == True:
 					getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":guest['gstNumber'],"code":company_code['code'],"invoice":guest['invoice_number'],"apidata":gspApiDataResponse['data']})
 					if getTaxPayerDetailsResponse['success'] == True:
-						calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+						sez = 1 if getTaxPayerDetailsResponse["data"].tax_type == "SEZ" else 0
+						calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format,"sez":sez})
 						if calulateItemsApiResponse['success'] == True:
 							guest['invoice_file'] = filepath
 							if reupload == False:
-								insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
+								insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"sez":sez})
 								if insertInvoiceApiResponse['success']== True:
 									print("Invoice Created",insertInvoiceApiResponse)
 									return {"success":True,"message":"Invoice Created"}
@@ -248,11 +251,12 @@ def file_parsing(filepath):
 									error_data['error_message'] = insertInvoiceApiResponse['message']
 									error_data['amened'] = amened
 									error_data["items_data"]=calulateItemsApiResponse['data']
+									error_data["sez"] = sez
 									errorInvoice = Error_Insert_invoice(error_data)
 									print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 									return {"success":False,"message":insertInvoiceApiResponse['message']}
 							else:
-								insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened})
+								insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"taxpayer":getTaxPayerDetailsResponse['data'].__dict__,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"sez":sez})
 								if insertInvoiceApiResponse['success']== True:
 									print("Invoice Created",insertInvoiceApiResponse)
 									return {"success":True,"message":"Invoice Created"}
@@ -260,15 +264,16 @@ def file_parsing(filepath):
 								else:
 									error_data['error_message'] = insertInvoiceApiResponse['message']
 									error_data['amened'] = amened
+									error_data["sez"] = sez
 									error_data["items_data"]=calulateItemsApiResponse['data']
 									errorInvoice = Error_Insert_invoice(error_data)
 									print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 									return {"success":False,"message":insertInvoiceApiResponse['message']}
 
 						else:
-							
 							error_data['error_message'] = calulateItemsApiResponse['message']
 							error_data['amened'] = amened
+							error_data["sez"] = sez
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 							return {"success":False,"message":calulateItemsApiResponse['message']}
@@ -286,11 +291,13 @@ def file_parsing(filepath):
 					return {"success":False,"message":checkTokenIsValidResponse['message']} 
 			else:
 				taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-				calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
+
+
+				calulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format,"sez":0})
 				if calulateItemsApiResponse['success'] == True:
 					guest['invoice_file'] = filepath
 					if reupload == False:
-						insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
+						insertInvoiceApiResponse = insert_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer,"sez":0})
 						if insertInvoiceApiResponse['success']== True:
 							print("B2C Invoice Created",insertInvoiceApiResponse)
 							return {"success":True,"message":"Invoice Created"}
@@ -302,7 +309,7 @@ def file_parsing(filepath):
 							print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 					else:
-						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
+						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer,"sez":0})
 						if insertInvoiceApiResponse['success']== True:
 							print("B2C Invoice Created",insertInvoiceApiResponse)
 							return {"success":True,"message":"Invoice Created"}
@@ -310,7 +317,7 @@ def file_parsing(filepath):
 							error_data['error_message'] = insertInvoiceApiResponse['message']
 							error_data['amened'] = amened
 							errorInvoice = Error_Insert_invoice(error_data)
-							print("B2C re insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+							print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
 
 				else:
@@ -326,6 +333,6 @@ def file_parsing(filepath):
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
-	# except Exception as e:
-	# 	print(str(e),"       invoice parsing")
-	# 	return {"success":False,"message":str(e)}
+	except Exception as e:
+		print(str(e),"       invoice parsing")
+		return {"success":False,"message":str(e)}
