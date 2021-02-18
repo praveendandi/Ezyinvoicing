@@ -10,7 +10,10 @@
   "guest_name",
   "invoice_type",
   "room_number",
-  "confirmation_number"
+  "confirmation_number",
+  "invoice_category",
+  "print_by",
+  "viewed"
  ],
  "fields": [
   {
@@ -40,11 +43,28 @@
    "fieldname": "confirmation_number",
    "fieldtype": "Data",
    "label": "Confirmation Number"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "label": "Invoice Category",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+  },
+  {
+   "fieldname": "print_by",
+   "fieldtype": "Data",
+   "label": "Print By"
+  },
+  {
+   "default": "0",
+   "fieldname": "viewed",
+   "fieldtype": "Check",
+   "label": "Viewed"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-17 18:42:22.286709",
+ "modified": "2021-02-18 14:16:53.160400",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Socket Notification",
