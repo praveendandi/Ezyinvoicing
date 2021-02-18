@@ -14,6 +14,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
+from version2_app.version2_app.doctype.invoices.invoice_helpers import update_document_bin
 
 
 folder_path = frappe.utils.get_bench_path()
@@ -24,6 +25,9 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
+	invoiceNumber = ''
+	print_by = ''
+	invoice_type_data = ""
 	try:
 		start_time = datetime.datetime.utcnow()
 		companyCheckResponse = check_company_exist("EHNDNP-01")
@@ -42,19 +46,16 @@ def file_parsing(filepath):
 		for i in content:
 			for j in i.splitlines():
 				raw_data.append(j)
-
 		data = []
 		amened = ''
 		entered = False
 		guestDetailsEntered = False
 		guestDeatils = []
-		invoiceNumber = ''
 		gstNumber = ''
 		date_time_obj = ''
 		total_invoice_amount = ''
 		conf_number = ''
 		membership = ''
-		print_by = ''
 		roomNumber = ""
 		reupload = False
 		invoice_category = "Tax Invoice"
@@ -161,7 +162,6 @@ def file_parsing(filepath):
 				guest['address1'] = i
 			if index == 2:
 				guest['address2'] = i
-
 		guest['invoice_number'] = invoiceNumber.replace(' ', '')
 
 		guest['membership'] = membership
@@ -175,6 +175,7 @@ def file_parsing(filepath):
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
 		guest['invoice_category'] = invoice_category
+		invoice_type_data = guest['invoice_type']
 
 		check_invoice = check_invoice_exists(guest['invoice_number'])
 		if check_invoice['success']==True:
@@ -322,6 +323,7 @@ def file_parsing(filepath):
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
 		print(str(e),"       reinitiate parsing")
+		update_document_bin(print_by,invoice_type_data,invoiceNumber,str(e),filepath)
 		print(traceback.print_exc())
 		return {"success":False,"message":str(e)}				
 

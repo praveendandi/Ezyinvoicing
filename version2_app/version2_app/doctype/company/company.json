@@ -58,7 +58,9 @@
   "company_logo",
   "service_charge_percentage",
   "b2c_to_b2b",
-  "number_in_description"
+  "number_in_description",
+  "angular_project_production_path",
+  "backend_git_branch"
  ],
  "fields": [
   {
@@ -358,11 +360,21 @@
    "fieldname": "number_in_description",
    "fieldtype": "Check",
    "label": "Number In Description"
+  },
+  {
+   "fieldname": "angular_project_production_path",
+   "fieldtype": "Data",
+   "label": "Angular Project Production Path"
+  },
+  {
+   "fieldname": "backend_git_branch",
+   "fieldtype": "Data",
+   "label": "Backend Git Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-17 17:33:33.153339",
+ "modified": "2021-02-18 14:42:29.995810",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
