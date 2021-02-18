@@ -58,9 +58,7 @@
   "company_logo",
   "service_charge_percentage",
   "b2c_to_b2b",
-  "number_in_description",
-  "ipp_port",
-  "folios_folder_path"
+  "number_in_description"
  ],
  "fields": [
   {
@@ -360,21 +358,11 @@
    "fieldname": "number_in_description",
    "fieldtype": "Check",
    "label": "Number In Description"
-  },
-  {
-   "fieldname": "ipp_port",
-   "fieldtype": "Data",
-   "label": "IPP Port"
-  },
-  {
-   "fieldname": "folios_folder_path",
-   "fieldtype": "Data",
-   "label": "Folios Folder Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-15 15:38:50.015811",
+ "modified": "2021-02-17 17:33:33.153339",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

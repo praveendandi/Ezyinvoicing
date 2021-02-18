@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from . import __version__ as app_version
-# from version2_app.ipp_printer import safe_decode
-# from version2_app.file_watcher import *
+
 
 app_name = "version2_app"
 app_title = "Version2 App"
