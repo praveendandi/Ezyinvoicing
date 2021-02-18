@@ -8,7 +8,6 @@ import sys
 import datetime
 import importlib.util
 import traceback
-from version2_app.version2_app.doctype.invoices.invoice_helpers import update_document_bin
 # from version2_app.version2_app.doctype.invoices import *
 
 # modules = dir()
@@ -58,14 +57,22 @@ def invoiceCreated(doc, method=None):
 
 
     # frappe.subscriber.on("invoice_created", function (channel, message) {  etc, etc })
+def update_documentbin(filepath, error_log):
+    try:
+        bin_doc = frappe.new_doc("Document Bin")
+        bin_doc.invoice_file = filepath
+        bin_doc.error_log =  error_log
+        bin_doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+    except Exception as e:
+        print(str(e), "update_documentbin")
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 def fileCreated(doc, method=None):
     try:
         if 'job-' in doc.file_name:
-            bin_doc = frappe.new_doc("Document Bin")
-            bin_doc.invoice_file = doc.file_url
-            bin_doc.insert(ignore_permissions=True)
-            frappe.db.commit()
+            update_documentbin(doc.file_url,"")
             abs_path = os.path.dirname(os.getcwd())
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
             module_name = 'file_parsing'
@@ -77,7 +84,7 @@ def fileCreated(doc, method=None):
             print('Normal File')
     except Exception as e:
         print(str(e), "fileCreated")
-        update_document_bin()
+        update_documentbin(doc.file_url,str(e))
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
