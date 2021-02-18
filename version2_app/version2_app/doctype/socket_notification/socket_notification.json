@@ -12,7 +12,8 @@
   "room_number",
   "confirmation_number",
   "invoice_category",
-  "print_by"
+  "print_by",
+  "viewed"
  ],
  "fields": [
   {
@@ -53,11 +54,17 @@
    "fieldname": "print_by",
    "fieldtype": "Data",
    "label": "Print By"
+  },
+  {
+   "default": "0",
+   "fieldname": "viewed",
+   "fieldtype": "Check",
+   "label": "Viewed"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-18 11:55:07.706898",
+ "modified": "2021-02-18 14:16:53.160400",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Socket Notification",

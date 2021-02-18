@@ -16,7 +16,7 @@
  "fields": [
   {
    "fieldname": "invoice_file",
-   "fieldtype": "Attach",
+   "fieldtype": "Data",
    "label": "Invoice File"
   },
   {
@@ -55,7 +55,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-18 12:14:16.761208",
+ "modified": "2021-02-18 14:25:24.041998",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Document Bin",
