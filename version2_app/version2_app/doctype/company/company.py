@@ -231,43 +231,57 @@ def qr_generatedtoirn_generated():
 @frappe.whitelist(allow_guest=True)
 def reprocess_error_inoices():
     try:
-        doc = frappe.db.get_list('company',fields=['name'])
-        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        doc = frappe.db.get_list('company', fields=['name'])
+        file_path = abs_path + '/apps/version2_app/version2_app/parsers/' + doc[
+            0]["name"] + '/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
-        if len(data)>0:
+        data = frappe.db.get_list(
+            'Invoices',
+            filters={'irn_generated': 'Error'},
+            fields=["name", "invoice_number", "invoice_file"])
+        if len(data) > 0:
             for each in data:
-                obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+                obj = {
+                    "filepath": each["invoice_file"],
+                    "invoice_number": each["name"]
+                }
                 reinitiate = module.reinitiateInvoice(obj)
-            return {"success":True}
+            return {"success": True}
         else:
-            return {"success":False, "message":"no data found"}
+            return {"success": False, "message": "no data found"}
     except Exception as e:
         print("reprocess_error_inoices", str(e))
-        return {"success":False,"message":str(e)}
+        return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
 def reprocess_pending_inoices():
     try:
-        doc = frappe.db.get_list('company',fields=['name'])
-        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        doc = frappe.db.get_list('company', fields=['name'])
+        file_path = abs_path + '/apps/version2_app/version2_app/parsers/' + doc[
+            0]["name"] + '/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending'},fields=["name","invoice_number","invoice_file"])
-        if len(data)>0:
+        data = frappe.db.get_list(
+            'Invoices',
+            filters={'irn_generated': 'Pending'},
+            fields=["name", "invoice_number", "invoice_file"])
+        if len(data) > 0:
             for each in data:
-                obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+                obj = {
+                    "filepath": each["invoice_file"],
+                    "invoice_number": each["name"]
+                }
                 reinitiate = module.reinitiateInvoice(obj)
-            return {"success":True}
+            return {"success": True}
         else:
-            return {"success":False, "message":"no data found"}
+            return {"success": False, "message": "no data found"}
     except Exception as e:
         print("reprocess_pending_inoices", str(e))
-        return {"success":False,"message":str(e)}
+        return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -311,6 +325,12 @@ def manulaTax_credit_to_debit():
 
 import time
 
+import frappe
+from frappe.model.document import Document
+from subprocess import Popen, PIPE, STDOUT
+import re, shlex
+import subprocess
+
 
 # from bench_manager.bench_manager.utils import run_command
 @frappe.whitelist(allow_guest=True)
@@ -324,21 +344,25 @@ def console_command(key=None,
         "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
         "bench_update_pull": ["bench update --pull", "bench migrate"]
     }
-    run_command(commands=commands[caller],
-                doctype='Bench Settings',
-                key=str(time.time()),
-                docname='Bench Settings')
+    # list_files = subprocess.run(["ls", "-l"])
+    p = subprocess.Popen('bench update',
+                         shell=True,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+        print(line)
+    retval = p.wait()
+    print(retval)
+    # run_command(commands=commands[caller],
+    #             doctype='Bench Settings',
+    #             key=str(time.time()),
+    #             docname='Bench Settings')
     return True
 
 
 # -*- coding: utf-8 -*-
 # Copyright (c) 2017, Frappé and contributors
 # For license information, please see license.txt
-
-import frappe
-from frappe.model.document import Document
-from subprocess import Popen, PIPE, STDOUT
-import re, shlex
 
 
 def run_command(commands,
