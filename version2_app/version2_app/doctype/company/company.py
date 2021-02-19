@@ -367,7 +367,7 @@ def run_command(commands,
         'console': console_dump,
         'status': 'Ongoing'
     })
-    doc.insert()
+    doc.insert(ignore_permissions=True)
     frappe.db.commit()
     print(doc.name, '----------------------')
     frappe.publish_realtime(key,
