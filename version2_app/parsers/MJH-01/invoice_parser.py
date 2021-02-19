@@ -59,6 +59,7 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			print(i)
 			if "Confirmation No" in i:
 				confirmation_number = i.split(" ")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -157,19 +158,15 @@ def file_parsing(filepath):
 		guest = dict()
 		# print(guestDeatils)
 		for index, i in enumerate(guestDeatils):
-			print("======================",i)
 			if index == 0:
 				if "COPY OF INVOICE" in i:
-					print("=-----------=========----------")
 					nameindex = i.index("COPY OF INVOICE")
 					guest['name'] = i[:nameindex]
 				if "TAX INVOICE" in i:
-					print("--------------------------------------")
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
 				res = test_str.find("BillNo.") 
 				if res>=0:
-					print("-----------==========")
 					nameindex = i.index("BillNo.")
 					guest['name'] = i[:nameindex]
 			if index == 1:
