@@ -99,7 +99,7 @@ def reinitiateInvoice(data):
 				entered = False
 			if entered == True:
 				data.append(i)
-			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i):
+			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i) or "Bill No." in i:
 				guestDeatils.append(i)
 			if "Membership" in i:
 				Membership = i.split(":")

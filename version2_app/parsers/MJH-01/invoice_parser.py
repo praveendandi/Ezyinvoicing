@@ -59,7 +59,6 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			print(i)
 			if "Confirmation No" in i:
 				confirmation_number = i.split(" ")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -100,7 +99,7 @@ def file_parsing(filepath):
 				entered = False
 			if entered == True:
 				data.append(i)
-			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i):
+			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i) or "Bill No." in i:
 				guestDeatils.append(i)
 			if "Membership" in i:
 				Membership = i.split(":")
