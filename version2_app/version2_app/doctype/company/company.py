@@ -394,6 +394,7 @@ def run_command(commands,
                            status='Failed',
                            user=frappe.session.user)
         else:
+            print("))))))))))))))))((((((((((((((((((((((((((((((((((((((((((")
             _close_the_doc(start_time,
                            key,
                            console_dump,
