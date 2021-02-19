@@ -166,7 +166,7 @@ def reinitiateInvoice(data):
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
 				if "Bill No." in i:
-					nameindex = i.index("Bill No.")
+					nameindex = i.index("BillNo.")
 					guest['name'] = i[:nameindex]
 			if index == 1:
 				guest['address1'] = ""

@@ -59,6 +59,7 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			print(i)
 			if "Confirmation No" in i:
 				confirmation_number = i.split(" ")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -82,7 +83,7 @@ def file_parsing(filepath):
 					else:
 						gstNumber = ""
 			if "Bill No." in i:
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				invoiceNumber = (i.split(':')[- 1]).replace(" ", "")
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
@@ -165,7 +166,7 @@ def file_parsing(filepath):
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
 				if "Bill No." in i:
-					nameindex = i.index("Bill No.")
+					nameindex = i.index("BillNo.")
 					guest['name'] = i[:nameindex]
 			if index == 1:
 				guest['address1'] = ""
