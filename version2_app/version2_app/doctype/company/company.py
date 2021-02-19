@@ -20,8 +20,6 @@ import frappe
 import os, importlib.util
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
-<<<<<<< HEAD
-=======
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
 
@@ -54,7 +52,6 @@ class company(Document):
                     frappe.throw("file updated Failed")
 
 
->>>>>>> 893d30939faf5e0afbda774ea3bc987c62b681e3
 
 class company(Document):
     # pass

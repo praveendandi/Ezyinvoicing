@@ -1,12 +1,12 @@
 var fs = require('fs');
 var path = require('path');
-var socket = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/socket.io/lib/index.js');
+var socket = require('/home/caratred/Desktop/ezyinvoicing/apps/frappe/node_modules/socket.io/lib/index.js');
 // var socket = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/socket.io/lib/socket.js')
-var express = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/express/index.js')
+var express = require('/home/caratred/Desktop/ezyinvoicing/apps/frappe/node_modules/express/index.js')
 // var http = require('/home/caratred/Desktop/dpower/apps/frappe/node_modules/http/index.js')
 var http = require('http')
-var redis = require("/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/redis/index.js");
-var { get_conf, get_redis_subscriber } = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_utils.js');
+var redis = require("/home/caratred/Desktop/ezyinvoicing/apps/frappe/node_modules/redis/index.js");
+var { get_conf, get_redis_subscriber } = require('/home/caratred/Desktop/ezyinvoicing/apps/frappe/node_utils.js');
 
 var conf = get_conf();
 
