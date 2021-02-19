@@ -1,15 +1,15 @@
 var fs = require('fs');
 var path = require('path');
-var socket = require('/home/frappe/frappe-bench/apps/frappe/node_modules/socket.io/lib/index.js');
+var socket = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/socket.io/lib/index.js');
 // var socket = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/socket.io/lib/socket.js')
-var express = require('/home/frappe/frappe-bench/apps/frappe/node_modules/express/index.js')
+var express = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/express/index.js')
 // var http = require('/home/caratred/Desktop/dpower/apps/frappe/node_modules/http/index.js')
 var http = require('http')
-var redis = require("/home/frappe/frappe-bench/apps/frappe/node_modules/redis/index.js");
-var { get_conf, get_redis_subscriber } = require('/home/frappe/frappe-bench/apps//frappe/node_utils.js');
-// /home/caratred/frappe_projects/Einvoice_Bench
+var redis = require("/home/caratred/frappe/frappe_bench/apps/frappe/node_modules/redis/index.js");
+var { get_conf, get_redis_subscriber } = require('/home/caratred/frappe/frappe_bench/apps/frappe/node_utils.js');
+
 var conf = get_conf();
-// /home/frappe/frappe-bench/apps/frappe
+
 // var subscriber = redis.createClient(conf.redis_socketio || conf.redis_async_broker_port);
 // alternatively one can try:
 var subscriber = get_redis_subscriber();
@@ -45,5 +45,4 @@ subscriber.on("message", function (channel, message) {
     // io.emit('message',"tetetetetetette")
 });
 subscriber.subscribe("events");
-
 
