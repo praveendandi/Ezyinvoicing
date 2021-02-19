@@ -376,6 +376,7 @@ def run_command(commands,
                             user=frappe.session.user)
     try:
         for command in commands:
+            print(command,"+++++++++++++++++++++++++++++++++++++++++++")
             terminal = Popen(shlex.split(command),
                              stdin=PIPE,
                              stdout=PIPE,
@@ -384,6 +385,7 @@ def run_command(commands,
             for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
                 frappe.publish_realtime(key, c, user=frappe.session.user)
                 console_dump += c
+        
         if terminal.wait():
             print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             _close_the_doc(start_time,
@@ -403,6 +405,7 @@ def run_command(commands,
                        "{} \n\n{}".format(e, console_dump),
                        status='Failed',
                        user=frappe.session.user)
+        print("Exception 77777777777777777777",e)
     finally:
         frappe.db.commit()
         # hack: frappe.db.commit() to make sure the log created is robust,
