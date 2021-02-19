@@ -385,6 +385,7 @@ def run_command(commands,
                 frappe.publish_realtime(key, c, user=frappe.session.user)
                 console_dump += c
         if terminal.wait():
+            print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
             _close_the_doc(start_time,
                            key,
                            console_dump,
