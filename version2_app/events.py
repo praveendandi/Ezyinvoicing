@@ -27,10 +27,11 @@ import traceback
 #sample
 #sample
 
+def invoice_created(doc, method=None):
+    print("Invoice Created",doc.name)
 
-def invoiceCreated(doc, method=None):
+def invoiceCreated(doc):
     try:
-        print("Invoice Created",doc.name)
         # frappe.publish_realtime("invoice_created", "message")
         frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':{"name":doc.name, "irn_generated":doc.irn_generated,"invoice_type":doc.invoice_type,"invoice_from":doc.invoice_from,"guest_name":doc.guest_name,"invoice_file":doc.invoice_file,"print_by":doc.print_by,"creation":doc.creation,"invoice_category":doc.invoice_category}})
         soc_doc = frappe.new_doc("Socket Notification")

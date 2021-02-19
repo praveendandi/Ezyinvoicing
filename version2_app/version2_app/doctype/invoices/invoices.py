@@ -23,6 +23,7 @@ import random
 import math
 from frappe.utils import get_site_name
 from frappe.utils import logger
+from version2_app.events import invoiceCreated
 import time
 import os
 
@@ -974,6 +975,9 @@ def insert_invoice(data):
 							TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
 							hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 								items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+							if frappe.db.exists('Invoices', TotalMismatchErrorAPI['invoice_number']):
+								invoicedoc = frappe.get_doc("Invoices", TotalMismatchErrorAPI['invoice_number'])
+								socket = invoiceCreated(invoicedoc)
 							return {"success": True}
 
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
@@ -1125,11 +1129,13 @@ def insert_invoice(data):
 		# b2cattach = Invoices()
 		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
+			socket = invoiceCreated(invoice)
 			return {"success":True}
 		# if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
 		# 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
 		# 	Error_Insert_invoice(error_data)
 		# document_bin = update_document_bin(data['guest_data']['print_by'], data['guest_data']['invoice_type'],data['guest_data']['invoice_number'],data['guest_data']['invoice_file'])	
+		socket = invoiceCreated(invoice)
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
@@ -2718,8 +2724,10 @@ def Error_Insert_invoice(data):
 							items, data['invoice_number'],"Invoice")
 					
 				# return {"success": True}	
-
-					return {"success":False,"message":"Error"} 
+					if frappe.db.exists('Invoices', data['invoice_number']):
+						invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
+						socket = invoiceCreated(invoice_bin)
+					return {"success":False,"message":"Error","name":data['invoice_number']} 
 		
 		company = frappe.get_doc('company',data['company_code'])
 		if not frappe.db.exists('Invoices', data['invoice_number']):
@@ -2802,7 +2810,7 @@ def Error_Insert_invoice(data):
 					items, data['invoice_number'],"Invoice")
 					
 				# return {"success": True}	
-
+			socket = invoiceCreated(invoice)
 			return {"success":False,"message":"Error"} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])

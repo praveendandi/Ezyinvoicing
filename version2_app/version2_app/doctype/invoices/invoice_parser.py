@@ -163,7 +163,7 @@ def file_parsing(filepath):
 				guest['address2'] = i
 
 		guest['invoice_number'] = invoiceNumber.replace(' ', '')
-
+		gstNumber = "12345"
 		guest['membership'] = membership
 		guest['invoice_date'] = date_time_obj
 		guest['items'] = total_items
