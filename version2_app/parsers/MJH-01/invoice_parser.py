@@ -164,6 +164,9 @@ def file_parsing(filepath):
 				if "TAX INVOICE" in i:
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
+				if "BillNo." in i:
+					nameindex = i.index("BillNo.")
+					guest['name'] = i[:nameindex]
 			if index == 1:
 				guest['address1'] = ""
 			if index == 2:
