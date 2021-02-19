@@ -100,7 +100,6 @@ def file_parsing(filepath):
 			if entered == True:
 				data.append(i)
 			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i) or "Bill No." in i:
-				print("==========================================",i)
 				guestDeatils.append(i)
 			if "Membership" in i:
 				Membership = i.split(":")
@@ -159,16 +158,14 @@ def file_parsing(filepath):
 		# print(guestDeatils)
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
-				print(i,"----------------------")
 				if "COPY OF INVOICE" in i:
 					nameindex = i.index("COPY OF INVOICE")
 					guest['name'] = i[:nameindex]
 				if "TAX INVOICE" in i:
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
-				res = i.find("BillNo.")
-				if res>=0:
-					nameindex = i.index("BillNo.")
+				if "Bill No." in i:
+					nameindex = i.index("Bill No.")
 					guest['name'] = i[:nameindex]
 			if index == 1:
 				guest['address1'] = ""
