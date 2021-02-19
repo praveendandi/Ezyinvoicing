@@ -166,6 +166,7 @@ def reinitiateInvoice(data):
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
+				guest["name"] = guest["name"].replace("Arrival","")
 			if index == 1:
 				guest['address1'] = i
 			if index == 2:
