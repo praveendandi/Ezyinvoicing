@@ -68,6 +68,9 @@ def file_parsing(filepath):
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
+			if "Departure :" in i and date_time_obj == "":
+				depatureDateIndex = i.index('Departure')
+				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
 			if "Invoice Date" in i:
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
