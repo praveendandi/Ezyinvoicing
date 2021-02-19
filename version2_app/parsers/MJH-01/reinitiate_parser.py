@@ -59,7 +59,6 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			print(i)
 			if "Confirmation No" in i:
 				confirmation_number = i.split(" ")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -82,9 +81,12 @@ def reinitiateInvoice(data):
 						gstNumber = re.search("(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})", i).group()
 					else:
 						gstNumber = ""
+			if "COPY OF INVOICE" in i:
+				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ","")
 			if "Bill No." in i:
-				print("=======================",i)
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				number = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				if number.isdigit():
+					invoiceNumber = number
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
