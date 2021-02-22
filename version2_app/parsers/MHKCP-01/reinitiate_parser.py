@@ -58,6 +58,8 @@ def reinitiateInvoice(data):
 		print_by = ''
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			if "CREDIT TAX INVOICE" in i:
+				invoice_category = "Credit Invoice"
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -100,8 +102,12 @@ def reinitiateInvoice(data):
 				membership = Membership[-1].replace(" ", "")
 			if "Printed By / On" in i:
 				p = i.split(":")
-				print_by = p[1].replace(" ","")		
-
+				print_by = p[1].replace(" ","")	
+	
+		check_invoice = check_invoice_exists(invoiceNumber)
+        if check_invoice['success']==True:
+            inv_data = check_invoice['data']
+            invoiceNumber = inv_data.name
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		
@@ -184,6 +190,8 @@ def reinitiateInvoice(data):
 			inv_data = check_invoice['data']
 			# print(inv_data.__dict__)
 			if inv_data.docstatus==2:
+				invoiceNumber = inv_data.name
+				guest['invoice_number'] = inv_data.name
 				amened='Yes'
 			else:
 				invoiceNumber = inv_data.name
