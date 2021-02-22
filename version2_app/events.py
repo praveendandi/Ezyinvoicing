@@ -8,22 +8,7 @@ import sys
 import importlib.util
 # from version2_app.version2_app.doctype.invoices import *
 
-# modules = dir()
-# command = sys.argv[1]
-# try:
-#     command_module = __import__("myapp.commands.%s" % command, fromlist=["myapp.commands"])
-# except ImportError:
-#     # Display error message
 
-# command_module.run()
-
-#sample
-
-#sample
-
-#sample
-#sample
-#sample
 
 
 def invoiceCreated(doc, method=None):
