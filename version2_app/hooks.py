@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from . import __version__ as app_version
 
+
 app_name = "version2_app"
 app_title = "Version2 App"
 app_publisher = "caratred"
@@ -100,7 +101,7 @@ app_license = "MIT"
 # }
 doc_events = {
 	"Invoices": {
-        "after_insert":"version2_app.events.invoiceCreated",
+        "after_insert":"version2_app.events.invoice_created",
 		# "on_update": "version2_app.events.invoiceUpdate",
 		# "on_cancel": "method",
 		# "on_trash": "method"
