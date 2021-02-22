@@ -15,12 +15,14 @@ import traceback
 def invoice_created(doc, method=None):
     print("Invoice Created",doc.name)
 
+
+
 def invoiceCreated(doc):
     try:
         # frappe.publish_realtime("invoice_created", "message")
         frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':{"name":doc.name, "irn_generated":doc.irn_generated,"invoice_type":doc.invoice_type,"invoice_from":doc.invoice_from,"guest_name":doc.guest_name,"invoice_file":doc.invoice_file,"print_by":doc.print_by,"creation":doc.creation,"invoice_category":doc.invoice_category}})
         soc_doc = frappe.new_doc("Socket Notification")
-        soc_doc.invoice_number = doc.name
+        soc_doc.invoice_number = doc.name+"000"
         soc_doc.guest_name = doc.guest_name
         soc_doc.invoice_type = doc.invoice_type
         soc_doc.room_number = doc.room_number
@@ -30,6 +32,7 @@ def invoiceCreated(doc):
         soc_doc.insert(ignore_permissions=True)
         filename = doc.invoice_file
         bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filename})
+               
         bin_doc = frappe.get_doc("Document Bin",bin_name)
         bin_doc.print_by = doc.print_by
         bin_doc.document_printed = "Yes"
@@ -58,14 +61,16 @@ def update_documentbin(filepath, error_log):
 def fileCreated(doc, method=None):
     try:
         if 'job-' in doc.file_name:
-            update_documentbin(doc.file_url,"")
-            abs_path = os.path.dirname(os.getcwd())
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
-            module_name = 'file_parsing'
-            spec = importlib.util.spec_from_file_location(module_name, file_path)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            module.file_parsing(doc.file_url)
+            if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
+
+                update_documentbin(doc.file_url,"")
+                abs_path = os.path.dirname(os.getcwd())
+                file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                module_name = 'file_parsing'
+                spec = importlib.util.spec_from_file_location(module_name, file_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                module.file_parsing(doc.file_url)
         else:
             print('Normal File')
     except Exception as e:

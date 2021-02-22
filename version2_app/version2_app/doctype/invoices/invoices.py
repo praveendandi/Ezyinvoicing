@@ -1094,7 +1094,8 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": data["sez"] if "sez" in data else 0
+			"sez": data["sez"] if "sez" in data else 0,
+			"allowance_invoice":allowance_invoice
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -1141,19 +1142,6 @@ def insert_invoice(data):
 		print(e, "insert invoice")
 		return {"success": False, "message": str(e)}
 
-def update_document_bin(print_by, invoice_type, invoice_number, invoice_file):
-	try:
-		bin_name = frappe.db.get_value('Document Bin', {'invoice_file': str(invoice_file)}, ['name'])
-		print(bin_name)
-		bin_doc = frappe.get_doc("Document Bin",bin_name)
-		bin_doc.print_by = print_by
-		bin_doc.invoice_status = "Yes"
-		bin_doc.invoice_type = invoice_type
-		bin_doc.invoice_number = invoice_number
-		bin_doc.save(ignore_permissions=True,ignore_version=True)
-	except Exception as e:
-		print(e, "Update Document Bin")
-		return {"success": False, "message": str(e)}
 
 def insert_hsn_code_based_taxes(items, invoice_number,sacType):
 	try:

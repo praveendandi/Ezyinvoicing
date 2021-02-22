@@ -1,6 +1,5 @@
 {
  "actions": [],
- "autoname": "field:invoice_number",
  "creation": "2021-02-17 18:03:34.397136",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -64,7 +63,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-18 14:16:53.160400",
+ "modified": "2021-02-22 16:11:31.411047",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Socket Notification",
