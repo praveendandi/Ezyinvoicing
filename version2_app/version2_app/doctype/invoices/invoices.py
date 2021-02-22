@@ -1090,7 +1090,8 @@ def insert_invoice(data):
 			'credit_gst_amount': round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
-			"sez": data["sez"] if "sez" in data else 0
+			"sez": data["sez"] if "sez" in data else 0,
+			"allowance_invoice":allowance_invoice
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
