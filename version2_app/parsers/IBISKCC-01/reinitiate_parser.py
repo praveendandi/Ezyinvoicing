@@ -198,7 +198,7 @@ def reinitiateInvoice(data):
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
-		error_data['state_code'] = " "
+		error_data['state_code'] = "32"
 		error_data['room_number'] = guest['room_number']
 		error_data['pincode'] = " "
 		error_data['total_invoice_amount'] = total_invoice_amount
