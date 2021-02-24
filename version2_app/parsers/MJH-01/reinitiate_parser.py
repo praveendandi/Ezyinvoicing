@@ -73,7 +73,7 @@ def reinitiateInvoice(data):
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 			if "GST ID" in i:
-				gstNumber = i.split(':')[-1]
+				gstNumber = (i.split(':')[-1]).strip()
 			if "TAX INVOICE" in i:
 				if gstNumber == "":
 					regexp = re.compile(r'(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})')
