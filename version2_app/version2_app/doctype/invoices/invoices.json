@@ -127,7 +127,8 @@
   "converted_from_b2b_by",
   "tax_invoice_referrence_number",
   "tax_invoice_referrence_date",
-  "allowance_invoice"
+  "allowance_invoice",
+  "irn_generated_type"
  ],
  "fields": [
   {
@@ -822,12 +823,19 @@
    "fieldtype": "Select",
    "label": "Allowance Invoice",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "Manual",
+   "fieldname": "irn_generated_type",
+   "fieldtype": "Select",
+   "label": "Irn Generated Type",
+   "options": "Manual\nSystem"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-02-11 11:05:18.863224",
+ "modified": "2021-02-24 11:53:10.913245",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

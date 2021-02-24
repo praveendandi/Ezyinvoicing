@@ -58,7 +58,8 @@
   "company_logo",
   "service_charge_percentage",
   "b2c_to_b2b",
-  "number_in_description"
+  "number_in_description",
+  "allow_auto_irn"
  ],
  "fields": [
   {
@@ -358,11 +359,17 @@
    "fieldname": "number_in_description",
    "fieldtype": "Check",
    "label": "Number In Description"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_auto_irn",
+   "fieldtype": "Check",
+   "label": "Allow Auto Irn"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-04 20:10:17.501104",
+ "modified": "2021-02-24 12:06:06.188138",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

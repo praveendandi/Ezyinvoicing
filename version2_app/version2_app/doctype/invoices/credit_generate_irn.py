@@ -365,7 +365,7 @@ def insert_discount_items(items,invoice_number):
 		print(e,"insert itemns api")
 		return {"success":False,"message":e}
 
-def CreditgenerateIrn(invoice_number):
+def CreditgenerateIrn(invoice_number,generation_type):
 	try:
 		# get invoice details
 		credit_items = []
@@ -539,6 +539,7 @@ def CreditgenerateIrn(invoice_number):
 			invoice.credit_signed_invoice_generated = 'Yes'
 			invoice.credit_irn_generated = 'Success'
 			invoice.irn_generated = "Success"
+			invoice.irn_generated_type = generation_type
 			# invoice.irn_number = " "
 			if not invoice.irn_number:
 				invoice.irn_number = " "
@@ -561,6 +562,7 @@ def CreditgenerateIrn(invoice_number):
 					invoice.credit_ack_no = response['result'][0]['Desc']['AckNo']
 					invoice.credit_irn_number = response['result'][0]['Desc']['Irn']
 					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
+					invoice.irn_generated_type = generation_type
 					invoice.credit_irn_generated = "Success"
 					invoice.credit_qr_code_generated = "Success"
 					# invoice.credit_qr_code_image = ""
