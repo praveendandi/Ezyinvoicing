@@ -21,7 +21,7 @@ import math
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Reinitiate_invoice(data):
 	'''
 	insert invoice data     data, company_code, taxpayer,items_data
@@ -241,7 +241,7 @@ def Reinitiate_invoice(data):
 		print(e,"reinitaite invoice", traceback.print_exc())
 		return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_calulate_items(data):
 	# items, invoice_number,company_code
 	try:

@@ -482,7 +482,7 @@ def attach_qr_code(invoice_number, gsp, code):
 		print(e, "attach qr code")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def send_invoicedata_to_gcb(invoice_number):
 		try:
 			folder_path = frappe.utils.get_bench_path()
@@ -804,7 +804,7 @@ def postIrn(gst_data, gsp, company, invoice_number):
 		return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_invoice(data):
 	try:
 
@@ -827,7 +827,7 @@ def create_invoice(data):
 		print(e)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def insert_invoice(data):
 	'''
 	insert invoice data     data, company_code, taxpayer,items_data
@@ -1231,7 +1231,7 @@ def insert_items(items, invoice_number):
 		return {"success":False,"message":str(e)}
 		
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
@@ -2214,7 +2214,7 @@ def insert_tax_summaries(items, invoice_number):
 		print(e, 'insert tax summerie')
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_tax_payer_details(data):
 	'''
 	get TaxPayerDetail from gsp   gstNumber, code, apidata
@@ -2305,7 +2305,7 @@ def get_tax_payer_details(data):
 		return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_company_exist(code):
 	try:
 		company = frappe.get_doc('company', code)
@@ -2324,7 +2324,7 @@ def check_company_exist_for_Irn(code):
 		return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_token_is_valid(data):
 	try:
 		login_gsp(data['code'], data['mode'])
@@ -2383,7 +2383,7 @@ def login_gsp(code,mode):
 	except Exception as e:
 		print(e, "login gsp")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def updatelogin_gsp(data):
 	try:
 		code = data['code']
@@ -2422,7 +2422,7 @@ def updatelogin_gsp(data):
 	except Exception as e:
 		print(e, "login gsp")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gsp_api_data(data):
 	try:
 		mode = data['mode']
@@ -2631,7 +2631,7 @@ def request_get(api, headers, invoice, code):
 		print(e, "request get")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_gstNumber_Length(data):
 
 	print("Error:  *******The given gst number is not a vaild one**********")
@@ -2641,7 +2641,7 @@ def check_gstNumber_Length(data):
 	}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_invoice_file_exists(data):
 	try:
 		invoiceExists = frappe.get_value(
@@ -2659,7 +2659,7 @@ def check_invoice_file_exists(data):
 		return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def check_invoice_exists(invoice_number):
 	try:
 		if len(invoice_number)>0:
@@ -2690,7 +2690,7 @@ def check_invoice_exists(invoice_number):
 		return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Error_Insert_invoice(data):
 	try:
 		if "sez" in data:

@@ -6,7 +6,7 @@ import random
 from version2_app.version2_app.doctype.invoices.invoices import create_qr_image, gsp_api_data,send_invoicedata_to_gcb
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import create_credit_qr_image
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def AttachQrCodeInInvoice(invoice_number):
     try:
         invoice = frappe.get_doc('Invoices', invoice_number)
