@@ -58,7 +58,12 @@
   "company_logo",
   "service_charge_percentage",
   "b2c_to_b2b",
-  "number_in_description"
+  "number_in_description",
+  "sc_sac_code",
+  "sc_name",
+  "sc_gst_percentage",
+  "adjustment_service_charge_list",
+  "enable_sc_from_folios"
  ],
  "fields": [
   {
@@ -358,11 +363,37 @@
    "fieldname": "number_in_description",
    "fieldtype": "Check",
    "label": "Number In Description"
+  },
+  {
+   "fieldname": "sc_sac_code",
+   "fieldtype": "Data",
+   "label": "SC SAC Code"
+  },
+  {
+   "fieldname": "sc_name",
+   "fieldtype": "Data",
+   "label": "SC Name"
+  },
+  {
+   "fieldname": "sc_gst_percentage",
+   "fieldtype": "Float",
+   "label": "SC GST Percentage"
+  },
+  {
+   "fieldname": "adjustment_service_charge_list",
+   "fieldtype": "Long Text",
+   "label": "Adjustment Service Charge List"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_sc_from_folios",
+   "fieldtype": "Check",
+   "label": "Enable SC from Folios"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-04 20:10:17.501104",
+ "modified": "2021-02-24 17:30:47.030100",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
