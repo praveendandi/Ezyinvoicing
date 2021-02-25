@@ -70,14 +70,8 @@ def file_parsing(filepath):
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
 			if "Departure :" in i:
-<<<<<<< HEAD
 				depatureDateIndex = i.index('Departure')
 				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-=======
-				# depatureDateIndex = i.index('Departure')
-				# date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-				date_time_obj = "08-DEC-20 19:40:00"
->>>>>>> stable-version
 			if "Room No." in i:
 				room = i.split(":")
 				roomNumber = room[-1]
