@@ -946,10 +946,12 @@ def insert_invoice(data):
 
 		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
 			data['total_invoice_amount'] = sales_amount_after_tax
+		print(sales_amount_after_tax)	
 		if '-' in str(sales_amount_after_tax):
 			allowance_invoice = "Yes"
 		else:
-			allowance_invoice = "No"	 	
+			allowance_invoice = "No"	 
+		print(allowance_invoice)		
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
@@ -1114,7 +1116,7 @@ def insert_invoice(data):
 			else:
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
 
-					
+		print(invoice.allowance_invoice)			
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		data['invoice_number'] = v.name
 		data['guest_data']['invoice_number'] = v.name

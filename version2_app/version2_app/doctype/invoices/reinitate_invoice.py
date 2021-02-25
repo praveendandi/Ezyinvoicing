@@ -143,6 +143,11 @@ def Reinitiate_invoice(data):
 			data['total_invoice_amount'] = sales_amount_after_tax
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
+		if '-' in str(sales_amount_after_tax):
+			print(".////////////")
+			allowance_invoice = "Yes"
+		else:
+			allowance_invoice = "No"
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
 		doc.total_inovice_amount = total_invoice_amount
 		doc.invoice_number=data['guest_data']['invoice_number']
@@ -198,6 +203,7 @@ def Reinitiate_invoice(data):
 		doc.credit_gst_amount = round(credit_cgst_amount,2) + round(credit_sgst_amount,2) + round(credit_igst_amount,2)	
 		doc.has_credit_items = has_credit_items
 		doc.mode = company.mode
+		doc.allowance_invoice = allowance_invoice
 		# if data['total_invoice_amount'] == 0:
 		# 	irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
