@@ -108,7 +108,6 @@ def file_parsing(filepath):
 				print_by = i.split(":")
 				print_by = print_by[1].replace(" ","")
 
-		gstNumber="36AACCC2725K1ZQ"
 		paymentTypes = GetPaymentTypes()
 		paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
 		original_data = []
