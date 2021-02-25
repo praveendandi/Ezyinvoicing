@@ -1135,7 +1135,6 @@ def insert_invoice(data):
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 			return {"success":True}
 		else:
-			print("=============")
 			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
 				data = {'invoice_number': v.name,'generation_type': "System"}
 				irn_generate = generateIrn(data)
@@ -1282,7 +1281,6 @@ def calulate_items(data):
 					ItemMode = "Discount"
 			elif invoice_category == "Credit Invoice":
 				ItemMode = "Credit"
-					
 			acc_gst_percentage = 0.00
 			acc_igst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":

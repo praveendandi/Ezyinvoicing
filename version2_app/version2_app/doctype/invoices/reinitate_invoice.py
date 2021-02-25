@@ -67,7 +67,6 @@ def Reinitiate_invoice(data):
 		#calculat items
 		if len(data['items_data'])>0:
 			for item in data['items_data']:
-				print("===================",item)
 				if item['taxable'] == 'No' and item['item_type'] != "Discount":
 					other_charges += float(item['item_value_after_gst'])
 					other_charges_before_tax += float(item['item_value'])
