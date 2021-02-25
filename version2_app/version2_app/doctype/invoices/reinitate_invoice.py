@@ -488,8 +488,9 @@ def reprocess_calulate_items(data):
 					acc_igst_percentage = percentage_gst["igst_percentage"]
 				else:
 					{"success": False, "message": "error in slab helper function"}
-			service_charge_name = (companyDetails.sc_name).strip()
+			service_charge_name = (companyDetails.sc_name)
 			if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1 and item["manual_edit"] == "No"):
+				service_charge_name = service_charge_name.strip()
 				if service_charge_name in item["item_name"]:
 					if placeofsupply != companyDetails.state_code:
 						item["igst"] = companyDetails.sc_gst_percentage

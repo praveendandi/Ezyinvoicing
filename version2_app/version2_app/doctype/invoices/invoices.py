@@ -1313,10 +1313,11 @@ def calulate_items(data):
 						acc_igst_percentage = percentage_gst["igst_percentage"]
 					else:
 						{"success": False, "message": "error in slab helper function"}
-				service_charge_name = (companyDetails.sc_name).strip()
+				service_charge_name = (companyDetails.sc_name)
 				if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
 					gst_value = 0
 					service_dict = {}
+					service_charge_name = service_charge_name.strip()
 					split_string = companyDetails.adjustment_service_charge_list.split(",")
 					remove_spaces = [num.strip() for num in split_string]
 					if item["name"] not in remove_spaces:
