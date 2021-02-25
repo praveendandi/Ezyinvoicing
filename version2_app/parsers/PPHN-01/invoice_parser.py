@@ -70,7 +70,7 @@ def file_parsing(filepath):
 			if "Net Amount" in i:
 				total_invoice = i.split(":")[-1]
 				total_invoice_amount = float(total_invoice.replace(",",""))
-			if "Bill Date" in i:
+			if "Bill Date" in i or "BillDate" in i:
 				date_time_obj = i.split(':')[-1]
 				date_time_obj = datetime.datetime.strptime(date_time_obj, '%m/%d/%Y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
@@ -79,7 +79,7 @@ def file_parsing(filepath):
 			if "Company GST No." in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("Plan","")
-			if "Bill Number" in i:
+			if "Bill Number" in i or "BillNumber" in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
 					invoiceNumber = invoiceNumber.replace("/","")
