@@ -22,7 +22,7 @@ def invoiceCreated(doc):
         # frappe.publish_realtime("invoice_created", "message")
         frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':{"name":doc.name, "irn_generated":doc.irn_generated,"invoice_type":doc.invoice_type,"invoice_from":doc.invoice_from,"guest_name":doc.guest_name,"invoice_file":doc.invoice_file,"print_by":doc.print_by,"creation":doc.creation,"invoice_category":doc.invoice_category}})
         soc_doc = frappe.new_doc("Socket Notification")
-        soc_doc.invoice_number = doc.name+"000"
+        soc_doc.invoice_number = doc.name
         soc_doc.guest_name = doc.guest_name
         soc_doc.invoice_type = doc.invoice_type
         soc_doc.room_number = doc.room_number

@@ -59,9 +59,9 @@
   "service_charge_percentage",
   "b2c_to_b2b",
   "number_in_description",
-  "angular_project_production_path",
+  "allow_auto_irn",
   "backend_git_branch",
-  "allow_auto_irn"
+  "angular_project_production_path"
  ],
  "fields": [
   {
@@ -381,7 +381,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-24 12:06:06.188138",
+ "modified": "2021-02-25 14:33:51.457091",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

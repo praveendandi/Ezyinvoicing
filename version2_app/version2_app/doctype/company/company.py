@@ -319,12 +319,12 @@ def console_command(key=None,
                     caller='bench_update_pull',
                     app_name=None,
                     branch_name=None):
-    commands = {
-        "bench_update": ["bench update"],
-        "switch_branch": [""],
-        "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
-        "bench_update_pull": ["bench update --pull", "bench migrate"]
-    }
+    commands = {"bench_update_pull": ["bench update --pull", "bench migrate"]}
+        # "bench_update": ["bench update"],
+        # "switch_branch": [""],
+        # "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
+        # "bench_update_pull": ["bench update --pull", "bench migrate"]
+    # }
     run_command(commands=commands[caller],
                 doctype='Bench Settings',
                 key=str(time.time()),
