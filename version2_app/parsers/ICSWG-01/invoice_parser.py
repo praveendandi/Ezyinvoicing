@@ -26,7 +26,7 @@ folder_path = frappe.utils.get_bench_path()
 def file_parsing(filepath):
 	try:
 		start_time = datetime.datetime.utcnow()
-		companyCheckResponse = check_company_exist("Pullman-01")
+		companyCheckResponse = check_company_exist("ICSWG-01")
 		site_folder_path = companyCheckResponse['data'].site_name
 		file_path = folder_path+'/sites/'+site_folder_path+filepath
 		today = date.today()
@@ -77,10 +77,10 @@ def file_parsing(filepath):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if ("GST NO" in i and "HOTEL GST NO" not in i) or ("GST ID" in i):
+			if "Company GSTN" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
-				if "ConfirmationNo." in gstNumber:
-					gstNumber = gstNumber.replace("ConfirmationNo.","")
+				# if "ConfirmationNo." in gstNumber:
+				gstNumber = gstNumber.replace("ConfirmationNo.","")
 				gstNumber = gstNumber.replace("Membership","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
@@ -186,7 +186,7 @@ def file_parsing(filepath):
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
 		guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
-		guest['company_code'] = "Pullman-01"
+		guest['company_code'] = "ICSWG-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
@@ -212,8 +212,8 @@ def file_parsing(filepath):
 						reupload = True
 
 
-		company_code = {"code":"Pullman-01"}
-		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"Pullman-01","invoice_date":date_time_obj}
+		company_code = {"code":"ICSWG-01"}
+		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"ICSWG-01","invoice_date":date_time_obj}
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber

@@ -9,7 +9,7 @@ import string
 from frappe.utils import get_site_name
 import time
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
-from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert
+from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
@@ -21,7 +21,7 @@ import math
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Reinitiate_invoice(data):
 	'''
 	insert invoice data     data, company_code, taxpayer,items_data
@@ -230,12 +230,18 @@ def Reinitiate_invoice(data):
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
 		if data['guest_data']['invoice_type'] == "B2C" and generateb2cQr == True:
 			send_invoicedata_to_gcb(data['guest_data']['invoice_number'])
+		invoice_data = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+
+		if data['guest_data']['invoice_type'] == "B2B":
+			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
+				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
+				irn_generate = generateIrn(data)	
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
 		return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_calulate_items(data):
 	# items, invoice_number,company_code
 	try:

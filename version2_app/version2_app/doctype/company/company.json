@@ -60,7 +60,8 @@
   "b2c_to_b2b",
   "number_in_description",
   "angular_project_production_path",
-  "backend_git_branch"
+  "backend_git_branch",
+  "allow_auto_irn"
  ],
  "fields": [
   {
@@ -370,11 +371,17 @@
    "fieldname": "backend_git_branch",
    "fieldtype": "Data",
    "label": "Backend Git Branch"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_auto_irn",
+   "fieldtype": "Check",
+   "label": "Allow Auto Irn"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-18 14:42:29.995810",
+ "modified": "2021-02-24 12:06:06.188138",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

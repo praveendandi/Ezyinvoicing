@@ -68,6 +68,9 @@ def file_parsing(filepath):
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
+			if "Departure :" in i and date_time_obj == "":
+				depatureDateIndex = i.index('Departure')
+				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
 			if "Invoice Date" in i:
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
@@ -75,9 +78,10 @@ def file_parsing(filepath):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "GST ID" in i and "Confirmation No." in i:
+			if ("GST NO" in i and "HOTEL GST NO" not in i) or ("GST ID" in i):
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("ConfirmationNo.","")
+				gstNumber = gstNumber.replace("Membership","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "Bill To" in i:
@@ -160,6 +164,7 @@ def file_parsing(filepath):
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
+				guest["name"] = guest["name"].replace("Arrival","")
 			if index == 1:
 				guest['address1'] = i
 			if index == 2:

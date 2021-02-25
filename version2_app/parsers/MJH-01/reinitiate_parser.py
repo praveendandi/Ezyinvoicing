@@ -73,7 +73,7 @@ def reinitiateInvoice(data):
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
 			if "GST ID" in i:
-				gstNumber = i.split(':')[-1]
+				gstNumber = (i.split(':')[-1]).strip()
 			if "TAX INVOICE" in i:
 				if gstNumber == "":
 					regexp = re.compile(r'(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})')
@@ -81,8 +81,12 @@ def reinitiateInvoice(data):
 						gstNumber = re.search("(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})", i).group()
 					else:
 						gstNumber = ""
+			if "COPY OF INVOICE" in i:
+				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ","")
 			if "Bill No." in i:
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				number = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				if number.isdigit():
+					invoiceNumber = number
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
@@ -99,7 +103,7 @@ def reinitiateInvoice(data):
 				entered = False
 			if entered == True:
 				data.append(i)
-			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i):
+			if ("COPY OF INVOICE" in i and "Bill No." in i) or ("TAX INVOICE" in i and "Bill No." in i) or "Bill No." in i:
 				guestDeatils.append(i)
 			if "Membership" in i:
 				Membership = i.split(":")
@@ -165,8 +169,8 @@ def reinitiateInvoice(data):
 				if "TAX INVOICE" in i:
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
-				if "BillNo." in i:
-					nameindex = i.index("BillNo.")
+				if "Bill No." in i:
+					nameindex = i.index("Bill No.")
 					guest['name'] = i[:nameindex]
 			if index == 1:
 				guest['address1'] = ""
