@@ -31,10 +31,10 @@ def Reinitiate_invoice(data):
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
-		if "place_of_supply" in data:
-			place_of_supply = data['place_of_supply']
-		else:
-			place_of_supply = company.state_code
+		# if "place_of_supply" in data:
+		# 	place_of_supply = data['place_of_supply']
+		# else:
+		# 	place_of_supply = company.state_code
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
@@ -177,8 +177,8 @@ def Reinitiate_invoice(data):
 		doc.total_state_cess_amount = total_state_cess_amount
 		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
-		doc.place_of_supply = place_of_supply
-		doc.sez = data["sez"] if "sez" in data else doc.sez
+		# doc.place_of_supply = place_of_supply
+		# doc.sez = data["sez"] if "sez" in data else doc.sez
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
 		doc.igst_amount=round(igst_amount,2)
@@ -214,7 +214,7 @@ def Reinitiate_invoice(data):
 					doc.irn_generated = "Error"
 					doc.ready_to_generate_irn = "No"
 		doc.total_invoice_amount = data["total_invoice_amount"]
-		doc.place_of_supply = place_of_supply
+		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		
@@ -255,7 +255,12 @@ def reprocess_calulate_items(data):
 		if "place_of_supply" in data:
 			placeofsupply = data["place_of_supply"]
 		else:
-			placeofsupply = companyDetails.state_code
+			doc_invoice = frappe.db.exists("Invoices",data["invoice_number"])
+			if doc_invoice:
+				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+				placeofsupply = invoice_doc.place_of_supply
+			else:
+				placeofsupply = companyDetails.state_code
 		if "sez" in data:
 			sez = data["sez"]
 		else:
@@ -823,6 +828,9 @@ def reprocess_calulate_items(data):
 		total_items.extend(second_list)
 		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
 		reinitiate = Reinitiate_invoice(final_data)
+		doc_inv = frappe.get_doc("Invoices",data["invoice_number"])
+		doc_inv.sez = sez
+		doc_inv.save(ignore_permissions=True)
 		if reinitiate["success"] == True:
 			return {"success": True}
 		else:

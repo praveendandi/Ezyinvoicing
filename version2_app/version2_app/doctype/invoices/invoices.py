@@ -1246,6 +1246,11 @@ def calulate_items(data):
 		# companyDetails = frappe.get_doc('company', data['company_code'])
 		if "sez" in data:
 			sez = data["sez"]
+			if sez == 0:
+				doc = frappe.db.exists("Invoices",data["invoice_number"])
+				if doc:
+					invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+					sez = invoice_doc.sez
 		else:
 			doc = frappe.db.exists("Invoices",data["invoice_number"])
 			if doc:
