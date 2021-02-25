@@ -73,7 +73,7 @@ def reinitiateInvoice(data):
 			if "Bill Generation Date" in i:
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
-			if "Room" in i and "CHECK#" not in i:
+			if "Room" in i and "CHECK#" not in i and "Rooms" not in i and "GST" not in i:
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
@@ -173,14 +173,18 @@ def reinitiateInvoice(data):
 
 		guest = dict()
 		# print(guestDeatils)
-		for index, i in enumerate(guestDeatils):
-			if index == 0:
-				guest['name'] = i.split(':')[1]
-				guest["name"] = guest["name"].replace("Arrival","")
-			if index == 1:
-				guest['address1'] = i
-			if index == 2:
-				guest['address2'] = i
+		if len(guestDeatils)>0:
+			for index, i in enumerate(guestDeatils):
+				if index == 0:
+					guest['name'] = i.split(':')[0]
+					guest["name"] = guest["name"].replace("Company Name","")
+					guest["name"] = guest["name"].replace("Cashier","")
+				if index == 1:
+					guest['address1'] = ""
+				if index == 2:
+					guest['address2'] = ""
+		else:
+			guest['name'] = "NA"
 
 		guest['invoice_number'] = invoiceNumber.replace(' ', '')
 
