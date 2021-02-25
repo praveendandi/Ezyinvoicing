@@ -63,7 +63,8 @@
   "sc_name",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
-  "enable_sc_from_folios"
+  "enable_sc_from_folios",
+  "allow_auto_irn"
  ],
  "fields": [
   {
@@ -389,11 +390,17 @@
    "fieldname": "enable_sc_from_folios",
    "fieldtype": "Check",
    "label": "Enable SC from Folios"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_auto_irn",
+   "fieldtype": "Check",
+   "label": "Allow Auto Irn"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-24 17:30:47.030100",
+ "modified": "2021-02-24 12:06:06.188138",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
