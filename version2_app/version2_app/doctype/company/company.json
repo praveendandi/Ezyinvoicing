@@ -61,7 +61,8 @@
   "number_in_description",
   "allow_auto_irn",
   "backend_git_branch",
-  "angular_project_production_path"
+  "angular_project_production_path",
+  "sampleaddd"
  ],
  "fields": [
   {
@@ -377,11 +378,16 @@
    "fieldname": "allow_auto_irn",
    "fieldtype": "Check",
    "label": "Allow Auto Irn"
+  },
+  {
+   "fieldname": "sampleaddd",
+   "fieldtype": "Data",
+   "label": "sampleADDD"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-26 15:02:01.951469",
+ "modified": "2021-02-26 15:28:59.604469",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
