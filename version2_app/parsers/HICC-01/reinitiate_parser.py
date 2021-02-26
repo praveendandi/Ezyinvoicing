@@ -101,27 +101,6 @@ def reinitiateInvoice(data):
 			print_by = i.split(":")
 			print_by = print_by[1].replace(" ","")
 
-	if invoiceNumber != reupload_inv_number:
-		return {"success":False,"message":"Incorrect Invoice Attempted"}
-	paymentTypes = GetPaymentTypes()
-	paymentTypes  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
-	original_data = []
-	for index, i in enumerate(data):
-		if 'XX/XX' in i:
-			i = " "
-		if i !=" ":
-			j = i.split(' ')
-			j = j[1:-1]
-			if len(j)>1:
-				ele = j[0]
-				if "~" not in j[1]:
-					ele = ele+" "+j[1]
-				if ele not in paymentTypes:
-					original_data.append(i)
-			elif len(j) == 1:
-				if j[0] not in paymentTypes:
-					original_data.append(i)
-
 	items = [] 
 	itemsort = 0
 	for i in original_data:
@@ -160,9 +139,12 @@ def reinitiateInvoice(data):
 			items.append(item)
 
 	total_items = []
+	paymentTypes = GetPaymentTypes()
+	payment_Types  = [''.join(each) for each in paymentTypes['data']]
 	for each in items:
-		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Allow " not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name']:
-			total_items.append(each)
+		if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+			if each["name"] not in payment_Types:
+				total_items.append(each)
 
 	guest = dict()
 	# print(guestDeatils)
