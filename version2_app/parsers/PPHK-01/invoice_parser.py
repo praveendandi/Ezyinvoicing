@@ -138,6 +138,13 @@ def file_parsing(filepath):
 					total_items.append(each)
 				else:
 					if "-" in str(each["item_value"]):
+						get_index = items.index(each)
+						cgst = items[get_index+1]
+						sgst = items[get_index+2]
+						if ("Central GST" in cgst["name"] or "State GST" in cgst["name"]) and "-" in str(cgst["item_value"]):
+							each["item_value"]  = abs(each["item_value"])+abs(cgst["item_value"])
+						if ("Central GST" in sgst["name"] or "State GST" in sgst["name"]) and "-" in str(sgst["item_value"]):
+							each["item_value"] = abs(each["item_value"])+abs(sgst["item_value"])
 						total_invoice_amount = total_invoice_amount+abs(each["item_value"])
 
 		guest = dict()
