@@ -91,6 +91,7 @@ def emitsocket(doc,method=None):
 def updateManager(doc, method=None):
   
     if doc.status!="Ongoing":
+        #==========
         # commands = ['git pull','service nginx reload','service nginx restart']
         commands = ['git pull']
         console_dump = ''
