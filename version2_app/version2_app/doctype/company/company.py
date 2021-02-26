@@ -436,7 +436,7 @@ def bench_migrate():
                              stdin=PIPE,
                              stdout=PIPE,
                              stderr=STDOUT,
-                             cwd=cwd)
+                             cwd="..")
     return True                             
 
 
