@@ -75,10 +75,6 @@ def file_parsing(filepath):
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room" in i and "CHECK#" not in i and "Rooms" not in i and "GST" not in i:
-<<<<<<< HEAD
-				print("/////////////,   ",i)
-=======
->>>>>>> stable-version
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
