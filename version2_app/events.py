@@ -96,7 +96,7 @@ def updateManager(doc, method=None):
         # company = frappe.get_last_doc('company')
         # cwd = company.angular_project_production_path
         # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
-        cwd = '/home/caratred/Desktop/ezy-invoice-production'
+        cwd = '/home/frappe/ezy-invoice-production'
         key = str(time.time())
         # count = 0
         for command in commands:
