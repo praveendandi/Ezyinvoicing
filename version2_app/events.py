@@ -8,9 +8,7 @@ import sys
 import datetime
 import importlib.util
 import traceback
-# from version2_app.version2_app.doctype.invoices import *
-#===============================
-#===================================
+
 
 
 
