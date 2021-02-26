@@ -404,12 +404,13 @@ def run_command(commands,
                            status='Success',
                            user=frappe.session.user)
             print("----------,else")  
-        with open("/home/caratred/frappe_projects/Einvoice_Bench/sites/common_site_config.json", "r") as jsonFile:
+        common_site = frappe.utils.get_bench_path()    
+        with open(common_site+"/sites/common_site_config.json", "r") as jsonFile:
             data = json.load(jsonFile)
         data["maintenance_mode"] = 0
         data["pause_scheduler"] = 0
 
-        with open("/home/caratred/frappe_projects/Einvoice_Bench/sites/common_site_config.json", "w") as jsonFile:
+        with open(common_site+"/sites/common_site_config.json", "w") as jsonFile:
             json.dump(data, jsonFile)                     
     except Exception as e:
         print(str(e),"  excep")
