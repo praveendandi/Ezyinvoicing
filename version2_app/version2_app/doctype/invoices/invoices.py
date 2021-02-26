@@ -1323,8 +1323,11 @@ def calulate_items(data):
 					gst_value = 0
 					service_dict = {}
 					service_charge_name = service_charge_name.strip()
-					split_string = companyDetails.adjustment_service_charge_list.split(",")
-					remove_spaces = [num.strip() for num in split_string]
+					if companyDetails.adjustment_service_charge_list != "":
+						split_string = companyDetails.adjustment_service_charge_list.split(",")
+						remove_spaces = [num.strip() for num in split_string]
+					else:
+						remove_spaces = []
 					if item["name"] not in remove_spaces:
 						if service_charge_name in item["name"]:
 							scharge = companyDetails.service_charge_percentage
