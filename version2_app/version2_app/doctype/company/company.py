@@ -432,12 +432,16 @@ def run_command(commands,
         _refresh(doctype=doctype, docname=docname, commands=commands)
 @frappe.whitelist(allow_guest=True)
 def bench_migrate():
-    terminal = Popen(shlex.split("bench migrate"),
-                             stdin=PIPE,
-                             stdout=PIPE,
-                             stderr=STDOUT,
-                             cwd="..")
-    return True                             
+    try:
+        terminal = Popen(shlex.split("bench migrate"),
+                                stdin=PIPE,
+                                stdout=PIPE,
+                                stderr=STDOUT,
+                                cwd="..")
+        return {"success":True,"message":"Bench Migrate Done"} 
+    except Exception as e:
+        print(str(e),"      bench_migrate")
+        return {"success":False,"messgae":str(e)}                                
 
 
 def _close_the_doc(start_time, key, console_dump, status, user):
