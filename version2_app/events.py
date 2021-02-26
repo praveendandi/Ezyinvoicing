@@ -90,7 +90,6 @@ def updateManager(doc, method=None):
   
     if doc.status!="Ongoing":
         print("==========")
-        # commands = ['git pull','service nginx reload','service nginx restart']
         commands = ['git pull origin master']
         console_dump = ''
         # company = frappe.get_last_doc('company')
