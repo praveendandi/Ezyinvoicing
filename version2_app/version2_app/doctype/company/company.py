@@ -404,6 +404,11 @@ def run_command(commands,
                            status='Success',
                            user=frappe.session.user)
             print("----------,else")  
+        terminal = Popen(shlex.split("bench migrate"),
+                             stdin=PIPE,
+                             stdout=PIPE,
+                             stderr=STDOUT,
+                             cwd=cwd)    
         common_site = frappe.utils.get_bench_path()    
         with open(common_site+"/sites/common_site_config.json", "r") as jsonFile:
             data = json.load(jsonFile)
