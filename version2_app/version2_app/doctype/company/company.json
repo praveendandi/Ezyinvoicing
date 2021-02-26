@@ -61,9 +61,7 @@
   "number_in_description",
   "allow_auto_irn",
   "backend_git_branch",
-  "angular_project_production_path",
-  "sample_key",
-  "sample_key_2"
+  "angular_project_production_path"
  ],
  "fields": [
   {
@@ -379,21 +377,11 @@
    "fieldname": "allow_auto_irn",
    "fieldtype": "Check",
    "label": "Allow Auto Irn"
-  },
-  {
-   "fieldname": "sample_key",
-   "fieldtype": "Data",
-   "label": "Sample Key"
-  },
-  {
-   "fieldname": "sample_key_2",
-   "fieldtype": "Data",
-   "label": "Sample Key 2"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-26 13:59:05.983844",
+ "modified": "2021-02-26 15:02:01.951469",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
