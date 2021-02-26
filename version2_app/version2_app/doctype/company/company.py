@@ -372,20 +372,24 @@ def run_command(commands,
     doc.insert()
     frappe.db.commit()
     print(doc.name, '----------------------')
-    frappe.publish_realtime(key,
-                            "Executing Command:\n{logged_command}\n\n".format(
-                                logged_command=logged_command),
-                            user=frappe.session.user)
+    # frappe.publish_realtime(key,
+    #                         "Executing Command:\n{logged_command}\n\n".format(
+    #                             logged_command=logged_command),
+    #                         user=frappe.session.user)
     try:
         for command in commands:
+            print(command)
             terminal = Popen(shlex.split(command),
                              stdin=PIPE,
                              stdout=PIPE,
                              stderr=STDOUT,
                              cwd=cwd)
-            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-                frappe.publish_realtime(key, c, user=frappe.session.user)
-                console_dump += c
+            print(terminal._waitpid_lock,"terminal") 
+            print(safe_decode(terminal.stdout.read(1)),"//////////////")                
+            # for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+            #     # print(c,"ccccccccccc")
+            #     frappe.publish_realtime(key, c, user=frappe.session.user)
+            #     console_dump += c
         if terminal.wait():
             _close_the_doc(start_time,
                            key,
@@ -399,7 +403,14 @@ def run_command(commands,
                            console_dump,
                            status='Success',
                            user=frappe.session.user)
-            print("----------,else")                   
+            print("----------,else")  
+        with open("/home/caratred/frappe_projects/Einvoice_Bench/sites/common_site_config.json", "r") as jsonFile:
+            data = json.load(jsonFile)
+        data["maintenance_mode"] = 0
+        data["pause_scheduler"] = 0
+
+        with open("/home/caratred/frappe_projects/Einvoice_Bench/sites/common_site_config.json", "w") as jsonFile:
+            json.dump(data, jsonFile)                     
     except Exception as e:
         print(str(e),"  excep")
         _close_the_doc(start_time,
