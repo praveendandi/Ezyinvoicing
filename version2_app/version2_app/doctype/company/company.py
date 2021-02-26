@@ -427,7 +427,6 @@ def run_command(commands,
     finally:
         print("finalyyyyyyy")
         frappe.db.commit()
-        
         _refresh(doctype=doctype, docname=docname, commands=commands)
 @frappe.whitelist(allow_guest=True)
 def bench_migrate():
