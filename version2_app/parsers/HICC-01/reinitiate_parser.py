@@ -74,6 +74,7 @@ def reinitiateInvoice(data):
 			gstNumber = i.split(':')[1].replace(' ', '')
 			gstNumber = gstNumber.replace("ConfirmationNo.","")
 		if "Bill  No." in i:
+
 			invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			invoiceNumber = ''.join(filter(lambda i: i.isdigit(), invoiceNumber))
 		if "Bill To" in i:
