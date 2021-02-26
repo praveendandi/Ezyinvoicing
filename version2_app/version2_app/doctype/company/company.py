@@ -431,6 +431,14 @@ def run_command(commands,
         # and the _refresh throws an error if the doc is deleted
         _refresh(doctype=doctype, docname=docname, commands=commands)
 
+def bench_migrate():
+    terminal = Popen(shlex.split("bench migrate"),
+                             stdin=PIPE,
+                             stdout=PIPE,
+                             stderr=STDOUT,
+                             cwd=cwd)
+    return True                             
+
 
 def _close_the_doc(start_time, key, console_dump, status, user):
     time_taken = frappe.utils.time.time() - start_time
