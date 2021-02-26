@@ -392,19 +392,23 @@ def run_command(commands,
                            console_dump,
                            status='Failed',
                            user=frappe.session.user)
+            print("----------,if")               
         else:
             _close_the_doc(start_time,
                            key,
                            console_dump,
                            status='Success',
                            user=frappe.session.user)
+            print("----------,else")                   
     except Exception as e:
+        print(str(e),"  excep")
         _close_the_doc(start_time,
                        key,
                        "{} \n\n{}".format(e, console_dump),
                        status='Failed',
                        user=frappe.session.user)
     finally:
+        print("finalyyyyyyy")
         frappe.db.commit()
         # hack: frappe.db.commit() to make sure the log created is robust,
         # and the _refresh throws an error if the doc is deleted
