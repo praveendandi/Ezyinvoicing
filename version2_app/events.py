@@ -84,7 +84,7 @@ def emitsocket(doc,method=None):
     frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
     frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
 
-
+#-----------------
 
 
 def updateManager(doc, method=None):
