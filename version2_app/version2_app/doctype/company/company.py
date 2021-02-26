@@ -430,7 +430,7 @@ def run_command(commands,
         # hack: frappe.db.commit() to make sure the log created is robust,
         # and the _refresh throws an error if the doc is deleted
         _refresh(doctype=doctype, docname=docname, commands=commands)
-
+@frappe.whitelist(allow_guest=True)
 def bench_migrate():
     terminal = Popen(shlex.split("bench migrate"),
                              stdin=PIPE,
