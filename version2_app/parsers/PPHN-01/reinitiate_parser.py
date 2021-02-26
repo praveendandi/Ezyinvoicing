@@ -69,7 +69,7 @@ def reinitiateInvoice(data):
 			if "Net Amount" in i:
 				total_invoice = i.split(":")[-1]
 				total_invoice_amount = float(total_invoice.replace(",",""))
-			if "Bill Date" in i:
+			if "Bill Date" in i or "BillDate" in i:
 				date_time_obj = i.split(':')[-1]
 				date_time_obj = datetime.datetime.strptime(date_time_obj, '%m/%d/%Y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
@@ -78,7 +78,7 @@ def reinitiateInvoice(data):
 			if "Company GST No." in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("Plan","")
-			if "Bill Number" in i:
+			if "Bill Number" in i or "BillNumber" in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
 					invoiceNumber = invoiceNumber.replace("/","")
@@ -139,11 +139,18 @@ def reinitiateInvoice(data):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Central GST" not in each["name"] and "State GST" not in each["name"] and "SERVICE CHARGE" not in each["name"]:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Central GST" not in each["name"] and "State GST" not in each["name"]:
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 				else:
 					if "-" in str(each["item_value"]):
+						get_index = items.index(each)
+						cgst = items[get_index+1]
+						sgst = items[get_index+2]
+						if ("Central GST" in cgst["name"] or "State GST" in cgst["name"]) and "-" in str(cgst["item_value"]):
+							each["item_value"]  = abs(each["item_value"])+abs(cgst["item_value"])
+						if ("Central GST" in sgst["name"] or "State GST" in sgst["name"]) and "-" in str(sgst["item_value"]):
+							each["item_value"] = abs(each["item_value"])+abs(sgst["item_value"])
 						total_invoice_amount = total_invoice_amount+abs(each["item_value"])
 
 		guest = dict()

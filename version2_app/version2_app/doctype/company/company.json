@@ -59,6 +59,11 @@
   "service_charge_percentage",
   "b2c_to_b2b",
   "number_in_description",
+  "sc_sac_code",
+  "sc_name",
+  "sc_gst_percentage",
+  "adjustment_service_charge_list",
+  "enable_sc_from_folios",
   "allow_auto_irn"
  ],
  "fields": [
@@ -359,6 +364,32 @@
    "fieldname": "number_in_description",
    "fieldtype": "Check",
    "label": "Number In Description"
+  },
+  {
+   "fieldname": "sc_sac_code",
+   "fieldtype": "Data",
+   "label": "SC SAC Code"
+  },
+  {
+   "fieldname": "sc_name",
+   "fieldtype": "Data",
+   "label": "SC Name"
+  },
+  {
+   "fieldname": "sc_gst_percentage",
+   "fieldtype": "Float",
+   "label": "SC GST Percentage"
+  },
+  {
+   "fieldname": "adjustment_service_charge_list",
+   "fieldtype": "Long Text",
+   "label": "Adjustment Service Charge List"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_sc_from_folios",
+   "fieldtype": "Check",
+   "label": "Enable SC from Folios"
   },
   {
    "default": "0",
