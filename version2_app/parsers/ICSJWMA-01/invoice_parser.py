@@ -59,6 +59,7 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			# print(i)
 			if "CREDIT TAX INVOICE" in i:
 				invoice_category = "Credit Invoice"
 			if "Confirmation No" in i:
@@ -74,7 +75,10 @@ def file_parsing(filepath):
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room" in i and "CHECK#" not in i and "Rooms" not in i and "GST" not in i:
+<<<<<<< HEAD
 				print("/////////////,   ",i)
+=======
+>>>>>>> stable-version
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
@@ -136,7 +140,7 @@ def file_parsing(filepath):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Vat" not in i and "VAT" not in i:
+			if len(check_date) > 0 and "IGST" not in i and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Vat" not in i and "VAT" not in i:
 				item = dict()
 				item_value = ""
 				dt = i.strip()
@@ -165,22 +169,18 @@ def file_parsing(filepath):
 					item['sort_order'] =  itemsort+1
 				itemsort+=1
 				items.append(item)
-
-
-		guest = dict()
-		# print(guestDeatils)
-		if len(guestDeatils)>0:
-			for index, i in enumerate(guestDeatils):
-				if index == 0:
-					guest['name'] = i.split(':')[0]
-					guest["name"] = guest["name"].replace("Company Name","")
-					guest["name"] = guest["name"].replace("Cashier","")
-				if index == 1:
-					guest['address1'] = ""
-				if index == 2:
-					guest['address2'] = ""
+		guest = dict()		
+		if "Confirmation" in confirmation_number[0]: 
+			name = confirmation_number[0].strip().split("Confirmation No")
+			if len(name[0])>0:
+				guest['name'] = confirmation_number[0].split("Confirmation No ")[0].strip(" ").replace(",","")
+			else:
+				guest['name'] = room[0].split("Room")[0]	
 		else:
-			guest['name'] = "NA"			
+			guest['name'] = room[0].split("Room")[0]
+
+		
+
 
 		guest['invoice_number'] = invoiceNumber.replace(' ', '')
 

@@ -31,10 +31,10 @@ def Reinitiate_invoice(data):
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
-		if "place_of_supply" in data:
-			place_of_supply = data['place_of_supply']
-		else:
-			place_of_supply = company.state_code
+		# if "place_of_supply" in data:
+		# 	place_of_supply = data['place_of_supply']
+		# else:
+		# 	place_of_supply = company.state_code
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
@@ -182,8 +182,8 @@ def Reinitiate_invoice(data):
 		doc.total_state_cess_amount = total_state_cess_amount
 		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
-		doc.place_of_supply = place_of_supply
-		doc.sez = data["sez"] if "sez" in data else doc.sez
+		# doc.place_of_supply = place_of_supply
+		# doc.sez = data["sez"] if "sez" in data else doc.sez
 		doc.cgst_amount=round(cgst_amount,2)
 		doc.sgst_amount=round(sgst_amount,2)
 		doc.igst_amount=round(igst_amount,2)
@@ -220,7 +220,7 @@ def Reinitiate_invoice(data):
 					doc.irn_generated = "Error"
 					doc.ready_to_generate_irn = "No"
 		doc.total_invoice_amount = data["total_invoice_amount"]
-		doc.place_of_supply = place_of_supply
+		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount		
 		doc.save()
 		
@@ -239,7 +239,9 @@ def Reinitiate_invoice(data):
 		invoice_data = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
 
 		if data['guest_data']['invoice_type'] == "B2B":
+			print("///////")
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
+				print("----------")
 				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
 				irn_generate = generateIrn(data)	
 		return {"success":True}
@@ -261,7 +263,12 @@ def reprocess_calulate_items(data):
 		if "place_of_supply" in data:
 			placeofsupply = data["place_of_supply"]
 		else:
-			placeofsupply = companyDetails.state_code
+			doc_invoice = frappe.db.exists("Invoices",data["invoice_number"])
+			if doc_invoice:
+				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+				placeofsupply = invoice_doc.place_of_supply
+			else:
+				placeofsupply = companyDetails.state_code
 		if "sez" in data:
 			sez = data["sez"]
 		else:
@@ -285,7 +292,7 @@ def reprocess_calulate_items(data):
 						if each_item["manual_edit"] == "No":
 							total_items.append(each_item)
 							continue
-			if each_item["is_service_charge_item"] == "No" and isinstance(each_item["sort_order"], int):
+			if (each_item["is_service_charge_item"] == "No" and isinstance(each_item["sort_order"], int) and companyDetails.enable_sc_from_folios == 0) or ((each_item["is_service_charge_item"] == "Yes" or each_item["is_service_charge_item"] == "No") and companyDetails.enable_sc_from_folios == 1):
 				final_item = {}
 				if companyDetails.allowance_type == "Credit":
 					ItemMode = "Credit"
@@ -368,8 +375,8 @@ def reprocess_calulate_items(data):
 							total_items_data["service_charge_tax_applies"] = each_item["service_charge_tax_applies"]
 							if total_items_data["service_charge_tax_applies"] == "Seperate GST":
 								total_items_data["service_charge_tax_applies"] = "Separate GST"
-								total_items_data["sc_gst_tax_rate"] = float(each_item["sc_gst_tax_rate"])
-								total_items_data["sc_sac_code"] = each_item["sc_sac_code"]
+								total_items_data["sc_gst_tax_rate"] = float(each_item["sc_gst_tax_rate_value"])
+								total_items_data["sc_sac_code"] = each_item["sc_sac_code_value"]
 					else:
 						# total_items_data["cgst"] = sac_code_based_gst_rates.cgst
 						# total_items_data["sgst"] = sac_code_based_gst_rates.sgst
@@ -493,135 +500,161 @@ def reprocess_calulate_items(data):
 					acc_igst_percentage = percentage_gst["igst_percentage"]
 				else:
 					{"success": False, "message": "error in slab helper function"}
-			if item["service_charge"] == "Yes":
-				gst_value = 0
-				service_dict = {}
-				if item["service_charge_tax_applies"] == "Apply From Parent":
-					gst_percentage = float(item["cgst"])+float(item["sgst"])
-					igst_percentage = float(item["igst"])
-					sac_code_new = sac_code_based_gst_rates.code
-					vat_rate_percentage = item["vat"]
-				elif item["service_charge_tax_applies"] == "Separate GST":
-					if (sez == 1 and sac_code_based_gst_rates.exempted == 0) or placeofsupply != companyDetails.state_code:
-						igst_percentage = item["sc_gst_tax_rate"]
-						gst_percentage = 0
-						sac_code_new = item["sc_sac_code"]
-						vat_rate_percentage = item["vat"]
-					elif sez == 1 and sac_code_based_gst_rates.exempted == 1:
-						igst_percentage = 0
-						gst_percentage = 0
-						sac_code_new = item["sc_sac_code"]
-						vat_rate_percentage = item["vat"]
+			service_charge_name = (companyDetails.sc_name)
+			if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1 and item["manual_edit"] == "No"):
+				service_charge_name = service_charge_name.strip()
+				if service_charge_name in item["item_name"]:
+					if placeofsupply != companyDetails.state_code:
+						item["igst"] = companyDetails.sc_gst_percentage
+						item["cgst"] = 0
+						item["sgst"] = 0
+					elif sez == 1:
+						if sac_code_based_gst_rates.exempted == 0:
+							item["igst"] = companyDetails.sc_gst_percentage
+							item["cgst"] = 0
+							item["sgst"] = 0
+						else:
+							item["cgst"] = 0
+							item["sgst"] = 0
+							item["igst"] = 0
+					elif sez == 0 or placeofsupply == companyDetails.state_code:
+						item["cgst"] = float(companyDetails.sc_gst_percentage)/2
+						item["sgst"] = float(companyDetails.sc_gst_percentage)/2
+						item["igst"] = 0
 					else:
-						gst_percentage = item["sc_gst_tax_rate"]
-						igst_percentage = 0
-						sac_code_new = item["sc_sac_code"]
+						item["cgst"] = 0
+						item["sgst"] = 0
+						item["igst"] = 0
+			if companyDetails.enable_sc_from_folios == 0:
+				if item["service_charge"] == "Yes":
+					gst_value = 0
+					service_dict = {}
+					if item["service_charge_tax_applies"] == "Apply From Parent":
+						gst_percentage = float(item["cgst"])+float(item["sgst"])
+						igst_percentage = float(item["igst"])
+						sac_code_new = sac_code_based_gst_rates.code
 						vat_rate_percentage = item["vat"]
-				else:
-					gst_percentage = 0
-					igst_percentage = 0
-					sac_code_new = sac_code_based_gst_rates.code
-					vat_rate_percentage = 0
-				if item["net"] == "Yes":
-					base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
-					gst_value = item['item_value']- base_value
-					scharge_value = (item["service_charge_rate"] * base_value) / 100.0
+					elif item["service_charge_tax_applies"] == "Separate GST":
+						if (sez == 1 and sac_code_based_gst_rates.exempted == 0) or placeofsupply != companyDetails.state_code:
+							igst_percentage = item["sc_gst_tax_rate"]
+							gst_percentage = 0
+							sac_code_new = item["sc_sac_code"]
+							vat_rate_percentage = item["vat"]
+						elif sez == 1 and sac_code_based_gst_rates.exempted == 1:
+							igst_percentage = 0
+							gst_percentage = 0
+							sac_code_new = item["sc_sac_code"]
+							vat_rate_percentage = item["vat"]
+						else:
+							gst_percentage = item["sc_gst_tax_rate"]
+							igst_percentage = 0
+							sac_code_new = item["sc_sac_code"]
+							vat_rate_percentage = item["vat"]
+					else:
+						gst_percentage = 0
+						igst_percentage = 0
+						sac_code_new = sac_code_based_gst_rates.code
+						vat_rate_percentage = 0
+					if item["net"] == "Yes":
+						base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
+						gst_value = item['item_value']- base_value
+						scharge_value = (item["service_charge_rate"] * base_value) / 100.0
+						if sac_code_based_gst_rates.service_charge_net == "Yes":
+							scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
+							gst_value = scharge_value- scharge_value_base
+							scharge_value = scharge_value_base
+						item['base_value'] = base_value
+						igst_value = igst_percentage
+					else:
+						base_value = item['item_value']
+						scharge_value = (item["service_charge_rate"] * item['item_value']) / 100.0
+						if sac_code_based_gst_rates.code == '996311' and item["service_charge_tax_applies"] == "Apply From Parent":	
+							if item["manual_edit"] == "Yes":
+								gst_percentage = float(item["cgst"])+float(item["sgst"])
+								igst_percentage = float(item["igst"])
+							else:
+								gst_percentage = acc_gst_percentage
+								igst_percentage = acc_igst_percentage
 					if sac_code_based_gst_rates.service_charge_net == "Yes":
 						scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
 						gst_value = scharge_value- scharge_value_base
 						scharge_value = scharge_value_base
-					item['base_value'] = base_value
-					igst_value = igst_percentage
-				else:
-					base_value = item['item_value']
-					scharge_value = (item["service_charge_rate"] * item['item_value']) / 100.0
-					if sac_code_based_gst_rates.code == '996311' and item["service_charge_tax_applies"] == "Apply From Parent":	
-						if item["manual_edit"] == "Yes":
-							gst_percentage = float(item["cgst"])+float(item["sgst"])
-							igst_percentage = float(item["igst"])
-						else:
-							gst_percentage = acc_gst_percentage
-							igst_percentage = acc_igst_percentage
-				if sac_code_based_gst_rates.service_charge_net == "Yes":
-					scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
-					gst_value = scharge_value- scharge_value_base
-					scharge_value = scharge_value_base
-				if vat_rate_percentage>0:
-					vatamount = (vat_rate_percentage * scharge_value) / 100.0
-					service_dict['vat_amount'] = vatamount
-					service_dict['vat'] = vat_rate_percentage
-				else:
-					vatamount = 0
-					service_dict['vat_amount'] = 0
-					service_dict['vat'] = 0
-				if item["cess"]>0:
-					centralcessamount = (item["cess"] * scharge_value) / 100.0
-					service_dict['cess_amount'] = centralcessamount
-					service_dict['cess'] = item["cess"]
-				else:
-					centralcessamount = 0
-					service_dict['cess_amount'] = 0
-					service_dict['cess'] = 0
-				if item["state_cess"]>0:
-					statecessamount = (item["state_cess"] * scharge_value) / 100.0
-					service_dict['state_cess_amount'] = statecessamount
-					service_dict['state_cess'] = item["state_cess"]
-				else:
-					statecessamount = 0
-					service_dict['state_cess_amount'] = 0
-					service_dict['state_cess'] = 0	
-				# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.
-				if gst_value==0:
-					gst_value = (float(gst_percentage)* scharge_value)/100.0
-					igst_value = (float(igst_percentage)* scharge_value)/100.0
-				if sez == 1 and sac_code_based_gst_rates.exempted == 1:
-					type_item = "Excempted"
-				else:
-					type_item = "Included"
-				if gst_percentage>0 or igst_percentage>0:
-					scTaxble = "Yes"
-				else:
-					scTaxble = sac_code_based_gst_rates.taxble	
-				service_dict['item_name'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
-				service_dict['description'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
-				service_dict['date'] = date_item
-				service_dict['sac_code'] = sac_code_new
-				service_dict['sac_code_found'] = 'Yes'
-				service_dict['cgst'] = int(gst_percentage)/2
-				service_dict['other_charges'] = 0
-				service_dict['cgst_amount'] = gst_value/2
-				service_dict['sgst'] = int(gst_percentage)/2
-				service_dict['sgst_amount'] = gst_value/2
-				service_dict['igst'] = igst_percentage
-				service_dict['igst_amount'] = igst_value
-				service_dict['gst_rate'] = int(gst_percentage)+int(igst_percentage)
-				service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
-				service_dict['item_taxable_value'] = scharge_value 
-				service_dict['item_value'] = scharge_value
-				service_dict['taxable'] = "Yes" if gst_percentage>0 else "No"
-				service_dict['unit_of_measurement']= item["unit_of_measurement"]
-				service_dict['quantity'] = item["quantity"]
-				service_dict['unit_of_measurement_description'] = item["unit_of_measurement_description"]
-				# service_dict['cess'] = 0
-				# service_dict['cess_amount'] = 0
-				# service_dict['state_cess'] = 0
-				# service_dict['state_cess_amount'] = 0
-				service_dict['type'] = type_item
-				service_dict['item_mode'] = "Debit"
-				service_dict['item_type'] = sac_code_based_gst_rates.type
-				service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
-				# service_dict['vat_amount'] = 0
-				# service_dict['vat'] = 0
-				sortorder = str(item['sort_order'])+".1"
-				service_dict['sort_order'] = float(sortorder)
-				service_dict['doctype'] = 'Items'
-				service_dict['parentfield'] = 'items'
-				service_dict['parenttype'] = 'invoices'
-				service_dict["is_manual_edit"] = item["manual_edit"]
-				service_dict["is_service_charge_item"] = item["service_charge"]
-				service_dict["exempted"] = sac_code_based_gst_rates.exempted
-				service_dict["discount_value"] = 0
-				second_list.append(service_dict)
+					if vat_rate_percentage>0:
+						vatamount = (vat_rate_percentage * scharge_value) / 100.0
+						service_dict['vat_amount'] = vatamount
+						service_dict['vat'] = vat_rate_percentage
+					else:
+						vatamount = 0
+						service_dict['vat_amount'] = 0
+						service_dict['vat'] = 0
+					if item["cess"]>0:
+						centralcessamount = (item["cess"] * scharge_value) / 100.0
+						service_dict['cess_amount'] = centralcessamount
+						service_dict['cess'] = item["cess"]
+					else:
+						centralcessamount = 0
+						service_dict['cess_amount'] = 0
+						service_dict['cess'] = 0
+					if item["state_cess"]>0:
+						statecessamount = (item["state_cess"] * scharge_value) / 100.0
+						service_dict['state_cess_amount'] = statecessamount
+						service_dict['state_cess'] = item["state_cess"]
+					else:
+						statecessamount = 0
+						service_dict['state_cess_amount'] = 0
+						service_dict['state_cess'] = 0	
+					# if  sac_code_based_gst_rates.taxble=="No" and sac_code_based_gst_rates.
+					if gst_value==0:
+						gst_value = (float(gst_percentage)* scharge_value)/100.0
+						igst_value = (float(igst_percentage)* scharge_value)/100.0
+					if sez == 1 and sac_code_based_gst_rates.exempted == 1:
+						type_item = "Excempted"
+					else:
+						type_item = "Included"
+					if gst_percentage>0 or igst_percentage>0:
+						scTaxble = "Yes"
+					else:
+						scTaxble = sac_code_based_gst_rates.taxble	
+					service_dict['item_name'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
+					service_dict['description'] = item['item_name']+"-SC " + str(item["service_charge_rate"])
+					service_dict['date'] = date_item
+					service_dict['sac_code'] = sac_code_new
+					service_dict['sac_code_found'] = 'Yes'
+					service_dict['cgst'] = int(gst_percentage)/2
+					service_dict['other_charges'] = 0
+					service_dict['cgst_amount'] = gst_value/2
+					service_dict['sgst'] = int(gst_percentage)/2
+					service_dict['sgst_amount'] = gst_value/2
+					service_dict['igst'] = igst_percentage
+					service_dict['igst_amount'] = igst_value
+					service_dict['gst_rate'] = int(gst_percentage)+int(igst_percentage)
+					service_dict['item_value_after_gst'] = scharge_value + gst_value + vatamount + statecessamount + centralcessamount + igst_value
+					service_dict['item_taxable_value'] = scharge_value 
+					service_dict['item_value'] = scharge_value
+					service_dict['taxable'] = "Yes" if gst_percentage>0 else "No"
+					service_dict['unit_of_measurement']= item["unit_of_measurement"]
+					service_dict['quantity'] = item["quantity"]
+					service_dict['unit_of_measurement_description'] = item["unit_of_measurement_description"]
+					# service_dict['cess'] = 0
+					# service_dict['cess_amount'] = 0
+					# service_dict['state_cess'] = 0
+					# service_dict['state_cess_amount'] = 0
+					service_dict['type'] = type_item
+					service_dict['item_mode'] = "Debit"
+					service_dict['item_type'] = sac_code_based_gst_rates.type
+					service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
+					# service_dict['vat_amount'] = 0
+					# service_dict['vat'] = 0
+					sortorder = str(item['sort_order'])+".1"
+					service_dict['sort_order'] = float(sortorder)
+					service_dict['doctype'] = 'Items'
+					service_dict['parentfield'] = 'items'
+					service_dict['parenttype'] = 'invoices'
+					service_dict["is_manual_edit"] = item["manual_edit"]
+					service_dict["is_service_charge_item"] = item["service_charge"]
+					service_dict["exempted"] = sac_code_based_gst_rates.exempted
+					service_dict["discount_value"] = 0
+					second_list.append(service_dict)
 			if sac_code_based_gst_rates.type == "Discount":
 				final_item['sac_code'] = 'No Sac'
 				final_item['sac_code_found'] = 'No'
@@ -829,6 +862,9 @@ def reprocess_calulate_items(data):
 		total_items.extend(second_list)
 		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
 		reinitiate = Reinitiate_invoice(final_data)
+		doc_inv = frappe.get_doc("Invoices",data["invoice_number"])
+		doc_inv.sez = sez
+		doc_inv.save(ignore_permissions=True)
 		if reinitiate["success"] == True:
 			return {"success": True}
 		else:

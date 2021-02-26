@@ -76,6 +76,7 @@ def reinitiateInvoice(data):
 			if "GST NO" in i and "HOTEL" not in i:				
 				if "GST NO." not in i:
 					gstNumber = i.split(':')[1].replace(' ', '')
+					gstNumber = gstNumber.replace(".","")
 				# gstNumber = gstNumber.replace("TAXINVOICE","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
