@@ -89,9 +89,9 @@ def emitsocket(doc,method=None):
 def updateManager(doc, method=None):
   
     if doc.status!="Ongoing":
-        #==========
+        ==========
         # commands = ['git pull','service nginx reload','service nginx restart']
-        commands = ['git pull']
+        commands = ['git pull origin master']
         console_dump = ''
         # cwd = '/home/caratred/Desktop/ezy-invoice-production'
         # company = frappe.get_last_doc('company')
@@ -106,7 +106,7 @@ def updateManager(doc, method=None):
                             stdout=PIPE,
                             stderr=STDOUT,
                             cwd=cwd)
-            # frappe.log_error("log error", terminal.stdout.read(1))
+            frappe.log_error("log error", terminal.stdout.read(1))
             for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
                 console_dump += c
         logged_command = " && ".join(commands)
