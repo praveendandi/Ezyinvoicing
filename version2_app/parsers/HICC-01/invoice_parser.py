@@ -115,21 +115,22 @@ def file_parsing(filepath):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if len(check_date) > 0 and "Room No." not in i:
+			if len(check_date) > 0:
 				item = dict()
 				item_value = ""
 				dt = i.strip()
 				for index, j in enumerate(i.split(' ')):
-					if index == 0 and len(j)<11:
-						item['date'] = j
 					val = dt.split(" ")
-					if val != "":
+					if index == 0 and len(val)>1:
+						item['date'] = j
+					
+					if len(val)>1:
 						item_value = val[-1]
 						item['item_value'] = float(item_value.replace(',', ''))
-					else:
-						item_value = val[-2]
-						item['item_value'] = float(item_value.replace(',', ''))
-					if index == 1:
+					# else:
+					# 	item_value = val[-2]
+					# 	item['item_value'] = float(item_value.replace(',', ''))
+					if index == 1 and len(val)>1:
 						starting_index = i.index(j)
 						if "~" in i:
 							ending_index = i.find("~")
@@ -137,14 +138,16 @@ def file_parsing(filepath):
 						else:
 							ending_index = i.find(item_value)
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
-							
-					if 'SAC' in j:
-						item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
-					else:
-						item['sac_code'] = "No Sac"
-					item['sort_order'] =  itemsort+1
+					if len(val)>1:		
+						if 'SAC' in j:
+							item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
+						else:
+							item['sac_code'] = "No Sac"
+					if len(val)>1:		
+						item['sort_order'] =  itemsort+1
 				itemsort+=1
-				items.append(item)
+				if item !={}:
+					items.append(item)
 
 		total_items = []
 		paymentTypes = GetPaymentTypes()
