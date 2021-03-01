@@ -575,7 +575,7 @@
    "fieldname": "invoice_from",
    "fieldtype": "Select",
    "label": "Invoice From",
-   "options": "Manual\nPms\nWeb"
+   "options": "Manual\nPms\nWeb\nFile"
   },
   {
    "fieldname": "invoice_process_time",
@@ -835,7 +835,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-02-24 11:53:10.913245",
+ "modified": "2021-03-01 16:58:08.783765",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

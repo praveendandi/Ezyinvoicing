@@ -995,7 +995,10 @@ def insert_invoice(data):
 			# else:
 			# 	qr_generated = "Zero Invoice"
 			# 	irn_generated = "NA"
-
+		if "invoice_from" in data['guest_data']:
+			invoice_from = data['guest_data']['invoice_from']
+		else:
+			invoice_from = "Pms"	
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -1004,7 +1007,7 @@ def insert_invoice(data):
 			'guest_name':
 			data['guest_data']['name'],
 			'ready_to_generate_irn':ready_to_generate_irn,
-			'invoice_from':"Pms",
+			'invoice_from':invoice_from,
 			'gst_number':
 			data['guest_data']['gstNumber'],
 			'invoice_round_off_amount': data['invoice_round_off_amount'],
@@ -1137,7 +1140,7 @@ def insert_invoice(data):
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 			return {"success":True}
 		else:
-			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
+			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and v.invoice_type=="B2B":
 				data = {'invoice_number': v.name,'generation_type': "System"}
 				irn_generate = generateIrn(data)
 				print(irn_generate)	
@@ -1238,6 +1241,7 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
+		# print(data)
 		total_items = []
 		second_list = []
 		if "guest_data" in list(data.keys()):
