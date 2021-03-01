@@ -338,7 +338,7 @@ def generateIrn(data):
 			"TotInvValFc": round(TotInvValFc, 2)
 		}
 		
-		# print(gst_data['ValDtls'])
+		print(gst_data['ValDtls'])
 		if ass_value > 0:
 			try:
 				response = postIrn(gst_data, GSP_details['data'],
@@ -346,6 +346,7 @@ def generateIrn(data):
 				# IRNObjects = {"invoice_number":invoice_number,"irn_request_object":gst_data,"irn_response_object":response}				
 				IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,'irn_request_object':str(gst_data),'irn_response_object':str(response)})
 				IRNObjectdoc.insert(ignore_permissions=True, ignore_links=True)
+				print(response)
 				if response['success']:
 					invoice = frappe.get_doc('Invoices', invoice_number)
 					invoice.ack_no = response['result']['AckNo']
