@@ -59,15 +59,17 @@ def file_parsing(filepath):
         reupload = False
         invoice_category = "Tax Invoice"
         for i in raw_data:
+            if "CREDIT TAX" in i:
+                invoice_category = "Credit Invoice"
             if "Confirmation No." in i:
                 confirmation_number = i.split(":")
                 conf_number = confirmation_number[-1].replace(" ", "")
             if "Total" in i:
                 total_invoice = i.split(" ")
                 total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-            if "Departure :" in i:
-                depatureDateIndex = i.index('Departure')
-                date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
+            if "Invoice Date" in i:
+                date_time_obj = (i.split(":")[-1]).strip()
+                date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
             if "Room No." in i or "Room No" in i:
                 room = i.split(":")
                 roomNumber = room[-1]
@@ -102,7 +104,7 @@ def file_parsing(filepath):
                 membership = Membership[-1].replace(" ", "")
             if "Printed By / On" in i:
                 p = i.split(":")
-                print_by = p[1].replace(" ","")
+                print_by = p[2].replace(" ","")
 
 
         items = [] 
@@ -159,7 +161,7 @@ def file_parsing(filepath):
         # print(guestDeatils)
         for index, i in enumerate(guestDeatils):
             if index == 0:
-                guest['name'] = i.split(':')[1]
+                guest['name'] = i.split(':')[1].strip()
             if index == 1:
                 guest['address1'] = i
             if index == 2:
@@ -227,7 +229,7 @@ def file_parsing(filepath):
         
 
 
-        # print(json.dumps(guest, indent = 1))
+        print(json.dumps(guest, indent = 1))
         gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
         if gspApiDataResponse['success'] == True:
             if guest['invoice_type'] == 'B2B':
