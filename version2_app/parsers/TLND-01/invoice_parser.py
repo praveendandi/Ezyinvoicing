@@ -73,10 +73,9 @@ def file_parsing(filepath):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "GST ID" in i:
+			if "Guest GST ID" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("TAXINVOICE","")
-				print(gstNumber)
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				invoiceNumber = invoiceNumber.replace('-',"")
