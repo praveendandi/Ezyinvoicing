@@ -142,6 +142,8 @@ def generateIrn(data):
 		# get invoice details
 		start_time = datetime.datetime.utcnow()
 		invoice = frappe.get_doc('Invoices', invoice_number)
+		if invoice.irn_generated == "Success":
+			return {"success":True,"message":"Already IRN Generated"}
 		# get seller details
 		if invoice.invoice_category == "Tax Invoice":
 			category = "INV"

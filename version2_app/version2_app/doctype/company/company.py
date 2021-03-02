@@ -242,6 +242,7 @@ def reprocess_error_inoices():
             for each in data:
                 obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
                 reinitiate = module.reinitiateInvoice(obj)
+                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':each['name'],'type':"reprocess error invoicess"})
             return {"success":True}
         else:
             return {"success":False, "message":"no data found"}
@@ -288,6 +289,7 @@ def manual_to_pms():
         return True
     except Exception as e:
         return {"success": False}
+
 
 
 @frappe.whitelist(allow_guest=True)
