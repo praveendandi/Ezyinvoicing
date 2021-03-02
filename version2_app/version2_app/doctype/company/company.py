@@ -242,7 +242,7 @@ def reprocess_error_inoices():
             for each in data:
                 obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
                 reinitiate = module.reinitiateInvoice(obj)
-                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':each['name'],'type':"reprocess error invoicess"})
+                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"reprocess error invoicess"})
             return {"success":True}
         else:
             return {"success":False, "message":"no data found"}
@@ -264,6 +264,7 @@ def reprocess_pending_inoices():
             for each in data:
                 obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
                 reinitiate = module.reinitiateInvoice(obj)
+                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name']})
             return {"success":True}
         else:
             return {"success":False, "message":"no data found"}
@@ -374,10 +375,7 @@ def run_command(commands,
     doc.insert()
     frappe.db.commit()
     print(doc.name, '----------------------')
-    # frappe.publish_realtime(key,
-    #                         "Executing Command:\n{logged_command}\n\n".format(
-    #                             logged_command=logged_command),
-    #                         user=frappe.session.user)
+
     try:
         for command in commands:
             print(command)
@@ -387,25 +385,19 @@ def run_command(commands,
                              stderr=STDOUT,
                              cwd=cwd)
             print(terminal._waitpid_lock,"terminal") 
-            print(safe_decode(terminal.stdout.read(1)),"//////////////")                
-            # for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-            #     # print(c,"ccccccccccc")
-            #     frappe.publish_realtime(key, c, user=frappe.session.user)
-            #     console_dump += c
+         
         if terminal.wait():
             _close_the_doc(start_time,
                            key,
                            console_dump,
                            status='Failed',
                            user=frappe.session.user)
-            print("----------,if")               
         else:
             _close_the_doc(start_time,
                            key,
                            console_dump,
                            status='Success',
                            user=frappe.session.user)
-            print("----------,else")  
         terminal = Popen(shlex.split("bench migrate"),
                              stdin=PIPE,
                              stdout=PIPE,
@@ -427,9 +419,9 @@ def run_command(commands,
                        status='Failed',
                        user=frappe.session.user)
     finally:
-        print("finalyyyyyyy")
         frappe.db.commit()
         _refresh(doctype=doctype, docname=docname, commands=commands)
+
 @frappe.whitelist(allow_guest=True)
 def bench_migrate():
     try:

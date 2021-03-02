@@ -16,6 +16,8 @@ def invoice_created(doc, method=None):
     print("Invoice Created",doc.name)
 
 
+def invoice_deleted(doc,method=None):
+    frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name})
 
 def invoiceCreated(doc):
     try:
@@ -87,30 +89,36 @@ def emitsocket(doc,method=None):
 
 
 def updateManager(doc, method=None):
-  
-    if doc.status!="Ongoing":
-        print("==========")
-        commands = ['git pull origin master']
-        console_dump = ''
-        # company = frappe.get_last_doc('company')
-        # cwd = company.angular_project_production_path
-        # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
-        cwd = '/home/frappe/ezy-invoice-production'
-        key = str(time.time())
-        # count = 0
-        for command in commands:
-            terminal = Popen(shlex.split(command),
-                            stdin=PIPE,
-                            stdout=PIPE,
-                            stderr=STDOUT,
-                            cwd=cwd)
-            frappe.log_error("log error", terminal.stdout.read(1))
-            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-                console_dump += c
-        logged_command = " && ".join(commands)
-        frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
-        # frappe.log_error("Angular project pull", console_dump)
-        frappe.log_error("Angular project pull data","sample")
+    try:
+        if doc.status!="Ongoing":
+            print("==========")
+            commands = ['git pull origin master']
+            console_dump = ''
+            company = frappe.get_last_doc('company')
+            print(company,"//////")
+            # cwd = company.angular_project_production_path
+            cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
+            # cwd = '/home/frappe/ezy-invoice-production'
+            # cwd = company.angular_project_production_path
+            key = str(time.time())
+            # count = 0
+            for command in commands:
+                print(command,"    command")
+                terminal = Popen(shlex.split(command),
+                                stdin=PIPE,
+                                stdout=PIPE,
+                                stderr=STDOUT,
+                                cwd=cwd)
+                print(terminal,"//////////")                
+                frappe.log_error("log error", terminal.stdout.read(1))
+                for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+                    console_dump += c
+            logged_command = " && ".join(commands)
+            frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
+            # frappe.log_error("Angular project pull", console_dump)
+            frappe.log_error("Angular project pull data","update manager")
+    except Exception as e:
+        print(str(e),"    updateManager")
 
         
 

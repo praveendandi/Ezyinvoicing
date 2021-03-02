@@ -239,7 +239,6 @@ def Reinitiate_invoice(data):
 		invoice_data = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
 
 		if data['guest_data']['invoice_type'] == "B2B":
-			print("///////")
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
 				print("----------")
 				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
