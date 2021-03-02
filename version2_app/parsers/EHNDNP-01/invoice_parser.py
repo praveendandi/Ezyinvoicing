@@ -14,7 +14,6 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-from version2_app.version2_app.doctype.invoices.invoice_helpers import update_document_bin
 
 
 folder_path = frappe.utils.get_bench_path()
@@ -25,87 +24,89 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
-	invoiceNumber = ''
-	print_by = ''
-	invoice_type_data = ""
-	try:
-		start_time = datetime.datetime.utcnow()
-		companyCheckResponse = check_company_exist("EHNDNP-01")
-		site_folder_path = companyCheckResponse['data'].site_name
-		file_path = folder_path+'/sites/'+site_folder_path+filepath
-		today = date.today()
-		invoiceDate = today.strftime("%Y-%m-%d")
-		content = []
-		with pdfplumber.open(file_path) as pdf:
-			count = len(pdf.pages)
-			for index in range(count):
-				first_page = pdf.pages[index]
-				content.append(first_page.extract_text())
+    try:
+        start_time = datetime.datetime.utcnow()
+        companyCheckResponse = check_company_exist("EHNDNP-01")
+        site_folder_path = companyCheckResponse['data'].site_name
+        file_path = folder_path+'/sites/'+site_folder_path+filepath
+        today = date.today()
+        invoiceDate = today.strftime("%Y-%m-%d")
+        content = []
+        with pdfplumber.open(file_path) as pdf:
+            count = len(pdf.pages)
+            for index in range(count):
+                first_page = pdf.pages[index]
+                content.append(first_page.extract_text())
 
-		raw_data = []
-		for i in content:
-			for j in i.splitlines():
-				raw_data.append(j)
-		data = []
-		amened = ''
-		entered = False
-		guestDetailsEntered = False
-		guestDeatils = []
-		gstNumber = ''
-		date_time_obj = ''
-		total_invoice_amount = ''
-		conf_number = ''
-		membership = ''
-		roomNumber = ""
-		reupload = False
-		invoice_category = "Tax Invoice"
-		for i in raw_data:
-			if "Confirmation No." in i:
-				confirmation_number = i.split(":")
-				conf_number = confirmation_number[-1].replace(" ", "")
-			if "Total" in i and "Sub Total" not in i:
-				total_invoice = i.split(" ")
-				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-			if "Departure :" in i:
-				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-			if "Room No." in i or "Room No" in i:
-				room = i.split(":")
-				roomNumber = room[-1]
-				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "GST No" in i:
-				gst_split = i.split(" ")
-				gst_regex = re.compile('[a-zA-Z0-9]{15,}$')
-				gst_num =  list(filter(gst_regex.match, gst_split))
-				gstNumber =  gst_num[0] if len(gst_num) > 0 else ""
-				if len(gstNumber) >= 15:
-					gstNumber = gstNumber[-15:]
-			if "Invoice No." in i:
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-			if "Bill To" in i:
-				guestDetailsEntered = True
-			if "Checkout By:" in i:
-				guestDetailsEntered = False
-			if guestDetailsEntered == True:
-				guestDeatils.append(i)
-			if i in "Date Description Reference Debit Credit":
-				entered = True
-			if 'CGST 6%=' in i:
-				entered = False
-			if 'Billing' in i:
-				entered = False
-			if 'Total' in i and "Sub Total" not in i and "Guest Total" not in i:
-				entered = False
-			if entered == True:
-				data.append(i)
-			if "Guest Name" in i:
-				guestDeatils.append(i)
-			if "Membership" in i:
-				Membership = i.split(":")
-				membership = Membership[-1].replace(" ", "")
-			if "Printed By / On" in i:
-				p = i.split(":")
-				print_by = p[2].replace(" ","")
+        raw_data = []
+        for i in content:
+            for j in i.splitlines():
+                raw_data.append(j)
+
+        data = []
+        amened = ''
+        entered = False
+        guestDetailsEntered = False
+        guestDeatils = []
+        invoiceNumber = ''
+        gstNumber = ''
+        date_time_obj = ''
+        total_invoice_amount = ''
+        conf_number = ''
+        membership = ''
+        print_by = ''
+        roomNumber = ""
+        reupload = False
+        invoice_category = "Tax Invoice"
+        for i in raw_data:
+            if "CREDIT TAX INVOICE" in i:
+                invoice_category = "Credit Invoice"
+            if "Confirmation No." in i:
+                confirmation_number = i.split(":")
+                conf_number = confirmation_number[-1].replace(" ", "")
+            if "Total" in i and "Sub Total" not in i:
+                total_invoice = i.split(" ")
+                total_invoice_amount = float(total_invoice[-2].replace(",", ""))
+            if "Invoice Date" in i:
+                date_time_obj = (i.split(":")[-1]).strip()
+                date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
+            if "Room No." in i or "Room No" in i:
+                room = i.split(":")
+                roomNumber = room[-1]
+                # roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
+            if "GST No" in i:
+                gst_split = i.split(" ")
+                gst_regex = re.compile('[a-zA-Z0-9]{15,}$')
+                gst_num =  list(filter(gst_regex.match, gst_split))
+                gstNumber =  gst_num[0] if len(gst_num) > 0 else ""
+                if len(gstNumber) >= 15:
+                    gstNumber = gstNumber[-15:]
+            if "Invoice No." in i:
+                invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+            if "Bill To" in i:
+                guestDetailsEntered = True
+            if "Checkout By:" in i:
+                guestDetailsEntered = False
+            if guestDetailsEntered == True:
+                guestDeatils.append(i)
+            if i in "Date Description Reference Debit Credit":
+                entered = True
+            if 'CGST 6%=' in i:
+                entered = False
+            if 'Billing' in i:
+                entered = False
+            if 'Total' in i and "Sub Total" not in i and "Guest Total" not in i:
+                entered = False
+            if entered == True:
+                data.append(i)
+            if "Guest Name" in i:
+                guestDeatils.append(i)
+            if "Membership" in i:
+                Membership = i.split(":")
+                membership = Membership[-1].replace(" ", "")
+            if "Printed By / On" in i:
+                p = i.split(":")
+                print_by = p[2].replace(" ","")
 
         items = [] 
         itemsort = 0
@@ -152,30 +153,30 @@ def file_parsing(filepath):
                 if each["name"] not in payment_Types:
                     total_items.append(each)
 
-		guest = dict()
-		# print(guestDeatils)
-		for index, i in enumerate(guestDeatils):
-			if index == 0:
-				guest['name'] = i.split(':')[1]
-				guest["name"] = (guest["name"].replace("Departure","")).strip()
-			if index == 1:
-				guest['address1'] = i
-			if index == 2:
-				guest['address2'] = i
-		guest['invoice_number'] = invoiceNumber.replace(' ', '')
+        guest = dict()
+        # print(guestDeatils)
+        for index, i in enumerate(guestDeatils):
+            if index == 0:
+                guest['name'] = i.split(':')[1]
+                guest["name"] = (guest["name"].replace("Departure","")).strip()
+            if index == 1:
+                guest['address1'] = i
+            if index == 2:
+                guest['address2'] = i
 
-		guest['membership'] = membership
-		guest['invoice_date'] = date_time_obj
-		guest['items'] = total_items
-		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
-		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
-		guest['company_code'] = "EHNDNP-01"
-		guest['confirmation_number'] = conf_number
-		guest['start_time'] = str(start_time)
-		guest['print_by'] = print_by
-		guest['invoice_category'] = invoice_category
-		invoice_type_data = guest['invoice_type']
+        guest['invoice_number'] = invoiceNumber.replace(' ', '')
+
+        guest['membership'] = membership
+        guest['invoice_date'] = date_time_obj
+        guest['items'] = total_items
+        guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
+        guest['gstNumber'] = gstNumber
+        guest['room_number'] = int(roomNumber)
+        guest['company_code'] = "EHNDNP-01"
+        guest['confirmation_number'] = conf_number
+        guest['start_time'] = str(start_time)
+        guest['print_by'] = print_by
+        guest['invoice_category'] = invoice_category
 
         check_invoice = check_invoice_exists(guest['invoice_number'])
         if check_invoice['success']==True:
@@ -311,22 +312,21 @@ def file_parsing(filepath):
                             print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                             return {"success":False,"message":insertInvoiceApiResponse['message']}
 
-				else:
-							
-					error_data['error_message'] = calulateItemsApiResponse['message']
-					error_data['amened'] = amened
-					errorInvoice = Error_Insert_invoice(error_data)
-					print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-					return {"success":False,"message":calulateItemsApiResponse['message']}		
-		else:
-			error_data['error_message'] = gspApiDataResponse['message']
-			error_data['amened'] = amened
-			errorInvoice = Error_Insert_invoice(error_data)
-			print("gspApiData fialed:  ",gspApiDataResponse['message'])
-			return {"success":False,"message":gspApiDataResponse['message']}
-	except Exception as e:
-		print(str(e),"       reinitiate parsing")
-		update_document_bin(print_by,invoice_type_data,invoiceNumber,str(e),filepath)
-		print(traceback.print_exc())
-		return {"success":False,"message":str(e)}				
+                else:
+                            
+                    error_data['error_message'] = calulateItemsApiResponse['message']
+                    error_data['amened'] = amened
+                    errorInvoice = Error_Insert_invoice(error_data)
+                    print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+                    return {"success":False,"message":calulateItemsApiResponse['message']}		
+        else:
+            error_data['error_message'] = gspApiDataResponse['message']
+            error_data['amened'] = amened
+            errorInvoice = Error_Insert_invoice(error_data)
+            print("gspApiData fialed:  ",gspApiDataResponse['message'])
+            return {"success":False,"message":gspApiDataResponse['message']}
+    except Exception as e:
+        print(str(e),"       reinitiate parsing")
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}				
 

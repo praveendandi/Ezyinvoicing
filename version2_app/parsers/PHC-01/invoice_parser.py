@@ -14,7 +14,6 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 # from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
-#----------------------------------------------------------
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
 
