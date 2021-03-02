@@ -748,6 +748,7 @@ def reprocess_calulate_items(data):
 			else:
 				# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
 				if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
+					print("/////////")
 					final_item['sort_order'] = item['sort_order']
 					if item['sac_code'].isdigit():
 						final_item['sac_code'] = item['sac_code']

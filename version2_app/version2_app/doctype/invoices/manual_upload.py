@@ -22,30 +22,13 @@ def manual_upload(data):
 	try:
 		folder_path = frappe.utils.get_bench_path()
 		items_data_file = data['invoice_file']
-		# gst_data_file = data['gst_file']
 		company = data['company']
 		companyData = frappe.get_doc('company',data['company'])
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-		# gst_file_path = folder_path+'/sites/'+site_folder_path+gst_data_file
 		items_dataframe = pd.read_excel(items_file_path)
 		items_dataframe = items_dataframe.fillna('empty')	
-		# gst_dataframe = pd.read_csv(gst_file_path)
-		# columns = list(gst_dataframe.columns.values)
-		# # print(columns)
-		# gst_data = gst_dataframe.values.tolist()
-		# gst_data.insert(0,columns)
-		# print(gst_data)
-		# gst_list = []
-		# for each in gst_data:
-		# 	# print(each[0][0])
-		# 	if each[0][0]=="|":
-		# 		inv = each[0].split("|")
-		# 		gst_list.append({"gst_number":"","invoice_number":inv[1]})
-		# 	else:
-		# 		inv = each[0].split("|")
-		# 		gst_list.append({"gst_number":inv[0],"invoice_number":inv[1]})	
-		# # print(gst_list)		
+				
 		input_data = []
 		items_dataframe.loc[(items_dataframe.FOLIO_TYPE=="CREDIT TAX INVOICE"),'FOLIO_TYPE'] = 'Credit Invoice'
 		items_dataframe.loc[(items_dataframe.FOLIO_TYPE=="TAX INVOICE"),'FOLIO_TYPE'] = 'Tax Invoice'
@@ -68,7 +51,6 @@ def manual_upload(data):
 					list_data['room_number'] = each['ROOM']
 					list_data['guest_name'] = each['DISPLAY_NAME']
 					list_data['total_invoice_amount'] = each['SUMFT_DEBITPERBILL_NO']
-					# list_data['iems'] = []
 					item_list = {'date':each['BILL_GENERATION_DATE_CHAR'],'item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'}
 					items = []
 					items.append(item_list)
@@ -78,7 +60,6 @@ def manual_upload(data):
 					list_data['place_of_supply'] = companyData.state_code
 					list_data['invoice_item_date_format'] = companyData.invoice_item_date_format
 					list_data['guest_data'] = {'invoice_category':list_data['invoice_category']}
-					#  {'items':items,'company_code':data['company'],'invoice_number':each['BILL_NO'],'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,'guest_data':{'invoice_category':list_data['invoice_category']}}
 				else:
 					if list_data['invoice_number'] == each['BILL_NO']:
 						items = {'date':each['BILL_GENERATION_DATE_CHAR'],"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
@@ -92,11 +73,9 @@ def manual_upload(data):
 						list_data['room_number'] = each['ROOM']
 						list_data['guest_name'] = each['DISPLAY_NAME']
 						list_data['total_invoice_amount'] = each['SUMFT_DEBITPERBILL_NO']
-						# list_data['iems'] = []
 						item_list = {'date':each['BILL_GENERATION_DATE_CHAR'],"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
 						items = []
 						items.append(item_list)
-						# list_data['items'] = {'items':items,'company_code':data['company'],'invoice_number':each['BILL_NO'],'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,'guest_data':{'invoice_category':list_data['invoice_category']}}
 						list_data['items'] = items
 						list_data['company_code'] = data['company']
 						list_data['invoice_number'] = each['BILL_NO']
@@ -135,27 +114,21 @@ def manual_upload(data):
 			each['sez'] = 0
 			calulateItemsApiResponse = calulate_items(each)
 			if calulateItemsApiResponse['success'] == True:
-				# guest['invoice_file'] = filepath
-				# if reupload == False:
+				
 				insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":0})
 				if insertInvoiceApiResponse['success']== True:
 					print("B2C Invoice Created",insertInvoiceApiResponse)
-					# return {"success":True,"message":"Invoice Created"}
 				else:
 					
 					error_data['error_message'] = insertInvoiceApiResponse['message']
-					# error_data['amened'] = amened
 					errorInvoice = Error_Insert_invoice(error_data)
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-					# return {"success":False,"message":insertInvoiceApiResponse['message']}
 
 			else:
 						
 				error_data['error_message'] = calulateItemsApiResponse['message']
-				# error_data['amened'] = amened
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-				# return {"success":False,"message":calulateItemsApiResponse['message']}
 		return input_data
 
 	except Exception as e:
