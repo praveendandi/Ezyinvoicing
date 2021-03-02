@@ -94,7 +94,6 @@ def updateManager(doc, method=None):
             console_dump = ''
             company = frappe.get_last_doc('company')
             print(company,"//////")
-            # cwd = company.angular_project_production_path
             # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
             # cwd = '/home/frappe/ezy-invoice-production'
             cwd = company.angular_project_production_path
