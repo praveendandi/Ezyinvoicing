@@ -93,7 +93,7 @@ def updateManager(doc, method=None):
             commands = ['git pull origin master','systemctl nginx reload','systemctl nginx restart']
             console_dump = ''
             company = frappe.get_last_doc('company')
-            print(company,"//////")
+            print(company)
             # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
             # cwd = '/home/frappe/ezy-invoice-production'
             cwd = company.angular_project_production_path
