@@ -47,7 +47,6 @@ def invoiceCreated(doc):
         return {"success":False,"message":str(e)}
 
 
-    # frappe.subscriber.on("invoice_created", function (channel, message) {  etc, etc })
 def update_documentbin(filepath, error_log):
     try:
         bin_doc = frappe.new_doc("Document Bin")
