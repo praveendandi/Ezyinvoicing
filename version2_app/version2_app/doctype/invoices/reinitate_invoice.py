@@ -240,7 +240,6 @@ def Reinitiate_invoice(data):
 
 		if data['guest_data']['invoice_type'] == "B2B":
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				print("----------")
 				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
 				irn_generate = generateIrn(data)	
 		return {"success":True}

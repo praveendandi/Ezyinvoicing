@@ -1246,6 +1246,7 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
+
 		total_items = []
 		second_list = []
 		if "guest_data" in list(data.keys()):
