@@ -1143,7 +1143,7 @@ def insert_invoice(data):
 			socket = invoiceCreated(invoice)
 			return {"success":True}
 		else:
-			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
+			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and v.invoice_type=="B2B":
 				data = {'invoice_number': v.name,'generation_type': "System"}
 				irn_generate = generateIrn(data)
 				print(irn_generate)	

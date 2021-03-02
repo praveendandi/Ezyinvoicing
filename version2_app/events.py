@@ -85,7 +85,6 @@ def emitsocket(doc,method=None):
     frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
     frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
 
-#-----------------
 
 
 def updateManager(doc, method=None):
@@ -97,9 +96,9 @@ def updateManager(doc, method=None):
             company = frappe.get_last_doc('company')
             print(company,"//////")
             # cwd = company.angular_project_production_path
-            cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
+            # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
             # cwd = '/home/frappe/ezy-invoice-production'
-            # cwd = company.angular_project_production_path
+            cwd = company.angular_project_production_path
             key = str(time.time())
             # count = 0
             for command in commands:

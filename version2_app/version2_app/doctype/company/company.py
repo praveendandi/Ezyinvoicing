@@ -230,6 +230,22 @@ def qr_generatedtoirn_generated():
 
 
 @frappe.whitelist(allow_guest=True)
+def errorInvoicesList():
+    try:
+        doc = frappe.db.get_list('company',fields=['name'])
+        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","guest_name","irn_generated"])
+        if len(data)>0:
+            return {"success":True,"data":data}
+        else:
+            return {"success":False,"message":"No data"} 
+    except Exception as e:
+        return {"success":False,"mesasge":str(e)}
+
+@frappe.whitelist(allow_guest=True)
 def reprocess_error_inoices():
     try:
         doc = frappe.db.get_list('company',fields=['name'])
@@ -239,10 +255,12 @@ def reprocess_error_inoices():
         spec.loader.exec_module(module)
         data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
         if len(data)>0:
+            # frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
             for each in data:
                 obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
                 reinitiate = module.reinitiateInvoice(obj)
-                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"reprocess error invoicess"})
+                doc = frappe.get_doc("Invoices",each['name'])
+                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name})
             return {"success":True}
         else:
             return {"success":False, "message":"no data found"}
@@ -264,7 +282,8 @@ def reprocess_pending_inoices():
             for each in data:
                 obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
                 reinitiate = module.reinitiateInvoice(obj)
-                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name']})
+                doc = frappe.get_doc("Invoices",each['name'])
+                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
             return {"success":True}
         else:
             return {"success":False, "message":"no data found"}
