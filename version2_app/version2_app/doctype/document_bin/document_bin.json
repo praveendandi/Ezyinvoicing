@@ -9,7 +9,7 @@
   "print_by",
   "document_printed",
   "printed_at",
-  "invoice_type",
+  "document_type",
   "invoice_number",
   "error_log"
  ],
@@ -30,12 +30,6 @@
    "label": "Printed At"
   },
   {
-   "fieldname": "invoice_type",
-   "fieldtype": "Select",
-   "label": "Invoice Type",
-   "options": "B2B\nB2C"
-  },
-  {
    "fieldname": "invoice_number",
    "fieldtype": "Data",
    "label": "Invoice Number"
@@ -51,10 +45,16 @@
    "fieldtype": "Select",
    "label": "Document Printed",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Select",
+   "label": "Document Type",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
   }
  ],
  "links": [],
- "modified": "2021-02-18 16:34:16.895029",
+ "modified": "2021-03-03 17:42:00.640643",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Document Bin",
@@ -81,6 +81,30 @@
    "read": 1,
    "report": 1,
    "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1,
    "write": 1
   }

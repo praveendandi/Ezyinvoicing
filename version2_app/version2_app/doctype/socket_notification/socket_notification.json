@@ -12,7 +12,8 @@
   "confirmation_number",
   "invoice_category",
   "print_by",
-  "viewed"
+  "viewed",
+  "record_type"
  ],
  "fields": [
   {
@@ -58,11 +59,16 @@
    "fieldname": "viewed",
    "fieldtype": "Check",
    "label": "Viewed"
+  },
+  {
+   "fieldname": "record_type",
+   "fieldtype": "Data",
+   "label": "Record Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-03 14:47:12.627817",
+ "modified": "2021-03-03 18:46:08.447101",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Socket Notification",

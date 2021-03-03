@@ -3,8 +3,20 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-# import frappe
+import frappe
 from frappe.model.document import Document
 
 class SocketNotification(Document):
 	pass
+
+
+@frappe.whitelist()
+def DeleteNotifications():
+	try:
+		deleteb2b = frappe.db.delete('Socket Notification', {'invoice_type': 'B2B'})
+		deleteb2c = frappe.db.delete('Socket Notification', {'invoice_type': 'B2C'})
+		frappe.db.commit()
+		return {"success":True,"message":"Successfully Deleted"}
+	except Exception as e:
+		return {"success":False,"message":str(e)}	
+

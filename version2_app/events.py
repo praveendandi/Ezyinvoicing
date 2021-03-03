@@ -9,7 +9,6 @@ import datetime
 import importlib.util
 import traceback
 
-#sampleeeeeeeeeeeeeeeee 
 
 
 def invoice_created(doc, method=None):
@@ -18,6 +17,16 @@ def invoice_created(doc, method=None):
 
 def invoice_deleted(doc,method=None):
     frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name})
+    soc_doc = frappe.new_doc("Socket Notification")
+    soc_doc.invoice_number = doc.name
+    soc_doc.guest_name = doc.guest_name
+    soc_doc.document_type = doc.invoice_category
+    soc_doc.room_number = doc.room_number
+    soc_doc.confirmation_number = doc.confirmation_number
+    soc_doc.print_by = doc.print_by
+    soc_doc.invoice_category = doc.invoice_category
+    soc_doc.record_type = "Delete"
+    soc_doc.insert(ignore_permissions=True)
 
 def invoiceCreated(doc):
     try:
@@ -26,19 +35,21 @@ def invoiceCreated(doc):
         soc_doc = frappe.new_doc("Socket Notification")
         soc_doc.invoice_number = doc.name
         soc_doc.guest_name = doc.guest_name
-        soc_doc.invoice_type = doc.invoice_type
+        soc_doc.document_type = doc.invoice_category
         soc_doc.room_number = doc.room_number
         soc_doc.confirmation_number = doc.confirmation_number
         soc_doc.print_by = doc.print_by
         soc_doc.invoice_category = doc.invoice_category
+        soc_doc.record_type = "Create"
         soc_doc.insert(ignore_permissions=True)
+        
         filename = doc.invoice_file
         bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filename})
                
         bin_doc = frappe.get_doc("Document Bin",bin_name)
         bin_doc.print_by = doc.print_by
         bin_doc.document_printed = "Yes"
-        bin_doc.invoice_type = doc.invoice_type
+        bin_doc.document_type = doc.invoice_category
         bin_doc.invoice_number = doc.invoice_number
         bin_doc.save(ignore_permissions=True,ignore_version=True)
     except Exception as e:
@@ -49,11 +60,16 @@ def invoiceCreated(doc):
 
 def update_documentbin(filepath, error_log):
     try:
-        bin_doc = frappe.new_doc("Document Bin")
-        bin_doc.invoice_file = filepath
-        bin_doc.error_log =  error_log
-        bin_doc.insert(ignore_permissions=True)
-        frappe.db.commit()
+        bin_data = frappe.db.get_list('Document Bin', filters={'invoice_file': ['=', filepath]})
+        print(bin_data)
+        if len(bin_data)>0:
+            pass
+        else:
+            bin_doc = frappe.new_doc("Document Bin")
+            bin_doc.invoice_file = filepath
+            bin_doc.error_log =  error_log
+            bin_doc.insert(ignore_permissions=True)
+            frappe.db.commit()
     except Exception as e:
         print(str(e), "update_documentbin")
         print(traceback.print_exc())
