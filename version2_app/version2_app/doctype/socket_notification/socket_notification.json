@@ -18,8 +18,7 @@
   {
    "fieldname": "invoice_number",
    "fieldtype": "Data",
-   "label": "Invoice Number",
-   "unique": 1
+   "label": "Invoice Number"
   },
   {
    "fieldname": "guest_name",
@@ -63,7 +62,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-22 16:11:31.411047",
+ "modified": "2021-03-03 14:47:12.627817",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Socket Notification",
