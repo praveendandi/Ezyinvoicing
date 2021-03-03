@@ -18,7 +18,16 @@ def invoice_created(doc, method=None):
 
 def invoice_deleted(doc,method=None):
     frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name})
-
+    soc_doc = frappe.new_doc("Socket Notification")
+    soc_doc.invoice_number = doc.name
+    soc_doc.guest_name = doc.guest_name
+    soc_doc.invoice_type = doc.invoice_type
+    soc_doc.room_number = doc.room_number
+    soc_doc.confirmation_number = doc.confirmation_number
+    soc_doc.print_by = doc.print_by
+    soc_doc.invoice_category = doc.invoice_category
+    soc_doc.insert(ignore_permissions=True)
+    
 def invoiceCreated(doc):
     try:
         # frappe.publish_realtime("invoice_created", "message")
