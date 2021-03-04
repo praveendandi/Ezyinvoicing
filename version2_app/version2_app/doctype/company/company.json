@@ -62,7 +62,6 @@
   "allow_auto_irn",
   "backend_git_branch",
   "angular_project_production_path",
-  "sampleaddd",
   "sc_sac_code",
   "sc_name",
   "sc_gst_percentage",
@@ -390,18 +389,13 @@
   },
   {
    "fieldname": "sc_gst_percentage",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "label": "SC GST Percentage"
   },
   {
    "fieldname": "adjustment_service_charge_list",
-   "fieldtype": "Data",
+   "fieldtype": "Long Text",
    "label": "Adjustment Service Charge List"
-  },
-  {
-   "fieldname": "enable_sc_from_folios",
-   "fieldtype": "Data",
-   "label": "Enable SC from Folios"
   },
   {
    "default": "0",
@@ -410,14 +404,15 @@
    "label": "Allow Auto Irn"
   },
   {
-   "fieldname": "sampleaddd",
-   "fieldtype": "Data",
-   "label": "sampleADDD"
+   "default": "0",
+   "fieldname": "enable_sc_from_folios",
+   "fieldtype": "Check",
+   "label": "Enable SC From Folios"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-26 16:14:48.233880",
+ "modified": "2021-03-04 10:59:32.935604",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
