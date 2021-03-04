@@ -144,6 +144,8 @@ def generateIrn(data):
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		if invoice.irn_generated == "Success":
 			return {"success":True,"message":"Already IRN Generated"}
+		if invoice.invoice_type=="B2C":
+			return {"success":False,"message":"B2C Invoice"}	
 		# get seller details
 		if invoice.invoice_category == "Tax Invoice":
 			category = "INV"
@@ -954,7 +956,10 @@ def insert_invoice(data):
 		if '-' in str(sales_amount_after_tax):
 			allowance_invoice = "Yes"
 		else:
-			allowance_invoice = "No"	 
+			allowance_invoice = "No"
+
+		# if data['guest_data']['room_number']==0 and "-" not in str(sales_amount_after_tax):
+		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
 		print(allowance_invoice)		
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"

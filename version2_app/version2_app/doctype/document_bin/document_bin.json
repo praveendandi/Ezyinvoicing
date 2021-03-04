@@ -36,7 +36,7 @@
   },
   {
    "fieldname": "error_log",
-   "fieldtype": "Data",
+   "fieldtype": "Long Text",
    "label": "Error Log"
   },
   {
@@ -54,7 +54,7 @@
   }
  ],
  "links": [],
- "modified": "2021-03-03 17:42:00.640643",
+ "modified": "2021-03-04 14:55:20.525243",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Document Bin",

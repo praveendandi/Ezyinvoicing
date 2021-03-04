@@ -276,7 +276,7 @@ def file_parsing(filepath):
                                     error_data["items_data"]=calulateItemsApiResponse['data']
                                     errorInvoice = Error_Insert_invoice(error_data)
                                     print("insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-                                    # update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
+                                    update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                                     return {"success":False,"message":insertInvoiceApiResponse['message']}
 
                         else:
@@ -319,7 +319,7 @@ def file_parsing(filepath):
                             error_data['amened'] = amened
                             errorInvoice = Error_Insert_invoice(error_data)
                             print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-                            # update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
+                            update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                             return {"success":False,"message":insertInvoiceApiResponse['message']}
                     else:
                         insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":guest,"company_code":company_code['code'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":total_invoice_amount,"invoice_number":guest['invoice_number'],"amened":amened,"taxpayer":taxpayer})
@@ -331,7 +331,7 @@ def file_parsing(filepath):
                             error_data['amened'] = amened
                             errorInvoice = Error_Insert_invoice(error_data)
                             print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-                            # update_document_bin(print_by,document_type,"",error_data['error_message'],filepath)
+                            update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                             return {"success":False,"message":insertInvoiceApiResponse['message']}
 
                 else:
@@ -353,5 +353,6 @@ def file_parsing(filepath):
     except Exception as e:
         print(traceback.print_exc())
         update_document_bin(print_by,document_type,"",str(e),filepath)
+        
 
 
