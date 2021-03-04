@@ -156,13 +156,16 @@ def file_parsing(filepath):
                         name_index = item["name"].rindex("-Rebate")
                         item["name"] = item["name"][:name_index]
                     if "Transfer Debit" in item["name"]:
-                        name_index = item["name"].rindex("Transfer Debit")
-                        item["name"] = item["name"][:name_index]
+                        if "(" in i:
+                            name_index = item["name"].rindex(" (")
+                            item["name"] = item["name"][:name_index]
                     if len(items_split[-2]) == 6 or len(items_split[-2]) == 8:
                         if items_split[-2].isdigit():
                             item['sac_code'] = items_split[-2]
                         else:
                             item["sac_code"] = "No Sac"
+                    else:
+                        item["sac_code"] = "No Sac"
                     item['sort_order'] =  itemsort+1
                 itemsort+=1
                 if item !={}:
