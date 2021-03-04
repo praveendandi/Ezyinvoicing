@@ -234,7 +234,7 @@ def reinitiateInvoice(data):
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}
 
-
+		print(json.dumps(guest, indent = 1))
 		gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 		if gspApiDataResponse['success'] == True:
 			if guest['invoice_type'] == 'B2B':
