@@ -66,8 +66,7 @@
   "sc_name",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
-  "enable_sc_from_folios",
-  "addsample"
+  "enable_sc_from_folios"
  ],
  "fields": [
   {
@@ -409,16 +408,11 @@
    "fieldname": "enable_sc_from_folios",
    "fieldtype": "Check",
    "label": "Enable SC From Folios"
-  },
-  {
-   "fieldname": "addsample",
-   "fieldtype": "Data",
-   "label": "ADDSAMPLE"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-05 18:13:30.614111",
+ "modified": "2021-03-05 18:15:22.214463",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
