@@ -67,7 +67,7 @@
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "test_migrate"
+  "test_migrate_2"
  ],
  "fields": [
   {
@@ -411,14 +411,14 @@
    "label": "Enable SC From Folios"
   },
   {
-   "fieldname": "test_migrate",
+   "fieldname": "test_migrate_2",
    "fieldtype": "Data",
-   "label": "Test Migrate"
+   "label": "Test Migrate 2"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-05 14:52:40.067839",
+ "modified": "2021-03-05 14:56:52.784963",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
