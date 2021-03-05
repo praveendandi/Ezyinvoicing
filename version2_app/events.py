@@ -15,6 +15,7 @@ import traceback
 #-=-=-=-=-=-
 #=-=-=====================
 #0-0-0-0-0-0-0
+#$$$$$$$$$4
 
 def invoice_created(doc, method=None):
     print("Invoice Created",doc.name)
