@@ -1409,7 +1409,7 @@ def calulate_items(data):
 							# service_dict['state_cess'] = 0
 							# service_dict['state_cess_amount'] = 0
 							service_dict['type'] = type_item
-							service_dict['item_mode'] = "Debit"
+							service_dict['item_mode'] = ItemMode if "-" in str(scharge_value) else "Debit"
 							service_dict['item_type'] = sac_code_based_gst_rates.type
 							# service_dict['vat_amount'] = 0
 							# service_dict['vat'] = 0
