@@ -67,6 +67,7 @@ def reinitiateInvoice(data):
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
 			if "Bill Generation Date" in i:
 				date_time_obj = (i.strip().split(":")[1]).replace("Original Bill Date","").strip()
+				date_time_obj = date_time_obj.replace("Original Bill","").strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room  :" in i:
 				room = i.split(":")
@@ -139,9 +140,11 @@ def reinitiateInvoice(data):
 						if "~" in i:
 							ending_index = i.find("~")
 							item["name"] = (i[starting_index:ending_index]).strip()
+							item["name"] = re.sub(' +', ' ', item["name"])
 						else:
 							ending_index = i.find(item_value)
 							item["name"] = (i[starting_index:ending_index]).strip()
+							item["name"] = re.sub(' +', ' ', item["name"])
 					if 'SAC' in j:
 						item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
 					else:
