@@ -110,12 +110,12 @@ doc_events = {
 	"File":{
 		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
+	},
+	"Bench Manager Command":{
+		'before_insert':"version2_app.events.emitsocket",
+		# 'after_insert':"version2_app.events.updateManager"
+		'on_update':"version2_app.events.updateManager"
 	}
-	# "Bench Manager Command":{
-	# 	'before_insert':"version2_app.events.emitsocket",
-	# 	# 'after_insert':"version2_app.events.updateManager"
-	# 	'on_update':"version2_app.events.updateManager"
-	# }
 
 }
 

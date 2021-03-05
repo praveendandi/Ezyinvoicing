@@ -109,7 +109,7 @@ def updateManager(doc, method=None):
     try:
         if doc.status!="Ongoing":
             print("==========")
-            commands = ['git pull origin master','systemctl nginx reload','systemctl nginx restart']
+            commands = ['git pull origin updates','systemctl nginx reload','systemctl nginx restart']
             console_dump = ''
             company = frappe.get_last_doc('company')
             print(company)
@@ -126,7 +126,7 @@ def updateManager(doc, method=None):
                                 stderr=STDOUT,
                                 cwd=cwd)
                 print(terminal,"//////////")                
-                frappe.log_error("log error", terminal.stdout.read(1))
+                # frappe.log_error("log error", terminal.stdout.read(1))
                 for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
                     console_dump += c
             logged_command = " && ".join(commands)
