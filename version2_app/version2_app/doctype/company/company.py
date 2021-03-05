@@ -351,6 +351,7 @@ def console_command(key=None,
                 doctype='Bench Settings',
                 key=str(time.time()),
                 docname='Bench Settings')
+    frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
     return True
 
 
