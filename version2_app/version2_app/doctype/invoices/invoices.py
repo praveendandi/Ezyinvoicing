@@ -1234,10 +1234,11 @@ def insert_items(items, invoice_number):
 		return {"success":False,"message":str(e)}
 		
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
+		print("=========",data)
 		total_items = []
 		second_list = []
 		if "guest_data" in list(data.keys()):
@@ -1544,7 +1545,7 @@ def calulate_items(data):
 					# service_dict['state_cess'] = 0
 					# service_dict['state_cess_amount'] = 0
 					service_dict['type'] = type_item
-					service_dict['item_mode'] = "Debit"
+					service_dict['item_mode'] = ItemMode if "-" in str(scharge_value) else "Debit"
 					service_dict['item_type'] = sac_code_based_gst_rates.type
 					# service_dict['vat_amount'] = 0
 					# service_dict['vat'] = 0
