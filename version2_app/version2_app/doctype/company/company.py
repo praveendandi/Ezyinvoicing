@@ -444,6 +444,9 @@ def run_command(commands,
         frappe.db.commit()
         _refresh(doctype=doctype, docname=docname, commands=commands)
 
+
+
+
 @frappe.whitelist(allow_guest=True)
 def bench_migrate():
     try:
@@ -492,3 +495,30 @@ def safe_decode(string, encoding='utf-8'):
     except Exception:
         pass
     return string
+
+
+
+@frappe.whitelist(allow_guest=True)
+def updateUiProd(company):
+    try:
+        print("==========")
+        commands = ['git pull origin updates','systemctl nginx reload','systemctl nginx restart']
+        console_dump = ''
+        company = frappe.get_doc('company',company)
+        cwd = company.angular_project_production_path
+        key = str(time.time())
+        # count = 0
+        for command in commands:
+            print(command,"    command")
+            terminal = Popen(shlex.split(command),
+                            stdin=PIPE,
+                            stdout=PIPE,
+                            stderr=STDOUT,
+                            cwd=cwd)
+            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+                console_dump += c
+        logged_command = " && ".join(commands)
+        frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
+        frappe.log_error("Angular project pull data","updateUiProd")
+    except Exception as e:
+        print(str(e),"    updateUiProd")
