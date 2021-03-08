@@ -149,6 +149,8 @@ def Reinitiate_invoice(data):
 		else:
 			allowance_invoice = "No"
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+		invoice_from = doc.invoice_from
+		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
 		doc.total_inovice_amount = total_invoice_amount
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
@@ -208,17 +210,31 @@ def Reinitiate_invoice(data):
 		# 	irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
-		if len(data['items_data'])==0:
-			ready_to_generate_irn = "No"
-			irn_generated = "Zero Invoice"
-			generateb2cQr = False
+		if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
+			if len(data['items_data'])==0:
+				ready_to_generate_irn = "No"
+				irn_generated = "Zero Invoice"
+				generateb2cQr = False
+			else:
+				if abs(invoice_round_off_amount)>6:
+					if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+						generateb2cQr = False
+						doc.error_message = " Invoice Total Mismatch"
+						doc.irn_generated = "Error"
+						doc.ready_to_generate_irn = "No"
 		else:
-			if abs(invoice_round_off_amount)>6:
-				if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-					generateb2cQr = False
-					doc.error_message = " Invoice Total Mismatch"
-					doc.irn_generated = "Error"
-					doc.ready_to_generate_irn = "No"
+			if len(data['items_data'])==0:
+				ready_to_generate_irn = "No"
+				irn_generated = "Zero Invoice"
+				generateb2cQr = False
+			else:
+				invoice_round_off_amount = 0
+				
+				generateb2cQr = True
+				doc.irn_generated = "Pending"
+				doc.ready_to_generate_irn = "Yes"
+
+
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount		
