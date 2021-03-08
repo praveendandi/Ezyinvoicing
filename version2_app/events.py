@@ -109,6 +109,9 @@ def emitsocket(doc,method=None):
     frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
 
 
+def DocumentBinSocket(doc,method=None):
+    frappe.log_error("Document Bin Insert", " {'message':'Docuemnt Bin Insert'}")
+    frappe.publish_realtime("custom_socket", {'message':'Document Bin Insert','type':"document_bin_insert","data":doc.__dict__})
 
 def updateManager(doc, method=None):
     try:

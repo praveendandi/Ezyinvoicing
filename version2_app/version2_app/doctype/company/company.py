@@ -132,6 +132,18 @@ def gitCurrentBranchCommit():
     except Exception as e:
         print("git branch commit id:  ", str(e))
         return {"success": False, "message": str(e)}
+# angular_project_production_path
+
+@frappe.whitelist(allow_guest=True)
+def gitUiBranchCommit(company):
+    try:
+        company = frappe.get_doc('company',company)
+        # folder_path = frappe.utils.get_bench_path()
+        b = os.popen("git --git-dir=" + company.angular_project_production_path+"/.git rev-parse HEAD")
+        return {"success": True, "message": b}
+    except Exception as e:
+        print("git branch commit id:  ", str(e))
+        return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)

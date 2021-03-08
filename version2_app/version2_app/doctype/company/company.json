@@ -67,7 +67,7 @@
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "fun"
+  "ui_git_branch"
  ],
  "fields": [
   {
@@ -411,14 +411,14 @@
    "label": "Enable SC From Folios"
   },
   {
-   "fieldname": "fun",
+   "fieldname": "ui_git_branch",
    "fieldtype": "Data",
-   "label": "FUN"
+   "label": "Ui Git Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-05 18:25:09.909706",
+ "modified": "2021-03-08 10:03:02.207064",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

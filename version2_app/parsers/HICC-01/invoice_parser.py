@@ -285,21 +285,21 @@ def file_parsing(filepath):
                             error_data['amened'] = amened
                             errorInvoice = Error_Insert_invoice(error_data)
                             print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-                            update_document_bin(print_by,document_type,"",error_data['error_message'],filepath)
+                            update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                             return {"success":False,"message":calulateItemsApiResponse['message']}
                     else:
                         # print(error_data)
                         error_data['error_message'] = getTaxPayerDetailsResponse['message']
                         error_data['amened'] = amened
                         errorInvoice = Error_Insert_invoice(error_data)
-                        update_document_bin(print_by,document_type,"",error_data['error_message'],filepath)
+                        update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                         return {"success":False,"message":getTaxPayerDetailsResponse['message']}                        
                 else:
                     # itsindex = checkTokenIsValidResponse['message']['message'].index("'")
                     error_data['error_message'] = checkTokenIsValidResponse['message']
                     error_data['amened'] = amened
                     errorInvoice = Error_Insert_invoice(error_data)
-                    update_document_bin(print_by,document_type,"",error_data['error_message'],filepath)
+                    update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                     return {"success":False,"message":checkTokenIsValidResponse['message']} 
             else:
                 taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
@@ -340,14 +340,14 @@ def file_parsing(filepath):
                     error_data['amened'] = amened
                     errorInvoice = Error_Insert_invoice(error_data)
                     print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-                    update_document_bin(print_by,document_type,"",error_data['error_message'],filepath)
+                    update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
                     return {"success":False,"message":calulateItemsApiResponse['message']}		
         else:
             error_data['error_message'] = gspApiDataResponse['message']
             error_data['amened'] = amened
             errorInvoice = Error_Insert_invoice(error_data)
             print("gspApiData fialed:  ",gspApiDataResponse['message'])
-            update_document_bin(print_by,document_type,"",error_data['error_message'],filepath)
+            update_document_bin(print_by,document_type,invoiceNumber,error_data['error_message'],filepath)
             return {"success":False,"message":gspApiDataResponse['message']}
 
     except Exception as e:
