@@ -70,7 +70,7 @@ def file_parsing(filepath):
                 date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
             if "Room No." in i or "Room No" in i:
                 room = i.split(":")
-                roomNumber = room[-1]
+                roomNumber = room[-1].strip()
                 # roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
             if "C. GST ID" in i:
                 gstNumber = i.split(':')[1].replace(' ', '')
