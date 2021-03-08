@@ -62,7 +62,7 @@ def reinitiateInvoice(data):
             if "Confirmation No." in i:
                 confirmation_number = i.split(":")
                 conf_number = confirmation_number[-1].replace(" ", "")
-            if "Total" in i:
+            if "Total" in i and "INR" in i:
                 total_invoice = i.split(" ")
                 total_invoice_amount = float(total_invoice[-2].replace(",", ""))
             if "Departure :" in i:
@@ -171,7 +171,7 @@ def reinitiateInvoice(data):
         guest['items'] = total_items
         guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
         guest['gstNumber'] = gstNumber
-        guest['room_number'] = int(roomNumber)
+        guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
         guest['company_code'] = "IBISBHR-01"
         guest['confirmation_number'] = conf_number
         guest['start_time'] = str(start_time)
