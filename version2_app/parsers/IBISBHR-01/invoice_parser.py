@@ -166,7 +166,7 @@ def file_parsing(filepath):
         guest['items'] = total_items
         guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
         guest['gstNumber'] = gstNumber
-        guest['room_number'] = int(roomNumber)
+        guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
         guest['company_code'] = "IBISBHR-01"
         guest['confirmation_number'] = conf_number
         guest['start_time'] = str(start_time)
