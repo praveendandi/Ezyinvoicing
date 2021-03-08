@@ -12,7 +12,6 @@ import traceback
 #sampleeeeeeeeeeeeee
 #++++++++++++++++
 #===========
-#-=-=-=-=-=-
 
 
 def invoice_created(doc, method=None):
