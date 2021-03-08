@@ -531,7 +531,7 @@ def updateUiProd(company):
             for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
                 console_dump += c
         logged_command = " && ".join(commands)
-        frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
+        # frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
         frappe.log_error("Angular project pull data","updateUiProd")
     except Exception as e:
         print(str(e),"    updateUiProd")
