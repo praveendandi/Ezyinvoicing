@@ -157,8 +157,8 @@ def reinitiateInvoice(data):
                         name_index = item["name"].rindex("-Rebate")
                         item["name"] = item["name"][:name_index]
                     if "Transfer Debit" in item["name"]:
-                        if " (" in i:
-                            name_index = item["name"].rindex(" (")
+                        if "(Amt" in i:
+                            name_index = item["name"].rindex("(Amt")
                             item["name"] = item["name"][:name_index]
                     if len(items_split[-2]) == 6 or len(items_split[-2]) == 8:
                         if items_split[-2].isdigit():
