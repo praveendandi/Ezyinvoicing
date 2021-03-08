@@ -156,7 +156,7 @@ def file_parsing(filepath):
                         name_index = item["name"].rindex("-Rebate")
                         item["name"] = item["name"][:name_index]
                     if "Transfer Debit" in item["name"]:
-                        if "(" in i:
+                        if " (" in i:
                             name_index = item["name"].rindex(" (")
                             item["name"] = item["name"][:name_index]
                     if len(items_split[-2]) == 6 or len(items_split[-2]) == 8:
