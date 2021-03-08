@@ -71,7 +71,7 @@ def reinitiateInvoice(data):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "GST ID" in i:
+			if "GST ID" in i and "GST ID-" not in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("CREDITINVOICE","")
 				gstNumber = gstNumber.replace("TAXINVOICE","")
