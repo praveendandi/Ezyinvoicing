@@ -9,7 +9,6 @@ import datetime
 import importlib.util
 import traceback
 
-#____________________---
 
 
 def invoice_created(doc, method=None):
