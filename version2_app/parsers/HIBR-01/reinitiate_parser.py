@@ -108,9 +108,7 @@ def reinitiateInvoice(data):
 		items = [] 
 		itemsort = 0
 		for i in data:
-			pattern = re.compile(
-			"^([0-9]{2}\/[0-9]{2}\/[0-9]{2})+"
-			)
+            pattern = re.compile("^([0-9]{2}\/[0-9]{2}\/[0-9]{2})+")
 			check_date = re.findall(pattern, i)
 			if len(check_date) > 0:
 				item = dict()
