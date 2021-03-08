@@ -515,7 +515,7 @@ def safe_decode(string, encoding='utf-8'):
 def updateUiProd(company):
     try:
         print("==========")
-        commands = ['git pull origin updates','systemctl nginx reload','systemctl nginx restart']
+        commands = ['git pull origin updates','systemctl reload nginx','systemctl restart nginx']
         console_dump = ''
         company = frappe.get_doc('company',company)
         cwd = company.angular_project_production_path
