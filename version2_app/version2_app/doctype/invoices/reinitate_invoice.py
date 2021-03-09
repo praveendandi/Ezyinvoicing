@@ -148,6 +148,13 @@ def Reinitiate_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"
+
+		if "gstNumber" not in data['guest_data']:
+			data['guest_data']['gstNumber'] = ""
+		if "confirmation_number" not in data['guest_data']:
+			data['guest_data']['confirmation_number'] = ""
+
+
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
 		invoice_from = doc.invoice_from
 		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
@@ -229,7 +236,7 @@ def Reinitiate_invoice(data):
 				generateb2cQr = False
 			else:
 				invoice_round_off_amount = 0
-				
+
 				generateb2cQr = True
 				doc.irn_generated = "Pending"
 				doc.ready_to_generate_irn = "Yes"
