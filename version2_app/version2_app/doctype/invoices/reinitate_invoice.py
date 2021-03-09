@@ -261,7 +261,7 @@ def Reinitiate_invoice(data):
 			send_invoicedata_to_gcb(data['guest_data']['invoice_number'])
 		invoice_data = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
 
-		if data['guest_data']['invoice_type'] == "B2B":
+		if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
 				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
 				irn_generate = generateIrn(data)	

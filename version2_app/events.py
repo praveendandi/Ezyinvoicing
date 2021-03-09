@@ -37,4 +37,4 @@ def fileCreated(doc, method=None):
         module.file_parsing(doc.file_url)
     else:
         print('Normal File')
-
+    
