@@ -184,6 +184,9 @@ def file_parsing(filepath):
 				if inv_data.invoice_type == "B2B":
 					if inv_data.irn_generated=="Pending" or inv_data.irn_generated == "Error":
 						reupload = True
+					if inv_data.irn_generated =="Success":
+                        invoiceNumber = inv_data.name+"-"
+                        guest['invoice_number'] = inv_data.name+"-"	
 				else:
 					reupload = True
 
