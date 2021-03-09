@@ -1652,7 +1652,7 @@ def calulate_items(data):
 						final_item['cgst_amount'] = round(gst_value / 2,3)
 						final_item['sgst_amount'] = round(gst_value / 2,3)
 						# final_item['igst'] = float(sac_code_based_gst_rates.igst)
-						if float(sac_code_based_gst_rates.igst) <= 0:
+						if float(final_item["igst"]) <= 0:
 							final_item['igst_amount'] = 0
 						else:
 							base_value = item['item_value'] * (100 / (final_item["igst"] + 100))
