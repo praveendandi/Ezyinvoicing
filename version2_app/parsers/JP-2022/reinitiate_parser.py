@@ -156,7 +156,7 @@ def reinitiateInvoice(data):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and "XX/XX" not in i and "XXXXX" not in i:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and ("XX/XX" not in i or "XXXXX" not in i):
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 
