@@ -148,6 +148,8 @@ def Reinitiate_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"
+		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
 
 		if "gstNumber" not in data['guest_data']:
 			data['guest_data']['gstNumber'] = ""
