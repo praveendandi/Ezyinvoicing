@@ -64,7 +64,8 @@
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "allow_auto_irn"
+  "allow_auto_irn",
+  "tax_invoice_to_manual_taxinvoice"
  ],
  "fields": [
   {
@@ -396,11 +397,17 @@
    "fieldname": "allow_auto_irn",
    "fieldtype": "Check",
    "label": "Allow Auto Irn"
+  },
+  {
+   "default": "0",
+   "fieldname": "tax_invoice_to_manual_taxinvoice",
+   "fieldtype": "Check",
+   "label": "Tax Invoice to Manual TaxInvoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-24 12:06:06.188138",
+ "modified": "2021-03-09 14:17:54.991090",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

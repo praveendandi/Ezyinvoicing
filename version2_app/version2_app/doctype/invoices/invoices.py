@@ -136,6 +136,7 @@ class Invoices(Document):
 @frappe.whitelist()
 def generateIrn(data):
 	try:
+		print(data)
 		invoice_number = data['invoice_number']
 		generation_type = data['generation_type']
 		# get invoice details
@@ -1215,6 +1216,7 @@ def insert_items(items, invoice_number):
 		b = frappe.db.commit()
 		if len(items)>0:
 			for item in items:
+				print(item)
 				item['item_value'] = round(item['item_value'],2)
 				item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
 				item['parent'] = invoice_number
