@@ -179,7 +179,7 @@ def reinitiateInvoice(data):
         for each in items:
             if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service charge" not in each['name']:
                 if each["name"] not in payment_Types:
-                    res = [ele for ele in payment if(ele in each["name"])]
+                    res = [ele for ele in payment if(ele in each["name"] and "Paid Out" not in each["name"])]
                     if not res:
                         total_items.append(each)
 
