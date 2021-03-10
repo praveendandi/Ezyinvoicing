@@ -38,19 +38,3 @@ def fileCreated(doc, method=None):
     else:
         print('Normal File')
     
-
-    # check if it's all there..
-    # def bla(mod):
-    #     print(dir(mod))
-    # bla(module)
-
-
-
-    # from p
-    # print("Invoice Created",doc.name,"Hey am created *****************8")
-    # doc.comapnay
-    # from parsers import 
-
-
-
-

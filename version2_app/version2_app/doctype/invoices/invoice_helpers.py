@@ -154,11 +154,11 @@ def TotalMismatchError(data,calculated_data):
 
 def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
 	try:
-		if data['item_value']>=1000 and data['item_value']<=7500:
+		if abs(data['item_value'])>=1000 and abs(data['item_value'])<=7500:
 			gst_percentage = 12
-		elif data['item_value'] > 7500:
+		elif abs(data['item_value']) > 7500:
 			gst_percentage = 18
-		elif data['item_value'] == 1000:
+		elif abs(data['item_value']) == 1000:
 			gst_percentage = 0
 		else:
 			gst_percentage = 0

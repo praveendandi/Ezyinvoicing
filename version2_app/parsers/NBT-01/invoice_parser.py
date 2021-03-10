@@ -3,12 +3,12 @@ from datetime import date
 import datetime
 import requests
 import pandas as pd
-import traceback
 import re
 import json
 import sys
 import frappe
 import itertools
+import traceback
 from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
@@ -27,7 +27,7 @@ folder_path = frappe.utils.get_bench_path()
 def file_parsing(filepath):
 	try:
 		start_time = datetime.datetime.utcnow()
-		companyCheckResponse = check_company_exist("TLND-01")
+		companyCheckResponse = check_company_exist("NBT-01")
 		site_folder_path = companyCheckResponse['data'].site_name
 		file_path = folder_path+'/sites/'+site_folder_path+filepath
 		today = date.today()
@@ -60,6 +60,12 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			if "CREDIT TAX INVOICE" in i:
+				invoice_category = "Credit Invoice"
+			if "CREDIT INVOICE" in i:
+				invoice_category = "Credit Invoice"
+			if "CREDIT TAX" in i:
+				invoice_category = "Credit Invoice"
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -73,12 +79,13 @@ def file_parsing(filepath):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "Guest GST ID" in i:
+			if "GST ID" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
-				gstNumber = gstNumber.replace("TAXINVOICE","")
+				gstNumber = gstNumber.replace("ConfirmationNo.","")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-				invoiceNumber = invoiceNumber.replace('-',"")
+				if "/" in invoiceNumber:
+					invoiceNumber = invoiceNumber.replace("/","")
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
@@ -104,6 +111,7 @@ def file_parsing(filepath):
 				p = i.split(":")
 				print_by = p[1].replace(" ","")
 
+
 		items = [] 
 		itemsort = 0
 		for i in data:
@@ -117,25 +125,24 @@ def file_parsing(filepath):
 				dt = i.strip()
 				for index, j in enumerate(i.split(' ')):
 					val = dt.split(" ")
+					# print(val,"*********")
 					if index == 0 and len(val)>1:
 						item['date'] = j
+					
 					if len(val)>1:
 						item_value = val[-1]
 						item['item_value'] = float(item_value.replace(',', ''))
+					# else:
+					# 	item_value = val[-2]
+					# 	item['item_value'] = float(item_value.replace(',', ''))
 					if index == 1 and len(val)>1:
 						starting_index = i.index(j)
 						if "~" in i:
 							ending_index = i.find("~")
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
-							item_name = item["name"].split(" ")[-1]
-							if len(item_name) == 1:
-								item["name"] = (item["name"][:-1]).strip()
 						else:
 							ending_index = i.find(item_value)
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
-							item_name = item["name"].split(" ")[-1]
-							if len(item_name) == 1:
-								item["name"] = (item["name"][:-1]).strip()
 					if len(val)>1:		
 						if 'SAC' in j:
 							item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
@@ -160,7 +167,6 @@ def file_parsing(filepath):
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
-				guest['name'] = guest['name'].replace("Departure","")
 			if index == 1:
 				guest['address1'] = i
 			if index == 2:
@@ -174,7 +180,7 @@ def file_parsing(filepath):
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
 		guest['room_number'] = int(roomNumber)
-		guest['company_code'] = "TLND-01"
+		guest['company_code'] = "NBT-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
@@ -198,16 +204,16 @@ def file_parsing(filepath):
 				else:
 					reupload = True
 
-		company_code = {"code":"TLND-01"}
-		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"TLND-01","invoice_date":date_time_obj}
+		company_code = {"code":"NBT-01"}
+		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"NBT-01","invoice_date":date_time_obj}
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
-		error_data['state_code'] = "7"
+		error_data['state_code'] = " "
 		error_data['room_number'] = guest['room_number']
-		error_data['pincode'] = "110001"
+		error_data['pincode'] = " "
 		error_data['total_invoice_amount'] = total_invoice_amount
 		# gstNumber = "12345"
 		# print(guest['invoice_number'])
@@ -224,10 +230,7 @@ def file_parsing(filepath):
 			return {"success":False,"message":"Invalid GstNumber"}
 
 
-		
-
-
-		print(json.dumps(guest, indent = 1))
+		# print(json.dumps(guest, indent = 1))
 		gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
 		if gspApiDataResponse['success'] == True:
 			if guest['invoice_type'] == 'B2B':
@@ -312,6 +315,7 @@ def file_parsing(filepath):
 							errorInvoice = Error_Insert_invoice(error_data)
 							print("B2C re insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 							return {"success":False,"message":insertInvoiceApiResponse['message']}
+
 				else:
 							
 					error_data['error_message'] = calulateItemsApiResponse['message']
@@ -326,6 +330,6 @@ def file_parsing(filepath):
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
-		print(str(e),"       reinitiate parsing")
+		print(str(e),"       invoice parsing")
 		print(traceback.print_exc())
 		return {"success":False,"message":str(e)}

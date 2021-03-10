@@ -71,7 +71,7 @@ def reinitiateInvoice(data):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "GST ID" in i:
+			if "GST ID" in i and "GST ID-" not in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("CREDITINVOICE","")
 				gstNumber = gstNumber.replace("TAXINVOICE","")
@@ -108,9 +108,7 @@ def reinitiateInvoice(data):
 		items = [] 
 		itemsort = 0
 		for i in data:
-			pattern = re.compile(
-			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
-			)
+			pattern = re.compile("^([0-9]{2}\/[0-9]{2}\/[0-9]{2})+")
 			check_date = re.findall(pattern, i)
 			if len(check_date) > 0:
 				item = dict()
@@ -146,7 +144,7 @@ def reinitiateInvoice(data):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each["name"]:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "Cess" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each["name"]:
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 

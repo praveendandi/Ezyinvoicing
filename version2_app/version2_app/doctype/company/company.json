@@ -65,7 +65,9 @@
   "sc_name",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
-  "enable_sc_from_folios"
+  "enable_sc_from_folios",
+  "allow_auto_irn",
+  "tax_invoice_to_manual_taxinvoice"
  ],
  "fields": [
   {
@@ -394,19 +396,15 @@
    "label": "Allow Auto Irn"
   },
   {
-   "fieldname": "angular_project_production_path",
-   "fieldtype": "Data",
-   "label": "Angular Project Production Path"
-  },
-  {
-   "fieldname": "backend_git_branch",
-   "fieldtype": "Data",
-   "label": "Backend Git Branch"
+   "default": "0",
+   "fieldname": "tax_invoice_to_manual_taxinvoice",
+   "fieldtype": "Check",
+   "label": "Tax Invoice to Manual TaxInvoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-01 09:53:53.262260",
+ "modified": "2021-03-09 14:17:54.991090",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -74,7 +74,7 @@ def file_parsing(filepath):
 			if "Bill Generation Date" in i:
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
-			if "Room" in i and "CHECK#" not in i and "Rooms" not in i and "GST" not in i:
+			if "Room" in i and "CHECK#" not in i and "Rooms" not in i and "GST" not in i and "Room No" not in i:
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))

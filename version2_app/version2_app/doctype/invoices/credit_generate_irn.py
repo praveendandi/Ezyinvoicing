@@ -426,7 +426,8 @@ def CreditgenerateIrn(invoice_number,generation_type):
 				taxpayer_details['data'].trade_name,
 				"Pos":
 				"01" if company_details['data'].mode == "Testing" else
-				company_details['data'].state_code,
+				# company_details['data'].state_code,
+				invoice.place_of_supply,
 				"Addr1":
 				taxpayer_details['data'].address_1,
 				"Addr2":

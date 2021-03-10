@@ -136,6 +136,7 @@ class Invoices(Document):
 @frappe.whitelist()
 def generateIrn(data):
 	try:
+		print(data)
 		invoice_number = data['invoice_number']
 		generation_type = data['generation_type']
 		# get invoice details
@@ -953,7 +954,10 @@ def insert_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"	 
-		print(allowance_invoice)		
+		print(allowance_invoice)	
+		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
@@ -1218,6 +1222,7 @@ def insert_items(items, invoice_number):
 		b = frappe.db.commit()
 		if len(items)>0:
 			for item in items:
+				print(item)
 				item['item_value'] = round(item['item_value'],2)
 				item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
 				item['parent'] = invoice_number
@@ -1237,11 +1242,11 @@ def insert_items(items, invoice_number):
 		return {"success":False,"message":str(e)}
 		
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
-		# print(data)
+		print("=========",data)
 		total_items = []
 		second_list = []
 		if "guest_data" in list(data.keys()):
@@ -1413,7 +1418,7 @@ def calulate_items(data):
 							# service_dict['state_cess'] = 0
 							# service_dict['state_cess_amount'] = 0
 							service_dict['type'] = type_item
-							service_dict['item_mode'] = "Debit"
+							service_dict['item_mode'] = ItemMode if "-" in str(scharge_value) else "Debit"
 							service_dict['item_type'] = sac_code_based_gst_rates.type
 							# service_dict['vat_amount'] = 0
 							# service_dict['vat'] = 0
@@ -1548,7 +1553,7 @@ def calulate_items(data):
 					# service_dict['state_cess'] = 0
 					# service_dict['state_cess_amount'] = 0
 					service_dict['type'] = type_item
-					service_dict['item_mode'] = "Debit"
+					service_dict['item_mode'] = ItemMode if "-" in str(scharge_value) else "Debit"
 					service_dict['item_type'] = sac_code_based_gst_rates.type
 					# service_dict['vat_amount'] = 0
 					# service_dict['vat'] = 0
@@ -1655,7 +1660,7 @@ def calulate_items(data):
 						final_item['cgst_amount'] = round(gst_value / 2,3)
 						final_item['sgst_amount'] = round(gst_value / 2,3)
 						# final_item['igst'] = float(sac_code_based_gst_rates.igst)
-						if float(sac_code_based_gst_rates.igst) <= 0:
+						if float(final_item["igst"]) <= 0:
 							final_item['igst_amount'] = 0
 						else:
 							base_value = item['item_value'] * (100 / (final_item["igst"] + 100))
