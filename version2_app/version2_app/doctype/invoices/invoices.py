@@ -954,7 +954,10 @@ def insert_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"	 
-		print(allowance_invoice)		
+		print(allowance_invoice)	
+		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
 		
