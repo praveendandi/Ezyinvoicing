@@ -86,7 +86,7 @@ def manual_upload(data):
 		taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 		gstNumber = ''
 		for each in input_data:
-			print(type(each['items']),each['invoice_number'],each['invoice_category'])
+			# print(type(each['items']),each['invoice_number'],each['invoice_category'])
 			# each['items'] = each['items']
 			if each['invoice_category'] == "empty":
 				each['invoice_category'] = "Tax Invoice"
@@ -111,7 +111,9 @@ def manual_upload(data):
 			error_data['pincode'] = ""
 			error_data['total_invoice_amount'] = each['total_invoice_amount']
 			error_data['sez'] = 0
+			error_data['invoice_from'] = "File"
 			each['sez'] = 0
+			print(each['invoice_from'])
 			calulateItemsApiResponse = calulate_items(each)
 			if calulateItemsApiResponse['success'] == True:
 				
@@ -129,6 +131,56 @@ def manual_upload(data):
 				error_data['error_message'] = calulateItemsApiResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+
+		gst_data_file = data['gst_file']
+		# company = data['company']
+		# companyData = frappe.get_doc('company',data['company'])
+		# site_folder_path = companyData.site_name
+		gst_file_path = folder_path+'/sites/'+site_folder_path+gst_data_file
+		gst_dataframe = pd.read_csv(gst_file_path)
+		columns = list(gst_dataframe.columns.values)
+		gst_data = gst_dataframe.values.tolist()
+		gst_data.insert(0,columns)
+		gst_list = []
+		for each in gst_data:
+			if each[0][0]=="|":
+				inv = each[0].split("|")
+			else:
+				inv = each[0].split("|")
+				gst_list.append({"gst_number":inv[0],"invoice_number":inv[1]})	
+		# print(gst_list)
+		for each in gst_list:
+			gspApiDataResponse = gsp_api_data({"code":data['company'],"mode":companyData.mode,"provider":companyData.provider})
+			if gspApiDataResponse['success'] == True:
+				getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":each['gst_number'],"code":data['company'],"invoice":each['invoice_number'],"apidata":gspApiDataResponse['data']})
+				
+				if getTaxPayerDetailsResponse['success'] == True:
+					taxpayer = getTaxPayerDetailsResponse['data'].__dict__
+					
+					if frappe.db.exists('Invoices', each['invoice_number']):
+						invoice = frappe.get_doc("Invoices",each['invoice_number'])
+						print(invoice)
+						irn_generated = invoice.irn_generated
+						invoice.gst_number = each['gst_number']
+						invoice.legal_name = taxpayer['legal_name']
+						invoice.trade_name =  taxpayer['trade_name']
+						invoice.address_1 = taxpayer['address_1']
+						invoice.address_2 = taxpayer['address_2']
+						invoice.email = taxpayer['email']
+						invoice.phone_number = taxpayer['phone_number']
+						invoice.location = taxpayer['location']
+						invoice.pincode = taxpayer['pincode']
+						invoice.state_code = taxpayer['state_code']
+						if irn_generated == "Success":
+							invoice.irn_generated = "Pending"
+						invoice.invoice_type = "B2B"	
+						invoice.save()
+						if companyData.allow_auto_irn ==1:
+							if irn_generated == "Success" or irn_generated=="Pending":
+								irn_data = {'invoice_number': each['invoice_number'],'generation_type': "System"}
+								irn_generate = generateIrn(irn_data)
+
+		return {"success":True,"message":"Successfully Updated Gst Numbers"}		
 		return input_data
 
 	except Exception as e:

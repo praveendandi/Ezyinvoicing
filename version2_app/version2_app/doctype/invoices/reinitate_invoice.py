@@ -150,6 +150,7 @@ def Reinitiate_invoice(data):
 			allowance_invoice = "No"
 		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
 		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+		# 	invoice_category = "Debit Invoice"
 
 		if "gstNumber" not in data['guest_data']:
 			data['guest_data']['gstNumber'] = ""
@@ -158,6 +159,11 @@ def Reinitiate_invoice(data):
 
 
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			data['guest_data']['invoice_category'] = "Debit Invoice"
+			invoice_category = "Debit Invoice"
+		else:
+			invoice_category = doc.invoice_category	
 		invoice_from = doc.invoice_from
 		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
 		doc.total_inovice_amount = total_invoice_amount

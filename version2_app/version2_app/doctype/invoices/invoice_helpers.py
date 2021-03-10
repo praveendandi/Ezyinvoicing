@@ -10,6 +10,10 @@ import datetime
 
 def TotalMismatchError(data,calculated_data):
 	try:
+		if "invoice_from" in data['guest_data']:
+			invoice_from = data['guest_data']['invoice_from']
+		else:
+			invoice_from = "Pms"	
 		invType = data['guest_data']['invoice_type']
 		irn_generated = "Error"   
 		companyDetails = frappe.get_doc("company",data['company_code'])
@@ -26,7 +30,7 @@ def TotalMismatchError(data,calculated_data):
 				data['guest_data']['name'],
 				'invoice_round_off_amount': data['invoice_round_off_amount'],
 				'ready_to_generate_irn':"No",
-				'invoice_from':"Pms",
+				'invoice_from':invoice_from,
 				'gst_number':
 				data['guest_data']['gstNumber'],
 				'invoice_file':

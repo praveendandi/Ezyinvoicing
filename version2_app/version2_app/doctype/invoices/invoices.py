@@ -138,8 +138,10 @@ def generateIrn(data):
 	try:
 		print(data)
 		invoice_number = data['invoice_number']
+
 		generation_type = data['generation_type']
 		# get invoice details
+		
 		start_time = datetime.datetime.utcnow()
 		invoice = frappe.get_doc('Invoices', invoice_number)
 		if invoice.irn_generated == "Success":
@@ -151,7 +153,7 @@ def generateIrn(data):
 			category = "DBN"
 		else:
 			category = "CRN"	
-		
+		IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category})
 		company_details = check_company_exist_for_Irn(invoice.company)
 		# get gsp_details
 		credit_note_items = []
@@ -955,8 +957,8 @@ def insert_invoice(data):
 		else:
 			allowance_invoice = "No"	 
 		print(allowance_invoice)	
-		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
-		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			data['guest_data']['invoice_category'] = "Debit Invoice"
 
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
@@ -1246,7 +1248,7 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
-		print("=========",data)
+		# print("=========",data)
 		total_items = []
 		second_list = []
 		if "guest_data" in list(data.keys()):
@@ -2813,6 +2815,10 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist()
 def Error_Insert_invoice(data):
 	try:
+		if "invoice_from" in data:
+			invoice_from = data['invoice_from']
+		else:
+			invoice_from = "Pms"	
 		if "sez" in data:
 			sez = data["sez"]
 		else:
@@ -2908,7 +2914,8 @@ def Error_Insert_invoice(data):
 				'error_message':
 				data['error_message'],
 				"place_of_supply":company.state_code,
-				"sez":sez
+				"sez":sez,
+				"invoice_from":invoice_from
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			
