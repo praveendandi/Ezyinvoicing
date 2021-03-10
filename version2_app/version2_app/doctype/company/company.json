@@ -65,7 +65,7 @@
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
   "allow_auto_irn",
-  "tax_invoice_to_manual_taxinvoice"
+  "disable_credit_note"
  ],
  "fields": [
   {
@@ -400,14 +400,14 @@
   },
   {
    "default": "0",
-   "fieldname": "tax_invoice_to_manual_taxinvoice",
+   "fieldname": "disable_credit_note",
    "fieldtype": "Check",
-   "label": "Tax Invoice to Manual TaxInvoice"
+   "label": "Disable Credit Note"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-09 14:17:54.991090",
+ "modified": "2021-03-10 12:54:35.820210",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
