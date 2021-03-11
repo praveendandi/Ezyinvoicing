@@ -124,6 +124,7 @@ def manual_upload(data):
 		
 		taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 		gstNumber = ''
+		output_date = []
 		for each in input_data:
 			if each['invoice_category'] == "empty":
 				each['invoice_category'] = "Tax Invoice"
@@ -160,7 +161,7 @@ def manual_upload(data):
 			error_data['invoice_from'] = "File"
 			each['sez'] = 0
 			sez = 0
-			output_date = []
+			
 			if each['invoice_type']=="B2B":
 				gspApiDataResponse = gsp_api_data({"code":data['company'],"mode":companyData.mode,"provider":companyData.provider})
 				checkTokenIsValidResponse = check_token_is_valid({"code":data['company'],"mode":companyData.mode})
@@ -176,19 +177,26 @@ def manual_upload(data):
 				
 				insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez})
 				if insertInvoiceApiResponse['success']== True:
-					print("B2C Invoice Created",insertInvoiceApiResponse)
+					# print(insertInvoiceApiResponse['data'].__dict__)
+					# print({'invoice_number':insertInvoiceApiResponse['data'].name},"/////////////")
+					output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"irn_generated":insertInvoiceApiResponse['data'].irn_generated,"date":insertInvoiceApiResponse['data'].invoice_date})
 				else:
 					
 					error_data['error_message'] = insertInvoiceApiResponse['message']
 					errorInvoice = Error_Insert_invoice(error_data)
+					output_date.append({'invoice_number':errorInvoice['data'].name,"irn_generated":errorInvoice['data'].irn_generated,"date":errorInvoice['data'].invoice_date})
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 
 			else:
 						
 				error_data['error_message'] = calulateItemsApiResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
+				output_date.append({'invoice_number':errorInvoice['data'].name,"irn_generated":errorInvoice['data'].irn_generated,"date":errorInvoice['data'].invoice_date})
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-
+		# print(output_date,"/////////")
+		df = pd.DataFrame(output_date)
+		# print(df)
+		print(df.groupby('invoice_date').count())
 		return {"success":True,"message":"Successfully Uploaded Invoices"}		
 
 	except Exception as e:

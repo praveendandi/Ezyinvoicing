@@ -989,7 +989,7 @@ def insert_invoice(data):
 							TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
 							hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 								items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
-							return {"success": True}
+							return {"success": True,"data":TotalMismatchErrorAPI['data']}
 
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"

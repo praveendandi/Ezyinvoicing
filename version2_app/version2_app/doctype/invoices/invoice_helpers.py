@@ -137,6 +137,7 @@ def TotalMismatchError(data,calculated_data):
 			invoice.invoice_number = "Amened" + data['guest_data'][
 				'invoice_number']
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		invName = v.name
 		if data['amened'] == 'Yes':
 			getInvoiceNUmber = frappe.db.get_value('Invoices', {
 				'invoice_number':
@@ -145,13 +146,15 @@ def TotalMismatchError(data,calculated_data):
 			# print(getInvoiceNUmber)
 			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
 			# print(updateInvoi)
+			invName = updateInvoi.name
+
 			updateInvoi.invoice_number = getInvoiceNUmber
 			updateInvoi.save()
 
 			data['invoice_number'] = getInvoiceNUmber
 			data['guest_data']['invoice_number'] = getInvoiceNUmber
-
-		return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data']}
+		updateInvoi = frappe.get_doc('Invoices', invName)
+		return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data'],"data":updateInvoi}
 	except Exception as e:
 		return {"success":False,"message":str(e)}    
 		
