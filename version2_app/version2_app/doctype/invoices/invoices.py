@@ -1144,7 +1144,9 @@ def insert_invoice(data):
 		# b2cattach = Invoices()
 		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
-			return {"success":True}
+			invoice = frappe.get_doc("Invoices",v.name)	
+			return {"success": True,"data":invoice}
+			# return {"success":True}
 		else:
 			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and v.invoice_type=="B2B":
 				data = {'invoice_number': v.name,'generation_type': "System"}
@@ -1153,8 +1155,9 @@ def insert_invoice(data):
 
 		# if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
 		# 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
-		# 	Error_Insert_invoice(error_data)	
-		return {"success": True}
+		# 	Error_Insert_invoice(error_data)
+		invoice = frappe.get_doc("Invoices",v.name)	
+		return {"success": True,"data":invoice}
 	except Exception as e:
 		print(e, "insert invoice")
 		return {"success": False, "message": str(e)}
@@ -2929,7 +2932,7 @@ def Error_Insert_invoice(data):
 					
 				# return {"success": True}	
 
-			return {"success":False,"message":"Error"} 
+			return {"success":False,"message":"Error","data":v} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
 		if len(data['gst_number'])<15 and len(data['gst_number'])>0:

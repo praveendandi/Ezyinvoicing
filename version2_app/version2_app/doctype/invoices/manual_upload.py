@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from datetime import date
 import requests
 import datetime
 import random
@@ -124,12 +125,15 @@ def manual_upload(data):
 		taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 		gstNumber = ''
 		for each in input_data:
-			print(each['invoice_date'])
 			if each['invoice_category'] == "empty":
 				each['invoice_category'] = "Tax Invoice"
 			each['invoice_from'] = "File"
 			each['company_code'] = data['company']
-			# each['invoice_date'] = "23-DEC-20 07:55:00"
+			each['invoice_date'] = each['invoice_date'].replace("/","-")
+			# print(each['invoice_date'])
+			date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
+			date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
+			each['invoice_date'] = date_time_obj
 			each['mode'] = companyData.mode
 			each['invoice_file'] = " "
 			each['gstNumber'] = each['gstNumber']
@@ -156,6 +160,7 @@ def manual_upload(data):
 			error_data['invoice_from'] = "File"
 			each['sez'] = 0
 			sez = 0
+			output_date = []
 			if each['invoice_type']=="B2B":
 				gspApiDataResponse = gsp_api_data({"code":data['company'],"mode":companyData.mode,"provider":companyData.provider})
 				checkTokenIsValidResponse = check_token_is_valid({"code":data['company'],"mode":companyData.mode})
@@ -164,9 +169,8 @@ def manual_upload(data):
 					if getTaxPayerDetailsResponse['success'] == True:
 						sez = 1 if getTaxPayerDetailsResponse["data"].tax_type == "SEZ" else 0
 						each['sez']=1
-						# print(get_tax_payer_details['data'])
 						taxpayer=getTaxPayerDetailsResponse['data'].__dict__
-						# taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+						
 			calulateItemsApiResponse = calulate_items(each)
 			if calulateItemsApiResponse['success'] == True:
 				
@@ -184,39 +188,6 @@ def manual_upload(data):
 				error_data['error_message'] = calulateItemsApiResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-
-		
-			
-		# print(gst_list)
-		# for each in gst_list:
-		# 	gspApiDataResponse = gsp_api_data({"code":data['company'],"mode":companyData.mode,"provider":companyData.provider})
-		# 	if gspApiDataResponse['success'] == True:
-		# 		getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":each['gst_number'],"code":data['company'],"invoice":each['invoice_number'],"apidata":gspApiDataResponse['data']})
-				
-		# 		if getTaxPayerDetailsResponse['success'] == True:
-		# 			taxpayer = getTaxPayerDetailsResponse['data'].__dict__
-					
-		# 			if frappe.db.exists('Invoices', each['invoice_number']):
-		# 				invoice = frappe.get_doc("Invoices",each['invoice_number'])
-		# 				irn_generated = invoice.irn_generated
-		# 				invoice.gst_number = each['gst_number']
-		# 				invoice.legal_name = taxpayer['legal_name']
-		# 				invoice.trade_name =  taxpayer['trade_name']
-		# 				invoice.address_1 = taxpayer['address_1']
-		# 				invoice.address_2 = taxpayer['address_2']
-		# 				invoice.email = taxpayer['email']
-		# 				invoice.phone_number = taxpayer['phone_number']
-		# 				invoice.location = taxpayer['location']
-		# 				invoice.pincode = taxpayer['pincode']
-		# 				invoice.state_code = taxpayer['state_code']
-		# 				if irn_generated == "Success":
-		# 					invoice.irn_generated = "Pending"
-		# 				invoice.invoice_type = "B2B"	
-		# 				invoice.save()
-		# 				if companyData.allow_auto_irn ==1:
-		# 					if irn_generated == "Success" or irn_generated=="Pending":
-		# 						irn_data = {'invoice_number': each['invoice_number'],'generation_type': "System"}
-		# 						irn_generate = generateIrn(irn_data)
 
 		return {"success":True,"message":"Successfully Uploaded Invoices"}		
 
