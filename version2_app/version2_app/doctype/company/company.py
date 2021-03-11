@@ -480,7 +480,7 @@ def update_parsers():
                 Popen(shlex.split(clone_command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=check_folder)
             # token = "foQJihWZhufdixW43yCs"
             terminal = Popen(shlex.split(command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=cwd)
-            return{"success":False,"message":"Parsers Updated Successfully"}
+            return{"success":True,"message":"Parsers Updated Successfully"}
         else:
             return{"success":False,"message":"Please add branch name in Company"}
     except Exception as e:
