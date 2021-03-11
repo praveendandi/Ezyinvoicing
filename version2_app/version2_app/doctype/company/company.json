@@ -68,8 +68,8 @@
   "enable_sc_from_folios",
   "allow_auto_irn",
   "disable_credit_note",
-  "ui_branch_name",
-  "error_tax_invoices_to_manual"
+  "error_tax_invoices_to_manual",
+  "ui_git_branch"
  ],
  "fields": [
   {
@@ -419,19 +419,20 @@
    "label": "Disable Credit Note"
   },
   {
-   "fieldname": "ui_branch_name",
-   "fieldtype": "Data",
-   "label": "Ui Branch Name"
-  },
-  {
+   "default": "0",
    "fieldname": "error_tax_invoices_to_manual",
    "fieldtype": "Check",
    "label": "Error Tax invoices to Manual"
+  },
+  {
+   "fieldname": "ui_git_branch",
+   "fieldtype": "Data",
+   "label": "Ui Git Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-11 14:26:09.469742",
+ "modified": "2021-03-11 16:12:48.131840",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
