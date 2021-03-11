@@ -515,9 +515,10 @@ def safe_decode(string, encoding='utf-8'):
 def updateUiProd(company):
     try:
         print("==========")
-        commands = ['git pull origin updates','systemctl reload nginx','systemctl restart nginx']
-        console_dump = ''
         company = frappe.get_doc('company',company)
+        commands = ['git pull origin'+company.ui_branch_name,'systemctl reload nginx','systemctl restart nginx']
+        console_dump = ''
+        
         cwd = company.angular_project_production_path
         key = str(time.time())
         # count = 0
