@@ -65,7 +65,9 @@
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
   "allow_auto_irn",
-  "disable_credit_note"
+  "disable_credit_note",
+  "parsers_branch_name",
+  "new_parsers"
  ],
  "fields": [
   {
@@ -403,11 +405,22 @@
    "fieldname": "disable_credit_note",
    "fieldtype": "Check",
    "label": "Disable Credit Note"
+  },
+  {
+   "fieldname": "parsers_branch_name",
+   "fieldtype": "Data",
+   "label": "Parsers Branch Name"
+  },
+  {
+   "default": "1",
+   "fieldname": "new_parsers",
+   "fieldtype": "Check",
+   "label": "New Parsers"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-10 12:54:35.820210",
+ "modified": "2021-03-11 17:27:21.662325",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -6,7 +6,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import get_site_name
-import shutil
+from subprocess import Popen, PIPE, STDOUT
+import shutil,shlex
 import os
 import pdfplumber
 from datetime import date, datetime
@@ -202,8 +203,11 @@ def qr_generatedtoirn_generated():
 @frappe.whitelist(allow_guest=True)
 def reprocess_error_inoices():
     try:
-        doc = frappe.db.get_list('company',fields=['name'])
-        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
+        if doc[0]["new_parsers"] == 0:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        else:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -223,8 +227,11 @@ def reprocess_error_inoices():
 @frappe.whitelist(allow_guest=True)
 def reprocess_pending_inoices():
     try:
-        doc = frappe.db.get_list('company',fields=['name'])
-        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
+        if doc[0]["new_parsers"] == 0:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        else:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -264,3 +271,18 @@ def manulaTax_credit_to_debit():
     except Exception as e:
         return{"success":False,"message":str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def update_parsers():
+    try:
+        company = frappe.get_last_doc('company')
+        if company.parsers_branch_name:
+            command = "git pull origin "+company.parsers_branch_name
+            abs_path = os.path.dirname(os.getcwd())
+            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'
+            # token = "foQJihWZhufdixW43yCs"
+            terminal = Popen(shlex.split(command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=cwd)
+            return{"success":False,"message":"Parsers Updated Successfully"}
+        else:
+            return{"success":False,"message":"Please add branch name in Company"}
+    except Exception as e:
+        return{"success":False,"message":str(e)}

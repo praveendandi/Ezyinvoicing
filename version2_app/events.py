@@ -29,7 +29,12 @@ def fileCreated(doc, method=None):
     # imp.load_source(name, version2_app.parsers)
     if 'job-' in doc.file_name:
         abs_path = os.path.dirname(os.getcwd())
-        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+        company_doc = frappe.get_doc("company",doc.attached_to_name)
+        new_parsers = company_doc.new_parsers
+        if new_parsers == 0:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+        else:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
         module_name = 'file_parsing'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
