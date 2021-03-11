@@ -1,6 +1,6 @@
 import frappe
-from frappe.utils import getdate, requests, json
-
+from frappe.utils import getdate
+import requests,json
 @frappe.whitelist(allow_guest=True)
 def getTotalamount():
     if frappe.local.request.method=="POST":

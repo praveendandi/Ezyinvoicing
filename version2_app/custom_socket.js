@@ -33,3 +33,4 @@ subscriber.on("message", function(channel, message) {
 });
  
 subscriber.subscribe("a channel");
+

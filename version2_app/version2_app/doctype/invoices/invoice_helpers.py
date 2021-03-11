@@ -424,3 +424,25 @@ def error_invoice_calculation(data,data1):
 	doc.invoice_round_off_amount = roundoff_amount
 	doc.save(ignore_permissions=True, ignore_version=True)
 	return True
+
+
+def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
+	try:
+		document_printed = "No"
+		if len(invoiceNumber)>0:
+			inv = frappe.get_doc("Invoices",invoiceNumber)
+			if inv:
+				error_log = ""
+				document_printed = "Yes"
+			else:
+				document_printed = "No"	
+		bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filepath})
+		bin_doc = frappe.get_doc("Document Bin",bin_name)
+		bin_doc.print_by = print_by
+		bin_doc.document_type = invoice_type
+		bin_doc.invoice_number = invoiceNumber
+		bin_doc.error_log = error_log
+		bin_doc.document_printed = document_printed
+		bin_doc.save(ignore_permissions=True,ignore_version=True)
+	except Exception as e:
+		return {"success":False,"message":str(e)}

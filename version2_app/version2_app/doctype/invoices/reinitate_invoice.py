@@ -64,7 +64,10 @@ def Reinitiate_invoice(data):
 		irn_generated = "Pending"
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
+		if "gstNumber" not in data['guest_data']:
+			data['guest_data']['gstNumber'] = ""
 		#calculat items
+		print(data['items_data'])
 		if len(data['items_data'])>0:
 			for item in data['items_data']:
 				if item['taxable'] == 'No' and item['item_type'] != "Discount":
