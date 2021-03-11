@@ -111,7 +111,7 @@ def file_parsing(filepath):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if len(check_date) > 0:
+			if len(check_date) > 0 and "XXXXX" not in i:
 				item = dict()
 				item_value = ""
 				dt = i.strip()
@@ -150,7 +150,7 @@ def file_parsing(filepath):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and "XX/XX" not in each["name"] and "XXXXX" not in each["name"]:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and ("XX/XX" not in each["name"] or "XXXXX" not in each["name"]):
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 

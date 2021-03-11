@@ -151,7 +151,18 @@ def Reinitiate_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"
+		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+
+		if "gstNumber" not in data['guest_data']:
+			data['guest_data']['gstNumber'] = ""
+		if "confirmation_number" not in data['guest_data']:
+			data['guest_data']['confirmation_number'] = ""
+
+
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+		invoice_from = doc.invoice_from
+		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
 		doc.total_inovice_amount = total_invoice_amount
 		doc.invoice_number=data['guest_data']['invoice_number']
 		doc.guest_name=data['guest_data']['name']
@@ -211,17 +222,31 @@ def Reinitiate_invoice(data):
 		# 	irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
-		if len(data['items_data'])==0:
-			ready_to_generate_irn = "No"
-			irn_generated = "Zero Invoice"
-			generateb2cQr = False
+		if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
+			if len(data['items_data'])==0:
+				ready_to_generate_irn = "No"
+				irn_generated = "Zero Invoice"
+				generateb2cQr = False
+			else:
+				if abs(invoice_round_off_amount)>6:
+					if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+						generateb2cQr = False
+						doc.error_message = " Invoice Total Mismatch"
+						doc.irn_generated = "Error"
+						doc.ready_to_generate_irn = "No"
 		else:
-			if abs(invoice_round_off_amount)>6:
-				if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-					generateb2cQr = False
-					doc.error_message = " Invoice Total Mismatch"
-					doc.irn_generated = "Error"
-					doc.ready_to_generate_irn = "No"
+			if len(data['items_data'])==0:
+				ready_to_generate_irn = "No"
+				irn_generated = "Zero Invoice"
+				generateb2cQr = False
+			else:
+				invoice_round_off_amount = 0
+
+				generateb2cQr = True
+				doc.irn_generated = "Pending"
+				doc.ready_to_generate_irn = "Yes"
+
+
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount		
@@ -241,10 +266,13 @@ def Reinitiate_invoice(data):
 			send_invoicedata_to_gcb(data['guest_data']['invoice_number'])
 		invoice_data = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
 
-		if data['guest_data']['invoice_type'] == "B2B":
+		if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
-				irn_generate = generateIrn(data)	
+				if invoice_data.has_credit_items == "Yes" and company.disable_credit_note == 1:
+					pass
+				else:
+					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
+					irn_generate = generateIrn(data)	
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
@@ -641,7 +669,7 @@ def reprocess_calulate_items(data):
 					# service_dict['state_cess'] = 0
 					# service_dict['state_cess_amount'] = 0
 					service_dict['type'] = type_item
-					service_dict['item_mode'] = "Debit"
+					service_dict['item_mode'] = ItemMode if "-" in str(scharge_value) else "Debit"
 					service_dict['item_type'] = sac_code_based_gst_rates.type
 					service_dict["sac_index"] = sac_code_based_gst_rates.sac_index
 					# service_dict['vat_amount'] = 0

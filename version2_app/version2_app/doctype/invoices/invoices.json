@@ -128,7 +128,8 @@
   "tax_invoice_referrence_number",
   "tax_invoice_referrence_date",
   "allowance_invoice",
-  "irn_generated_type"
+  "irn_generated_type",
+  "converted_from_tax_invoices_to_manual_tax_invoices"
  ],
  "fields": [
   {
@@ -830,12 +831,19 @@
    "fieldtype": "Select",
    "label": "Irn Generated Type",
    "options": "Manual\nSystem"
+  },
+  {
+   "default": "No",
+   "fieldname": "converted_from_tax_invoices_to_manual_tax_invoices",
+   "fieldtype": "Select",
+   "label": "Converted From Tax Invoices to Manual Tax Invoices",
+   "options": "No\nYes"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-03-08 16:18:45.427918",
+ "modified": "2021-03-08 18:28:36.245351",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

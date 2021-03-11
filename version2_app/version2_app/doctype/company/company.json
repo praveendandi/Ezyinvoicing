@@ -67,7 +67,9 @@
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "ui_git_branch"
+  "ui_git_branch",
+  "allow_auto_irn",
+  "disable_credit_note"
  ],
  "fields": [
   {
@@ -408,17 +410,18 @@
    "default": "0",
    "fieldname": "enable_sc_from_folios",
    "fieldtype": "Check",
-   "label": "Enable SC From Folios"
+   "label": "Allow Auto Irn"
   },
   {
-   "fieldname": "ui_git_branch",
-   "fieldtype": "Data",
-   "label": "Ui Git Branch"
+   "default": "0",
+   "fieldname": "disable_credit_note",
+   "fieldtype": "Check",
+   "label": "Disable Credit Note"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-08 10:03:02.207064",
+ "modified": "2021-03-10 12:54:35.820210",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
