@@ -264,3 +264,12 @@ def manulaTax_credit_to_debit():
     except Exception as e:
         return{"success":False,"message":str(e)}
 
+
+
+@frappe.whitelist(allow_guest=True)
+def diskspace():
+    b = os.popen(" df -h /dev/sda1")
+    print(b)
+    # print(b.encoding)
+    return b
+

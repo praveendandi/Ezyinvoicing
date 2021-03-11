@@ -59,15 +59,14 @@
   "service_charge_percentage",
   "b2c_to_b2b",
   "number_in_description",
-  "angular_project_production_path",
-  "backend_git_branch",
   "allow_auto_irn",
   "sc_name",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "allow_auto_irn",
-  "tax_invoice_to_manual_taxinvoice"
+  "tax_invoice_to_manual_taxinvoice",
+  "bulk_import_invoice_headers",
+  "bulk_import_gst_count"
  ],
  "fields": [
   {
@@ -400,11 +399,21 @@
    "fieldname": "tax_invoice_to_manual_taxinvoice",
    "fieldtype": "Check",
    "label": "Tax Invoice to Manual TaxInvoice"
+  },
+  {
+   "fieldname": "bulk_import_invoice_headers",
+   "fieldtype": "Long Text",
+   "label": "Bulk Import Invoice Headers"
+  },
+  {
+   "fieldname": "bulk_import_gst_count",
+   "fieldtype": "Int",
+   "label": "Bulk Import Gst Count"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-09 14:17:54.991090",
+ "modified": "2021-03-11 11:41:01.059005",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -1224,7 +1224,7 @@ def insert_items(items, invoice_number):
 		b = frappe.db.commit()
 		if len(items)>0:
 			for item in items:
-				print(item)
+				# print(item)
 				item['item_value'] = round(item['item_value'],2)
 				item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
 				item['parent'] = invoice_number
