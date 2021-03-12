@@ -66,7 +66,6 @@
   "enable_sc_from_folios",
   "allow_auto_irn",
   "disable_credit_note",
-  "test",
   "backend_git_branch",
   "angular_project_production_path",
   "parsers_branch_name",
@@ -412,11 +411,6 @@
    "label": "Disable Credit Note"
   },
   {
-   "fieldname": "test",
-   "fieldtype": "Data",
-   "label": "test"
-  },
-  {
    "fieldname": "backend_git_branch",
    "fieldtype": "Data",
    "label": "Backend Git Branch"
@@ -451,7 +445,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-12 12:38:33.977295",
+ "modified": "2021-03-12 12:45:52.352515",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
