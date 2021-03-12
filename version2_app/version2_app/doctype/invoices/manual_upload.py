@@ -71,15 +71,26 @@ def manual_upload(data):
 	output = items_dataframe.to_dict('records')
 	list_data={}
 	# return output
+	invoice_referrence_objects = {}
 	for each in output:
+		# print("-----")
 		if each['FOLIO_TYPE'] == "SUMFT_DEBITPERREPORT" or each['TRANSACTION_DESCRIPTION']== 'empty':
 			break
 		
+		if each['BILL_NO'] not in invoice_referrence_objects:
+			# print("//////")
+			
+			invoice_referrence_objects[each['BILL_NO']] = []
+			invoice_referrence_objects[each['BILL_NO']].append(each)
+		else:
+			invoice_referrence_objects[each['BILL_NO']].append(each)
 		if "CGST" in each['TRANSACTION_DESCRIPTION'] or "SGST" in each['TRANSACTION_DESCRIPTION'] or "IGST" in each['TRANSACTION_DESCRIPTION']:
 			continue
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
+		
 		if each['TRANSACTION_DESCRIPTION'] not in payment_Types:
+			
 			if 'invoice_number' not in list_data:
 				list_data['invoice_category'] = each['FOLIO_TYPE']
 				list_data['invoice_number'] = each['BILL_NO']
@@ -132,7 +143,6 @@ def manual_upload(data):
 		# if " " in each['invoice_date']:
 		# 	each['invoice_date'] = each['invoice_date'].split(" ")[0]
 		each['invoice_date'] = each['invoice_date'].replace("/","-")
-		# print(each['invoice_date'])
 		date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
 		date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 		each['invoice_date'] = date_time_obj
@@ -144,6 +154,8 @@ def manual_upload(data):
 			each['gstNumber']=""
 		else:
 			each['invoice_type'] = "B2B"
+			invoice_referrence_objects[each['invoice_number']][0]['gstNumber'] = each['gstNumber']
+
 		each['confirmation_number'] = each['invoice_number']
 		each['print_by'] = "System"
 		each['start_time'] = str(datetime.datetime.utcnow())
@@ -170,13 +182,11 @@ def manual_upload(data):
 				getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":each['gstNumber'],"code":data['company'],"invoice":each['invoice_number'],"apidata":gspApiDataResponse['data']})
 				if getTaxPayerDetailsResponse['success'] == True:
 					sez = 1 if getTaxPayerDetailsResponse["data"].tax_type == "SEZ" else 0
-					each['sez']=1
+					each['sez']=1 if getTaxPayerDetailsResponse["data"].tax_type == "SEZ" else 0
 					taxpayer=getTaxPayerDetailsResponse['data'].__dict__
-					
 		calulateItemsApiResponse = calulate_items(each)
 		if calulateItemsApiResponse['success'] == True:
-			
-			insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez})
+			insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":invoice_referrence_objects[each['invoice_number']]})
 			if insertInvoiceApiResponse['success']== True:
 				# print(insertInvoiceApiResponse['data'].__dict__)
 				# print({'invoice_number':insertInvoiceApiResponse['data'].name},"/////////////")
@@ -193,7 +203,9 @@ def manual_upload(data):
 			else:
 				
 				error_data['error_message'] = insertInvoiceApiResponse['message']
+				error_data['invoice_object_from_file'] = invoice_referrence_objects[each['invoice_number']]
 				errorInvoice = Error_Insert_invoice(error_data)
+				print(errorInvoice,"/a/a")
 				# invdate = str(insertInvoiceApiResponse['data']
 				# if " " in str(errorInvoice['data'].invoice_date):
 				# 	invdate = str(errorInvoice['data'].invoice_date).split(" ")[0]
@@ -203,12 +215,13 @@ def manual_upload(data):
 		else:
 					
 			error_data['error_message'] = calulateItemsApiResponse['message']
+			error_data['invoice_object_from_file'] = invoice_referrence_objects[each['invoice_number']]
 			errorInvoice = Error_Insert_invoice(error_data)
 			# invdate = str(insertInvoiceApiResponse['data']
 			# if " " in str(errorInvoice['data'].invoice_date):
 			# 	invdate = str(errorInvoice['data'].invoice_date).split(" ")[0]
 			output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date)})
-			print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+			print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 	df = pd.DataFrame(output_date)
 	df = df.groupby('date').count().reset_index()
 	output_data = df.to_dict('records')

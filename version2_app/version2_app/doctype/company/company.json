@@ -64,9 +64,10 @@
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "tax_invoice_to_manual_taxinvoice",
   "bulk_import_invoice_headers",
-  "bulk_import_gst_count"
+  "bulk_import_gst_count",
+  "tax_invoice_to_manual",
+  "disable_credit_note"
  ],
  "fields": [
   {
@@ -398,7 +399,7 @@
    "default": "0",
    "fieldname": "disable_credit_note",
    "fieldtype": "Check",
-   "label": "Tax Invoice to Manual TaxInvoice"
+   "label": "Disable Credit Note"
   },
   {
    "fieldname": "bulk_import_invoice_headers",
@@ -409,11 +410,17 @@
    "fieldname": "bulk_import_gst_count",
    "fieldtype": "Int",
    "label": "Bulk Import Gst Count"
+  },
+  {
+   "default": "0",
+   "fieldname": "tax_invoice_to_manual",
+   "fieldtype": "Check",
+   "label": "Tax Invoice to Manual TaxInvoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-10 12:54:35.820210",
+ "modified": "2021-03-12 15:17:09.418091",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
