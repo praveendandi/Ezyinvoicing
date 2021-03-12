@@ -66,7 +66,13 @@
   "enable_sc_from_folios",
   "allow_auto_irn",
   "disable_credit_note",
-  "test"
+  "test",
+  "backend_git_branch",
+  "angular_project_production_path",
+  "parsers_branch_name",
+  "new_parsers",
+  "error_tax_invoices_to_manual",
+  "ui_git_branch"
  ],
  "fields": [
   {
@@ -409,11 +415,43 @@
    "fieldname": "test",
    "fieldtype": "Data",
    "label": "test"
+  },
+  {
+   "fieldname": "backend_git_branch",
+   "fieldtype": "Data",
+   "label": "Backend Git Branch"
+  },
+  {
+   "fieldname": "angular_project_production_path",
+   "fieldtype": "Data",
+   "label": "Angular Project Production Path"
+  },
+  {
+   "fieldname": "parsers_branch_name",
+   "fieldtype": "Data",
+   "label": "Parsers Branch Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "new_parsers",
+   "fieldtype": "Check",
+   "label": "New Parsers"
+  },
+  {
+   "default": "0",
+   "fieldname": "error_tax_invoices_to_manual",
+   "fieldtype": "Check",
+   "label": "Error Tax invoices to Manual"
+  },
+  {
+   "fieldname": "ui_git_branch",
+   "fieldtype": "Data",
+   "label": "Ui Git Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-12 11:49:42.736909",
+ "modified": "2021-03-12 12:38:33.977295",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
