@@ -95,7 +95,7 @@ def fileCreated(doc, method=None):
                 spec.loader.exec_module(module)
                 module.file_parsing(doc.file_url)
         else:
-            if ".pdf" in doc.file_url:
+            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                 update_documentbin(doc.file_url,"")
 
             print('Normal File')
