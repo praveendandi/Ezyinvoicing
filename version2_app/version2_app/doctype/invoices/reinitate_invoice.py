@@ -271,8 +271,11 @@ def Reinitiate_invoice(data):
 
 		if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				data = {'invoice_number': invoice_data.name,'generation_type': "System"}
-				irn_generate = generateIrn(data)	
+				if invoice_data.has_credit_items == "Yes" and company.disable_credit_note == 1:
+					pass
+				else:
+					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
+					irn_generate = generateIrn(data)	
 		return {"success":True}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())

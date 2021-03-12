@@ -396,7 +396,7 @@
   },
   {
    "default": "0",
-   "fieldname": "tax_invoice_to_manual_taxinvoice",
+   "fieldname": "disable_credit_note",
    "fieldtype": "Check",
    "label": "Tax Invoice to Manual TaxInvoice"
   },
@@ -413,7 +413,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-11 11:41:01.059005",
+ "modified": "2021-03-10 12:54:35.820210",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -73,7 +73,7 @@ def createError(title,error):
 
 @frappe.whitelist(allow_guest=True)
 def getPrinters():
-    raw_printers = os.popen("lpstat -p -d")
+    raw_printers = os.popen("lpstat -p -d")    
     print(raw_printers.__dict__)
     printers = []
     for index,i in enumerate(raw_printers):

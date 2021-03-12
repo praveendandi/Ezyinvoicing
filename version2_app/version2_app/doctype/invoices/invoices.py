@@ -1148,14 +1148,17 @@ def insert_invoice(data):
 			return {"success": True,"data":invoice}
 			# return {"success":True}
 		else:
-			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and v.invoice_type=="B2B":
-				data = {'invoice_number': v.name,'generation_type': "System"}
-				irn_generate = generateIrn(data)
-				print(irn_generate)	
+			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
+				if v.has_credit_items == "Yes" and company.disable_credit_note == 1:
+					pass
+				else:
+					data = {'invoice_number': v.name,'generation_type': "System"}
+					irn_generate = generateIrn(data)
+					print(irn_generate)
 
 		# if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
 		# 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
-		# 	Error_Insert_invoice(error_data)
+		# 	Error_Insert_invoice(error_data)    
 		invoice = frappe.get_doc("Invoices",v.name)	
 		return {"success": True,"data":invoice}
 	except Exception as e:
@@ -1251,7 +1254,6 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	# try:
-	# print("=========",data)
 	total_items = []
 	second_list = []
 	if "guest_data" in list(data.keys()):
