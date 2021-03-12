@@ -1259,6 +1259,17 @@ def calulate_items(data):
 		else:
 			invoice_category = "Tax Invoice"
 		companyDetails = frappe.get_doc('company', data['company_code'])
+		if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
+			print("-----------")
+			if companyDetails.allowance_type == "Credit":
+				ItemMode = "Credit"
+			else:
+				ItemMode = "Discount"
+		elif invoice_category == "Credit Invoice":
+			print("==================")
+			ItemMode = "Credit"
+		else:
+			pass	
 		data['invoice_item_date_format'] = companyDetails.invoice_item_date_format
 		# companyDetails = frappe.get_doc('company', data['company_code'])
 		if "sez" in data:
@@ -1295,13 +1306,7 @@ def calulate_items(data):
 				final_item['unit_of_measurement_description'] = "OTHERS"
 				final_item['quantity'] = 1
 			scharge = companyDetails.service_charge_percentage
-			if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-				if companyDetails.allowance_type == "Credit":
-					ItemMode = "Credit"
-				else:
-					ItemMode = "Discount"
-			elif invoice_category == "Credit Invoice":
-				ItemMode = "Credit"
+			
 			acc_gst_percentage = 0.00
 			acc_igst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":

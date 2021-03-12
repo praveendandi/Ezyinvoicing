@@ -32,7 +32,6 @@ def manual_upload(data):
 		items_dataframe['Gst Number'] = "NoGst"
 		invoice_columns = list(items_dataframe.columns.values)
 		invoice_num = list(set(items_dataframe['BILL_NO']))
-		print(invoice_num)
 		company_check_columns = companyData.bulk_import_invoice_headers
 		company_check_columns = company_check_columns.split(",")
 
@@ -130,6 +129,8 @@ def manual_upload(data):
 				each['invoice_category'] = "Tax Invoice"
 			each['invoice_from'] = "File"
 			each['company_code'] = data['company']
+			# if " " in each['invoice_date']:
+			# 	each['invoice_date'] = each['invoice_date'].split(" ")[0]
 			each['invoice_date'] = each['invoice_date'].replace("/","-")
 			# print(each['invoice_date'])
 			date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
@@ -179,25 +180,41 @@ def manual_upload(data):
 				if insertInvoiceApiResponse['success']== True:
 					# print(insertInvoiceApiResponse['data'].__dict__)
 					# print({'invoice_number':insertInvoiceApiResponse['data'].name},"/////////////")
-					output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"irn_generated":insertInvoiceApiResponse['data'].irn_generated,"date":insertInvoiceApiResponse['data'].invoice_date})
+					
+					if insertInvoiceApiResponse['data'].irn_generated == "Success":
+						# invdate = str(insertInvoiceApiResponse['data']
+						# if " " in str(errorInvoice['data'].invoice_date):
+						# 	invdate = str(insertInvoiceApiResponse['data'].invoice_date).split(" ")[0]
+						output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date)})
+					elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
+						output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date)})
+					else:
+						output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date)})
 				else:
 					
 					error_data['error_message'] = insertInvoiceApiResponse['message']
 					errorInvoice = Error_Insert_invoice(error_data)
-					output_date.append({'invoice_number':errorInvoice['data'].name,"irn_generated":errorInvoice['data'].irn_generated,"date":errorInvoice['data'].invoice_date})
+					# invdate = str(insertInvoiceApiResponse['data']
+					# if " " in str(errorInvoice['data'].invoice_date):
+					# 	invdate = str(errorInvoice['data'].invoice_date).split(" ")[0]
+					output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date)})
 					print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 
 			else:
 						
 				error_data['error_message'] = calulateItemsApiResponse['message']
 				errorInvoice = Error_Insert_invoice(error_data)
-				output_date.append({'invoice_number':errorInvoice['data'].name,"irn_generated":errorInvoice['data'].irn_generated,"date":errorInvoice['data'].invoice_date})
+				# invdate = str(insertInvoiceApiResponse['data']
+				# if " " in str(errorInvoice['data'].invoice_date):
+				# 	invdate = str(errorInvoice['data'].invoice_date).split(" ")[0]
+				output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date)})
 				print("B2C calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-		# print(output_date,"/////////")
 		df = pd.DataFrame(output_date)
-		# print(df)
-		print(df.groupby('invoice_date').count())
-		return {"success":True,"message":"Successfully Uploaded Invoices"}		
+		df = df.groupby('date').count().reset_index()
+		output_data = df.to_dict('records')
+
+
+		return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
 
 	except Exception as e:
 		frappe.db.delete('File', {'file_url': data['invoice_file']})
@@ -264,3 +281,6 @@ def updateGstNumber(data):
 		print(str(e),"     updateGstNumber  ")
 		return {"success":False,"message":str(e)}	
 	 		
+
+
+
