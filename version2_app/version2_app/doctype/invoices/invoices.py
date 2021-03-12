@@ -3031,7 +3031,7 @@ def attach_b2c_qrcode(data):
 def b2b_success_to_credit_note(data):
 	try:
 		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
-		invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name'], as_dict=1)
+		invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled",], as_dict=1)
 		print(invoice_data)
 	except Exception as e:
 		print(e, "attach b2c qrcode")
