@@ -71,7 +71,8 @@
   "parsers_branch_name",
   "new_parsers",
   "error_tax_invoices_to_manual",
-  "ui_git_branch"
+  "ui_git_branch",
+  "sample_test"
  ],
  "fields": [
   {
@@ -441,11 +442,16 @@
    "fieldname": "ui_git_branch",
    "fieldtype": "Data",
    "label": "Ui Git Branch"
+  },
+  {
+   "fieldname": "sample_test",
+   "fieldtype": "Data",
+   "label": "Sample Test"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-12 12:45:52.352515",
+ "modified": "2021-03-12 12:49:29.292316",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
