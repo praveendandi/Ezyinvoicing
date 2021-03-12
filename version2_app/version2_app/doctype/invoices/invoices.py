@@ -3025,3 +3025,15 @@ def attach_b2c_qrcode(data):
 	except Exception as e:
 		print(e, "attach b2c qrcode")
 		return {"success": False, "message": e}
+
+
+@frappe.whitelist(allow_guest=True)
+def b2b_success_to_credit_note(data):
+	try:
+		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+		invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name'], as_dict=1)
+		print(invoice_data)
+	except Exception as e:
+		print(e, "attach b2c qrcode")
+		return {"success": False, "message": str(e)}
+	
