@@ -59,8 +59,6 @@
   "service_charge_percentage",
   "b2c_to_b2b",
   "number_in_description",
-  "backend_git_branch",
-  "angular_project_production_path",
   "sc_sac_code",
   "sc_name",
   "sc_gst_percentage",
@@ -68,10 +66,7 @@
   "enable_sc_from_folios",
   "allow_auto_irn",
   "disable_credit_note",
-  "parsers_branch_name",
-  "new_parsers",
-  "error_tax_invoices_to_manual",
-  "ui_git_branch"
+  "test"
  ],
  "fields": [
   {
@@ -373,16 +368,6 @@
    "label": "Number In Description"
   },
   {
-   "fieldname": "angular_project_production_path",
-   "fieldtype": "Data",
-   "label": "Angular Project Production Path"
-  },
-  {
-   "fieldname": "backend_git_branch",
-   "fieldtype": "Data",
-   "label": "Backend Git Branch"
-  },
-  {
    "fieldname": "sc_sac_code",
    "fieldtype": "Data",
    "label": "SC SAC Code"
@@ -412,7 +397,7 @@
    "default": "0",
    "fieldname": "enable_sc_from_folios",
    "fieldtype": "Check",
-   "label": "Enable SC From Folios"
+   "label": "Enable SC from Folios"
   },
   {
    "default": "0",
@@ -421,31 +406,14 @@
    "label": "Disable Credit Note"
   },
   {
-   "fieldname": "parsers_branch_name",
+   "fieldname": "test",
    "fieldtype": "Data",
-   "label": "Parsers Branch Name"
-  },
-  {
-   "default": "1",
-   "fieldname": "new_parsers",
-   "fieldtype": "Check",
-   "label": "New Parsers"
-  },
-  {
-   "default": "0",
-   "fieldname": "error_tax_invoices_to_manual",
-   "fieldtype": "Check",
-   "label": "Error Tax invoices to Manual"
-  },
-  {
-   "fieldname": "ui_git_branch",
-   "fieldtype": "Data",
-   "label": "Ui Git Branch"
+   "label": "test"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-11 16:12:48.131840",
+ "modified": "2021-03-12 11:49:42.736909",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
