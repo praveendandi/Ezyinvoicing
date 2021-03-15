@@ -5,6 +5,7 @@ from frappe.utils import get_site_name
 import time
 import os
 import datetime
+import json
 
 
 
@@ -125,7 +126,7 @@ def TotalMismatchError(data,calculated_data):
 				"place_of_supply":companyDetails.state_code,
 				"sez":data["sez"] if "sez" in data else 0,
 				"allowance_invoice":allowance_invoice,
-				"invoice_object_from_file":str(data['invoice_object_from_file'])
+				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 			})
 		if data['amened'] == 'Yes':
 			invCount = frappe.db.get_list(

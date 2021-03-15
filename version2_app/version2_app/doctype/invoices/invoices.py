@@ -491,176 +491,176 @@ def attach_qr_code(invoice_number, gsp, code):
 
 @frappe.whitelist()
 def send_invoicedata_to_gcb(invoice_number):
-		try:
-			folder_path = frappe.utils.get_bench_path()
+	try:
+		folder_path = frappe.utils.get_bench_path()
 
-			doc = frappe.get_doc('Invoices', invoice_number)
-			company = frappe.get_doc('company', doc.company)
-			path = folder_path + '/sites/' + company.site_name
-			file_name = invoice_number + 'b2cqr.png'
-			dst_pdf_filename = path + "/private/files/" + file_name
-			# if doc.b2c_qrimage:
-			# 	attach_qr = attach_b2c_qrcode({
-			# 		"invoice_number": invoice_number,
-			# 		"company": doc.company
-			# 	})
-			# 	if attach_qr["success"] == False:
-			# 		return {"success": False, "message": attach_qr["message"]}
-			# 	else:
-			# 		return {
-			# 			"success": True,
-			# 			"message": "QR-Code generated successfully"
-			# 		}
+		doc = frappe.get_doc('Invoices', invoice_number)
+		company = frappe.get_doc('company', doc.company)
+		path = folder_path + '/sites/' + company.site_name
+		file_name = invoice_number + 'b2cqr.png'
+		dst_pdf_filename = path + "/private/files/" + file_name
+		# if doc.b2c_qrimage:
+		# 	attach_qr = attach_b2c_qrcode({
+		# 		"invoice_number": invoice_number,
+		# 		"company": doc.company
+		# 	})
+		# 	if attach_qr["success"] == False:
+		# 		return {"success": False, "message": attach_qr["message"]}
+		# 	else:
+		# 		return {
+		# 			"success": True,
+		# 			"message": "QR-Code generated successfully"
+		# 		}
 
-			filename = invoice_number + doc.company + ".json"
-			b2c_file = path + "/private/files/" + filename
-			items_count = 0
-			hsn_code = ""
-			items = doc.items
-			items_count = 0
-			hsn_code = ""
-			headers = {'Content-Type': 'application/json'}
-			if company.b2c_qr_type == "Invoice Details":
-				if company.proxy == 1:
-					proxyhost = company.proxy_url
-					proxyhost = proxyhost.replace("http://","@")
-					proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
-				
-				for xyz in items:
-					if xyz.sac_code not in hsn_code:
-						hsn_code += xyz.sac_code + ", "
-					items_count += 1
-				b2c_data = {
-					"invoice_number": doc.invoice_number,
-					"invoice_type": doc.invoice_type,
-					"invoice_date": str(doc.invoice_date),
-					"pms_invoice_summary": doc.pms_invoice_summary,
-					"irn": "N/A",
-					"company_name": company.company_name,
-					"guest_name": doc.guest_name,
-					"issued_by": "ezyinvoicing",
-					"items_count": items_count,
-					"hsn_code": hsn_code.rstrip(', '),
-					"company": company.name
-				}
-				if company.proxy == 0:
-					json_response = requests.post(
-						"https://gst.caratred.in/ezy/api/addJsonToGcb",
-						headers=headers,
-						json=b2c_data)
-					response = json_response.json()
-					if response["success"] == False:
-						return {
-							"success": False,
-							"message": response["message"]
-						}
-				else:
-					print(proxies, "     proxy console")
-					json_response = requests.post(
-						"https://gst.caratred.in/ezy/api/addJsonToGcb",
-						headers=headers,
-						json=b2c_data,
-						proxies=proxies,verify=False)
-					response = json_response.json()
-					if response["success"] == False:
-						return {
-							"success": False,
-							"message": response["message"]
-						}
-
-				
-				qr = qrcode.QRCode(
-					version=1,
-					error_correction=qrcode.constants.ERROR_CORRECT_L,
-					box_size=3,
-					border=4
-				)
-				qrurl = company.b2c_qr_url + response['data']
-				qr.add_data(qrurl)
-				qr.make(fit=True)
-				img = qr.make_image(fill_color="black", back_color="white")
-				img.save(dst_pdf_filename)
-			elif company.b2c_qr_type == "Virtual Payment":
-
-				if company.proxy == 0:
-					generate_qr = requests.post(
-						"https://upiqr.in/api/qr?format=png",
-						headers=headers,
-						json={
-							"vpa": company.merchant_virtual_payment_address,
-							"name": company.merchant_name,
-							"txnReference": invoice_number,
-							"amount": '%.2f' % doc.pms_invoice_summary
-						})
-				else:
-					proxyhost = company.proxy_url
-					proxyhost = proxyhost.replace("http://", "@")
-					proxies = {
-						'https':
-						'https://' + company.proxy_username + ":" +
-						company.proxy_password + proxyhost}
-					print(proxies, "     proxy console")
-					generate_qr = requests.post(
-						"https://upiqr.in/api/qr?format=png",
-						headers=headers,
-						json={
-							"vpa": company.merchant_virtual_payment_address,
-							"name": company.merchant_name,
-							"txnReference": invoice_number,
-							"amount": '%.2f' % doc.pms_invoice_summary
-						},
-						proxies=proxies,verify=False)
-				if generate_qr.status_code == 200:
-					with open(dst_pdf_filename, "wb") as f:
-						f.write(generate_qr.content)
-			else:
-				return {
-					"success":
-					False,
-					"message":
-					"Please select any in 'B2C QR Code Type' in Company Details"
-				}
-			files = {"file": open(dst_pdf_filename, 'rb')}
-			payload = {
-				"is_private": 1,
-				"folder": "Home",
-				"doctype": "Invoices",
-				"docname": invoice_number,
-				'fieldname': 'b2c_qrimage'
+		filename = invoice_number + doc.company + ".json"
+		b2c_file = path + "/private/files/" + filename
+		items_count = 0
+		hsn_code = ""
+		items = doc.items
+		items_count = 0
+		hsn_code = ""
+		headers = {'Content-Type': 'application/json'}
+		if company.b2c_qr_type == "Invoice Details":
+			if company.proxy == 1:
+				proxyhost = company.proxy_url
+				proxyhost = proxyhost.replace("http://","@")
+				proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+			
+			for xyz in items:
+				if xyz.sac_code not in hsn_code:
+					hsn_code += xyz.sac_code + ", "
+				items_count += 1
+			b2c_data = {
+				"invoice_number": doc.invoice_number,
+				"invoice_type": doc.invoice_type,
+				"invoice_date": str(doc.invoice_date),
+				"pms_invoice_summary": doc.pms_invoice_summary,
+				"irn": "N/A",
+				"company_name": company.company_name,
+				"guest_name": doc.guest_name,
+				"issued_by": "ezyinvoicing",
+				"items_count": items_count,
+				"hsn_code": hsn_code.rstrip(', '),
+				"company": company.name
 			}
-			site = company.host
-			upload_qr_image = requests.post(site + "api/method/upload_file",
-											files=files,
-											data=payload)
-			response = upload_qr_image.json()
-			if 'message' in response:
-				doc.b2c_qrimage = response['message']['file_url']
-				doc.name = invoice_number
-				doc.irn_generated = "Success"
-				doc.qr_code_generated = "Success"
-				doc.save(ignore_permissions=True, ignore_version=True)
-				frappe.db.commit()
-				# attach_qr = attach_b2c_qrcode({
-				# 	"invoice_number": invoice_number,
-				# 	"company": doc.company
-				# })
-				# if attach_qr["success"] == False:
-				# 	if os.path.exists(b2c_file):
-				# 		os.remove(b2c_file)
-				# 	if os.path.exists(dst_pdf_filename):
-				# 		os.remove(dst_pdf_filename)
-				# 	return {"success": False, "message": attach_qr["message"]}
-				# if os.path.exists(b2c_file):
-				# 	os.remove(b2c_file)
-				# if os.path.exists(dst_pdf_filename):
-				# 	os.remove(dst_pdf_filename)
-				return {
-					"success": True,
-					"message": "QR-Code generated successfully"
-				}
-		except Exception as e:
-			print(e, "send invoicedata to gcb")
-			return {"success": False, "message": str(e)}
+			if company.proxy == 0:
+				json_response = requests.post(
+					"https://gst.caratred.in/ezy/api/addJsonToGcb",
+					headers=headers,
+					json=b2c_data)
+				response = json_response.json()
+				if response["success"] == False:
+					return {
+						"success": False,
+						"message": response["message"]
+					}
+			else:
+				print(proxies, "     proxy console")
+				json_response = requests.post(
+					"https://gst.caratred.in/ezy/api/addJsonToGcb",
+					headers=headers,
+					json=b2c_data,
+					proxies=proxies,verify=False)
+				response = json_response.json()
+				if response["success"] == False:
+					return {
+						"success": False,
+						"message": response["message"]
+					}
+
+			
+			qr = qrcode.QRCode(
+				version=1,
+				error_correction=qrcode.constants.ERROR_CORRECT_L,
+				box_size=3,
+				border=4
+			)
+			qrurl = company.b2c_qr_url + response['data']
+			qr.add_data(qrurl)
+			qr.make(fit=True)
+			img = qr.make_image(fill_color="black", back_color="white")
+			img.save(dst_pdf_filename)
+		elif company.b2c_qr_type == "Virtual Payment":
+
+			if company.proxy == 0:
+				generate_qr = requests.post(
+					"https://upiqr.in/api/qr?format=png",
+					headers=headers,
+					json={
+						"vpa": company.merchant_virtual_payment_address,
+						"name": company.merchant_name,
+						"txnReference": invoice_number,
+						"amount": '%.2f' % doc.pms_invoice_summary
+					})
+			else:
+				proxyhost = company.proxy_url
+				proxyhost = proxyhost.replace("http://", "@")
+				proxies = {
+					'https':
+					'https://' + company.proxy_username + ":" +
+					company.proxy_password + proxyhost}
+				print(proxies, "     proxy console")
+				generate_qr = requests.post(
+					"https://upiqr.in/api/qr?format=png",
+					headers=headers,
+					json={
+						"vpa": company.merchant_virtual_payment_address,
+						"name": company.merchant_name,
+						"txnReference": invoice_number,
+						"amount": '%.2f' % doc.pms_invoice_summary
+					},
+					proxies=proxies,verify=False)
+			if generate_qr.status_code == 200:
+				with open(dst_pdf_filename, "wb") as f:
+					f.write(generate_qr.content)
+		else:
+			return {
+				"success":
+				False,
+				"message":
+				"Please select any in 'B2C QR Code Type' in Company Details"
+			}
+		files = {"file": open(dst_pdf_filename, 'rb')}
+		payload = {
+			"is_private": 1,
+			"folder": "Home",
+			"doctype": "Invoices",
+			"docname": invoice_number,
+			'fieldname': 'b2c_qrimage'
+		}
+		site = company.host
+		upload_qr_image = requests.post(site + "api/method/upload_file",
+										files=files,
+										data=payload)
+		response = upload_qr_image.json()
+		if 'message' in response:
+			doc.b2c_qrimage = response['message']['file_url']
+			doc.name = invoice_number
+			doc.irn_generated = "Success"
+			doc.qr_code_generated = "Success"
+			doc.save(ignore_permissions=True, ignore_version=True)
+			frappe.db.commit()
+			# attach_qr = attach_b2c_qrcode({
+			# 	"invoice_number": invoice_number,
+			# 	"company": doc.company
+			# })
+			# if attach_qr["success"] == False:
+			# 	if os.path.exists(b2c_file):
+			# 		os.remove(b2c_file)
+			# 	if os.path.exists(dst_pdf_filename):
+			# 		os.remove(dst_pdf_filename)
+			# 	return {"success": False, "message": attach_qr["message"]}
+			# if os.path.exists(b2c_file):
+			# 	os.remove(b2c_file)
+			# if os.path.exists(dst_pdf_filename):
+			# 	os.remove(dst_pdf_filename)
+			return {
+				"success": True,
+				"message": "QR-Code generated successfully"
+			}
+	except Exception as e:
+		print(e, "send invoicedata to gcb")
+		return {"success": False, "message": str(e)}
 
 
 def cancel_irn(irn_number, gsp, reason, company, invoice_number):
@@ -1114,7 +1114,7 @@ def insert_invoice(data):
 		"place_of_supply": company.state_code,
 		"sez": data["sez"] if "sez" in data else 0,
 		"allowance_invoice":allowance_invoice,
-		"invoice_object_from_file":str(data['invoice_object_from_file'])
+		"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 	})
 	if data['amened'] == 'Yes':
 		invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -1148,13 +1148,12 @@ def insert_invoice(data):
 		items, data['guest_data']['invoice_number'],"Invoice")
 	# b2cattach = Invoices()
 	if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
-		print("b2cccccccccccccccccc")
 		b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 		invoice = frappe.get_doc("Invoices",v.name)	
 		return {"success": True,"data":invoice}
 		# return {"success":True}
 	else:
-		if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and v.invoice_type=="B2B":
+		if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and v.invoice_type=="B2B" and v.invoice_from=='Pms':
 			if v.has_credit_items == "Yes" and company.disable_credit_note == 1:
 				pass
 			else:
@@ -2935,7 +2934,7 @@ def Error_Insert_invoice(data):
 				"place_of_supply":company.state_code,
 				"sez":sez,
 				"invoice_from":invoice_from,
-				"invoice_object_from_file":str(data['invoice_object_from_file'])
+				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			
@@ -2955,7 +2954,7 @@ def Error_Insert_invoice(data):
 		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 			data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
 		if invoiceExists.invoice_type == "B2B" and	invoiceExists.irn_generated == "Success":
-			return True 	
+			return {"success":True,"data":invoiceExists} 	
 		else:
 			invoiceExists.error_message = data['error_message']
 			# if invoiceExists.invoice_type == "B2B":
@@ -2976,7 +2975,7 @@ def Error_Insert_invoice(data):
 				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 					items, data['invoice_number'],"Invoice")
 					
-			return {"success":False,"message":"error"}
+			return {"success":False,"message":"error","data":invoiceExists}
 	except Exception as e:
 		print(e, "  Error insert Invoice")
 		return {"success": False, "message": str(e)}
