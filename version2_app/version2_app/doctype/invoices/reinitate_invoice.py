@@ -491,6 +491,7 @@ def reprocess_calulate_items(data):
 				total_items_data["unit_of_measurement_description"] = each_item["unit_of_measurement_description"]
 				total_items_data["unit_of_measurement"] = each_item["unit_of_measurement"]
 				total_items_data["sac_index"] = sac_code_based_gst_rates.sac_index
+				total_items_data["item_value_after_gst"] = each_item["item_value_after_gst"]
 				item_list.append(total_items_data)
 		for service_charge_items in total_items:
 			if service_charge_items["is_service_charge_item"] == "Yes":
@@ -776,6 +777,16 @@ def reprocess_calulate_items(data):
 			else:
 				# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
 				if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
+					if item["net"] == "Yes":
+						vatcessrate = item["state_cess"]+item["cess"]+item["vat"]
+						if "item_value_after_gst" in item:
+							base_value = round(item['item_value_after_gst'] * (100 / (vatcessrate + 100)),3)
+							final_item['item_value'] = base_value
+							final_item['item_value_after_gst'] = base_value
+							item["item_value"] = base_value
+					else:
+						final_item['item_value_after_gst'] = item['item_value']
+						final_item['item_value'] = item['item_value']
 					final_item['sort_order'] = item['sort_order']
 					if item['sac_code'].isdigit():
 						final_item['sac_code'] = item['sac_code']

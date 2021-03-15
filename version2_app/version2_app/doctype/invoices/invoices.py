@@ -1248,6 +1248,14 @@ def calulate_items(data):
 	try:
 		total_items = []
 		second_list = []
+		if any("split_value" in check for check in data["items"]):
+			non_split = list(sv for sv in data["items"] if "split_value" not in sv)
+			total_items.extend(non_split)
+			data["items"] = list(st for st in data["items"] if "split_value" in st)
+		if any("sacName" in checkname for checkname in data["items"]) and not any("split_value" in check for check in data["items"]):
+			olditems = list(st for st in data["items"] if "sacName" not in st)
+			total_items.extend(olditems)
+			data["items"] = list(scn for scn in data["items"] if "sacName" in scn)
 		if "guest_data" in list(data.keys()):
 			invoice_category = data['guest_data']['invoice_category']
 		else:
@@ -1676,7 +1684,7 @@ def calulate_items(data):
 					if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
 						if sac_code_based_gst_rates.net == "Yes":
 							vatcessrate = sac_code_based_gst_rates.state_cess_rate+sac_code_based_gst_rates.central_cess_rate+sac_code_based_gst_rates.vat_rate
-							if "item_value_after_gst" in item:
+							if "item_value_after_gst" in item and "split_value" not in item:
 								final_item['item_value'] = item["item_value"]
 								final_item['item_value_after_gst'] = item["item_value"]
 							else:
