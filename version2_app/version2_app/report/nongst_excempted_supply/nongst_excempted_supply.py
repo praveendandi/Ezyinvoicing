@@ -37,6 +37,7 @@ def execute(filters=None):
 
 	mergedDf = pd.merge(invoice_df, items_df)
 	del mergedDf['invoice_number']
+	print(mergedDf)
 	grouped_df = mergedDf.groupby(["type","invoice_type"],as_index=False).sum().round(2)
 	
 	grouped_df['Nature Of Supply'] = "Inter State"
