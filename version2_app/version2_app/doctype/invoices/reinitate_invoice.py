@@ -884,6 +884,7 @@ def reprocess_calulate_items(data):
 				'quantity': item["quantity"],
 				'unit_of_measurement_description': item["unit_of_measurement_description"],
 				"discount_value" : item["discount_value"]
+				# "net": item["net"]
 			})
 		total_items.extend(second_list)
 		final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
