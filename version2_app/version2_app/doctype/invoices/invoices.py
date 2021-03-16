@@ -1250,8 +1250,13 @@ def calulate_items(data):
 		second_list = []
 		if any("split_value" in check for check in data["items"]):
 			non_split = list(sv for sv in data["items"] if "split_value" not in sv)
-			total_items.extend(non_split)
 			data["items"] = list(st for st in data["items"] if "split_value" in st)
+			sort_ids = [ sub['sort_order'] for sub in data["items"]]
+			nonsplit = []
+			for nsplit in non_split:
+				if int(nsplit["sort_order"]) not in sort_ids:
+					nonsplit.append(nsplit)
+			total_items.extend(nonsplit)
 		if any("sacName" in checkname for checkname in data["items"]) and not any("split_value" in check for check in data["items"]):
 			olditems = list(st for st in data["items"] if "sacName" not in st)
 			total_items.extend(olditems)
