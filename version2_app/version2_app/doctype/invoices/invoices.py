@@ -656,7 +656,8 @@ def send_invoicedata_to_gcb(invoice_number):
 				# 	os.remove(dst_pdf_filename)
 				return {
 					"success": True,
-					"message": "QR-Code generated successfully"
+					"message": "QR-Code generated successfully",
+					"invoice": doc
 				}
 		except Exception as e:
 			print(e, "send invoicedata to gcb")
@@ -1146,7 +1147,10 @@ def insert_invoice(data):
 		# b2cattach = Invoices()
 		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
-			socket = invoiceCreated(invoice)
+			if b2cAttachQrcode["success"] == True:
+				socket = invoiceCreated(b2cAttachQrcode["invoice"])
+			else:
+				socket = invoiceCreated(invoice)
 			return {"success":True}
 		else:
 			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
@@ -1161,7 +1165,8 @@ def insert_invoice(data):
 		# 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
 		# 	Error_Insert_invoice(error_data)
 		# document_bin = update_document_bin(data['guest_data']['print_by'], data['guest_data']['invoice_type'],data['guest_data']['invoice_number'],data['guest_data']['invoice_file'])	
-		socket = invoiceCreated(invoice)
+		get_invoice = frappe.get_doc("Invoices",data['invoice_number'])
+		socket = invoiceCreated(get_invoice)
 		return {"success": True}
 	except Exception as e:
 		print(e, "insert invoice")
