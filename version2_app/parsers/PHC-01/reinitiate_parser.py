@@ -59,21 +59,31 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			if "Reservation #" in i:
-				confirmation_number = i.split(":")
-				conf_number = confirmation_number[-1].replace(" ", "")
+			if "Reservation #" in i or "Reservation No" in i:
+				if "Reservation #" in i:
+					confirmation_number = i.split(":")
+					conf_number = confirmation_number[-1].replace(" ", "")
+				elif "Reservation No" in i:
+					confirmation_number = i.split(":")
+					conf_number = confirmation_number[1].replace("Bill No", "").strip()
 			if "Net Amount" in i:
 				total_invoice = i.split(":")[-1]
 				total_invoice_amount = float(total_invoice.replace(",",""))
-			if "Bill Date" in i:
-				date_time_obj = i.split(':')[-1]
-				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
+			if "Bill Date" in i or "Bill Date & Time" in i:
+				date_time_obj = i.split(':')[-1].strip()
+				if "." in date_time_obj:
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y %H.%M').strftime('%d-%b-%y %H:%M:%S')
+				else:
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
 				room = i.split(" ")
 				roomNumber = room[-1]
-			if "GSTN Number" in i:
-				gstNumber = i.split(':')[-1].replace(' ', '')
-			if "Bill Number" in i:
+			if "GSTN Number" in i or "Guest GSTN #" in i:
+				if "Guest GSTN #" in i:
+					gstNumber = i.split(':')[1].replace('GSTN Bill #', '').strip()
+				else:
+					gstNumber = i.split(':')[-1].replace(' ', '')
+			if "Bill Number" in i or "Bill No" in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
 					invoiceNumber = invoiceNumber.replace("/","")
@@ -111,7 +121,8 @@ def reinitiateInvoice(data):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if len(check_date) > 0 and "Total:" not in i:
+			check_digit = " ".join(i.split())
+			if (len(check_date) > 0 and "Total:" not in i) or (check_digit[0].isdigit() and "~" in check_digit):
 				item = dict()
 				item_value = ""
 				dt = i.strip()
@@ -149,6 +160,7 @@ def reinitiateInvoice(data):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
 				guest['name'] = (guest["name"].replace("Bill Number","")).strip()
+				guest["name"] = guest["name"].replace("Bill Date & Time","").strip()
 			if index == 1:
 				guest['address1'] = ((i.split(':')[1]).replace("Bill Date","")).strip()
 			if index == 2:
