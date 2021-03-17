@@ -62,7 +62,7 @@ def reinitiateInvoice(data):
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-			if "Total" in i:
+			if "Total" in i and "INR" in i:
 				total_invoice = i.split(" ")
 				total_invoice = list(filter(None, total_invoice))
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
@@ -73,11 +73,12 @@ def reinitiateInvoice(data):
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "Cust GSTIN" in i:
+			if "GST ID" in i and "Property Gst ID" not in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("TAXINVOICE","")
+				gstNumber = gstNumber.replace("CREDITINVOICE","")
 			if "Bill  No." in i:
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace("-", "")
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
