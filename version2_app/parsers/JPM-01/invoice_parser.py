@@ -86,7 +86,7 @@ def file_parsing(filepath):
 				gstNumber = gstNumber.replace("Rate","")
 			if "Invoice No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-			if "Bill To" in i:
+			if "Bill To  " in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
 				guestDetailsEntered = False
@@ -349,3 +349,4 @@ def file_parsing(filepath):
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
 		print(traceback.print_exc())
+		return {"success":False,"message":str(e)}
