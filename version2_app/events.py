@@ -32,7 +32,7 @@ def invoice_deleted(doc,method=None):
 def invoiceCreated(doc):
     try:
         # frappe.publish_realtime("invoice_created", "message")
-        frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':{"name":doc.name, "irn_generated":doc.irn_generated,"invoice_type":doc.invoice_type,"invoice_from":doc.invoice_from,"guest_name":doc.guest_name,"invoice_file":doc.invoice_file,"print_by":doc.print_by,"creation":doc.creation,"invoice_category":doc.invoice_category,"invoice_type":doc.invoice_type,"qr_code_image":doc.qr_code_image,"b2c_qrimage":doc.b2c_qrimage,"irn_number":doc.irn_number,"ack_no":doc.ack_no,"ack_date":doc.ack_date}})
+        frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':doc.__dict__})
         soc_doc = frappe.new_doc("Socket Notification")
         soc_doc.invoice_number = doc.name
         soc_doc.guest_name = doc.guest_name
