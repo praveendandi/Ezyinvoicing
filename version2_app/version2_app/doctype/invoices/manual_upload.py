@@ -164,7 +164,7 @@ def manual_upload(data):
 			date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 			each['invoice_date'] = date_time_obj
 			each['mode'] = companyData.mode
-			each['invoice_file'] = " "
+			each['invoice_file'] = ""
 			each['gstNumber'] = each['gstNumber']
 			if each['gstNumber'] == "NoGst":
 				each['invoice_type'] = "B2C"
@@ -178,7 +178,7 @@ def manual_upload(data):
 			each['start_time'] = str(datetime.datetime.utcnow())
 			each['name'] = each['guest_name']
 			error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":each['invoice_number'],"company_code":data['company'],"invoice_date":each['invoice_date']}
-			error_data['invoice_file'] = " "
+			error_data['invoice_file'] = ""
 			error_data['guest_name'] = each['guest_name']
 			error_data['gst_number'] = ''
 			if each['invoice_type'] == "B2C":
@@ -206,6 +206,7 @@ def manual_upload(data):
 			if calulateItemsApiResponse['success'] == True:
 				if reupload==False:
 					insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":invoice_referrence_objects[each['invoice_number']]})
+					print(insertInvoiceApiResponse)
 					if insertInvoiceApiResponse['success']== True:
 						
 						if insertInvoiceApiResponse['data'].invoice_type == "B2B":

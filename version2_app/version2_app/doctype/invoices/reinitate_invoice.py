@@ -66,7 +66,10 @@ def Reinitiate_invoice(data):
 		irn_generated = "Pending"
 		if "legal_name" not in data['taxpayer']:
 			data['taxpayer']['legal_name'] = " "
+		if "gstNumber" not in data['guest_data']:
+			data['guest_data']['gstNumber'] = ""
 		#calculat items
+		print(data['items_data'])
 		if len(data['items_data'])>0:
 			for item in data['items_data']:
 				if item['taxable'] == 'No' and item['item_type'] != "Discount":
@@ -160,11 +163,11 @@ def Reinitiate_invoice(data):
 
 
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
-		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
-			data['guest_data']['invoice_category'] = "Debit Invoice"
-			invoice_category = "Debit Invoice"
-		else:
-			invoice_category = doc.invoice_category	
+		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+		# 	invoice_category = "Debit Invoice"
+		# else:
+			# invoice_category = doc.invoice_category	
 		invoice_from = doc.invoice_from
 		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
 		doc.total_inovice_amount = total_invoice_amount
@@ -172,6 +175,8 @@ def Reinitiate_invoice(data):
 		doc.guest_name=data['guest_data']['name']
 		doc.gst_number=data['guest_data']['gstNumber']
 		doc.invoice_file=data['guest_data']['invoice_file']
+		if data['invoice_object_from_file'] == " ":
+			data['invoice_object_from_file'] = doc.invoice_object_from_file
 		doc.room_number=data['guest_data']['room_number']
 		doc.invoice_type=data['guest_data']['invoice_type']
 		doc.invoice_date=datetime.datetime.strptime(data['guest_data']['invoice_date'],'%d-%b-%y %H:%M:%S')

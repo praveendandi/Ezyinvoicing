@@ -14,7 +14,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-
+#______
 
 folder_path = frappe.utils.get_bench_path()
 

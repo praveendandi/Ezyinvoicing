@@ -68,7 +68,12 @@
   "bulk_import_gst_count",
   "tax_invoice_to_manual",
   "disable_credit_note",
-  "bulk_excel_upload_type"
+  "bulk_excel_upload_type",
+  "new_parsers",
+  "parsers_branch_name",
+  "ui_git_branch",
+  "angular_project_production_path",
+  "backend_git_branch"
  ],
  "fields": [
   {
@@ -386,15 +391,15 @@
   },
   {
    "default": "0",
-   "fieldname": "enable_sc_from_folios",
-   "fieldtype": "Check",
-   "label": "Enable SC from Folios"
-  },
-  {
-   "default": "0",
    "fieldname": "allow_auto_irn",
    "fieldtype": "Check",
    "label": "Allow Auto Irn"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_sc_from_folios",
+   "fieldtype": "Check",
+   "label": "Enable SC from Folios"
   },
   {
    "default": "0",
@@ -424,11 +429,37 @@
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
    "options": "None\nMarriot\nOpera"
+  },
+  {
+   "default": "0",
+   "fieldname": "new_parsers",
+   "fieldtype": "Check",
+   "label": "New Parsers"
+  },
+  {
+   "fieldname": "parsers_branch_name",
+   "fieldtype": "Data",
+   "label": "Parsers Branch Name"
+  },
+  {
+   "fieldname": "ui_git_branch",
+   "fieldtype": "Data",
+   "label": "Ui Git Branch"
+  },
+  {
+   "fieldname": "angular_project_production_path",
+   "fieldtype": "Data",
+   "label": "Angular Project Production Path"
+  },
+  {
+   "fieldname": "backend_git_branch",
+   "fieldtype": "Data",
+   "label": "Backend Git Branch"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-18 14:28:35.485640",
+ "modified": "2021-03-18 16:39:44.419824",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
