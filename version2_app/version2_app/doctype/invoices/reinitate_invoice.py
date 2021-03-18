@@ -3,6 +3,7 @@ import frappe
 from frappe.model.document import Document
 import requests
 import datetime
+import json
 import random
 import traceback
 import string
@@ -12,7 +13,6 @@ from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMism
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
 import math
 
 
@@ -35,6 +35,8 @@ def Reinitiate_invoice(data):
 		# 	place_of_supply = data['place_of_supply']
 		# else:
 		# 	place_of_supply = company.state_code
+		if "invoice_object_from_file" not in data:
+			data['invoice_object_from_file'] = " "	
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
@@ -144,12 +146,12 @@ def Reinitiate_invoice(data):
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		if '-' in str(sales_amount_after_tax):
-			print(".////////////")
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"
 		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
 		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+		# 	invoice_category = "Debit Invoice"
 
 		if "gstNumber" not in data['guest_data']:
 			data['guest_data']['gstNumber'] = ""
@@ -158,6 +160,11 @@ def Reinitiate_invoice(data):
 
 
 		doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			data['guest_data']['invoice_category'] = "Debit Invoice"
+			invoice_category = "Debit Invoice"
+		else:
+			invoice_category = doc.invoice_category	
 		invoice_from = doc.invoice_from
 		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
 		doc.total_inovice_amount = total_invoice_amount
@@ -246,7 +253,8 @@ def Reinitiate_invoice(data):
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		# doc.place_of_supply = place_of_supply
-		doc.invoice_round_off_amount = invoice_round_off_amount		
+		doc.invoice_round_off_amount = invoice_round_off_amount	
+		doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])	
 		doc.save()
 		
 
@@ -259,9 +267,10 @@ def Reinitiate_invoice(data):
 		taxSummariesInsert = TaxSummariesInsert(items, data['guest_data']['invoice_number'])
 		# insert sac code based taxes
 		hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['guest_data']['invoice_number'],"Invoice")
-		if data['guest_data']['invoice_type'] == "B2C" and generateb2cQr == True:
-			send_invoicedata_to_gcb(data['guest_data']['invoice_number'])
 		invoice_data = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+		if data['guest_data']['invoice_type'] == "B2C" and generateb2cQr == True:
+			send_invoicedata_to_gcb(invoice_data.name)
+		
 
 		if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
@@ -270,7 +279,8 @@ def Reinitiate_invoice(data):
 				else:
 					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
 					irn_generate = generateIrn(data)	
-		return {"success":True}
+		returnData = frappe.get_doc('Invoices',invoice_data.name)			
+		return {"success":True,"data":returnData}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
 		return {"success":False,"message":str(e)}

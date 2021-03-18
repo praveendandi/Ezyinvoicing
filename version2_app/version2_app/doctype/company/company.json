@@ -59,13 +59,16 @@
   "service_charge_percentage",
   "b2c_to_b2b",
   "number_in_description",
-  "sc_sac_code",
+  "allow_auto_irn",
   "sc_name",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
-  "allow_auto_irn",
-  "disable_credit_note"
+  "bulk_import_invoice_headers",
+  "bulk_import_gst_count",
+  "tax_invoice_to_manual",
+  "disable_credit_note",
+  "bulk_excel_upload_type"
  ],
  "fields": [
   {
@@ -367,23 +370,18 @@
    "label": "Number In Description"
   },
   {
-   "fieldname": "sc_sac_code",
-   "fieldtype": "Data",
-   "label": "SC SAC Code"
-  },
-  {
    "fieldname": "sc_name",
    "fieldtype": "Data",
    "label": "SC Name"
   },
   {
    "fieldname": "sc_gst_percentage",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "SC GST Percentage"
   },
   {
    "fieldname": "adjustment_service_charge_list",
-   "fieldtype": "Long Text",
+   "fieldtype": "Data",
    "label": "Adjustment Service Charge List"
   },
   {
@@ -403,11 +401,34 @@
    "fieldname": "disable_credit_note",
    "fieldtype": "Check",
    "label": "Disable Credit Note"
+  },
+  {
+   "fieldname": "bulk_import_invoice_headers",
+   "fieldtype": "Long Text",
+   "label": "Bulk Import Invoice Headers"
+  },
+  {
+   "fieldname": "bulk_import_gst_count",
+   "fieldtype": "Int",
+   "label": "Bulk Import Gst Count"
+  },
+  {
+   "default": "0",
+   "fieldname": "tax_invoice_to_manual",
+   "fieldtype": "Check",
+   "label": "Tax Invoice to Manual TaxInvoice"
+  },
+  {
+   "default": "None",
+   "fieldname": "bulk_excel_upload_type",
+   "fieldtype": "Select",
+   "label": "Bulk Excel Upload Type",
+   "options": "None\nMarriot\nOpera"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-10 12:54:35.820210",
+ "modified": "2021-03-18 14:28:35.485640",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
