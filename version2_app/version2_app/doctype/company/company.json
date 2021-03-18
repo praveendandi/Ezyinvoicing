@@ -67,7 +67,8 @@
   "bulk_import_invoice_headers",
   "bulk_import_gst_count",
   "tax_invoice_to_manual",
-  "disable_credit_note"
+  "disable_credit_note",
+  "bulk_excel_upload_type"
  ],
  "fields": [
   {
@@ -416,11 +417,17 @@
    "fieldname": "tax_invoice_to_manual",
    "fieldtype": "Check",
    "label": "Tax Invoice to Manual TaxInvoice"
+  },
+  {
+   "fieldname": "bulk_excel_upload_type",
+   "fieldtype": "Select",
+   "label": "Bulk Excel Upload Type",
+   "options": "None\nMarriot\nOpera"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-12 15:17:09.418091",
+ "modified": "2021-03-18 10:40:03.684944",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

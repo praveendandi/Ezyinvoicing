@@ -1741,7 +1741,7 @@ def calulate_items(data):
 						final_item['type'] = "Non-Gst"
 						# final_item['item_mode'] = "Debit"
 						if "-" in str(item['item_value']):
-							final_item['item_mode'] = "Credit"
+							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
 				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
