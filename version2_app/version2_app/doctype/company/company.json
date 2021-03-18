@@ -419,6 +419,7 @@
    "label": "Tax Invoice to Manual TaxInvoice"
   },
   {
+   "default": "None",
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
@@ -427,7 +428,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-18 10:40:03.684944",
+ "modified": "2021-03-18 14:28:35.485640",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
