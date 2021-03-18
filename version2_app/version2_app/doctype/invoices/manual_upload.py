@@ -277,7 +277,8 @@ def manual_upload(data):
 		df = pd.DataFrame(output_date)
 		df = df.groupby('date').count().reset_index()
 		output_data = df.to_dict('records')
-		InsertExcelUploadStats({"data":output_data,"uploaded_by":data['UserName'],"start_time":str(start_time),"referrence_file":data['invoice_file'],"gst_file":data['gst_file']})
+		# data['UserName'] = "Ganesh"
+		InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file'],"gst_file":data['gst_file']})
 
 		return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
 

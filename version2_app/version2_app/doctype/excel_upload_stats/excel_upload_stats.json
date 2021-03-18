@@ -15,7 +15,8 @@
   "process_time",
   "uploaded_by",
   "referrence_file",
-  "gst_file"
+  "gst_file",
+  "invoice_details"
  ],
  "fields": [
   {
@@ -72,11 +73,16 @@
    "fieldname": "gst_file",
    "fieldtype": "Data",
    "label": "Gst File"
+  },
+  {
+   "fieldname": "invoice_details",
+   "fieldtype": "Long Text",
+   "label": "Invoice Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-15 12:51:28.518466",
+ "modified": "2021-03-18 09:22:48.614087",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Excel upload Stats",
