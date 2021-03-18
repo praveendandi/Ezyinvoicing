@@ -247,10 +247,10 @@ def qr_generatedtoirn_generated():
 def errorInvoicesList():
     try:
         doc = frappe.db.get_list('company',fields=['name'])
-        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
-        spec = importlib.util.spec_from_file_location(module_name, file_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        # file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        # spec = importlib.util.spec_from_file_location(module_name, file_path)
+        # module = importlib.util.module_from_spec(spec)
+        # spec.loader.exec_module(module)
         data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","guest_name","irn_generated"])
         if len(data)>0:
             return {"success":True,"data":data}
