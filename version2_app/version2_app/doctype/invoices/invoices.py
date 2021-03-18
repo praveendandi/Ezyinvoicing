@@ -3018,8 +3018,9 @@ def Error_Insert_invoice(data):
 		invoiceExists.error_message = data['error_message']
 		# if invoiceExists.invoice_type == "B2B":
 		invoiceExists.ready_to_generate_irn = "No"
-		if len(invoiceExists.gst_number)<15:
-			invoiceExists.gst_number = ""
+		if invoiceExists.gst_number:
+			if len(invoiceExists.gst_number)<15:
+				invoiceExists.gst_number = ""
 		invoiceExists.irn_generated = "Error"
 		invoiceExists.total_invoice_amount = data['total_invoice_amount']
 		# invoiceExists.qr_generated = "Pending"
