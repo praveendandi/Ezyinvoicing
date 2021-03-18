@@ -83,7 +83,7 @@ def reinitiateInvoice(data):
 					gstNumber = i.split(':')[1].replace('GSTN Bill #', '').strip()
 				else:
 					gstNumber = i.split(':')[-1].replace(' ', '')
-			if "Bill Number" in i or "Bill No" in i:
+			if ("Bill Number" in i or "GSTN Bill #" in i) and "GSTN Bill No" not in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
 					invoiceNumber = invoiceNumber.replace("/","")
