@@ -73,7 +73,7 @@ def createError(title,error):
 
 @frappe.whitelist(allow_guest=True)
 def getPrinters():
-    raw_printers = os.popen("lpstat -p -d")
+    raw_printers = os.popen("lpstat -p -d")    
     print(raw_printers.__dict__)
     printers = []
     for index,i in enumerate(raw_printers):
@@ -263,4 +263,13 @@ def manulaTax_credit_to_debit():
         return True
     except Exception as e:
         return{"success":False,"message":str(e)}
+
+
+
+@frappe.whitelist(allow_guest=True)
+def diskspace():
+    b = os.popen(" df -h /dev/sda1")
+    print(b)
+    # print(b.encoding)
+    return b
 

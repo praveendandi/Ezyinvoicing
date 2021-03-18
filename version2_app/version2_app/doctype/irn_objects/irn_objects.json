@@ -7,7 +7,14 @@
  "field_order": [
   "invoice_number",
   "irn_request_object",
-  "irn_response_object"
+  "irn_response_object",
+  "invoice_category",
+  "allowance_irn_request_object",
+  "allowance_irn_response_object",
+  "irn_status",
+  "error_message",
+  "allowance_irn_status",
+  "allowance_error_message"
  ],
  "fields": [
   {
@@ -24,11 +31,49 @@
    "fieldname": "irn_response_object",
    "fieldtype": "Long Text",
    "label": "Irn Response Object"
+  },
+  {
+   "fieldname": "allowance_irn_request_object",
+   "fieldtype": "Long Text",
+   "label": "Allowance Irn Request Object"
+  },
+  {
+   "fieldname": "allowance_irn_response_object",
+   "fieldtype": "Long Text",
+   "label": "Allowance Irn Response Object"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Long Text",
+   "label": "Error Message"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "label": "Invoice  Category",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+  },
+  {
+   "fieldname": "irn_status",
+   "fieldtype": "Select",
+   "label": "Irn Status",
+   "options": "Success\nFailed"
+  },
+  {
+   "fieldname": "allowance_irn_status",
+   "fieldtype": "Select",
+   "label": "Allowance Irn Status",
+   "options": "Success\nFailed"
+  },
+  {
+   "fieldname": "allowance_error_message",
+   "fieldtype": "Long Text",
+   "label": "Allowance Error Message"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-20 16:11:54.710531",
+ "modified": "2021-03-10 17:13:31.032101",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "IRN Objects",
