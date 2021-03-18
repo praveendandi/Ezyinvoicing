@@ -167,7 +167,7 @@ def Reinitiate_invoice(data):
 		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
 		# 	invoice_category = "Debit Invoice"
 		# else:
-			# invoice_category = doc.invoice_category	
+		# 	invoice_category = doc.invoice_category	
 		invoice_from = doc.invoice_from
 		converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
 		doc.total_inovice_amount = total_invoice_amount
