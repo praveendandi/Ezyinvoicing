@@ -79,6 +79,9 @@ def reinitiateInvoice(data):
 				# gstNumber = gstNumber.replace("ConfirmationNo.","")
 				# gstNumber = gstNumber.replace("Membership","").strip(".")
 				gstNumber = gstNumber.replace("TAXINVOICE"," ")
+				gstNumber = gstNumber.replace("CREDITTAXINVOICE"," ")
+				gstNumber = gstNumber.replace("CREDITINVOICE"," ")
+				gstNumber = gstNumber.replace("CREDIT","")
 				gstNumber = gstNumber.strip()
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
@@ -229,10 +232,11 @@ def reinitiateInvoice(data):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
-			errorInvoice = Error_Insert_invoice(error_data)
-			print("Error:  *******The given gst number is not a vaild one**********")
-			return {"success":False,"message":"Invalid GstNumber"}
+			if errorcalulateItemsApiResponse['success']==True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
+				errorInvoice = Error_Insert_invoice(error_data)
+				print("Error:  *******The given gst number is not a vaild one**********")
+				return {"success":False,"message":"Invalid GstNumber"}
 
 		print(json.dumps(guest, indent = 1))
 		gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
