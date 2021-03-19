@@ -135,7 +135,7 @@ def file_parsing(filepath):
 							if (len(check_date)>0):
 								item['date'] = j
 							else:
-								item["date"] = datetime.datetime.strptime(date_time_obj, '%d-%b-%y %H:%M:%S').strftime('%d/%m/%y')
+								item["date"] = datetime.datetime.strptime(date_time_obj, '%d-%b-%y %H:%M:%S').strftime('%d/%m/%Y')
 						if "~" in i:
 							result = re.search("~(.*)~", i)
 							item['name'] = (result.group(1)).strip()
