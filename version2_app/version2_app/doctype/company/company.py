@@ -264,7 +264,7 @@ def reprocess_error_inoices():
         if doc[0]["new_parsers"] == 0:
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         else:
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -291,7 +291,7 @@ def reprocess_pending_inoices():
         if doc[0]["new_parsers"] == 0:
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         else:
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -471,8 +471,8 @@ def update_parsers():
         if company.parsers_branch_name:
             command = "git pull origin "+company.parsers_branch_name
             abs_path = os.path.dirname(os.getcwd())
-            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'
-            check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoices'
+            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'
+            check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoice'
             if not os.path.exists(check_folder):
                 os.mkdir(check_folder)
                 clone_command = "git clone https://prasanthvajja:foQJihWZhufdixW43yCs@gitlab.caratred.com/prasanthvajja/invoice_parsers.git"
