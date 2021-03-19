@@ -996,6 +996,9 @@ def insert_invoice(data):
 							TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
 							hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 								items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+							invoiceData = frappe.get_doc('Invoices',TotalMismatchErrorAPI['invoice_number'])	
+							if invoiceData.invoice_from=="Pms":
+								socket = invoiceCreated(invoiceData)	
 							return {"success": True,"data":TotalMismatchErrorAPI['data']}
 
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
@@ -1156,11 +1159,9 @@ def insert_invoice(data):
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 			if b2cAttachQrcode["success"] == True:
 				if invoice.invoice_from=="Pms":
-					print("/////////////11111")
 					socket = invoiceCreated(b2cAttachQrcode["invoice"])
 			else:
 				if invoice.invoice_from=="Pms":
-					print("/////////////22222")
 					socket = invoiceCreated(invoice)
 			
 			return {"success": True,"data":invoice}
@@ -1179,7 +1180,6 @@ def insert_invoice(data):
 		# document_bin = update_document_bin(data['guest_data']['print_by'], data['guest_data']['invoice_type'],data['guest_data']['invoice_number'],data['guest_data']['invoice_file'])	
 		get_invoice = frappe.get_doc("Invoices",data['invoice_number'])
 		if get_invoice.invoice_from=="Pms":
-			print("/////////////3333333")
 			socket = invoiceCreated(get_invoice)
 		return {"success": True,"data":get_invoice}
 	except Exception as e:
@@ -2921,7 +2921,6 @@ def Error_Insert_invoice(data):
 					if frappe.db.exists('Invoices', data['invoice_number']):
 						invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
 						if invoice_bin.invoice_from!="Pms":
-							print("/////////////444444")
 							socket = invoiceCreated(invoice_bin)
 						return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
 		
@@ -3009,7 +3008,6 @@ def Error_Insert_invoice(data):
 					
 				# return {"success": True}
 			if v.invoice_from=="Pms": 	
-				print("/////////////555555")
 				socket = invoiceCreated(invoice)
 			return {"success":False,"message":"Error","data":v} 
 		
