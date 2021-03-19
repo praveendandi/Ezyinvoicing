@@ -5,11 +5,16 @@ from frappe.utils import get_site_name
 import time
 import os
 import datetime
+import json
 
 
 
 def TotalMismatchError(data,calculated_data):
 	try:
+		if "invoice_from" in data['guest_data']:
+			invoice_from = data['guest_data']['invoice_from']
+		else:
+			invoice_from = "Pms"	
 		invType = data['guest_data']['invoice_type']
 		irn_generated = "Error"   
 		companyDetails = frappe.get_doc("company",data['company_code'])
@@ -26,7 +31,7 @@ def TotalMismatchError(data,calculated_data):
 				data['guest_data']['name'],
 				'invoice_round_off_amount': data['invoice_round_off_amount'],
 				'ready_to_generate_irn':"No",
-				'invoice_from':"Pms",
+				'invoice_from':invoice_from,
 				'gst_number':
 				data['guest_data']['gstNumber'],
 				'invoice_file':
@@ -120,7 +125,8 @@ def TotalMismatchError(data,calculated_data):
 				'error_message':" Invoice Total Mismatch",
 				"place_of_supply":companyDetails.state_code,
 				"sez":data["sez"] if "sez" in data else 0,
-				"allowance_invoice":allowance_invoice
+				"allowance_invoice":allowance_invoice,
+				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 			})
 		if data['amened'] == 'Yes':
 			invCount = frappe.db.get_list(
@@ -133,6 +139,7 @@ def TotalMismatchError(data,calculated_data):
 			invoice.invoice_number = "Amened" + data['guest_data'][
 				'invoice_number']
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
+		invName = v.name
 		if data['amened'] == 'Yes':
 			getInvoiceNUmber = frappe.db.get_value('Invoices', {
 				'invoice_number':
@@ -141,13 +148,15 @@ def TotalMismatchError(data,calculated_data):
 			# print(getInvoiceNUmber)
 			updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
 			# print(updateInvoi)
+			invName = updateInvoi.name
+
 			updateInvoi.invoice_number = getInvoiceNUmber
 			updateInvoi.save()
 
 			data['invoice_number'] = getInvoiceNUmber
 			data['guest_data']['invoice_number'] = getInvoiceNUmber
-
-		return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data']}
+		updateInvoi = frappe.get_doc('Invoices', invName)
+		return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data'],"data":updateInvoi}
 	except Exception as e:
 		return {"success":False,"message":str(e)}    
 		
@@ -424,3 +433,26 @@ def error_invoice_calculation(data,data1):
 	doc.invoice_round_off_amount = roundoff_amount
 	doc.save(ignore_permissions=True, ignore_version=True)
 	return True
+
+
+
+def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
+	try:
+		document_printed = "No"
+		if len(invoiceNumber)>0:
+			inv = frappe.get_doc("Invoices",invoiceNumber)
+			if inv:
+				error_log = ""
+				document_printed = "Yes"
+			else:
+				document_printed = "No"	
+		bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filepath})
+		bin_doc = frappe.get_doc("Document Bin",bin_name)
+		bin_doc.print_by = print_by
+		bin_doc.document_type = invoice_type
+		bin_doc.invoice_number = invoiceNumber
+		bin_doc.error_log = error_log
+		bin_doc.document_printed = document_printed
+		bin_doc.save(ignore_permissions=True,ignore_version=True)
+	except Exception as e:
+		return {"success":False,"message":str(e)}

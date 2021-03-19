@@ -60,21 +60,31 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			if "Reservation #" in i:
-				confirmation_number = i.split(":")
-				conf_number = confirmation_number[-1].replace(" ", "")
+			if "Reservation #" in i or "Reservation No" in i:
+				if "Reservation #" in i:
+					confirmation_number = i.split(":")
+					conf_number = confirmation_number[-1].replace(" ", "")
+				elif "Reservation No" in i:
+					confirmation_number = i.split(":")
+					conf_number = confirmation_number[1].replace("Bill No", "").strip()
 			if "Net Amount" in i:
 				total_invoice = i.split(":")[-1]
 				total_invoice_amount = float(total_invoice.replace(",",""))
-			if "Bill Date" in i:
-				date_time_obj = i.split(':')[-1]
-				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
+			if "Bill Date" in i or "Bill Date & Time" in i:
+				date_time_obj = i.split(':')[-1].strip()
+				if "." in date_time_obj:
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y %H.%M').strftime('%d-%b-%y %H:%M:%S')
+				else:
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
 				room = i.split(" ")
 				roomNumber = room[-1]
-			if "GSTN Number" in i:
-				gstNumber = i.split(':')[-1].replace(' ', '')
-			if "Bill Number" in i:
+			if "GSTN Number" in i or "Guest GSTN #" in i:
+				if "Guest GSTN #" in i:
+					gstNumber = i.split(':')[1].replace('GSTN Bill #', '').strip()
+				else:
+					gstNumber = i.split(':')[-1].replace(' ', '')
+			if ("Bill Number" in i or "GSTN Bill #" in i) and "GSTN Bill No" not in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 				if "/" in invoiceNumber:
 					invoiceNumber = invoiceNumber.replace("/","")
@@ -109,7 +119,8 @@ def file_parsing(filepath):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if len(check_date) > 0 and "Total:" not in i:
+			check_digit = " ".join(i.split())
+			if (len(check_date) > 0 and "Total:" not in i) or (check_digit[0].isdigit() and "~" in check_digit):
 				item = dict()
 				item_value = ""
 				dt = i.strip()
@@ -117,7 +128,10 @@ def file_parsing(filepath):
 					val = dt.split(" ")
 					if len(val)>1:
 						if index == 0:
-							item['date'] = j
+							if (len(check_date)>0):
+								item['date'] = j
+							else:
+								item["date"] = datetime.datetime.strptime(date_time_obj, '%d-%b-%y %H:%M:%S').strftime('%d/%m/%y')
 						if "~" in i:
 							result = re.search("~(.*)~", i)
 							item['name'] = (result.group(1)).strip()
@@ -146,6 +160,7 @@ def file_parsing(filepath):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
 				guest['name'] = (guest["name"].replace("Bill Number","")).strip()
+				guest["name"] = guest["name"].replace("Bill Date & Time","").strip()
 			if index == 1:
 				guest['address1'] = ((i.split(':')[1]).replace("Bill Date","")).strip()
 			if index == 2:
@@ -159,7 +174,7 @@ def file_parsing(filepath):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
+		guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
 		guest['company_code'] = "PHC-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)

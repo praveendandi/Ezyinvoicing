@@ -61,6 +61,10 @@ def file_parsing(filepath):
 		for i in raw_data:
 			if "CREDIT TAX INVOICE" in i:
 				invoice_category = "Credit Invoice"
+			if "CREDIT TAX" in i:
+				invoice_category = "Credit Invoice"
+			if "CREDIT INVOICE" in i:
+				invoice_category = "Credit Invoice"	
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")

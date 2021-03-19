@@ -60,3 +60,25 @@ def emailTemplate():
   
 
 
+@frappe.whitelist(allow_guest=True)
+def send_email():
+    """send email with payment link"""
+    try:
+        # send_mail = frappe.sendmail(recipients=["ganesh@caratred.com"], subject="Invoice Reg.",
+        #     message="sample", attachments=[frappe.attach_print(doctype="File",name="ab5aba0184")])
+        # print(send_mail,"//////////")
+        pdffilename = frappe.get_doc("File","ab5aba0184")
+        
+        frappe.sendmail(
+            recipients = "ganesh@caratred.com",
+            cc = '',
+            subject = 'Sample',
+            content = 'Message',
+            reference_doctype = 'File',
+            reference_name = 'ab5aba0184',
+            attachments=[frappe.attach_print(doctype="File",name="ab5aba0184",file_name=pdffilename.file_name,print_letterhead=True)],
+            now = True
+        )
+    except Exception as e:
+        print(str(e))
+        return{"success":False,"message":str(e)}

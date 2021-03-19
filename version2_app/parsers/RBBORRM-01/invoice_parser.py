@@ -14,6 +14,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
+from version2_app.version2_app.doctype.invoices.invoice_helpers import update_document_bin
 
 
 folder_path = frappe.utils.get_bench_path()
@@ -24,6 +25,9 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
+	invoiceNumber = ''
+	print_by = ''
+	invoice_type_data = ""
 	try:
 		company = "RBBORRM-01"
 		start_time = datetime.datetime.utcnow()
@@ -235,10 +239,11 @@ def file_parsing(filepath):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
-			errorInvoice = Error_Insert_invoice(error_data)
-			print("Error:  *******The given gst number is not a vaild one**********")
-			return {"success":False,"message":"Invalid GstNumber"}
+			if errorcalulateItemsApiResponse['success']==True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
+				errorInvoice = Error_Insert_invoice(error_data)
+				print("Error:  *******The given gst number is not a vaild one**********")
+				return {"success":False,"message":"Invalid GstNumber"}
 
 
 		
@@ -350,4 +355,5 @@ def file_parsing(filepath):
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
 		print(e)
-		print(traceback.print_exc())		
+		print(traceback.print_exc())
+		update_document_bin(print_by,invoice_type_data,invoiceNumber,str(e),filepath)	
