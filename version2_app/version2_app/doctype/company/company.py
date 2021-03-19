@@ -550,7 +550,8 @@ def updateUiProd(company):
     try:
         print("==========")
         company = frappe.get_doc('company',company)
-        commands = ['git pull origin'+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        
         console_dump = ''
         
         cwd = company.angular_project_production_path
