@@ -79,7 +79,7 @@ def manual_upload(data):
 	invoice_referrence_objects = {}
 	
 	for each in output:
-		del each['BILL_GENERATION_DATE']
+		del each['BILL_GENERATION_DATE_CHAR']
 		del each['TRX_DATE']
 		if each['FOLIO_TYPE'] == "SUMFT_DEBITPERREPORT" or each['TRANSACTION_DESCRIPTION']== 'empty':
 			break
@@ -96,16 +96,22 @@ def manual_upload(data):
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		
 		if each['TRANSACTION_DESCRIPTION'] not in payment_Types:
-			
+			each['BILL_GENERATION_DATE'] = str(each['BILL_GENERATION_DATE'])
+			# if len(each['BILL_GENERATION_DATE'])>8:
+			# 	each['BILL_GENERATION_DATE'] = each['BILL_GENERATION_DATE'].replace('00:00:00',"")
+			# 	print(len(each['BILL_GENERATION_DATE']),"///////")
+			# 	print(each['BILL_GENERATION_DATE'])
+			# 	each['BILL_GENERATION_DATE'] = each['BILL_GENERATION_DATE'][:5]+each['BILL_GENERATION_DATE'][7:9]
+				# print(each['invoice_date'],"/aaaaaaaa")
 			if 'invoice_number' not in list_data:
 				list_data['invoice_category'] = each['FOLIO_TYPE']
 				list_data['invoice_number'] = each['BILL_NO']
-				list_data['invoice_date'] = each['BILL_GENERATION_DATE_CHAR']
+				list_data['invoice_date'] = each['BILL_GENERATION_DATE']
 				list_data['room_number'] = each['ROOM']
 				list_data['guest_name'] = each['DISPLAY_NAME']
 				list_data['total_invoice_amount'] = each['SUMFT_DEBITPERBILL_NO']
 				list_data['gstNumber'] = each['Gst Number']
-				item_list = {'date':each['BILL_GENERATION_DATE_CHAR'],'item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'}
+				item_list = {'date':each['BILL_GENERATION_DATE'],'item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'}
 				items = []
 				items.append(item_list)
 				list_data['items'] = items
@@ -116,19 +122,19 @@ def manual_upload(data):
 				list_data['guest_data'] = {'invoice_category':list_data['invoice_category']}
 			else:
 				if list_data['invoice_number'] == each['BILL_NO']:
-					items = {'date':each['BILL_GENERATION_DATE_CHAR'],"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
+					items = {'date':each['BILL_GENERATION_DATE'],"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
 					list_data['items'].extend([items])
 				else:
 					input_data.append(list_data)
 					list_data = {}
 					list_data['invoice_category'] = each['FOLIO_TYPE']
 					list_data['invoice_number'] = each['BILL_NO']
-					list_data['invoice_date'] = each['BILL_GENERATION_DATE_CHAR']
+					list_data['invoice_date'] = each['BILL_GENERATION_DATE']
 					list_data['room_number'] = each['ROOM']
 					list_data['guest_name'] = each['DISPLAY_NAME']
 					list_data['gstNumber'] = each['Gst Number']
 					list_data['total_invoice_amount'] = each['SUMFT_DEBITPERBILL_NO']
-					item_list = {'date':each['BILL_GENERATION_DATE_CHAR'],"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
+					item_list = {'date':each['BILL_GENERATION_DATE'],"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
 					items = []
 					items.append(item_list)
 					list_data['items'] = items
@@ -161,9 +167,17 @@ def manual_upload(data):
 		each['invoice_from'] = "File"
 		each['company_code'] = data['company']
 		# each['invoice_date'] = 
+		each['invoice_date'] = str(each['invoice_date'])
+		# if len(each['invoice_date'])>8:
+		# 	print(each['invoice_date'])
+		# 	each['invoice_date'] = each['invoice_date'][:5]+each['invoice_date'][7:9]
+		print(each['invoice_date'],"/aaaaaaaa")
 		each['invoice_date'] = each['invoice_date'].replace("/","-")
-		date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
-		date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
+		each['invoice_date'] = each['invoice_date'].replace("00:00:00 ","")
+		# print(each['invoice_date'],"/aaaaaaaa")
+		# date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
+		dateinv  = each['invoice_date'][8:10]+'-'+each['invoice_date'][5:7]
+		date_time_obj = datetime.datetime.strptime(each['invoice_date'][:10],'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
 		each['invoice_date'] = date_time_obj
 		each['mode'] = companyData.mode
 		each['invoice_file'] = ""
