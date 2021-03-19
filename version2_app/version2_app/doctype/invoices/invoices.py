@@ -1162,7 +1162,6 @@ def insert_invoice(data):
 					socket = invoiceCreated(b2cAttachQrcode["invoice"])
 			else:
 				if invoice.invoice_from=="Pms":
-					print("/////////////22222")
 					socket = invoiceCreated(invoice)
 			
 			return {"success": True,"data":invoice}
@@ -1181,7 +1180,6 @@ def insert_invoice(data):
 		# document_bin = update_document_bin(data['guest_data']['print_by'], data['guest_data']['invoice_type'],data['guest_data']['invoice_number'],data['guest_data']['invoice_file'])	
 		get_invoice = frappe.get_doc("Invoices",data['invoice_number'])
 		if get_invoice.invoice_from=="Pms":
-			print("/////////////3333333")
 			socket = invoiceCreated(get_invoice)
 		return {"success": True,"data":get_invoice}
 	except Exception as e:
@@ -2922,8 +2920,7 @@ def Error_Insert_invoice(data):
 				# return {"success": True}	
 					if frappe.db.exists('Invoices', data['invoice_number']):
 						invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
-						if invoice_bin.invoice_from!="Pms":
-							print("/////////////444444")
+						if invoice_bin.invoice_from=="Pms":
 							socket = invoiceCreated(invoice_bin)
 						return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
 		
@@ -3010,9 +3007,10 @@ def Error_Insert_invoice(data):
 					items, data['invoice_number'],"Invoice")
 					
 				# return {"success": True}
-			if v.invoice_from=="Pms": 	
-				print("/////////////555555")
+			if v.invoice_from=="Pms": 
+				print("///////")	
 				socket = invoiceCreated(invoice)
+			print("/a/a/a/a/a/")	
 			return {"success":False,"message":"Error","data":v} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
