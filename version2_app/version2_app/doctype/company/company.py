@@ -22,6 +22,7 @@ import frappe
 import os, importlib.util
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
+
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
 
@@ -358,11 +359,12 @@ def console_command(key=None,
                     caller='bench_update_pull',
                     app_name=None,
                     branch_name=None):
+    company = frappe.get_last_doc("company")                
     commands = {
         "bench_update": ["bench update"],
         "switch_branch": [""],
         "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
-        "bench_update_pull": ["bench update --pull", "bench migrate"]
+        "bench_update_pull": ["git pull origin "+company.backend_git_branch, "bench migrate"]
     }
     run_command(commands=commands[caller],
                 doctype='Bench Settings',
@@ -492,6 +494,7 @@ def diskspace():
     # print(b.encoding)
     return b
 
+@frappe.whitelist(allow_guest=True)
 def bench_migrate():
     try:
         terminal = Popen(shlex.split("bench migrate"),
@@ -548,7 +551,8 @@ def updateUiProd(company):
     try:
         print("==========")
         company = frappe.get_doc('company',company)
-        commands = ['git pull origin'+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        
         console_dump = ''
         
         cwd = company.angular_project_production_path
