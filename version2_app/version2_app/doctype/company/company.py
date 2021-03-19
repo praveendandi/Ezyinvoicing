@@ -358,11 +358,12 @@ def console_command(key=None,
                     caller='bench_update_pull',
                     app_name=None,
                     branch_name=None):
+    company = frappe.get_last_doc("company")                
     commands = {
         "bench_update": ["bench update"],
         "switch_branch": [""],
         "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
-        "bench_update_pull": ["bench update --pull", "bench migrate"]
+        "bench_update_pull": ["git pull origin "+company.backend_git_branch, "bench migrate"]
     }
     run_command(commands=commands[caller],
                 doctype='Bench Settings',
