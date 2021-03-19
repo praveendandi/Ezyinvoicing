@@ -4,6 +4,7 @@ import glob
 import os
 from os import path
 import time
+import frappe
 # def printit():
 # 	threading.Timer(5.0, printit).start()
 # 	files = glob.glob("/home/caratred/test/*.pdf")
@@ -30,8 +31,9 @@ def getfiles():
         time.sleep(5)
         print("waiting for print")
         files = glob.glob("/home/frappe/files/*.pdf")
+        company = frappe.get_last_doc("company")
         for file_path in files:
-            data = {"company":"MJH-01","host":"http://0.0.0.0:8000/api/method/"}
+            data = {"company":company.name,"host":"http://0.0.0.0:8000/api/method/"}
             print(data,"config data")
             invoicefile = {'file': open(file_path, 'rb')}
             payload = {
