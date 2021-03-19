@@ -3029,12 +3029,14 @@ def attach_b2c_qrcode(data):
 
 @frappe.whitelist(allow_guest=True)
 def b2b_success_to_credit_note(data):
-	try:
+	# try:
 		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
-		invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled","other_charges","company","confirmation_number","invoice_from","print_by","has_discount_items","invoice_category","sez","converted_from_b2b","allowance_invoice","converted_from_tax_invoices_to_manual_tax_invoices"], as_dict=1)
+		# invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled","other_charges","company","confirmation_number","invoice_from","print_by","has_discount_items","invoice_category","sez","converted_from_b2b","allowance_invoice","converted_from_tax_invoices_to_manual_tax_invoices"], as_dict=1)
+		invoice_data = frappe.db.get_all('Invoices', filters={"name":data["invoice_number"]},fields=["*"])
+		
 		# filters = {"invoice_number":data["invoice_number"]}
-		item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["item_value","item_value_after_gst","item_name","sac_code"])
-	except Exception as e:
-		print(e, "attach b2c qrcode")
-		return {"success": False, "message": str(e)}
+		# item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["item_value","item_value_after_gst","item_name","sac_code"])
+	# except Exception as e:
+	# 	print(e, "attach b2c qrcode")
+	# 	return {"success": False, "message": str(e)}
 	
