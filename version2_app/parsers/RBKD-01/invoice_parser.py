@@ -87,6 +87,8 @@ def file_parsing(filepath):
 				gstNumber = gstNumber.replace("TAXINVOICE"," ")
 				gstNumber = gstNumber.replace("CREDITTAXINVOICE"," ")
 				gstNumber = gstNumber.replace("CREDITINVOICE"," ")
+				gstNumber = gstNumber.replace("CREDIT"," ")
+
 				gstNumber = gstNumber.strip()
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
@@ -192,7 +194,6 @@ def file_parsing(filepath):
 				guest['address2'] = i
 
 		guest['invoice_number'] = invoiceNumber.replace(' ', '')
-		print(gstNumber,len(gstNumber),"///////")
 		guest['membership'] = membership
 		guest['invoice_date'] = date_time_obj
 		guest['items'] = total_items
