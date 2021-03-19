@@ -996,8 +996,11 @@ def insert_invoice(data):
 							TaxSummariesInsert(items,TotalMismatchErrorAPI['invoice_number'])
 							hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 								items, TotalMismatchErrorAPI['invoice_number'],"Invoice")
+							invoiceData = frappe.get_doc('Invoices',TotalMismatchErrorAPI['invoice_number'])	
+							if invoiceData.invoice_from=="Pms":
+								socket = invoiceCreated(invoiceData)	
 							return {"success": True,"data":TotalMismatchErrorAPI['data']}
-
+						
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
 		if len(data['items_data'])==0:
@@ -1156,7 +1159,6 @@ def insert_invoice(data):
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 			if b2cAttachQrcode["success"] == True:
 				if invoice.invoice_from=="Pms":
-					print("/////////////11111")
 					socket = invoiceCreated(b2cAttachQrcode["invoice"])
 			else:
 				if invoice.invoice_from=="Pms":
