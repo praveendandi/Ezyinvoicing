@@ -492,6 +492,7 @@ def diskspace():
     # print(b.encoding)
     return b
 
+@frappe.whitelist(allow_guest=True)
 def bench_migrate():
     try:
         terminal = Popen(shlex.split("bench migrate"),
