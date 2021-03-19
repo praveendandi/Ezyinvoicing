@@ -2920,7 +2920,7 @@ def Error_Insert_invoice(data):
 				# return {"success": True}	
 					if frappe.db.exists('Invoices', data['invoice_number']):
 						invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
-						if invoice_bin.invoice_from!="Pms":
+						if invoice_bin.invoice_from=="Pms":
 							socket = invoiceCreated(invoice_bin)
 						return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
 		
@@ -3007,8 +3007,10 @@ def Error_Insert_invoice(data):
 					items, data['invoice_number'],"Invoice")
 					
 				# return {"success": True}
-			if v.invoice_from=="Pms": 	
+			if v.invoice_from=="Pms": 
+				print("///////")	
 				socket = invoiceCreated(invoice)
+			print("/a/a/a/a/a/")	
 			return {"success":False,"message":"Error","data":v} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
