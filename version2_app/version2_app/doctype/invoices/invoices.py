@@ -1274,7 +1274,7 @@ def insert_items(items, invoice_number):
 @frappe.whitelist(allow_guest=True)
 def calulate_items(data):
 	# items, invoice_number,company_code
-	try:
+	# try:
 		total_items = []
 		second_list = []
 		if any("split_value" in check for check in data["items"]):
@@ -1380,6 +1380,7 @@ def calulate_items(data):
 					net_value = item["net"]
 				else:
 					net_value = sac_code_based_gst_rates.net
+				print("=====================",net_value)
 				if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
 					gst_value = 0
 					service_dict = {}
@@ -1980,9 +1981,9 @@ def calulate_items(data):
 			})
 		total_items.extend(second_list)	
 		return {"success": True, "data": total_items}
-	except Exception as e:
-		print(e, "calculation api")
-		return {"success": False, "message": str(e)}
+	# except Exception as e:
+	# 	print(e, "calculation api")
+	# 	return {"success": False, "message": str(e)}
 
 
 def insert_tax_summariesd(items, invoice_number):
