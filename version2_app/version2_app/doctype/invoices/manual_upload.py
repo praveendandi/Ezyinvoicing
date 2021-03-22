@@ -78,7 +78,6 @@ def manual_upload(data):
 	list_data={}
 	invoice_referrence_objects = {}
 	for each in output:
-		# print(str(each['BILL_NO']),"INVOICEEEEEEEEEEEEEE")
 		del each['BILL_GENERATION_DATE_CHAR']
 		del each['TRX_DATE']
 		each['BILL_GENERATION_DATE'] = str(each['BILL_GENERATION_DATE'])
@@ -165,9 +164,7 @@ def manual_upload(data):
 		
 		each['invoice_date'] = each['invoice_date'].replace("/","-")
 		each['invoice_date'] = each['invoice_date'].replace("00:00:00","")
-		# each['invoice_date'] = each['invoice_date'][8:10]+'-'+each['invoice_date'][5:7]+'-'+each['invoice_date'][3:5]
 		date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
-		# print(date_time_obj)
 		date_time_obj = datetime.datetime.strptime(date_time_obj,'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 		each['invoice_date'] = date_time_obj
 		each['mode'] = companyData.mode
@@ -179,7 +176,6 @@ def manual_upload(data):
 		else:
 			each['invoice_type'] = "B2B"
 			invoice_referrence_objects[each['invoice_number']][0]['gstNumber'] = each['gstNumber']
-		# each['invoice_number'] = str(each['invoice_number'])
 		each['confirmation_number'] = each['invoice_number']
 		each['print_by'] = "System"
 		each['start_time'] = str(datetime.datetime.utcnow())
