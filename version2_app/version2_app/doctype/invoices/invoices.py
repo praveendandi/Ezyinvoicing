@@ -79,7 +79,6 @@ class Invoices(Document):
 				invoice.irn_cancelled = 'Yes'
 				invoice.irn_generated = 'Cancelled'
 				invoice.save()
-				print("/////")
 				if invoice.has_credit_items=="Yes" and company_details['data'].allowance_type == "Credit":
 					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'],invoice_number)
 					if credit_cancel_response['success']:
@@ -958,7 +957,7 @@ def insert_invoice(data):
 
 		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
 			data['total_invoice_amount'] = sales_amount_after_tax
-		print(sales_amount_after_tax)	
+		# print(sales_amount_after_tax)	
 		if '-' in str(sales_amount_after_tax):
 			allowance_invoice = "Yes"
 		else:
@@ -1139,7 +1138,7 @@ def insert_invoice(data):
 				
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
 
-		print(invoice.allowance_invoice)			
+		# print(invoice.allowance_invoice)			
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		data['invoice_number'] = v.name
 		data['guest_data']['invoice_number'] = v.name
@@ -1759,19 +1758,18 @@ def calulate_items(data):
 					else:
 						invoice_category = "Tax Invoice"
 					companyDetails = frappe.get_doc('company', data['company_code'])
-					print(".a.a.a",invoice_category)
+					# print(".a.a.a",invoice_category)
 					if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-						print("---()()()")
+						# print("---()()()")
 						if companyDetails.allowance_type == "Credit":
 							ItemMode = "Credit"
 						else:
 							ItemMode = "Discount"
 					elif invoice_category == "Credit Invoice":
-						print("...))__))__")
 						ItemMode = "Credit"
 					else:
 						pass	
-					print(ItemMode,"/a/a/a")
+					# print(ItemMode,"/a/a/a")
 					if "-" in str(item['item_value']):
 						final_item['item_mode'] = ItemMode
 					else:
@@ -2422,16 +2420,17 @@ def get_tax_payer_details(data):
 			response = request_get(
 				data['apidata']['get_taxpayer_details'] + data['gstNumber'],
 				data['apidata'], data['invoice'], data['code'])
+			
 			if response['success']:
 
 				details = response['result']
 				if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
 					if (details['AddrBno'] != "") or (details['AddrBno'] !=
-													  ""):
+														""):
 						details['AddrBnm'] = details['AddrBno']
 				if (details['AddrBno'] == "") or (details['AddrBno'] == None):
 					if (details['AddrBnm'] != "") or (details['AddrBnm'] !=
-													  None):
+														None):
 						details['AddrBno'] = details['AddrBnm']
 				if (details['TradeName'] == "") or (details['TradeName']
 													== None):
@@ -2482,7 +2481,7 @@ def get_tax_payer_details(data):
 					}
 			else:
 				print("Unknown error in get taxpayer details get call  ",
-					  response)
+						response)
 				error_message = "Invalid GstNumber "+data['gstNumber']
 				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
 				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
@@ -2870,7 +2869,6 @@ def check_invoice_exists(invoice_number):
 						'invoice_number':
 						['like', invoice_number+'-%']
 					})
-					print(AmenedinvCount)
 					if len(AmenedinvCount)>0:
 						invoice_number = AmenedinvCount[0]['name']
 					
@@ -2888,174 +2886,170 @@ def check_invoice_exists(invoice_number):
 
 @frappe.whitelist()
 def Error_Insert_invoice(data):
-	# try:
-	# print(data,"/////////")
-	if "invoice_object_from_file" not in data:
-		data['invoice_object_from_file'] = " "
-	print(data['invoice_object_from_file'])	
-	if "invoice_from" in data:
-		invoice_from = data['invoice_from']
-	else:
-		invoice_from = "Pms"	
-	if "sez" in data:
-		sez = data["sez"]
-	else:
-		doc = frappe.db.exists("Invoices",data["invoice_number"])
-		if doc:
-			invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
-			sez = invoice_doc.sez
+	try:
+		if "invoice_object_from_file" not in data:
+			data['invoice_object_from_file'] = " "
+		if "invoice_from" in data:
+			invoice_from = data['invoice_from']
 		else:
-			sez = 0
-	if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-		if 'items_data' not in list(data.keys()):
-			data['items_data'] = []
-		data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
-		if not frappe.db.exists('Invoices', data['invoice_number']):
-			data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
-			if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-				error_invoice_calculation(data_error,data)
-				if 'items_data' in list(data.keys()):
-					items = data['items_data']
-					itemsInsert = insert_items(items,data['invoice_number'])
-					# insert_tax_summaries2(items,data['invoice_number'])
-					TaxSummariesInsert(items,data['invoice_number'])
-					hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-						items, data['invoice_number'],"Invoice")
-				
-			# return {"success": True}	
-				if frappe.db.exists('Invoices', data['invoice_number']):
-					invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
-					if invoice_bin.invoice_from=="Pms":
-						socket = invoiceCreated(invoice_bin)
-					return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
-	
-	company = frappe.get_doc('company',data['company_code'])
-	if not frappe.db.exists('Invoices', data['invoice_number']):
-		invType = data['invoice_type']
-		
-		irn_generated = "Error"
-		# qr_generated = "Error"
-		
-
-		invoice = frappe.get_doc({
-			'doctype':
-			'Invoices',
-			'invoice_number':
-			data['invoice_number'],
-			'invoice_type':data['invoice_type'],
-			'guest_name':
-			data['guest_name'],
-			# if len(data['gst_number'])==15:
-			# 	'gst_number': data['gst_number'],
-
-
-			'invoice_file':
-			data['invoice_file'],
-			'room_number':
-			data['room_number'],
-			'irn_generated':irn_generated,
-			# 'qr_generated':qr_generated,
-			'invoice_date':
-			datetime.datetime.strptime(data['invoice_date'],
-									'%d-%b-%y %H:%M:%S'),
-			'legal_name':
-			" ",
-			'address_1':
-			" ",
-			'email':
-			" ",
-			'trade_name':
-			" ",
-			'address_2':
-			" ",
-			'phone_number':
-			" ",
-			'location':
-			" ",
-			'pincode':
-			data['pincode'],
-			'state_code':
-			data['state_code'],
-			'amount_before_gst':
-			0,
-			"amount_after_gst":
-			0,
-			"other_charges":
-			0,  
-			'mode':company.mode,
-			'total_invoice_amount':data['total_invoice_amount'],
-			'irn_cancelled':
-			'No',
-			'qr_code_generated':
-			'Pending',
-			'signed_invoice_generated':
-			'No',
-			'company':
-			data['company_code'],
-			'ready_to_generate_irn':
-			"No",
-			'error_message':
-			data['error_message'],
-			"place_of_supply":company.state_code,
-			"sez":sez,
-			"invoice_from":invoice_from,
-			"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
-		})
-		v = invoice.insert(ignore_permissions=True, ignore_links=True)
-		
-		if 'items_data' in list(data.keys()):
-			items = data['items_data']
-			itemsInsert = insert_items(items,data['invoice_number'])
-			# insert_tax_summaries2(items,data['invoice_number'])
-			TaxSummariesInsert(items,data['invoice_number'])
-			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-				items, data['invoice_number'],"Invoice")
-				
-			# return {"success": True}
-		if v.invoice_from=="Pms": 
-			print("///////")	
-			socket = invoiceCreated(invoice)
-		print("/a/a/a/a/a/")	
-		return {"success":False,"message":"Error","data":v} 
-	
-	invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
-	if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-		data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
-
-	if invoiceExists.invoice_type == "B2B" and	invoiceExists.irn_generated == "Success":
-		return {"success":True,"data":invoiceExists} 	
-	else:
-		invoiceExists.error_message = data['error_message']
-		# if invoiceExists.invoice_type == "B2B":
-		invoiceExists.ready_to_generate_irn = "No"
-		if invoiceExists.gst_number == None:
-			# if len(invoiceExists.gst_number)<15:
-				invoiceExists.gst_number = ""
+			invoice_from = "Pms"	
+		if "sez" in data:
+			sez = data["sez"]
 		else:
-			if len(invoiceExists.gst_number)<15:
-				invoiceExists.gst_number = ""
-
+			doc = frappe.db.exists("Invoices",data["invoice_number"])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+				sez = invoice_doc.sez
+			else:
+				sez = 0
+		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+			if 'items_data' not in list(data.keys()):
+				data['items_data'] = []
+			data_error = {'invoice_number':data['invoice_number'],'company_code':data['company_code'],'items_data':data['items_data'],'total_invoice_amount':data['total_invoice_amount']}
+			if not frappe.db.exists('Invoices', data['invoice_number']):
+				data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
+				if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+					error_invoice_calculation(data_error,data)
+					if 'items_data' in list(data.keys()):
+						items = data['items_data']
+						itemsInsert = insert_items(items,data['invoice_number'])
+						# insert_tax_summaries2(items,data['invoice_number'])
+						TaxSummariesInsert(items,data['invoice_number'])
+						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+							items, data['invoice_number'],"Invoice")
 					
-		invoiceExists.irn_generated = "Error"
-		invoiceExists.total_invoice_amount = data['total_invoice_amount']
-		# invoiceExists.qr_generated = "Pending"
+				# return {"success": True}	
+					if frappe.db.exists('Invoices', data['invoice_number']):
+						invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
+						if invoice_bin.invoice_from=="Pms":
+							socket = invoiceCreated(invoice_bin)
+						return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
+		
+		company = frappe.get_doc('company',data['company_code'])
+		if not frappe.db.exists('Invoices', data['invoice_number']):
+			invType = data['invoice_type']
+			
+			irn_generated = "Error"
+			# qr_generated = "Error"
+			
+
+			invoice = frappe.get_doc({
+				'doctype':
+				'Invoices',
+				'invoice_number':
+				data['invoice_number'],
+				'invoice_type':data['invoice_type'],
+				'guest_name':
+				data['guest_name'],
+				# if len(data['gst_number'])==15:
+				# 	'gst_number': data['gst_number'],
 
 
-		invoiceExists.save()
-		# if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-		# 	error_invoice_calculation(data_error)
-		if 'items_data' in list(data.keys()):
-			items = data['items_data']
-			itemsInsert = insert_items(items,data['invoice_number'])
-			# insert_tax_summaries2(items,data['invoice_number'])
-			TaxSummariesInsert(items,data['invoice_number'])
-			hsnbasedtaxcodes = insert_hsn_code_based_taxes(
-				items, data['invoice_number'],"Invoice")
-				
-		return {"success":False,"message":"error","data":invoiceExists}
-	# except Exception as e:
-	# 	print(e, "  Error insert Invoice")
-	# 	return {"success": False, "message": str(e)}
+				'invoice_file':
+				data['invoice_file'],
+				'room_number':
+				data['room_number'],
+				'irn_generated':irn_generated,
+				# 'qr_generated':qr_generated,
+				'invoice_date':
+				datetime.datetime.strptime(data['invoice_date'],
+										'%d-%b-%y %H:%M:%S'),
+				'legal_name':
+				" ",
+				'address_1':
+				" ",
+				'email':
+				" ",
+				'trade_name':
+				" ",
+				'address_2':
+				" ",
+				'phone_number':
+				" ",
+				'location':
+				" ",
+				'pincode':
+				data['pincode'],
+				'state_code':
+				data['state_code'],
+				'amount_before_gst':
+				0,
+				"amount_after_gst":
+				0,
+				"other_charges":
+				0,  
+				'mode':company.mode,
+				'total_invoice_amount':data['total_invoice_amount'],
+				'irn_cancelled':
+				'No',
+				'qr_code_generated':
+				'Pending',
+				'signed_invoice_generated':
+				'No',
+				'company':
+				data['company_code'],
+				'ready_to_generate_irn':
+				"No",
+				'error_message':
+				data['error_message'],
+				"place_of_supply":company.state_code,
+				"sez":sez,
+				"invoice_from":invoice_from,
+				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+			})
+			v = invoice.insert(ignore_permissions=True, ignore_links=True)
+			
+			if 'items_data' in list(data.keys()):
+				items = data['items_data']
+				itemsInsert = insert_items(items,data['invoice_number'])
+				# insert_tax_summaries2(items,data['invoice_number'])
+				TaxSummariesInsert(items,data['invoice_number'])
+				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+					items, data['invoice_number'],"Invoice")
+					
+				# return {"success": True}
+			if v.invoice_from=="Pms": 
+				socket = invoiceCreated(invoice)
+			return {"success":False,"message":"Error","data":v} 
+		
+		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
+		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+			data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
+
+		if invoiceExists.invoice_type == "B2B" and	invoiceExists.irn_generated == "Success":
+			return {"success":True,"data":invoiceExists} 	
+		else:
+			invoiceExists.error_message = data['error_message']
+			# if invoiceExists.invoice_type == "B2B":
+			invoiceExists.ready_to_generate_irn = "No"
+			if invoiceExists.gst_number == None:
+				# if len(invoiceExists.gst_number)<15:
+					invoiceExists.gst_number = ""
+			else:
+				if len(invoiceExists.gst_number)<15:
+					invoiceExists.gst_number = ""
+
+			# print(invoiceExists.gst_number,"/a/a")			
+			invoiceExists.irn_generated = "Error"
+			invoiceExists.total_invoice_amount = data['total_invoice_amount']
+			# invoiceExists.qr_generated = "Pending"
+
+
+			invoiceExists.save()
+			# if len(data['gst_number'])<15 and len(data['gst_number'])>0:
+			# 	error_invoice_calculation(data_error)
+			if 'items_data' in list(data.keys()):
+				items = data['items_data']
+				itemsInsert = insert_items(items,data['invoice_number'])
+				# insert_tax_summaries2(items,data['invoice_number'])
+				TaxSummariesInsert(items,data['invoice_number'])
+				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
+					items, data['invoice_number'],"Invoice")
+					
+			return {"success":False,"message":"error","data":invoiceExists}
+	except Exception as e:
+		print(e, "  Error insert Invoice")
+		return {"success": False, "message": str(e)}
 
 
 def attach_b2c_qrcode(data):
