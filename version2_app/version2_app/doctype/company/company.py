@@ -572,3 +572,42 @@ def updateUiProd(company):
         frappe.log_error("Angular project pull data","updateUiProd")
     except Exception as e:
         print(str(e),"    updateUiProd")
+
+
+
+@frappe.whitelist(allow_guest=True)
+def updateProxySettings(data):
+    try:
+
+        abs_path = os.path.dirname(os.getcwd())
+        company = frappe.get_doc('company',data['company'])
+        if company.proxy==1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://", "@")
+            if data['type'] == "unset":
+                commands = ['unset https_proxy','unset http_proxy']
+                for each in commands:
+                    print(each)
+                    os.system(each)
+                    # terminal = Popen(shlex.split(each),
+                    #                 stdin=PIPE,
+                    #                 stdout=PIPE,
+                    #                 stderr=STDOUT,
+                    #                 cwd=abs_path)
+                return {"success":True}
+            else:
+                commands = ["https_proxy="+"'"+"https://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'","http_proxy="+"'"+"http://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'"]                    
+                for each in commands:
+                    print(each)
+                    os.system(each)
+                    # terminal = Popen(shlex.split(each),
+                    #                 stdin=PIPE,
+                    #                 stdout=PIPE,
+                    #                 stderr=STDOUT,
+                    #                 cwd=abs_path)
+                return {"success":True}
+        else:
+            return {"success":False,"message":"No Proxy Settings"}
+    except Exception as e:
+        print(str(e),"  updateProxySettings  ")
+        return {"success":False,"message":str(e)}    
