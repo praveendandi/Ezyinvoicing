@@ -589,22 +589,12 @@ def updateProxySettings(data):
                 for each in commands:
                     print(each)
                     os.system(each)
-                    # terminal = Popen(shlex.split(each),
-                    #                 stdin=PIPE,
-                    #                 stdout=PIPE,
-                    #                 stderr=STDOUT,
-                    #                 cwd=abs_path)
                 return {"success":True}
             else:
                 commands = ["https_proxy="+"'"+"https://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'","http_proxy="+"'"+"http://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'"]                    
                 for each in commands:
                     print(each)
                     os.system(each)
-                    # terminal = Popen(shlex.split(each),
-                    #                 stdin=PIPE,
-                    #                 stdout=PIPE,
-                    #                 stderr=STDOUT,
-                    #                 cwd=abs_path)
                 return {"success":True}
         else:
             return {"success":False,"message":"No Proxy Settings"}
