@@ -6,4 +6,4 @@ tags
 version2_app/docs/current
 apps/version2_app/version2_app/version2_app/doctype/invoices/invoice_parser.py
 apps/version2_app/version2_app/version2_app/doctype/invoices/reinitiate_parser.py
-parsers_invoices
+parsers_invoice

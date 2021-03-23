@@ -22,6 +22,7 @@ import frappe
 import os, importlib.util
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 
+
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
 
@@ -263,7 +264,7 @@ def reprocess_error_inoices():
         if doc[0]["new_parsers"] == 0:
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         else:
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -290,7 +291,7 @@ def reprocess_pending_inoices():
         if doc[0]["new_parsers"] == 0:
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         else:
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -358,11 +359,12 @@ def console_command(key=None,
                     caller='bench_update_pull',
                     app_name=None,
                     branch_name=None):
+    company = frappe.get_last_doc("company")                
     commands = {
         "bench_update": ["bench update"],
         "switch_branch": [""],
         "get-app": ["bench get-app {app_name}".format(app_name=app_name)],
-        "bench_update_pull": ["bench update --pull", "bench migrate"]
+        "bench_update_pull": ["git pull origin "+company.backend_git_branch, "bench migrate"]
     }
     run_command(commands=commands[caller],
                 doctype='Bench Settings',
@@ -469,8 +471,8 @@ def update_parsers():
         if company.parsers_branch_name:
             command = "git pull origin "+company.parsers_branch_name
             abs_path = os.path.dirname(os.getcwd())
-            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'
-            check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoices'
+            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'
+            check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoice'
             if not os.path.exists(check_folder):
                 os.mkdir(check_folder)
                 clone_command = "git clone https://prasanthvajja:foQJihWZhufdixW43yCs@gitlab.caratred.com/prasanthvajja/invoice_parsers.git"
@@ -492,6 +494,7 @@ def diskspace():
     # print(b.encoding)
     return b
 
+@frappe.whitelist(allow_guest=True)
 def bench_migrate():
     try:
         terminal = Popen(shlex.split("bench migrate"),
@@ -548,7 +551,8 @@ def updateUiProd(company):
     try:
         print("==========")
         company = frappe.get_doc('company',company)
-        commands = ['git pull origin'+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        
         console_dump = ''
         
         cwd = company.angular_project_production_path
