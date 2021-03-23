@@ -3138,8 +3138,10 @@ def b2b_success_to_credit_note(data):
 			guest_data = {"name":invoice_data[0]["guest_name"],"invoice_number":invoice_data[0]["invoice_number"],"membership":"","invoice_date":invoice_data[0]["invoice_date"],"invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":invoice_data[0]["invoice_category"],"invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"sez":invoice_data[0]["sez"]}
 			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["*"])
 			df = pd.DataFrame.from_records(item_data)
-			print(df)
-
+			df.drop(["name","creation","modified","modified_by","owner","docstatus","parent","parentfield","parenttype","idx"], axis=1, inplace=True)
+			group = df.groupby(["sac_code","gst_rate","type","vat","cess","state_cess"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first"})
+			group_data = group.to_dict('records')
+			print(group_data)
 	# except Exception as e:
 	# 	print(e, "attach b2c qrcode")
 	# 	return {"success": False, "message": str(e)}
