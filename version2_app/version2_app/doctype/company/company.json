@@ -73,7 +73,8 @@
   "parsers_branch_name",
   "ui_git_branch",
   "angular_project_production_path",
-  "backend_git_branch"
+  "backend_git_branch",
+  "irn_text_alignment"
  ],
  "fields": [
   {
@@ -455,11 +456,17 @@
    "fieldname": "backend_git_branch",
    "fieldtype": "Data",
    "label": "Backend Git Branch"
+  },
+  {
+   "fieldname": "irn_text_alignment",
+   "fieldtype": "Select",
+   "label": "Irn Text Alignment",
+   "options": "Horizontal\nVertical"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-18 16:39:44.419824",
+ "modified": "2021-03-23 11:45:54.001992",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
