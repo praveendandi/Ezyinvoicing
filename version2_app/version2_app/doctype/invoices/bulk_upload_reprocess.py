@@ -59,7 +59,7 @@ def BulkUploadReprocess(data):
 			taxpayer_details = {"gst_number":invoice_data.gst_number,"legal_name":invoice_data.legal_name,"email":invoice_data.email,"address_1":invoice_data.address_1,"address_2":invoice_data.address_1,"trade_name":invoice_data.trade_name,"location":invoice_data.location,"pincode":invoice_data.pincode,"phone_number":invoice_data.phone_number,"state_code":invoice_data.state_code}
 			reinitiate_data['taxpayer']= taxpayer_details
 			reinitiate_data['guest_data'] = guest_data
-			reinitiate_data['invoice_object_from_file'] = json.dumps(line_items)
+			reinitiate_data['invoice_object_from_file'] = json.loads(invoice_data.invoice_object_from_file)
 			invoicereinitiate = Reinitiate_invoice(reinitiate_data)
 			return invoicereinitiate
 

@@ -10,6 +10,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import Credi
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
+import traceback
 import json
 import string
 import qrcode
@@ -413,6 +414,7 @@ def generateIrn(data):
 				return {"success": False, "message": str(e)}
 	except Exception as e:
 		print(str(e), "generate Irn")
+		print(traceback.print_exc())
 		frappe.log_error(frappe.get_traceback(),invoice_number)
 		logger.error(f"{invoice_number},     generateIrn,   {str(e)}")
 		return {"success": False, "message": str(e)}
@@ -722,7 +724,9 @@ def create_qr_image(invoice_number, gsp):
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.irn_number
+			"Irn": invoice.irn_number,
+			"height":"150",
+			"width":"150"
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -1120,7 +1124,7 @@ def insert_invoice(data):
 			"place_of_supply": company.state_code,
 			"sez": data["sez"] if "sez" in data else 0,
 			"allowance_invoice":allowance_invoice,
-			"invoice_object_from_file":json.dumps({"data":data['invoice_object_from_file']})
+			"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -2998,7 +3002,7 @@ def Error_Insert_invoice(data):
 				"place_of_supply":company.state_code,
 				"sez":sez,
 				"invoice_from":invoice_from,
-				"invoice_object_from_file":json.dumps({"data":data['invoice_object_from_file']})
+				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			

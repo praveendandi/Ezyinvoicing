@@ -249,7 +249,7 @@ def errorInvoicesList():
     try:
         doc = frappe.db.get_list('company',fields=['name'])
        
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","guest_name","irn_generated"])
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':'Pms'},fields=["name","invoice_number","guest_name","irn_generated"])
         if len(data)>0:
             return {"success":True,"data":data}
         else:
@@ -268,7 +268,7 @@ def reprocess_error_inoices():
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':'Pms'},fields=["name","invoice_number","invoice_file"])
         if len(data)>0:
             # frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
             for each in data:
@@ -295,7 +295,7 @@ def reprocess_pending_inoices():
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending'},fields=["name","invoice_number","invoice_file"])
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Pending','invoice_from':'Pms'},fields=["name","invoice_number","invoice_file"])
         if len(data)>0:
             for each in data:
                 obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
