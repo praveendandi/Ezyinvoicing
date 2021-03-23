@@ -245,7 +245,7 @@ def manual_upload(data):
 								B2C = np.nan
 								
 								output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-								print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+								# print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 						else:
 							insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":invoice_referrence_objects[each['invoice_number']]})
 							if insertInvoiceApiResponse['success']== True:
@@ -267,7 +267,7 @@ def manual_upload(data):
 								B2C = np.nan
 								
 								output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-								print("B2B insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+								# print("B2B insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 					else:
 					
 						error_data['error_message'] = calulateItemsApiResponse['message']
@@ -277,7 +277,7 @@ def manual_upload(data):
 						B2C = np.nan
 						
 						output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-						print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+						# print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 				else:
 					error_data['error_message'] = "Invalid GstNumber"
 					error_data['amened'] = 'No'
@@ -327,7 +327,7 @@ def manual_upload(data):
 						B2B=np.nan
 						B2C = "B2C"
 						output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-						print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+						# print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 				else:
 					insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":invoice_referrence_objects[each['invoice_number']]})
 					if insertInvoiceApiResponse['success']== True:
@@ -347,7 +347,7 @@ def manual_upload(data):
 						B2B=np.nan
 						B2C = "B2C"
 						output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-						print("B2B insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+						# print("B2B insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
 			else:
 					
 				error_data['error_message'] = calulateItemsApiResponse['message']
@@ -357,7 +357,7 @@ def manual_upload(data):
 				B2B = np.nan
 				
 				output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-				print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+				# print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
 	df = pd.DataFrame(output_date)
 	df = df.groupby('date').count().reset_index()
 	output_data = df.to_dict('records')
