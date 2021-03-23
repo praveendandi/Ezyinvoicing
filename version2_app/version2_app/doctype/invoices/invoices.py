@@ -839,10 +839,10 @@ def create_invoice(data):
 
 @frappe.whitelist()
 def insert_invoice(data):
-	'''
-	insert invoice data     data, company_code, taxpayer,items_data
-	'''
-	try:
+	# '''
+	# insert invoice data     data, company_code, taxpayer,items_data
+	# '''
+	# try:
 		print(data,"/////")
 		if "invoice_category" not in list(data['guest_data']):
 			data['guest_data']['invoice_category'] = "Tax Invoice"
@@ -1182,9 +1182,9 @@ def insert_invoice(data):
 		if get_invoice.invoice_from=="Pms":
 			socket = invoiceCreated(get_invoice)
 		return {"success": True,"data":get_invoice}
-	except Exception as e:
-		print(e, "insert invoice")
-		return {"success": False, "message": str(e)}
+	# except Exception as e:
+	# 	print(e, "insert invoice")
+	# 	return {"success": False, "message": str(e)}
 
 
 def insert_hsn_code_based_taxes(items, invoice_number,sacType):
@@ -3134,14 +3134,30 @@ def b2b_success_to_credit_note(data):
 		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
 		# invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled","other_charges","company","confirmation_number","invoice_from","print_by","has_discount_items","invoice_category","sez","converted_from_b2b","allowance_invoice","converted_from_tax_invoices_to_manual_tax_invoices"], as_dict=1)
 		invoice_data = frappe.db.get_all('Invoices', filters={"name":data["invoice_number"]},fields=["*"])
+		total_data = {}
 		if len(invoice_data) > 0:
-			guest_data = {"name":invoice_data[0]["guest_name"],"invoice_number":invoice_data[0]["invoice_number"],"membership":"","invoice_date":invoice_data[0]["invoice_date"],"invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":invoice_data[0]["invoice_category"],"invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"sez":invoice_data[0]["sez"]}
+			invoice_number_amend = invoice_data[0]["invoice_number"]+"-1"
+			guest_data = {"name":invoice_data[0]["guest_name"],"invoice_number":invoice_number_amend,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":invoice_data[0]["invoice_category"],"invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"sez":invoice_data[0]["sez"]}
+			guest_data["invoice_date"] = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["*"])
 			df = pd.DataFrame.from_records(item_data)
-			df.drop(["name","creation","modified","modified_by","owner","docstatus","parent","parentfield","parenttype","idx"], axis=1, inplace=True)
-			group = df.groupby(["sac_code","gst_rate","type","vat","cess","state_cess"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first"})
+			group = df.groupby(["sac_code","gst_rate","type","vat","cess","state_cess","taxable"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first","parentfield":"first","parenttype":"first","taxable":"first"})
+			group["item_mode"] = "Credit"
+			group["doctype"] = "Items"
+			group["parent"] = invoice_number_amend
 			group_data = group.to_dict('records')
-			print(group_data)
+			if invoice_data[0]["gst_number"] != "":
+				taxpayer = frappe.get_doc("TaxPayerDetail",invoice_data[0]["gst_number"])
+				total_data["taxpayer"] = taxpayer.__dict__
+			else:
+				taxpayer = {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+				total_data["taxpayer"] = taxpayer
+			total_data["guest_data"] = guest_data
+			total_data["items_data"] = group_data
+			total_data["amened"] = "No"
+			total_data["company_code"] = invoice_data[0]["company"]
+			total_data["total_invoice_amount"] = invoice_data[0]["total_invoice_amount"]
+			insert_invoice(total_data)
 	# except Exception as e:
 	# 	print(e, "attach b2c qrcode")
 	# 	return {"success": False, "message": str(e)}
