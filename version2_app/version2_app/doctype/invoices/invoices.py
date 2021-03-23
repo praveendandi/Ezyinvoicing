@@ -1274,7 +1274,7 @@ def insert_items(items, invoice_number):
 @frappe.whitelist(allow_guest=True)
 def calulate_items(data):
 	# items, invoice_number,company_code
-	# try:
+	try:
 		total_items = []
 		second_list = []
 		if any("split_value" in check for check in data["items"]):
@@ -1759,13 +1759,11 @@ def calulate_items(data):
 						# final_item['item_mode'] = "Debit"
 						companyDetails = frappe.get_doc('company', data['company_code'])
 						if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-							print("-----------")
 							if companyDetails.allowance_type == "Credit":
 								ItemMode = "Credit"
 							else:
 								ItemMode = "Discount"
 						elif invoice_category == "Credit Invoice":
-							print("==================")
 							ItemMode = "Credit"
 						else:
 							pass	
@@ -1773,11 +1771,15 @@ def calulate_items(data):
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
-				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-				if sac_code_based_gst_rates.state_cess_rate > 0:
-					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
-				else:
+				if data["company_code"] == "NKIP-01" and data["state_code"] == companyDetails.state_code:
 					final_item["state_cess_amount"] = 0
+					final_item['state_cess'] = 0
+				else:
+					final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+					if sac_code_based_gst_rates.state_cess_rate > 0:
+						final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+					else:
+						final_item["state_cess_amount"] = 0
 				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
 				if sac_code_based_gst_rates.central_cess_rate > 0:
 					final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
@@ -1981,9 +1983,9 @@ def calulate_items(data):
 			})
 		total_items.extend(second_list)	
 		return {"success": True, "data": total_items}
-	# except Exception as e:
-	# 	print(e, "calculation api")
-	# 	return {"success": False, "message": str(e)}
+	except Exception as e:
+		print(e, "calculation api")
+		return {"success": False, "message": str(e)}
 
 
 def insert_tax_summariesd(items, invoice_number):
