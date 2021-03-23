@@ -1275,6 +1275,7 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
+		print(data)
 		total_items = []
 		second_list = []
 		if any("split_value" in check for check in data["items"]):
