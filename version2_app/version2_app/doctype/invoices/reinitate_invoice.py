@@ -27,6 +27,7 @@ def Reinitiate_invoice(data):
 	insert invoice data     data, company_code, taxpayer,items_data
 	'''
 	try:
+		print(data)
 		generateb2cQr = True	
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
@@ -259,7 +260,7 @@ def Reinitiate_invoice(data):
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount	
-		doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])	
+		doc.invoice_object_from_file = data['invoice_object_from_file']
 		doc.save()
 		
 

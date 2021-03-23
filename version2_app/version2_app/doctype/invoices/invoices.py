@@ -134,7 +134,7 @@ class Invoices(Document):
 		taxPayerDeatilsData.save()
 		return True
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def generateIrn(data):
 	try:
 		print(data)
@@ -1120,7 +1120,7 @@ def insert_invoice(data):
 			"place_of_supply": company.state_code,
 			"sez": data["sez"] if "sez" in data else 0,
 			"allowance_invoice":allowance_invoice,
-			"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+			"invoice_object_from_file":json.dumps({"data":data['invoice_object_from_file']})
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -2998,7 +2998,7 @@ def Error_Insert_invoice(data):
 				"place_of_supply":company.state_code,
 				"sez":sez,
 				"invoice_from":invoice_from,
-				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+				"invoice_object_from_file":json.dumps({"data":data['invoice_object_from_file']})
 			})
 			v = invoice.insert(ignore_permissions=True, ignore_links=True)
 			
@@ -3012,9 +3012,7 @@ def Error_Insert_invoice(data):
 					
 				# return {"success": True}
 			if v.invoice_from=="Pms": 
-				print("///////")	
 				socket = invoiceCreated(invoice)
-			print("/a/a/a/a/a/")	
 			return {"success":False,"message":"Error","data":v} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
