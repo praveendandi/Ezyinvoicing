@@ -22,6 +22,7 @@ import frappe
 import os, importlib.util
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
 #funnnnnnnnnnn
+#sample=---=
 
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
