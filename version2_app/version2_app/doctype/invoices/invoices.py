@@ -1279,7 +1279,7 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
-		print(data)
+		# print(data)
 		total_items = []
 		second_list = []
 		if any("split_value" in check for check in data["items"]):
@@ -1301,13 +1301,11 @@ def calulate_items(data):
 			invoice_category = "Tax Invoice"
 		companyDetails = frappe.get_doc('company', data['company_code'])
 		if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-			print("-----------")
 			if companyDetails.allowance_type == "Credit":
 				ItemMode = "Credit"
 			else:
 				ItemMode = "Discount"
 		elif invoice_category == "Credit Invoice":
-			print("==================")
 			ItemMode = "Credit"
 		else:
 			pass	
