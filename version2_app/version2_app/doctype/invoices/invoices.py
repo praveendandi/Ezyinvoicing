@@ -1771,6 +1771,18 @@ def calulate_items(data):
 						pass	
 					# print(ItemMode,"/a/a/a")
 					if "-" in str(item['item_value']):
+						if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
+							print("---()()()")
+							if companyDetails.allowance_type == "Credit":
+								print("----111111111")
+								ItemMode = "Credit"
+							else:
+								print("-00000000")
+								ItemMode = "Discount"
+						elif invoice_category == "Credit Invoice":
+							ItemMode = "Credit"
+							# Item
+						ItemMode = "Credit"	
 						final_item['item_mode'] = ItemMode
 					else:
 						final_item['item_mode'] = "Debit"
