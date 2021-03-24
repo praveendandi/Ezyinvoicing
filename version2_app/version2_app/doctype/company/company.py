@@ -123,6 +123,7 @@ def givePrint(invoiceNumber, printer):
 	}
 
 
+
 @frappe.whitelist(allow_guest=True)
 def gitCurrentBranchCommit():
 	try:
