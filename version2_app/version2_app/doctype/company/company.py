@@ -152,6 +152,8 @@ def gitpull(company):
 		company = frappe.get_doc('company',company)
 		# folder_path = frappe.utils.get_bench_path()
 		b = os.popen("git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch)
+		frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+
 		return {"success": True, "message": b}
 	except Exception as e:
 		print("git branch commit id:  ", str(e))
@@ -276,7 +278,7 @@ def reprocess_error_inoices():
 		spec = importlib.util.spec_from_file_location(module_name, file_path)
 		module = importlib.util.module_from_spec(spec)
 		spec.loader.exec_module(module)
-		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error'},fields=["name","invoice_number","invoice_file"])
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':"Pms"},fields=["name","invoice_number","invoice_file"])
 		if len(data)>0:
 			# frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
 			for each in data:
@@ -378,7 +380,7 @@ def console_command(key=None,
 				doctype='Bench Settings',
 				key=str(time.time()),
 				docname='Bench Settings')
-	# frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+	frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
 	return True
 
 
