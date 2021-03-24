@@ -153,7 +153,7 @@ def gitpull():
     try:
         # company = frappe.get_doc('company',company)
         # folder_path = frappe.utils.get_bench_path()
-        b = os.popen("git --git-dir=/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/.git pull origin git-pull-check")
+        b = os.popen("git --git-dir=/home/frappe/frappe-bench/apps/version2_app/.git pull origin git-pull-check")
         return {"success": True, "message": b}
     except Exception as e:
         print("git branch commit id:  ", str(e))
