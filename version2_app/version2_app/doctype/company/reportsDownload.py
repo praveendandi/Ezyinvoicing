@@ -14,7 +14,6 @@ from urllib.request import pathname2url
 from os.path import expanduser
 home = expanduser("~")
 
-# host = "http://0.0.0.0:8000/"
 @frappe.whitelist(allow_guest=True)
 def Report_Download(data):
     
