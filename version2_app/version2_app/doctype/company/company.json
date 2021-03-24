@@ -73,7 +73,8 @@
   "parsers_branch_name",
   "ui_git_branch",
   "angular_project_production_path",
-  "backend_git_branch"
+  "backend_git_branch",
+  "backend_git_path"
  ],
  "fields": [
   {
@@ -455,11 +456,16 @@
    "fieldname": "backend_git_branch",
    "fieldtype": "Data",
    "label": "Backend Git Branch"
+  },
+  {
+   "fieldname": "backend_git_path",
+   "fieldtype": "Data",
+   "label": "Backend Git Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-18 16:39:44.419824",
+ "modified": "2021-03-24 16:45:26.693872",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
