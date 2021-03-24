@@ -21,8 +21,8 @@ import sys
 import frappe
 import os, importlib.util
 # from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
-          
-#sample
+
+
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
 
@@ -148,6 +148,16 @@ def gitUiBranchCommit(company):
         print("git branch commit id:  ", str(e))
         return {"success": False, "message": str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def gitpull():
+    try:
+        # company = frappe.get_doc('company',company)
+        # folder_path = frappe.utils.get_bench_path()
+        b = os.popen("git --git-dir=/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/.git pull origin git-pull-check")
+        return {"success": True, "message": b}
+    except Exception as e:
+        print("git branch commit id:  ", str(e))
+        return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def b2cstatusupdate():
@@ -264,7 +274,7 @@ def reprocess_error_inoices():
         if doc[0]["new_parsers"] == 0:
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         else:
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -291,7 +301,7 @@ def reprocess_pending_inoices():
         if doc[0]["new_parsers"] == 0:
             file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         else:
-            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -370,7 +380,7 @@ def console_command(key=None,
                 doctype='Bench Settings',
                 key=str(time.time()),
                 docname='Bench Settings')
-    frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+    # frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
     return True
 
 
@@ -425,7 +435,7 @@ def run_command(commands,
                              stdin=PIPE,
                              stdout=PIPE,
                              stderr=STDOUT,
-                             cwd=cwd)
+                             cwd='/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app')
             print(terminal._waitpid_lock,"terminal") 
          
         if terminal.wait():
@@ -471,8 +481,8 @@ def update_parsers():
         if company.parsers_branch_name:
             command = "git pull origin "+company.parsers_branch_name
             abs_path = os.path.dirname(os.getcwd())
-            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'
-            check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoice'
+            cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'
+            check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoices'
             if not os.path.exists(check_folder):
                 os.mkdir(check_folder)
                 clone_command = "git clone https://prasanthvajja:foQJihWZhufdixW43yCs@gitlab.caratred.com/prasanthvajja/invoice_parsers.git"

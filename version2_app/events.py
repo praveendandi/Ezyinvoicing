@@ -97,7 +97,7 @@ def fileCreated(doc, method=None):
                 if new_parsers == 0:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 else:
-                    file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                    file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 module_name = 'file_parsing'
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
                 module = importlib.util.module_from_spec(spec)

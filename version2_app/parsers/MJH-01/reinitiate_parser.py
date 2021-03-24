@@ -69,7 +69,7 @@ def reinitiateInvoice(data):
 				date_time_obj = (i.strip().split(":")[1]).replace("Original Bill Date","").strip()
 				date_time_obj = date_time_obj.replace("Original Bill","").strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
-			if "Room  :" in i or "Room :" in i:
+			if "Room  :" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
@@ -82,10 +82,6 @@ def reinitiateInvoice(data):
 						gstNumber = re.search("(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})", i).group()
 					else:
 						gstNumber = ""
-			#if re.search(r'[:]\s+\d',i.strip()):
-			#	invoice_Number = i.replace(":","").strip()
-			#	if invoice_Number.isdigit():
-			#		invoiceNumber = invoice_Number
 			if "COPY OF INVOICE" in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ","")
 			if "Bill No." in i:
@@ -115,6 +111,7 @@ def reinitiateInvoice(data):
 				membership = Membership[-1].replace(" ", "")
 			if "printed on" in i:
 				print_by = re.search("([0-9]{2}\-[A-Za-z]{3}\-[0-9]{2})", i).group()
+
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		items = [] 
@@ -172,15 +169,12 @@ def reinitiateInvoice(data):
 				if "COPY OF INVOICE" in i:
 					nameindex = i.index("COPY OF INVOICE")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
 				if "TAX INVOICE" in i:
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
 				if "Bill No." in i:
 					nameindex = i.index("Bill No.")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
 			if index == 1:
 				guest['address1'] = ""
 			if index == 2:
@@ -312,4 +306,3 @@ def reinitiateInvoice(data):
 	except Exception as e:
 		print(e)
 		print(traceback.print_exc())
-		return(str(e))
