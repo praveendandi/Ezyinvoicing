@@ -148,15 +148,36 @@ def gitUiBranchCommit(company):
 		return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def gitpull(company):
+def gitpull(data):
 	try:
-		company = frappe.get_doc('company',company)
+		company = frappe.get_doc('company',data['company'])
 		# folder_path = frappe.utils.get_bench_path()
 		b = os.popen("git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch)
+		print(b.__dict__['_stream'].__dict__,"/a/a/a/a/a/a")
+		print(b.__dict__['_proc'].__dict__['_waitpid_lock'],"/a/a/a/a/a/a")
+		c = b.__dict__['_proc'].__dict__['_waitpid_lock']
+		print(c)
+		doc = frappe.get_doc({
+		'doctype': 'Update Logs',
+		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
+		'status': 'Success',
+		'updated_by':data['username']
+		})
+		doc.insert()
+		frappe.db.commit()
 		frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
 
 		return {"success": True, "message": b}
 	except Exception as e:
+		doc = frappe.get_doc({
+		'doctype': 'Update Logs',
+		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
+		'status': 'Success',
+		'error_message':str(e),
+		'updated_by':data['username']
+		})
+		doc.insert()
+		frappe.db.commit()
 		print("git branch commit id:  ", str(e))
 		return {"success": False, "message": str(e)}
 

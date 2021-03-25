@@ -114,9 +114,10 @@ def fileCreated(doc, method=None):
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
-def emitsocket(doc,method=None):
-    frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
-    frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
+def Updateemitsocket(doc,method=None):
+    if doc.status=="Success":
+        frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
+        frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
 
 
 def DocumentBinSocket(doc,method=None):
