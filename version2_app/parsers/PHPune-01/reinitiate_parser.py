@@ -82,7 +82,7 @@ def reinitiateInvoice(data):
 				if "Bill Date & Time" in i:
 					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y %H.%M').strftime('%d-%b-%y %H:%M:%S')
 				else:
-					date_time_obj = datetime.datetime.strptime(date_time_obj, '%m/%d/%Y').strftime('%d-%b-%y %H:%M:%S')
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%Y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
 				room = i.split(" ")
 				roomNumber = room[-1]
