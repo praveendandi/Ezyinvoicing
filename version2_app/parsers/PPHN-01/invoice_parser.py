@@ -91,7 +91,7 @@ def file_parsing(filepath):
 					gstNumber = i.split(':')[1].replace(' ', '')
 					gstNumber = gstNumber.replace("Plan","")
 			if "GSTN Bill No" in i or "GSTN Bill #" in i:
-				invoiceNumber = ((i.split(':')[len(i.split(':')) - 1]).replace(" ", "")).strip('0')
+				invoiceNumber = ((i.split(':')[len(i.split(':')) - 1]).replace(" ", "")).lstrip('0')
 				if "/" in invoiceNumber:
 					invoiceNumber = invoiceNumber.replace("/","")
 			if "Bill To" in i:

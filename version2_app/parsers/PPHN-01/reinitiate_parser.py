@@ -89,10 +89,17 @@ def reinitiateInvoice(data):
 				else:
 					gstNumber = i.split(':')[1].replace(' ', '')
 					gstNumber = gstNumber.replace("Plan","")
-			if "GSTN Bill No" in i or "GSTN Bill #" in i:
-				invoiceNumber = ((i.split(':')[len(i.split(':')) - 1]).replace(" ", "")).strip('0')
-				if "/" in invoiceNumber:
-					invoiceNumber = invoiceNumber.replace("/","")
+			if "Bill Number" in i:
+				invoice_Number = ((i.split(':')[len(i.split(':')) - 1]).replace(" ", ""))
+				if "/" in invoice_Number:
+					invoice_Number = invoice_Number.replace("/","")
+				if invoice_Number == reupload_inv_number:
+					invoiceNumber = invoice_Number
+			if invoiceNumber == "":
+				if "GSTN Bill No" in i or "GSTN Bill #" in i:
+					invoiceNumber = ((i.split(':')[len(i.split(':')) - 1]).replace(" ", "")).lstrip('0')
+					if "/" in invoiceNumber:
+						invoiceNumber = invoiceNumber.replace("/","")
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Check Out by" in i:
