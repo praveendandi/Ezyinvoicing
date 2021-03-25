@@ -76,7 +76,8 @@
   "backend_git_branch",
   "slab_12_starting_range",
   "slab_12_ending_range",
-  "irn_text_alignment"
+  "irn_text_alignment",
+  "backend_git_path"
  ],
  "fields": [
   {
@@ -474,11 +475,16 @@
    "fieldtype": "Select",
    "label": "Irn Text Alignment",
    "options": "Horizontal\nVertical"
+  },
+  {
+   "fieldname": "backend_git_path",
+   "fieldtype": "Data",
+   "label": "Backend Git Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-23 11:45:54.001992",
+ "modified": "2021-03-24 16:45:26.693872",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

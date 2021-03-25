@@ -20,8 +20,6 @@ import json
 import sys
 import frappe
 import os, importlib.util
-# from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
-
 
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
@@ -148,6 +146,35 @@ def gitUiBranchCommit(company):
 		print("git branch commit id:  ", str(e))
 		return {"success": False, "message": str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def gitpull(data):
+	try:
+		company = frappe.get_doc('company',data['company'])
+		# folder_path = frappe.utils.get_bench_path()
+		b = os.popen("git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch)
+		doc = frappe.get_doc({
+		'doctype': 'Update Logs',
+		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
+		'status': 'Success',
+		'updated_by':data['username']
+		})
+		doc.insert()
+		frappe.db.commit()
+		frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+
+		return {"success": True, "message": b}
+	except Exception as e:
+		doc = frappe.get_doc({
+		'doctype': 'Update Logs',
+		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
+		'status': 'Success',
+		'error_message':str(e),
+		'updated_by':data['username']
+		})
+		doc.insert()
+		frappe.db.commit()
+		print("git branch commit id:  ", str(e))
+		return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def b2cstatusupdate():
@@ -543,7 +570,6 @@ def safe_decode(string, encoding='utf-8'):
 	except Exception:
 		pass
 	return string
-
 
 
 @frappe.whitelist(allow_guest=True)

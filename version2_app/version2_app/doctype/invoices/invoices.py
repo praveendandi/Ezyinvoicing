@@ -1381,7 +1381,6 @@ def calulate_items(data):
 					net_value = item["net"]
 				else:
 					net_value = sac_code_based_gst_rates.net
-				print("=====================",net_value)
 				if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
 					gst_value = 0
 					service_dict = {}
@@ -1760,11 +1759,13 @@ def calulate_items(data):
 						# final_item['item_mode'] = "Debit"
 						companyDetails = frappe.get_doc('company', data['company_code'])
 						if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
+							print("-----------")
 							if companyDetails.allowance_type == "Credit":
 								ItemMode = "Credit"
 							else:
 								ItemMode = "Discount"
 						elif invoice_category == "Credit Invoice":
+							print("==================")
 							ItemMode = "Credit"
 						else:
 							pass	
@@ -1782,15 +1783,11 @@ def calulate_items(data):
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
-				if data["company_code"] == "NKIP-01" and data["state_code"] == companyDetails.state_code:
-					final_item["state_cess_amount"] = 0
-					final_item['state_cess'] = 0
+				final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+				if sac_code_based_gst_rates.state_cess_rate > 0:
+					final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
 				else:
-					final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-					if sac_code_based_gst_rates.state_cess_rate > 0:
-						final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
-					else:
-						final_item["state_cess_amount"] = 0
+					final_item["state_cess_amount"] = 0
 				final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
 				if sac_code_based_gst_rates.central_cess_rate > 0:
 					final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
