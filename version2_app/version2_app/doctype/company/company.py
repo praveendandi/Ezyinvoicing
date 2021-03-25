@@ -574,7 +574,6 @@ def updateUiProd(company):
         print(str(e),"    updateUiProd")
 
 
-
 @frappe.whitelist(allow_guest=True)
 def updateProxySettings(data):
     try:
