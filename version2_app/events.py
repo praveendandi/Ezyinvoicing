@@ -87,6 +87,7 @@ def update_documentbin(filepath, error_log):
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
+
 def fileCreated(doc, method=None):
     try:
         if 'job-' in doc.file_name:
