@@ -153,10 +153,6 @@ def gitpull(data):
 		company = frappe.get_doc('company',data['company'])
 		# folder_path = frappe.utils.get_bench_path()
 		b = os.popen("git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch)
-		print(b.__dict__['_stream'].__dict__,"/a/a/a/a/a/a")
-		print(b.__dict__['_proc'].__dict__['_waitpid_lock'],"/a/a/a/a/a/a")
-		c = b.__dict__['_proc'].__dict__['_waitpid_lock']
-		print(c)
 		doc = frappe.get_doc({
 		'doctype': 'Update Logs',
 		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
@@ -503,14 +499,19 @@ def update_parsers():
 		if company.parsers_branch_name:
 			command = "git pull origin "+company.parsers_branch_name
 			abs_path = os.path.dirname(os.getcwd())
-			cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoices/invoice_parsers/'
-			check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoices'
+			cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'
+			check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoice'
 			if not os.path.exists(check_folder):
 				os.mkdir(check_folder)
+				# clone_command = "git --git-dir="+check_folder+"/.git clone https://prasanthvajja:foQJihWZhufdixW43yCs@gitlab.caratred.com/prasanthvajja/invoice_parsers.git"
+				# b = os.popen(clone_command)
 				clone_command = "git clone https://prasanthvajja:foQJihWZhufdixW43yCs@gitlab.caratred.com/prasanthvajja/invoice_parsers.git"
 				Popen(shlex.split(clone_command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=check_folder)
 			# token = "foQJihWZhufdixW43yCs"
 			terminal = Popen(shlex.split(command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=cwd)
+			print(cwd,"/////......")
+			# output = os.popen("git --git-dir="+cwd+"/.git pull")
+			# os.popen("git --git-dir="+cwd+"/.git add .")
 			return{"success":True,"message":"Parsers Updated Successfully"}
 		else:
 			return{"success":False,"message":"Please add branch name in Company"}
