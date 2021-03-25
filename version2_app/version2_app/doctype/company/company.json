@@ -73,7 +73,9 @@
   "parsers_branch_name",
   "ui_git_branch",
   "angular_project_production_path",
-  "backend_git_branch"
+  "backend_git_branch",
+  "slab_12_starting_range",
+  "slab_12_ending_range"
  ],
  "fields": [
   {
@@ -455,11 +457,21 @@
    "fieldname": "backend_git_branch",
    "fieldtype": "Data",
    "label": "Backend Git Branch"
+  },
+  {
+   "fieldname": "slab_12_starting_range",
+   "fieldtype": "Int",
+   "label": "Slab 12% Starting Range"
+  },
+  {
+   "fieldname": "slab_12_ending_range",
+   "fieldtype": "Int",
+   "label": "Slab 12% Ending Range"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-18 16:39:44.419824",
+ "modified": "2021-03-23 11:16:18.326079",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
