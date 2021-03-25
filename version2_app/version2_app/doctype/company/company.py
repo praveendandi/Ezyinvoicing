@@ -25,7 +25,6 @@ abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
 
 
-#doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 class company(Document):
 	# pass
 	def on_update(self):
@@ -157,7 +156,7 @@ def gitpull(data):
 	
 		doc = frappe.get_doc({
 		'doctype': 'Update Logs',
-		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
+		'command': "cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch,
 		'status': 'Success',
 		'updated_by':data['username']
 		})
@@ -169,7 +168,7 @@ def gitpull(data):
 	except Exception as e:
 		doc = frappe.get_doc({
 		'doctype': 'Update Logs',
-		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
+		'command': "cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch,
 		'status': 'Success',
 		'error_message':str(e),
 		'updated_by':data['username']
