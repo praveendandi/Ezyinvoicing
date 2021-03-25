@@ -2,6 +2,10 @@ import threading
 import requests
 import glob
 import os
+<<<<<<< HEAD
+=======
+import frappe
+>>>>>>> jaipur-marriot-manualfileuplod-test
 from os import path
 import time
 # def printit():
@@ -24,6 +28,7 @@ import time
 # 			if path.exists(file_path):
 # 				os.remove(file_path)
 # printit()
+<<<<<<< HEAD
 
 def getfiles():
     try:
@@ -32,6 +37,18 @@ def getfiles():
         files = glob.glob("/home/frappe/files/*.pdf")
         for file_path in files:
             data = {"company":"MJH-01","host":"http://0.0.0.0:8000/api/method/"}
+=======
+company = frappe.get_last_doc("company")
+print(company.__dict__)
+print(company.watcher_folder_path,"////////")
+files = glob.glob(company.watcher_folder_path)
+def getfiles():
+    try:
+        time.sleep(5)
+        
+        for file_path in files:
+            data = {"company":company.name,"host":"http://0.0.0.0:8000/api/method/"}
+>>>>>>> jaipur-marriot-manualfileuplod-test
             print(data,"config data")
             invoicefile = {'file': open(file_path, 'rb')}
             payload = {

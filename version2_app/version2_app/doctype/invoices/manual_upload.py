@@ -121,7 +121,7 @@ def manual_upload(data):
 					list_data = {}
 					list_data['invoice_category'] = each['FOLIO_TYPE']
 					list_data['invoice_number'] = each['BILL_NO']
-					list_data['invoice_date'] = each['BILL_GENERATION_DATE_CHAR']
+					list_data['invoice_date'] = each['BILL_GENERATION_DATE']
 					list_data['room_number'] = each['ROOM']
 					list_data['guest_name'] = each['DISPLAY_NAME']
 					list_data['gstNumber'] = each['Gst Number']

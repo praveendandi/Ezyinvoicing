@@ -170,6 +170,7 @@ def reinitiateInvoice(data):
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
 				if "COPY OF INVOICE" in i:
+					print("///////")
 					nameindex = i.index("COPY OF INVOICE")
 					guest['name'] = i[:nameindex]
 					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
@@ -180,7 +181,9 @@ def reinitiateInvoice(data):
 				if "Bill No." in i:
 					nameindex = i.index("Bill No.")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
+				guest['name'] = guest['name'].replace("COPY OF INVOICE","")
+				guest['name'] = guest['name'].replace("TAX INVOICE","")
+				guest['name'] = guest['name'].replace("Bill No.","")		
 			if index == 1:
 				guest['address1'] = ""
 			if index == 2:
