@@ -152,8 +152,8 @@ def gitUiBranchCommit(company):
 def gitpull(data):
 	try:
 		company = frappe.get_doc('company',data['company'])
-		b = os.popen("git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch)
-		
+		b = os.popen("git --git-dir="+company.backend_git_path+" git pull origin "+company.backend_git_branch)
+	
 		doc = frappe.get_doc({
 		'doctype': 'Update Logs',
 		'command': "git --git-dir="+company.backend_git_path+"/.git pull origin "+company.backend_git_branch,
