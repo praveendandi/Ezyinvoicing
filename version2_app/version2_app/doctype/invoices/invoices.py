@@ -10,6 +10,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import Credi
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
+import traceback
 import json
 import string
 import qrcode
@@ -134,7 +135,7 @@ class Invoices(Document):
 		taxPayerDeatilsData.save()
 		return True
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def generateIrn(data):
 	try:
 		print(data)
@@ -413,6 +414,7 @@ def generateIrn(data):
 				return {"success": False, "message": str(e)}
 	except Exception as e:
 		print(str(e), "generate Irn")
+		print(traceback.print_exc())
 		frappe.log_error(frappe.get_traceback(),invoice_number)
 		logger.error(f"{invoice_number},     generateIrn,   {str(e)}")
 		return {"success": False, "message": str(e)}
@@ -722,7 +724,9 @@ def create_qr_image(invoice_number, gsp):
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.irn_number
+			"Irn": invoice.irn_number,
+			"height":"150",
+			"width":"150"
 		}
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
@@ -1275,6 +1279,7 @@ def insert_items(items, invoice_number):
 def calulate_items(data):
 	# items, invoice_number,company_code
 	try:
+		# print(data)
 		total_items = []
 		second_list = []
 		if any("split_value" in check for check in data["items"]):
@@ -1296,13 +1301,11 @@ def calulate_items(data):
 			invoice_category = "Tax Invoice"
 		companyDetails = frappe.get_doc('company', data['company_code'])
 		if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-			print("-----------")
 			if companyDetails.allowance_type == "Credit":
 				ItemMode = "Credit"
 			else:
 				ItemMode = "Discount"
 		elif invoice_category == "Credit Invoice":
-			print("==================")
 			ItemMode = "Credit"
 		else:
 			pass	
@@ -3011,9 +3014,7 @@ def Error_Insert_invoice(data):
 					
 				# return {"success": True}
 			if v.invoice_from=="Pms": 
-				print("///////")	
 				socket = invoiceCreated(invoice)
-			print("/a/a/a/a/a/")	
 			return {"success":False,"message":"Error","data":v} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
