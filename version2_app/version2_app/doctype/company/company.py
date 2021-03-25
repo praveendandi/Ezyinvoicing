@@ -548,27 +548,56 @@ def safe_decode(string, encoding='utf-8'):
 
 @frappe.whitelist(allow_guest=True)
 def updateUiProd(company):
-	try:
-		print("==========")
-		company = frappe.get_doc('company',company)
-		commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
-		
-		console_dump = ''
-		
-		cwd = company.angular_project_production_path
-		key = str(time.time())
-		# count = 0
-		for command in commands:
-			print(command,"    command")
-			terminal = Popen(shlex.split(command),
-							stdin=PIPE,
-							stdout=PIPE,
-							stderr=STDOUT,
-							cwd=cwd)
-			for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-				console_dump += c
-		logged_command = " && ".join(commands)
-		frappe.publish_realtime("custom_socket", {'message':'system_reload','type':"system_reload"})
-		frappe.log_error("Angular project pull data","updateUiProd")
-	except Exception as e:
-		print(str(e),"    updateUiProd")
+    try:
+        print("==========")
+        company = frappe.get_doc('company',company)
+        commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        
+        console_dump = ''
+        
+        cwd = company.angular_project_production_path
+        key = str(time.time())
+        # count = 0
+        for command in commands:
+            print(command,"    command")
+            terminal = Popen(shlex.split(command),
+                            stdin=PIPE,
+                            stdout=PIPE,
+                            stderr=STDOUT,
+                            cwd=cwd)
+            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+                console_dump += c
+        logged_command = " && ".join(commands)
+        frappe.publish_realtime("custom_socket", {'message':'system_reload','type':"system_reload"})
+        frappe.log_error("Angular project pull data","updateUiProd")
+    except Exception as e:
+        print(str(e),"    updateUiProd")
+
+
+
+@frappe.whitelist(allow_guest=True)
+def updateProxySettings(data):
+    try:
+
+        abs_path = os.path.dirname(os.getcwd())
+        company = frappe.get_doc('company',data['company'])
+        if company.proxy==1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://", "@")
+            if data['type'] == "unset":
+                commands = ['unset https_proxy','unset http_proxy']
+                for each in commands:
+                    print(each)
+                    os.system(each)
+                return {"success":True}
+            else:
+                commands = ["https_proxy="+"'"+"https://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'","http_proxy="+"'"+"http://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'"]                    
+                for each in commands:
+                    print(each)
+                    os.system(each)
+                return {"success":True}
+        else:
+            return {"success":False,"message":"No Proxy Settings"}
+    except Exception as e:
+        print(str(e),"  updateProxySettings  ")
+        return {"success":False,"message":str(e)}    
