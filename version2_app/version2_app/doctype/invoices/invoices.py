@@ -3137,15 +3137,26 @@ def b2b_success_to_credit_note(data):
 		total_data = {}
 		if len(invoice_data) > 0:
 			invoice_number_amend = invoice_data[0]["invoice_number"]+"-1"
-			guest_data = {"name":invoice_data[0]["guest_name"],"invoice_number":invoice_number_amend,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":invoice_data[0]["invoice_category"],"invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"sez":invoice_data[0]["sez"]}
+			guest_data = {"name":invoice_data[0]["guest_name"],"invoice_number":invoice_number_amend,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":"Credit Invoice","invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow())}
 			guest_data["invoice_date"] = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["*"])
 			df = pd.DataFrame.from_records(item_data)
-			group = df.groupby(["sac_code","gst_rate","type","vat","cess","state_cess","taxable"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first","parentfield":"first","parenttype":"first","taxable":"first"})
+			group = df.groupby(["sac_code","gst_rate","type","vat","cess","state_cess","taxable"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first","parentfield":"first","parenttype":"first","taxable":"first","sort_order":"first","sac_code_found":"first","gst_rate":"first"})
 			group["item_mode"] = "Credit"
 			group["doctype"] = "Items"
 			group["parent"] = invoice_number_amend
+			group.loc[group["cgst_amount"] != 0, "cgst_amount"] = -abs(group["cgst_amount"])
+			group.loc[group["sgst_amount"] != 0, "sgst_amount"] = -abs(group["sgst_amount"])
+			group.loc[group["igst_amount"] != 0, "igst_amount"] = -abs(group["igst_amount"])
+			group.loc[group["cess_amount"] != 0, "cess_amount"] = -abs(group["cess_amount"])
+			group.loc[group["state_cess_amount"] != 0, "state_cess_amount"] = -abs(group["state_cess_amount"])
+			group.loc[group["vat_amount"] != 0, "vat_amount"] = -abs(group["vat_amount"])
+			group.loc[group["item_value"] != 0, "item_value"] = -abs(group["item_value"])
+			group.loc[group["item_taxable_value"] != 0, "item_taxable_value"] = -abs(group["item_taxable_value"])
+			group.loc[group["item_value_after_gst"] != 0, "item_value_after_gst"] = -abs(group["item_value_after_gst"])
+			group.loc[group["item_value_after_gst"] != 0, "item_value_after_gst"] = -abs(group["item_value_after_gst"])
 			group_data = group.to_dict('records')
+			print(group_data)
 			if invoice_data[0]["gst_number"] != "":
 				taxpayer = frappe.get_doc("TaxPayerDetail",invoice_data[0]["gst_number"])
 				total_data["taxpayer"] = taxpayer.__dict__
@@ -3154,9 +3165,11 @@ def b2b_success_to_credit_note(data):
 				total_data["taxpayer"] = taxpayer
 			total_data["guest_data"] = guest_data
 			total_data["items_data"] = group_data
-			total_data["amened"] = "No"
+			total_data["amened"] = ""
+			total_data["invoice_number"] = invoice_number_amend
+			total_data["sez"] = invoice_data[0]["sez"]
 			total_data["company_code"] = invoice_data[0]["company"]
-			total_data["total_invoice_amount"] = invoice_data[0]["total_invoice_amount"]
+			total_data["total_invoice_amount"] = -abs(invoice_data[0]["total_invoice_amount"])
 			insert_invoice(total_data)
 	# except Exception as e:
 	# 	print(e, "attach b2c qrcode")
