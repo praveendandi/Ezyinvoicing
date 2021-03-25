@@ -146,6 +146,8 @@ def gitUiBranchCommit(company):
 		print("git branch commit id:  ", str(e))
 		return {"success": False, "message": str(e)}
 
+
+
 @frappe.whitelist(allow_guest=True)
 def gitpull(data):
 	try:
