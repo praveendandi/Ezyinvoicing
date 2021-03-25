@@ -70,6 +70,7 @@ def invoiceCreated(doc):
         return {"success":False,"message":str(e)}
 
 
+
 def update_documentbin(filepath, error_log):
     try:
         bin_data = frappe.db.get_list('Document Bin', filters={'invoice_file': ['=', filepath]})
