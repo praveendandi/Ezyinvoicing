@@ -362,11 +362,7 @@ def file_parsing(filepath):
 
 	except Exception as e:
 		print(traceback.print_exc())
-<<<<<<< HEAD
-		return {"success":False,"message":str(e)}
-=======
 		update_document_bin(print_by,document_type,"",str(e),filepath)
 		
 
 
->>>>>>> bench-update-ui
