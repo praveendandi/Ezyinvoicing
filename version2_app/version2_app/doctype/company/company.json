@@ -61,6 +61,7 @@
   "number_in_description",
   "allow_auto_irn",
   "sc_name",
+  "sc_sac_code",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
@@ -455,11 +456,16 @@
    "fieldname": "backend_git_branch",
    "fieldtype": "Data",
    "label": "Backend Git Branch"
+  },
+  {
+   "fieldname": "sc_sac_code",
+   "fieldtype": "Data",
+   "label": "SC SAC Code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-18 16:39:44.419824",
+ "modified": "2021-03-26 11:01:20.438911",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
