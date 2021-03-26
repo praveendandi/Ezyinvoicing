@@ -717,16 +717,20 @@ def create_qr_image(invoice_number, gsp):
 		site_folder_path = company.site_name
 		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
 		# print(path)
+
 		headers = {
 			"user_name": gsp['username'],
 			"password": gsp['password'],
 			"gstin": gsp['gst'],
 			"requestid": str(random.randint(0, 1000000000000000000)),
 			"Authorization": "Bearer " + gsp['token'],
-			"Irn": invoice.irn_number,
-			"height":"150",
-			"width":"150"
+			"Irn": invoice.irn_number
 		}
+		if company.irn_qr_size == "Small":
+				# "height":"150",
+			# "width":"150"
+			headers['height'] = "150"
+			headers['width'] = "150"
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,

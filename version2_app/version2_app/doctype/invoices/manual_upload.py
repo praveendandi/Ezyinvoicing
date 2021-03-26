@@ -195,7 +195,7 @@ def manual_upload(data):
 			error_data['invoice_from'] = "File"
 			each['sez'] = 0
 			sez = 0
-			print(len(each['gstNumber']),"lennn",each['gstNumber'],each['invoice_type'])
+			# print(len(each['gstNumber']),"lennn",each['gstNumber'],each['invoice_type'])
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 
 			if len(each['gstNumber']) < 15 and len(each['gstNumber'])>0:
