@@ -23,6 +23,10 @@ def emailTemplate():
         obj["val"] = b2bsuccess
         files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data['invoice_number']]},fields=['name'])
         obj["attachments"] = [d['name'] for d in files]
+        # print(obj['val']['response'])
+        # print(obj['val'].__dict__['response'].replace("{{",""))
+        obj['val'].__dict__['response'] = obj['val'].__dict__['response'].replace("{{","")
+        obj['val'].__dict__['response'] = obj['val'].__dict__['response'].replace("}}","")
         return(obj)
 
 
@@ -38,6 +42,8 @@ def emailTemplate():
         obj["val"] = b2bpending
         files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data['invoice_number']]},fields=['name'])
         obj["attachments"] = [d['name'] for d in files]
+        obj['val'].__dict__['response'] = obj['val'].__dict__['response'].replace("{{","")
+        obj['val'].__dict__['response'] = obj['val'].__dict__['response'].replace("}}","")
         return(obj)
 
 
@@ -51,6 +57,8 @@ def emailTemplate():
         obj["val"] = b2csuccess
         files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data['invoice_number']]},fields=['name'])
         obj["attachments"] = [d['name'] for d in files]
+        obj['val'].__dict__['response'] = obj['val'].__dict__['response'].replace("{{","")
+        obj['val'].__dict__['response'] = obj['val'].__dict__['response'].replace("}}","")
         return(obj)
         
     
@@ -70,7 +78,7 @@ def send_email():
         pdffilename = frappe.get_doc("File","ab5aba0184")
         
         frappe.sendmail(
-            recipients = "ganesh@caratred.com",
+            recipients = "info@caratred.com",
             cc = '',
             subject = 'Sample',
             content = 'Message',

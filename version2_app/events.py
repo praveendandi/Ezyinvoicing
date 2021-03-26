@@ -42,6 +42,7 @@ def invoice_deleted(doc,method=None):
 def invoiceCreated(doc):
     try:
         # frappe.publish_realtime("invoice_created", "message")
+        print("=================---------------000000000000")       
         frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':doc.__dict__})
         soc_doc = frappe.new_doc("Socket Notification")
         soc_doc.invoice_number = doc.name
@@ -69,6 +70,7 @@ def invoiceCreated(doc):
         return {"success":False,"message":str(e)}
 
 
+
 def update_documentbin(filepath, error_log):
     try:
         bin_data = frappe.db.get_list('Document Bin', filters={'invoice_file': ['=', filepath]})
@@ -85,6 +87,7 @@ def update_documentbin(filepath, error_log):
         print(str(e), "update_documentbin")
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
+
 
 def fileCreated(doc, method=None):
     try:
@@ -114,9 +117,10 @@ def fileCreated(doc, method=None):
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
-def emitsocket(doc,method=None):
-    frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
-    frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
+def Updateemitsocket(doc,method=None):
+    if doc.status=="Success":
+        frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
+        frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
 
 
 def DocumentBinSocket(doc,method=None):

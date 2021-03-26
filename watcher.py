@@ -2,6 +2,10 @@ import threading
 import requests
 import glob
 import os
+<<<<<<< HEAD
+=======
+import frappe
+>>>>>>> jaipur-marriot-manualfileuplod-test
 from os import path
 import time
 # def printit():

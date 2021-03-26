@@ -61,7 +61,6 @@
   "number_in_description",
   "allow_auto_irn",
   "sc_name",
-  "sc_sac_code",
   "sc_gst_percentage",
   "adjustment_service_charge_list",
   "enable_sc_from_folios",
@@ -74,7 +73,13 @@
   "parsers_branch_name",
   "ui_git_branch",
   "angular_project_production_path",
-  "backend_git_branch"
+  "backend_git_branch",
+  "slab_12_starting_range",
+  "slab_12_ending_range",
+  "irn_text_alignment",
+  "backend_git_path",
+  "irn_qr_size",
+  "sc_sac_code"
  ],
  "fields": [
   {
@@ -461,11 +466,38 @@
    "fieldname": "sc_sac_code",
    "fieldtype": "Data",
    "label": "SC SAC Code"
+  },
+  {
+   "fieldname": "slab_12_starting_range",
+   "fieldtype": "Int",
+   "label": "Slab 12% Starting Range"
+  },
+  {
+   "fieldname": "slab_12_ending_range",
+   "fieldtype": "Int",
+   "label": "Slab 12% Ending Range"
+  },
+  {
+   "fieldname": "irn_text_alignment",
+   "fieldtype": "Select",
+   "label": "Irn Text Alignment",
+   "options": "Horizontal\nVertical"
+  },
+  {
+   "fieldname": "backend_git_path",
+   "fieldtype": "Data",
+   "label": "Backend Git Path"
+  },
+  {
+   "fieldname": "irn_qr_size",
+   "fieldtype": "Select",
+   "label": "Irn Qr Size",
+   "options": "Small\nLarge"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-26 11:01:20.438911",
+ "modified": "2021-03-26 17:05:09.139658",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

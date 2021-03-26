@@ -63,7 +63,7 @@ def file_parsing(filepath):
             if "Conf. No." in i:
                 confirmation_number = i.split(" ")
                 conf_number = confirmation_number[-1].replace(" ", "")
-            if "Total" in i and "Total Value" not in i:
+            if "Total" in i and "Total Value" not in i and "INR" not in i:
                 total_invoice = i.split(" ")
                 total_invoice_amount = float(total_invoice[-2].replace(",", ""))
             if "Departure" in i:
@@ -108,7 +108,6 @@ def file_parsing(filepath):
             if "Printed By / On" in i:
                 p = i.split(":")
                 print_by = p[1].replace(" ","")
-
 
         items = [] 
         itemsort = 0
