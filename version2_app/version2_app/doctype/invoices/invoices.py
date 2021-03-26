@@ -536,7 +536,7 @@ def send_invoicedata_to_gcb(invoice_number):
 				"invoice_number": doc.invoice_number,
 				"invoice_type": doc.invoice_type,
 				"invoice_date": str(doc.invoice_date),
-				"pms_invoice_summary": doc.pms_invoice_summary,
+				"pms_invoice_summary": doc.total_invoice_amount,
 				"irn": "N/A",
 				"company_name": company.company_name,
 				"guest_name": doc.guest_name,

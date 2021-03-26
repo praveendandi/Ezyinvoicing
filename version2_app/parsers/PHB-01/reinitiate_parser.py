@@ -23,7 +23,7 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
-	try:
+	# try:
 		filepath = data['filepath']
 		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
@@ -59,24 +59,41 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			if "Reservation #" in i:
-				confirmation_number = i.split(":")
-				conf_number = confirmation_number[-1].replace(" ", "")
+			if "Reservation #" in i or "Reservation No" in i:
+				if "Reservation #" in i:
+					confirmation_number = i.split(":")
+					conf_number = confirmation_number[-1].replace(" ", "")
+				elif "Reservation No" in i:
+					confirmation_number = i.split(":")
+					conf_number = confirmation_number[1].replace("Bill No", "").strip()
 			if "Net Amount" in i:
 				total_invoice = i.split(":")[-1]
 				total_invoice_amount = float(total_invoice.replace(",",""))
-			if "Bill Date" in i:
-				date_time_obj = i.split(':')[-1]
-				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
+			if "Bill Date" in i or "Bill Date & Time" in i:
+				date_time_obj = i.split(':')[-1].strip()
+				if "Bill Date & Time" in i:
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y %H.%M').strftime('%d-%b-%y %H:%M:%S')
+				else:
+					date_time_obj = datetime.datetime.strptime(date_time_obj, '%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
 			if "Room No" in i:
 				room = i.split(" ")
 				roomNumber = room[-1]
-			if "GSTN Number" in i:
-				gstNumber = i.split(':')[-1].replace(' ', '')
+			if "GSTN Number" in i or "Guest GSTN #" in i or "STN Number" in i or "TN Number" in i:
+				if "Guest GSTN #" in i:
+					gstNumber = i.split(':')[1].replace('GSTN Bill #', '').strip()
+				else:
+					gstNumber = i.split(':')[-1].replace(' ', '')
 			if "Bill Number" in i:
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-				if "/" in invoiceNumber:
-					invoiceNumber = invoiceNumber.replace("/","")
+				invoice_Number = ((i.split(':')[len(i.split(':')) - 1]).replace(" ", ""))
+				if "/" in invoice_Number:
+					invoice_Number = invoice_Number.replace("/","")
+				if invoice_Number == reupload_inv_number:
+					invoiceNumber = invoice_Number
+			if invoiceNumber == "":
+				if "GSTN Bill No" in i or "GSTN Bill #" in i:
+					invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+					if "/" in invoiceNumber:
+						invoiceNumber = invoiceNumber.replace("/","")
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Check Out by" in i:
@@ -111,7 +128,8 @@ def reinitiateInvoice(data):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if len(check_date) > 0 and "Total:" not in i:
+			check_digit = " ".join(i.split())
+			if (len(check_date) > 0 and "Total:" not in i) or (check_digit[0].isdigit() and "~" in check_digit):
 				item = dict()
 				item_value = ""
 				dt = i.strip()
@@ -119,7 +137,10 @@ def reinitiateInvoice(data):
 					val = dt.split(" ")
 					if len(val)>1:
 						if index == 0:
-							item['date'] = j
+							if (len(check_date)>0):
+								item['date'] = j
+							else:
+								item["date"] = datetime.datetime.strptime(date_time_obj, '%d-%b-%y %H:%M:%S').strftime('%d/%m/%y')
 						if "~" in i:
 							result = re.search("~(.*)~", i)
 							item['name'] = (result.group(1)).strip()
@@ -149,6 +170,7 @@ def reinitiateInvoice(data):
 			if index == 0:
 				guest['name'] = i.split(':')[1]
 				guest['name'] = (guest["name"].replace("Bill Number","")).strip()
+				guest["name"] = guest["name"].replace("Bill Date & Time","").strip()
 			if index == 1:
 				guest['address1'] = ((i.split(':')[1]).replace("Bill Date","")).strip()
 			if index == 2:
@@ -277,7 +299,7 @@ def reinitiateInvoice(data):
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
-	except Exception as e:
-		print(str(e),"       invoice parsing")
-		print(traceback.print_exc())
-		return {"success":False,"message":str(e)}		
+	# except Exception as e:
+	# 	print(str(e),"       invoice parsing")
+	# 	print(traceback.print_exc())
+	# 	return {"success":False,"message":str(e)}		
