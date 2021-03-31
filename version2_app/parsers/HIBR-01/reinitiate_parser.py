@@ -58,15 +58,21 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			if "CREDIT INVOICE" in i:
+				invoice_category = "Credit Invoice"
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-			if "Departure :" in i:
-				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
+			if "Original Bill date" in i or "Original Bill  date" in i:
+				date_time_obj = i.split(":")[-1].strip()
+				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%b-%y').strftime('%d-%b-%y %H:%M:%S')
+			if date_time_obj == "":
+				if "Departure :" in i:
+					depatureDateIndex = i.index('Departure')
+					date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
 			if "Room No." in i or "Room No" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
@@ -165,7 +171,7 @@ def reinitiateInvoice(data):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
+		guest['room_number'] = int(roomNumber) if roomNumber != '' else 0
 		guest['company_code'] = "HIBR-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)

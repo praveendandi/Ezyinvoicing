@@ -80,7 +80,7 @@ def file_parsing(filepath):
                 i = i.replace("GST ","")
                 gstNumber = (i.split(':')[1]).split(" ")[1]
                 gstNumber = (gstNumber.replace("Arrival","")).strip()
-                
+                gstNumber = gstNumber.replace("Departure","").strip()
             if "Invoice No." in i:
                 invoiceNumber = (i.split(' ')[-1]).replace(" ", "")
             if "Bill To" in i:

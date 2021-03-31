@@ -3,10 +3,10 @@ from datetime import date
 import datetime
 import requests
 import pandas as pd
-import traceback
 import re
 import json
 import sys
+import traceback
 import frappe
 from frappe.utils import get_site_name
 from version2_app.version2_app.doctype.invoices.invoices import *
@@ -27,7 +27,7 @@ def reinitiateInvoice(data):
 		filepath = data['filepath']
 		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
-		companyCheckResponse = check_company_exist("IBISChennaiCC-01")
+		companyCheckResponse = check_company_exist("JWMC-01")
 		site_folder_path = companyCheckResponse['data'].site_name
 		file_path = folder_path+'/sites/'+site_folder_path+filepath
 		today = date.today()
@@ -59,32 +59,33 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			if "Confirmation No." in i:
+			if "Confirmation No" in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-			if "Total" in i and "INR" in i:
+			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-			if "Departure :" in i:
-				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-			if "Room No." in i or "Room No" in i:
+			if "Departure" in i:
+				date_time_obj = (i.split(":")[-1]).strip()
+				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
+			if "Room  :" in i or "Room :" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
-			if "GST NO" in i:
+			if "GST No." in i and "Hotel GST No." not in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("ConfirmationNo.","")
-			if "Bill  No." in i:
+			if "Invoice No" in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				invoiceNumber = invoiceNumber.replace("-","")
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
 				guestDetailsEntered = False
 			if guestDetailsEntered == True:
 				guestDeatils.append(i)
-			if i in "Date Description Reference Debit Credit":
-				entered = True
+			# if i in "Date Description Reference Debit Credit":
+			entered = True
 			if 'CGST 6%=' in i:
 				entered = False
 			if 'Billing' in i:
@@ -98,16 +99,17 @@ def reinitiateInvoice(data):
 			if "Membership" in i:
 				Membership = i.split(":")
 				membership = Membership[-1].replace(" ", "")
-			if "Printed By / On" in i:
+			if "Cashier" in i:
 				p = i.split(":")
-				print_by = p[1].replace(" ","")
+				print_by = p[-1].replace(" ","")
+
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		items = [] 
 		itemsort = 0
 		for i in data:
 			pattern = re.compile(
-			"^([0-9]{2}\-[0-9]{2}\-[0-9]{2})+"
+			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
 			if len(check_date) > 0:
@@ -144,7 +146,7 @@ def reinitiateInvoice(data):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "UTGST" not in each["name"]:
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 
@@ -165,8 +167,8 @@ def reinitiateInvoice(data):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
-		guest['company_code'] = "IBISChennaiCC-01"
+		guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
+		guest['company_code'] = "JWMC-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
 		guest['print_by'] = print_by
@@ -177,25 +179,26 @@ def reinitiateInvoice(data):
 			inv_data = check_invoice['data']
 			if inv_data.docstatus==2:
 				amened='Yes'
+				invoiceNumber = inv_data.name
+				guest['invoice_number'] = inv_data.name
 			else:
 				invoiceNumber = inv_data.name
 				guest['invoice_number'] = inv_data.name
 				amened='No'
 		
-		company_code = {"code":"IBISChennaiCC-01"}
-		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"IBISChennaiCC-01","invoice_date":date_time_obj}
+		company_code = {"code":"JWMC-01"}
+		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"JWMC-01","invoice_date":date_time_obj}
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
 		error_data['gst_number'] = gstNumber
 		if guest['invoice_type'] == "B2C":
 			error_data['gst_number'] == " "
-		error_data['state_code'] = "33"
+		error_data['state_code'] = " "
 		error_data['room_number'] = guest['room_number']
-		error_data['pincode'] = "603103"
+		error_data['pincode'] = " "
 		error_data['total_invoice_amount'] = total_invoice_amount
-		# gstNumber = "12345"
-		# print(guest['invoice_number'])
 
+		# gstNumber = "12345"
 		if len(gstNumber) < 15 and len(gstNumber)>0:
 			error_data['invoice_file'] = filepath
 			error_data['error_message'] = "Invalid GstNumber"
@@ -206,6 +209,8 @@ def reinitiateInvoice(data):
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}
+
+
 
 		print(json.dumps(guest, indent = 1))
 		gspApiDataResponse = gsp_api_data({"code":company_code['code'],"mode":companyCheckResponse['data'].mode,"provider":companyCheckResponse['data'].provider})
@@ -283,4 +288,5 @@ def reinitiateInvoice(data):
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
 		print(traceback.print_exc())
+		update_document_bin(print_by,document_type,"",str(e),filepath)
 		return {"success":False,"message":str(e)}
