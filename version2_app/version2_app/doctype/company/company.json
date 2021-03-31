@@ -79,7 +79,9 @@
   "irn_text_alignment",
   "backend_git_path",
   "irn_qr_size",
-  "sc_sac_code"
+  "sc_sac_code",
+  "configiration_section",
+  "config"
  ],
  "fields": [
   {
@@ -493,11 +495,22 @@
    "fieldtype": "Select",
    "label": "Irn Qr Size",
    "options": "Small\nLarge"
+  },
+  {
+   "fieldname": "configiration_section",
+   "fieldtype": "Section Break",
+   "label": "Configiration"
+  },
+  {
+   "fieldname": "config",
+   "fieldtype": "Table",
+   "label": "config",
+   "options": "CONFIGURATIONS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-26 17:05:09.139658",
+ "modified": "2021-03-31 10:35:18.567524",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
