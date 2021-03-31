@@ -10,6 +10,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import Credi
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 import pandas as pd
+import traceback
 import json
 import string
 import qrcode
@@ -79,7 +80,6 @@ class Invoices(Document):
 				invoice.irn_cancelled = 'Yes'
 				invoice.irn_generated = 'Cancelled'
 				invoice.save()
-				print("/////")
 				if invoice.has_credit_items=="Yes" and company_details['data'].allowance_type == "Credit":
 					credit_cancel_response = cancel_irn(invoice.credit_irn_number, GSP_details, reason,company_details['data'],invoice_number)
 					if credit_cancel_response['success']:
@@ -134,7 +134,7 @@ class Invoices(Document):
 		taxPayerDeatilsData.save()
 		return True
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def generateIrn(data):
 	try:
 		print(data)
@@ -413,6 +413,7 @@ def generateIrn(data):
 				return {"success": False, "message": str(e)}
 	except Exception as e:
 		print(str(e), "generate Irn")
+		print(traceback.print_exc())
 		frappe.log_error(frappe.get_traceback(),invoice_number)
 		logger.error(f"{invoice_number},     generateIrn,   {str(e)}")
 		return {"success": False, "message": str(e)}
@@ -716,6 +717,7 @@ def create_qr_image(invoice_number, gsp):
 		site_folder_path = company.site_name
 		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
 		# print(path)
+
 		headers = {
 			"user_name": gsp['username'],
 			"password": gsp['password'],
@@ -724,6 +726,11 @@ def create_qr_image(invoice_number, gsp):
 			"Authorization": "Bearer " + gsp['token'],
 			"Irn": invoice.irn_number
 		}
+		if company.irn_qr_size == "Small":
+				# "height":"150",
+			# "width":"150"
+			headers['height'] = "150"
+			headers['width'] = "150"
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,
@@ -958,7 +965,7 @@ def insert_invoice(data):
 
 		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
 			data['total_invoice_amount'] = sales_amount_after_tax
-		print(sales_amount_after_tax)	
+		# print(sales_amount_after_tax)	
 		if '-' in str(sales_amount_after_tax):
 			allowance_invoice = "Yes"
 		else:
@@ -1000,7 +1007,7 @@ def insert_invoice(data):
 							if invoiceData.invoice_from=="Pms":
 								socket = invoiceCreated(invoiceData)	
 							return {"success": True,"data":TotalMismatchErrorAPI['data']}
-
+						
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
 		if len(data['items_data'])==0:
@@ -1139,7 +1146,7 @@ def insert_invoice(data):
 				
 				invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
 
-		print(invoice.allowance_invoice)			
+		# print(invoice.allowance_invoice)			
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 		data['invoice_number'] = v.name
 		data['guest_data']['invoice_number'] = v.name
@@ -1296,13 +1303,11 @@ def calulate_items(data):
 			invoice_category = "Tax Invoice"
 		companyDetails = frappe.get_doc('company', data['company_code'])
 		if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-			print("-----------")
 			if companyDetails.allowance_type == "Credit":
 				ItemMode = "Credit"
 			else:
 				ItemMode = "Discount"
 		elif invoice_category == "Credit Invoice":
-			print("==================")
 			ItemMode = "Credit"
 		else:
 			pass	
@@ -1380,7 +1385,6 @@ def calulate_items(data):
 					net_value = item["net"]
 				else:
 					net_value = sac_code_based_gst_rates.net
-				print("=====================",net_value)
 				if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
 					gst_value = 0
 					service_dict = {}
@@ -1759,15 +1763,27 @@ def calulate_items(data):
 						# final_item['item_mode'] = "Debit"
 						companyDetails = frappe.get_doc('company', data['company_code'])
 						if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
+							print("-----------")
 							if companyDetails.allowance_type == "Credit":
 								ItemMode = "Credit"
 							else:
 								ItemMode = "Discount"
 						elif invoice_category == "Credit Invoice":
+							print("==================")
 							ItemMode = "Credit"
 						else:
 							pass	
 						if "-" in str(item['item_value']):
+							companyDetails = frappe.get_doc('company', data['company_code'])
+							if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
+								if companyDetails.allowance_type == "Credit":
+									ItemMode = "Credit"
+								else:
+									ItemMode = "Discount"
+							elif invoice_category == "Credit Invoice":
+								ItemMode = "Credit"
+							else:
+								pass
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
@@ -1986,6 +2002,7 @@ def calulate_items(data):
 	except Exception as e:
 		print(e, "calculation api")
 		return {"success": False, "message": str(e)}
+
 
 
 def insert_tax_summariesd(items, invoice_number):
@@ -2421,16 +2438,17 @@ def get_tax_payer_details(data):
 			response = request_get(
 				data['apidata']['get_taxpayer_details'] + data['gstNumber'],
 				data['apidata'], data['invoice'], data['code'])
+			
 			if response['success']:
 
 				details = response['result']
 				if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
 					if (details['AddrBno'] != "") or (details['AddrBno'] !=
-													  ""):
+														""):
 						details['AddrBnm'] = details['AddrBno']
 				if (details['AddrBno'] == "") or (details['AddrBno'] == None):
 					if (details['AddrBnm'] != "") or (details['AddrBnm'] !=
-													  None):
+														None):
 						details['AddrBno'] = details['AddrBnm']
 				if (details['TradeName'] == "") or (details['TradeName']
 													== None):
@@ -2481,7 +2499,7 @@ def get_tax_payer_details(data):
 					}
 			else:
 				print("Unknown error in get taxpayer details get call  ",
-					  response)
+						response)
 				error_message = "Invalid GstNumber "+data['gstNumber']
 				frappe.log_error(frappe.get_traceback(), data['gstNumber'])
 				logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
@@ -2869,7 +2887,6 @@ def check_invoice_exists(invoice_number):
 						'invoice_number':
 						['like', invoice_number+'-%']
 					})
-					print(AmenedinvCount)
 					if len(AmenedinvCount)>0:
 						invoice_number = AmenedinvCount[0]['name']
 					
@@ -2888,7 +2905,6 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist()
 def Error_Insert_invoice(data):
 	try:
-		# print(data,"/////////")
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "
 		if "invoice_from" in data:
@@ -3011,9 +3027,7 @@ def Error_Insert_invoice(data):
 					
 				# return {"success": True}
 			if v.invoice_from=="Pms": 
-				print("///////")	
 				socket = invoiceCreated(invoice)
-			print("/a/a/a/a/a/")	
 			return {"success":False,"message":"Error","data":v} 
 		
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
@@ -3033,7 +3047,7 @@ def Error_Insert_invoice(data):
 				if len(invoiceExists.gst_number)<15:
 					invoiceExists.gst_number = ""
 
-						
+			# print(invoiceExists.gst_number,"/a/a")			
 			invoiceExists.irn_generated = "Error"
 			invoiceExists.total_invoice_amount = data['total_invoice_amount']
 			# invoiceExists.qr_generated = "Pending"

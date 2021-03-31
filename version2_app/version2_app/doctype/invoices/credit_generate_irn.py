@@ -102,6 +102,7 @@ def create_credit_qr_image(invoice_number, gsp):
 		# path = folder_path + '/sites/' + get_site_name(frappe.local.request.host) + "/private/files/"
 		path = folder_path + '/sites/' + site_folder_path + "/private/files/"
 		# print(path)
+		
 		headers = {
 			"user_name": gsp['username'],
 			"password": gsp['password'],
@@ -111,6 +112,9 @@ def create_credit_qr_image(invoice_number, gsp):
 			"Irn": invoice.credit_irn_number
 			
 		}
+		if company.irn_qr_size=="Small":
+			headers['height']="150"
+			headers['width']="150"
 		if company.proxy == 0:
 			qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,

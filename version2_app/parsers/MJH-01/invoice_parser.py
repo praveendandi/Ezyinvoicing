@@ -59,7 +59,6 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			print(i)
 			if "Confirmation No" in i:
 				confirmation_number = i.split(" ")
 				conf_number = confirmation_number[-1].replace(" ", "")
@@ -70,7 +69,7 @@ def file_parsing(filepath):
 				date_time_obj = (i.strip().split(":")[1]).replace("Original Bill Date","").strip()
 				date_time_obj = date_time_obj.replace("Original Bill","").strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj, '%d-%m-%y').strftime('%d-%b-%y %H:%M:%S')
-			if "Room  :" in i or "Room :" in i:
+			if "Room  :" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
 				# roomNumber = ''.join(filter(lambda j: j.isdigit(), i))
@@ -83,18 +82,12 @@ def file_parsing(filepath):
 						gstNumber = re.search("(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})", i).group()
 					else:
 						gstNumber = ""
-			if re.search(r'[:]\s+\d',i.strip()):
-				invoice_Number = i.replace(":","").strip()
-				if invoice_Number.isdigit():
-					invoiceNumber = invoice_Number
-			#if not invoiceNumber.isdigit():
-			#	if "COPY OF INVOICE" in i:
-			#		invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ","")
-			#if not invoiceNumber.isdigit():
-			#	if "Bill No." in i:
-			#		number = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
-			#		if number.isdigit():
-			#			invoiceNumber = number
+			if "COPY OF INVOICE" in i:
+				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ","")
+			if "Bill No." in i:
+				number = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
+				if number.isdigit():
+					invoiceNumber = number
 			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
@@ -171,18 +164,20 @@ def file_parsing(filepath):
 		# print(guestDeatils)
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
+				print(i)
 				if "COPY OF INVOICE" in i:
+					print("/a/a/a/")
 					nameindex = i.index("COPY OF INVOICE")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
 				if "TAX INVOICE" in i:
 					nameindex = i.index("TAX INVOICE")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
 				if "Bill No." in i:
 					nameindex = i.index("Bill No.")
 					guest['name'] = i[:nameindex]
-					guest["name"] = guest["name"].replace("COPY OF INVOICE","")
+				guest['name'] = guest['name'].replace("COPY OF INVOICE","")
+				guest['name'] = guest['name'].replace("TAX INVOICE","")
+				guest['name'] = guest['name'].replace("Bill No.","")		
 			if index == 1:
 				guest['address1'] = ""
 			if index == 2:
