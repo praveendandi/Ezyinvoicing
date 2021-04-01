@@ -234,7 +234,7 @@ def generateIrn(data):
 				"Typ":
 				category,
 				"No":
-				invoice.invoice_number + str(random.randint(0, 100)) +
+				invoice.invoice_number + str(random.randint(0, 9)) +
 					'T' if company_details['data'].mode == 'Testing' else
 					invoice.invoice_number,
 				"Dt":
