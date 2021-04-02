@@ -174,6 +174,11 @@ def generateIrn(data):
 		}
 		taxpayer_details = get_tax_payer_details(GspData)
 		#gst data
+		if company_details['data'].mode == 'Testing':
+			if len(invoice.invoice_number) > 13:
+				testing_invoice_number = invoice.invoice_number
+			else :
+				testing_invoice_number = invoice.invoice_number + str(random.randint(0, 100)) + 'T'
 		gst_data = {
 			"Version": "1.1",
 			"TranDtls": {
@@ -233,16 +238,14 @@ def generateIrn(data):
 			"DocDtls": {
 				"Typ":
 				category,
-				"No":
-				invoice.invoice_number + str(random.randint(0, 100)) +
-					'T' if company_details['data'].mode == 'Testing' else
-					invoice.invoice_number,
+				"No": testing_invoice_number if company_details['data'].mode == 'Testing' else invoice.invoice_number,
 				"Dt":
 				datetime.datetime.strftime(invoice.invoice_date,
 											'%d/%m/%Y')
 			},
 			"ItemList": [],
 		}
+		print(gst_data)
 		total_igst_value = 0
 		total_sgst_value = 0
 		total_cgst_value = 0
