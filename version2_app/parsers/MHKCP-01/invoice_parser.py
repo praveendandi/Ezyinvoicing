@@ -62,6 +62,7 @@ def file_parsing(filepath):
         reupload = False
         invoice_category = "Tax Invoice"
         for i in raw_data:
+            print(i)
             if "CREDIT TAX INVOICE" in i:
                 invoice_category = "Credit Invoice"
             if "Confirmation No." in i:
@@ -80,6 +81,7 @@ def file_parsing(filepath):
             if "Cust GST ID" in i:
                 gstNumber = i.split(':')[1].replace(' ', '')
                 gstNumber = gstNumber.replace("ConfirmationNo.","")
+                gstNumber = gstNumber.rstrip("c")
             if "Bill  No." in i:
                 invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
             if "Bill To" in i:
@@ -88,7 +90,7 @@ def file_parsing(filepath):
                 guestDetailsEntered = False
             if guestDetailsEntered == True:
                 guestDeatils.append(i)
-            if i in "Date Description Reference Debit Credit":
+            if i in "Date Description Reference Debit Credit" or i in "Date Description Reference e Debit Credit":
                 entered = True
             if 'CGST 6%=' in i:
                 entered = False
@@ -111,6 +113,7 @@ def file_parsing(filepath):
         items = [] 
         itemsort = 0
         for i in data:
+            i = i.strip()
             pattern = re.compile(
             "^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
             )

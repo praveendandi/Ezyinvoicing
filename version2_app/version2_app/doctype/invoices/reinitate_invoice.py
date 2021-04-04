@@ -582,17 +582,17 @@ def reprocess_calulate_items(data):
 							igst_percentage = item["sc_gst_tax_rate"]
 							gst_percentage = 0
 							sac_code_new = item["sc_sac_code"]
-							vat_rate_percentage = item["vat"]
+							vat_rate_percentage = 0
 						elif sez == 1 and sac_code_based_gst_rates.exempted == 1:
 							igst_percentage = 0
 							gst_percentage = 0
 							sac_code_new = item["sc_sac_code"]
-							vat_rate_percentage = item["vat"]
+							vat_rate_percentage = 0
 						else:
 							gst_percentage = item["sc_gst_tax_rate"]
 							igst_percentage = 0
 							sac_code_new = item["sc_sac_code"]
-							vat_rate_percentage = item["vat"]
+							vat_rate_percentage = 0
 					else:
 						gst_percentage = 0
 						igst_percentage = 0
