@@ -191,7 +191,7 @@ def Reinitiate_invoice(data):
 		doc.mode = company.mode
 		doc.location=data['taxpayer']['location']
 		doc.pincode=data['taxpayer']['pincode']
-		state_code=data['taxpayer']['state_code']
+		doc.state_code=data['taxpayer']['state_code']
 		doc.amount_before_gst=round(value_before_gst, 2)
 		doc.amount_after_gst=round(value_after_gst, 2)
 		doc.credit_value_before_gst=round(credit_value_before_gst,2)
