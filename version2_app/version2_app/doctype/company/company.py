@@ -20,12 +20,9 @@ import json
 import sys
 import frappe
 import os, importlib.util
-# from version2_app.version2_app.doctype.invoices.reinitiate_parser import reinitiateInvoice
-
 
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
-
 
 
 class company(Document):
@@ -148,6 +145,38 @@ def gitUiBranchCommit(company):
 		print("git branch commit id:  ", str(e))
 		return {"success": False, "message": str(e)}
 
+
+
+
+@frappe.whitelist(allow_guest=True)
+def gitpull(data):
+	try:
+		company = frappe.get_doc('company',data['company'])
+		b = os.popen("cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch)
+	
+		doc = frappe.get_doc({
+		'doctype': 'Update Logs',
+		'command': "cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch,
+		'status': 'Success',
+		'updated_by':data['username']
+		})
+		doc.insert()
+		frappe.db.commit()
+		frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+
+		return {"success": True, "message": b}
+	except Exception as e:
+		doc = frappe.get_doc({
+		'doctype': 'Update Logs',
+		'command': "cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch,
+		'status': 'Success',
+		'error_message':str(e),
+		'updated_by':data['username']
+		})
+		doc.insert()
+		frappe.db.commit()
+		print("git branch commit id:  ", str(e))
+		return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def b2cstatusupdate():
@@ -467,19 +496,22 @@ def run_command(commands,
 @frappe.whitelist(allow_guest=True)
 def update_parsers():
 	try:
+		# b = os.popen("cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch)
 		company = frappe.get_last_doc('company')
 		if company.parsers_branch_name:
 			command = "git pull origin "+company.parsers_branch_name
 			abs_path = os.path.dirname(os.getcwd())
-			cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'
+			cwd = abs_path+'/apps/version2_app/version2_app/parsers_invoice/invoice_parsers'
 			check_folder = abs_path+'/apps/version2_app/version2_app/parsers_invoice'
 			if not os.path.exists(check_folder):
 				os.mkdir(check_folder)
 				clone_command = "git clone https://prasanthvajja:foQJihWZhufdixW43yCs@gitlab.caratred.com/prasanthvajja/invoice_parsers.git"
 				Popen(shlex.split(clone_command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=check_folder)
 			# token = "foQJihWZhufdixW43yCs"
-			terminal = Popen(shlex.split(command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=cwd)
-			return{"success":True,"message":"Parsers Updated Successfully"}
+			# terminal = Popen(shlex.split(command),stdin=PIPE,stdout=PIPE,stderr=STDOUT,cwd=cwd)
+			b = os.popen("cd "+cwd+" && git pull origin "+company.parsers_branch_name)
+			print(b)
+			return{"success":True,"message":"Parsers Updated Successfully","data":b}
 		else:
 			return{"success":False,"message":"Please add branch name in Company"}
 	except Exception as e:
@@ -545,30 +577,57 @@ def safe_decode(string, encoding='utf-8'):
 	return string
 
 
-
 @frappe.whitelist(allow_guest=True)
 def updateUiProd(company):
-	try:
-		print("==========")
-		company = frappe.get_doc('company',company)
-		commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
-		
-		console_dump = ''
-		
-		cwd = company.angular_project_production_path
-		key = str(time.time())
-		# count = 0
-		for command in commands:
-			print(command,"    command")
-			terminal = Popen(shlex.split(command),
-							stdin=PIPE,
-							stdout=PIPE,
-							stderr=STDOUT,
-							cwd=cwd)
-			for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-				console_dump += c
-		logged_command = " && ".join(commands)
-		frappe.publish_realtime("custom_socket", {'message':'system_reload','type':"system_reload"})
-		frappe.log_error("Angular project pull data","updateUiProd")
-	except Exception as e:
-		print(str(e),"    updateUiProd")
+    try:
+        print("==========")
+        company = frappe.get_doc('company',company)
+        commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+        
+        console_dump = ''
+        
+        cwd = company.angular_project_production_path
+        key = str(time.time())
+        # count = 0
+        for command in commands:
+            print(command,"    command")
+            terminal = Popen(shlex.split(command),
+                            stdin=PIPE,
+                            stdout=PIPE,
+                            stderr=STDOUT,
+                            cwd=cwd)
+            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+                console_dump += c
+        logged_command = " && ".join(commands)
+        frappe.publish_realtime("custom_socket", {'message':'system_reload','type':"system_reload"})
+        frappe.log_error("Angular project pull data","updateUiProd")
+    except Exception as e:
+        print(str(e),"    updateUiProd")
+
+
+@frappe.whitelist(allow_guest=True)
+def updateProxySettings(data):
+    try:
+
+        abs_path = os.path.dirname(os.getcwd())
+        company = frappe.get_doc('company',data['company'])
+        if company.proxy==1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://", "@")
+            if data['type'] == "unset":
+                commands = ['unset https_proxy','unset http_proxy']
+                for each in commands:
+                    print(each)
+                    os.system(each)
+                return {"success":True}
+            else:
+                commands = ["https_proxy="+"'"+"https://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'","http_proxy="+"'"+"http://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'"]                    
+                for each in commands:
+                    print(each)
+                    os.system(each)
+                return {"success":True}
+        else:
+            return {"success":False,"message":"No Proxy Settings"}
+    except Exception as e:
+        print(str(e),"  updateProxySettings  ")
+        return {"success":False,"message":str(e)}    

@@ -110,7 +110,7 @@ def reinitiateInvoice(data):
 
         if invoiceNumber != reupload_inv_number:
             return {"success":False,"message":"Incorrect Invoice Attempted"}
-
+        gstNumber=""
         items = [] 
         itemsort = 0
         for i in data:

@@ -9,6 +9,9 @@ import json
 
 
 
+
+
+
 def TotalMismatchError(data,calculated_data):
 	try:
 		if "invoice_from" in data['guest_data']:
@@ -163,12 +166,12 @@ def TotalMismatchError(data,calculated_data):
 
 def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
 	try:
-		if abs(data['item_value'])>=1000 and abs(data['item_value'])<=7500:
+		companyDetails = frappe.get_last_doc('company')
+
+		if abs(data['item_value'])>=companyDetails.slab_12_starting_range and abs(data['item_value'])<=companyDetails.slab_12_ending_range:
 			gst_percentage = 12
-		elif abs(data['item_value']) > 7500:
+		elif abs(data['item_value']) > companyDetails.slab_12_ending_range:
 			gst_percentage = 18
-		elif abs(data['item_value']) == 1000:
-			gst_percentage = 0
 		else:
 			gst_percentage = 0
 		if placeofsupply != state_code:

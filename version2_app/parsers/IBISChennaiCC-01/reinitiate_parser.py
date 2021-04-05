@@ -282,5 +282,5 @@ def reinitiateInvoice(data):
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
 	except Exception as e:
-		print(e)
 		print(traceback.print_exc())
+		return {"success":False,"message":str(e)}

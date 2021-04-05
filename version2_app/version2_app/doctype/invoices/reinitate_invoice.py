@@ -37,6 +37,8 @@ def Reinitiate_invoice(data):
 		# 	place_of_supply = company.state_code
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "	
+		else:
+			data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])	
 		sales_amount_before_tax = 0
 		sales_amount_after_tax = 0
 		value_before_gst = 0
@@ -69,7 +71,6 @@ def Reinitiate_invoice(data):
 		if "gstNumber" not in data['guest_data']:
 			data['guest_data']['gstNumber'] = ""
 		#calculat items
-		print(data['items_data'])
 		if len(data['items_data'])>0:
 			for item in data['items_data']:
 				if item['taxable'] == 'No' and item['item_type'] != "Discount":
@@ -190,7 +191,7 @@ def Reinitiate_invoice(data):
 		doc.mode = company.mode
 		doc.location=data['taxpayer']['location']
 		doc.pincode=data['taxpayer']['pincode']
-		state_code=data['taxpayer']['state_code']
+		doc.state_code=data['taxpayer']['state_code']
 		doc.amount_before_gst=round(value_before_gst, 2)
 		doc.amount_after_gst=round(value_after_gst, 2)
 		doc.credit_value_before_gst=round(credit_value_before_gst,2)
@@ -259,7 +260,7 @@ def Reinitiate_invoice(data):
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount	
-		doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])	
+		doc.invoice_object_from_file = data['invoice_object_from_file']
 		doc.save()
 		
 
@@ -581,17 +582,17 @@ def reprocess_calulate_items(data):
 							igst_percentage = item["sc_gst_tax_rate"]
 							gst_percentage = 0
 							sac_code_new = item["sc_sac_code"]
-							vat_rate_percentage = item["vat"]
+							vat_rate_percentage = 0
 						elif sez == 1 and sac_code_based_gst_rates.exempted == 1:
 							igst_percentage = 0
 							gst_percentage = 0
 							sac_code_new = item["sc_sac_code"]
-							vat_rate_percentage = item["vat"]
+							vat_rate_percentage = 0
 						else:
 							gst_percentage = item["sc_gst_tax_rate"]
 							igst_percentage = 0
 							sac_code_new = item["sc_sac_code"]
-							vat_rate_percentage = item["vat"]
+							vat_rate_percentage = 0
 					else:
 						gst_percentage = 0
 						igst_percentage = 0

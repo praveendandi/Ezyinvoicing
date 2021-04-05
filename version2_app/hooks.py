@@ -111,8 +111,8 @@ doc_events = {
 		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
 	},
-	"Bench Manager Command":{
-		'before_insert':"version2_app.events.emitsocket"
+	"Update Logs":{
+		'before_insert':"version2_app.events.Updateemitsocket"
 	},
 	"Document Bin":{
 		'on_update':"version2_app.events.DocumentBinSocket"

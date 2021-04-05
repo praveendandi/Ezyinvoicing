@@ -23,7 +23,7 @@ folder_path = frappe.utils.get_bench_path()
 
 @frappe.whitelist(allow_guest=True)
 def file_parsing(filepath):
-	try:
+	# try:
 		start_time = datetime.datetime.utcnow()
 		companyCheckResponse = check_company_exist("HIBR-01")
 		site_folder_path = companyCheckResponse['data'].site_name
@@ -58,15 +58,21 @@ def file_parsing(filepath):
 		reupload = False
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			if "CREDIT INVOICE" in i:
+				invoice_category = "Credit Invoice"
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-			if "Departure :" in i:
-				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
+			if "Original Bill date" in i or "Original Bill  date" in i:
+				date_time_obj = i.split(":")[-1].strip()
+				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%b-%y').strftime('%d-%b-%y %H:%M:%S')
+			if date_time_obj == "":
+				if "Departure :" in i:
+					depatureDateIndex = i.index('Departure')
+					date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
 			if "Room No." in i or "Room No" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
@@ -162,7 +168,7 @@ def file_parsing(filepath):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
+		guest['room_number'] = int(roomNumber) if roomNumber != '' else 0
 		guest['company_code'] = "HIBR-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
@@ -189,6 +195,7 @@ def file_parsing(filepath):
 					reupload = True
 
 		company_code = {"code":"HIBR-01"}
+		print("==========================---------------",date_time_obj)
 		error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"HIBR-01","invoice_date":date_time_obj}
 		error_data['invoice_file'] = filepath
 		error_data['guest_name'] = guest['name']
@@ -314,7 +321,7 @@ def file_parsing(filepath):
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("gspApiData fialed:  ",gspApiDataResponse['message'])
 			return {"success":False,"message":gspApiDataResponse['message']}
-	except Exception as e:
-		print(str(e),"       invoice parsing")
-		return {"success":False,"message":str(e)}
+	# except Exception as e:
+	# 	print(str(e),"       invoice parsing")
+	# 	return {"success":False,"message":str(e)}
 
