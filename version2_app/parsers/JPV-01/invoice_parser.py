@@ -78,6 +78,7 @@ def file_parsing(filepath):
 			if "GST ID" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("Guests","")
+				gstNumber = gstNumber.replace("Rate","")
 			if "Invoice No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "Bill To" in i:
@@ -132,6 +133,10 @@ def file_parsing(filepath):
 						if "~" in i:
 							ending_index = i.find("~")
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+							if "Telephone ( Local ) (SAC--:998599)" in item["name"]:
+								item["name"] = "Telephone ( Local ) (SAC--:998599)"
+							if "Telephone Allow (SAC--:998599)" in item["name"]:
+								item["name"] = "Telephone Allow (SAC--:998599)"
 						else:
 							ending_index = i.find(item_value)
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")

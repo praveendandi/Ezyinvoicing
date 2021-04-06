@@ -62,7 +62,7 @@ def reinitiateInvoice(data):
 			if "Reg No" in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-			if "Net Amount:" in i:
+			if "Net Amount:" in i or "Grand Total:" in i:
 				total_invoice = i.split(":")
 				total_invoice_amount = float(total_invoice[-1].replace(",", ""))
 			if "Invoice Date :" in i or "Invoice Date" in i:
@@ -87,8 +87,8 @@ def reinitiateInvoice(data):
 			entered = True
 			if 'CGST 6%=' in i:
 				entered = False
-			if 'Billing' in i:
-				entered = False
+			# if 'Billing' in i:
+			# 	entered = False
 			if 'Total' in i:
 				entered = False
 			if entered == True:
@@ -110,7 +110,7 @@ def reinitiateInvoice(data):
 			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
 			)
 			check_date = re.findall(pattern, i)
-			if (len(check_date) > 0):
+			if (len(check_date) > 0 and "~" in i):
 				item = dict()
 				item_value = ""
 				dt = i.strip()
