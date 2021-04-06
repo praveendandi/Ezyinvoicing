@@ -121,17 +121,25 @@ doc_events = {
 
 }
 
-# Scheduled Tasks
+# Scheduled Tasks/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/emailTemplat.py
 # ---------------
 
-scheduler_events = {
-	"all": [
-		"version2_app.doctype.invoices.invoices.login_gsp2"
+# scheduler_events = {
+# 	"all": [
+# 		"version2_app.doctype.invoices.invoices.login_gsp2"
+# 	]
+# }
+scheduler_events={
+	"all":[
+		"version2_app.version2_app.doctype.emailTemplat.sampleFun"
 	],
 	"cron": {
-        "0/1 * * *": [
-            "version2_app.doctype.invoices.invoices.login_gsp2"
-        ]}
+		"1-59 * * * *": [
+			"version2_app.version2_app.doctype.emailTemplat.sampleFun"
+		],
+		"09 11 * * * *": [
+			"version2_app.version2_app.doctype.emailTemplat.sampleFun"
+		]}
 }
 # scheduler_events = {
 	

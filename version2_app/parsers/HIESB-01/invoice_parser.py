@@ -81,6 +81,14 @@ def file_parsing(filepath):
                 gstNumber = (i.split(':')[1]).split(" ")[1]
                 gstNumber = (gstNumber.replace("Arrival","")).strip()
                 gstNumber = gstNumber.replace("Departure","").strip()
+                if len(gstNumber) == 15:
+                    gstNumber = gstNumber
+                    if re.match("^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",gstNumber):
+                        gstNumber = gstNumber
+                    else:
+                        gstNumber = ""
+                else:
+                    gstNumber = ""
             if "Invoice No." in i:
                 invoiceNumber = (i.split(' ')[-1]).replace(" ", "")
             if "Bill To" in i:
@@ -118,7 +126,7 @@ def file_parsing(filepath):
             "^([0-9]{4}|[0-9]{2})[./-]([0]?[1-9]|[1][0-2])[./-]([0]?[1-9]|[1|2][0-9]|[3][0|1])+"
             )
             check_date = re.findall(pattern, i)
-            if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Vat" not in i and "IGST" not in i and "Service Charge" not in i:
+            if len(check_date) > 0 and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Vat" not in i and "IGST" not in i and "Service Charge" not in i and ("CGST / SGST-FO" in i or ("CGST" not in i and "SGST" not in i)):
                 item = dict()
                 item_value = ""
                 dt = i.strip()
@@ -176,7 +184,7 @@ def file_parsing(filepath):
         payment_Types  = ' '.join([''.join(ele) for ele in paymentTypes['data']])
         payment = [''.join(ele) for ele in paymentTypes['data']]
         for each in items:
-            if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service charge" not in each['name']:
+            if "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and ("CGST / SGST" in each["name"] or ("CGST" not in each["name"] and "SGST" not in each["name"])):
                 if each["name"] not in payment_Types:
                     res = [ele for ele in payment if(ele in each["name"] and "Paid Out" not in each["name"])]
                     if not res:
