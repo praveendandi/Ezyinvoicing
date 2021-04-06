@@ -100,3 +100,10 @@ def send_email():
 	except Exception as e:
 		print(str(e))
 		return{"success":False,"message":str(e)}
+
+
+def sampleFun():
+	# com = frappe.get_doc("company","ICSJWMA-01")
+	# com.merchant_name = "Lakshmi"
+	# com.save()
+	print("workinggggggggggggggggggggg............")

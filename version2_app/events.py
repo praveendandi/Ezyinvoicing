@@ -95,6 +95,10 @@ def fileCreated(doc, method=None):
             if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
                 update_documentbin(doc.file_url,"")
                 abs_path = os.path.dirname(os.getcwd())
+                # print(doc.attached_to_name,"/aaaaaaa")
+                # name = doc.attached_to_name
+                # if not name.isdigit():
+                print("/a/a/a/a/a/a/")
                 company_doc = frappe.get_doc("company",doc.attached_to_name)
                 new_parsers = company_doc.new_parsers
                 if new_parsers == 0:

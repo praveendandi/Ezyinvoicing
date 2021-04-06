@@ -7,11 +7,13 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 import frappe
 import datetime
+import json
 
 class InformationFolio(Document):
 	pass
 @frappe.whitelist(allow_guest=True)
 def insert_information_folio(data):
+	items_data = json.dumps({"data":data['guest_data']['items']})
 	company = frappe.get_doc('company',data['company_code'])
 	check_inf_folio = frappe.get_list('Information Folio',filters={'name': data['guest_data']['confirmation_number']})
 	if len(check_inf_folio) == 0:
@@ -63,11 +65,13 @@ def insert_information_folio(data):
 				data['guest_data']['start_time'], "%Y-%m-%d %H:%M:%S.%f"),
 			"mode": company.mode,
 			"place_of_supply": company.state_code,
+			"items":items_data
 			})	
 		inf_folio.save()
 		return {"success":True}
 	else:
 		updateinf_folio = frappe.get_doc('Information Folio',check_inf_folio[0])
+		updateinf_folio.items = items_data
 		updateinf_folio.guest_name = data['guest_data']['name']
 		updateinf_folio.invoice_from = "Pms"
 		updateinf_folio.gst_number=data['guest_data']['gstNumber']
