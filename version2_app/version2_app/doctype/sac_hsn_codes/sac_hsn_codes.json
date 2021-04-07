@@ -31,7 +31,8 @@
   "sc_gst_tax_rate",
   "sc_sac_code",
   "exempted",
-  "sac_index"
+  "sac_index",
+  "inclusive_of_service_charge"
  ],
  "fields": [
   {
@@ -195,11 +196,17 @@
    "fieldtype": "Data",
    "label": "SAC Index",
    "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "inclusive_of_service_charge",
+   "fieldtype": "Check",
+   "label": "Inclusive of Service Charge"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-23 17:09:54.509025",
+ "modified": "2021-04-07 10:18:29.586757",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

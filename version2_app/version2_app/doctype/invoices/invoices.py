@@ -1528,7 +1528,16 @@ def calulate_items(data):
 						igst_percentage = 0
 						sac_code_new = sac_code_based_gst_rates.code
 						vat_rate_percentage = 0
-					if net_value == "Yes":
+					if companyDetails.reverse_calculation == 1 and net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1:
+						if sac_code_based_gst_rates.taxble == "Yes":
+							total_gst_percentage = gst_percentage+igst_percentage
+							scharge_value_no = scharge
+						else:
+							total_gst_percentage = 0
+							scharge_value_no = scharge + float("0."+str(int((gst_percentage+igst_percentage)/2)))
+						base_valu_inc_sc = round(item['item_value'] * (100 / ((total_gst_percentage) + 100)),3)
+						item['item_value'] = round(base_valu_inc_sc * (100 / (scharge_value_no + 100)),3)
+					if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
 						base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
 						scharge_value = (scharge * base_value) / 100.0
 						gst_value = round((gst_percentage+igst_percentage)*scharge_value )/ 100.0
@@ -1655,7 +1664,7 @@ def calulate_items(data):
 					else:
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
-					if net_value == "No":
+					if (net_value == "No") or (companyDetails.reverse_calculation == 1 and net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1):
 						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
 							if acc_gst_percentage == 0 and acc_igst_percentage == 0:
 								final_item['cgst'] = 0
@@ -1689,7 +1698,7 @@ def calulate_items(data):
 						final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
-					elif net_value == "Yes":
+					elif (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1):
 						if item['sac_code'] == '996311':
 							percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
 							if percentage_gst["success"] == True:
@@ -1733,7 +1742,7 @@ def calulate_items(data):
 				else:
 					# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
 					if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
-						if net_value == "Yes":
+						if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
 							vatcessrate = sac_code_based_gst_rates.state_cess_rate+sac_code_based_gst_rates.central_cess_rate+sac_code_based_gst_rates.vat_rate
 							if "item_value_after_gst" in item and "split_value" not in item:
 								final_item['item_value'] = item["item_value"]
@@ -1766,13 +1775,11 @@ def calulate_items(data):
 						# final_item['item_mode'] = "Debit"
 						companyDetails = frappe.get_doc('company', data['company_code'])
 						if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
-							print("-----------")
 							if companyDetails.allowance_type == "Credit":
 								ItemMode = "Credit"
 							else:
 								ItemMode = "Discount"
 						elif invoice_category == "Credit Invoice":
-							print("==================")
 							ItemMode = "Credit"
 						else:
 							pass	

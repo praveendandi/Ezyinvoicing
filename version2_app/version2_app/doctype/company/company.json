@@ -79,7 +79,8 @@
   "irn_text_alignment",
   "backend_git_path",
   "irn_qr_size",
-  "sc_sac_code"
+  "sc_sac_code",
+  "reverse_calculation"
  ],
  "fields": [
   {
@@ -493,11 +494,17 @@
    "fieldtype": "Select",
    "label": "Irn Qr Size",
    "options": "Small\nLarge"
+  },
+  {
+   "default": "0",
+   "fieldname": "reverse_calculation",
+   "fieldtype": "Check",
+   "label": "Reverse Calculation"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-26 17:05:09.139658",
+ "modified": "2021-04-06 11:30:27.982923",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
