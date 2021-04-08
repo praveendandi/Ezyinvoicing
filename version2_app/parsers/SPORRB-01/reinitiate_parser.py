@@ -63,8 +63,8 @@ def reinitiateInvoice(data):
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
 			if "Net Amount:" in i or "Grand Total:" in i:
-				total_invoice = i.split(":")
-				total_invoice_amount = float(total_invoice[-1].replace(",", ""))
+				total_invoice = i.split(":")[-1].strip()
+				total_invoice_amount = (total_invoice.split(" ")[-1]).replace(",", "")
 			if "Invoice Date :" in i or "Invoice Date" in i:
 				date_time_obj = (i.split(":")[-1]).strip()
 				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
