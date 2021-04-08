@@ -1376,7 +1376,7 @@ def calulate_items(data):
 					return{"success":False,"message":"SAC Code "+ item_description +" not found"}
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
-				if item['sac_code'] == '996311':
+				if item['sac_code'] == '996311' or item['sac_code'] == "997321":
 					percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
 					if percentage_gst["success"] == True:
 						acc_gst_percentage = percentage_gst["gst_percentage"]	
@@ -1552,7 +1552,7 @@ def calulate_items(data):
 					else:
 						base_value = item['item_value']
 						scharge_value = (scharge * item['item_value']) / 100.0
-						if item['sac_code'] == '996311' and sac_code_based_gst_rates.service_charge_tax_applies == "Apply From Parent":
+						if (item['sac_code'] == '996311' or item['sac_code'] == "997321") and sac_code_based_gst_rates.service_charge_tax_applies == "Apply From Parent":
 							gst_percentage = acc_gst_percentage
 							igst_percentage = acc_igst_percentage
 					if sac_code_based_gst_rates.service_charge_net == "Yes":
@@ -1665,7 +1665,7 @@ def calulate_items(data):
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if (net_value == "No") or (companyDetails.reverse_calculation == 1 and net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1):
-						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
+						if (item['sac_code'] == '996311' or item['sac_code'] == '997321') and sac_code_based_gst_rates.accommodation_slab == 1:
 							if acc_gst_percentage == 0 and acc_igst_percentage == 0:
 								final_item['cgst'] = 0
 								final_item['sgst'] = 0
@@ -1699,7 +1699,7 @@ def calulate_items(data):
 						final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 						final_item['item_value'] = item['item_value']
 					elif (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1):
-						if item['sac_code'] == '996311':
+						if item['sac_code'] == '996311' or item['sac_code'] == '997321':
 							percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
 							if percentage_gst["success"] == True:
 								acc_gst_percentage = percentage_gst["gst_percentage"]	
@@ -1741,7 +1741,7 @@ def calulate_items(data):
 					final_item['sort_order'] = item['sort_order']
 				else:
 					# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
-					if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
+					if (item['sac_code'] != "996311" or item['sac_code'] != "997321") and sac_code_based_gst_rates.taxble == "No":
 						if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
 							vatcessrate = sac_code_based_gst_rates.state_cess_rate+sac_code_based_gst_rates.central_cess_rate+sac_code_based_gst_rates.vat_rate
 							if "item_value_after_gst" in item and "split_value" not in item:
@@ -1843,7 +1843,7 @@ def calulate_items(data):
 						final_item['type'] = "Excempted"
 						final_item['item_type'] = "Discount"
 						final_item['item_mode'] = ItemMode
-				if item['sac_code'] == '996311':
+				if item['sac_code'] == '996311' or item['sac_code'] == "997321":
 					percentage_gst = CheckRatePercentages(item)
 					if percentage_gst["success"] == True:
 						acc_gst_percentage = percentage_gst["gst_percentage"]	
@@ -1856,7 +1856,7 @@ def calulate_items(data):
 						final_item['item_mode'] = "Debit"
 					# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
 					if sac_code_based_gst_rates.net == "No":
-						if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1:
+						if (item['sac_code'] == '996311' or item['sac_code'] == "997321") and sac_code_based_gst_rates.accommodation_slab == 1:
 							if acc_gst_percentage == 0:
 								final_item['cgst'] = 0
 								final_item['sgst'] = 0
@@ -1903,7 +1903,7 @@ def calulate_items(data):
 					final_item['sort_order'] = item['sort_order']
 				else:
 					# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
-					if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
+					if (item['sac_code'] != "996311" or item['sac_code'] != "997321") and sac_code_based_gst_rates.taxble == "No":
 						final_item['sort_order'] = item['sort_order']
 						if item['sac_code'].isdigit():
 							final_item['sac_code'] = item['sac_code']
