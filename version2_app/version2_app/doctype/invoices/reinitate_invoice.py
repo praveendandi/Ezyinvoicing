@@ -23,10 +23,10 @@ import math
 
 @frappe.whitelist()
 def Reinitiate_invoice(data):
-	'''
-	insert invoice data     data, company_code, taxpayer,items_data
-	'''
-	try:
+	# '''
+	# insert invoice data     data, company_code, taxpayer,items_data
+	# '''
+	# try:
 		generateb2cQr = True	
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
@@ -232,7 +232,7 @@ def Reinitiate_invoice(data):
 		# if data['total_invoice_amount'] == 0:
 		# 	irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
-		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
+		invoice_round_off_amount =  float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
 		if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
 			if len(data['items_data'])==0:
 				ready_to_generate_irn = "No"
@@ -288,9 +288,9 @@ def Reinitiate_invoice(data):
 					irn_generate = generateIrn(data)	
 		returnData = frappe.get_doc('Invoices',invoice_data.name)			
 		return {"success":True,"data":returnData}
-	except Exception as e:
-		print(e,"reinitaite invoice", traceback.print_exc())
-		return {"success":False,"message":str(e)}
+	# except Exception as e:
+	# 	print(e,"reinitaite invoice", traceback.print_exc())
+	# 	return {"success":False,"message":str(e)}
 
 @frappe.whitelist()
 def reprocess_calulate_items(data):
