@@ -206,6 +206,7 @@ def Reinitiate_invoice(data):
 		doc.total_state_cess_amount = total_state_cess_amount
 		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
+		doc.invoice_category = data['guest_data']['invoice_category'] if "invoice_category" in data['guest_data'] else "Tax Invoice"
 		# doc.place_of_supply = place_of_supply
 		# doc.sez = data["sez"] if "sez" in data else doc.sez
 		doc.cgst_amount=round(cgst_amount,2)

@@ -1742,19 +1742,41 @@ def calulate_items(data):
 				else:
 					# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
 					if (item['sac_code'] != "996311" or item['sac_code'] != "997321") and sac_code_based_gst_rates.taxble == "No":
-						if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
-							vatcessrate = sac_code_based_gst_rates.state_cess_rate+sac_code_based_gst_rates.central_cess_rate+sac_code_based_gst_rates.vat_rate
-							if "item_value_after_gst" in item and "split_value" not in item:
-								final_item['item_value'] = item["item_value"]
-								final_item['item_value_after_gst'] = item["item_value"]
-							else:
-								base_value = round(item['item_value'] * (100 / (vatcessrate + 100)),3)
-								final_item['item_value'] = base_value
-								final_item['item_value_after_gst'] = base_value
-								item["item_value"] = base_value
-						else:
-							final_item['item_value_after_gst'] = item['item_value']
+						if sac_code_based_gst_rates.ignore_non_taxable_items == 1:
+							gst_tax_percentage = float(sac_code_based_gst_rates.cgst)+float(sac_code_based_gst_rates.sgst)
+							gst_amount_value = (item['item_value'] * gst_tax_percentage)/100
+							final_item['item_value_after_gst'] = round(gst_amount_value+item["item_value"],3)
 							final_item['item_value'] = item['item_value']
+							final_item['cgst'] = float(sac_code_based_gst_rates.cgst)
+							final_item['other_charges'] = 0
+							final_item['cgst_amount'] = gst_amount_value/2
+							final_item['sgst'] = float(sac_code_based_gst_rates.sgst)
+							final_item['sgst_amount'] = gst_amount_value/2
+							final_item['igst'] = 0
+							final_item['igst_amount'] = 0
+							final_item['gst_rate'] = gst_tax_percentage						
+						else:
+							if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
+								vatcessrate = sac_code_based_gst_rates.state_cess_rate+sac_code_based_gst_rates.central_cess_rate+sac_code_based_gst_rates.vat_rate
+								if "item_value_after_gst" in item and "split_value" not in item:
+									final_item['item_value'] = item["item_value"]
+									final_item['item_value_after_gst'] = item["item_value"]
+								else:
+									base_value = round(item['item_value'] * (100 / (vatcessrate + 100)),3)
+									final_item['item_value'] = base_value
+									final_item['item_value_after_gst'] = base_value
+									item["item_value"] = base_value
+							else:
+								final_item['item_value_after_gst'] = item['item_value']
+								final_item['item_value'] = item['item_value']
+							final_item['cgst'] = 0
+							final_item['other_charges'] = 0
+							final_item['cgst_amount'] = 0
+							final_item['sgst'] = 0
+							final_item['sgst_amount'] = 0
+							final_item['igst'] = 0
+							final_item['igst_amount'] = 0
+							final_item['gst_rate'] = 0
 						final_item['sort_order'] = item['sort_order']
 						if item['sac_code'].isdigit():
 							final_item['sac_code'] = item['sac_code']
@@ -1762,14 +1784,6 @@ def calulate_items(data):
 						else:
 							final_item['sac_code'] = 'No Sac'
 							final_item['sac_code_found'] = 'No'
-						final_item['cgst'] = 0
-						final_item['other_charges'] = 0
-						final_item['cgst_amount'] = 0
-						final_item['sgst'] = 0
-						final_item['sgst_amount'] = 0
-						final_item['igst'] = 0
-						final_item['igst_amount'] = 0
-						final_item['gst_rate'] = 0
 						final_item['taxable'] = sac_code_based_gst_rates.taxble
 						final_item['type'] = "Non-Gst"
 						# final_item['item_mode'] = "Debit"
