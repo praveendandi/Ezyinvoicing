@@ -9,3 +9,4 @@ apps/version2_app/version2_app/version2_app/doctype/invoices/reinitiate_parser.p
 parsers_invoices
 version2_app/parsers_invoice/invoice_parsers
 apps/version2_app/version2_app/parsers_invoice/invoice_parsers
+version2_app/invoice_parsers/
