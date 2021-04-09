@@ -1811,9 +1811,16 @@ def calulate_items(data):
 							final_item['item_mode'] = ItemMode
 						else:
 							final_item['item_mode'] = "Debit"
-				if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01") and data["state_code"] == companyDetails.state_code:
-					final_item["state_cess_amount"] = 0
-					final_item['state_cess'] = 0
+				if "company_code" in data:
+					if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01") and data["state_code"] == companyDetails.state_code:
+						final_item["state_cess_amount"] = 0
+						final_item['state_cess'] = 0
+					else:
+						final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+						if sac_code_based_gst_rates.state_cess_rate > 0:
+							final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+						else:
+							final_item["state_cess_amount"] = 0
 				else:
 					final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
 					if sac_code_based_gst_rates.state_cess_rate > 0:
