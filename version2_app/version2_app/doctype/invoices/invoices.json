@@ -130,7 +130,8 @@
   "allowance_invoice",
   "irn_generated_type",
   "converted_from_tax_invoices_to_manual_tax_invoices",
-  "invoice_object_from_file"
+  "invoice_object_from_file",
+  "invoice_check"
  ],
  "fields": [
   {
@@ -844,12 +845,19 @@
    "fieldname": "invoice_object_from_file",
    "fieldtype": "Long Text",
    "label": "Invoice Object From File"
+  },
+  {
+   "default": "No",
+   "fieldname": "invoice_check",
+   "fieldtype": "Select",
+   "label": "Invoice Check",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-03-12 15:36:39.345618",
+ "modified": "2021-04-08 14:39:00.862914",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

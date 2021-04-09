@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "autoname": "field:bill_number",
+ "creation": "2021-04-07 14:50:09.229940",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "folio_type",
+  "bill_number",
+  "bill_generation_date",
+  "bill_generation_date_char",
+  "fiscal_bill_number",
+  "status",
+  "room",
+  "display_name",
+  "invoice_found"
+ ],
+ "fields": [
+  {
+   "fieldname": "folio_type",
+   "fieldtype": "Data",
+   "label": "Folio Type"
+  },
+  {
+   "fieldname": "bill_number",
+   "fieldtype": "Data",
+   "label": "Bill Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "bill_generation_date",
+   "fieldtype": "Date",
+   "label": "Bill Generation Date"
+  },
+  {
+   "fieldname": "bill_generation_date_char",
+   "fieldtype": "Date",
+   "label": "Bill Generation Date Char"
+  },
+  {
+   "fieldname": "fiscal_bill_number",
+   "fieldtype": "Data",
+   "label": "Fiscal Bill Number"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "room",
+   "fieldtype": "Data",
+   "label": "Room"
+  },
+  {
+   "fieldname": "display_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Display Name",
+   "reqd": 1
+  },
+  {
+   "default": "No",
+   "fieldname": "invoice_found",
+   "fieldtype": "Select",
+   "label": "Invoice Found",
+   "options": "Yes\nNo"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-04-08 14:58:59.160375",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Invoice Reconciliations",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
