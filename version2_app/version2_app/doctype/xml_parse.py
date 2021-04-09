@@ -1,8 +1,6 @@
 import json
 import xmltodict
 import frappe
-import email_listener
-import sys
 import os
 import re
 import requests
