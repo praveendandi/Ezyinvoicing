@@ -14,6 +14,9 @@ import traceback
 
 def invoice_created(doc, method=None):
     print("Invoice Created",doc.name)
+    reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
+    reconciliations_doc.invoice_found = "Yes"
+    reconciliations_doc.save(ignore_permissions=True,ignore_version=True)
     if doc.invoice_from=="Pms":
         bin_name = frappe.db.get_value('Document Bin',{'invoice_file': doc.invoice_file})
         bin_doc = frappe.get_doc("Document Bin",bin_name)
