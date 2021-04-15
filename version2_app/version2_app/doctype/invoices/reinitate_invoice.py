@@ -153,10 +153,12 @@ def Reinitiate_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"
-		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
-		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
-		# 	invoice_category = "Debit Invoice"
-
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			# data['guest_data']['invoice_category'] = "Debit Invoice"
+			# invoice_category = "Debit Invoice"
+			debit_invoice="Yes"
+		else:
+			debit_invoice="No"
 		if "gstNumber" not in data['guest_data']:
 			data['guest_data']['gstNumber'] = ""
 		if "confirmation_number" not in data['guest_data']:
@@ -229,6 +231,7 @@ def Reinitiate_invoice(data):
 		doc.has_credit_items = has_credit_items
 		doc.mode = company.mode
 		doc.allowance_invoice = allowance_invoice
+		doc.debit_invoice = debit_invoice
 		# if data['total_invoice_amount'] == 0:
 		# 	irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated

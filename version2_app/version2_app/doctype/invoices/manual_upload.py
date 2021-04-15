@@ -1,10 +1,8 @@
 from __future__ import unicode_literals
 import frappe
-from frappe import enqueue
+# from frappe import enqueue
 from frappe.model.document import Document
 from datetime import date
-# import async
-# import asyncio
 import requests
 import datetime
 import random
@@ -405,4 +403,3 @@ def manual_upload(data):
 		frappe.db.commit()
 		print(str(e),"   manual_upload")
 		return {"success":False,"message":str(e)}    
-
