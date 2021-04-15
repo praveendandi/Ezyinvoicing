@@ -852,7 +852,7 @@ def insert_invoice(data):
 	# '''
 	# insert invoice data     data, company_code, taxpayer,items_data
 	# '''
-	# try:
+	try:
 		# print(data,"/////")
 		if "invoice_category" not in list(data['guest_data']):
 			data['guest_data']['invoice_category'] = "Tax Invoice"
@@ -974,8 +974,8 @@ def insert_invoice(data):
 		else:
 			allowance_invoice = "No"	 
 		# print(allowance_invoice)	
-		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
-		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			data['guest_data']['invoice_category'] = "Debit Invoice"
 
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
@@ -1192,9 +1192,9 @@ def insert_invoice(data):
 		if get_invoice.invoice_from=="Pms":
 			socket = invoiceCreated(get_invoice)
 		return {"success": True,"data":get_invoice}
-	# except Exception as e:
-	# 	print(e, "insert invoice")
-	# 	return {"success": False, "message": str(e)}
+	except Exception as e:
+		print(e, "insert invoice")
+		return {"success": False, "message": str(e)}
 
 
 def insert_hsn_code_based_taxes(items, invoice_number,sacType):
