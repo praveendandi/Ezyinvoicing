@@ -156,7 +156,7 @@ def generateIrn(data):
 			category = "DBN"
 		else:
 			category = "CRN"	
-		IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category})
+		# IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category})
 		company_details = check_company_exist_for_Irn(invoice.company)
 		# get gsp_details
 		credit_note_items = []
@@ -326,7 +326,7 @@ def generateIrn(data):
 		if len(gst_data['ItemList']) == 0 and invoice.has_credit_items=="Yes" and invoice.invoice_category == "Tax Invoice":
 			return {"success":False,"message":"Please convert Tax invoice to Credit invoice"}
 		if invoice.invoice_category == "Credit Invoice":
-			creditIrn = CreditgenerateIrn(invoice_number,generation_type)
+			creditIrn = CreditgenerateIrn(invoice_number,generation_type,None)
 			return creditIrn
 		discount_before_value = abs(discount_before_value)	
 		discount_after_value = abs(discount_after_value)
@@ -354,9 +354,13 @@ def generateIrn(data):
 				response = postIrn(gst_data, GSP_details['data'],
 									company_details['data'], invoice_number)
 				# IRNObjects = {"invoice_number":invoice_number,"irn_request_object":gst_data,"irn_response_object":response}				
-				IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,'irn_request_object':str(gst_data),'irn_response_object':str(response)})
-				IRNObjectdoc.insert(ignore_permissions=True, ignore_links=True)
+				# IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,'irn_request_object':str(gst_data),'irn_response_object':str(response)})
+				# IRNObjectdoc.insert(ignore_permissions=True, ignore_links=True)
 				if response['success']:
+					# json.dumps(data['invoice_object_from_file']
+					IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
+					IRNObjectdoc.save()
+					# print(IRNObjectdoc.name,"/a/a/a/")
 					invoice = frappe.get_doc('Invoices', invoice_number)
 					invoice.ack_no = response['result']['AckNo']
 					invoice.irn_number = response['result']['Irn']
@@ -377,7 +381,7 @@ def generateIrn(data):
 												GSP_details['data'])
 					if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
 						if credit_note_items != []:
-							CreditgenerateIrn(invoice_number,generation_type)
+							CreditgenerateIrn(invoice_number,generation_type,IRNObjectdoc.name)
 							invoice = frappe.get_doc('Invoices',
 														invoice_number)
 							invoice.irn_process_time = datetime.datetime.utcnow(
@@ -388,6 +392,8 @@ def generateIrn(data):
 				else:
 					if "result" in list(response.keys()):
 						if response['result'][0]['InfCd'] == "DUPIRN":
+							IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response}),"error_message":"Duplicate Irn"})
+							IRNObjectdoc.save()
 							invoice = frappe.get_doc('Invoices', invoice_number)
 							invoice.duplicate_ack_date = response['result'][0]['Desc']['AckDt']
 							invoice.duplicate_ack_no = response['result'][0]['Desc']['AckNo']
@@ -975,7 +981,10 @@ def insert_invoice(data):
 			allowance_invoice = "No"	 
 		# print(allowance_invoice)	
 		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
-			data['guest_data']['invoice_category'] = "Debit Invoice"
+			# data['guest_data']['invoice_category'] = "Debit Invoice"
+			debit_invoice = "Yes"
+		else:
+			debit_invoice = "No"	
 
 		if len(data['items_data'])==0:
 			ready_to_generate_irn = "No"
@@ -1130,7 +1139,8 @@ def insert_invoice(data):
 			"place_of_supply": company.state_code,
 			"sez": data["sez"] if "sez" in data else 0,
 			"allowance_invoice":allowance_invoice,
-			"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+			"invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
+			"debit_invoice":debit_invoice
 		})
 		if data['amened'] == 'Yes':
 			invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])

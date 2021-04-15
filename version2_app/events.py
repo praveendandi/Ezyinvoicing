@@ -8,7 +8,7 @@ import sys
 import datetime
 import importlib.util
 import traceback
-
+from datetime import date, timedelta
 
 
 
@@ -171,3 +171,20 @@ def safe_decode(string, encoding='utf-8'):
         pass
     return string
 
+def deleteemailfilesdaily():
+	try:
+		company = frappe.get_last_doc('company')
+		lastdate = date.today() - timedelta(days=1)
+		print(lastdate)
+		emaildata = frappe.db.get_list('Email Queue',filters={'creation': ['>',lastdate],'status':"Sent"},fields=['name', 'attachments'])
+		print(emaildata)
+		filelist = []
+		for each in emaildata:
+			value = json.loads(each.attachments)
+			filelist.append(value[0]['fid'])
+			delete = frappe.delete_doc("File",value[0]['fid'])
+			print(delete)
+
+		return {"success":True}
+	except Exception as e:
+		return {"success":False,"message":str(e)}

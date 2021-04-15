@@ -23,7 +23,7 @@ import os, importlib.util
 
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
-
+parserModule_name = 'file_parsing'
 
 class company(Document):
 	# pass
@@ -631,3 +631,31 @@ def updateProxySettings(data):
     except Exception as e:
         print(str(e),"  updateProxySettings  ")
         return {"success":False,"message":str(e)}    
+
+
+
+@frappe.whitelist(allow_guest=True)
+def reprocess_error_documentbin_invoices(docdate):
+	try:
+		doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
+		if doc[0]["new_parsers"] == 0:
+			file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/invoice_parser.py'
+		else:
+			file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/invoice_parser.py'
+		spec = importlib.util.spec_from_file_location(parserModule_name, file_path)
+		module = importlib.util.module_from_spec(spec)
+		spec.loader.exec_module(module)
+		data = frappe.db.get_list('Document Bin',filters={'document_printed': 'No','creation':["between", [docdate, docdate]]},fields=["name","invoice_file"])
+		if len(data)>0:
+			for each in data:
+				print(each)
+				reinitiate = module.file_parsing(each["invoice_file"])
+				frappe.publish_realtime("custom_socket", {'type':"redo bin error","status":reinitiate['success'],'data':reinitiate,"message":reinitiate,'filepath':each["invoice_file"]})
+
+ 				
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("reprocess_error_inoices", str(e))
+		return {"success":False,"message":str(e)}
