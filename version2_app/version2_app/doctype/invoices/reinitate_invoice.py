@@ -19,14 +19,12 @@ import math
 
 
 
-
-
 @frappe.whitelist()
 def Reinitiate_invoice(data):
-	# '''
-	# insert invoice data     data, company_code, taxpayer,items_data
-	# '''
-	# try:
+	'''
+	insert invoice data     data, company_code, taxpayer,items_data
+	'''
+	try:
 		generateb2cQr = True	
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
@@ -288,9 +286,9 @@ def Reinitiate_invoice(data):
 					irn_generate = generateIrn(data)	
 		returnData = frappe.get_doc('Invoices',invoice_data.name)			
 		return {"success":True,"data":returnData}
-	# except Exception as e:
-	# 	print(e,"reinitaite invoice", traceback.print_exc())
-	# 	return {"success":False,"message":str(e)}
+	except Exception as e:
+		print(e,"reinitaite invoice", traceback.print_exc())
+		return {"success":False,"message":str(e)}
 
 @frappe.whitelist()
 def reprocess_calulate_items(data):
