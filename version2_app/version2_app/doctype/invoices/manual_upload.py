@@ -17,32 +17,9 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-import math
 
 
 
-# @frappe.whitelist(allow_guest=True)
-# def manual_upload(data):
-# 	# try:
-# 	frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.manualuploadEnqueue",queue='default', timeout=None, event="BulkUpload", is_async=True, job_name="samplefunforqueue", now=True,arg1=data)
-# 	# data = frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.samplefunforqueue",queue='default', timeout=None, event=None, is_async=True, job_name="samplefunforqueue", now=True)
-# 	# print(data,type(data))
-# 	return {"success":True}
-# 	# except Exception as e:
-# 	# 	logger.error(f"manual upload queue  {str(e)}")
-# 	# 	return {"success":False,"message":str(e)}
-
-
-# def samplefunforqueue():
-# 	doc = frappe.get_doc("company","MJH-01")
-# 	doc.merchant_name = "sample"
-# 	doc.save()
-
-
-# @frappe.whitelist(allow_guest=True)
-# def manual_upload1(data):
-# 	return await manual_upload1(data).start()
-# 	# return True
 
 
 @frappe.whitelist(allow_guest=True)
@@ -403,3 +380,9 @@ def manual_upload(data):
 		frappe.db.commit()
 		print(str(e),"   manual_upload")
 		return {"success":False,"message":str(e)}    
+
+
+
+
+
+
