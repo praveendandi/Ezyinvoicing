@@ -134,7 +134,7 @@ def TotalMismatchError(data,calculated_data):
 				"place_of_supply":companyDetails.state_code,
 				"sez":data["sez"] if "sez" in data else 0,
 				"allowance_invoice":allowance_invoice,
-				"debit_invoice":debit_invoice
+				"debit_invoice":debit_invoice,
 				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 			})
 		if data['amened'] == 'Yes':
