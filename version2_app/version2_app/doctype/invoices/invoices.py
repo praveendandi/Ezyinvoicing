@@ -1175,7 +1175,7 @@ def insert_invoice(data):
 			items, data['guest_data']['invoice_number'],"Invoice")
 		# b2cattach = Invoices()
 		invoice = frappe.get_doc("Invoices",v.name)	
-		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] >0:
+		if data['guest_data']['invoice_type'] == "B2C" and data['total_invoice_amount'] != 0:
 			b2cAttachQrcode = send_invoicedata_to_gcb(data['invoice_number'])
 			if b2cAttachQrcode["success"] == True:
 				if invoice.invoice_from=="Pms":
@@ -1186,8 +1186,9 @@ def insert_invoice(data):
 			
 			return {"success": True,"data":invoice}
 		else:
+			tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
 			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				if v.has_credit_items == "Yes" and company.disable_credit_note == 1:
+				if (v.has_credit_items == "Yes" and company.disable_credit_note == 1) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:
 					data = {'invoice_number': v.name,'generation_type': "System"}
