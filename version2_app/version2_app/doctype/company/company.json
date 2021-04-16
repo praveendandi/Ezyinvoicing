@@ -435,7 +435,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera"
+   "options": "None\nMarriot\nOpera\nHolidayIn"
   },
   {
    "default": "0",
@@ -504,7 +504,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-06 11:30:27.982923",
+ "modified": "2021-04-16 18:08:19.703480",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

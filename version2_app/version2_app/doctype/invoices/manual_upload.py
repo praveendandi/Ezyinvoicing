@@ -17,7 +17,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-
+from version2_app.version2_app.doctype.invoices.holiday_manual_upload import holidayinManualupload
 
 
 
@@ -31,6 +31,9 @@ def manual_upload(data):
 		items_data_file = data['invoice_file']
 		company = data['company']
 		companyData = frappe.get_doc('company',data['company'])
+		if companyData.bulk_excel_upload_type == "HolidayIn":
+			output = holidayinManualupload(data)
+			return output
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
 		items_dataframe = pd.read_excel(items_file_path)
