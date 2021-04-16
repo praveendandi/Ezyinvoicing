@@ -19,7 +19,12 @@ def TotalMismatchError(data,calculated_data):
 		else:
 			invoice_from = "Pms"	
 		invType = data['guest_data']['invoice_type']
-		irn_generated = "Error"   
+		irn_generated = "Error"  
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			# data['guest_data']['invoice_category'] = "Debit Invoice"
+			debit_invoice = "Yes"
+		else:
+			debit_invoice = "No" 
 		companyDetails = frappe.get_doc("company",data['company_code'])
 		if '-' in str(calculated_data['sales_amount_after_tax']):
 			allowance_invoice = "Yes"
@@ -129,6 +134,7 @@ def TotalMismatchError(data,calculated_data):
 				"place_of_supply":companyDetails.state_code,
 				"sez":data["sez"] if "sez" in data else 0,
 				"allowance_invoice":allowance_invoice,
+				"debit_invoice":debit_invoice
 				"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 			})
 		if data['amened'] == 'Yes':
@@ -379,7 +385,11 @@ def error_invoice_calculation(data,data1):
 	else:
 		roundoff_amount = data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
 		data['invoice_round_off_amount'] = roundoff_amount
-
+	if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		
+		debit_invoice = "Yes"
+	else:
+		debit_invoice = "No" 
 	doc = frappe.get_doc('Invoices',data['invoice_number'])
 	doc.total_invoice_amount = data['total_invoice_amount']	
 	# doc.invoice_number=data['guest_data']['invoice_number']
@@ -434,6 +444,7 @@ def error_invoice_calculation(data,data1):
 	doc.has_credit_items = has_credit_items
 	doc.mode = company.mode
 	doc.invoice_round_off_amount = roundoff_amount
+	doc.debit_invoice = debit_invoice
 	doc.save(ignore_permissions=True, ignore_version=True)
 	return True
 
