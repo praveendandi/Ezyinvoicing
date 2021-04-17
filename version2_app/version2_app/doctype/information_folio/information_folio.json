@@ -37,7 +37,9 @@
   "place_of_supply",
   "total_invoice_amount",
   "amended_from",
-  "items"
+  "items",
+  "signature_details_section",
+  "signature"
  ],
  "fields": [
   {
@@ -227,12 +229,23 @@
    "fieldname": "items",
    "fieldtype": "Long Text",
    "label": "Items"
+  },
+  {
+   "fieldname": "signature_details_section",
+   "fieldtype": "Section Break",
+   "label": "Signature Details"
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "ignore_user_permissions": 1,
+   "label": "signature"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-04-05 17:54:45.274675",
+ "modified": "2021-04-17 12:32:11.396594",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Information Folio",
@@ -343,7 +356,9 @@
    "read": 1,
    "report": 1,
    "role": "All",
+   "select": 1,
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

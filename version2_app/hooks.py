@@ -100,24 +100,40 @@ app_license = "MIT"
 #	}
 # }
 doc_events = {
-	"Invoices": {
-        "after_insert":"version2_app.events.invoice_created",
-		"after_delete":"version2_app.events.invoice_deleted",
-		# "on_update": "version2_app.events.invoiceUpdate",
-		# "on_cancel": "method",
-		# "on_trash": "method"
-	},
-	"File":{
-		# 'after_save':"version2_app.events.fileCreated",
-		'after_insert':"version2_app.events.fileCreated"
-	},
-	"Update Logs":{
-		'before_insert':"version2_app.events.Updateemitsocket"
-	},
-	"Document Bin":{
-		'on_update':"version2_app.events.DocumentBinSocket"
-	},
-	
+    "Invoices": {
+        "after_insert": "version2_app.events.invoice_created",
+        "after_delete": "version2_app.events.invoice_deleted",
+        # "on_update": "version2_app.events.invoiceUpdate",
+        # "on_cancel": "method",
+        # "on_trash": "method"
+    },
+    "Tablet Config": {
+        "after_insert": "version2_app.events.tablet_mapping",
+        "on_trash": "version2_app.events.remove_mapping",
+    },
+    "Active Tablets": {
+        "after_insert": "version2_app.events.tablet_connected",
+        "on_trash": "version2_app.events.tablet_disconnected",
+        "on_update": "version2_app.events.update_tablet_status",
+    },
+    "Active Work Stations": {
+        "on_trash": "version2_app.events.workstation_disconnected",
+    },
+    "Information Folio": {
+        "after_insert": "version2_app.events.information_folio_created",
+        "on_update": "version2_app.events.information_folio_created",
+    },
+    "File": {
+        # 'after_save':"version2_app.events.fileCreated",
+        'after_insert': "version2_app.events.fileCreated"
+    },
+    "Update Logs": {
+        'before_insert': "version2_app.events.Updateemitsocket"
+    },
+    "Document Bin": {
+        'on_update': "version2_app.events.DocumentBinSocket"
+    },
+
 
 }
 
@@ -129,20 +145,20 @@ doc_events = {
 # 		"version2_app.doctype.invoices.invoices.login_gsp2"
 # 	]
 # }
-scheduler_events={
-	"all":[
-		"version2_app.version2_app.doctype.emailTemplat.sampleFun"
-	],
-	"cron": {
-		"1-59 * * * *": [
-			"version2_app.version2_app.doctype.emailTemplat.sampleFun"
-		],
-		"09 11 * * * *": [
-			"version2_app.version2_app.doctype.emailTemplat.sampleFun"
-		]}
+scheduler_events = {
+    "all": [
+        "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+    ],
+    "cron": {
+        "1-59 * * * *": [
+            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+        ],
+        "09 11 * * * *": [
+            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+        ]}
 }
 # scheduler_events = {
-	
+
 # 	"all": [
 # 		"version2_app.tasks.all"
 # 	],
@@ -182,4 +198,3 @@ scheduler_events={
 # exempt linked doctypes from being automatically cancelled
 #
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
-
