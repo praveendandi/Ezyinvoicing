@@ -521,7 +521,8 @@ def update_parsers():
 
 @frappe.whitelist(allow_guest=True)
 def diskspace():
-	b = os.popen(" df -h /dev/sda1")
+	company = frappe.get_last_doc('company')
+	b = os.popen(" df -h "+company.system_storage_path)
 	print(b)
 	# print(b.encoding)
 	return b
