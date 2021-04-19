@@ -49,6 +49,7 @@ def holidayinManualupload(data):
 		input_data = []
 		invoice_referrence_objects = {}
 		for each in output:
+			each['taxcode_dsc'] = str(each['taxcode_dsc'])
 			# print(each['taxinvnum'],len(each['taxinvnum']))
 			del each['accountdate']# = str(each['accountdate'])
 			del each['arrdate']# = str(each['arrdate'])
