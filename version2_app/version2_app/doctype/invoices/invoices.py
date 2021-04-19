@@ -1298,6 +1298,7 @@ def calulate_items(data):
 	try:
 		total_items = []
 		second_list = []
+		companyDetails = frappe.get_doc('company', data['company_code'])
 		if any("split_value" in check for check in data["items"]):
 			non_split = list(sv for sv in data["items"] if "split_value" not in sv)
 			data["items"] = list(st for st in data["items"] if "split_value" in st)
@@ -1305,17 +1306,19 @@ def calulate_items(data):
 			nonsplit = []
 			for nsplit in non_split:
 				if int(nsplit["sort_order"]) not in sort_ids:
+					nsplit["date"] = datetime.datetime.strptime(nsplit["date"],companyDetails.invoice_item_date_format).strftime('%Y-%m-%d %H:%M:%S')
 					nonsplit.append(nsplit)
 			total_items.extend(nonsplit)
 		if any("sacName" in checkname for checkname in data["items"]) and not any("split_value" in check for check in data["items"]):
 			olditems = list(st for st in data["items"] if "sacName" not in st)
+			for changedate_format in olditems:
+				changedate_format["date"] = datetime.datetime.strptime(changedate_format["date"],companyDetails.invoice_item_date_format).strftime('%Y-%m-%d %H:%M:%S')
 			total_items.extend(olditems)
 			data["items"] = list(scn for scn in data["items"] if "sacName" in scn)
 		if "guest_data" in list(data.keys()):
 			invoice_category = data['guest_data']['invoice_category']
 		else:
 			invoice_category = "Tax Invoice"
-		companyDetails = frappe.get_doc('company', data['company_code'])
 		if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
 			if companyDetails.allowance_type == "Credit":
 				ItemMode = "Credit"

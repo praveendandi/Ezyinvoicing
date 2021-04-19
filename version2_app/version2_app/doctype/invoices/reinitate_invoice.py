@@ -317,19 +317,23 @@ def reprocess_calulate_items(data):
 			if sez == 0:
 				if each_item["is_manual_edit"] == "Yes":
 					if "manual_edit" not in each_item:
+						each_item["date"] = datetime.datetime.strptime(each_item["date"],companyDetails.invoice_item_date_format).strftime('%Y-%m-%d %H:%M:%S')
 						total_items.append(each_item)
 						continue
 					else:
 						if each_item["manual_edit"] == "No":
+							each_item["date"] = datetime.datetime.strptime(each_item["date"],companyDetails.invoice_item_date_format).strftime('%Y-%m-%d %H:%M:%S')
 							total_items.append(each_item)
 							continue
 			else:
 				if invoice_details.sez == 1 and sez != 0:
 					if "manual_edit" not in each_item:
-							total_items.append(each_item)
-							continue
+						each_item["date"] = datetime.datetime.strptime(each_item["date"],companyDetails.invoice_item_date_format).strftime('%Y-%m-%d %H:%M:%S')
+						total_items.append(each_item)
+						continue
 					else:
 						if each_item["manual_edit"] == "No":
+							each_item["date"] = datetime.datetime.strptime(each_item["date"],companyDetails.invoice_item_date_format).strftime('%Y-%m-%d %H:%M:%S')
 							total_items.append(each_item)
 							continue
 			if (each_item["is_service_charge_item"] == "No" and isinstance(each_item["sort_order"], int) and companyDetails.enable_sc_from_folios == 0) or ((each_item["is_service_charge_item"] == "Yes" or each_item["is_service_charge_item"] == "No") and companyDetails.enable_sc_from_folios == 1):
