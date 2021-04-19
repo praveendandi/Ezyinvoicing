@@ -1,560 +1,561 @@
 {
- "actions": [],
- "autoname": "field:company_code",
- "creation": "2020-10-08 13:12:15.148462",
- "doctype": "DocType",
- "editable_grid": 1,
- "engine": "InnoDB",
- "field_order": [
-  "company_details_section",
-  "company_code",
-  "company_name",
-  "trade_name",
-  "legal_name",
-  "mode",
-  "provider",
-  "column_break_6",
-  "gst_number",
-  "email",
-  "phone_number",
-  "status",
-  "address_details_section",
-  "address_1",
-  "address_2",
-  "state_code",
-  "calculation_by",
-  "merchant_name",
-  "b2c_qr_url",
-  "column_break_15",
-  "location",
-  "pincode",
-  "font_file",
-  "b2c_qr_type",
-  "merchant_virtual_payment_address",
-  "section_break_22",
-  "qr_rect_x0",
-  "qr_rect_x1",
-  "qr_rect_y0",
-  "qr_rect_y1",
-  "column_break_26",
-  "irn_text_point1",
-  "irn_text_point2",
-  "section_break_30",
-  "invoice_reinitiate_parsing_file",
-  "reinitiate_file_path",
-  "invoice_parser_file",
-  "invoice_parser_file_path",
-  "site_name",
-  "irn_details_page",
-  "invoice_item_date_format",
-  "font_file_path",
-  "proxy",
-  "proxy_url",
-  "proxy_username",
-  "proxy_password",
-  "allowance_type",
-  "invoice_cancelled_mails",
-  "host",
-  "company_logo",
-  "service_charge_percentage",
-  "b2c_to_b2b",
-  "number_in_description",
-  "allow_auto_irn",
-  "sc_name",
-  "sc_gst_percentage",
-  "adjustment_service_charge_list",
-  "enable_sc_from_folios",
-  "bulk_import_invoice_headers",
-  "bulk_import_gst_count",
-  "tax_invoice_to_manual",
-  "disable_credit_note",
-  "bulk_excel_upload_type",
-  "new_parsers",
-  "parsers_branch_name",
-  "ui_git_branch",
-  "angular_project_production_path",
-  "backend_git_branch",
-  "slab_12_starting_range",
-  "slab_12_ending_range",
-  "irn_text_alignment",
-  "backend_git_path",
-  "irn_qr_size",
-  "sc_sac_code",
-  "configiration_section",
-  "config"
- ],
- "fields": [
-  {
-   "fieldname": "company_details_section",
-   "fieldtype": "Section Break",
-   "label": "Company Details"
-  },
-  {
-   "fieldname": "company_code",
-   "fieldtype": "Data",
-   "label": "Company Code",
-   "reqd": 1,
-   "unique": 1
-  },
-  {
-   "fieldname": "company_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Company Name",
-   "reqd": 1
-  },
-  {
-   "fieldname": "trade_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Trade Name",
-   "reqd": 1
-  },
-  {
-   "fieldname": "legal_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Legal Name",
-   "reqd": 1
-  },
-  {
-   "fieldname": "mode",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Mode",
-   "options": "Testing\nUat\nProduction",
-   "reqd": 1
-  },
-  {
-   "fieldname": "provider",
-   "fieldtype": "Link",
-   "label": "Provider",
-   "options": "GSP APIS"
-  },
-  {
-   "fieldname": "column_break_6",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "gst_number",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "GST number",
-   "reqd": 1
-  },
-  {
-   "fieldname": "email",
-   "fieldtype": "Data",
-   "label": "Email",
-   "reqd": 1
-  },
-  {
-   "fieldname": "phone_number",
-   "fieldtype": "Data",
-   "label": "Phone Number",
-   "reqd": 1
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Status",
-   "options": "Active\nIn Active",
-   "reqd": 1
-  },
-  {
-   "fieldname": "address_details_section",
-   "fieldtype": "Section Break",
-   "label": "Address Details"
-  },
-  {
-   "fieldname": "address_1",
-   "fieldtype": "Data",
-   "label": "Address 1",
-   "reqd": 1
-  },
-  {
-   "fieldname": "address_2",
-   "fieldtype": "Data",
-   "label": "Address 2",
-   "reqd": 1
-  },
-  {
-   "fieldname": "state_code",
-   "fieldtype": "Data",
-   "label": "State Code",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_15",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "location",
-   "fieldtype": "Data",
-   "label": "Location",
-   "reqd": 1
-  },
-  {
-   "fieldname": "pincode",
-   "fieldtype": "Int",
-   "label": "Pincode",
-   "reqd": 1
-  },
-  {
-   "fieldname": "font_file",
-   "fieldtype": "Attach",
-   "label": "Font File"
-  },
-  {
-   "fieldname": "calculation_by",
-   "fieldtype": "Select",
-   "label": "Calculation By",
-   "options": "Description\nSAC"
-  },
-  {
-   "bold": 1,
-   "fieldname": "qr_rect_x0",
-   "fieldtype": "Int",
-   "label": "Qr Rect X0"
-  },
-  {
-   "bold": 1,
-   "fieldname": "qr_rect_x1",
-   "fieldtype": "Int",
-   "label": "Qr Rect X1"
-  },
-  {
-   "bold": 1,
-   "fieldname": "qr_rect_y0",
-   "fieldtype": "Int",
-   "label": "Qr Rect Y0"
-  },
-  {
-   "bold": 1,
-   "fieldname": "qr_rect_y1",
-   "fieldtype": "Int",
-   "label": "Qr Rect Y1"
-  },
-  {
-   "bold": 1,
-   "fieldname": "irn_text_point1",
-   "fieldtype": "Int",
-   "label": "IRN Text Point1"
-  },
-  {
-   "bold": 1,
-   "fieldname": "irn_text_point2",
-   "fieldtype": "Int",
-   "label": "IRN Text Point2"
-  },
-  {
-   "fieldname": "column_break_26",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_22",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "section_break_30",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "reinitiate_file_path",
-   "fieldtype": "Data",
-   "label": "Reinitiate File Path"
-  },
-  {
-   "fieldname": "invoice_parser_file",
-   "fieldtype": "Attach",
-   "label": "Invoice Parser File "
-  },
-  {
-   "fieldname": "invoice_reinitiate_parsing_file",
-   "fieldtype": "Attach",
-   "label": "Invoice Reinitiate Parsing File"
-  },
-  {
-   "fieldname": "site_name",
-   "fieldtype": "Data",
-   "label": "Site Name"
-  },
-  {
-   "fieldname": "irn_details_page",
-   "fieldtype": "Select",
-   "label": "IRN Details Page",
-   "options": "First\nLast"
-  },
-  {
-   "fieldname": "b2c_qr_type",
-   "fieldtype": "Select",
-   "label": "B2C QR Type",
-   "options": "Virtual Payment\nInvoice Details"
-  },
-  {
-   "fieldname": "merchant_name",
-   "fieldtype": "Data",
-   "label": "Merchant Name"
-  },
-  {
-   "fieldname": "merchant_virtual_payment_address",
-   "fieldtype": "Data",
-   "label": "Merchant Virtual Payment Address"
-  },
-  {
-   "fieldname": "b2c_qr_url",
-   "fieldtype": "Data",
-   "label": "B2C QR URL"
-  },
-  {
-   "fieldname": "invoice_item_date_format",
-   "fieldtype": "Data",
-   "label": "Invoice Item Date Format"
-  },
-  {
-   "fieldname": "invoice_parser_file_path",
-   "fieldtype": "Data",
-   "label": "Invoice Parser File Path"
-  },
-  {
-   "fieldname": "font_file_path",
-   "fieldtype": "Data",
-   "label": "Font File Path"
-  },
-  {
-   "default": "0",
-   "fieldname": "proxy",
-   "fieldtype": "Check",
-   "label": "Proxy"
-  },
-  {
-   "fieldname": "proxy_url",
-   "fieldtype": "Data",
-   "label": "Proxy Url"
-  },
-  {
-   "fieldname": "proxy_username",
-   "fieldtype": "Data",
-   "label": "Proxy UserName"
-  },
-  {
-   "fieldname": "proxy_password",
-   "fieldtype": "Data",
-   "label": "Proxy Password"
-  },
-  {
-   "fieldname": "allowance_type",
-   "fieldtype": "Select",
-   "label": "Allowance Type",
-   "options": "Credit\nDiscount"
-  },
-  {
-   "default": "0",
-   "fieldname": "invoice_cancelled_mails",
-   "fieldtype": "Check",
-   "label": "Invoice Cancelled Mails"
-  },
-  {
-   "fieldname": "host",
-   "fieldtype": "Data",
-   "label": "Host"
-  },
-  {
-   "fieldname": "company_logo",
-   "fieldtype": "Attach",
-   "label": "Company Logo"
-  },
-  {
-   "fieldname": "service_charge_percentage",
-   "fieldtype": "Float",
-   "label": "Service Charge Percentage"
-  },
-  {
-   "default": "1",
-   "fieldname": "b2c_to_b2b",
-   "fieldtype": "Check",
-   "label": "B2C To B2B"
-  },
-  {
-   "default": "0",
-   "fieldname": "number_in_description",
-   "fieldtype": "Check",
-   "label": "Number In Description"
-  },
-  {
-   "fieldname": "sc_name",
-   "fieldtype": "Data",
-   "label": "SC Name"
-  },
-  {
-   "fieldname": "sc_gst_percentage",
-   "fieldtype": "Data",
-   "label": "SC GST Percentage"
-  },
-  {
-   "fieldname": "adjustment_service_charge_list",
-   "fieldtype": "Data",
-   "label": "Adjustment Service Charge List"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_auto_irn",
-   "fieldtype": "Check",
-   "label": "Allow Auto Irn"
-  },
-  {
-   "default": "0",
-   "fieldname": "enable_sc_from_folios",
-   "fieldtype": "Check",
-   "label": "Enable SC from Folios"
-  },
-  {
-   "default": "0",
-   "fieldname": "disable_credit_note",
-   "fieldtype": "Check",
-   "label": "Disable Credit Note"
-  },
-  {
-   "fieldname": "bulk_import_invoice_headers",
-   "fieldtype": "Long Text",
-   "label": "Bulk Import Invoice Headers"
-  },
-  {
-   "fieldname": "bulk_import_gst_count",
-   "fieldtype": "Int",
-   "label": "Bulk Import Gst Count"
-  },
-  {
-   "default": "0",
-   "fieldname": "tax_invoice_to_manual",
-   "fieldtype": "Check",
-   "label": "Tax Invoice to Manual TaxInvoice"
-  },
-  {
-   "default": "None",
-   "fieldname": "bulk_excel_upload_type",
-   "fieldtype": "Select",
-   "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera"
-  },
-  {
-   "default": "0",
-   "fieldname": "new_parsers",
-   "fieldtype": "Check",
-   "label": "New Parsers"
-  },
-  {
-   "fieldname": "parsers_branch_name",
-   "fieldtype": "Data",
-   "label": "Parsers Branch Name"
-  },
-  {
-   "fieldname": "ui_git_branch",
-   "fieldtype": "Data",
-   "label": "Ui Git Branch"
-  },
-  {
-   "fieldname": "angular_project_production_path",
-   "fieldtype": "Data",
-   "label": "Angular Project Production Path"
-  },
-  {
-   "fieldname": "backend_git_branch",
-   "fieldtype": "Data",
-   "label": "Backend Git Branch"
-  },
-  {
-   "fieldname": "sc_sac_code",
-   "fieldtype": "Data",
-   "label": "SC SAC Code"
-  },
-  {
-   "fieldname": "slab_12_starting_range",
-   "fieldtype": "Int",
-   "label": "Slab 12% Starting Range"
-  },
-  {
-   "fieldname": "slab_12_ending_range",
-   "fieldtype": "Int",
-   "label": "Slab 12% Ending Range"
-  },
-  {
-   "fieldname": "irn_text_alignment",
-   "fieldtype": "Select",
-   "label": "Irn Text Alignment",
-   "options": "Horizontal\nVertical"
-  },
-  {
-   "fieldname": "backend_git_path",
-   "fieldtype": "Data",
-   "label": "Backend Git Path"
-  },
-  {
-   "fieldname": "irn_qr_size",
-   "fieldtype": "Select",
-   "label": "Irn Qr Size",
-   "options": "Small\nLarge"
-  },
-  {
-   "fieldname": "configiration_section",
-   "fieldtype": "Section Break",
-   "label": "Configiration"
-  },
-  {
-   "fieldname": "config",
-   "fieldtype": "Table",
-   "label": "config",
-   "options": "CONFIGURATIONS"
-  }
- ],
- "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2021-03-31 10:35:18.567524",
- "modified_by": "Administrator",
- "module": "Version2 App",
- "name": "company",
- "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Guest",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "IT",
-   "share": 1,
-   "write": 1
-  }
- ],
- "quick_entry": 1,
- "sort_field": "modified",
- "sort_order": "DESC",
- "track_changes": 1
+  "actions": [],
+  "autoname": "field:company_code",
+  "creation": "2020-10-08 13:12:15.148462",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "company_details_section",
+    "company_code",
+    "company_name",
+    "trade_name",
+    "legal_name",
+    "mode",
+    "provider",
+    "column_break_6",
+    "gst_number",
+    "email",
+    "phone_number",
+    "status",
+    "address_details_section",
+    "address_1",
+    "address_2",
+    "state_code",
+    "calculation_by",
+    "merchant_name",
+    "b2c_qr_url",
+    "column_break_15",
+    "location",
+    "pincode",
+    "font_file",
+    "b2c_qr_type",
+    "merchant_virtual_payment_address",
+    "section_break_22",
+    "qr_rect_x0",
+    "qr_rect_x1",
+    "qr_rect_y0",
+    "qr_rect_y1",
+    "column_break_26",
+    "irn_text_point1",
+    "irn_text_point2",
+    "section_break_30",
+    "invoice_reinitiate_parsing_file",
+    "reinitiate_file_path",
+    "invoice_parser_file",
+    "invoice_parser_file_path",
+    "site_name",
+    "irn_details_page",
+    "invoice_item_date_format",
+    "font_file_path",
+    "proxy",
+    "proxy_url",
+    "proxy_username",
+    "proxy_password",
+    "allowance_type",
+    "invoice_cancelled_mails",
+    "host",
+    "company_logo",
+    "service_charge_percentage",
+    "b2c_to_b2b",
+    "number_in_description",
+    "allow_auto_irn",
+    "sc_name",
+    "sc_gst_percentage",
+    "adjustment_service_charge_list",
+    "enable_sc_from_folios",
+    "bulk_import_invoice_headers",
+    "bulk_import_gst_count",
+    "tax_invoice_to_manual",
+    "disable_credit_note",
+    "bulk_excel_upload_type",
+    "new_parsers",
+    "parsers_branch_name",
+    "ui_git_branch",
+    "angular_project_production_path",
+    "backend_git_branch",
+    "slab_12_starting_range",
+    "slab_12_ending_range",
+    "irn_text_alignment",
+    "backend_git_path",
+    "irn_qr_size",
+    "sc_sac_code",
+    "configiration_section",
+    "config",
+    "reverse_calculation"
+  ],
+  "fields": [
+    {
+      "fieldname": "company_details_section",
+      "fieldtype": "Section Break",
+      "label": "Company Details"
+    },
+    {
+      "fieldname": "company_code",
+      "fieldtype": "Data",
+      "label": "Company Code",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "company_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Company Name",
+      "reqd": 1
+    },
+    {
+      "fieldname": "trade_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Trade Name",
+      "reqd": 1
+    },
+    {
+      "fieldname": "legal_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Legal Name",
+      "reqd": 1
+    },
+    {
+      "fieldname": "mode",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Mode",
+      "options": "Testing\nUat\nProduction",
+      "reqd": 1
+    },
+    {
+      "fieldname": "provider",
+      "fieldtype": "Link",
+      "label": "Provider",
+      "options": "GSP APIS"
+    },
+    {
+      "fieldname": "column_break_6",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "gst_number",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "GST number",
+      "reqd": 1
+    },
+    {
+      "fieldname": "email",
+      "fieldtype": "Data",
+      "label": "Email",
+      "reqd": 1
+    },
+    {
+      "fieldname": "phone_number",
+      "fieldtype": "Data",
+      "label": "Phone Number",
+      "reqd": 1
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Status",
+      "options": "Active\nIn Active",
+      "reqd": 1
+    },
+    {
+      "fieldname": "address_details_section",
+      "fieldtype": "Section Break",
+      "label": "Address Details"
+    },
+    {
+      "fieldname": "address_1",
+      "fieldtype": "Data",
+      "label": "Address 1",
+      "reqd": 1
+    },
+    {
+      "fieldname": "address_2",
+      "fieldtype": "Data",
+      "label": "Address 2",
+      "reqd": 1
+    },
+    {
+      "fieldname": "state_code",
+      "fieldtype": "Data",
+      "label": "State Code",
+      "reqd": 1
+    },
+    {
+      "fieldname": "column_break_15",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "location",
+      "fieldtype": "Data",
+      "label": "Location",
+      "reqd": 1
+    },
+    {
+      "fieldname": "pincode",
+      "fieldtype": "Int",
+      "label": "Pincode",
+      "reqd": 1
+    },
+    {
+      "fieldname": "font_file",
+      "fieldtype": "Attach",
+      "label": "Font File"
+    },
+    {
+      "fieldname": "calculation_by",
+      "fieldtype": "Select",
+      "label": "Calculation By",
+      "options": "Description\nSAC"
+    },
+    {
+      "bold": 1,
+      "fieldname": "qr_rect_x0",
+      "fieldtype": "Int",
+      "label": "Qr Rect X0"
+    },
+    {
+      "bold": 1,
+      "fieldname": "qr_rect_x1",
+      "fieldtype": "Int",
+      "label": "Qr Rect X1"
+    },
+    {
+      "bold": 1,
+      "fieldname": "qr_rect_y0",
+      "fieldtype": "Int",
+      "label": "Qr Rect Y0"
+    },
+    {
+      "bold": 1,
+      "fieldname": "qr_rect_y1",
+      "fieldtype": "Int",
+      "label": "Qr Rect Y1"
+    },
+    {
+      "bold": 1,
+      "fieldname": "irn_text_point1",
+      "fieldtype": "Int",
+      "label": "IRN Text Point1"
+    },
+    {
+      "bold": 1,
+      "fieldname": "irn_text_point2",
+      "fieldtype": "Int",
+      "label": "IRN Text Point2"
+    },
+    {
+      "fieldname": "column_break_26",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "section_break_22",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "section_break_30",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "reinitiate_file_path",
+      "fieldtype": "Data",
+      "label": "Reinitiate File Path"
+    },
+    {
+      "fieldname": "invoice_parser_file",
+      "fieldtype": "Attach",
+      "label": "Invoice Parser File "
+    },
+    {
+      "fieldname": "invoice_reinitiate_parsing_file",
+      "fieldtype": "Attach",
+      "label": "Invoice Reinitiate Parsing File"
+    },
+    {
+      "fieldname": "site_name",
+      "fieldtype": "Data",
+      "label": "Site Name"
+    },
+    {
+      "fieldname": "irn_details_page",
+      "fieldtype": "Select",
+      "label": "IRN Details Page",
+      "options": "First\nLast"
+    },
+    {
+      "fieldname": "b2c_qr_type",
+      "fieldtype": "Select",
+      "label": "B2C QR Type",
+      "options": "Virtual Payment\nInvoice Details"
+    },
+    {
+      "fieldname": "merchant_name",
+      "fieldtype": "Data",
+      "label": "Merchant Name"
+    },
+    {
+      "fieldname": "merchant_virtual_payment_address",
+      "fieldtype": "Data",
+      "label": "Merchant Virtual Payment Address"
+    },
+    {
+      "fieldname": "b2c_qr_url",
+      "fieldtype": "Data",
+      "label": "B2C QR URL"
+    },
+    {
+      "fieldname": "invoice_item_date_format",
+      "fieldtype": "Data",
+      "label": "Invoice Item Date Format"
+    },
+    {
+      "fieldname": "invoice_parser_file_path",
+      "fieldtype": "Data",
+      "label": "Invoice Parser File Path"
+    },
+    {
+      "fieldname": "font_file_path",
+      "fieldtype": "Data",
+      "label": "Font File Path"
+    },
+    {
+      "default": "0",
+      "fieldname": "proxy",
+      "fieldtype": "Check",
+      "label": "Proxy"
+    },
+    {
+      "fieldname": "proxy_url",
+      "fieldtype": "Data",
+      "label": "Proxy Url"
+    },
+    {
+      "fieldname": "proxy_username",
+      "fieldtype": "Data",
+      "label": "Proxy UserName"
+    },
+    {
+      "fieldname": "proxy_password",
+      "fieldtype": "Data",
+      "label": "Proxy Password"
+    },
+    {
+      "fieldname": "allowance_type",
+      "fieldtype": "Select",
+      "label": "Allowance Type",
+      "options": "Credit\nDiscount"
+    },
+    {
+      "default": "0",
+      "fieldname": "invoice_cancelled_mails",
+      "fieldtype": "Check",
+      "label": "Invoice Cancelled Mails"
+    },
+    {
+      "fieldname": "host",
+      "fieldtype": "Data",
+      "label": "Host"
+    },
+    {
+      "fieldname": "company_logo",
+      "fieldtype": "Attach",
+      "label": "Company Logo"
+    },
+    {
+      "fieldname": "service_charge_percentage",
+      "fieldtype": "Float",
+      "label": "Service Charge Percentage"
+    },
+    {
+      "default": "1",
+      "fieldname": "b2c_to_b2b",
+      "fieldtype": "Check",
+      "label": "B2C To B2B"
+    },
+    {
+      "default": "0",
+      "fieldname": "number_in_description",
+      "fieldtype": "Check",
+      "label": "Number In Description"
+    },
+    {
+      "fieldname": "sc_name",
+      "fieldtype": "Data",
+      "label": "SC Name"
+    },
+    {
+      "fieldname": "sc_gst_percentage",
+      "fieldtype": "Data",
+      "label": "SC GST Percentage"
+    },
+    {
+      "fieldname": "adjustment_service_charge_list",
+      "fieldtype": "Data",
+      "label": "Adjustment Service Charge List"
+    },
+    {
+      "default": "0",
+      "fieldname": "allow_auto_irn",
+      "fieldtype": "Check",
+      "label": "Allow Auto Irn"
+    },
+    {
+      "default": "0",
+      "fieldname": "enable_sc_from_folios",
+      "fieldtype": "Check",
+      "label": "Enable SC from Folios"
+    },
+    {
+      "default": "0",
+      "fieldname": "disable_credit_note",
+      "fieldtype": "Check",
+      "label": "Disable Credit Note"
+    },
+    {
+      "fieldname": "bulk_import_invoice_headers",
+      "fieldtype": "Long Text",
+      "label": "Bulk Import Invoice Headers"
+    },
+    {
+      "fieldname": "bulk_import_gst_count",
+      "fieldtype": "Int",
+      "label": "Bulk Import Gst Count"
+    },
+    {
+      "default": "0",
+      "fieldname": "tax_invoice_to_manual",
+      "fieldtype": "Check",
+      "label": "Tax Invoice to Manual TaxInvoice"
+    },
+    {
+      "default": "None",
+      "fieldname": "bulk_excel_upload_type",
+      "fieldtype": "Select",
+      "label": "Bulk Excel Upload Type",
+      "options": "None\nMarriot\nOpera\nHolidayIn"
+    },
+    {
+      "default": "0",
+      "fieldname": "new_parsers",
+      "fieldtype": "Check",
+      "label": "New Parsers"
+    },
+    {
+      "fieldname": "parsers_branch_name",
+      "fieldtype": "Data",
+      "label": "Parsers Branch Name"
+    },
+    {
+      "fieldname": "ui_git_branch",
+      "fieldtype": "Data",
+      "label": "Ui Git Branch"
+    },
+    {
+      "fieldname": "angular_project_production_path",
+      "fieldtype": "Data",
+      "label": "Angular Project Production Path"
+    },
+    {
+      "fieldname": "backend_git_branch",
+      "fieldtype": "Data",
+      "label": "Backend Git Branch"
+    },
+    {
+      "fieldname": "sc_sac_code",
+      "fieldtype": "Data",
+      "label": "SC SAC Code"
+    },
+    {
+      "fieldname": "slab_12_starting_range",
+      "fieldtype": "Int",
+      "label": "Slab 12% Starting Range"
+    },
+    {
+      "fieldname": "slab_12_ending_range",
+      "fieldtype": "Int",
+      "label": "Slab 12% Ending Range"
+    },
+    {
+      "fieldname": "irn_text_alignment",
+      "fieldtype": "Select",
+      "label": "Irn Text Alignment",
+      "options": "Horizontal\nVertical"
+    },
+    {
+      "fieldname": "backend_git_path",
+      "fieldtype": "Data",
+      "label": "Backend Git Path"
+    },
+    {
+      "fieldname": "irn_qr_size",
+      "fieldtype": "Select",
+      "label": "Irn Qr Size",
+      "options": "Small\nLarge"
+    },
+    {
+      "fieldname": "configiration_section",
+      "fieldtype": "Section Break",
+      "label": "Configiration"
+    },
+    {
+      "fieldname": "config",
+      "fieldtype": "Table",
+      "label": "config",
+      "options": "CONFIGURATIONS"
+    }
+  ],
+  "index_web_pages_for_search": 1,
+  "links": [],
+  "modified": "2021-03-31 10:35:18.567524",
+  "modified_by": "Administrator",
+  "module": "Version2 App",
+  "name": "company",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "Guest",
+      "share": 1,
+      "write": 1
+    },
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "IT",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "quick_entry": 1,
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "track_changes": 1
 }

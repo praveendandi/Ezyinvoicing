@@ -155,7 +155,11 @@ scheduler_events = {
         ],
         "09 11 * * * *": [
             "version2_app.version2_app.doctype.emailTemplat.sampleFun"
-        ]}
+        ]},
+    "daily": [
+        "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
+        "version2_app.events.deleteemailfilesdaily"
+    ]
 }
 # scheduler_events = {
 

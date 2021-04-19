@@ -1,27 +1,29 @@
-# -*- coding: utf-8 -*-
-# Copyright (c) 2021, caratred and contributors
-# For license information, please see license.txt
-
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+import requests
+from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoices import check_company_exist_for_Irn,gsp_api_data,get_tax_payer_details
-
-class IRNObjects(Document):
-	pass
-
-
 import pandas as pd
 import json
+import string
+import qrcode
 import os, os.path
 import random, string
 from random import randint
+from google.cloud import storage
+# from datetime import da
 import datetime
+import random
+import math
 from frappe.utils import get_site_name
 from frappe.utils import logger
+from version2_app.events import invoiceCreated
+import time
+import os
 
-
-
+from PyPDF2 import PdfFileWriter, PdfFileReader
+# import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -43,13 +45,13 @@ def IrnObject(invoice_number):
 		else:
 			category = "CRN"	
 		# IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category})
-		company_details = frappe.get_doc('company',invoice.company)
+		company_details = check_company_exist_for_Irn(invoice.company)
 		# get gsp_details
 		credit_note_items = []
 		companyData = {
-			"code": company_details.name,
-			"mode": company_details.mode,
-			"provider": company_details.provider
+			"code": company_details['data'].name,
+			"mode": company_details['data'].mode,
+			"provider": company_details['data'].provider
 		}
 		GSP_details = gsp_api_data(companyData)
 		# get taxpayer details
@@ -66,31 +68,31 @@ def IrnObject(invoice_number):
 				"TaxSch": "GST",
 				"SupTyp": "B2B",
 				"RegRev": "N",
-				"IgstOnIntra": "Y" if invoice.place_of_supply == company_details.state_code and invoice.sez == 1 else "N"
+				"IgstOnIntra": "Y" if invoice.place_of_supply == company_details['data'].state_code and invoice.sez == 1 else "N"
 			},
 			"SellerDtls": {
 				"Gstin":
 				GSP_details['data']['gst'],
 				"LglNm":
-				company_details.legal_name,
+				company_details['data'].legal_name,
 				"TrdNm":
-				company_details.trade_name,
+				company_details['data'].trade_name,
 				"Addr1":
-				company_details.address_1,
+				company_details['data'].address_1,
 				"Addr2":
-				company_details.address_2,
+				company_details['data'].address_2,
 				"Loc":
-				company_details.location,
+				company_details['data'].location,
 				"Pin":
-				193502 if company_details.mode == "Testing" else
-				company_details.pincode,
+				193502 if company_details['data'].mode == "Testing" else
+				company_details['data'].pincode,
 				"Stcd":
-				"01" if company_details.mode == "Testing" else
-				company_details.state_code,
+				"01" if company_details['data'].mode == "Testing" else
+				company_details['data'].state_code,
 				"Ph":
-				company_details.phone_number,
+				company_details['data'].phone_number,
 				"Em":
-				company_details.email
+				company_details['data'].email
 			},
 			"BuyerDtls": {
 				"Gstin":
@@ -100,8 +102,8 @@ def IrnObject(invoice_number):
 				"TrdNm":
 				taxpayer_details['data'].trade_name,
 				"Pos":
-				"01" if company_details.mode == "Testing" else
-				# company_details.state_code,
+				"01" if company_details['data'].mode == "Testing" else
+				# company_details['data'].state_code,
 				invoice.place_of_supply,
 				"Addr1":
 				taxpayer_details['data'].address_1,
@@ -121,7 +123,7 @@ def IrnObject(invoice_number):
 				category,
 				"No":
 				invoice.invoice_number + str(random.randint(0, 100)) +
-					'T' if company_details.mode == 'Testing' else
+					'T' if company_details['data'].mode == 'Testing' else
 					invoice.invoice_number,
 				"Dt":
 				datetime.datetime.strftime(invoice.invoice_date,
@@ -301,13 +303,3 @@ def IrnObject(invoice_number):
 	except Exception as e:
 		print(str(e))
 		return {"success":False,"message":str(e)}
-
-
-
-# @frappe.whitelist(allow_guest=True)
-# def getsuccessirnobject(invoiceNumber):
-# 	get_data = frappe.db.get_list('IRN Objects',filters={'invoice_number': invoiceNumber,'irn_status':'Success'})
-# 	if len(get_data)>0:
-# 		getobj = frappe.get_doc('IRN Objects',get_data[0])
-# 		print(getobj)
-# 		return {"success":True,"data":getobj}

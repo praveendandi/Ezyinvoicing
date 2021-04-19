@@ -30,6 +30,8 @@ class ExceluploadStats(Document):
 def InsertExcelUploadStats(data):
 	try:
 		invoice_list = []
+		if "gst_file" not in data:
+			data["gst_file"] =" "
 		process_time = datetime.datetime.now() - datetime.datetime.strptime(data['start_time'], "%Y-%m-%d %H:%M:%S.%f")
 		doc_data = {"doctype":"Excel upload Stats","uploaded_by":data['uploaded_by'],"process_time":process_time,"referrence_file":data['referrence_file'],"gst_file":data['gst_file']}
 		for each in data['data']:

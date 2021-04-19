@@ -6,20 +6,13 @@ import datetime
 import json
 import random
 import traceback
-import string
+import string,math
 from frappe.utils import get_site_name
 import time
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
-import math
-
-
-
-
-
-
 
 @frappe.whitelist()
 def Reinitiate_invoice(data):
@@ -153,10 +146,12 @@ def Reinitiate_invoice(data):
 			allowance_invoice = "Yes"
 		else:
 			allowance_invoice = "No"
-		# if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
-		# 	data['guest_data']['invoice_category'] = "Debit Invoice"
-		# 	invoice_category = "Debit Invoice"
-
+		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+			# data['guest_data']['invoice_category'] = "Debit Invoice"
+			# invoice_category = "Debit Invoice"
+			debit_invoice="Yes"
+		else:
+			debit_invoice="No"
 		if "gstNumber" not in data['guest_data']:
 			data['guest_data']['gstNumber'] = ""
 		if "confirmation_number" not in data['guest_data']:
@@ -206,6 +201,7 @@ def Reinitiate_invoice(data):
 		doc.total_state_cess_amount = total_state_cess_amount
 		doc.total_vat_amount = total_vat_amount
 		doc.ready_to_generate_irn = ready_to_generate_irn
+		doc.invoice_category = data['guest_data']['invoice_category'] if "invoice_category" in data['guest_data'] else "Tax Invoice"
 		# doc.place_of_supply = place_of_supply
 		# doc.sez = data["sez"] if "sez" in data else doc.sez
 		doc.cgst_amount=round(cgst_amount,2)
@@ -228,10 +224,11 @@ def Reinitiate_invoice(data):
 		doc.has_credit_items = has_credit_items
 		doc.mode = company.mode
 		doc.allowance_invoice = allowance_invoice
+		doc.debit_invoice = debit_invoice
 		# if data['total_invoice_amount'] == 0:
 		# 	irn_generated = "Zero Invoice"
 		doc.irn_generated=irn_generated
-		invoice_round_off_amount =  data['total_invoice_amount'] - (pms_invoice_summary+other_charges)
+		invoice_round_off_amount =  float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
 		if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
 			if len(data['items_data'])==0:
 				ready_to_generate_irn = "No"
@@ -279,8 +276,9 @@ def Reinitiate_invoice(data):
 		
 
 		if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
+			tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				if invoice_data.has_credit_items == "Yes" and company.disable_credit_note == 1:
+				if (invoice_data.has_credit_items == "Yes" and company.disable_credit_note == 1) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:
 					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
@@ -536,7 +534,7 @@ def reprocess_calulate_items(data):
 					continue
 			else:
 				return{"success":False,"message":"SAC Code "+ item_description+" not found"}
-			if sac_code_based_gst_rates.code == '996311':
+			if sac_code_based_gst_rates.code == '996311' or sac_code_based_gst_rates.code == '997321':
 				percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
 				if percentage_gst["success"] == True:
 					acc_gst_percentage = percentage_gst["gst_percentage"]
@@ -598,7 +596,7 @@ def reprocess_calulate_items(data):
 						igst_percentage = 0
 						sac_code_new = sac_code_based_gst_rates.code
 						vat_rate_percentage = 0
-					if item["net"] == "Yes":
+					if (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
 						base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
 						gst_value = item['item_value']- base_value
 						scharge_value = (item["service_charge_rate"] * base_value) / 100.0
@@ -611,7 +609,7 @@ def reprocess_calulate_items(data):
 					else:
 						base_value = item['item_value']
 						scharge_value = (item["service_charge_rate"] * item['item_value']) / 100.0
-						if sac_code_based_gst_rates.code == '996311' and item["service_charge_tax_applies"] == "Apply From Parent":	
+						if (sac_code_based_gst_rates.code == '996311' or sac_code_based_gst_rates.code == '997321') and item["service_charge_tax_applies"] == "Apply From Parent":	
 							if item["manual_edit"] == "Yes":
 								gst_percentage = float(item["cgst"])+float(item["sgst"])
 								igst_percentage = float(item["igst"])
@@ -723,8 +721,8 @@ def reprocess_calulate_items(data):
 				else:
 					final_item['item_mode'] = "Debit"
 				# if sac_code_based_gst_rates.net == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])):
-				if item["net"] == "No":
-					if item['sac_code'] == '996311' and sac_code_based_gst_rates.accommodation_slab == 1 and item["manual_edit"] != "Yes":
+				if (item["net"] == "No") or (companyDetails.reverse_calculation == 1 and item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1):
+					if (item['sac_code'] == '996311' or item['sac_code'] == '997321') and sac_code_based_gst_rates.accommodation_slab == 1 and item["manual_edit"] != "Yes":
 						if acc_gst_percentage == 0 and acc_igst_percentage == 0:
 							final_item['cgst'] = 0
 							final_item['sgst'] = 0
@@ -746,7 +744,7 @@ def reprocess_calulate_items(data):
 					final_item['gst_rate'] = final_item['cgst']+final_item['sgst']+final_item['igst']
 					final_item['item_value_after_gst'] = final_item['cgst_amount']+final_item['sgst_amount']+final_item['igst_amount']+item['item_value']
 					final_item['item_value'] = item['item_value']
-				elif item["net"] == "Yes" and item['sac_code'] != "996311":
+				elif (item["net"] == "Yes" and (item['sac_code'] != "996311" or item['sac_code'] != '997321') and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and (item['sac_code'] != "996311" or item['sac_code'] != '997321') and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and (item['sac_code'] != "996311" or item['sac_code'] != '997321') and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1):
 					gst_percentage = (float(item["cgst"]) + float(item["sgst"]))
 					base_value = round(item['item_value'] * (100 / (gst_percentage + 100)),3)
 					gst_value = item['item_value'] - base_value
@@ -792,8 +790,8 @@ def reprocess_calulate_items(data):
 			# 		final_item['item_mode'] = "Debit"
 			else:
 				# if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
-				if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No":
-					if item["net"] == "Yes":
+				if (item['sac_code'] != "996311" or item['sac_code'] != "997321") and sac_code_based_gst_rates.taxble == "No":
+					if (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
 						vatcessrate = item["state_cess"]+item["cess"]+item["vat"]
 						if "item_value_after_gst" in item:
 							base_value = round(item['item_value_after_gst'] * (100 / (vatcessrate + 100)),3)

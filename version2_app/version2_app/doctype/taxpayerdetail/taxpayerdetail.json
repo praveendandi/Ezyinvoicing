@@ -25,7 +25,8 @@
   "address_floor_number",
   "address_street",
   "block_status",
-  "status"
+  "status",
+  "disable_auto_irn"
  ],
  "fields": [
   {
@@ -132,11 +133,17 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Active\nIn-Active"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_auto_irn",
+   "fieldtype": "Check",
+   "label": "Disable Auto IRN"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-01-11 14:28:12.351140",
+ "modified": "2021-04-16 10:44:02.024180",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "TaxPayerDetail",
