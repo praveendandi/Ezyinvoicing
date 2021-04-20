@@ -25,11 +25,15 @@ def holidayinManualupload(data):
 		start_time = datetime.datetime.now()
 		folder_path = frappe.utils.get_bench_path()
 		items_data_file = data['invoice_file']
+
 		company = data['company']
 		companyData = frappe.get_doc('company',data['company'])
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-		items_dataframe = pd.read_excel(items_file_path)
+		if ".csv" in items_file_path:
+			items_dataframe = pd.read_csv(items_file_path)
+		else:
+			items_dataframe = pd.read_excel(items_file_path)	
 		items_dataframe = items_dataframe.fillna('empty')
 		items_dataframe = items_dataframe.sort_values("taxinvnum")
 		# print(items_dataframe.head(16))
@@ -68,8 +72,10 @@ def holidayinManualupload(data):
 			each['invoicedate'] = str(each['invoicedate'])
 			if each['goods_desc'] not in payment_Types:
 				
-				
-				item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+				if "00:00:00" in each['invoicedate']:
+					item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+				else:
+					item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
 				if 'invoice_number' not in list_data:
 					list_data['invoice_category'] = "Tax Invoice"
 					list_data['invoice_number'] = each['taxinvnum']
