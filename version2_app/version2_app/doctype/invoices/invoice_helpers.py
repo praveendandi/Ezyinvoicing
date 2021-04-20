@@ -265,7 +265,8 @@ def error_invoice_calculation(data,data1):
 		'ready_to_generate_irn':
 		"No",
 		'error_message':
-		data1['error_message']
+		data1['error_message'],
+		"invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
 	})
 	v = invoice.insert(ignore_permissions=True, ignore_links=True)
 
