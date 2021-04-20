@@ -79,7 +79,7 @@ def samplebulk(data):
 	input_data = []
 	invoice_referrence_objects = {}
 	for each in valuesdata:
-		print(each)
+		# print(each)
 		val = each[0].split("|")
 		if len(val[7])>5:
 			invoice_type = "B2B"
@@ -94,8 +94,8 @@ def samplebulk(data):
 		cess = 0 if val[60]!="" else float(val[60])
 		print(each)
 		total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
-		each = {"total_invoice_amount":total_invoice_amount}
-		
+		each["total_invoice_amount"] = total_invoice_amount
+		print(each['taxinvnum'],invoice_referrence_objects)
 		if each['taxinvnum'] not in invoice_referrence_objects:
 				
 			invoice_referrence_objects[each['taxinvnum']] = []
