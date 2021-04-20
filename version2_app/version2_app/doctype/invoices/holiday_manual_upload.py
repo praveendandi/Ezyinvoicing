@@ -29,7 +29,12 @@ def holidayinManualupload(data):
 		companyData = frappe.get_doc('company',data['company'])
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-		items_dataframe = pd.read_excel(items_file_path)
+		if ".csv" in items_file_path:
+			items_dataframe = pd.read_csv(items_file_path)
+		else:
+			items_dataframe = pd.read_excel(items_file_path)
+
+		# items_dataframe = pd.read_excel(items_file_path)
 		items_dataframe = items_dataframe.fillna('empty')
 		items_dataframe = items_dataframe.sort_values("taxinvnum")
 		# print(items_dataframe.head(16))
