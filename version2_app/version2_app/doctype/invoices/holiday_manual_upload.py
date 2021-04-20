@@ -68,8 +68,12 @@ def holidayinManualupload(data):
 			each['invoicedate'] = str(each['invoicedate'])
 			if each['goods_desc'] not in payment_Types:
 				
-				
-				item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+				if "00:00:00" in each['invoicedate']:
+					item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+				else:
+					item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
+
+				# item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
 				if 'invoice_number' not in list_data:
 					list_data['invoice_category'] = "Tax Invoice"
 					list_data['invoice_number'] = each['taxinvnum']

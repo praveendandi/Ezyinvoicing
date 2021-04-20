@@ -36,7 +36,11 @@ def BulkUploadReprocess(data):
 			for each in line_items['data']:
 				if each['goods_desc'] not in payment_Types:
 					item_dict = {}
-					date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
+					if "00:00:00" in each['invoicedate']:
+						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
+					else:
+						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(company.invoice_item_date_format)
+					# date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
 					item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
 					item_dict['item_value'] = each['invoiceamount']
 					item_dict['sac_code'] = str(each["taxcode_dsc"])
