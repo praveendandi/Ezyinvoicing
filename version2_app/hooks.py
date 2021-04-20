@@ -111,6 +111,10 @@ doc_events = {
         "after_insert": "version2_app.events.tablet_mapping",
         "on_trash": "version2_app.events.remove_mapping",
     },
+    "Redg Card": {
+        "after_insert": "version2_app.events.create_redg_card",
+        "on_trash": "version2_app.events.create_redg_card",
+    },
     "Active Tablets": {
         "after_insert": "version2_app.events.tablet_connected",
         "on_trash": "version2_app.events.tablet_disconnected",

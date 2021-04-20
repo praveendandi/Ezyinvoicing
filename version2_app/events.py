@@ -15,6 +15,10 @@ import traceback
 
 def invoice_created(doc, method=None):
     print("Invoice Created", doc.name)
+    if frappe.db.exists('Invoice Reconciliations', doc.name):
+        reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
+        reconciliations_doc.invoice_found = "Yes"
+        reconciliations_doc.save(ignore_permissions=True,ignore_version=True)
     if doc.invoice_from == "Pms":
         bin_name = frappe.db.get_value(
             'Document Bin', {'invoice_file': doc.invoice_file})
@@ -26,10 +30,8 @@ def invoice_created(doc, method=None):
         bin_doc.document_printed = "Yes"
         bin_doc.save(ignore_permissions=True, ignore_version=True)
 
-
 def invoice_deleted(doc, method=None):
-    frappe.publish_realtime("custom_socket", {
-                            'message': 'Invoice deleted', 'type': "Delete invoice", "invoice_number": doc.name})
+    frappe.publish_realtime("custom_socket", {'message': 'Invoice deleted', 'type': "Delete invoice", "invoice_number": doc.name})
     soc_doc = frappe.new_doc("Socket Notification")
     soc_doc.invoice_number = doc.name
     soc_doc.guest_name = doc.guest_name
@@ -46,8 +48,7 @@ def invoiceCreated(doc):
     try:
         # frappe.publish_realtime("invoice_created", "message")
         print("=================---------------000000000000")
-        frappe.publish_realtime(
-            "custom_socket", {'message': 'Invoices Created', 'data': doc.__dict__})
+        frappe.publish_realtime("custom_socket", {'message': 'Invoices Created', 'data': doc.__dict__})
         soc_doc = frappe.new_doc("Socket Notification")
         soc_doc.invoice_number = doc.name
         soc_doc.guest_name = doc.guest_name
@@ -60,8 +61,7 @@ def invoiceCreated(doc):
         soc_doc.insert(ignore_permissions=True)
 
         filename = doc.invoice_file
-        bin_name = frappe.db.get_value(
-            'Document Bin', {'invoice_file': filename})
+        bin_name = frappe.db.get_value('Document Bin', {'invoice_file': filename})
 
         bin_doc = frappe.get_doc("Document Bin", bin_name)
         bin_doc.print_by = doc.print_by
@@ -107,8 +107,7 @@ def fileCreated(doc, method=None):
                 company_doc = frappe.get_doc("company", doc.attached_to_name)
                 new_parsers = company_doc.new_parsers
                 if new_parsers == 0:
-                    file_path = abs_path + '/apps/version2_app/version2_app/parsers/' + \
-                        doc.attached_to_name+'/invoice_parser.py'
+                    file_path = abs_path + '/apps/version2_app/version2_app/parsers/' + doc.attached_to_name+'/invoice_parser.py'
                 else:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/' + \
                         doc.attached_to_name+'/invoice_parser.py'
@@ -273,3 +272,31 @@ def update_tablet_status(doc, method=None):
             "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
     except Exception as e:
         print(e)
+
+
+def create_redg_card(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Redg Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def deleteemailfilesdaily():
+	try:
+		company = frappe.get_last_doc('company')
+		lastdate = date.today() - timedelta(days=1)
+		print(lastdate)
+		emaildata = frappe.db.get_list('Email Queue',filters={'creation': ['>',lastdate],'status':"Sent"},fields=['name', 'attachments'])
+		print(emaildata)
+		filelist = []
+		for each in emaildata:
+			value = json.loads(each.attachments)
+			filelist.append(value[0]['fid'])
+			delete = frappe.delete_doc("File",value[0]['fid'])
+			print(delete)
+
+		return {"success":True}
+	except Exception as e:
+		return {"success":False,"message":str(e)}
+
