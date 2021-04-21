@@ -7,9 +7,10 @@ import traceback
 import os
 import datetime
 import json
-from version2_app.version2_app.doctype.invoices.invoices import calulate_items
+from version2_app.version2_app.doctype.invoices.invoices import calulate_items,Error_Insert_invoice
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.payment_types.payment_types import *
+
 
 # {'items': [{'date': '11-12-19', 'item_value': 222000.0, 'sac_code': 'No Sac', 'sort_order': 1, 'name': 'BQT (OC) Lunch'}], 'invoice_number': '303698', 'company_code': 'ICSJWMA-01', 'invoice_item_date_format': '%d-%m-%y', 'sez': 0}
 # insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],
@@ -54,6 +55,7 @@ def BulkUploadReprocess(data):
 			calculate_data['invoice_item_date_format'] = company.invoice_item_date_format
 			calculate_data['sez'] = invoice_data.sez	
 			calculate_items_data = calulate_items(calculate_data)
+			print(calculate_items_data)
 			if calculate_items_data['success']==True:
 
 				guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoice_data.invoice_type,
@@ -65,8 +67,28 @@ def BulkUploadReprocess(data):
 				reinitiate_data['invoice_object_from_file'] = json.loads(invoice_data.invoice_object_from_file)
 				invoicereinitiate = Reinitiate_invoice(reinitiate_data)
 				return invoicereinitiate
+			# else:
+			# 	error_data ={}
+			# 	# error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":invoiceNumber.replace(" ",""),"company_code":"CPTG-01","invoice_date":date_time_obj}
+			# 	# error_data['invoice_file'] = filepath
+			# 	# error_data['guest_name'] = guest['name']
+			# 	# error_data['gst_number'] = gstNumber
+			# 	# if guest['invoice_type'] == "B2C":
+			# 		# error_data['gst_number'] == " "
+			# 	# error_data['state_code'] = " "
+			# 	# error_data['room_number'] = guest['room_number']
+			# 	# error_data['pincode'] = " "
+			# 	# error_data['total_invoice_amount'] = total_invoice_amount
+			# 	error_data['invoice_number'] = invoice_number
+			# 	error_data['gst_number'] = invoice_data.gst_number
+			# 	error_data['company_code'] = invoice_data.company
+			# 	error_data['error_message'] = calculate_items_data['message']
 
+			# 	# error_data['amened'] = amened
+			# 	# error_data["sez"] = sez
+			# 	errorInvoice = Error_Insert_invoice(error_data)
 			return {"success":True,"data":line_items}
+			
 		elif company.bulk_excel_upload_type == "Marriot":
 			line_items = json.loads(invoice_data.invoice_object_from_file)
 			# invoice_date = invoice_data.invoice_date

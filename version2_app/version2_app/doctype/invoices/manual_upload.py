@@ -19,11 +19,26 @@ from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats imp
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.invoices.holiday_manual_upload import holidayinManualupload
 
+from frappe.utils.background_jobs import enqueue
+
+
 
 
 
 @frappe.whitelist(allow_guest=True)
 def manual_upload(data):
+    enqueue(
+            manual_upload_data,
+            queue="default",
+            timeout=8000,
+            event="data_import",
+            now=frappe.conf.developer_mode or frappe.flags.in_test,
+            data = data
+			)
+    return True    
+
+@frappe.whitelist(allow_guest=True)
+def manual_upload_data(data):
 	try:
 		print("startt--------------------------")
 		start_time = datetime.datetime.now()
