@@ -2950,8 +2950,9 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist()
 def Error_Insert_invoice(data):
 	try:
+		# print(data,"&&&&&&&&&&&&7")
 		if "invoice_object_from_file" not in data:
-			data['invoice_object_from_file'] = " "
+			data['invoice_object_from_file'] = {"data":[]}
 		if "invoice_from" in data:
 			invoice_from = data['invoice_from']
 		else:
@@ -2981,7 +2982,6 @@ def Error_Insert_invoice(data):
 						hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 							items, data['invoice_number'],"Invoice")
 					
-				# return {"success": True}	
 					if frappe.db.exists('Invoices', data['invoice_number']):
 						invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
 						if invoice_bin.invoice_from=="Pms":
@@ -3085,7 +3085,10 @@ def Error_Insert_invoice(data):
 			if data['invoice_object_from_file'] == " ":
 				data['invoice_object_from_file'] = invoiceExists.invoice_object_from_file
 			invoiceExists.error_message = data['error_message']
-			invoiceExists.invoice_object_from_file = data['invoice_object_from_file']
+			if isinstance(data['invoice_object_from_file'], dict):
+				data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
+			else:
+				invoiceExists.invoice_object_from_file = data['invoice_object_from_file']
 			# if invoiceExists.invoice_type == "B2B":
 			invoiceExists.ready_to_generate_irn = "No"
 			if invoiceExists.gst_number == None:
@@ -3102,8 +3105,7 @@ def Error_Insert_invoice(data):
 
 
 			invoiceExists.save()
-			# if len(data['gst_number'])<15 and len(data['gst_number'])>0:
-			# 	error_invoice_calculation(data_error)
+			
 			if 'items_data' in list(data.keys()):
 				items = data['items_data']
 				itemsInsert = insert_items(items,data['invoice_number'])
@@ -3115,6 +3117,7 @@ def Error_Insert_invoice(data):
 			return {"success":False,"message":"error","data":invoiceExists}
 	except Exception as e:
 		print(e, "  Error insert Invoice")
+		print(traceback.print_exc())
 		return {"success": False, "message": str(e)}
 
 
