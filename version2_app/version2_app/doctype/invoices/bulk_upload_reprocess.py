@@ -36,9 +36,12 @@ def BulkUploadReprocess(data):
 			for each in line_items['data']:
 				if each['goods_desc'] not in payment_Types:
 					item_dict = {}
-					date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
+					if "00:00:00" in each['invoicedate']:
+						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
+					else:
+						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(company.invoice_item_date_format)
 					item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
-					item_dict['item_value'] = each['invoiceamount']
+					item_dict['item_value'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
 					item_dict['sac_code'] = str(each["taxcode_dsc"])
 					item_dict['name'] = each['goods_desc']
 					item_dict['sort_order'] = sort_order
@@ -51,7 +54,6 @@ def BulkUploadReprocess(data):
 			calculate_data['invoice_item_date_format'] = company.invoice_item_date_format
 			calculate_data['sez'] = invoice_data.sez	
 			calculate_items_data = calulate_items(calculate_data)
-			print(calculate_items_data)
 			if calculate_items_data['success']==True:
 
 				guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoice_data.invoice_type,
@@ -67,7 +69,6 @@ def BulkUploadReprocess(data):
 			return {"success":True,"data":line_items}
 		elif company.bulk_excel_upload_type == "Marriot":
 			line_items = json.loads(invoice_data.invoice_object_from_file)
-			print(line_items,type(line_items),type(invoice_data.invoice_object_from_file))
 			# invoice_date = invoice_data.invoice_date
 			invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 			items = []
