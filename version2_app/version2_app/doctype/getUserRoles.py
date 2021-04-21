@@ -61,7 +61,8 @@ def samplebulk(data):
 	print("startt--------------------------")
 	start_time = datetime.datetime.now()
 	folder_path = frappe.utils.get_bench_path()
-	items_data_file = "/private/files/EINVOICE 01.03.2021 to 01.03.2021.xlsx"
+	# items_data_file = "/private/files/EINVOICE 01.03.2021 to 01.03.2021.xlsx"
+	items_data_file = data['invoice_file']
 	# company = "HIEHH-01"
 	# data = {"company":"HIEHH-01","username":"Ganesh","invoice_file":items_data_file}
 	companyData = frappe.get_doc('company',data['company'])
