@@ -3083,7 +3083,7 @@ def Error_Insert_invoice(data):
 			return {"success":True,"data":invoiceExists} 	
 		else:
 			if data['invoice_object_from_file'] = " ":
-			data['invoice_object_from_file'] = invoiceExists.invoice_object_from_file
+				data['invoice_object_from_file'] = invoiceExists.invoice_object_from_file
 			invoiceExists.error_message = data['error_message']
 			invoiceExists.invoice_object_from_file = data['invoice_object_from_file']
 			# if invoiceExists.invoice_type == "B2B":
