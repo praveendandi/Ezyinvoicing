@@ -1369,7 +1369,7 @@ def calulate_items(data):
 			acc_igst_percentage = 0.00
 			if companyDetails.calculation_by == "Description":
 				if companyDetails.number_in_description == 1:
-					item_description = (item['name'].rstrip(string.digits)).strip()
+					item_description = (item['name']).strip()
 				else:
 					item_description = item['name']
 				sac_code_based_gst = frappe.db.get_list(
