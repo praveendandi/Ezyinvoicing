@@ -19,11 +19,27 @@ from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats imp
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.invoices.holiday_manual_upload import holidayinManualupload
 from version2_app.version2_app.doctype.invoices.opera_manula_bulkupload import operabulkupload
+from frappe.utils.background_jobs import enqueue
+
+
 
 
 
 @frappe.whitelist(allow_guest=True)
 def manual_upload(data):
+    enqueue(
+            manual_upload_data,
+            queue="default",
+            timeout=800000,
+            event="data_import",
+            now=frappe.conf.developer_mode or frappe.flags.in_test,
+            data = data,
+			# is_async = False
+			)
+    return True    
+
+@frappe.whitelist(allow_guest=True)
+def manual_upload_data(data):
 	try:
 		print("startt--------------------------")
 		start_time = datetime.datetime.now()
@@ -310,7 +326,7 @@ def manual_upload(data):
 					errorInvoice = Error_Insert_invoice(error_data)
 					B2B = "B2B"
 					B2C = np.nan
-					
+					frappe.log_error(errorInvoice, 'enques')
 					output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
 					print("Error:  *******The given gst number is not a vaild one**********")		
 			else:
@@ -385,6 +401,8 @@ def manual_upload(data):
 		frappe.db.delete('File',{'file_url': data['gst_file']})
 		frappe.db.commit()
 		print(str(e),"   manual_upload")
+		frappe.log_error(frappe.get_traceback(), 'enques')
+		# make_error_snapshot(e)
 		return {"success":False,"message":str(e)}    
 
 
