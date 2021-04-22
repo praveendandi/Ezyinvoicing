@@ -74,7 +74,7 @@ def reinitiateInvoice(data):
 				roomNumber = room[-1]
 			if "GST ID" in i:				
 				gstNumber = i.split(':')[1].replace(' ', '')
-				gstNumber = gstNumber.replace("TAXINVOICE.","")
+				gstNumber = gstNumber.replace("TAXINVOICE","")
 				gstNumber = gstNumber.replace("Membership","").strip(".")
 			if "Bill  No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
@@ -105,14 +105,18 @@ def reinitiateInvoice(data):
 				p = i.split(":")
 				print_by = p[1].replace(" ","")
 
+		check_invoice = check_invoice_exists(invoiceNumber)
+		if check_invoice['success']==True:
+			inv_data = check_invoice['data']
+			invoiceNumber = inv_data.name
+			if inv_data.change_gst_number == "No":
+				gstNumber = inv_data.gst_number
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		items = [] 
 		itemsort = 0
 		for i in data:
-			pattern = re.compile(
-			"^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+"
-			)
+			pattern = re.compile("^([0-9]{2}\-[0-9]{2}\-[0-9]{2})+")
 			check_date = re.findall(pattern, i)
 			if len(check_date) > 0:
 				item = dict()
@@ -163,7 +167,9 @@ def reinitiateInvoice(data):
 							if re.match(pattern, next_dict["name"]):
 								pass
 							else:
-								total_items.append(each)	
+								total_items.append(each)
+						else:
+							total_items.append(each)
 					else:
 						check_date = re.findall(pattern, each["name"].strip())
 						if len(check_date) > 0:
@@ -188,7 +194,7 @@ def reinitiateInvoice(data):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
+		guest['room_number'] = int(roomNumber) if roomNumber != "" else 0
 		guest['company_code'] = company
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
@@ -225,7 +231,8 @@ def reinitiateInvoice(data):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
+			if errorcalulateItemsApiResponse['success'] == True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}
