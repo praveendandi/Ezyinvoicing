@@ -3116,7 +3116,7 @@ def Error_Insert_invoice(data):
 				hsnbasedtaxcodes = insert_hsn_code_based_taxes(
 					items, data['invoice_number'],"Invoice")
 					
-			return {"success":False,"message":"error","data":invoiceExists}
+			return {"success":True,"message":"Error Invoice","data":invoiceExists}
 	except Exception as e:
 		print(e, "  Error insert Invoice")
 		print(traceback.print_exc())
