@@ -2997,7 +2997,8 @@ def Error_Insert_invoice(data):
 			
 			if "Invalid GstNumber" in data['error_message']:
 				data['invoice_type'] ="B2B"
-			
+			if "gst_number" not in data or "gstNumber" not in data:
+				data['gst_number'] = ""
 			invoice = frappe.get_doc({
 				'doctype':
 				'Invoices',
@@ -3006,6 +3007,7 @@ def Error_Insert_invoice(data):
 				'invoice_type':data['invoice_type'],
 				'guest_name':
 				data['guest_name'],
+				'gst_number':data['gst_number'],
 				# if len(data['gst_number'])==15:
 				# 	'gst_number': data['gst_number'],
 
