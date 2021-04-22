@@ -201,7 +201,8 @@ def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
 
 def error_invoice_calculation(data,data1):
 	try:
-		print(data1)
+		if "invoice_object_from_file" not in data1:
+			data1['invoice_object_from_file'] = {"data":[]}
 		company = frappe.get_doc('company',data['company_code'])
 		invType = data1['invoice_type']
 		# if invType == "B2B":
@@ -270,8 +271,8 @@ def error_invoice_calculation(data,data1):
 			'ready_to_generate_irn':
 			"No",
 			'error_message':
-			data1['error_message']
-			# "invoice_object_from_file":json.dumps(data1['invoice_object_from_file'])
+			data1['error_message'],
+			"invoice_object_from_file":json.dumps(data1['invoice_object_from_file'])
 		})
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 

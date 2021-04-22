@@ -192,6 +192,7 @@ def holidayinManualupload(data):
 				error_data['error_message'] = "Invalid GstNumber "+each['gstNumber']
 				error_data['amened'] = 'No'
 				error_data['invoice_type'] = "B2B"
+				error_data['gst_number'] = each['gstNumber']
 				errorcalulateItemsApiResponse = calulate_items(each)
 				error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
 				if errorcalulateItemsApiResponse['success'] == True:
