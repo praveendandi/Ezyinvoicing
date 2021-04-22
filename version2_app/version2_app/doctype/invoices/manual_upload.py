@@ -59,7 +59,6 @@ def manual_upload_data(data):
 		items_dataframe = items_dataframe.fillna('empty')	
 		items_dataframe['Gst Number'] = "NoGst"
 		invoice_columns = list(items_dataframe.columns.values)
-		print(invoice_columns)
 		invoice_num = list(set(items_dataframe['BILL_NO']))
 		company_check_columns = companyData.bulk_import_invoice_headers
 		company_check_columns = company_check_columns.split(",")

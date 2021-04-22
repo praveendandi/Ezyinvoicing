@@ -2046,6 +2046,7 @@ def calulate_items(data):
 		return {"success": True, "data": total_items}
 	except Exception as e:
 		print(e, "calculation api")
+		print(traceback.print_exc())
 		return {"success": False, "message": str(e)}
 
 
@@ -2107,6 +2108,7 @@ def insert_tax_summariesd(items, invoice_number):
 		return {"success": True}
 	except Exception as e:
 		print('tax', e)
+		print(traceback.print_exc())
 		return {'succes': False, "message": str(e)}
 
 
@@ -2607,9 +2609,6 @@ def check_token_is_valid(data):
 
 def login_gsp(code,mode):
 	try:
-		# code = "MHKCP-01"
-		# mode = "Testing"
-		# print("********** scheduler")
 		gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
 			'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
