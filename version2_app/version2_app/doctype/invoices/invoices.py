@@ -3079,7 +3079,8 @@ def Error_Insert_invoice(data):
 		invoiceExists = frappe.get_doc('Invoices', data['invoice_number'])
 		if len(data['gst_number'])<15 and len(data['gst_number'])>0:
 			data['error_message'] = data['error_message']+" -'"+data['gst_number']+"'"
-
+			invoiceExists.invoice_type = "B2B"
+			invoiceExists.gst_number = data['gst_number']
 		if invoiceExists.invoice_type == "B2B" and	invoiceExists.irn_generated == "Success":
 			return {"success":True,"data":invoiceExists} 	
 		else:
