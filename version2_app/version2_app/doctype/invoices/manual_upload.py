@@ -34,7 +34,7 @@ def manual_upload(data):
             event="data_import",
             now=frappe.conf.developer_mode or frappe.flags.in_test,
             data = data,
-			# is_async = False
+			is_async = False
 			)
     return True    
 

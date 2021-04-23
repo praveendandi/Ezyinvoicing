@@ -46,8 +46,18 @@ def operabulkupload(data):
         items_dataframe = pd.read_excel(items_file_path)
         
         columnslist = items_dataframe.columns.values.tolist()
-        # print(columnslist,len(columnslist))
         columnslist = columnslist[0].split("|")
+        print(columnslist,len(columnslist))
+        # company_check_columns = companyData.bulk_import_invoice_headers
+        # print(companyData.bulk_import_invoice_headers)
+        check_columns = companyData.bulk_import_invoice_headers
+        # print(check_columns.split(","))type(check_columns))
+		# company_check_columns = check_columns.split(",")
+        # if company_check_columns != columnslist:
+            # print("//////////")
+			# frappe.db.delete('File', {'file_url': data['invoice_file']})
+			# frappe.db.commit()
+			# return {"success":False,"message":"Invoice data File mismatch"}
         listdata = items_dataframe.head(3)
         valuesdata = items_dataframe.values.tolist()
         
