@@ -67,17 +67,18 @@ def operabulkupload(data):
         for each in valuesdata:
             # print(each)
             val = each[0].split("|")
+            print(val)
             if len(val[7])>5:
                 invoice_type = "B2B"
             else:
                 val[7] = "empty"	
                 
-            each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[60]),"taxcode_dsc":val[35]}
+            each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[44]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
             # total_invoice_amount = float(val[-1])+float(val[])
-            sgst = 0 if val[61]!="" else float(val[61])
-            cgst = 0 if val[62]!="" else float(val[62])
-            igst = 0 if val[63]!="" else float(val[63])
-            cess = 0 if val[60]!="" else float(val[60])
+            sgst = 0 if val[46]!="" else float(val[46])
+            cgst = 0 if val[47]!="" else float(val[47])
+            igst = 0 if val[48]!="" else float(val[48])
+            cess = 0 if val[49]!="" else float(val[49])
             total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
             each["total_invoice_amount"] = total_invoice_amount
             if each['taxinvnum'] not in invoice_referrence_objects:
@@ -114,7 +115,7 @@ def operabulkupload(data):
                 else:
                     if list_data['invoice_number'] == each['taxinvnum'] :
                         # amount = list_data['invoiceamount']+list_data['sgstamount']+list_data['sgstamount']+list_data['ngstamount']
-                        list_data['total_invoice_amount'] = list_data['total_invoice_amount']+each['total_invoice_amount']
+                        list_data['total_invoice_amount'] = each['total_invoice_amount']
                         items = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1}
                         list_data['items'].extend([items])
                     else:

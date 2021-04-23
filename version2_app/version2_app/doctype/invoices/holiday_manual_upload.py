@@ -55,6 +55,8 @@ def holidayinManualupload(data):
 		input_data = []
 		invoice_referrence_objects = {}
 		for each in output:
+			totalitemAmount = each['invoiceamount']
+			each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
 			each['taxcode_dsc'] = str(each['taxcode_dsc'])
 			# print(each['taxinvnum'],len(each['taxinvnum']))
 			del each['accountdate']# = str(each['accountdate'])
@@ -73,7 +75,7 @@ def holidayinManualupload(data):
 			payment_Types  = [''.join(each) for each in paymentTypes['data']]
 			each['invoicedate'] = str(each['invoicedate'])
 			if each['goods_desc'] not in payment_Types:
-				totalitemAmount = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
+				# totalitemAmount = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
 				if "00:00:00" in each['invoicedate']:
 					item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
 				else:
@@ -88,9 +90,9 @@ def holidayinManualupload(data):
 					list_data['room_number'] = 1
 					list_data['guest_name'] = each['guestname']
 					# amount = #+each['sgstamount']+each['sgstamount']+each['ngstamount']
-					list_data['total_invoice_amount'] = each['invoiceamount']
+					list_data['total_invoice_amount'] = totalitemAmount
 					list_data['gstNumber'] = each['taxid']
-					item_list = {'date':item_date,'item_value':totalitemAmount,'name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc'])}
+					item_list = {'date':item_date,'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc'])}
 					items = []
 					items.append(item_list)
 					list_data['items'] = items
@@ -102,8 +104,8 @@ def holidayinManualupload(data):
 				else:
 					if list_data['invoice_number'] == each['taxinvnum'] :
 						# amount = list_data['invoiceamount']+list_data['sgstamount']+list_data['sgstamount']+list_data['ngstamount']
-						list_data['total_invoice_amount'] = list_data['total_invoice_amount']+each['invoiceamount'] #+each['sgstamount']+each['sgstamount']+each['ngstamount']
-						items = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':totalitemAmount,'name':each['goods_desc'],'sort_order':1}
+						list_data['total_invoice_amount'] = list_data['total_invoice_amount']+totalitemAmount #+each['sgstamount']+each['sgstamount']+each['ngstamount']
+						items = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1}
 						list_data['items'].extend([items])
 					else:
 						input_data.append(list_data)
@@ -114,10 +116,10 @@ def holidayinManualupload(data):
 						list_data['room_number'] = 1
 						list_data['guest_name'] = each['guestname']
 						# amount = each['invoiceamount']#+each['sgstamount']+each['sgstamount']+each['ngstamount']
-						list_data['total_invoice_amount'] = each['invoiceamount']
+						list_data['total_invoice_amount'] = totalitemAmount
 						list_data['gstNumber'] = each['taxid']
 						# list_data['total_invoice_amount'] = each['SUMFT_DEBITPERtaxinvnum']
-						item_list = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':totalitemAmount,'name':each['goods_desc'],'sort_order':1}
+						item_list = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1}
 						items = []
 						items.append(item_list)
 						list_data['items'] = items
