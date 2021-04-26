@@ -50,12 +50,12 @@ def manual_upload_data(data):
 		if companyData.bulk_excel_upload_type == "HolidayIn":
 			output = holidayinManualupload(data)
 			if output['success'] == False:
-				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message']})
+				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
 			return output
 		if companyData.bulk_excel_upload_type == "Opera":
 			output = operabulkupload(data)
 			if output['success'] ==False:
-				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message']})
+				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
 			return output	
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
@@ -70,7 +70,7 @@ def manual_upload_data(data):
 			frappe.db.delete('File', {'file_url': data['invoice_file']})
 			frappe.db.delete('File',{'file_url': data['gst_file']})
 			frappe.db.commit()
-			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch"})
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
 			return {"success":False,"message":"Invoice data mismatch"}
 
 		gst_data_file = data['gst_file']
@@ -85,7 +85,7 @@ def manual_upload_data(data):
 			frappe.db.delete('File', {'file_url': data['invoice_file']})
 			frappe.db.delete('File',{'file_url': data['gst_file']})
 			frappe.db.commit()
-			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":"Gst data mismatch"})
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":"Gst data mismatch","company":company})
 			return {"success":False,"message":"Gst data mismatch"}
 		for each in gst_data:
 			if each[0][0]=="|":
@@ -408,7 +408,7 @@ def manual_upload_data(data):
 		print(str(e),"   manual_upload")
 		frappe.log_error(frappe.get_traceback(), 'enques')
 		# make_error_snapshot(e)
-		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e)})
+		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
 		return {"success":False,"message":str(e)}    
 
 
