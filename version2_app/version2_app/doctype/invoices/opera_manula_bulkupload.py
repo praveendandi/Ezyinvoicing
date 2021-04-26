@@ -19,17 +19,6 @@ from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 
-# @frappe.whitelist(allow_guest=True)
-# def operabulkupload(data):
-#     enqueue(
-#             operabulkupload1,
-#             queue="default",
-#             timeout=8000,
-#             event="data_import",
-#             now=frappe.conf.developer_mode or frappe.flags.in_test,
-#             data = data
-# 			)
-#     return True        
 
 
 @frappe.whitelist(allow_guest=True)
@@ -142,7 +131,7 @@ def operabulkupload(data):
         output_date = []
         # print(len(input_data),"lemnnnnnn output")
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data)})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":data['company']})
         countIn = 1
         print(len(input_data),"count")
 
@@ -361,13 +350,13 @@ def operabulkupload(data):
                     print(errorInvoice)
                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number'])})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":data['company']})
             countIn+=1
         df = pd.DataFrame(output_date)
         df = df.groupby('date').count().reset_index()
         output_data = df.to_dict('records')
         InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":data['company']})
         # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
