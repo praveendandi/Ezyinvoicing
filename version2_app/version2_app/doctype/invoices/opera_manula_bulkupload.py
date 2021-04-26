@@ -362,4 +362,5 @@ def operabulkupload(data):
     except Exception as e:
         print(str(e),"   Opera manual ")
         print(traceback.print_exc())
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e)})
         return {"success":False,"message":str(e)}    
