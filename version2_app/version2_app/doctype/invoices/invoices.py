@@ -2954,7 +2954,8 @@ def Error_Insert_invoice(data):
 		if "invoice_from" in data:
 			invoice_from = data['invoice_from']
 		else:
-			invoice_from = "Pms"	
+			invoice_from = "Pms"
+			data['invoice_from'] = "Pms"	
 		if "sez" in data:
 			sez = data["sez"]
 		else:
