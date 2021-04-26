@@ -31,7 +31,7 @@ def invoice_created(doc, method=None):
 
 
 def invoice_deleted(doc,method=None):
-    frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name})
+    frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name,"company":doc.company})
     soc_doc = frappe.new_doc("Socket Notification")
     soc_doc.invoice_number = doc.name
     soc_doc.guest_name = doc.guest_name
@@ -47,7 +47,7 @@ def invoiceCreated(doc):
     try:
         # frappe.publish_realtime("invoice_created", "message")
         print("=================---------------000000000000")       
-        frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':doc.__dict__})
+        frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':doc.__dict__,"company":doc.company})
         soc_doc = frappe.new_doc("Socket Notification")
         soc_doc.invoice_number = doc.name
         soc_doc.guest_name = doc.guest_name
@@ -123,13 +123,15 @@ def fileCreated(doc, method=None):
 
 def Updateemitsocket(doc,method=None):
     if doc.status=="Success":
+        company = frappe.get_last_doc('company')
         frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
-        frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update"})
+        frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update","company":company.name})
 
 
 def DocumentBinSocket(doc,method=None):
+    company = frappe.get_last_doc('company')
     frappe.log_error("Document Bin Insert", " {'message':'Docuemnt Bin Insert'}")
-    frappe.publish_realtime("custom_socket", {'message':'Document Bin Insert','type':"document_bin_insert","data":doc.__dict__})
+    frappe.publish_realtime("custom_socket", {'message':'Document Bin Insert','type':"document_bin_insert","data":doc.__dict__,"company":company.name})
 
 def updateManager(doc, method=None):
     try:
@@ -156,7 +158,7 @@ def updateManager(doc, method=None):
                 for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
                     console_dump += c
             logged_command = " && ".join(commands)
-            frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})
+            frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed","company":company.name})
             # frappe.log_error("Angular project pull", console_dump)
             frappe.log_error("Angular project pull data","update manager")
     except Exception as e:
