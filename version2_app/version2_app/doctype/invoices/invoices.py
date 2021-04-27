@@ -1293,14 +1293,13 @@ def insert_items(items, invoice_number):
 
 def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
 	try:
-		print(data)
 		if "calulation_type" in data:
 			if data["calulation_type"] == "line_edit":
-				item_gst_percentage = data["cgst"] + data["sgst"]
-				item_igst_percentage = data["igst"]
-				state_cess = data["state_cess"]
-				central_cess = data["cess"]
-				vat = data["vat"]
+				item_gst_percentage = float(data["cgst"]) + float(data["sgst"])
+				item_igst_percentage = float(data["igst"])
+				state_cess = float(data["state_cess"])
+				central_cess = float(data["cess"])
+				vat = float(data["vat"])
 				service_charge = data["service_charge"]
 				if service_charge == "Yes":
 					tax_applies = data["service_charge_tax_applies"]
@@ -1322,18 +1321,23 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
 			tax_applies = sac_code_obj.service_charge_tax_applies
 		if sac_code_obj.taxble == "Yes":
 			if sac_code_obj.code == '996311' or sac_code_obj.code == "997321":
-				calulateslab = (companyDetails.slab_12_ending_range*12)/100
-				slab_amount = calulateslab+companyDetails.slab_12_ending_range
-				if float(data["item_value"]) > slab_amount:
-					gst_percentage = 18
-					igst_percentage = 18
-				elif float(data["item_value"])>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
-					gst_percentage = 12
-					igst_percentage = 12
+				if "calulation_type" in data:
+					if item_gst_percentage != float(sac_code_obj.cgst) + float(sac_code_obj.sgst):
+						gst_percentage = item_gst_percentage
+						igst_percentage = item_igst_percentage
 				else:
-					gst_percentage = 0
-					igst_percentage = 0
-					data['type'] = "Excempted"
+					calulateslab = (companyDetails.slab_12_ending_range*12)/100
+					slab_amount = calulateslab+companyDetails.slab_12_ending_range
+					if float(data["item_value"]) > slab_amount:
+						gst_percentage = 18
+						igst_percentage = 18
+					elif float(data["item_value"])>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
+						gst_percentage = 12
+						igst_percentage = 12
+					else:
+						gst_percentage = 0
+						igst_percentage = 0
+						data['type'] = "Excempted"
 			else:
 				gst_percentage = item_gst_percentage
 				igst_percentage = item_igst_percentage
@@ -1358,8 +1362,14 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
 			data["igst"] = 0
 			data['type'] = "Non-Gst"
 		if service_charge == "Yes":
-			if data["calulation_type"] == "line_edit":
-				service_charge_per = data["service_charge_rate"]
+			if "calulation_type" in data:
+				if data["calulation_type"] == "line_edit":
+					service_charge_per = data["service_charge_rate"]
+				else:
+					if sac_code_obj.one_sc_applies_to_all == 1:
+						service_charge_per = companyDetails.service_charge_percentage
+					else:
+						service_charge_per = sac_code_obj.service_charge_rate
 			else:
 				if sac_code_obj.one_sc_applies_to_all == 1:
 					service_charge_per = companyDetails.service_charge_percentage
@@ -1372,7 +1382,13 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
 					sc_gst_per = (service_charge_per*(data["sgst"]+data["cgst"]+data["igst"]))/100
 					vat_percentage = (service_charge_per*vat)/100
 				else:
-					sc_gst_per = (service_charge_per*sac_code_obj.sc_gst_tax_rate)/100
+					if "calulation_type" in data:
+						if data["calulation_type"] == "line_edit":
+							sc_gst_per = (service_charge_per*data["sc_gst_tax_rate"])/100
+						else:
+							sc_gst_per = (service_charge_per*sac_code_obj.sc_gst_tax_rate)/100
+					else:
+						sc_gst_per = (service_charge_per*sac_code_obj.sc_gst_tax_rate)/100
 					vat_percentage = 0
 			else:
 				statecess_percentage = 0
@@ -1643,15 +1659,15 @@ def calulate_items(data):
 						igst_percentage = 0
 						sac_code_new = sac_code_based_gst_rates.code
 						vat_rate_percentage = 0
-					if companyDetails.reverse_calculation == 1 and net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1:
-						if sac_code_based_gst_rates.taxble == "Yes":
-							total_gst_percentage = gst_percentage+igst_percentage
-							scharge_value_no = scharge
-						else:
-							total_gst_percentage = 0
-							scharge_value_no = scharge + float("0."+str(int((gst_percentage+igst_percentage)/2)))
-						base_valu_inc_sc = round(item['item_value'] * (100 / ((total_gst_percentage) + 100)),3)
-						item['item_value'] = round(base_valu_inc_sc * (100 / (scharge_value_no + 100)),3)
+					# if companyDetails.reverse_calculation == 1 and net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1:
+					# 	if sac_code_based_gst_rates.taxble == "Yes":
+					# 		total_gst_percentage = gst_percentage+igst_percentage
+					# 		scharge_value_no = scharge
+					# 	else:
+					# 		total_gst_percentage = 0
+					# 		scharge_value_no = scharge + float("0."+str(int((gst_percentage+igst_percentage)/2)))
+					# 	base_valu_inc_sc = round(item['item_value'] * (100 / ((total_gst_percentage) + 100)),3)
+					# 	item['item_value'] = round(base_valu_inc_sc * (100 / (scharge_value_no + 100)),3)
 					# if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
 					# 	base_value = round(item['item_value'] * (100 / ((gst_percentage+igst_percentage) + 100)),3) 
 					# 	scharge_value = (scharge * base_value) / 100.0
@@ -2142,8 +2158,8 @@ def calulate_items(data):
 				"quantity":final_item['quantity'],
 				"unit_of_measurement_description":final_item['unit_of_measurement_description'],
 				"is_service_charge_item": "No",
-				"sac_index": sac_code_based_gst_rates.sac_index
-				# "net": sac_code_based_gst_rates.net
+				"sac_index": sac_code_based_gst_rates.sac_index,
+				"line_edit_net":net_value
 			})
 		total_items.extend(second_list)	
 		return {"success": True, "data": total_items}

@@ -415,7 +415,10 @@ def reprocess_calulate_items(data):
 						total_items_data["date"] = each_item['date']
 						total_items_data["manual_edit"] = each_item["manual_edit"]
 						if total_items_data["service_charge"] == "Yes":
-							total_items_data["service_charge_rate"] = float(each_item["service_charge_rate"])
+							if "service_charge_rate" in each_item:
+								total_items_data["service_charge_rate"] = float(each_item["service_charge_rate"])
+							else:
+								each_item["service_charge_rate"] = sac_code_based_gst_rates.service_charge_rate
 							total_items_data["service_charge_tax_applies"] = each_item["service_charge_tax_applies"]
 							if total_items_data["service_charge_tax_applies"] == "Seperate GST":
 								total_items_data["service_charge_tax_applies"] = "Separate GST"
@@ -510,6 +513,7 @@ def reprocess_calulate_items(data):
 				total_items_data["unit_of_measurement"] = each_item["unit_of_measurement"]
 				total_items_data["sac_index"] = sac_code_based_gst_rates.sac_index
 				total_items_data["item_value_after_gst"] = each_item["item_value_after_gst"]
+				total_items_data["line_edit_net"] = each_item["line_edit_net"]
 				item_list.append(total_items_data)
 		for service_charge_items in total_items:
 			if service_charge_items["is_service_charge_item"] == "Yes":
@@ -571,9 +575,32 @@ def reprocess_calulate_items(data):
 						item["sgst"] = 0
 						item["igst"] = 0
 			if item["net"] == "Yes":
+				if sac_code_based_gst_rates.net == "Yes" and item["line_edit_net"] == "Yes":
+					for item_each in data['items_data']:
+						if isinstance(item_each["sort_order"], float):
+							if item["sort_order"] == int(item_each["sort_order"]):
+								item["item_value"] = item["item_value_after_gst"]+item_each["item_value_after_gst"]
+						else:
+							if item["service_charge"] == "No":
+								item["item_value"] = item["item_value_after_gst"]
+				else:
+					if item["line_edit_net"] == "Yes":
+						item["item_value"] = item["item_value_after_gst"]
+						find_sc = [item for item in data["items_data"] if isinstance(item["sort_order"], float)]
+						for item_each in find_sc:
+							if isinstance(item_each["sort_order"], float):
+								if item["sort_order"] == int(item_each["sort_order"]):
+									item["item_value"] = item["item_value_after_gst"]+item_each["item_value_after_gst"]
 				item["calulation_type"] = "line_edit"
 				item = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
-				print(item)
+			else:
+				if item["line_edit_net"] == "Yes":
+					item["item_value"] = item["item_value_after_gst"]
+					find_sc = [item for item in data["items_data"] if isinstance(item["sort_order"], float)]
+					for item_each in find_sc:
+						if isinstance(item_each["sort_order"], float):
+							if item["sort_order"] == int(item_each["sort_order"]):
+								item["item_value"] = item["item_value_after_gst"]+item_each["item_value_after_gst"]
 			if companyDetails.enable_sc_from_folios == 0:
 				if item["service_charge"] == "Yes":
 					gst_value = 0
@@ -916,8 +943,8 @@ def reprocess_calulate_items(data):
 				'unit_of_measurement': item["unit_of_measurement"],
 				'quantity': item["quantity"],
 				'unit_of_measurement_description': item["unit_of_measurement_description"],
-				"discount_value" : item["discount_value"]
-				# "net": item["net"]
+				"discount_value" : item["discount_value"],
+				"line_edit_net": item["net"]
 			})
 		total_items.extend(second_list)
 		for xyz in total_items:

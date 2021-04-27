@@ -39,7 +39,8 @@
   "sac_index",
   "is_service_charge_item",
   "is_manual_edit",
-  "discount_value"
+  "discount_value",
+  "line_edit_net"
  ],
  "fields": [
   {
@@ -247,12 +248,19 @@
    "fieldname": "discount_value",
    "fieldtype": "Float",
    "label": "Discount Value"
+  },
+  {
+   "default": "No",
+   "fieldname": "line_edit_net",
+   "fieldtype": "Select",
+   "label": "Line_Edit_Net",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-03-15 11:25:44.942745",
+ "modified": "2021-04-26 18:08:15.012953",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",

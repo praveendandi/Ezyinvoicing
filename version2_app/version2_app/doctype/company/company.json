@@ -80,7 +80,6 @@
   "backend_git_path",
   "irn_qr_size",
   "sc_sac_code",
-  "reverse_calculation",
   "system_storage_path"
  ],
  "fields": [
@@ -497,12 +496,6 @@
    "options": "Small\nLarge"
   },
   {
-   "default": "0",
-   "fieldname": "reverse_calculation",
-   "fieldtype": "Check",
-   "label": "Reverse Calculation"
-  },
-  {
    "fieldname": "system_storage_path",
    "fieldtype": "Data",
    "label": "System Storage Path"
@@ -510,7 +503,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-19 10:20:52.667747",
+ "modified": "2021-04-26 15:24:32.039020",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
