@@ -403,7 +403,8 @@ def manual_upload_data(data):
 	except Exception as e:
 		print(traceback.print_exc())
 		frappe.db.delete('File', {'file_url': data['invoice_file']})
-		frappe.db.delete('File',{'file_url': data['gst_file']})
+		if "gst_file" in data:
+			frappe.db.delete('File',{'file_url': data['gst_file']})
 		frappe.db.commit()
 		print(str(e),"   manual_upload")
 		frappe.log_error(frappe.get_traceback(), 'enques')
