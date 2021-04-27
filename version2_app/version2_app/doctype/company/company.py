@@ -308,11 +308,11 @@ def reprocess_error_inoices():
 					obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
 					reinitiate = module.reinitiateInvoice(obj)
 					doc = frappe.get_doc("Invoices",each['name'])
-					frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc[0]["name"]})
+					frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
 				else:
 					bulk_upload_reprocessapi = BulkUploadReprocess({"invoice_number":each['name']})
 					doc = frappe.get_doc("Invoices",each['name'])
-					frappe.publish_realtime("custom_socket", {'data':bulk_upload_reprocessapi,'message':bulk_upload_reprocessapi,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc[0]["name"]})
+					frappe.publish_realtime("custom_socket", {'data':bulk_upload_reprocessapi,'message':bulk_upload_reprocessapi,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
 			return {"success":True}
 		else:
 			return {"success":False, "message":"no data found"}
@@ -338,7 +338,7 @@ def reprocess_pending_inoices():
 				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
 				reinitiate = module.reinitiateInvoice(obj)
 				doc = frappe.get_doc("Invoices",each['name'])
-				frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc[0]["name"]})
+				frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company]})
 			return {"success":True}
 		else:
 			return {"success":False, "message":"no data found"}
