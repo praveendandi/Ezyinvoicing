@@ -133,7 +133,8 @@
   "invoice_object_from_file",
   "invoice_check",
   "change_gst_number",
-  "debit_invoice"
+  "debit_invoice",
+  "note"
  ],
  "fields": [
   {
@@ -868,12 +869,17 @@
    "fieldtype": "Select",
    "label": "Debit Invoice",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Long Text",
+   "label": "Note"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-04-21 15:22:31.401317",
+ "modified": "2021-04-26 15:45:01.284364",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
