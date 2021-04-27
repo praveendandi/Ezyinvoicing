@@ -591,7 +591,11 @@ def reprocess_calulate_items(data):
 								if item["sort_order"] == int(item_each["sort_order"]):
 									item["item_value"] = item["item_value_after_gst"]+item_each["item_value_after_gst"]
 				item["calulation_type"] = "line_edit"
-				item = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
+				item_data = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
+				if item_data["success"] == True:
+					item = item_data["data"]
+				else:
+					return item_data
 			else:
 				if item["line_edit_net"] == "Yes":
 					item["item_value"] = item["item_value_after_gst"]

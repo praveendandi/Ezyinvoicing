@@ -1401,7 +1401,7 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
 		total_gst_percentage = data["sgst"]+data["cgst"]+data["igst"]+service_charge_per+state_cess+central_cess+vat
 		reverse_calculation = round(data['item_value'] * (100 / (total_gst_percentage + 100)),3)
 		data["item_value"] = reverse_calculation
-		return data
+		return {"success":True,"data":data}
 	except Exception as e:
 		print(e,"calulate_net_yes")
 		return {"success":False,"message":str(e)}
@@ -1518,7 +1518,10 @@ def calulate_items(data):
 					net_value = sac_code_based_gst_rates.net
 				if net_value == "Yes":
 					item_data = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
-					item = item_data
+					if item_data["success"] == True:
+						item = item_data["data"]
+					else:
+						return item_data
 				if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
 					gst_value = 0
 					service_dict = {}
