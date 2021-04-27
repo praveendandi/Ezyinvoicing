@@ -253,7 +253,6 @@ def Reinitiate_invoice(data):
 				doc.irn_generated = "Pending"
 				doc.ready_to_generate_irn = "Yes"
 
-
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		# doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount	

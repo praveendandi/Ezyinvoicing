@@ -6,7 +6,10 @@ import pandas as pd
 def invoicecategorycount():
 	try:
 		# data = {"fromdate":"2020-12-31","todate":"2021-04-04"}
+		deletedocuments = frappe.db.get_list('Deleted Document',filters={"deleted_doctype":"Invoices"},fields=['count(name) as count'])
+		# print(deletedocuments)
 		outputdata = frappe.db.get_list('Invoices',fields=['count(name) as count', 'invoice_category'],group_by='invoice_category')
+		outputdata.append({'invoice_category':"Deleted Documents","count":deletedocuments[0]['count']})
 		return {"success":True,"data":outputdata}
 	except Exception as e:
 		print(traceback.print_exc())
