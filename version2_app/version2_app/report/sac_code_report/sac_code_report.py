@@ -14,7 +14,7 @@ def execute(filters=None):
 		# columns = ['GSTIN','Legal Entity','Invoice Number','Taxable Value','Tax Rate','CGST','SGST','GST','Invoice Value']
 		columns = ['HSN','UQC','Total Quantity','Total Value','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','State Cess Amount','Central Cess Amount']
 		fields = ['invoice_number']
-		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice'],'invoice_type':'B2B'},fields=fields,as_list=True)
+		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice'],'invoice_type':['=','B2B']},fields=fields,as_list=True)
 		if len(doc) == 0:
 			data = []
 			columns = []
@@ -52,7 +52,7 @@ def execute(filters=None):
 		data = mergedDf.values.tolist()
 		# columns = ['HSN','UQC','Total Quantity','Total Value','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','State Cess Amount','Central Cess Amount']
 		
-		data.append(['Total',' ',mergedDf['Total Quantity'].sum(),mergedDf['Total Value'].sum(),mergedDf['Taxable Value'].sum(),mergedDf['Integrated Tax Amount'].sum(),mergedDf['Central Tax Amount'].sum(),mergedDf['State/UT Tax Amount'].sum(),mergedDf['State Cess Amount'].sum(),mergedDf['Central Cess Amount'].sum()])
+		data.append(['Total',' ',round(mergedDf['Total Quantity'].sum(),2),round(mergedDf['Total Value'].sum(),2),round(mergedDf['Taxable Value'].sum(),2),round(mergedDf['Integrated Tax Amount'].sum(),2),round(mergedDf['Central Tax Amount'].sum(),2),round(mergedDf['State/UT Tax Amount'].sum(),2),round(mergedDf['State Cess Amount'].sum(),2),round(mergedDf['Central Cess Amount'].sum(),2)])
 		print(columns,data,mergedDf['Total Value'].sum())
 		return columns, data
 	except Exception as e:

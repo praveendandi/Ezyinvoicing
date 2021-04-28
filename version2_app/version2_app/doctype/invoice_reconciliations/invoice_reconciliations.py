@@ -17,13 +17,7 @@ import traceback
 @frappe.whitelist(allow_guest=True)
 def invoicereconciliationcount(data):
 	try:
-		# fromdate = str(date.today().replace(day=1))
-		# mothrange = calendar.monthrange(2021, 5)
-		# fromdate =data['data['year']']+'-'+data['month']+'-01'
-		# todate = data['data['year']']+'-'+data['month']+'-'+str(mothrange[1])
-		# print(fromdate,todate)
-		# data['year'] = '2021'
-		# month = '04'
+		
 		monthrange = calendar.monthrange(2021, int(data['month']))
 		fromdate =data['year']+'-'+data['month']+'-01'
 		todate = data['year']+'-'+data['month']+'-'+str(monthrange[1])
