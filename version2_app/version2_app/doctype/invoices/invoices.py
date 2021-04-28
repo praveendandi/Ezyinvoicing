@@ -3196,3 +3196,12 @@ def attach_b2c_qrcode(data):
 	except Exception as e:
 		print(e, "attach b2c qrcode")
 		return {"success": False, "message": e}
+
+@frappe.whitelist(allow_guest=True)
+def auto_adjustment(data):
+	try:
+		doc = frappe.db.get_list("Invoices",data["invoice_number"])
+		print(doc)
+	except Exception as e:
+		print(e, "attach b2c qrcode")
+		return {"success": False, "message": e}	
