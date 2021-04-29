@@ -18,7 +18,7 @@ import traceback
 def invoicereconciliationcount(data):
 	try:
 		
-		monthrange = calendar.monthrange(2021, int(data['month']))
+		monthrange = calendar.monthrange(int(data['year']), int(data['month']))
 		fromdate =data['year']+'-'+data['month']+'-01'
 		todate = data['year']+'-'+data['month']+'-'+str(monthrange[1])
 		outputdata=[]
