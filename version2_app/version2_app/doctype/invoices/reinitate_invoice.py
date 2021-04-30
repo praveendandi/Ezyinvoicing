@@ -992,5 +992,5 @@ def auto_adjustment(data):
 				return {"success": False, "message": calulate_response["message"]}
 			return {"success": True, "message": "Adjustment was successfully adjusted"}
 	except Exception as e:
-		print(e, "attach b2c qrcode")
-		return {"success": False, "message": e}
+		print(e, "auto_adjustment")
+		return {"success": False, "message": str(e)}
