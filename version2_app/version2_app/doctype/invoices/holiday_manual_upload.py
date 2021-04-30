@@ -48,8 +48,8 @@ def holidayinManualupload(data):
 		if company_check_columns != invoice_columns:
 			frappe.db.delete('File', {'file_url': data['invoice_file']})
 			frappe.db.commit()
-			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":data['company']})
-			return {"success":False,"message":"Invoice data mismatch"}
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
+			return {"success":False,"message":"Invoice data File mismatch"}
 		# print(items_dataframe)
 		output = items_dataframe.to_dict('records')
 		list_data={}
