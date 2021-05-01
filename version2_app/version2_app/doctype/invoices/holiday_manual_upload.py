@@ -31,18 +31,18 @@ def holidayinManualupload(data):
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
 		if ".csv" in items_file_path:
-			items_dataframe = pd.read_csv(items_file_path)
+			try:
+				items_dataframe = pd.read_csv(items_file_path)
+			except UnicodeDecodeError:
+				items_dataframe = pd.read_csv(items_file_path,encoding ='latin1')
 		else:
 			items_dataframe = pd.read_excel(items_file_path)
 
 		# items_dataframe = pd.read_excel(items_file_path)
 		items_dataframe = items_dataframe.fillna('empty')
 		items_dataframe = items_dataframe.sort_values("taxinvnum")
-		# print(items_dataframe.head(16))
 		invoice_columns = list(items_dataframe.columns.values)
-		# print(invoice_columns)
 		invoice_num = list(set(items_dataframe['taxinvnum']))
-		# print(invoice_num,len(invoice_num))
 		company_check_columns = companyData.bulk_import_invoice_headers
 		company_check_columns = company_check_columns.split(",")
 		if company_check_columns != invoice_columns:
