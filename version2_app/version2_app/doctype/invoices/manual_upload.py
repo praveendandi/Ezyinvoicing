@@ -32,9 +32,9 @@ def manual_upload(data):
             queue="default",
             timeout=800000,
             event="data_import",
-            now=frappe.conf.developer_mode or frappe.flags.in_test,
+            now=False,
             data = data,
-			# is_async = False
+			is_async = True,
 			)
     return True    
 
