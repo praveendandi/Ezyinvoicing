@@ -100,7 +100,11 @@ def Reinitiate_invoice(data):
 						total_credit_vat_amount += float(item['vat_amount'])
 				else:
 					pass
-		
+		else:
+			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+			data['taxpayer'] =taxpayer
+			data['guest_data']['invoice_type'] = "B2C"
+			
 		if company.allowance_type=="Discount":
 			discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
 			discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
@@ -234,6 +238,7 @@ def Reinitiate_invoice(data):
 			if len(data['items_data'])==0:
 				doc.ready_to_generate_irn = "No"
 				doc.irn_generated = "Zero Invoice"
+				doc.invoice_type = "B2C"
 				generateb2cQr = False
 			else:
 				if abs(invoice_round_off_amount)>6:

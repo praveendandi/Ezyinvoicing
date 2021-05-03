@@ -859,7 +859,6 @@ def insert_invoice(data):
 	# insert invoice data     data, company_code, taxpayer,items_data
 	# '''
 	try:
-		# print(data,"/////")
 		if "invoice_category" not in list(data['guest_data']):
 			data['guest_data']['invoice_category'] = "Tax Invoice"
 		if "invoice_object_from_file" not in data:
@@ -1024,6 +1023,10 @@ def insert_invoice(data):
 		# qr_generated = "Pending"
 		if len(data['items_data'])==0:
 			irn_generated = "Zero Invoice"
+			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+			data['taxpayer'] =taxpayer
+			data['guest_data']['invoice_type'] = "B2C"
+
 			# if data['guest_data']['invoice_type']=="B2B":
 			# 	irn_generated = "Zero Invoice"
 			# 	qr_generated = "Pending"
