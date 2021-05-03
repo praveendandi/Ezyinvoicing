@@ -1351,6 +1351,8 @@ def calulate_items(data):
 			if doc:
 				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
 				placeofsupply = invoice_doc.place_of_supply
+				if not placeofsupply:
+					placeofsupply = companyDetails.state_code
 			else:
 				placeofsupply = companyDetails.state_code
 		for item in data['items']:
