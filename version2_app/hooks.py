@@ -118,7 +118,7 @@ doc_events = {
 		'on_update':"version2_app.events.DocumentBinSocket"
 	},
 	"company":{
-		"after_insert":"version2_app.version2_app.doctype.comp.company_created"
+		"after_insert":"version2_app.events.company_created"
 	}
 	
 
