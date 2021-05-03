@@ -67,7 +67,6 @@
   "bulk_import_invoice_headers",
   "bulk_import_gst_count",
   "tax_invoice_to_manual",
-  "disable_credit_note",
   "bulk_excel_upload_type",
   "new_parsers",
   "parsers_branch_name",
@@ -411,12 +410,6 @@
    "label": "Enable SC from Folios"
   },
   {
-   "default": "0",
-   "fieldname": "disable_credit_note",
-   "fieldtype": "Check",
-   "label": "Disable Credit Note"
-  },
-  {
    "fieldname": "bulk_import_invoice_headers",
    "fieldtype": "Long Text",
    "label": "Bulk Import Invoice Headers"
@@ -509,15 +502,16 @@
    "label": "System Storage Path"
   },
   {
-   "default": "0",
+   "default": "Manual",
    "fieldname": "auto_adjustment",
-   "fieldtype": "Check",
-   "label": "Auto Adjustment"
+   "fieldtype": "Select",
+   "label": "Auto Adjustment",
+   "options": "Automatic\nManual\nCredit"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-03 09:54:24.744783",
+ "modified": "2021-05-03 12:31:31.919462",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

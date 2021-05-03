@@ -278,7 +278,7 @@ def Reinitiate_invoice(data):
 		if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
 			tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
 			if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				if (invoice_data.has_credit_items == "Yes" and company.disable_credit_note == 1) or tax_payer_details.disable_auto_irn == 1:
+				if (invoice_data.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:
 					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
@@ -975,8 +975,8 @@ def auto_adjustment(data):
 			total_items = []
 			for items in items_total:
 				item_date = datetime.datetime.strptime(str(items["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
-				total_items.append({"date":item_date, "item_value":items["item_value"],"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"]})
-			calulate_items_data = {"items":total_items,"invoice_number":data["invoice_number"],"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}
+				total_items.append({"date":item_date, "item_value":items["item_value"],"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"],"sgst":items["sgst"],"cgst":items["sgst"],"igst":items["igst"]})
+			calulate_items_data = {"items":total_items,"invoice_number":data["invoice_number"],"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez,"adjustment":"Yes"}
 			calulate_response = calulate_items(calulate_items_data)
 			if calulate_response["success"] == False:
 				return {"success": False, "message": calulate_response["message"]}
