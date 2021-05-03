@@ -24,10 +24,10 @@ def Reinitiate_invoice(data):
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
-		# if "place_of_supply" in data:
-		# 	place_of_supply = data['place_of_supply']
-		# else:
-		# 	place_of_supply = company.state_code
+		if "place_of_supply" in data:
+			place_of_supply = data['place_of_supply']
+		else:
+			place_of_supply = company.state_code
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "	
 		else:
