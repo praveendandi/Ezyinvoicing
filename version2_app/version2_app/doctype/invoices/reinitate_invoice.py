@@ -254,7 +254,7 @@ def Reinitiate_invoice(data):
 				doc.ready_to_generate_irn = "Yes"
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
-		# doc.place_of_supply = place_of_supply
+		doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount	
 		doc.invoice_object_from_file = data['invoice_object_from_file']
 		doc.save()
