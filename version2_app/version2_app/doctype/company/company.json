@@ -85,7 +85,9 @@
   "port",
   "reverse_calculation",
   "system_storage_path",
-  "auto_adjustment"
+  "auto_adjustment",
+  "property_group",
+  "custom_e_tax_invoice"
  ],
  "fields": [
   {
@@ -533,11 +535,23 @@
    "fieldname": "auto_adjustment",
    "fieldtype": "Check",
    "label": "Auto Adjustment"
+  },
+  {
+   "fieldname": "property_group",
+   "fieldtype": "Select",
+   "label": "Property Group",
+   "options": "Accor\nMarriott\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_e_tax_invoice",
+   "fieldtype": "Check",
+   "label": "Custom E Tax Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-03 09:54:24.744783",
+ "modified": "2021-04-30 13:48:52.345786",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
