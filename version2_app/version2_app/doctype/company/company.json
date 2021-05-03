@@ -509,16 +509,15 @@
    "label": "System Storage Path"
   },
   {
-   "default": "No",
+   "default": "0",
    "fieldname": "auto_adjustment",
    "fieldtype": "Check",
-   "label": "Auto Adjustment",
-   "options": "Yes\nNo"
+   "label": "Auto Adjustment"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-03 09:31:03.768664",
+ "modified": "2021-05-03 09:54:24.744783",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
