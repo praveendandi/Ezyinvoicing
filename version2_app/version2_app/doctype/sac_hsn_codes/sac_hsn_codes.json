@@ -33,7 +33,8 @@
   "exempted",
   "sac_index",
   "inclusive_of_service_charge",
-  "ignore_non_taxable_items"
+  "ignore_non_taxable_items",
+  "alternate_description"
  ],
  "fields": [
   {
@@ -209,11 +210,16 @@
    "fieldname": "inclusive_of_service_charge",
    "fieldtype": "Check",
    "label": "Inclusive of Service Charge"
+  },
+  {
+   "fieldname": "alternate_description",
+   "fieldtype": "Data",
+   "label": "Alternate Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-08 10:16:47.384476",
+ "modified": "2021-04-30 17:48:37.159883",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
