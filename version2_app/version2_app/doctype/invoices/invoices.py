@@ -1186,8 +1186,8 @@ def insert_invoice(data):
 			
 			return {"success": True,"data":invoice}
 		else:
-			tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
-			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
+			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+				tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
 				if (v.has_credit_items == "Yes" and company.disable_credit_note == 1) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:

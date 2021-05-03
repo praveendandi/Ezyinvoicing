@@ -82,7 +82,10 @@
   "sc_sac_code",
   "reconciliation_format",
   "ip_address",
-  "port"
+  "port",
+  "reverse_calculation",
+  "system_storage_path",
+  "auto_adjustment"
  ],
  "fields": [
   {
@@ -498,6 +501,13 @@
    "options": "Small\nLarge"
   },
   {
+    "default": "0",
+    "fieldname": "reverse_calculation",
+    "fieldtype": "Check",
+    "label": "Reverse Calculation"
+   },
+ 
+  {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
    "label": "Reconciliation Format",
@@ -512,11 +522,23 @@
    "fieldname": "port",
    "fieldtype": "Data",
    "label": "Port"
+  },
+  {
+    "fieldname": "system_storage_path",
+    "fieldtype": "Data", 
+    "label": "System Storage Path"
+  },
+  {
+   "default": "No",
+   "fieldname": "auto_adjustment",
+   "fieldtype": "Check",
+   "label": "Auto Adjustment",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-27 18:02:54.173918",
+ "modified": "2021-05-03 09:31:03.768664",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
