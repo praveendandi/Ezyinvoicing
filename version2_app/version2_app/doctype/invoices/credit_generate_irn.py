@@ -129,6 +129,14 @@ def create_credit_qr_image(invoice_number, gsp):
 										headers=headers,
 										stream=True,proxies=proxies,verify=False)
 
+		if qr_response.status_code==200:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+		else:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)	
+
+
 		file_name = invoice_number + "creditqr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -634,8 +642,13 @@ def postIrn(gst_data, gsp,company,invoice_number):
 											headers=headers,
 											json=gst_data,proxies=proxies,verify=False)									
 		if irn_response.status_code == 200:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company['data'].name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+
 			return irn_response.json()
 		else:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company['data'].name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			response_error_message = str(irn_response.text)
 			logger.error(f"{invoice_number},     Credit Post Irn,   {response_error_message}")
 			frappe.log_error(frappe.get_traceback(),invoice_number)

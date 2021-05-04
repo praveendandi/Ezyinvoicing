@@ -704,6 +704,12 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 											headers=headers,
 											json=payload,
 											proxies=proxies,verify=False)
+		if cancel_response.status_code == 200:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","cancel_irn":'True',"status":"Success","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+		else:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","cancel_irn":'True',"status":"Failed","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)									
 		repsone = cancel_response.json()
 		return repsone
 	except Exception as e:
@@ -755,7 +761,13 @@ def create_qr_image(invoice_number, gsp):
 			qr_response = requests.get(gsp['generate_qr_code'],
 									   headers=headers,
 									   stream=True,
-									   proxies=proxies,verify=False)						   
+									   proxies=proxies,verify=False)	
+		if qr_response.status_code==200:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+		else:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)								   					   
 		file_name = invoice_number + "qr.png"
 		full_file_path = path + file_name
 		with open(full_file_path, "wb") as f:
@@ -817,10 +829,14 @@ def postIrn(gst_data, gsp, company, invoice_number):
 
 		# print(irn_response.text)
 		if irn_response.status_code == 200:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			return irn_response.json()
 		else:
 			message_error = str(irn_response.text)
 			logger.error(f"{invoice_number},     postIrn,   {message_error}")
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company.name})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			return {"success": False, 'message': irn_response.text}
 		# print(irn_response.text)
 	except Exception as e:
@@ -2623,13 +2639,16 @@ def login_gsp(code,mode):
 			'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
 		],
 								  as_dict=1)
+		# company = frappe.get_doc('company',code)						  
 		if mode == 'Testing':
 			headers = {
 				"gspappid": gsp["gsp_test_app_id"],
 				"gspappsecret": gsp["gsp_test_app_secret"],
 			}
 			login_response = request_post(gsp['auth_test'], code, headers)
-
+			print("***********88")
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
@@ -2641,12 +2660,16 @@ def login_gsp(code,mode):
 				"gspappsecret": gsp["gsp_prod_app_secret"]
 			}
 			login_response = request_post(gsp['auth_prod'], code, headers)
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:
+		insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
+		insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 		print(e, "login gsp")
 
 @frappe.whitelist()
@@ -2666,7 +2689,8 @@ def updatelogin_gsp(data):
 				"gspappsecret": gsp["gsp_test_app_secret"],
 			}
 			login_response = request_post(gsp['auth_test'], code, headers)
-
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_test_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_test_token = login_response['access_token']
@@ -2679,6 +2703,8 @@ def updatelogin_gsp(data):
 				"gspappsecret": gsp["gsp_prod_app_secret"]
 			}
 			login_response = request_post(gsp['auth_prod'], code, headers)
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
 			gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
 			gsp_update.gsp_prod_token = login_response['access_token']
@@ -2686,6 +2712,8 @@ def updatelogin_gsp(data):
 			gsp_update.save(ignore_permissions=True)
 			return True
 	except Exception as e:
+		insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
+		insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 		print(e, "login gsp")
 
 @frappe.whitelist()
@@ -2890,8 +2918,12 @@ def request_get(api, headers, invoice, code):
 			raw_response = requests.get(api, headers=headers, proxies=proxies,verify=False)
 		# print(raw_response.json())
 		if raw_response.status_code == 200:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","tax_payer_details":'True',"status":"Success","company":code})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			return raw_response.json()
 		else:
+			insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","tax_payer_details":'True',"status":"Failed","company":code})
+			insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 			print(raw_response.text)
 	except Exception as e:
 		print(e, "request get")

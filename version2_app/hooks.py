@@ -119,6 +119,9 @@ doc_events = {
 	},
 	"company":{
 		"after_insert":"version2_app.events.company_created"
+	},
+	"Gsp Metering":{
+		'after_insert':"version2_app.events.gspmeteringhook"
 	}
 	
 
