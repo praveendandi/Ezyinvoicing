@@ -1001,7 +1001,7 @@ def auto_adjustment(data):
 				tax_payer = taxpayer
 			reinitate = Reinitiate_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":invoice_doc.total_invoice_amount,"taxpayer":tax_payer,"invoice_number":invoice_doc.invoice_number,"company_code":company.name})
 			if reinitate["success"] == False:
-				return {"success": False, "message": calulate_response["message"]}
+				return {"success": False, "message": reinitate["message"]}
 			return {"success": True, "message": "Adjustment was successfully adjusted"}
 	except Exception as e:
 		print(e, "auto_adjustment")
