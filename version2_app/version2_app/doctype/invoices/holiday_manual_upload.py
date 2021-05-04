@@ -58,6 +58,7 @@ def holidayinManualupload(data):
 		for each in output:
 			totalitemAmount = each['invoiceamount']
 			each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
+			each['invoiceamount'] = round(each['invoiceamount'],2)
 			each['taxcode_dsc'] = str(each['taxcode_dsc'])
 			# print(each['taxinvnum'],len(each['taxinvnum']))
 			del each['accountdate']# = str(each['accountdate'])

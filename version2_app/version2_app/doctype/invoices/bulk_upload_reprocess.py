@@ -57,7 +57,7 @@ def BulkUploadReprocess(data):
 					else:
 						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(company.invoice_item_date_format)
 					item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
-					item_dict['item_value'] = each['invoiceamount']
+					item_dict['item_value'] = round(each['invoiceamount'],2)
 					item_dict['sac_code'] = str(each["taxcode_dsc"])
 					item_dict['name'] = each['goods_desc']
 					item_dict['sort_order'] = sort_order
