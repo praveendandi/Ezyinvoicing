@@ -25,10 +25,17 @@ def Reinitiate_invoice(data):
 		total_invoice_amount = data['total_invoice_amount']
 		# del data['total_invoice_amount']
 		company = frappe.get_doc('company',data['company_code'])
-		# if "place_of_supply" in data:
-		# 	place_of_supply = data['place_of_supply']
-		# else:
-		# 	place_of_supply = company.state_code
+		if "place_of_supply" in data:
+			place_of_supply = data['place_of_supply']
+		else:
+			doc = frappe.db.exists("Invoices",data['guest_data']['invoice_number'])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
+				place_of_supply = invoice_doc.place_of_supply
+				if not place_of_supply:
+					place_of_supply = companyDetails.state_code
+			else:
+				place_of_supply = companyDetails.state_code
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "	
 		else:
@@ -260,7 +267,7 @@ def Reinitiate_invoice(data):
 				doc.ready_to_generate_irn = "Yes"
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
-		# doc.place_of_supply = place_of_supply
+		doc.place_of_supply = place_of_supply
 		doc.invoice_round_off_amount = invoice_round_off_amount	
 		doc.invoice_object_from_file = data['invoice_object_from_file']
 		doc.save()
