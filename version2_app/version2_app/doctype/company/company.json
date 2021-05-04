@@ -439,7 +439,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera"
+   "options": "None\nMarriot\nOpera\nHolidayIn"
   },
   {
    "default": "0",
@@ -500,12 +500,11 @@
    "options": "Small\nLarge"
   },
   {
-    "default": "0",
-    "fieldname": "reverse_calculation",
-    "fieldtype": "Check",
-    "label": "Reverse Calculation"
-   },
- 
+   "default": "0",
+   "fieldname": "reverse_calculation",
+   "fieldtype": "Check",
+   "label": "Reverse Calculation"
+  },
   {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
@@ -523,9 +522,9 @@
    "label": "Port"
   },
   {
-    "fieldname": "system_storage_path",
-    "fieldtype": "Data", 
-    "label": "System Storage Path"
+   "fieldname": "system_storage_path",
+   "fieldtype": "Data",
+   "label": "System Storage Path"
   },
   {
    "default": "Manual",
@@ -571,7 +570,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-03 12:31:31.919462",
+ "modified": "2021-05-04 10:15:36.370085",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
