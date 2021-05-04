@@ -1006,3 +1006,39 @@ def auto_adjustment(data):
 	except Exception as e:
 		print(e, "auto_adjustment")
 		return {"success": False, "message": str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def b2b_success_to_credit_note(data):
+	try:
+		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+		company = frappe.get_doc('company',invoice_doc.company)
+		# invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled","other_charges","company","confirmation_number","invoice_from","print_by","has_discount_items","invoice_category","sez","converted_from_b2b","allowance_invoice","converted_from_tax_invoices_to_manual_tax_invoices"], as_dict=1)
+		invoice_data = frappe.db.get_all('Invoices', filters={"name":data["invoice_number"]},fields=["*"])
+		total_data = {}
+		if len(invoice_data) > 0:
+			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["*"])
+			total_items = []
+			if invoice_doc.has_discount_items == "Yes":
+				pass
+			else:
+				for items in item_data:
+					item_date = datetime.datetime.strptime(str(items["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
+					total_items.append({"date":item_date, "item_value":-abs(items["item_value"]),"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"],"sgst":items["sgst"],"cgst":items["sgst"],"igst":items["igst"]})
+			calulate_items_data = {"items":total_items,"invoice_number":data["invoice_number"],"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}
+			calulate_response = calulate_items(calulate_items_data)
+			if calulate_response["success"] == False:
+				return {"success": False, "message": calulate_response["message"]}
+			guest_data = {"name":invoice_data[0]["guest_name"],"items":calulate_items_data,"invoice_date":invoice_date,"invoice_number":invoice_doc.invoice_number,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":invoice_doc.invoice_category,"invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow())}
+			if invoice_data[0]["gst_number"] != "":
+				taxpayer = frappe.get_doc("TaxPayerDetail",invoice_data[0]["gst_number"])
+				tax_payer = taxpayer.__dict__
+			else:
+				taxpayer = {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+				tax_payer = taxpayer
+			reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":invoice_doc.total_invoice_amount,"taxpayer":tax_payer,"invoice_number":invoice_doc.invoice_number,"company_code":company.name})
+			if reinitate["success"] == False:
+				return {"success": False, "message": calulate_response["message"]}
+			return {"success": True, "message": "Adjustment was successfully adjusted"}
+	except Exception as e:
+		print(e, "attach b2c qrcode")
+		return {"success": False, "message": str(e)}
