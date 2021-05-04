@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import frappe
+# from frappe import enqueue
 from frappe.model.document import Document
 from datetime import date
 import requests
@@ -16,12 +17,29 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
-import math
+from version2_app.version2_app.doctype.invoices.holiday_manual_upload import holidayinManualupload
+from version2_app.version2_app.doctype.invoices.opera_manula_bulkupload import operabulkupload
+from frappe.utils.background_jobs import enqueue
+
+
 
 
 
 @frappe.whitelist(allow_guest=True)
 def manual_upload(data):
+	enqueue(
+			manual_upload_data,
+			queue="default",
+			timeout=800000,
+			event="data_import",
+			now=False,
+			data = data,
+			is_async = True,
+			)
+	return True    
+
+@frappe.whitelist(allow_guest=True)
+def manual_upload_data(data):
 	try:
 		print("startt--------------------------")
 		start_time = datetime.datetime.now()
@@ -29,13 +47,22 @@ def manual_upload(data):
 		items_data_file = data['invoice_file']
 		company = data['company']
 		companyData = frappe.get_doc('company',data['company'])
+		if companyData.bulk_excel_upload_type == "HolidayIn":
+			output = holidayinManualupload(data)
+			if output['success'] == False:
+				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+			return output
+		if companyData.bulk_excel_upload_type == "Opera":
+			output = operabulkupload(data)
+			if output['success'] ==False:
+				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+			return output	
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
 		items_dataframe = pd.read_excel(items_file_path)
 		items_dataframe = items_dataframe.fillna('empty')	
 		items_dataframe['Gst Number'] = "NoGst"
 		invoice_columns = list(items_dataframe.columns.values)
-		print(invoice_columns)
 		invoice_num = list(set(items_dataframe['BILL_NO']))
 		company_check_columns = companyData.bulk_import_invoice_headers
 		company_check_columns = company_check_columns.split(",")
@@ -43,6 +70,7 @@ def manual_upload(data):
 			frappe.db.delete('File', {'file_url': data['invoice_file']})
 			frappe.db.delete('File',{'file_url': data['gst_file']})
 			frappe.db.commit()
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
 			return {"success":False,"message":"Invoice data mismatch"}
 
 		gst_data_file = data['gst_file']
@@ -57,6 +85,7 @@ def manual_upload(data):
 			frappe.db.delete('File', {'file_url': data['invoice_file']})
 			frappe.db.delete('File',{'file_url': data['gst_file']})
 			frappe.db.commit()
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":"Gst data mismatch","company":company})
 			return {"success":False,"message":"Gst data mismatch"}
 		for each in gst_data:
 			if each[0][0]=="|":
@@ -142,7 +171,7 @@ def manual_upload(data):
 		output_date = []
 		# print(len(input_data),"lemnnnnnn output")
 		taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-		frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data)})
+		frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":company})
 		countIn = 1
 		for each in input_data:
 			print(countIn,"////////")
@@ -203,7 +232,8 @@ def manual_upload(data):
 				error_data['amened'] = 'No'
 				
 				errorcalulateItemsApiResponse = calulate_items(each)
-				error_data['items_data'] = errorcalulateItemsApiResponse['data']
+				if errorcalulateItemsApiResponse['success'] == True:
+					error_data['items_data'] = errorcalulateItemsApiResponse['data']
 				errorInvoice = Error_Insert_invoice(error_data)
 				print("Error:  *******The given gst number is not a vaild one**********")
 				B2B = "B2B"
@@ -283,7 +313,8 @@ def manual_upload(data):
 						error_data['amened'] = 'No'
 						
 						errorcalulateItemsApiResponse = calulate_items(each)
-						error_data['items_data'] = errorcalulateItemsApiResponse['data']
+						if errorcalulateItemsApiResponse['success'] == True:
+							error_data['items_data'] = errorcalulateItemsApiResponse['data']
 						errorInvoice = Error_Insert_invoice(error_data)
 						B2B = "B2B"
 						B2C = np.nan
@@ -295,11 +326,12 @@ def manual_upload(data):
 					error_data['amened'] = 'No'
 					
 					errorcalulateItemsApiResponse = calulate_items(each)
-					error_data['items_data'] = errorcalulateItemsApiResponse['data']
+					if errorcalulateItemsApiResponse['success'] == True:
+						error_data['items_data'] = errorcalulateItemsApiResponse['data']
 					errorInvoice = Error_Insert_invoice(error_data)
 					B2B = "B2B"
 					B2C = np.nan
-					
+					frappe.log_error(errorInvoice, 'enques')
 					output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
 					print("Error:  *******The given gst number is not a vaild one**********")		
 			else:
@@ -358,21 +390,30 @@ def manual_upload(data):
 					
 					output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
 					# print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number'])})
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
 			countIn+=1
 		df = pd.DataFrame(output_date)
 		df = df.groupby('date').count().reset_index()
 		output_data = df.to_dict('records')
 		# data['UserName'] = "Ganesh"
 		InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file'],"gst_file":data['gst_file']})
-		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data})
-		return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
-
+		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+		# return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
+		return {"success":True,"message":"Successfully Uploaded"}
 	except Exception as e:
 		print(traceback.print_exc())
 		frappe.db.delete('File', {'file_url': data['invoice_file']})
-		frappe.db.delete('File',{'file_url': data['gst_file']})
+		if "gst_file" in data:
+			frappe.db.delete('File',{'file_url': data['gst_file']})
 		frappe.db.commit()
 		print(str(e),"   manual_upload")
+		frappe.log_error(frappe.get_traceback(), 'enques')
+		# make_error_snapshot(e)
+		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
 		return {"success":False,"message":str(e)}    
+
+
+
+
+
 

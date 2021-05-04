@@ -11,7 +11,8 @@
   "printed_at",
   "document_type",
   "invoice_number",
-  "error_log"
+  "error_log",
+  "system_name"
  ],
  "fields": [
   {
@@ -51,10 +52,15 @@
    "fieldtype": "Select",
    "label": "Document Type",
    "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+  },
+  {
+   "fieldname": "system_name",
+   "fieldtype": "Data",
+   "label": "System Name"
   }
  ],
  "links": [],
- "modified": "2021-03-04 14:55:20.525243",
+ "modified": "2021-04-23 12:03:20.210734",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Document Bin",

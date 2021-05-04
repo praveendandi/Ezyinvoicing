@@ -20,10 +20,13 @@ import json
 import sys
 import frappe
 import os, importlib.util
+from version2_app.version2_app.doctype.invoices.bulk_upload_reprocess import BulkUploadReprocess
+
+
 
 abs_path = os.path.dirname(os.getcwd())
 module_name = 'reinitiateInvoice'
-
+parserModule_name = 'file_parsing'
 
 class company(Document):
 	# pass
@@ -162,7 +165,7 @@ def gitpull(data):
 		})
 		doc.insert()
 		frappe.db.commit()
-		frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+		frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed","company":company.name})            
 
 		return {"success": True, "message": b}
 	except Exception as e:
@@ -278,7 +281,7 @@ def errorInvoicesList():
 	try:
 		doc = frappe.db.get_list('company',fields=['name'])
 	   
-		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':'Pms'},fields=["name","invoice_number","guest_name","irn_generated"])
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","guest_name","irn_generated"])
 		if len(data)>0:
 			return {"success":True,"data":data}
 		else:
@@ -297,14 +300,19 @@ def reprocess_error_inoices():
 		spec = importlib.util.spec_from_file_location(module_name, file_path)
 		module = importlib.util.module_from_spec(spec)
 		spec.loader.exec_module(module)
-		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':'Pms'},fields=["name","invoice_number","invoice_file"])
+		data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file","invoice_from"])
 		if len(data)>0:
 			# frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
 			for each in data:
-				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
-				reinitiate = module.reinitiateInvoice(obj)
-				doc = frappe.get_doc("Invoices",each['name'])
-				frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name})
+				if each['invoice_from'] == "Pms":
+					obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+					reinitiate = module.reinitiateInvoice(obj)
+					doc = frappe.get_doc("Invoices",each['name'])
+					frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
+				else:
+					bulk_upload_reprocessapi = BulkUploadReprocess({"invoice_number":each['name']})
+					doc = frappe.get_doc("Invoices",each['name'])
+					frappe.publish_realtime("custom_socket", {'data':bulk_upload_reprocessapi,'message':bulk_upload_reprocessapi,"invoice_number":each['name'],'type':"redo error","status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
 			return {"success":True}
 		else:
 			return {"success":False, "message":"no data found"}
@@ -330,7 +338,7 @@ def reprocess_pending_inoices():
 				obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
 				reinitiate = module.reinitiateInvoice(obj)
 				doc = frappe.get_doc("Invoices",each['name'])
-				frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
+				frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
 			return {"success":True}
 		else:
 			return {"success":False, "message":"no data found"}
@@ -399,7 +407,7 @@ def console_command(key=None,
 				doctype='Bench Settings',
 				key=str(time.time()),
 				docname='Bench Settings')
-	frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed"})            
+	frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed","company":company.name})            
 	return True
 
 
@@ -521,7 +529,8 @@ def update_parsers():
 
 @frappe.whitelist(allow_guest=True)
 def diskspace():
-	b = os.popen(" df -h /dev/sda1")
+	company = frappe.get_last_doc('company')
+	b = os.popen(" df -h "+company.system_storage_path)
 	print(b)
 	# print(b.encoding)
 	return b
@@ -579,55 +588,83 @@ def safe_decode(string, encoding='utf-8'):
 
 @frappe.whitelist(allow_guest=True)
 def updateUiProd(company):
-    try:
-        print("==========")
-        company = frappe.get_doc('company',company)
-        commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
-        
-        console_dump = ''
-        
-        cwd = company.angular_project_production_path
-        key = str(time.time())
-        # count = 0
-        for command in commands:
-            print(command,"    command")
-            terminal = Popen(shlex.split(command),
-                            stdin=PIPE,
-                            stdout=PIPE,
-                            stderr=STDOUT,
-                            cwd=cwd)
-            for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-                console_dump += c
-        logged_command = " && ".join(commands)
-        frappe.publish_realtime("custom_socket", {'message':'system_reload','type':"system_reload"})
-        frappe.log_error("Angular project pull data","updateUiProd")
-    except Exception as e:
-        print(str(e),"    updateUiProd")
+	try:
+		print("==========")
+		company = frappe.get_doc('company',company)
+		commands = ['git pull origin '+company.ui_git_branch,'systemctl reload nginx','systemctl restart nginx']
+		
+		console_dump = ''
+		
+		cwd = company.angular_project_production_path
+		key = str(time.time())
+		# count = 0
+		for command in commands:
+			print(command,"    command")
+			terminal = Popen(shlex.split(command),
+							stdin=PIPE,
+							stdout=PIPE,
+							stderr=STDOUT,
+							cwd=cwd)
+			for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+				console_dump += c
+		logged_command = " && ".join(commands)
+		frappe.publish_realtime("custom_socket", {'message':'system_reload','type':"system_reload","company":company.name})
+		frappe.log_error("Angular project pull data","updateUiProd")
+	except Exception as e:
+		print(str(e),"    updateUiProd")
 
 
 @frappe.whitelist(allow_guest=True)
 def updateProxySettings(data):
-    try:
+	try:
 
-        abs_path = os.path.dirname(os.getcwd())
-        company = frappe.get_doc('company',data['company'])
-        if company.proxy==1:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://", "@")
-            if data['type'] == "unset":
-                commands = ['unset https_proxy','unset http_proxy']
-                for each in commands:
-                    print(each)
-                    os.system(each)
-                return {"success":True}
-            else:
-                commands = ["https_proxy="+"'"+"https://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'","http_proxy="+"'"+"http://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'"]                    
-                for each in commands:
-                    print(each)
-                    os.system(each)
-                return {"success":True}
-        else:
-            return {"success":False,"message":"No Proxy Settings"}
-    except Exception as e:
-        print(str(e),"  updateProxySettings  ")
-        return {"success":False,"message":str(e)}    
+		abs_path = os.path.dirname(os.getcwd())
+		company = frappe.get_doc('company',data['company'])
+		if company.proxy==1:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://", "@")
+			if data['type'] == "unset":
+				commands = ['unset https_proxy','unset http_proxy']
+				for each in commands:
+					print(each)
+					os.system(each)
+				return {"success":True}
+			else:
+				commands = ["https_proxy="+"'"+"https://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'","http_proxy="+"'"+"http://" + company.proxy_username + ":" +company.proxy_password + proxyhost+"'"]                    
+				for each in commands:
+					print(each)
+					os.system(each)
+				return {"success":True}
+		else:
+			return {"success":False,"message":"No Proxy Settings"}
+	except Exception as e:
+		print(str(e),"  updateProxySettings  ")
+		return {"success":False,"message":str(e)}    
+
+
+
+@frappe.whitelist(allow_guest=True)
+def reprocess_error_documentbin_invoices(docdate):
+	try:
+		doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
+		if doc[0]["new_parsers"] == 0:
+			file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/invoice_parser.py'
+		else:
+			file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/invoice_parser.py'
+		spec = importlib.util.spec_from_file_location(parserModule_name, file_path)
+		module = importlib.util.module_from_spec(spec)
+		spec.loader.exec_module(module)
+		data = frappe.db.get_list('Document Bin',filters={'document_printed': 'No','creation':["between", [docdate, docdate]]},fields=["name","invoice_file"])
+		if len(data)>0:
+			for each in data:
+				print(each)
+				reinitiate = module.file_parsing(each["invoice_file"])
+				frappe.publish_realtime("custom_socket", {'type':"redo bin error","status":reinitiate['success'],'data':reinitiate,"message":reinitiate,'filepath':each["invoice_file"],"company":doc[0]["name"]})
+
+ 				
+			return {"success":True}
+		else:
+			return {"success":False, "message":"no data found"}
+	except Exception as e:
+		print("reprocess_error_inoices", str(e))
+		return {"success":False,"message":str(e)}

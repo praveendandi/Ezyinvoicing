@@ -123,16 +123,16 @@ doc_events = {
 
 # Scheduled Tasks
 # ---------------
-
 scheduler_events = {
-	"all": [
-		"version2_app.doctype.invoices.invoices.login_gsp2"
+	"daily": [
+		"version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin"
 	],
-	"cron": {
-        "0/1 * * *": [
-            "version2_app.doctype.invoices.invoices.login_gsp2"
-        ]}
-}
+	"daily":[
+		"version2_app.events.deleteemailfilesdaily"
+	]
+}	
+
+
 # scheduler_events = {
 	
 # 	"all": [

@@ -154,6 +154,9 @@ def reinitiateInvoice(data):
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		pattern = re.compile("^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+")
 		for ind, each in enumerate(items):
+			split_words = each["name"].split(" ")
+			if len(split_words[-1]) == 1:
+				each["name"] = ' '.join( [w for w in each["name"].split() if len(w)>1] )
 			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
 				if each["name"] not in payment_Types:
 					if each["name"] == "Room Charge" or each["name"] == "Package Room Charge" or each["name"] == "Accommodation & Breakfast" or each["name"] == "Room Rate" or each["name"] == "Members Only Rates" or each["name"] == "March Getaway Sale":

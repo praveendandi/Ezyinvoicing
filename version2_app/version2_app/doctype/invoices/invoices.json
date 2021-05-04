@@ -131,7 +131,11 @@
   "irn_generated_type",
   "converted_from_tax_invoices_to_manual_tax_invoices",
   "invoice_object_from_file",
-  "converted_tax_to_credit"
+  "converted_tax_to_credit",
+  "invoice_check",
+  "change_gst_number",
+  "debit_invoice",
+  "note"
  ],
  "fields": [
   {
@@ -852,12 +856,37 @@
    "fieldtype": "Select",
    "label": "Converted Tax to Credit",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "invoice_check",
+   "fieldtype": "Select",
+   "label": "Invoice Check",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "Yes",
+   "fieldname": "change_gst_number",
+   "fieldtype": "Select",
+   "label": "Change Gst Number",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "No",
+   "fieldname": "debit_invoice",
+   "fieldtype": "Select",
+   "label": "Debit Invoice",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Long Text",
+   "label": "Note"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-03-26 10:18:59.632855",
+ "modified": "2021-04-26 15:45:01.284364",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

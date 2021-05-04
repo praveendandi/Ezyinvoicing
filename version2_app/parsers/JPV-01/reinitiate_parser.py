@@ -59,6 +59,7 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
+			print(i)
 			if "Confirmation No" in i:
 				Index = i.index('Confirmation No')
 				cn = i[Index:]
@@ -77,6 +78,7 @@ def reinitiateInvoice(data):
 			if "GST ID" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("Guests","")
+				gstNumber = gstNumber.replace("Rate","")
 			if "Invoice No." in i:
 				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")
 			if "Bill To" in i:
@@ -139,6 +141,10 @@ def reinitiateInvoice(data):
 						if "~" in i:
 							ending_index = i.find("~")
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+							if "Telephone ( Local ) (SAC--:998599)" in item["name"]:
+								item["name"] = "Telephone ( Local ) (SAC--:998599)"
+							if "Telephone Allow (SAC--:998599)" in item["name"]:
+								item["name"] = "Telephone Allow (SAC--:998599)"
 						else:
 							ending_index = i.find(item_value)
 							item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
@@ -157,7 +163,7 @@ def reinitiateInvoice(data):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and "XX/XX" not in i and "XXXXX" not in i:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and "XX/XX" not in each["name"] and "XXXXX" not in each["name"]:
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 

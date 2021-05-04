@@ -79,7 +79,9 @@
   "irn_text_alignment",
   "backend_git_path",
   "irn_qr_size",
-  "sc_sac_code"
+  "sc_sac_code",
+  "reverse_calculation",
+  "system_storage_path"
  ],
  "fields": [
   {
@@ -434,7 +436,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera"
+   "options": "None\nMarriot\nOpera\nHolidayIn"
   },
   {
    "default": "0",
@@ -493,11 +495,22 @@
    "fieldtype": "Select",
    "label": "Irn Qr Size",
    "options": "Small\nLarge"
+  },
+  {
+   "default": "0",
+   "fieldname": "reverse_calculation",
+   "fieldtype": "Check",
+   "label": "Reverse Calculation"
+  },
+  {
+   "fieldname": "system_storage_path",
+   "fieldtype": "Data",
+   "label": "System Storage Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-03-26 17:05:09.139658",
+ "modified": "2021-04-19 10:20:52.667747",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
