@@ -27,16 +27,16 @@ from frappe.utils.background_jobs import enqueue
 
 @frappe.whitelist(allow_guest=True)
 def manual_upload(data):
-	enqueue(
-			manual_upload_data,
-			queue="default",
-			timeout=800000,
-			event="data_import",
-			now=False,
-			data = data,
+    enqueue(
+            manual_upload_data,
+            queue="default",
+            timeout=800000,
+            event="data_import",
+            now=False,
+            data = data,
 			is_async = True,
-			)
-	return True    
+			)		
+    return True    
 
 @frappe.whitelist(allow_guest=True)
 def manual_upload_data(data):

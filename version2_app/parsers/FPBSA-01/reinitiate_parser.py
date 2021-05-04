@@ -24,7 +24,7 @@ folder_path = frappe.utils.get_bench_path()
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
 	try:
-		company = "RBMBDHN-01"
+		company = "FPBSA-01"
 		filepath = data['filepath']
 		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()
@@ -60,34 +60,34 @@ def reinitiateInvoice(data):
 		roomNumber = ""
 		invoice_category = "Tax Invoice"
 		for i in raw_data:
-			if "Confirmation No." in i:
+			if "Confirmation No" in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
+
 			if "Total" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
-			if "Departure :" in i:
-				depatureDateIndex = i.index('Departure')
-				date_time_obj = ':'.join(i[depatureDateIndex:].split(':')[1:])[1:]
-				inv_date = datetime.datetime.strptime(date_time_obj, '%d-%b-%y %H:%M:%S')
-				date_time_obj = inv_date.strftime("%d-%b-%y %H:%M:%S")
-			if "Room No." in i or "Room No" in i:
+
+			if "Original Bill Date" in i:
+				date_time_obj = (i.split(":")[-1]).strip()
+				date_time_obj = datetime.datetime.strptime(date_time_obj,'%d/%m/%y').strftime('%d-%b-%y %H:%M:%S')
+			if "Room  :" in i or "Room :" in i:
 				room = i.split(":")
 				roomNumber = room[-1]
-			if "GST ID" in i:				
+			if "GST ID" in i:
 				gstNumber = i.split(':')[1].replace(' ', '')
 				gstNumber = gstNumber.replace("ConfirmationNo.","")
 				gstNumber = gstNumber.replace("Membership","")
-			if "Bill  No." in i:
-				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")	
-			if "Bill To" in i or "Bill No." in i:
+			if "Invoice No" in i:
+				invoiceNumber = (i.split(':')[len(i.split(':')) - 1]).replace(" ", "")				
+			if "Bill To" in i:
 				guestDetailsEntered = True
 			if "Checkout By:" in i:
 				guestDetailsEntered = False
 			if guestDetailsEntered == True:
 				guestDeatils.append(i)
-			if i in "Date Description Reference Debit Credit":
-				entered = True
+			# if i in "Date Description Reference Debit Credit":
+			entered = True
 			if 'CGST 6%=' in i:
 				entered = False
 			if 'Billing' in i:
@@ -96,15 +96,15 @@ def reinitiateInvoice(data):
 				entered = False
 			if entered == True:
 				data.append(i)
-			if "Guest Name" in i:
-				guestDeatils.append(i)
+			if "Arrival" in i:
+				name_ind = raw_data.index(i)
+				guestDeatils.append(raw_data[name_ind+1])
 			if "Membership" in i:
 				Membership = i.split(":")
 				membership = Membership[-1].replace(" ", "")
-			if "Printed By / On" in i:
+			if "Cashier" in i:
 				p = i.split(":")
-				print_by = p[1]
-
+				print_by = p[-1]
 		check_invoice = check_invoice_exists(invoiceNumber)
 		if check_invoice['success']==True:
 			inv_data = check_invoice['data']
@@ -113,7 +113,6 @@ def reinitiateInvoice(data):
 				gstNumber = inv_data.gst_number
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
-
 		items = [] 
 		itemsort = 0
 		for i in data:
@@ -161,10 +160,7 @@ def reinitiateInvoice(data):
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		pattern = re.compile("^([0]?[1-9]|[1|2][0-9]|[3][0|1])[./-]([0]?[1-9]|[1][0-2])[./-]([0-9]{4}|[0-9]{2})+")
 		for ind, each in enumerate(items):
-			split_words = each["name"].split(" ")
-			if len(split_words[-1]) == 1:
-				each["name"] = ' '.join( [w for w in each["name"].split() if len(w)>1] )
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each["name"]:
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"]:
 				if each["name"] not in payment_Types:
 					if each["name"] == "Room Charge" or each["name"] == "Package Room Charge" or each["name"] == "Accommodation & Breakfast" or each["name"] == "Room Rate" or each["name"] == "Members Only Rates" or each["name"] == "March Getaway Sale":
 						if ind+1 < len(items):
@@ -185,7 +181,7 @@ def reinitiateInvoice(data):
 		# print(guestDeatils)
 		for index, i in enumerate(guestDeatils):
 			if index == 0:
-				guest['name'] = i.split(':')[1]
+				guest['name'] = i.strip()
 			if index == 1:
 				guest['address1'] = i
 			if index == 2:

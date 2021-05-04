@@ -859,7 +859,6 @@ def insert_invoice(data):
 	# insert invoice data     data, company_code, taxpayer,items_data
 	# '''
 	try:
-		# print(data,"/////")
 		if "invoice_category" not in list(data['guest_data']):
 			data['guest_data']['invoice_category'] = "Tax Invoice"
 		if "invoice_object_from_file" not in data:
@@ -1024,6 +1023,10 @@ def insert_invoice(data):
 		# qr_generated = "Pending"
 		if len(data['items_data'])==0:
 			irn_generated = "Zero Invoice"
+			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+			data['taxpayer'] =taxpayer
+			data['guest_data']['invoice_type'] = "B2C"
+
 			# if data['guest_data']['invoice_type']=="B2B":
 			# 	irn_generated = "Zero Invoice"
 			# 	qr_generated = "Pending"
@@ -1187,9 +1190,9 @@ def insert_invoice(data):
 			
 			return {"success": True,"data":invoice}
 		else:
-			tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
-			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				if (v.has_credit_items == "Yes" and company.disable_credit_note == 1) or tax_payer_details.disable_auto_irn == 1:
+			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+				tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
+				if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:
 					data = {'invoice_number': v.name,'generation_type': "System"}
@@ -1394,12 +1397,16 @@ def calulate_items(data):
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if item['sac_code'] == '996311' or item['sac_code'] == "997321":
-					percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
-					if percentage_gst["success"] == True:
-						acc_gst_percentage = percentage_gst["gst_percentage"]	
-						acc_igst_percentage = percentage_gst["igst_percentage"]
+					if "adjustment" in data:
+						acc_gst_percentage = item["cgst"]+item["sgst"]
+						acc_igst_percentage = item["igst"]
 					else:
-						{"success": False, "message": "error in slab helper function"}
+						percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+						if percentage_gst["success"] == True:
+							acc_gst_percentage = percentage_gst["gst_percentage"]	
+							acc_igst_percentage = percentage_gst["igst_percentage"]
+						else:
+							{"success": False, "message": "error in slab helper function"}
 				service_charge_name = (companyDetails.sc_name)
 				if "net" in item:
 					net_value = item["net"]
