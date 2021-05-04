@@ -27,7 +27,14 @@ def Reinitiate_invoice(data):
 		if "place_of_supply" in data:
 			place_of_supply = data['place_of_supply']
 		else:
-			place_of_supply = company.state_code
+			doc = frappe.db.exists("Invoices",data['guest_data']['invoice_number'])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
+				place_of_supply = invoice_doc.place_of_supply
+				if not place_of_supply:
+					place_of_supply = companyDetails.state_code
+			else:
+				place_of_supply = companyDetails.state_code
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "	
 		else:
