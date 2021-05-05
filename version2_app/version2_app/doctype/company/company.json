@@ -527,7 +527,7 @@
    "label": "System Storage Path"
   },
   {
-   "default": "Manual",
+   "default": "Credit",
    "fieldname": "auto_adjustment",
    "fieldtype": "Select",
    "label": "Auto Adjustment",
@@ -570,7 +570,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-04 10:15:36.370085",
+ "modified": "2021-05-05 10:43:39.481689",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
