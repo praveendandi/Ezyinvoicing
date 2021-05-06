@@ -1010,6 +1010,7 @@ def auto_adjustment(data):
 @frappe.whitelist(allow_guest=True)
 def b2b_success_to_credit_note(data):
 	try:
+		user = frappe.session.user
 		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
 		company = frappe.get_doc('company',invoice_doc.company)
 		# invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled","other_charges","company","confirmation_number","invoice_from","print_by","has_discount_items","invoice_category","sez","converted_from_b2b","allowance_invoice","converted_from_tax_invoices_to_manual_tax_invoices"], as_dict=1)
@@ -1018,7 +1019,7 @@ def b2b_success_to_credit_note(data):
 		if len(invoice_data) > 0:
 			invoice_number = data["invoice_number"]+"-1"
 			invoice_date = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
-			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"]},fields=["*"])
+			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
 			total_items = []
 			if invoice_doc.has_credit_items == "Yes":
 				negative_data = [items for items in item_data if items["item_value"]<0]
@@ -1067,10 +1068,17 @@ def b2b_success_to_credit_note(data):
 			else:
 				taxpayer = {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 				tax_payer = taxpayer
-			reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes"})
+			reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes","tax_invoice_referrence_number":invoice_doc.name})
 			if reinitate["success"] == False:
 				return {"success": False, "message": reinitate["message"]}
-			return {"success": True, "message": "Adjustment was successfully adjusted"}
+			doc_invoice = frappe.get_doc("Invoices",data["invoice_number"])
+			doc_invoice.credit_note_raised = "Yes"
+			doc_invoice.save(ignore_permissions=True,ignore_version=True)
+			# subject1 = 'Credit Note Created and Invoice Number is {}'.format(invoice_number)
+			# parent_activity = frappe.get_doc({'doctype': 'Version','data': '<!DOCTYPE html><html><body><p>{}</p></body></html>'.format(subject1),"ref_doctype":"Invoices","docname":data["invoice_number"]})
+			# parent_activity.insertS(ignore_permissions=True,ignore_version=True)
+			# frappe.db.commit()
+			return {"success": True, "message": "Credit Note Raised Successfully"}
 	except Exception as e:
 		print(e, "attach b2c qrcode")
 		return {"success": False, "message": str(e)}

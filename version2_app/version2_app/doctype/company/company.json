@@ -90,7 +90,8 @@
   "custom_e_tax_invoice_logo",
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
-  "custom_e_tax_invoice_footer_image"
+  "custom_e_tax_invoice_footer_image",
+  "b2b_to_credit"
  ],
  "fields": [
   {
@@ -527,7 +528,7 @@
    "label": "System Storage Path"
   },
   {
-   "default": "Manual",
+   "default": "Credit",
    "fieldname": "auto_adjustment",
    "fieldtype": "Select",
    "label": "Auto Adjustment",
@@ -566,11 +567,17 @@
    "fieldname": "custom_e_tax_invoice_footer_image",
    "fieldtype": "Attach",
    "label": "Custom E Tax Invoice Footer Image"
+  },
+  {
+   "default": "0",
+   "fieldname": "b2b_to_credit",
+   "fieldtype": "Check",
+   "label": "B2B To Credit"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-04 10:15:36.370085",
+ "modified": "2021-05-05 12:26:41.469673",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
