@@ -90,7 +90,8 @@
   "custom_e_tax_invoice_logo",
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
-  "custom_e_tax_invoice_footer_image"
+  "custom_e_tax_invoice_footer_image",
+  "skip_ssl_verify"
  ],
  "fields": [
   {
@@ -566,11 +567,17 @@
    "fieldname": "custom_e_tax_invoice_footer_image",
    "fieldtype": "Attach",
    "label": "Custom E Tax Invoice Footer Image"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_ssl_verify",
+   "fieldtype": "Check",
+   "label": "Skip SSL Verify"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-05 10:43:39.481689",
+ "modified": "2021-05-06 15:02:56.205554",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
