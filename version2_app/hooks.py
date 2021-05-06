@@ -128,7 +128,7 @@ doc_events = {
 # ---------------
 scheduler_events = {
 	"daily": [
-		"version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin"
+		"version2_app.events.dailyDeletedocumentBin"
 	],
 	"daily":[
 		"version2_app.events.deleteemailfilesdaily"
