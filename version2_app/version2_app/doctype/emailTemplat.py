@@ -15,9 +15,14 @@ def emailTemplate():
 		response_data = b2bsuccess.response
 		rep=response_data.replace("invoice_number", get_invoice.invoice_number)
 		re=rep.replace("company", get_invoice.company)
-		irn_re=re.replace("irn_number",get_invoice.irn_number)
-		ack_re=irn_re.replace("ack_no",get_invoice.ack_no)
-		ack_date=ack_re.replace("ack_date",get_invoice.ack_date)
+		if get_invoice.invoice_category != "Credit Invoice":
+			irn_re=re.replace("irn_number",get_invoice.irn_number)
+			ack_re=irn_re.replace("ack_no",get_invoice.ack_no)
+			ack_date=ack_re.replace("ack_date",get_invoice.ack_date)
+		if get_invoice.invoice_category == "Credit Invoice":
+			irn_re=re.replace("irn_number",get_invoice.credit_irn_number)
+			ack_re=irn_re.replace("ack_no",get_invoice.credit_ack_no)
+			ack_date=ack_re.replace("ack_date",get_invoice.credit_ack_date)
 		gst_num=ack_date.replace("gst_number",get_invoice.gst_number)
 		b2bsuccess.response=gst_num
 		obj["val"] = b2bsuccess
