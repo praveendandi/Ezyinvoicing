@@ -33,9 +33,9 @@ def Reinitiate_invoice(data):
 				invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
 				place_of_supply = invoice_doc.place_of_supply
 				if not place_of_supply:
-					place_of_supply = companyDetails.state_code
+					place_of_supply = company.state_code
 			else:
-				place_of_supply = companyDetails.state_code
+				place_of_supply = company.state_code
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "	
 		else:
@@ -954,6 +954,14 @@ def auto_adjustment(data):
 		if len(invoice_data) > 0:
 			invoice_date = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
+			for item_each in item_data:
+				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
+				if not sac_code_based_gst:
+					sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['like', '%' + item_each["description"] + '%']})
+				if len(sac_code_based_gst)>0:
+					sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
+				if sac_code_based_gst_rates.net == "Yes":
+					item_each["item_value"] = item_each["item_value_after_gst"]
 			negative_data = [items for items in item_data if items["item_value"]<0]
 			positive_data = [items for items in item_data if items["item_value"]>0]
 			# df = pd.DataFrame.from_records(negative_data)

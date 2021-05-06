@@ -1,0 +1,346 @@
+{
+ "actions": [],
+ "creation": "2021-05-06 15:28:06.540806",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reservation_number",
+  "frro_id",
+  "room_number",
+  "no_of_nights",
+  "checkin_date",
+  "checkin_time",
+  "surname",
+  "given_name",
+  "gender",
+  "date_of_birth",
+  "age",
+  "category",
+  "nationality",
+  "passport_number",
+  "passport_place_of_issued_country",
+  "passport_place_of_issued_city",
+  "date_of_issue",
+  "valid_till",
+  "visa_number",
+  "visa_place_of_issued_country",
+  "visa_place_of_issued_city",
+  "visa_date_of_issue",
+  "visa_valid_till",
+  "visa_type",
+  "visa_sub_type",
+  "address",
+  "city",
+  "country",
+  "arrival_from_country",
+  "arrival_from_city",
+  "arrival_place",
+  "date_of_arrival_in_india",
+  "whether_employed_in_india",
+  "purpose_of_visit",
+  "next_destination",
+  "next_destination_place",
+  "contact_phone_no",
+  "contact_mobile_no",
+  "permanent_phone_no",
+  "permanent_mobile_no",
+  "id_image1",
+  "id_image2",
+  "id_image3",
+  "face_image",
+  "status",
+  "email",
+  "confirmation_number",
+  "booking_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "reservation_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Reservation Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "frro_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "FRRO ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "room_number",
+   "fieldtype": "Int",
+   "label": "Room Number"
+  },
+  {
+   "fieldname": "no_of_nights",
+   "fieldtype": "Int",
+   "label": "No of Nights"
+  },
+  {
+   "fieldname": "checkin_date",
+   "fieldtype": "Date",
+   "label": "Checkin Date"
+  },
+  {
+   "fieldname": "checkin_time",
+   "fieldtype": "Time",
+   "label": "Checkin Time"
+  },
+  {
+   "fieldname": "surname",
+   "fieldtype": "Data",
+   "label": "Surname"
+  },
+  {
+   "fieldname": "given_name",
+   "fieldtype": "Data",
+   "label": "Given Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Data",
+   "label": "Gender",
+   "reqd": 1
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth",
+   "reqd": 1
+  },
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "label": "Age"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "nationality",
+   "fieldtype": "Data",
+   "label": "Nationality",
+   "reqd": 1
+  },
+  {
+   "fieldname": "passport_number",
+   "fieldtype": "Data",
+   "label": "Passport Number"
+  },
+  {
+   "fieldname": "passport_place_of_issued_country",
+   "fieldtype": "Data",
+   "label": "Passport Place of Issued Country"
+  },
+  {
+   "fieldname": "passport_place_of_issued_city",
+   "fieldtype": "Data",
+   "label": "Passport Place of Issued City"
+  },
+  {
+   "fieldname": "date_of_issue",
+   "fieldtype": "Date",
+   "label": "Passport Date of Issue"
+  },
+  {
+   "fieldname": "valid_till",
+   "fieldtype": "Date",
+   "label": "Passport Valid Till"
+  },
+  {
+   "fieldname": "visa_number",
+   "fieldtype": "Data",
+   "label": "Visa Number"
+  },
+  {
+   "fieldname": "visa_place_of_issued_country",
+   "fieldtype": "Data",
+   "label": "Visa Place of Issued Country"
+  },
+  {
+   "fieldname": "visa_place_of_issued_city",
+   "fieldtype": "Data",
+   "label": "Visa Place of Issued City"
+  },
+  {
+   "fieldname": "visa_date_of_issue",
+   "fieldtype": "Data",
+   "label": "Visa Date of Issue"
+  },
+  {
+   "fieldname": "visa_valid_till",
+   "fieldtype": "Data",
+   "label": "Visa Valid Till"
+  },
+  {
+   "fieldname": "visa_type",
+   "fieldtype": "Data",
+   "label": "Visa Type"
+  },
+  {
+   "fieldname": "visa_sub_type",
+   "fieldtype": "Data",
+   "label": "Visa Sub Type"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Long Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country"
+  },
+  {
+   "fieldname": "arrival_from_country",
+   "fieldtype": "Data",
+   "label": "Arrival From Country"
+  },
+  {
+   "fieldname": "arrival_from_city",
+   "fieldtype": "Data",
+   "label": "Arrival From City"
+  },
+  {
+   "fieldname": "arrival_place",
+   "fieldtype": "Data",
+   "label": "Arrival Place"
+  },
+  {
+   "fieldname": "date_of_arrival_in_india",
+   "fieldtype": "Date",
+   "label": "Date of Arrival in India"
+  },
+  {
+   "default": "No",
+   "fieldname": "whether_employed_in_india",
+   "fieldtype": "Select",
+   "label": "Whether Employed in India",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "purpose_of_visit",
+   "fieldtype": "Data",
+   "label": "Purpose of Visit"
+  },
+  {
+   "fieldname": "next_destination",
+   "fieldtype": "Data",
+   "label": "Next Destination"
+  },
+  {
+   "fieldname": "next_destination_place",
+   "fieldtype": "Data",
+   "label": "Next Destination Place"
+  },
+  {
+   "fieldname": "contact_phone_no",
+   "fieldtype": "Data",
+   "label": "Contact Phone No"
+  },
+  {
+   "fieldname": "contact_mobile_no",
+   "fieldtype": "Data",
+   "label": "Contact Mobile No"
+  },
+  {
+   "fieldname": "permanent_phone_no",
+   "fieldtype": "Data",
+   "label": "Permanent Phone No"
+  },
+  {
+   "fieldname": "permanent_mobile_no",
+   "fieldtype": "Data",
+   "label": "Permanent Mobile No"
+  },
+  {
+   "fieldname": "id_image1",
+   "fieldtype": "Attach Image",
+   "label": "ID Image1"
+  },
+  {
+   "fieldname": "id_image2",
+   "fieldtype": "Attach Image",
+   "label": "ID Image2"
+  },
+  {
+   "fieldname": "id_image3",
+   "fieldtype": "Attach Image",
+   "label": "iD Image3"
+  },
+  {
+   "fieldname": "face_image",
+   "fieldtype": "Attach Image",
+   "label": "Face Image"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number"
+  },
+  {
+   "fieldname": "booking_status",
+   "fieldtype": "Data",
+   "label": "Booking Status"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-05-06 17:35:01.185500",
+ "modified_by": "Administrator",
+ "module": "Passport Scanner",
+ "name": "Reservations",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
