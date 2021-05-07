@@ -556,10 +556,17 @@ def send_invoicedata_to_gcb(invoice_number):
 				"company": company.name
 			}
 			if company.proxy == 0:
-				json_response = requests.post(
-					"https://gst.caratred.in/ezy/api/addJsonToGcb",
-					headers=headers,
-					json=b2c_data)
+				if company.skip_ssl_verify == 0:
+					json_response = requests.post(
+						"https://gst.caratred.in/ezy/api/addJsonToGcb",
+						headers=headers,
+						json=b2c_data)
+				else:
+					json_response = requests.post(
+						"https://gst.caratred.in/ezy/api/addJsonToGcb",
+						headers=headers,
+						json=b2c_data,verify=False)
+
 				response = json_response.json()
 				if response["success"] == False:
 					return {
@@ -595,15 +602,27 @@ def send_invoicedata_to_gcb(invoice_number):
 		elif company.b2c_qr_type == "Virtual Payment":
 
 			if company.proxy == 0:
-				generate_qr = requests.post(
-					"https://upiqr.in/api/qr?format=png",
-					headers=headers,
-					json={
-						"vpa": company.merchant_virtual_payment_address,
-						"name": company.merchant_name,
-						"txnReference": invoice_number,
-						"amount": '%.2f' % doc.pms_invoice_summary
-					})
+				if company.skip_ssl_verify == 0:
+					generate_qr = requests.post(
+						"https://upiqr.in/api/qr?format=png",
+						headers=headers,
+						json={
+							"vpa": company.merchant_virtual_payment_address,
+							"name": company.merchant_name,
+							"txnReference": invoice_number,
+							"amount": '%.2f' % doc.pms_invoice_summary
+						})
+				else:
+					generate_qr = requests.post(
+						"https://upiqr.in/api/qr?format=png",
+						headers=headers,
+						json={
+							"vpa": company.merchant_virtual_payment_address,
+							"name": company.merchant_name,
+							"txnReference": invoice_number,
+							"amount": '%.2f' % doc.pms_invoice_summary},
+						verify=False)
+
 			else:
 				proxyhost = company.proxy_url
 				proxyhost = proxyhost.replace("http://", "@")
@@ -688,10 +707,15 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 		}
 		payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
 		if company.proxy == 0:
+			if company.skip_ssl_verify == 0:
+				cancel_response = requests.post(gsp['data']['cancel_irn'],
+												headers=headers,
+												json=payload)
+			else:
+				cancel_response = requests.post(gsp['data']['cancel_irn'],
+												headers=headers,
+												json=payload,verify=False)
 
-			cancel_response = requests.post(gsp['data']['cancel_irn'],
-											headers=headers,
-											json=payload)
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -741,9 +765,14 @@ def create_qr_image(invoice_number, gsp):
 			headers['height'] = "150"
 			headers['width'] = "150"
 		if company.proxy == 0:
-			qr_response = requests.get(gsp['generate_qr_code'],
-									   headers=headers,
-									   stream=True)
+			if company.skip_ssl_verify == 0:
+				qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True)
+			else:
+				qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True,verify=False)							
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -798,10 +827,15 @@ def postIrn(gst_data, gsp, company, invoice_number):
 			"Authorization": "Bearer " + gsp['token']
 		}
 		if company.proxy == 0:
+			if company.skip_ssl_verify == 0:
+				irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data)
+			else:
+				irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data,verify=False)
 
-			irn_response = requests.post(gsp['generate_irn'],
-										 headers=headers,
-										 json=gst_data)
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -2957,7 +2991,10 @@ def request_post(url, code, headers=None):
 	try:
 		company = frappe.get_doc('company', code)
 		if company.proxy == 0:
-			data = requests.post(url, headers=headers)
+			if company.skip_ssl_verify == 0:
+				data = requests.post(url, headers=headers)
+			else:
+				data = requests.post(url, headers=headers,verify=False)	
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -2990,7 +3027,11 @@ def request_get(api, headers, invoice, code):
 		}
 		company = frappe.get_doc('company', code)
 		if company.proxy == 0:
-			raw_response = requests.get(api, headers=headers)
+			if company.skip_ssl_verify == 0:
+				raw_response = requests.get(api, headers=headers)
+			else:
+				raw_response = requests.get(api, headers=headers,verify=False)
+
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")

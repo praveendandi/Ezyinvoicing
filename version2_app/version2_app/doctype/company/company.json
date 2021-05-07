@@ -80,7 +80,8 @@
   "backend_git_path",
   "irn_qr_size",
   "sc_sac_code",
-  "system_storage_path"
+  "system_storage_path",
+  "skip_ssl_verify"
  ],
  "fields": [
   {
@@ -499,11 +500,17 @@
    "fieldname": "system_storage_path",
    "fieldtype": "Data",
    "label": "System Storage Path"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_ssl_verify",
+   "fieldtype": "Check",
+   "label": "Skip SSL Verify"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-26 15:24:32.039020",
+ "modified": "2021-05-07 12:46:55.130240",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
