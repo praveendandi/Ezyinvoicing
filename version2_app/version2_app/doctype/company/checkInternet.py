@@ -14,8 +14,13 @@ def CheckInternetConnection():
             print(proxies)
             res = requests.get(url,proxies=proxies,verify=False)
         else:
+            
             url = "https://google.com"
-            res = requests.get(url)
+            if company.skip_ssl_verify == 0:
+                res = requests.get(url)
+            else:
+                res = requests.get(url,verify=False)
+
         print(res.status_code)
         if res.status_code == 200:
             return True
