@@ -132,9 +132,7 @@ scheduler_events = {
 	"daily":[
 		"version2_app.events.deleteemailfilesdaily"
 	],
-	"cron": {
-		"0/10 * * * *": [
-			"version2_app.events.dailyDeletedocumentBin"]}	
+	"corn":{"15 1 * * *":["version2_app.events.dailyDeletedocumentBin"]}	
 }	
 
 
