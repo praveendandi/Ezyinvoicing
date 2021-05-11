@@ -10,11 +10,13 @@ import string,math
 from frappe.utils import get_site_name
 import time
 import pandas as pd
-from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
+from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages, update_document_bin
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn,calulate_items
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
+# 
+# update_document_bin(print_by,document_type,"","Duplicate",filepath)
 @frappe.whitelist()
 def Reinitiate_invoice(data):
 	'''
@@ -295,7 +297,9 @@ def Reinitiate_invoice(data):
 				else:
 					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
 					irn_generate = generateIrn(data)	
-		returnData = frappe.get_doc('Invoices',invoice_data.name)			
+		returnData = frappe.get_doc('Invoices',invoice_data.name)
+		if returnData.invoice_from=="Pms":		
+			update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
 		return {"success":True,"data":returnData}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
