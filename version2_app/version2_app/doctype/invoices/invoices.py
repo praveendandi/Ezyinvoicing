@@ -1004,8 +1004,8 @@ def insert_invoice(data):
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 
 
-		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
-			data['total_invoice_amount'] = sales_amount_after_tax
+		# if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
+		# 	data['total_invoice_amount'] = sales_amount_after_tax
 		# print(sales_amount_after_tax)	
 		if '-' in str(sales_amount_after_tax):
 			allowance_invoice = "Yes"
@@ -1022,7 +1022,7 @@ def insert_invoice(data):
 			ready_to_generate_irn = "No"
 		
 		else:
-			if len(data['items_data'])>0:
+			if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
 				roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
 				data['invoice_round_off_amount'] = roundoff_amount
 				if abs(roundoff_amount)>6:
@@ -1054,7 +1054,7 @@ def insert_invoice(data):
 						
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
-		if len(data['items_data'])==0:
+		if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
 			irn_generated = "Zero Invoice"
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 			data['taxpayer'] =taxpayer

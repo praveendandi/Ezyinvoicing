@@ -109,7 +109,7 @@ def Reinitiate_invoice(data):
 						total_credit_vat_amount += float(item['vat_amount'])
 				else:
 					pass
-		else:
+		if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 			data['taxpayer'] =taxpayer
 			data['guest_data']['invoice_type'] = "B2C"
@@ -151,9 +151,10 @@ def Reinitiate_invoice(data):
 		sales_amount_after_tax = value_after_gst + other_charges
 		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
-		if total_invoice_amount==0 and len(data['items_data'])>0:
-			total_invoice_amount = sales_amount_after_tax
-			data['total_invoice_amount'] = sales_amount_after_tax
+		# if total_invoice_amount==0 and len(data['items_data'])>0:
+		# 	total_invoice_amount = sales_amount_after_tax
+		# 	data['total_invoice_amount'] = sales_amount_after_tax
+
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		if '-' in str(sales_amount_after_tax):
@@ -239,8 +240,8 @@ def Reinitiate_invoice(data):
 		doc.mode = company.mode
 		doc.allowance_invoice = allowance_invoice
 		doc.debit_invoice = debit_invoice
-		# if data['total_invoice_amount'] == 0:
-		# 	irn_generated = "Zero Invoice"
+		
+
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
 		if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
@@ -257,7 +258,7 @@ def Reinitiate_invoice(data):
 						doc.irn_generated = "Error"
 						doc.ready_to_generate_irn = "No"
 		else:
-			if len(data['items_data'])==0:
+			if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
 				doc.ready_to_generate_irn = "No"
 				doc.irn_generated = "Zero Invoice"
 				generateb2cQr = False
@@ -267,6 +268,12 @@ def Reinitiate_invoice(data):
 				generateb2cQr = True
 				doc.irn_generated = "Pending"
 				doc.ready_to_generate_irn = "Yes"
+				
+		if data['total_invoice_amount'] == 0 or data['total_invoice_amount'] == 0.0:
+			doc.ready_to_generate_irn = "No"
+			doc.irn_generated = "Zero Invoice"
+			doc.invoice_type = "B2C"
+			generateb2cQr = False
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		doc.place_of_supply = place_of_supply
