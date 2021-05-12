@@ -10,6 +10,7 @@ import importlib.util
 import traceback
 from datetime import date, timedelta
 
+import shutil
 
 
 def invoice_created(doc, method=None):
@@ -216,3 +217,10 @@ def dailyDeletedocumentBin():
 		return {"success":True}
 	except Exception as e:
 		return {"success":False,"message":str(e)}	
+
+def dailyIppprinterFiles():
+	company = frappe.get_last_doc('company')
+	# today = date.today()
+	# lastdate = date.today() - timedelta(days=6)
+	shutil.rmtree(company.ipp_printer_file_path)
+			

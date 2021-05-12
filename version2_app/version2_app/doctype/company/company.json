@@ -91,7 +91,8 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "skip_ssl_verify"
+  "skip_ssl_verify",
+  "ipp_printer_file_path"
  ],
  "fields": [
   {
@@ -573,11 +574,16 @@
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"
+  },
+  {
+   "fieldname": "ipp_printer_file_path",
+   "fieldtype": "Data",
+   "label": "Ipp Printer File Path"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-06 15:02:56.205554",
+ "modified": "2021-05-12 18:55:53.897847",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
