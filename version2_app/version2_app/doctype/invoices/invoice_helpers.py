@@ -212,7 +212,17 @@ def error_invoice_calculation(data,data1):
 			invoice_from = data1['invoice_from']
 		else:
 			invoice_from = "Pms"
-
+		if "place_of_supply" in data1:
+			place_of_supply = data1['place_of_supply']
+		else:
+			doc = frappe.db.exists("Invoices",data1['invoice_number'])
+			if doc:
+				invoice_doc = frappe.get_doc("Invoices",data1['invoice_number'])
+				place_of_supply = invoice_doc.place_of_supply
+				if not place_of_supply:
+					place_of_supply = company.state_code
+			else:
+				place_of_supply = company.state_code
 		invoice = frappe.get_doc({
 			'doctype':
 			'Invoices',
@@ -272,7 +282,8 @@ def error_invoice_calculation(data,data1):
 			"No",
 			'error_message':
 			data1['error_message'],
-			"invoice_object_from_file":json.dumps(data1['invoice_object_from_file'])
+			"invoice_object_from_file":json.dumps(data1['invoice_object_from_file']),
+			"place_of_supply" : place_of_supply
 		})
 		v = invoice.insert(ignore_permissions=True, ignore_links=True)
 
@@ -449,6 +460,8 @@ def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
 				document_printed = "Yes"
 			else:
 				document_printed = "No"	
+		if "Duplicate" in error_log:
+			error_log = "Invoice Already Printed"		
 		bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filepath})
 		bin_doc = frappe.get_doc("Document Bin",bin_name)
 		bin_doc.print_by = print_by

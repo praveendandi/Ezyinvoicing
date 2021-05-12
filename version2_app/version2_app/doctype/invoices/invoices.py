@@ -556,10 +556,16 @@ def send_invoicedata_to_gcb(invoice_number):
 				"company": company.name
 			}
 			if company.proxy == 0:
-				json_response = requests.post(
-					"https://gst.caratred.in/ezy/api/addJsonToGcb",
-					headers=headers,
-					json=b2c_data)
+				if company.skip_ssl_verify == 0:
+					json_response = requests.post(
+						"https://gst.caratred.in/ezy/api/addJsonToGcb",
+						headers=headers,
+						json=b2c_data)
+				else:
+					json_response = requests.post(
+						"https://gst.caratred.in/ezy/api/addJsonToGcb",
+						headers=headers,
+						json=b2c_data,verify=False)
 				response = json_response.json()
 				if response["success"] == False:
 					return {
@@ -595,15 +601,27 @@ def send_invoicedata_to_gcb(invoice_number):
 		elif company.b2c_qr_type == "Virtual Payment":
 
 			if company.proxy == 0:
-				generate_qr = requests.post(
-					"https://upiqr.in/api/qr?format=png",
-					headers=headers,
-					json={
-						"vpa": company.merchant_virtual_payment_address,
-						"name": company.merchant_name,
-						"txnReference": invoice_number,
-						"amount": '%.2f' % doc.pms_invoice_summary
-					})
+				if company.skip_ssl_verify == 0:
+					generate_qr = requests.post(
+						"https://upiqr.in/api/qr?format=png",
+						headers=headers,
+						json={
+							"vpa": company.merchant_virtual_payment_address,
+							"name": company.merchant_name,
+							"txnReference": invoice_number,
+							"amount": '%.2f' % doc.pms_invoice_summary
+						})
+				else:
+					generate_qr = requests.post(
+						"https://upiqr.in/api/qr?format=png",
+						headers=headers,
+						json={
+							"vpa": company.merchant_virtual_payment_address,
+							"name": company.merchant_name,
+							"txnReference": invoice_number,
+							"amount": '%.2f' % doc.pms_invoice_summary},
+						verify=False)
+
 			else:
 				proxyhost = company.proxy_url
 				proxyhost = proxyhost.replace("http://", "@")
@@ -688,10 +706,14 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 		}
 		payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
 		if company.proxy == 0:
-
-			cancel_response = requests.post(gsp['data']['cancel_irn'],
-											headers=headers,
-											json=payload)
+			if company.skip_ssl_verify == 0:
+				cancel_response = requests.post(gsp['data']['cancel_irn'],
+												headers=headers,
+												json=payload)
+			else:
+				cancel_response = requests.post(gsp['data']['cancel_irn'],
+												headers=headers,
+												json=payload,verify=False)									
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -741,9 +763,15 @@ def create_qr_image(invoice_number, gsp):
 			headers['height'] = "150"
 			headers['width'] = "150"
 		if company.proxy == 0:
-			qr_response = requests.get(gsp['generate_qr_code'],
-									   headers=headers,
-									   stream=True)
+			if company.skip_ssl_verify == 0:
+				qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True)
+			else:
+				qr_response = requests.get(gsp['generate_qr_code'],
+										headers=headers,
+										stream=True,verify=False)							
+
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -798,10 +826,15 @@ def postIrn(gst_data, gsp, company, invoice_number):
 			"Authorization": "Bearer " + gsp['token']
 		}
 		if company.proxy == 0:
+			if company.skip_ssl_verify == 0:
+				irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data)
+			else:
+				irn_response = requests.post(gsp['generate_irn'],
+											headers=headers,
+											json=gst_data,verify=False)
 
-			irn_response = requests.post(gsp['generate_irn'],
-										 headers=headers,
-										 json=gst_data)
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -859,7 +892,6 @@ def insert_invoice(data):
 	# insert invoice data     data, company_code, taxpayer,items_data
 	# '''
 	try:
-		# print(data,"/////")
 		if "invoice_category" not in list(data['guest_data']):
 			data['guest_data']['invoice_category'] = "Tax Invoice"
 		if "invoice_object_from_file" not in data:
@@ -972,8 +1004,8 @@ def insert_invoice(data):
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
 
 
-		if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
-			data['total_invoice_amount'] = sales_amount_after_tax
+		# if data['total_invoice_amount'] == 0 and len(data['items_data'])>0:
+		# 	data['total_invoice_amount'] = sales_amount_after_tax
 		# print(sales_amount_after_tax)	
 		if '-' in str(sales_amount_after_tax):
 			allowance_invoice = "Yes"
@@ -990,7 +1022,7 @@ def insert_invoice(data):
 			ready_to_generate_irn = "No"
 		
 		else:
-			if len(data['items_data'])>0:
+			if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
 				roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
 				data['invoice_round_off_amount'] = roundoff_amount
 				if abs(roundoff_amount)>6:
@@ -1022,8 +1054,12 @@ def insert_invoice(data):
 						
 						return{"success":False,"message":TotalMismatchErrorAPI['message']}
 		# qr_generated = "Pending"
-		if len(data['items_data'])==0:
+		if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
 			irn_generated = "Zero Invoice"
+			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+			data['taxpayer'] =taxpayer
+			data['guest_data']['invoice_type'] = "B2C"
+
 			# if data['guest_data']['invoice_type']=="B2B":
 			# 	irn_generated = "Zero Invoice"
 			# 	qr_generated = "Pending"
@@ -1186,9 +1222,9 @@ def insert_invoice(data):
 			
 			return {"success": True,"data":invoice}
 		else:
-			tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
-			if v.irn_generated == "Pending" and company.allow_auto_irn == 1:
-				if (v.has_credit_items == "Yes" and company.disable_credit_note == 1) or tax_payer_details.disable_auto_irn == 1:
+			if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+				tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
+				if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:
 					data = {'invoice_number': v.name,'generation_type': "System"}
@@ -1465,6 +1501,8 @@ def calulate_items(data):
 			if doc:
 				invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
 				placeofsupply = invoice_doc.place_of_supply
+				if not placeofsupply:
+					placeofsupply = companyDetails.state_code
 			else:
 				placeofsupply = companyDetails.state_code
 		for item in data['items']:
@@ -1505,12 +1543,16 @@ def calulate_items(data):
 				if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
 					item['sac_code'] = sac_code_based_gst_rates.code
 				if item['sac_code'] == '996311' or item['sac_code'] == "997321":
-					percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
-					if percentage_gst["success"] == True:
-						acc_gst_percentage = percentage_gst["gst_percentage"]	
-						acc_igst_percentage = percentage_gst["igst_percentage"]
+					if "adjustment" in data:
+						acc_gst_percentage = item["cgst"]+item["sgst"]
+						acc_igst_percentage = item["igst"]
 					else:
-						{"success": False, "message": "error in slab helper function"}
+						percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+						if percentage_gst["success"] == True:
+							acc_gst_percentage = percentage_gst["gst_percentage"]	
+							acc_igst_percentage = percentage_gst["igst_percentage"]
+						else:
+							{"success": False, "message": "error in slab helper function"}
 				service_charge_name = (companyDetails.sc_name)
 				if "net" in item:
 					net_value = item["net"]
@@ -2957,7 +2999,10 @@ def request_post(url, code, headers=None):
 	try:
 		company = frappe.get_doc('company', code)
 		if company.proxy == 0:
-			data = requests.post(url, headers=headers)
+			if company.skip_ssl_verify == 0:
+				data = requests.post(url, headers=headers)
+			else:
+				data = requests.post(url, headers=headers,verify=False)	
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -2990,7 +3035,10 @@ def request_get(api, headers, invoice, code):
 		}
 		company = frappe.get_doc('company', code)
 		if company.proxy == 0:
-			raw_response = requests.get(api, headers=headers)
+			if company.skip_ssl_verify == 0:
+				raw_response = requests.get(api, headers=headers)
+			else:
+				raw_response = requests.get(api, headers=headers,verify=False)	
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")

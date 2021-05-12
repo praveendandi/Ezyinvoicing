@@ -31,25 +31,25 @@ def holidayinManualupload(data):
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
 		if ".csv" in items_file_path:
-			items_dataframe = pd.read_csv(items_file_path)
+			try:
+				items_dataframe = pd.read_csv(items_file_path)
+			except UnicodeDecodeError:
+				items_dataframe = pd.read_csv(items_file_path,encoding ='latin1')
 		else:
 			items_dataframe = pd.read_excel(items_file_path)
 
 		# items_dataframe = pd.read_excel(items_file_path)
 		items_dataframe = items_dataframe.fillna('empty')
 		items_dataframe = items_dataframe.sort_values("taxinvnum")
-		# print(items_dataframe.head(16))
 		invoice_columns = list(items_dataframe.columns.values)
-		# print(invoice_columns)
 		invoice_num = list(set(items_dataframe['taxinvnum']))
-		# print(invoice_num,len(invoice_num))
 		company_check_columns = companyData.bulk_import_invoice_headers
 		company_check_columns = company_check_columns.split(",")
 		if company_check_columns != invoice_columns:
 			frappe.db.delete('File', {'file_url': data['invoice_file']})
 			frappe.db.commit()
-			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":data['company']})
-			return {"success":False,"message":"Invoice data mismatch"}
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
+			return {"success":False,"message":"Invoice data File mismatch"}
 		# print(items_dataframe)
 		output = items_dataframe.to_dict('records')
 		list_data={}
@@ -58,6 +58,7 @@ def holidayinManualupload(data):
 		for each in output:
 			totalitemAmount = each['invoiceamount']
 			each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
+			each['invoiceamount'] = round(each['invoiceamount'],2)
 			each['taxcode_dsc'] = str(each['taxcode_dsc'])
 			# print(each['taxinvnum'],len(each['taxinvnum']))
 			del each['accountdate']# = str(each['accountdate'])
