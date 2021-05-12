@@ -83,8 +83,6 @@
   "reconciliation_format",
   "ip_address",
   "port",
-  "reverse_calculation",
-  "system_storage_path",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -92,8 +90,8 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "b2b_to_credit",
-  "skip_ssl_verify"
+  "skip_ssl_verify",
+  "b2b_to_credit"
  ],
  "fields": [
   {
@@ -566,19 +564,20 @@
   },
   {
    "default": "0",
-   "fieldname": "b2b_to_credit",
-   "fieldtype": "Check",
-   "label": "B2B To Credit"
-  },
-  {
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"
+  },
+  {
+   "default": "0",
+   "fieldname": "b2b_to_credit",
+   "fieldtype": "Check",
+   "label": "B2B To Credit"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-06 15:02:56.205554",
+ "modified": "2021-05-12 12:35:40.386845",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
