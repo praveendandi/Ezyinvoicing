@@ -460,6 +460,8 @@ def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
 				document_printed = "Yes"
 			else:
 				document_printed = "No"	
+		if "Duplicate" in error_log:
+			error_log = "Invoice Already Printed"		
 		bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filepath})
 		bin_doc = frappe.get_doc("Document Bin",bin_name)
 		bin_doc.print_by = print_by

@@ -91,7 +91,8 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "b2b_to_credit"
+  "b2b_to_credit",
+  "skip_ssl_verify"
  ],
  "fields": [
   {
@@ -573,11 +574,16 @@
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
    "label": "B2B To Credit"
+  },
+  {
+   "fieldname": "skip_ssl_verify",
+   "fieldtype": "Check",
+   "label": "Skip SSL Verify"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-05 12:26:41.469673",
+ "modified": "2021-05-06 15:02:56.205554",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

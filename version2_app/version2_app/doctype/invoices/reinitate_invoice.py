@@ -10,11 +10,13 @@ import string,math
 from frappe.utils import get_site_name
 import time
 import pandas as pd
-from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages
+from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages, update_document_bin
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn,calulate_items,insert_invoice
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
+# 
+# update_document_bin(print_by,document_type,"","Duplicate",filepath)
 @frappe.whitelist()
 def Reinitiate_invoice(data):
 	'''
@@ -33,9 +35,9 @@ def Reinitiate_invoice(data):
 				invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
 				place_of_supply = invoice_doc.place_of_supply
 				if not place_of_supply:
-					place_of_supply = companyDetails.state_code
+					place_of_supply = company.state_code
 			else:
-				place_of_supply = companyDetails.state_code
+				place_of_supply = company.state_code
 		if "invoice_object_from_file" not in data:
 			data['invoice_object_from_file'] = " "	
 		else:
@@ -107,7 +109,7 @@ def Reinitiate_invoice(data):
 						total_credit_vat_amount += float(item['vat_amount'])
 				else:
 					pass
-		else:
+		if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
 			taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 			data['taxpayer'] =taxpayer
 			data['guest_data']['invoice_type'] = "B2C"
@@ -149,9 +151,10 @@ def Reinitiate_invoice(data):
 		sales_amount_after_tax = value_after_gst + other_charges
 		sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
 		sales_amount_before_tax = sales_amount_before_tax - credit_value_before_gst
-		if total_invoice_amount==0 and len(data['items_data'])>0:
-			total_invoice_amount = sales_amount_after_tax
-			data['total_invoice_amount'] = sales_amount_after_tax
+		# if total_invoice_amount==0 and len(data['items_data'])>0:
+		# 	total_invoice_amount = sales_amount_after_tax
+		# 	data['total_invoice_amount'] = sales_amount_after_tax
+
 		if "address_1" not in data['taxpayer']:
 			data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
 		if '-' in str(sales_amount_after_tax):
@@ -237,8 +240,8 @@ def Reinitiate_invoice(data):
 		doc.mode = company.mode
 		doc.allowance_invoice = allowance_invoice
 		doc.debit_invoice = debit_invoice
-		# if data['total_invoice_amount'] == 0:
-		# 	irn_generated = "Zero Invoice"
+		
+
 		doc.irn_generated=irn_generated
 		invoice_round_off_amount =  float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
 		if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
@@ -255,7 +258,7 @@ def Reinitiate_invoice(data):
 						doc.irn_generated = "Error"
 						doc.ready_to_generate_irn = "No"
 		else:
-			if len(data['items_data'])==0:
+			if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
 				doc.ready_to_generate_irn = "No"
 				doc.irn_generated = "Zero Invoice"
 				generateb2cQr = False
@@ -265,6 +268,12 @@ def Reinitiate_invoice(data):
 				generateb2cQr = True
 				doc.irn_generated = "Pending"
 				doc.ready_to_generate_irn = "Yes"
+				
+		if data['total_invoice_amount'] == 0 or data['total_invoice_amount'] == 0.0:
+			doc.ready_to_generate_irn = "No"
+			doc.irn_generated = "Zero Invoice"
+			doc.invoice_type = "B2C"
+			generateb2cQr = False
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		doc.place_of_supply = place_of_supply
@@ -295,7 +304,9 @@ def Reinitiate_invoice(data):
 				else:
 					data = {'invoice_number': invoice_data.name,'generation_type': "System"}
 					irn_generate = generateIrn(data)	
-		returnData = frappe.get_doc('Invoices',invoice_data.name)			
+		returnData = frappe.get_doc('Invoices',invoice_data.name)
+		if returnData.invoice_from=="Pms":		
+			update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
 		return {"success":True,"data":returnData}
 	except Exception as e:
 		print(e,"reinitaite invoice", traceback.print_exc())
@@ -954,6 +965,14 @@ def auto_adjustment(data):
 		if len(invoice_data) > 0:
 			invoice_date = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
+			for item_each in item_data:
+				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
+				if not sac_code_based_gst:
+					sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['like', '%' + item_each["description"] + '%']})
+				if len(sac_code_based_gst)>0:
+					sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
+				if sac_code_based_gst_rates.net == "Yes":
+					item_each["item_value"] = item_each["item_value_after_gst"]
 			negative_data = [items for items in item_data if items["item_value"]<0]
 			positive_data = [items for items in item_data if items["item_value"]>0]
 			# df = pd.DataFrame.from_records(negative_data)
