@@ -92,6 +92,7 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
+  "b2b_to_credit",
   "skip_ssl_verify"
  ],
  "fields": [
@@ -565,6 +566,11 @@
   },
   {
    "default": "0",
+   "fieldname": "b2b_to_credit",
+   "fieldtype": "Check",
+   "label": "B2B To Credit"
+  },
+  {
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"

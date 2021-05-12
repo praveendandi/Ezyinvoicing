@@ -487,6 +487,9 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 			},
 			"ItemList": [],
 		}
+		if invoice.converted_tax_to_credit == "Yes":
+			gst_data["PrecDocDtls"] = [{"InvNo": invoice.tax_invoice_referrence_number,"InvDt": datetime.datetime.strftime(invoice.invoice_date,
+											'%d/%m/%Y')}]
 		total_igst_value = 0
 		total_sgst_value = 0
 		total_cgst_value = 0

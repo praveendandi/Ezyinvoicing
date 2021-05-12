@@ -13,20 +13,21 @@ from datetime import date, timedelta
 
 
 def invoice_created(doc, method=None):
-	print("Invoice Created",doc.name)
-	if frappe.db.exists('Invoice Reconciliations', doc.name):
-		reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
-		reconciliations_doc.invoice_found = "Yes"
-		reconciliations_doc.save(ignore_permissions=True,ignore_version=True)
-	if doc.invoice_from=="Pms":
-		bin_name = frappe.db.get_value('Document Bin',{'invoice_file': doc.invoice_file})
-		bin_doc = frappe.get_doc("Document Bin",bin_name)
-		bin_doc.print_by = doc.print_by
-		bin_doc.document_type = doc.invoice_category
-		bin_doc.invoice_number = doc.name
-		# bin_doc.error_log = error_log
-		bin_doc.document_printed = "Yes"
-		bin_doc.save(ignore_permissions=True,ignore_version=True)
+    print("Invoice Created",doc.name)
+    if frappe.db.exists('Invoice Reconciliations', doc.name):
+        reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
+        reconciliations_doc.invoice_found = "Yes"
+        reconciliations_doc.save(ignore_permissions=True,ignore_version=True)
+    if doc.invoice_from=="Pms":
+        if frappe.db.exists({"doctype":'Document Bin', 'invoice_file': doc.invoice_file}):
+            bin_name = frappe.db.get_value('Document Bin',{'invoice_file': doc.invoice_file})
+            bin_doc = frappe.get_doc("Document Bin",bin_name)
+            bin_doc.print_by = doc.print_by
+            bin_doc.document_type = doc.invoice_category
+            bin_doc.invoice_number = doc.name
+            # bin_doc.error_log = error_log
+            bin_doc.document_printed = "Yes"
+            bin_doc.save(ignore_permissions=True,ignore_version=True)
 
 def company_created(doc,method=None):
 	doc = frappe.db.get_list('company',filters={"docstatus":0},fields=["name","company_name","company_code","phone_number","gst_number","provider","ip_address","port"])
@@ -50,34 +51,33 @@ def invoice_deleted(doc,method=None):
 	soc_doc.insert(ignore_permissions=True)
 
 def invoiceCreated(doc):
-	try:
-		# frappe.publish_realtime("invoice_created", "message")
-		print("=================---------------000000000000")       
-		frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':doc.__dict__,"company":doc.company})
-		soc_doc = frappe.new_doc("Socket Notification")
-		soc_doc.invoice_number = doc.name
-		soc_doc.guest_name = doc.guest_name
-		soc_doc.document_type = doc.invoice_category
-		soc_doc.room_number = doc.room_number
-		soc_doc.confirmation_number = doc.confirmation_number
-		soc_doc.print_by = doc.print_by
-		soc_doc.invoice_category = doc.invoice_category
-		soc_doc.record_type = "Create"
-		soc_doc.insert(ignore_permissions=True)
-		
-		filename = doc.invoice_file
-		bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filename})
-			   
-		bin_doc = frappe.get_doc("Document Bin",bin_name)
-		bin_doc.print_by = doc.print_by
-		bin_doc.document_printed = "Yes"
-		bin_doc.document_type = doc.invoice_category
-		bin_doc.invoice_number = doc.invoice_number
-		bin_doc.save(ignore_permissions=True,ignore_version=True)
-	except Exception as e:
-		print(str(e), "Invoice Created Socket Method")
-		print(traceback.print_exc())
-		return {"success":False,"message":str(e)}
+    try:
+        # frappe.publish_realtime("invoice_created", "message")
+        frappe.publish_realtime("custom_socket", {'message':'Invoices Created','data':doc.__dict__,"company":doc.company})
+        soc_doc = frappe.new_doc("Socket Notification")
+        soc_doc.invoice_number = doc.name
+        soc_doc.guest_name = doc.guest_name
+        soc_doc.document_type = doc.invoice_category
+        soc_doc.room_number = doc.room_number
+        soc_doc.confirmation_number = doc.confirmation_number
+        soc_doc.print_by = doc.print_by
+        soc_doc.invoice_category = doc.invoice_category
+        soc_doc.record_type = "Create"
+        soc_doc.insert(ignore_permissions=True)
+        
+        filename = doc.invoice_file
+        bin_name = frappe.db.get_value('Document Bin',{'invoice_file': filename})
+        if frappe.db.exists({"doctype":'Document Bin', 'name': bin_name}):   
+            bin_doc = frappe.get_doc("Document Bin",bin_name)
+            bin_doc.print_by = doc.print_by
+            bin_doc.document_printed = "Yes"
+            bin_doc.document_type = doc.invoice_category
+            bin_doc.invoice_number = doc.invoice_number
+            bin_doc.save(ignore_permissions=True,ignore_version=True)
+    except Exception as e:
+        print(str(e), "Invoice Created Socket Method")
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 
 
