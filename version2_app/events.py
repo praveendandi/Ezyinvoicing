@@ -218,6 +218,13 @@ def gspmeteringhook(doc,method=None):
 	except Exception as e:
 		print(str(e))    
 
+def InvoiceDataTolicensing():
+	company = frappe.get_last_doc('company')
+	today = date.today() - timedelta(days=43)
+	Invoice_count = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]]},fields=['count(name) as count','invoice_category'],group_by='invoice_category')
+	print(Invoice_count,".a.a.a.a.a.")
+	# headers = {'Content-Type': 'application/json'}
+	# json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
 
 def dailyDeletedocumentBin():
 	try:
