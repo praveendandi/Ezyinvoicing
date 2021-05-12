@@ -251,12 +251,15 @@ def Reinitiate_invoice(data):
 				doc.invoice_type = "B2C"
 				generateb2cQr = False
 			else:
-				if abs(invoice_round_off_amount)>6:
+				if abs(invoice_round_off_amount)>6 and invoice_from !="Web":
 					if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
 						generateb2cQr = False
 						doc.error_message = " Invoice Total Mismatch"
 						doc.irn_generated = "Error"
 						doc.ready_to_generate_irn = "No"
+				else:
+					doc.irn_generated ="Pending"
+					doc.ready_to_generate_irn = "Yes"		
 		else:
 			if len(data['items_data'])==0 and data['total_invoice_amount'] == 0 and invoice_from != "Web":
 				doc.ready_to_generate_irn = "No"
