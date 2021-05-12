@@ -123,8 +123,13 @@ def create_credit_qr_image(invoice_number, gsp):
 											stream=True)
 			else:
 				qr_response = requests.get(gsp['generate_qr_code'],
+<<<<<<< HEAD
 											headers=headers,
 											stream=True,verify=False)								
+=======
+										headers=headers,
+										stream=True,verify=False)								
+>>>>>>> a7a12e9df8310c436f3c356f33a0946d74cc5604
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
@@ -176,7 +181,12 @@ def request_get_data(api, headers,invoice,code):
 			if company.skip_ssl_verify == 0:
 				raw_response = requests.get(api, headers=headers)
 			else:
+<<<<<<< HEAD
 				raw_response = requests.get(api, headers=headers,verify=False)	
+=======
+				raw_response = requests.get(api, headers=headers,verify=False)
+
+>>>>>>> a7a12e9df8310c436f3c356f33a0946d74cc5604
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
@@ -636,7 +646,11 @@ def postIrn(gst_data, gsp,company,invoice_number):
 			else:
 				irn_response = requests.post(gsp['generate_irn'],
 											headers=headers,
+<<<<<<< HEAD
 											json=gst_data,verify=False)									
+=======
+											json=gst_data,verify=False)
+>>>>>>> a7a12e9df8310c436f3c356f33a0946d74cc5604
 		else:
 			
 			proxyhost = company['data'].proxy_url

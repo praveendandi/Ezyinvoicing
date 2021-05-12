@@ -713,7 +713,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 			else:
 				cancel_response = requests.post(gsp['data']['cancel_irn'],
 												headers=headers,
-												json=payload,verify=False)									
+												json=payload,verify=False)
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -771,7 +771,6 @@ def create_qr_image(invoice_number, gsp):
 				qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,
 										stream=True,verify=False)							
-
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
@@ -3038,7 +3037,8 @@ def request_get(api, headers, invoice, code):
 			if company.skip_ssl_verify == 0:
 				raw_response = requests.get(api, headers=headers)
 			else:
-				raw_response = requests.get(api, headers=headers,verify=False)	
+				raw_response = requests.get(api, headers=headers,verify=False)
+
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://", "@")
