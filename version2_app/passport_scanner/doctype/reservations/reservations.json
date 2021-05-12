@@ -21,8 +21,8 @@
   "passport_number",
   "passport_place_of_issued_country",
   "passport_place_of_issued_city",
-  "date_of_issue",
-  "valid_till",
+  "passport_date_of_issue",
+  "passport_valid_till",
   "visa_number",
   "visa_place_of_issued_country",
   "visa_place_of_issued_city",
@@ -142,16 +142,6 @@
    "fieldname": "passport_place_of_issued_city",
    "fieldtype": "Data",
    "label": "Passport Place of Issued City"
-  },
-  {
-   "fieldname": "date_of_issue",
-   "fieldtype": "Date",
-   "label": "Passport Date of Issue"
-  },
-  {
-   "fieldname": "valid_till",
-   "fieldtype": "Date",
-   "label": "Passport Valid Till"
   },
   {
    "fieldname": "visa_number",
@@ -304,11 +294,21 @@
    "fieldname": "booking_status",
    "fieldtype": "Data",
    "label": "Booking Status"
+  },
+  {
+   "fieldname": "passport_date_of_issue",
+   "fieldtype": "Date",
+   "label": "Passport Date of Issue"
+  },
+  {
+   "fieldname": "passport_valid_till",
+   "fieldtype": "Date",
+   "label": "Passport Valid Till"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-06 17:35:01.185500",
+ "modified": "2021-05-06 18:19:52.134171",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Reservations",
