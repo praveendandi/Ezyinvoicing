@@ -89,7 +89,8 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "licensing_host"
+  "licensing_host",
+  "skip_ssl_verify"
  ],
  "fields": [
   {
@@ -516,7 +517,7 @@
    "label": "System Storage Path"
   },
   {
-   "default": "Manual",
+   "default": "Credit",
    "fieldname": "auto_adjustment",
    "fieldtype": "Select",
    "label": "Auto Adjustment",
@@ -560,11 +561,17 @@
    "fieldname": "licensing_host",
    "fieldtype": "Data",
    "label": "Licensing Host"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_ssl_verify",
+   "fieldtype": "Check",
+   "label": "Skip SSL Verify"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-04 17:30:09.300741",
+ "modified": "2021-05-06 15:02:56.205554",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
