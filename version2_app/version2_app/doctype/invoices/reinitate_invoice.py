@@ -258,7 +258,7 @@ def Reinitiate_invoice(data):
 						doc.irn_generated = "Error"
 						doc.ready_to_generate_irn = "No"
 		else:
-			if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
+			if len(data['items_data'])==0 and data['total_invoice_amount'] == 0 and invoice_from != "Web":
 				doc.ready_to_generate_irn = "No"
 				doc.irn_generated = "Zero Invoice"
 				generateb2cQr = False
@@ -268,12 +268,12 @@ def Reinitiate_invoice(data):
 				generateb2cQr = True
 				doc.irn_generated = "Pending"
 				doc.ready_to_generate_irn = "Yes"
-				
-		if data['total_invoice_amount'] == 0 or data['total_invoice_amount'] == 0.0:
-			doc.ready_to_generate_irn = "No"
-			doc.irn_generated = "Zero Invoice"
-			doc.invoice_type = "B2C"
-			generateb2cQr = False
+		if invoice_from != "Web":		
+			if data['total_invoice_amount'] == 0 or data['total_invoice_amount'] == 0.0:
+				doc.ready_to_generate_irn = "No"
+				doc.irn_generated = "Zero Invoice"
+				doc.invoice_type = "B2C"
+				generateb2cQr = False
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		doc.place_of_supply = place_of_supply
