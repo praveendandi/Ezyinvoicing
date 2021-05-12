@@ -280,7 +280,7 @@ def Reinitiate_invoice(data):
 		else:
 			doc.ready_to_generate_irn = "Yes"
 			doc.irn_generated = "Pending"
-
+			invoice_round_off_amount = 0
 
 		doc.total_invoice_amount = data["total_invoice_amount"]
 		doc.place_of_supply = place_of_supply
@@ -1081,6 +1081,14 @@ def b2b_success_to_credit_note(data):
 			invoice_number = data["invoice_number"]+"-1"
 			invoice_date = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
 			item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
+			for item_each in item_data:
+				sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
+				if not sac_code_based_gst:
+					sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['like', '%' + item_each["description"] + '%']})
+				if len(sac_code_based_gst)>0:
+					sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
+				if sac_code_based_gst_rates.net == "Yes":
+					item_each["item_value"] = item_each["item_value_after_gst"]
 			total_items = []
 			if invoice_doc.has_credit_items == "Yes":
 				negative_data = [items for items in item_data if items["item_value"]<0]
