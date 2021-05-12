@@ -1228,9 +1228,9 @@ def insert_invoice(data):
 				if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1:
 					pass
 				else:
-					data = {'invoice_number': v.name,'generation_type': "System"}
-					irn_generate = generateIrn(data)
-					print(irn_generate)
+					if v.invoice_from != "Web":
+						data = {'invoice_number': v.name,'generation_type': "System"}
+						irn_generate = generateIrn(data)
 
 		# if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
 		# 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
