@@ -1088,7 +1088,10 @@ def b2b_success_to_credit_note(data):
 				if len(sac_code_based_gst)>0:
 					sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
 				if sac_code_based_gst_rates.net == "Yes":
-					item_each["item_value"] = item_each["item_value_after_gst"]
+					if sac_code_based_gst_rates.code == '996311':
+						item_each["item_value"] = item_each["item_taxable_value"]
+					else:	
+						item_each["item_value"] = item_each["item_value_after_gst"]
 			total_items = []
 			if invoice_doc.has_credit_items == "Yes":
 				negative_data = [items for items in item_data if items["item_value"]<0]
@@ -1124,6 +1127,7 @@ def b2b_success_to_credit_note(data):
 					return {"success": False, "message": "Please adjust the items manually before converting to credit."}
 				item_data.extend([items for items in positive_data if abs(items["item_value"]) != 0])
 			for items in item_data:
+				print(items)
 				item_date = datetime.datetime.strptime(str(items["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
 				total_items.append({"date":item_date, "item_value":-abs(items["item_value"]),"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"],"sgst":items["sgst"],"cgst":items["sgst"],"igst":items["igst"]})
 			calulate_items_data = {"items":total_items,"invoice_number":invoice_number,"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}

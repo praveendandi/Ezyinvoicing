@@ -577,7 +577,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-12 12:35:40.386845",
+ "modified": "2021-05-13 10:04:14.368943",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
@@ -615,7 +615,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "IT",
+   "role": "Administrator",
    "share": 1,
    "write": 1
   },
@@ -627,7 +627,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Administrator",
+   "role": "IT",
    "share": 1,
    "write": 1
   }
