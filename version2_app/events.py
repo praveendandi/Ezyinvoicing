@@ -124,6 +124,7 @@ def fileCreated(doc, method=None):
 				module = importlib.util.module_from_spec(spec)
 				spec.loader.exec_module(module)
 				module.file_parsing(doc.file_url)
+				frappe.log_error(frappe.get_traceback(), traceback.print_exc())
 				logger.error(f"fileCreated,   {traceback.print_exc()}")
 		else:
 			if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
@@ -132,6 +133,7 @@ def fileCreated(doc, method=None):
 			print('Normal File')
 		logger.error(f"fileCreated,   {traceback.print_exc()}")
 	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), traceback.print_exc())
 		logger.error(f"fileCreated,   {traceback.print_exc()}")
 		print(str(e), "fileCreated")
 		update_documentbin(doc.file_url,str(e))
