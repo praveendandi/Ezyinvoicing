@@ -471,9 +471,9 @@ def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
 		bin_doc.error_log = error_log
 		bin_doc.document_printed = document_printed
 		bin_doc.save(ignore_permissions=True,ignore_version=True)
-		frappe.log_error(frappe.get_traceback(), traceback.print_exc())
+		frappe.log_error(traceback.print_exc())
 		logger.error(f"fileCreated,   {traceback.print_exc()}")
 	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), traceback.print_exc())
+		frappe.log_error(traceback.print_exc())
 		logger.error(f"fileCreated,   {traceback.print_exc()}")
 		return {"success":False,"message":str(e)}
