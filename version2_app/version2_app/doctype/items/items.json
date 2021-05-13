@@ -39,7 +39,8 @@
   "sac_index",
   "is_service_charge_item",
   "is_manual_edit",
-  "discount_value"
+  "discount_value",
+  "line_edit_net"
  ],
  "fields": [
   {
@@ -247,6 +248,13 @@
    "fieldname": "discount_value",
    "fieldtype": "Float",
    "label": "Discount Value"
+  },
+  {
+   "default": "No",
+   "fieldname": "line_edit_net",
+   "fieldtype": "Select",
+   "label": "Line_Edit_Net",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,

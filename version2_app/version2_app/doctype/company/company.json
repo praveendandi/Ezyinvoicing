@@ -79,9 +79,12 @@
   "backend_git_path",
   "irn_qr_size",
   "sc_sac_code",
+  "system_storage_path",
   "reconciliation_format",
   "reverse_calculation",
   "system_storage_path",
+  "ip_address",
+  "port",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -90,7 +93,8 @@
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
   "licensing_host",
-  "skip_ssl_verify"
+  "skip_ssl_verify",
+  "b2b_to_credit"
  ],
  "fields": [
   {
@@ -500,12 +504,6 @@
    "options": "Small\nLarge"
   },
   {
-   "default": "0",
-   "fieldname": "reverse_calculation",
-   "fieldtype": "Check",
-   "label": "Reverse Calculation"
-  },
-  {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
    "label": "Reconciliation Format",
@@ -567,11 +565,17 @@
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"
+  },
+  {
+   "default": "0",
+   "fieldname": "b2b_to_credit",
+   "fieldtype": "Check",
+   "label": "B2B To Credit"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-06 15:02:56.205554",
+ "modified": "2021-05-13 10:04:14.368943",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
@@ -609,7 +613,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "IT",
+   "role": "Administrator",
    "share": 1,
    "write": 1
   },
@@ -621,7 +625,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Administrator",
+   "role": "IT",
    "share": 1,
    "write": 1
   }

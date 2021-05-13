@@ -32,9 +32,7 @@
   "sc_sac_code",
   "exempted",
   "sac_index",
-  "inclusive_of_service_charge",
-  "ignore_non_taxable_items",
-  "alternate_description"
+  "ignore_non_taxable_items"
  ],
  "fields": [
   {
@@ -204,17 +202,6 @@
    "fieldname": "ignore_non_taxable_items",
    "fieldtype": "Check",
    "label": "Ignore Non Taxable Items"
-  },
-  {
-   "default": "0",
-   "fieldname": "inclusive_of_service_charge",
-   "fieldtype": "Check",
-   "label": "Inclusive of Service Charge"
-  },
-  {
-   "fieldname": "alternate_description",
-   "fieldtype": "Data",
-   "label": "Alternate Description"
   }
  ],
  "index_web_pages_for_search": 1,

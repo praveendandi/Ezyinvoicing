@@ -123,8 +123,8 @@ def create_credit_qr_image(invoice_number, gsp):
 											stream=True)
 			else:
 				qr_response = requests.get(gsp['generate_qr_code'],
-											headers=headers,
-											stream=True,verify=False)								
+										headers=headers,
+										stream=True,verify=False)								
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
@@ -184,7 +184,8 @@ def request_get_data(api, headers,invoice,code):
 			if company.skip_ssl_verify == 0:
 				raw_response = requests.get(api, headers=headers)
 			else:
-				raw_response = requests.get(api, headers=headers,verify=False)	
+				raw_response = requests.get(api, headers=headers,verify=False)
+
 		else:
 			proxyhost = company.proxy_url
 			proxyhost = proxyhost.replace("http://","@")
@@ -485,6 +486,9 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 			},
 			"ItemList": [],
 		}
+		if invoice.converted_tax_to_credit == "Yes":
+			gst_data["PrecDocDtls"] = [{"InvNo": invoice.tax_invoice_referrence_number,"InvDt": datetime.datetime.strftime(invoice.invoice_date,
+											'%d/%m/%Y')}]
 		total_igst_value = 0
 		total_sgst_value = 0
 		total_cgst_value = 0
@@ -644,7 +648,7 @@ def postIrn(gst_data, gsp,company,invoice_number):
 			else:
 				irn_response = requests.post(gsp['generate_irn'],
 											headers=headers,
-											json=gst_data,verify=False)									
+											json=gst_data,verify=False)
 		else:
 			
 			proxyhost = company['data'].proxy_url

@@ -94,7 +94,7 @@ def file_parsing(filepath):
 				entered = False
 			if 'Billing' in i:
 				entered = False
-			if 'Total' in i:
+			if 'Total' in i and "IRN" in i:
 				entered = False
 			if entered == True:
 				data.append(i)
@@ -106,6 +106,15 @@ def file_parsing(filepath):
 			if "Printed By / On" in i:
 				p = i.split(":")
 				print_by = p[2]
+
+		check_invoice = check_invoice_exists(invoiceNumber)
+		if check_invoice['success']==True:
+			inv_data = check_invoice['data']
+			invoiceNumber = inv_data.name
+			if inv_data.change_gst_number == "No":
+				gstNumber = inv_data.gst_number
+		if invoiceNumber != reupload_inv_number:
+			return {"success":False,"message":"Incorrect Invoice Attempted"}
 
 		items = [] 
 		itemsort = 0
@@ -216,7 +225,8 @@ def file_parsing(filepath):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
+			if errorcalulateItemsApiResponse['success'] == True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}
