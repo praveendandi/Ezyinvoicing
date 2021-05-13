@@ -91,8 +91,8 @@
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
   "skip_ssl_verify",
-  "ipp_printer_file_path",
-  "b2b_to_credit"
+  "b2b_to_credit",
+  "ipp_printer_file_path"
  ],
  "fields": [
   {
@@ -583,7 +583,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-13 10:04:14.368943",
+ "modified": "2021-05-13 13:47:53.180149",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
