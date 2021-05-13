@@ -223,17 +223,17 @@ def InvoiceDataTolicensing():
     today = date.today()# - timedelta(days=43)
     Invoice_count = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]]},fields=['count(name) as count','invoice_category'],group_by='invoice_category')
     print(Invoice_count,".a.a.a.a.a.")
-    inputData = {"date":today,"property_code":company.name,"mode":company.mode}
+    inputData = {"data":{"date":str(today),"property_code":company.name,"mode":company.mode}}
     for each in Invoice_count:
         if each['invoice_category'] == "Tax Invoice":
-            inputData['taxinvoices'] = each['invoice_category']
+            inputData['data']['taxinvoices'] = each['count']
         if each['invoice_category'] == "Debit Invoice":
-            inputData['debitinvoices'] = each['invoice_category']
+            inputData['data']['debitinvoices'] = each['count']
         if each['invoice_category'] == "Credit Invoice":
-            inputData['creditinvoices'] = each['invoice_category']        
+            inputData['data']['creditinvoices'] = each['count']        
 
     headers = {'Content-Type': 'application/json'}
-    # json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)
 
 def dailyDeletedocumentBin():
     try:
