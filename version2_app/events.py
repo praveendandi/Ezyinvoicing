@@ -9,7 +9,9 @@ import datetime
 import importlib.util
 import traceback
 from datetime import date, timedelta
-
+from frappe.utils import logger
+frappe.utils.logger.set_log_level("DEBUG")
+logger = frappe.logger("api", allow_site=True, file_count=50)
 
 
 def invoice_created(doc, method=None):
@@ -122,12 +124,15 @@ def fileCreated(doc, method=None):
 				module = importlib.util.module_from_spec(spec)
 				spec.loader.exec_module(module)
 				module.file_parsing(doc.file_url)
+				logger.error(f"fileCreated,   {traceback.print_exc()}")
 		else:
 			if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
 				update_documentbin(doc.file_url,"")
 
 			print('Normal File')
+		logger.error(f"fileCreated,   {traceback.print_exc()}")
 	except Exception as e:
+		logger.error(f"fileCreated,   {traceback.print_exc()}")
 		print(str(e), "fileCreated")
 		update_documentbin(doc.file_url,str(e))
 		print(traceback.print_exc())
