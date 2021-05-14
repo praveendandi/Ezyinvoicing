@@ -115,6 +115,26 @@ doc_events = {
         "after_insert": "version2_app.events.create_redg_card",
         "on_trash": "version2_app.events.create_redg_card",
     },
+    "Paidout Receipts": {
+        "after_insert": "version2_app.events.create_paidout_receipt",
+        "on_trash": "version2_app.events.create_paidout_receipt",
+    },
+    "Advance Deposits": {
+        "after_insert": "version2_app.events.create_advance_deposits",
+        "on_trash": "version2_app.events.create_advance_deposits",
+    },
+    "Payment Receipts": {
+        "after_insert": "version2_app.events.create_payment_receipts",
+        "on_trash": "version2_app.events.create_payment_receipts",
+    },
+    "Encashment Certificates": {
+        "after_insert": "version2_app.events.create_encashment_certificates",
+        "on_trash": "version2_app.events.create_encashment_certificates",
+    },
+    "Pos Bills": {
+        "after_insert": "version2_app.events.create_pos_bill",
+        # "on_trash": "version2_app.events.create_encashment_certificates",
+    },
     "Active Tablets": {
         "after_insert": "version2_app.events.tablet_connected",
         "on_trash": "version2_app.events.tablet_disconnected",

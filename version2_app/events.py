@@ -287,6 +287,47 @@ def create_redg_card(doc, method=None):
             "custom_socket", {'message': 'Redg Created', 'data': doc.__dict__})
     except Exception as e:
         print(e)
+        
+        
+def create_paidout_receipt(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Paidout Receipt Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_advance_deposits(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Advance Deposits Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_encashment_certificates(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Encashment Certifcates Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_payment_receipts(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Payment Receipts Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_pos_bill(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Pos Bills Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
 
 
 def deleteemailfilesdaily():

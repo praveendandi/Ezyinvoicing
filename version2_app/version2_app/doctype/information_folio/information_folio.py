@@ -109,18 +109,13 @@ def insert_information_folio(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def update_signature(name=None, signature=None, work_station=None, tab=None):
-    # information_folio = frappe.get_doc('Information Folio', name)
-    # information_folio.signature = signature
-    # information_folio.save(ignore_permissions=True,  # ignore write permissions during insert
-    #                        ignore_version=True  # do not create a version record
-    #                        )
-    doc = frappe.db.set_value('Information Folio', name,
+def update_signature(name=None, signature=None, work_station=None, tab=None, doctype=None):
+    doc = frappe.db.set_value(doctype, name,
                               'signature', signature, update_modified=False)
 
     frappe.db.commit()
     data = {
-        'information_invoice': name,
+        'name': name,
         'signature': signature,
         'work_station': work_station,
         'tab': tab
