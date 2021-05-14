@@ -12,8 +12,6 @@
   "tax_payer_details",
   "sync_gst_details",
   "get_irn_details_by_doc",
-  "company",
-  "status",
   "create_qr_image"
  ],
  "fields": [
@@ -67,18 +65,6 @@
    "options": "True\nFalse"
   },
   {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "company"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Success\nFailed"
-  },
-  {
    "default": "False",
    "fieldname": "create_qr_image",
    "fieldtype": "Select",
@@ -88,7 +74,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-04 14:02:16.365775",
+ "modified": "2021-05-14 11:20:00.603641",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Gsp Metering",

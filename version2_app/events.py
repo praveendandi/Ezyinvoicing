@@ -210,10 +210,12 @@ def deleteemailfilesdaily():
 
 def gspmeteringhook(doc,method=None):
     try:
+        print("---------")
         company = frappe.get_doc('company',doc.company)
         inputData = {"data":{"doctype":"Gsp Metering","property_code":doc.company,'tax_payer_details':doc.tax_payer_details,'login':doc.login,'generate_irn':doc.generate_irn,'get_irn_details_by_doc':doc.get_irn_details_by_doc,'cancel_irn':doc.cancel_irn,'invoice_by_irn':doc.invoice_by_irn,'create_qr_image':doc.create_qr_image,'status':doc.status}}
         headers = {'Content-Type': 'application/json'}
         json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+        print(json_response,"/////////")
         return json_response            
     except Exception as e:
         print(str(e))    
