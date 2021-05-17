@@ -572,19 +572,19 @@
    "label": "Licensing Host"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "manual_tax_invoice",
    "fieldtype": "Check",
    "label": "Manual Tax Invoice"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "manual_credit_invoice",
    "fieldtype": "Check",
    "label": "Manual Credit Invoice"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "manual_debit_invoice",
    "fieldtype": "Check",
    "label": "Manual Debit Invoice"
@@ -592,7 +592,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-14 14:29:35.878206",
+ "modified": "2021-05-17 09:37:25.219191",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
