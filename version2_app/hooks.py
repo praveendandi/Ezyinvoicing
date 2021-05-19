@@ -116,9 +116,9 @@ doc_events = {
 	},
 	"Document Bin":{
 		'on_update':"version2_app.events.DocumentBinSocket"
-	},
-	"company":{
-		"after_insert":"version2_app.events.company_created"
+	# },
+	# "company":{
+	# 	"after_insert":"version2_app.events.company_created"
 	}
 	
 
