@@ -27,20 +27,26 @@ def execute(filters=None):
 			return columns,data
 		doc_list = [list(x) for x in doc]
 		invoice_names = [x[0] for x in doc_list]
+		debit_names_list = [list(x) for x in debit_invoices]
+		debit_names = [x[0] for x in debit_names_list]
+		credit_names_list = [list(x) for x in credit_invoices]
+		credit_names = [x[0] for x in credit_names_list]
+		sys_names_list = [list(x) for x in sysCredit_invoices]
+		sys_names = [x[0] for x in sys_names_list]
 		# print(invoice_names)
 		items_fields = ['parent','sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount']
 		items_columns = ['invoice_number','sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount']
 		if len(debit_invoices)>0:
-			items_debit_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
+			items_debit_doc = frappe.db.get_list('Items',filters={'parent':['in',debit_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
 		else:
 			items_debit_doc=()
 		if len(credit_invoices)>0:
 
-			items_credit_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
+			items_credit_doc = frappe.db.get_list('Items',filters={'parent':['in',credit_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
 		else:
 			items_credit_doc = ()
 		if len(sysCredit_invoices)>0:	
-			items_sysCredit_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
+			items_sysCredit_doc = frappe.db.get_list('Items',filters={'parent':['in',sys_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
 		else:
 			items_sysCredit_doc = ()
 		items_doc = items_debit_doc+items_credit_doc+items_sysCredit_doc	
