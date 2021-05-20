@@ -11,6 +11,9 @@ import traceback
 from datetime import date, timedelta
 
 import shutil
+from frappe.utils import logger
+frappe.utils.logger.set_log_level("DEBUG")
+logger = frappe.logger("api", allow_site=True, file_count=50)
 
 
 def invoice_created(doc, method=None):
@@ -107,32 +110,37 @@ def update_documentbin(filepath, error_log):
 
 
 def fileCreated(doc, method=None):
-    try:
-        if 'job-' in doc.file_name:
-            if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
-                update_documentbin(doc.file_url,"")
-                abs_path = os.path.dirname(os.getcwd())
-                company_doc = frappe.get_doc("company",doc.attached_to_name)
-                new_parsers = company_doc.new_parsers
-                if new_parsers == 0:
-                    file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
-                else:
-                    file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
-                module_name = 'file_parsing'
-                spec = importlib.util.spec_from_file_location(module_name, file_path)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                module.file_parsing(doc.file_url)
-        else:
-            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
-                update_documentbin(doc.file_url,"")
+	try:
+		if 'job-' in doc.file_name:
+			if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
+				update_documentbin(doc.file_url,"")
+				abs_path = os.path.dirname(os.getcwd())
+				company_doc = frappe.get_doc("company",doc.attached_to_name)
+				new_parsers = company_doc.new_parsers
+				if new_parsers == 0:
+					file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+				else:
+					file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
+				module_name = 'file_parsing'
+				spec = importlib.util.spec_from_file_location(module_name, file_path)
+				module = importlib.util.module_from_spec(spec)
+				spec.loader.exec_module(module)
+				module.file_parsing(doc.file_url)
+				frappe.log_error(traceback.print_exc())
+				logger.error(f"fileCreated,   {traceback.print_exc()}")
+		else:
+			if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
+				update_documentbin(doc.file_url,"")
 
-            print('Normal File')
-    except Exception as e:
-        print(str(e), "fileCreated")
-        update_documentbin(doc.file_url,str(e))
-        print(traceback.print_exc())
-        return {"success":False,"message":str(e)}
+			print('Normal File')
+		logger.error(f"fileCreated,   {traceback.print_exc()}")
+	except Exception as e:
+		frappe.log_error(traceback.print_exc())
+		logger.error(f"fileCreated,   {traceback.print_exc()}")
+		print(str(e), "fileCreated")
+		update_documentbin(doc.file_url,str(e))
+		print(traceback.print_exc())
+		return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):
     if doc.status=="Success":

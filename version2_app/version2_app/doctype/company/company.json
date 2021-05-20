@@ -81,8 +81,6 @@
   "sc_sac_code",
   "system_storage_path",
   "reconciliation_format",
-  "ip_address",
-  "port",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -90,9 +88,13 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
+  "licensing_host",
   "skip_ssl_verify",
   "b2b_to_credit",
-  "ipp_printer_file_path"
+  "ipp_printer_file_path",
+  "manual_tax_invoice",
+  "manual_credit_invoice",
+  "manual_debit_invoice"
  ],
  "fields": [
   {
@@ -508,16 +510,6 @@
    "options": "Accor\nMarriott"
   },
   {
-   "fieldname": "ip_address",
-   "fieldtype": "Data",
-   "label": "IP Address"
-  },
-  {
-   "fieldname": "port",
-   "fieldtype": "Data",
-   "label": "Port"
-  },
-  {
    "fieldname": "system_storage_path",
    "fieldtype": "Data",
    "label": "System Storage Path"
@@ -579,11 +571,34 @@
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
    "label": "B2B To Credit"
+  },
+  {
+   "fieldname": "licensing_host",
+   "fieldtype": "Data",
+   "label": "Licensing Host"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_tax_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Tax Invoice"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_credit_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Credit Invoice"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_debit_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Debit Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-13 13:47:53.180149",
+ "modified": "2021-05-17 09:37:25.219191",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -116,9 +116,9 @@ doc_events = {
 	},
 	"Document Bin":{
 		'on_update':"version2_app.events.DocumentBinSocket"
-	},
-	"company":{
-		"after_insert":"version2_app.events.company_created"
+	# },
+	# "company":{
+	# 	"after_insert":"version2_app.events.company_created"
 	}
 	
 
@@ -132,7 +132,9 @@ scheduler_events = {
 	# "daily":[
 	# 	"version2_app.events.deleteemailfilesdaily"
 	# ],
-	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"]}	
+	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"]}	
 }	
 
 
