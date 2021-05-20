@@ -1,0 +1,281 @@
+{
+ "actions": [],
+ "creation": "2021-04-02 11:17:19.957257",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "room_number",
+  "room_type",
+  "room_rate",
+  "no_of_guests",
+  "confirmation_number",
+  "no_of_rooms",
+  "title",
+  "surname",
+  "passport_no",
+  "passport_place_of_issue",
+  "passport_date_of_issue",
+  "nationality",
+  "dob",
+  "visa",
+  "visa_place_of_issue",
+  "visa_date_of_issue",
+  "arrived_from",
+  "proceeding_to",
+  "prop_dur_of_stay",
+  "purpose_of_visit",
+  "address",
+  "city",
+  "country",
+  "state",
+  "pin_code",
+  "membership",
+  "gst_no",
+  "company",
+  "designation",
+  "email",
+  "mobile",
+  "arrival_date",
+  "arrival_flight",
+  "eta",
+  "depature_date",
+  "etd",
+  "depature_flight",
+  "signature",
+  "redg_file"
+ ],
+ "fields": [
+  {
+   "fieldname": "room_number",
+   "fieldtype": "Data",
+   "label": "Room Number"
+  },
+  {
+   "fieldname": "room_type",
+   "fieldtype": "Data",
+   "label": "Room Type"
+  },
+  {
+   "fieldname": "room_rate",
+   "fieldtype": "Data",
+   "label": "Room Rate"
+  },
+  {
+   "fieldname": "no_of_guests",
+   "fieldtype": "Data",
+   "label": "No Of Guests"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number"
+  },
+  {
+   "fieldname": "no_of_rooms",
+   "fieldtype": "Data",
+   "label": "No Of Rooms"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "label": "Title"
+  },
+  {
+   "fieldname": "surname",
+   "fieldtype": "Data",
+   "label": "Surname"
+  },
+  {
+   "fieldname": "passport_no",
+   "fieldtype": "Data",
+   "label": "Passport No"
+  },
+  {
+   "fieldname": "passport_place_of_issue",
+   "fieldtype": "Data",
+   "label": "Passport Place Of Issue"
+  },
+  {
+   "fieldname": "passport_date_of_issue",
+   "fieldtype": "Data",
+   "label": "Passport Date Of Issue"
+  },
+  {
+   "fieldname": "nationality",
+   "fieldtype": "Data",
+   "label": "Nationality"
+  },
+  {
+   "fieldname": "dob",
+   "fieldtype": "Data",
+   "label": "DOB"
+  },
+  {
+   "fieldname": "visa",
+   "fieldtype": "Data",
+   "label": "Visa"
+  },
+  {
+   "fieldname": "visa_place_of_issue",
+   "fieldtype": "Data",
+   "label": "Visa Place Of Issue"
+  },
+  {
+   "fieldname": "visa_date_of_issue",
+   "fieldtype": "Data",
+   "label": "Visa Date Of Issue"
+  },
+  {
+   "fieldname": "arrived_from",
+   "fieldtype": "Data",
+   "label": "Arrived From"
+  },
+  {
+   "fieldname": "proceeding_to",
+   "fieldtype": "Data",
+   "label": "Proceeding To"
+  },
+  {
+   "fieldname": "prop_dur_of_stay",
+   "fieldtype": "Data",
+   "label": "Prop Dur of Stay"
+  },
+  {
+   "fieldname": "purpose_of_visit",
+   "fieldtype": "Data",
+   "label": "Purpose Of Visit"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "label": "Address"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "pin_code",
+   "fieldtype": "Data",
+   "label": "Pin Code"
+  },
+  {
+   "fieldname": "membership",
+   "fieldtype": "Data",
+   "label": "Membership"
+  },
+  {
+   "fieldname": "gst_no",
+   "fieldtype": "Data",
+   "label": "Gst No"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "label": "Mobile"
+  },
+  {
+   "fieldname": "arrival_date",
+   "fieldtype": "Data",
+   "label": "Arrival Date"
+  },
+  {
+   "fieldname": "arrival_flight",
+   "fieldtype": "Data",
+   "label": "Arrival Flight"
+  },
+  {
+   "fieldname": "eta",
+   "fieldtype": "Data",
+   "label": "ETA"
+  },
+  {
+   "fieldname": "depature_date",
+   "fieldtype": "Data",
+   "label": "Depature Date"
+  },
+  {
+   "fieldname": "etd",
+   "fieldtype": "Data",
+   "label": "ETD"
+  },
+  {
+   "fieldname": "depature_flight",
+   "fieldtype": "Data",
+   "label": "Depature Flight"
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "redg_file",
+   "fieldtype": "Data",
+   "label": "Redg File"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-04-19 11:39:08.526767",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Redg Card",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

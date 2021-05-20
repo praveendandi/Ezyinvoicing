@@ -1,0 +1,146 @@
+{
+ "actions": [],
+ "creation": "2021-03-30 14:45:31.096195",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "check_number",
+  "table_no",
+  "check_date",
+  "billed_by",
+  "guest_count",
+  "work_station",
+  "column_break_6",
+  "transaction_no",
+  "ce",
+  "cc",
+  "tc",
+  "invoice_type",
+  "raw_text",
+  "items_section",
+  "items",
+  "signature"
+ ],
+ "fields": [
+  {
+   "fieldname": "check_number",
+   "fieldtype": "Data",
+   "label": "Check Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "table_no",
+   "fieldtype": "Data",
+   "label": "Table No"
+  },
+  {
+   "fieldname": "check_date",
+   "fieldtype": "Date",
+   "label": "Check Date"
+  },
+  {
+   "fieldname": "billed_by",
+   "fieldtype": "Data",
+   "label": "Billed By"
+  },
+  {
+   "fieldname": "guest_count",
+   "fieldtype": "Int",
+   "label": "Guest Count"
+  },
+  {
+   "fieldname": "work_station",
+   "fieldtype": "Data",
+   "label": "Work Station"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "transaction_no",
+   "fieldtype": "Int",
+   "label": "Transaction No"
+  },
+  {
+   "fieldname": "ce",
+   "fieldtype": "Data",
+   "label": "CE"
+  },
+  {
+   "fieldname": "cc",
+   "fieldtype": "Data",
+   "label": "CC"
+  },
+  {
+   "fieldname": "tc",
+   "fieldtype": "Data",
+   "label": "TC"
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Data",
+   "label": "Invoice Type"
+  },
+  {
+   "fieldname": "raw_text",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Raw Text",
+   "reqd": 1
+  },
+  {
+   "fieldname": "items_section",
+   "fieldtype": "Section Break",
+   "label": "ITEMS"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Pos Bills Items"
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-04-27 10:19:29.838666",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Pos Bills",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

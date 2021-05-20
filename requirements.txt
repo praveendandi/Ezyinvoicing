@@ -9,3 +9,7 @@ watchdog
 ippserver
 pycups
 xmltodict
+opencv-python
+Pillow
+dateparser
+pyzbar

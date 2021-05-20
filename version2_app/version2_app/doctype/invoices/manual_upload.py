@@ -1,8 +1,14 @@
 from __future__ import unicode_literals
 import frappe
+<<<<<<< HEAD
+from frappe import enqueue
+=======
 # from frappe import enqueue
+>>>>>>> 216129b2e2b8106e0a27233e2bf639b0fdd947d8
 from frappe.model.document import Document
 from datetime import date
+# import async
+# import asyncio
 import requests
 import datetime
 import random
@@ -23,6 +29,30 @@ from frappe.utils.background_jobs import enqueue
 
 
 
+
+
+# @frappe.whitelist(allow_guest=True)
+# def manual_upload(data):
+# 	# try:
+# 	frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.manualuploadEnqueue",queue='default', timeout=None, event="BulkUpload", is_async=True, job_name="samplefunforqueue", now=True,arg1=data)
+# 	# data = frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.samplefunforqueue",queue='default', timeout=None, event=None, is_async=True, job_name="samplefunforqueue", now=True)
+# 	# print(data,type(data))
+# 	return {"success":True}
+# 	# except Exception as e:
+# 	# 	logger.error(f"manual upload queue  {str(e)}")
+# 	# 	return {"success":False,"message":str(e)}
+
+
+# def samplefunforqueue():
+# 	doc = frappe.get_doc("company","MJH-01")
+# 	doc.merchant_name = "sample"
+# 	doc.save()
+
+
+# @frappe.whitelist(allow_guest=True)
+# def manual_upload1(data):
+# 	return await manual_upload1(data).start()
+# 	# return True
 
 
 @frappe.whitelist(allow_guest=True)
@@ -411,9 +441,12 @@ def manual_upload_data(data):
 		# make_error_snapshot(e)
 		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
 		return {"success":False,"message":str(e)}    
+<<<<<<< HEAD
+=======
 
 
 
 
 
 
+>>>>>>> 216129b2e2b8106e0a27233e2bf639b0fdd947d8

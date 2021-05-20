@@ -21,6 +21,9 @@
   "address_details_section",
   "address_1",
   "address_2",
+  "city",
+  "district",
+  "state",
   "state_code",
   "calculation_by",
   "merchant_name",
@@ -91,7 +94,14 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "skip_ssl_verify"
+  "skip_ssl_verify",
+  "configiration_section",
+  "config",
+  "cform_user_name",
+  "cform_password",
+  "signezy",
+  "ezybills",
+  "scaneasy"
  ],
  "fields": [
   {
@@ -573,11 +583,65 @@
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"
+  },
+  {
+   "fieldname": "configiration_section",
+   "fieldtype": "Section Break",
+   "label": "Configiration"
+  },
+  {
+   "fieldname": "config",
+   "fieldtype": "Table",
+   "label": "config",
+   "options": "CONFIGURATIONS"
+  },
+  {
+   "fieldname": "cform_user_name",
+   "fieldtype": "Data",
+   "label": "Cform user name"
+  },
+  {
+   "fieldname": "cform_password",
+   "fieldtype": "Password",
+   "label": "Cform password"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "default": "0",
+   "fieldname": "signezy",
+   "fieldtype": "Check",
+   "label": "Signezy"
+  },
+  {
+   "default": "0",
+   "fieldname": "ezybills",
+   "fieldtype": "Check",
+   "label": "Ezybills"
+  },
+  {
+   "default": "0",
+   "fieldname": "scaneasy",
+   "fieldtype": "Check",
+   "label": "Scaneasy"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-06 15:02:56.205554",
+ "modified": "2021-05-19 18:36:30.075683",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

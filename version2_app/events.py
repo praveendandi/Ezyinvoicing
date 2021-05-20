@@ -1,15 +1,16 @@
 import frappe, requests, json
 
 from version2_app.parsers import *
-import json, shlex, time, re
+import json
+import shlex
+import time
+import re
 from subprocess import Popen, PIPE, STDOUT
 import os
 import sys
 import datetime
 import importlib.util
 import traceback
-from datetime import date, timedelta
-
 
 
 def invoice_created(doc, method=None):
@@ -48,6 +49,7 @@ def invoice_deleted(doc,method=None):
 	soc_doc.invoice_category = doc.invoice_category
 	soc_doc.record_type = "Delete"
 	soc_doc.insert(ignore_permissions=True)
+
 
 def invoiceCreated(doc):
 	try:
@@ -184,6 +186,145 @@ def safe_decode(string, encoding='utf-8'):
 	except Exception:
 		pass
 	return string
+
+
+def information_folio_created(doc, method=None):
+    try:
+        print(doc.invoice_file, "heeloo hiee")
+        print(doc.name, "hello hiee")
+        # if
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'information Invoices Created', 'data': doc.__dict__})
+
+        # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
+    except Exception as e:
+        print(e)
+
+
+def tablet_mapping(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        # if
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
+        # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
+    except Exception as e:
+        print(e)
+
+
+def remove_mapping(doc, method=None):
+    try:
+        print(doc.__dict__, "hello hiee removing mapping &&&&&&&77")
+        # if
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Remove Tablet config', 'data': doc.__dict__})
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Tablet Config Disconnected', 'data': doc.__dict__})
+        # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
+    except Exception as e:
+        print(e)
+
+
+def tablet_connected(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        # if
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Tablet Connected', 'data': doc.__dict__})
+        # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
+    except Exception as e:
+        print(e)
+
+
+def tablet_disconnected(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        # if
+        # config_doc = frappe.db.exists({
+        #     'doctype': 'Tablet Config',
+        #     'tablet': doc.name,
+        # })
+        # print(config_doc,"hello*************8")
+        # if True:
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Tablet Config Disconnected', 'data': doc.__dict__})
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Tablet Disconnected', 'data': doc.__dict__})
+        # else:
+        #     frappe.publish_realtime(
+        #         "custom_socket", {'message': 'Tablet Disconnected', 'data': doc.__dict__})
+        # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
+    except Exception as e:
+        print(e)
+
+
+def workstation_disconnected(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        # frappe.publish_realtime(
+        #     "custom_socket", {'message': 'station_disconnected', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+
+
+def update_tablet_status(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+
+
+def create_redg_card(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Redg Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+        
+def create_paidout_receipt(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Paidout Receipt Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_advance_deposits(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Advance Deposits Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_encashment_certificates(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Encashment Certifcates Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_payment_receipts(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Payment Receipts Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+        
+def create_pos_bill(doc, method=None):
+    try:
+        print(doc.name, "hello hiee")
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Pos Bills Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+
 
 def deleteemailfilesdaily():
 	try:
