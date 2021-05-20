@@ -91,10 +91,10 @@
   "licensing_host",
   "skip_ssl_verify",
   "b2b_to_credit",
-  "ipp_printer_file_path",
   "manual_tax_invoice",
   "manual_credit_invoice",
-  "manual_debit_invoice"
+  "manual_debit_invoice",
+  "ipp_printer_file_path"
  ],
  "fields": [
   {
@@ -598,7 +598,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-17 09:37:25.219191",
+ "modified": "2021-05-20 09:39:39.431881",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
