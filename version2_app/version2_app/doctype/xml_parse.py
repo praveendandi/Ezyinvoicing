@@ -33,7 +33,7 @@ def extract_xml(file_list):
             if "-" in each["BILL_GENERATION_DATE_CHAR"]:
                 convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
             elif "." in each["BILL_GENERATION_DATE_CHAR"]:
-                convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%b.%y').strftime('%Y-%m-%d')
+                convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%m.%y').strftime('%Y-%m-%d')
             else:
                 convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d/%m/%y').strftime('%Y-%m-%d')	
             doc=frappe.get_doc({"doctype":"Invoice Reconciliations","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"]})   
