@@ -131,11 +131,13 @@
   "irn_generated_type",
   "converted_from_tax_invoices_to_manual_tax_invoices",
   "invoice_object_from_file",
+  "converted_tax_to_credit",
   "invoice_check",
   "change_gst_number",
   "debit_invoice",
   "note",
-  "signature"
+  "signature",
+  "credit_note_raised"
  ],
  "fields": [
   {
@@ -852,6 +854,12 @@
   },
   {
    "default": "No",
+   "fieldname": "converted_tax_to_credit",
+   "fieldtype": "Select",
+   "label": "Converted Tax to Credit",
+   "options": "Yes\nNo"
+  },
+  {
    "fieldname": "invoice_check",
    "fieldtype": "Select",
    "label": "Invoice Check",
@@ -880,12 +888,19 @@
    "fieldname": "signature",
    "fieldtype": "Signature",
    "label": "Signature"
+  },
+  {
+   "default": "No",
+   "fieldname": "credit_note_raised",
+   "fieldtype": "Select",
+   "label": "Credit Note Raised",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-04-26 13:00:55.495363",
+ "modified": "2021-05-05 12:39:38.710147",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

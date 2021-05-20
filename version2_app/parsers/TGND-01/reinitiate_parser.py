@@ -89,7 +89,7 @@ def reinitiateInvoice(data):
 				entered = False
 			if 'Billing' in i:
 				entered = False
-			if 'Total' in i:
+			if 'Total' in i and "IRN" in i:
 				entered = False
 			if entered == True:
 				data.append(i)
@@ -205,7 +205,8 @@ def reinitiateInvoice(data):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
+			if errorcalulateItemsApiResponse['success'] == True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}

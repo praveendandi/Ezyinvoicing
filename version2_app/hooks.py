@@ -156,15 +156,25 @@ doc_events = {
 	},
 	"Document Bin":{
 		'on_update':"version2_app.events.DocumentBinSocket"
-	},
-	"company":{
-		"after_insert":"version2_app.events.company_created"
+	# },
+	# "company":{
+	# 	"after_insert":"version2_app.events.company_created"
 	}
 	
 
 }
 
 # Scheduled Tasks/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/emailTemplat.py
+# ---------------
+scheduler_events = {
+	
+
+	# "daily":[
+	# 	"version2_app.events.deleteemailfilesdaily"
+	# ],
+	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"]}	
+}	
+
 
 scheduler_events = {
     "all": [

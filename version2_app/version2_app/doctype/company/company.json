@@ -82,11 +82,8 @@
   "backend_git_path",
   "irn_qr_size",
   "sc_sac_code",
-  "reconciliation_format",
-  "ip_address",
-  "port",
-  "reverse_calculation",
   "system_storage_path",
+  "reconciliation_format",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -94,14 +91,19 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "skip_ssl_verify",
   "configiration_section",
   "config",
   "cform_user_name",
   "cform_password",
   "signezy",
   "ezybills",
-  "scaneasy"
+  "scaneasy",
+  "licensing_host",
+  "skip_ssl_verify",
+  "b2b_to_credit",
+  "manual_tax_invoice",
+  "manual_credit_invoice",
+  "manual_debit_invoice"
  ],
  "fields": [
   {
@@ -511,26 +513,10 @@
    "options": "Small\nLarge"
   },
   {
-   "default": "0",
-   "fieldname": "reverse_calculation",
-   "fieldtype": "Check",
-   "label": "Reverse Calculation"
-  },
-  {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
    "label": "Reconciliation Format",
    "options": "Accor\nMarriott"
-  },
-  {
-   "fieldname": "ip_address",
-   "fieldtype": "Data",
-   "label": "IP Address"
-  },
-  {
-   "fieldname": "port",
-   "fieldtype": "Data",
-   "label": "Port"
   },
   {
    "fieldname": "system_storage_path",
@@ -637,11 +623,40 @@
    "fieldname": "scaneasy",
    "fieldtype": "Check",
    "label": "Scaneasy"
+  },
+  {
+   "default": "0",
+   "fieldname": "b2b_to_credit",
+   "fieldtype": "Check",
+   "label": "B2B To Credit"
+  },
+  {
+   "fieldname": "licensing_host",
+   "fieldtype": "Data",
+   "label": "Licensing Host"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_tax_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Tax Invoice"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_credit_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Credit Invoice"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_debit_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Debit Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-19 18:36:30.075683",
+ "modified": "2021-05-17 09:37:25.219191",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
@@ -679,7 +694,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "IT",
+   "role": "Administrator",
    "share": 1,
    "write": 1
   },
@@ -691,7 +706,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Administrator",
+   "role": "IT",
    "share": 1,
    "write": 1
   }

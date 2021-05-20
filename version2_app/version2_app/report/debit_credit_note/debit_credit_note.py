@@ -40,7 +40,7 @@ def execute(filters=None):
 		else:
 			items_credit_doc = ()
 		if len(sysCredit_invoices)>0:	
-			items_sysCredit_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
+			items_sysCredit_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
 		else:
 			items_sysCredit_doc = ()
 		items_doc = items_debit_doc+items_credit_doc+items_sysCredit_doc	
