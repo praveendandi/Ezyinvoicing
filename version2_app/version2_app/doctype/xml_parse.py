@@ -9,6 +9,8 @@ import traceback
 import logging, frappe
 from frappe.utils import cstr
 import datetime
+import importlib.util
+
 
 @frappe.whitelist(allow_guest=True)
 def extract_xml(file_list):
@@ -18,12 +20,26 @@ def extract_xml(file_list):
         site_name = cstr(frappe.local.site)
         date = datetime.datetime.today()
         date=str(date.strftime("%d"))+"-"+(date.strftime("%b")).upper()+"-"+date.strftime("%y")
+        abs_path = os.path.dirname(os.getcwd())
+        company_doc = frappe.get_last_doc("company")
+        new_parsers = company_doc.new_parsers
+        if new_parsers == 0:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+company_doc.name+'/invoice_parser.py'
+        else:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+company_doc.name+'/invoice_parser.py'
+        module_name = 'file_parsing'
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
         
         with open(cwd+"/"+site_name+file_list) as xml_file:
             data_dict = xmltodict.parse(xml_file.read())
         data=[]
         for each in data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
             each['BILL_NO'] = each["BILL_NO"].strip()
+            if company_doc.change_invoice_reconciliation_invoice_number == 1:
+                each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
+            print(each['BILL_NO'])
             if "-" in each["BILL_GENERATION_DATE"]:
                 convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
             elif "." in each["BILL_GENERATION_DATE"]:

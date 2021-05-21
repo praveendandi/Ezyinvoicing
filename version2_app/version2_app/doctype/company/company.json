@@ -94,7 +94,8 @@
   "manual_tax_invoice",
   "manual_credit_invoice",
   "manual_debit_invoice",
-  "ipp_printer_file_path"
+  "ipp_printer_file_path",
+  "change_invoice_reconciliation_invoice_number"
  ],
  "fields": [
   {
@@ -594,11 +595,17 @@
    "fieldname": "manual_debit_invoice",
    "fieldtype": "Check",
    "label": "Manual Debit Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "change_invoice_reconciliation_invoice_number",
+   "fieldtype": "Check",
+   "label": "Change Invoice Reconciliation Invoice Number "
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-20 09:39:39.431881",
+ "modified": "2021-05-21 16:38:54.891306",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
