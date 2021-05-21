@@ -57,7 +57,10 @@
   "checkout_date",
   "no_of_nights",
   "uploaded_to_frro",
-  "frro_failure_count"
+  "frro_failure_count",
+  "frro_checkout",
+  "frro_checkout_message",
+  "frro_checkout_date"
  ],
  "fields": [
   {
@@ -335,11 +338,27 @@
    "fieldname": "frro_failure_count",
    "fieldtype": "Data",
    "label": "Frro Failure Count"
+  },
+  {
+   "default": "0",
+   "fieldname": "frro_checkout",
+   "fieldtype": "Check",
+   "label": "Frro Checkout"
+  },
+  {
+   "fieldname": "frro_checkout_message",
+   "fieldtype": "Data",
+   "label": "Frro Checkout Message"
+  },
+  {
+   "fieldname": "frro_checkout_date",
+   "fieldtype": "Data",
+   "label": "Frro Checkout Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-19 18:07:50.479338",
+ "modified": "2021-05-20 10:59:23.630301",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

@@ -10,7 +10,7 @@ import dateparser
 import frappe
 import math
 import random
-import requests
+import requests, json
 import sys
 import os
 import re
@@ -283,12 +283,14 @@ def image_processing(image):
 
 # API to scan aadhar card images
 @frappe.whitelist(allow_guest=True)
-def scan_aadhar(data):
+def scan_aadhar():
     try:
+        base = frappe.local.form_dict.get("aadhar_image")
+        doc_type = frappe.local.form_dict.get("scanView")
         company = frappe.get_last_doc('company')
         api_time = time.time()
-        base = data['aadhar_image']
-        doc_type = data['scanView']
+        # base = data['aadhar_image']
+        # doc_type = data['scanView']
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -298,18 +300,18 @@ def scan_aadhar(data):
         details = ''
         croppedaadhar = image_processing(filename)
         if croppedaadhar["success"] == False:
-            return {"success": False,"message": croppedaadhar["message"]}
+            return {"success": False,"error": croppedaadhar["message"],"message":"Unable to scan Aadhar"}
         cropped_aadhar = croppedaadhar["data"]
         aadhar_text = aadhar_detect_text(base, doc_type)
         if aadhar_text["success"] == False:
-            return {"success": False,"message": aadhar_text["message"],"aadhar_details":{"base64_string": cropped_aadhar}}
+            return {"success": False,"error": aadhar_text["message"],"aadhar_details":{"base64_string": cropped_aadhar},"message":"Unable to scan Aadhar"}
         details = aadhar_text["data"]
         details['base64_string'] = cropped_aadhar
         image_string = ' '
         rand_int = str(datetime.datetime.now())
         face_detect = detect_faces(filename, rand_int)
         if face_detect["success"] == False:
-            return {"success": False,"message": face_detect["message"],"aadhar_details":{"base64_string": cropped_aadhar}}
+            return {"success": False,"error": face_detect["message"],"aadhar_details":{"base64_string": cropped_aadhar},"message":"Unable to scan Aadhar"}
         face = face_detect["data"]
         os.remove(filename)
         if doc_type == 'front':
@@ -339,8 +341,8 @@ def scan_aadhar(data):
 
     except IndexError as e:
         api_time =time.time()
-        base = data['aadhar_image']
-        doc_type = data['scanView']
+        base = frappe.local.form_dict.get("aadhar_image")
+        doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -350,10 +352,10 @@ def scan_aadhar(data):
 
         details = {"base64_string": cropped_aadhar}
         frappe.log_error("scan_aadhar",str(e))
-        return ({"message": str(e), "success": False, "aadhar_details": details})
+        return ({"error": str(e), "success": False, "aadhar_details": details,"message":"Unable to scan Aadhar"})
     except Exception as e:
-        base = data['aadhar_image']
-        doc_type = data['scanView']
+        base = frappe.local.form_dict.get("aadhar_image")
+        doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -363,11 +365,11 @@ def scan_aadhar(data):
 
         croppedaadhar = image_processing(filename)
         if croppedaadhar["success"] == False:
-            return {"success": False,"message": croppedaadhar["message"]}
+            return {"success": False,"error": croppedaadhar["message"],"message":"Unable to scan Aadhar"}
         cropped_aadhar = croppedaadhar["data"]
         details = {"base64_string": cropped_aadhar}
         frappe.log_error("scan_aadhar",str(e))
-        return ({"message": str(e), "success": False, "aadhar_details": details})
+        return ({"error": str(e), "success": False, "aadhar_details": details,"message":"Unable to scan Aadhar"})
 
 
 def license_detect_text(image_file):
@@ -540,11 +542,11 @@ def license_detect_text(image_file):
 
 # API to scan driving license images
 @frappe.whitelist(allow_guest=True)
-def scan_driving_license(data):
+def scan_driving_license():
     try:
         company = frappe.get_last_doc('company')
         api_time = time.time()
-        base = data['driving_image']
+        base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -595,7 +597,7 @@ def scan_driving_license(data):
             return ({"success": True, "driving_details": details})
 
     except IndexError as e:
-        base = data['driving_image']
+        base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -611,7 +613,7 @@ def scan_driving_license(data):
         frappe.log_error("scan_driving",str(e))
         return ({"message": str(e), "success": False, "driving_details": details})
     except Exception as e:
-        base = data['driving_image']
+        base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -689,10 +691,11 @@ def pan_detect_text(image_file):
 
 # API to scan pan card images
 @frappe.whitelist(allow_guest=True)
-def scan_pancard(data):
+def scan_pancard():
     try:
+        base = frappe.local.form_dict.get("pancard")
         company = frappe.get_last_doc('company')
-        imagedata = base64.b64decode(data['pancard'])
+        imagedata = base64.b64decode(base)
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/pan_document.jpeg"
         with open(filename, 'wb') as f:
@@ -951,13 +954,13 @@ def voter_detect_text(image_file, doc_type):
 
 # API to scan voter card images
 @frappe.whitelist(allow_guest=True)
-def scan_votercard(data):
+def scan_votercard():
     try:
         company = frappe.get_last_doc('company')
         api_time = time.time()
         # logger.info("api call hits")
-        base = data['voter_image']
-        doc_type = data['scanView']
+        base = frappe.local.form_dict.get("voter_image")
+        doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -1026,8 +1029,8 @@ def scan_votercard(data):
 
     except IndexError as e:
         print(str(e))
-        base = data['voter_image']
-        doc_type = data['scanView']
+        base = frappe.local.form_dict.get("voter_image")
+        doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -1044,8 +1047,8 @@ def scan_votercard(data):
         return ({"message": str(e), "success": False, "voter_details": details})
     except Exception as e:
         print(str(e))
-        base = data['voter_image']
-        doc_type = data['scanView']
+        base = frappe.local.form_dict.get("voter_image")
+        doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
         # I assume you have a way of picking unique filenames
@@ -1360,15 +1363,15 @@ def rotate(imagepath,number):
 
 # API to scan passport and visa images
 @frappe.whitelist(allow_guest=True)
-def passportvisadetails(data):
+def passportvisadetails():
     try:
         company = frappe.get_last_doc('company')
         api_time = time.time()
         # startlog.info("api call hits")
         # file = request.form
-        base = data['Passport_Image']
+        base = frappe.local.form_dict.get("Passport_Image")
         imgdata = base64.b64decode(base)
-        header = data['scan_type']
+        header = frappe.local.form_dict.get("scan_type")
         pass_details = pass_detect_text(base)
         if pass_details["success"] == False:
             return pass_details
