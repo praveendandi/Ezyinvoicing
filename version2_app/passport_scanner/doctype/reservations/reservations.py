@@ -1492,11 +1492,11 @@ def passport_address_detect_text(image_file):
 
 # API to passort address images
 @frappe.whitelist(allow_guest=True)
-def passport_address(data):
+def passport_address():
     try:
         api_time = time.time()
         # logger.info(f"request get from client")
-        base = data['image']
+        base = frappe.local.form_dict.get("Passport_Image")
         imgdata = base64.b64decode(base)
         add_details = passport_address_detect_text(base)
         if add_details["success"] == False:
@@ -1661,10 +1661,10 @@ def qrvisa(data):
 
 # API to scan other images
 @frappe.whitelist(allow_guest=True)
-def other_images(data):
+def other_images():
     try:
         company = frappe.get_last_doc('company')
-        base = data['image']
+        base = frappe.local.form_dict.get("image")
         # doc_type = file['scanView']
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
