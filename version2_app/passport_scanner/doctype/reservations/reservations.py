@@ -1604,59 +1604,59 @@ def qr_detect_text(image_file):
         return ({"success":False,"message": str(e)})
 
 # API to scan QR-Visa and E-Visa images
-@frappe.whitelist(allow_guest=True)
-def qrvisa(data):
-    try:
-        company = frappe.get_last_doc('company')
-        # logger.info("api call hits")
-        # file = request.form
-        base = data['evisaqr']
-        doc_type = data['scanView']
-        imgdata = base64.b64decode(base)
-        unique_no = datetime.datetime.now()
-        filename = basedir + company.site_name + "/private/files/evisa.jpeg"
-        with open(filename, 'wb') as f:
-            f.write(imgdata)
-        if doc_type == 'qrscan':
-            qrdetails = qr_scan(filename)
-            if qrdetails["success"] == False:
-                return qrdetails
-            qr_details = qrdetails["data"]
-            face_detect = detect_faces(filename, unique_no)
-            if face_detect["success"] == False:
-                return {"success": False,"message": face_detect["message"]}
-            face = face_detect["data"]
-            face = ""
-            if os.path.exists(filename):
-                image_string = ''
-                if os.path.isfile(face) is True:
-                    with open(face, 'rb') as image:
-                        image_string = base64.b64encode(image.read()).decode()
-                    os.remove(face)
-            os.remove(filename)
-            # logger.info(qr_details)
-            return ({"success": True, "data": qr_details, "face": image_string})
-        if doc_type == 'textscan':
-            textdetails = qr_detect_text(base)
-            if textdetails["success"] == False:
-                return textdetails
-            text_details = textdetails["data"]
-            face_detect = detect_faces(filename, unique_no)
-            if face_detect["success"] == False:
-                return {"success": False,"message": face_detect["message"]}
-            face = face_detect["data"]
-            if os.path.exists(filename):
-                image_string = ''
-                if os.path.isfile(face) is True:
-                    with open(face, 'rb') as image:
-                        image_string = base64.b64encode(image.read()).decode()
-                    os.remove(face)
-            os.remove(filename)
-            # logger.info(text_details)
-            return ({"success": True, "data": text_details, "face": image_string})
-    except Exception as e:
-        frappe.log_error("qrVisa",str(e))
-        return ({"success": False, "message": "Unable to scan your id, please try again","error":str(e)})
+# @frappe.whitelist(allow_guest=True)
+# def qrvisa(data):
+#     try:
+#         company = frappe.get_last_doc('company')
+#         # logger.info("api call hits")
+#         # file = request.form
+#         base = data['evisaqr']
+#         doc_type = data['scanView']
+#         imgdata = base64.b64decode(base)
+#         unique_no = datetime.datetime.now()
+#         filename = basedir + company.site_name + "/private/files/evisa.jpeg"
+#         with open(filename, 'wb') as f:
+#             f.write(imgdata)
+#         if doc_type == 'qrscan':
+#             qrdetails = qr_scan(filename)
+#             if qrdetails["success"] == False:
+#                 return qrdetails
+#             qr_details = qrdetails["data"]
+#             face_detect = detect_faces(filename, unique_no)
+#             if face_detect["success"] == False:
+#                 return {"success": False,"message": face_detect["message"]}
+#             face = face_detect["data"]
+#             face = ""
+#             if os.path.exists(filename):
+#                 image_string = ''
+#                 if os.path.isfile(face) is True:
+#                     with open(face, 'rb') as image:
+#                         image_string = base64.b64encode(image.read()).decode()
+#                     os.remove(face)
+#             os.remove(filename)
+#             # logger.info(qr_details)
+#             return ({"success": True, "data": qr_details, "face": image_string})
+#         if doc_type == 'textscan':
+#             textdetails = qr_detect_text(base)
+#             if textdetails["success"] == False:
+#                 return textdetails
+#             text_details = textdetails["data"]
+#             face_detect = detect_faces(filename, unique_no)
+#             if face_detect["success"] == False:
+#                 return {"success": False,"message": face_detect["message"]}
+#             face = face_detect["data"]
+#             if os.path.exists(filename):
+#                 image_string = ''
+#                 if os.path.isfile(face) is True:
+#                     with open(face, 'rb') as image:
+#                         image_string = base64.b64encode(image.read()).decode()
+#                     os.remove(face)
+#             os.remove(filename)
+#             # logger.info(text_details)
+#             return ({"success": True, "data": text_details, "face": image_string})
+#     except Exception as e:
+#         frappe.log_error("qrVisa",str(e))
+#         return ({"success": False, "message": "Unable to scan your id, please try again","error":str(e)})
 
 
 # API to scan other images
