@@ -22,7 +22,7 @@ from collections import defaultdict, OrderedDict
 from difflib import get_close_matches
 from datetime import date
 from frappe.model.document import Document
-from pyzbar.pyzbar import decode, ZBarSymbol
+# from pyzbar.pyzbar import decode, ZBarSymbol
 from os.path import expanduser
 from frappe.utils import logger
 
@@ -1511,25 +1511,25 @@ def passport_address():
         frappe.log_error("passportaddress",str(e))
         return({"success": False, "message": "Unable to scan your id, please try again"})
 
-def qr_scan(img_path):
-    try:
-        data = decode(Image.open(img_path), symbols=[ZBarSymbol.QRCODE])
-        if len(data)>0:
-            qr_extracted_data = (data[0][0]).decode("utf-8")
-            d = (xmltodict.parse(qr_extracted_data, process_namespaces=True))
-            original = d['applicant']
-            person_data = dict(original)
-            print("......,:", d, person_data)
-            Visa_Number = person_data['visaNumber']
-            Given_Name = person_data['applname']
-            passportNumber = person_data['passportNumber']
-            details = {'Visa_Number': Visa_Number, "Given_Name": Given_Name, "passportNumber": passportNumber}
-        else:
-            details = {'Visa_Number':"","Given_Name": "", "passportNumber": ""}
-        return {"success":True,"data":details}
-    except Exception as e:
-        frappe.log_error("qr_scan",str(e))
-        return ({"success":False,"message": str(e)})
+# def qr_scan(img_path):
+#     try:
+#         data = decode(Image.open(img_path), symbols=[ZBarSymbol.QRCODE])
+#         if len(data)>0:
+#             qr_extracted_data = (data[0][0]).decode("utf-8")
+#             d = (xmltodict.parse(qr_extracted_data, process_namespaces=True))
+#             original = d['applicant']
+#             person_data = dict(original)
+#             print("......,:", d, person_data)
+#             Visa_Number = person_data['visaNumber']
+#             Given_Name = person_data['applname']
+#             passportNumber = person_data['passportNumber']
+#             details = {'Visa_Number': Visa_Number, "Given_Name": Given_Name, "passportNumber": passportNumber}
+#         else:
+#             details = {'Visa_Number':"","Given_Name": "", "passportNumber": ""}
+#         return {"success":True,"data":details}
+#     except Exception as e:
+#         frappe.log_error("qr_scan",str(e))
+#         return ({"success":False,"message": str(e)})
 
 
 country_with_codes = {'MDG': 'Madagascar', 'AND': 'Andorra', 'LIE': 'Liechtenstein', 'SGS': 'South Georgia and the South Sandwich Island', 'GEO': 'Georgia', 'GAB': 'Gabon', 'GNQ': 'Equatorial Guinea', 'IND': 'India', 'NIU': 'Niue', 'IRN': 'Iran, Islamic Republic of', 'UZB': 'Uzbekistan', 'JAM': 'Jamaica', 'TGO': 'Togo', 'SYR': 'Syrian Arab Republic', 'STP': 'Sao Tome and Principe', 'BWA': 'Botswana', 'BHR': 'Bahrain', 'AZE': 'Azerbaijan', 'TCD': 'Chad', 'LVA': 'Latvia', 'MHL': 'Marshall Islands', 'GBD': 'Dependent territories citizen', 'MAR': 'Morocco', 'D': 'Germany', 'PLW': 'Palau', 'SHN': 'Saint Helena', 'SUR': 'Suriname', 'ANT': 'Netherlands Antilles', 'CYM': 'Cayman Islands', 'LUX': 'Luxembourg', 'NIC': 'Nicaragua', 'ESP': 'Spain', 'WLF': 'Wallis and Futuna Islands', 'COG': 'Congo', 'MUS': 'Mauritius', 'CXR': 'Christmas Island', 'RUS': 'Russian Federation', 'KAZ': 'Kazakhstan', 'SYC': 'Seychelles', 'TKM': 'Turkmenistan', 'CHN': 'China', 'IDN': 'Indonesia', 'CIV': "Côte d'Ivoire", 'FLK': 'Falkland Islands (Malvinas)', 'ARM': 'Armenia', 'GRC': 'Greece', 'GIN': 'Guinea', 'COK': 'Cook Islands', 'BRN': 'Brunei Darussalam', 'ATA': 'Antarctica', 'YEM': 'Yemen', 'GBN': 'National (overseas)', 'AUT': 'Austria', 'EGY': 'Egypt', 'MOZ': 'Mozambique', 'VUT': 'Vanuatu', 'CAF': 'Central African Republic', 'KIR': 'Kiribati', 'CAN': 'Canada', 'SOM': 'Somalia', 'GUF': 'French Guiana', 'NTZ': 'Neutral Zone', 'PHL': 'Philippines', 'HTI': 'Haiti', 'BRB': 'Barbados', 'GUY': 'Guyana', 'AIA': 'Anguilla', 'TKL': 'Tokelau', 'NOR': 'Norway', 'MKD': 'The former Yugoslav Republic of Macedonia', 'SAU': 'Saudi Arabia', 'DOM': 'Dominican Republic', 'GIB': 'Gibraltar', 'PNG': 'Papua New Guinea', 'COL': 'Colombia', 'PAK': 'Pakistan', 'DJI': 'Djibouti', 'SGP': 'Singapore', 'TZA': 'United Republic of Tanzania', 'FIN': 'Finland', 'GMB': 'Gambia', 'ECU': 'Ecuador', 'ABW': 'Aruba', 'ERI': 'Eritrea', 'SMR': 'San Marino', 'PAN': 'Panama', 'NRU': 'Nauru', 'MSR': 'Montserrat', 'PRK': "Democratic People's Republic of Korea", 'CHE': 'Switzerland', 'TON': 'Tonga', 'COM': 'Comoros', 'BTN': 'Bhutan', 'REU': 'Réunion', 'GBS': 'Subject', 'LCA': 'Saint Lucia', 'MEX': 'Mexico', 'ARG': 'Argentina', 'TUR': 'Turkey', 'HUN': 'Hungary', 'HND': 'Honduras', 'NFK': 'Norfolk Island', 'BRA': 'Brazil', 'LAO': "Lao People's Democratic Republic", 'NZL': 'New Zealand', 'PRY': 'Paraguay', 'QAT': 'Qatar', 'GRD': 'Grenada', 'AGO': 'Angola', 'BLR': 'Belarus', 'BVT': 'Bouvet Island', 'GUM': 'Guam', 'MMR': 'Myanmar', 'POL': 'Poland', 'FSM': 'Micronesia, Federated States of', 'LBR': 'Liberia', 'HRV': 'Croatia', 'PCN': 'Pitcairn', 'GRL': 'Greenland', 'MNP': 'Northern Mariana Islands', 'SWZ': 'Swaziland', 'THA': 'Thailand', 'ASM': 'American Samoa', 'SLV': 'El Salvador',
