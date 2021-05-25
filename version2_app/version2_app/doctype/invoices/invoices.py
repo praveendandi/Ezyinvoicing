@@ -1017,12 +1017,18 @@ def insert_invoice(data):
         else:
             debit_invoice = "No"	
 
+        total = (value_after_gst + other_charges) - credit_value_after_gst
+        print(total)
+        if (total>0 and total<1) or (total>-1 and total<1):
+            data['total_invoice_amount'] = 0
+        else:
+            data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
+
+
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
-            # irn_generated = "Zero Invoice"
-            # taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-            # data['taxpayer'] =taxpayer
-            # data['guest_data']['invoice_type'] = "B2C"
+
+
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
