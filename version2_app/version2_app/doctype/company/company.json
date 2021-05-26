@@ -527,7 +527,7 @@
    "fieldname": "property_group",
    "fieldtype": "Select",
    "label": "Property Group",
-   "options": "Accor\nMarriott\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
+   "options": "Accor\nMarriott\nHolidayIn Express\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
   },
   {
    "default": "0",
@@ -612,7 +612,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-26 11:01:36.687073",
+ "modified": "2021-05-26 16:08:34.866989",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
