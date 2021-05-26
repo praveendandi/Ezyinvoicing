@@ -52,14 +52,13 @@ def hyattbulkupload(data):
             # print(each)
             # ['Satoshi Inatomi', '', 'HIGH', '0809', '1762', '01-APR-2021', 'CREDIT INVOICE', '5301', '999712', 'Guest Laundry', 'N', '-237.01', '', '226.85', '0.00', '0.00', '0.00', '0.00', '0.00', '', '', '', '', 'NONTAX']
             val = each[0].split("|")
-            print(val)
             if len(val[1])>5:
                 invoice_type = "B2B"
             else:
                 val[1] = "empty"	
                 invoice_type = "B2C"
-            # if val[13]=='':
-            #     continue
+            if val[13]=='':
+                continue
 
             each = {"invoicedate":val[5],"taxinvnum":val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
             # print(each)
