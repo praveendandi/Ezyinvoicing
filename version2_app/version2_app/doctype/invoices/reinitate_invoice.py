@@ -160,7 +160,6 @@ def Reinitiate_invoice(data):
         if (total>0 and total<1) or (total>-1 and total<1):
             data['total_invoice_amount'] = 0
         else:
-            print("////////////////,,,,,,,")
             data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
 
         if "address_1" not in data['taxpayer']:
