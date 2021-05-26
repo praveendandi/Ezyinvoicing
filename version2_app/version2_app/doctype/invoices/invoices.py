@@ -2662,7 +2662,7 @@ def get_tax_payer_details(data):
                 data['apidata'], data['invoice'], data['code'])
             
             if response['success']:
-
+                company = frappe.get_doc('company',data['code'])
                 details = response['result']
                 if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
                     if (details['AddrBno'] != "") or (details['AddrBno'] !=
@@ -2700,6 +2700,8 @@ def get_tax_payer_details(data):
                 tax_payer.pincode = details['AddrPncd']
                 tax_payer.gst_status = details['Status']
                 tax_payer.tax_type = details['TxpType']
+                if company.disable_sez == 1:
+                    tax_payer.tax_type = "REG"
                 tax_payer.company = data['code']
                 tax_payer.trade_name = details['TradeName']
                 tax_payer.state_code = details['StateCode']

@@ -95,7 +95,8 @@
   "manual_credit_invoice",
   "manual_debit_invoice",
   "ipp_printer_file_path",
-  "change_invoice_reconciliation_invoice_number"
+  "change_invoice_reconciliation_invoice_number",
+  "disable_sez"
  ],
  "fields": [
   {
@@ -444,7 +445,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn"
+   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt"
   },
   {
    "default": "0",
@@ -601,11 +602,17 @@
    "fieldname": "change_invoice_reconciliation_invoice_number",
    "fieldtype": "Check",
    "label": "Change Invoice Reconciliation Invoice Number "
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_sez",
+   "fieldtype": "Check",
+   "label": "Disable Sez"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-21 16:38:54.891306",
+ "modified": "2021-05-26 11:01:36.687073",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
