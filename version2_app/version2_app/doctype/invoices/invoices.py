@@ -1017,12 +1017,13 @@ def insert_invoice(data):
         else:
             debit_invoice = "No"	
 
-        total = (value_after_gst + other_charges) - credit_value_after_gst
-        print(total)
-        if (total>0 and total<1) or (total>-1 and total<1):
-            data['total_invoice_amount'] = 0
-        else:
-            data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
+        
+        if data['total_invoice_amount'] == 0:
+            total = (value_after_gst + other_charges) - credit_value_after_gst
+            if (total>0 and total<1) or (total>-1 and total<1):
+                data['total_invoice_amount'] = 0
+            else:
+                data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
 
 
         if len(data['items_data'])==0:
@@ -1032,8 +1033,10 @@ def insert_invoice(data):
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
+                print("//////,,,,,,,,,,,")
                 roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
                 data['invoice_round_off_amount'] = roundoff_amount
+                print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
                 if abs(roundoff_amount)>6:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                         

@@ -155,12 +155,13 @@ def Reinitiate_invoice(data):
         # 	total_invoice_amount = sales_amount_after_tax
         # 	data['total_invoice_amount'] = sales_amount_after_tax
 
-        total = (value_after_gst + other_charges) - credit_value_after_gst
-        print(total)
-        if (total>0 and total<1) or (total>-1 and total<1):
-            data['total_invoice_amount'] = 0
-        else:
-            data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
+        
+        if data['total_invoice_amount'] == 0:
+            total = (value_after_gst + other_charges) - credit_value_after_gst
+            if (total>0 and total<1) or (total>-1 and total<1):
+                data['total_invoice_amount'] = 0
+            else:
+                data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
 
         if "address_1" not in data['taxpayer']:
             data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
