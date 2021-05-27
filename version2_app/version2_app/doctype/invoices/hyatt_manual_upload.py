@@ -73,7 +73,7 @@ def hyattbulkupload(data):
             cgst = 0 if val[15]!="" else float(val[15])
             igst = 0 if val[16]!="" else float(val[16])
             cess = 0 if val[17]!="" else float(val[17])
-            total_invoice_amount = float(val[13])+sgst+igst+cess+cgst
+            total_invoice_amount = float(val[11])
             each["total_invoice_amount"] = total_invoice_amount
             if each['taxinvnum'] not in invoice_referrence_objects:
                     
