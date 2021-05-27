@@ -25,8 +25,7 @@
    "fieldname": "reservation_number",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Reservation Number",
-   "reqd": 1
+   "label": "Reservation Number"
   },
   {
    "fieldname": "room_number",
@@ -94,7 +93,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-19 16:05:18.301369",
+ "modified": "2021-05-26 09:44:03.970350",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Reservations",

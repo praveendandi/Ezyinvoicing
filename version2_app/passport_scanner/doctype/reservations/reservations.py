@@ -1148,7 +1148,7 @@ def pass_detect_text(image_file):
 
             if (len(name_spliting) == 2):
                 mrx = re.sub('\ |\?|\.|\!|\/|\;|\:|\<|\>', ' ', name_spliting[1])
-                givenname = mrx
+                givenname = mrx.rstrip("«")
                 #print("given name:",givenname)
             else:
                 givenname = ''
@@ -1288,7 +1288,7 @@ def pass_detect_text(image_file):
             surname = re.sub('\ |\?|\.|\!|\/|\;|\:|\<|\>', ' ', fullname[0])
             if (len(fullname) == 2):
                 mrx = re.sub('\ |\?|\.|\!|\/|\;|\:|\<|\>', ' ', fullname[1])
-                givenname = mrx
+                givenname = mrx.rstrip("«")
 
             else:
                 givenname = ''
