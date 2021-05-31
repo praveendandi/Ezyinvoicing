@@ -16,7 +16,6 @@ class PosBills(Document):
 
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(bills):
-    # print(bills)
     # print(bills['transaction_date'])
     if 'transaction_date' not in bills:
         bills['check_date'] = date.today()
