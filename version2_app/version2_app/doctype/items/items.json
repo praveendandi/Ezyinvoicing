@@ -250,17 +250,16 @@
    "label": "Discount Value"
   },
   {
-   "default": "No",
    "fieldname": "line_edit_net",
    "fieldtype": "Select",
-   "label": "Line_Edit_Net",
+   "label": "Line Edit Net",
    "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-04-30 19:42:51.070352",
+ "modified": "2021-05-31 09:37:16.016763",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
