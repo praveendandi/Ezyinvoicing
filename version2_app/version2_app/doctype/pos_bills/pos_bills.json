@@ -20,7 +20,8 @@
   "raw_text",
   "items_section",
   "items",
-  "signature"
+  "signature",
+  "company"
  ],
  "fields": [
   {
@@ -105,11 +106,17 @@
    "fieldname": "signature",
    "fieldtype": "Signature",
    "label": "Signature"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-27 10:19:29.838666",
+ "modified": "2021-06-01 14:55:32.740223",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Pos Bills",
