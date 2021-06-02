@@ -1544,7 +1544,11 @@ def calulate_items(data):
                 if not sac_code_based_gst:
                     sac_code_based_gst = frappe.db.get_list(
                         'SAC HSN CODES',
-                        filters={'name': ['like', '%' + item_description + '%']})
+                        filters={'name': ['like', item_description + '%']})
+                    if len(sac_code_based_gst) > 0:
+                        sac_names = list(map(lambda x : x['name'], sac_code_based_gst))
+                        min_len_des = min(sac_names, key = len)
+                        sac_code_based_gst = [{"name":min_len_des}]
                 if len(sac_code_based_gst)>0:
                     sac_code_based_gst_rates = frappe.get_doc(
                     'SAC HSN CODES',sac_code_based_gst[0]['name'])	
