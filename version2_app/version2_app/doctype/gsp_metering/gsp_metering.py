@@ -7,6 +7,7 @@ from frappe.model.document import Document
 import calendar
 import frappe
 import traceback
+import requests
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -107,3 +108,26 @@ def gspmeteringdata(data):
 # 	propertyData = frappe.get_doc(Properties,data['property_code'])
 # 	get_gsp=frappe.get_doc(data)
 # 	get_gsp.insert()
+
+@frappe.whitelist(allow_guest=True)
+def GstDataImportToLicensing():
+	try:
+		company = frappe.get_last_doc('company')
+		all_data = frappe.db.get_all('TaxPayerDetail',fields=['gst_number','legal_name','email','address_1','address_2','location','pincode','gst_status','tax_type','trade_name','phone_number','state_code','address_floor_number','address_street','status','block_status'])
+		if len(all_data)>0:
+			for each in all_data:
+				each['doctype']="TaxPayerDetail"
+				headers = {'Content-Type': 'application/json'}
+				json_response = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=each)
+				if json_response.status==200:
+					pass
+				else:
+					print(json_response.status,json_response)
+					break
+			return {"success":True,"message":"Data Updated successfully"}
+		return {"success":True,"message":"No Data Available"}
+	except Exception as e:
+		print(traceback.print_exc())
+		return {"status":False,"message":str(e),"message2":traceback.print_exc()}
+
+
