@@ -119,7 +119,7 @@ def GstDataImportToLicensing():
 				each['doctype']="TaxPayerDetail"
 				headers = {'Content-Type': 'application/json'}
 				json_response = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=each)
-				if json_response.status==200:
+				if json_response.status_code==200:
 					pass
 				else:
 					print(json_response.status,json_response)

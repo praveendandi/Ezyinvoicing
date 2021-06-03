@@ -2762,9 +2762,6 @@ def get_tax_payer_details(data):
             else:
                 doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
                 headers = {'Content-Type': 'application/json'}
-                licenseData = doc
-                licenseData['doctype'] = "TaxPayerDetail"
-                json_response = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=licenseData)
                 return {"success": True, "data": doc}        
         else:
             json_response['doctype'] ="TaxPayerDetail"

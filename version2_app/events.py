@@ -229,6 +229,21 @@ def gspmeteringhook(doc,method=None):
     except Exception as e:
         print(str(e))    
 
+def taxpayerhook(doc,method=None):
+    try:
+        company = frappe.get_doc('company',doc.company)
+        headers = {'Content-Type': 'application/json'}
+        
+        inputData = {'doctype':'TaxPayerDetail','gst_number':doc.gst_number,'legal_name':doc.legal_name,'email':doc.email,'address_1':doc.address_1,'address_2':doc.address_2,'location':doc.location,'pincode':doc.pincode,'gst_status':doc.gst_status,'tax_type':doc.tax_type,'trade_name':doc.trade_name,'phone_number':doc.phone_number,'state_code':doc.state_code,'address_floor_number':doc.address_floor_number,'address_street':doc.address_street,'status':doc.status,'block_status':doc.block_status}
+        insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+        if insertTaxpayer.status_code==200:
+            print("--------- Taxpayer hook")
+        return insertTaxpayer            
+    except Exception as e:
+        print(str(e))  
+
+
+
 def InvoiceDataTolicensing():
     company = frappe.get_last_doc('company')
     today = date.today()# - timedelta(days=43)

@@ -122,6 +122,9 @@ doc_events = {
 	},
 	"Gsp Metering":{
 		'after_insert':"version2_app.events.gspmeteringhook"
+	},
+	"TaxPayerDetail":{
+		'after_insert':"version2_app.events.taxpayerhook"
 	}
 	
 
