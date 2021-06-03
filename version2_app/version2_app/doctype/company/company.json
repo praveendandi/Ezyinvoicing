@@ -83,8 +83,6 @@
   "reconciliation_format",
   "reverse_calculation",
   "system_storage_path",
-  "ip_address",
-  "port",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -94,7 +92,13 @@
   "custom_e_tax_invoice_footer_image",
   "licensing_host",
   "skip_ssl_verify",
-  "b2b_to_credit"
+  "b2b_to_credit",
+  "manual_tax_invoice",
+  "manual_credit_invoice",
+  "manual_debit_invoice",
+  "ipp_printer_file_path",
+  "change_invoice_reconciliation_invoice_number",
+  "disable_sez"
  ],
  "fields": [
   {
@@ -443,7 +447,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn"
+   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt"
   },
   {
    "default": "0",
@@ -525,7 +529,7 @@
    "fieldname": "property_group",
    "fieldtype": "Select",
    "label": "Property Group",
-   "options": "Accor\nMarriott\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
+   "options": "Accor\nMarriott\nHolidayIn Express\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
   },
   {
    "default": "0",
@@ -567,15 +571,55 @@
    "label": "Skip SSL Verify"
   },
   {
+   "fieldname": "ipp_printer_file_path",
+   "fieldtype": "Data",
+   "label": "Ipp Printer File Path"
+  },
+  {
    "default": "0",
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
    "label": "B2B To Credit"
+  },
+  {
+   "fieldname": "licensing_host",
+   "fieldtype": "Data",
+   "label": "Licensing Host"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_tax_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Tax Invoice"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_credit_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Credit Invoice"
+  },
+  {
+   "default": "1",
+   "fieldname": "manual_debit_invoice",
+   "fieldtype": "Check",
+   "label": "Manual Debit Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "change_invoice_reconciliation_invoice_number",
+   "fieldtype": "Check",
+   "label": "Change Invoice Reconciliation Invoice Number "
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_sez",
+   "fieldtype": "Check",
+   "label": "Disable Sez"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-13 10:04:14.368943",
+ "modified": "2021-05-26 16:08:34.866989",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

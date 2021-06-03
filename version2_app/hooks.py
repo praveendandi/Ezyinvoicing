@@ -135,7 +135,9 @@ scheduler_events = {
 	# "daily":[
 	# 	"version2_app.events.deleteemailfilesdaily"
 	# ],
-	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"]}	
+	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"]}	
 }	
 
 
