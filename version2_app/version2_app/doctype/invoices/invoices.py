@@ -2679,11 +2679,10 @@ def get_tax_payer_details(data):
     try:
         company = frappe.get_doc('company',data['code'])
         headers = {'Content-Type': 'application/json'}
-        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
-        if len(json_response)==0:
-            tay_payer_details = frappe.db.get_value('TaxPayerDetail',
-                                                    data['gstNumber'])
-            if tay_payer_details is None:
+        tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
+        if tay_payer_details is None:
+            json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+            if json_response.content:
                 response = request_get(
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
                     data['apidata'], data['invoice'], data['code'])
@@ -2759,16 +2758,17 @@ def get_tax_payer_details(data):
                         "message": error_message,
                         "response": response
                     }
+                  
             else:
-                doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
-                headers = {'Content-Type': 'application/json'}
-                return {"success": True, "data": doc}        
+                json_response['doctype'] ="TaxPayerDetail"
+                doc = frappe.get_doc(json_response)
+                doc.insert(ignore_permissions=True, ignore_links=True)
+                get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
+                return {"success": True, "data": get_doc}
         else:
-            json_response['doctype'] ="TaxPayerDetail"
-            doc = frappe.get_doc(json_response)
-            doc.insert(ignore_permissions=True, ignore_links=True)
-            get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
-            return {"success": True, "data": get_doc}
+            doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
+            headers = {'Content-Type': 'application/json'}
+            return {"success": True, "data": doc}  
     except Exception as e:
         print(e, "get tax payers")
         frappe.log_error(frappe.get_traceback())
