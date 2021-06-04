@@ -218,21 +218,21 @@ def deleteemailfilesdaily():
 
 
 def gspmeteringhook(doc,method=None):
-    try:
-        # doc=frappe.get_last_doc('Gsp Metering')
-        # print("---------",doc.__dict__)
-        # company = frappe.get_last_doc('company')
-        # inputData = {"data":{"doctype":"Gsp Metering","property_code":company.name,'tax_payer_details':doc.tax_payer_details,'login':doc.login,'generate_irn':doc.generate_irn,'get_irn_details_by_doc':doc.get_irn_details_by_doc,'cancel_irn':doc.cancel_irn,'invoice_by_irn':doc.invoice_by_irn,'create_qr_image':doc.create_qr_image,'status':doc.status}}
-        # headers = {'Content-Type': 'application/json'}
-        # json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
-        # print(json_response,"/////////")
-        # return json_response 
+    try: 
         company = frappe.get_last_doc('company')
         inputData = {"data":{"doctype":"Gsp Metering","property_code":company.name,'tax_payer_details':doc.tax_payer_details,'login':doc.login,'generate_irn':doc.generate_irn,'get_irn_details_by_doc':doc.get_irn_details_by_doc,'cancel_irn':doc.cancel_irn,'invoice_by_irn':doc.invoice_by_irn,'create_qr_image':doc.create_qr_image,'status':doc.status}}
         inputData['data']['property_code'] ="HICC-01"
         print(inputData)
         headers = {'Content-Type': 'application/json'}
-        json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                }
+            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,proxies=proxies)
+        else:
+            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
         print(json_response,"/////////")
         return json_response     
     except Exception as e:
@@ -244,7 +244,15 @@ def taxpayerhook(doc,method=None):
         headers = {'Content-Type': 'application/json'}
         
         inputData = {'doctype':'TaxPayerDetail','gst_number':doc.gst_number,'legal_name':doc.legal_name,'email':doc.email,'address_1':doc.address_1,'address_2':doc.address_2,'location':doc.location,'pincode':doc.pincode,'gst_status':doc.gst_status,'tax_type':doc.tax_type,'trade_name':doc.trade_name,'phone_number':doc.phone_number,'state_code':doc.state_code,'address_floor_number':doc.address_floor_number,'address_street':doc.address_street,'status':doc.status,'block_status':doc.block_status}
-        insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                }
+            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,proxies=proxies)
+        else:
+            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
         if insertTaxpayer.status_code==200:
             print("--------- Taxpayer hook")
         return insertTaxpayer            
