@@ -61,7 +61,16 @@ def hyattbulkupload(data):
                 continue
 
             each = {"invoicedate":val[5],"taxinvnum":val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
-            # print(each)
+            if frappe.db.exists("SAC HSN CODES",each['goods_desc']):
+                sac_desc = frappe.get_doc("SAC HSN CODES",each['goods_desc'])
+                if sac_desc.bulk_upload_service_charge ==1:
+                    if sac_desc.one_sc_applies_to_all == 1:
+                        # vatamount = (vat_rate_percentage * scharge_value) / 100.0
+                        itemcharge = (each['invoiceamount']*companyData.service_charge_percentage)/100.0
+                    else:
+                        itemcharge = (each['invoiceamount']*sac_desc.service_charge_rate)/100.0
+
+                    each['invoiceamount'] = each['invoiceamount'] - itemcharge    
             if each['invoice_category'] == "CREDIT INVOICE":
                 each['invoice_category'] = "Credit Invoice"
             if each['invoice_category'] == "TAX INVOICE":

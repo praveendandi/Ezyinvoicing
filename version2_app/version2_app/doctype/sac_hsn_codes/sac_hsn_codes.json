@@ -32,7 +32,8 @@
   "sc_sac_code",
   "exempted",
   "sac_index",
-  "ignore_non_taxable_items"
+  "ignore_non_taxable_items",
+  "bulk_upload_service_charge"
  ],
  "fields": [
   {
@@ -202,11 +203,17 @@
    "fieldname": "ignore_non_taxable_items",
    "fieldtype": "Check",
    "label": "Ignore Non Taxable Items"
+  },
+  {
+   "default": "0",
+   "fieldname": "bulk_upload_service_charge",
+   "fieldtype": "Check",
+   "label": " Bulk Upload Service charge"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-30 17:48:37.159883",
+ "modified": "2021-06-04 18:46:29.901372",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
