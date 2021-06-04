@@ -111,37 +111,37 @@ def update_documentbin(filepath, error_log):
 
 
 def fileCreated(doc, method=None):
-	try:
-		if 'job-' in doc.file_name:
-			if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
-				update_documentbin(doc.file_url,"")
-				abs_path = os.path.dirname(os.getcwd())
-				company_doc = frappe.get_doc("company",doc.attached_to_name)
-				new_parsers = company_doc.new_parsers
-				if new_parsers == 0:
-					file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
-				else:
-					file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
-				module_name = 'file_parsing'
-				spec = importlib.util.spec_from_file_location(module_name, file_path)
-				module = importlib.util.module_from_spec(spec)
-				spec.loader.exec_module(module)
-				module.file_parsing(doc.file_url)
-				frappe.log_error(traceback.print_exc())
-				logger.error(f"fileCreated,   {traceback.print_exc()}")
-		else:
-			if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
-				update_documentbin(doc.file_url,"")
+    try:
+        if 'job-' in doc.file_name:
+            if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
+                update_documentbin(doc.file_url,"")
+                abs_path = os.path.dirname(os.getcwd())
+                company_doc = frappe.get_doc("company",doc.attached_to_name)
+                new_parsers = company_doc.new_parsers
+                if new_parsers == 0:
+                    file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                else:
+                    file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                module_name = 'file_parsing'
+                spec = importlib.util.spec_from_file_location(module_name, file_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                module.file_parsing(doc.file_url)
+                frappe.log_error(traceback.print_exc())
+                logger.error(f"fileCreated,   {traceback.print_exc()}")
+        else:
+            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
+                update_documentbin(doc.file_url,"")
 
-			print('Normal File')
-		logger.error(f"fileCreated,   {traceback.print_exc()}")
-	except Exception as e:
-		frappe.log_error(traceback.print_exc())
-		logger.error(f"fileCreated,   {traceback.print_exc()}")
-		print(str(e), "fileCreated")
-		update_documentbin(doc.file_url,str(e))
-		print(traceback.print_exc())
-		return {"success":False,"message":str(e)}
+            print('Normal File')
+        logger.error(f"fileCreated,   {traceback.print_exc()}")
+    except Exception as e:
+        frappe.log_error(traceback.print_exc())
+        logger.error(f"fileCreated,   {traceback.print_exc()}")
+        print(str(e), "fileCreated")
+        update_documentbin(doc.file_url,str(e))
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):
     if doc.status=="Success":
@@ -230,9 +230,12 @@ def gspmeteringhook(doc,method=None):
             proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
                             'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
                                 }
-            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,proxies=proxies)
+            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,proxies=proxies,verify=False)
         else:
-            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+            if company.skip_ssl_verify == 1:
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
+            else:
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
         print(json_response,"/////////")
         return json_response     
     except Exception as e:
@@ -250,9 +253,12 @@ def taxpayerhook(doc,method=None):
             proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
                             'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
                                 }
-            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,proxies=proxies)
+            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,proxies=proxies,verify=False)
         else:
-            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+            if company.skip_ssl_verify == 1:
+                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
+            else:
+                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
         if insertTaxpayer.status_code==200:
             print("--------- Taxpayer hook")
         return insertTaxpayer            

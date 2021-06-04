@@ -2681,7 +2681,17 @@ def get_tax_payer_details(data):
         headers = {'Content-Type': 'application/json'}
         tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
         if tay_payer_details is None:
-            json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+            if company.proxy == 1:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                                'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+                json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,proxies=proxies,verify=False)
+            else:
+                if company.skip_ssl_verify == 1:
+                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
+                else:
+                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
             if json_response.content:
                 response = request_get(
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
