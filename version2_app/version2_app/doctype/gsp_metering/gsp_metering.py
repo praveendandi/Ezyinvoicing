@@ -114,7 +114,7 @@ def GstDataImportToLicensing():
     try:
         company = frappe.get_last_doc('company')
         headers = {'Content-Type': 'application/json'}        
-        inputData = {'doctype':'Properties','property_name':company.company_name,"property_code":company.code,'contact_number':company.phone_number,'gst_number':company.gst_number,'gsp_provider':company.provider}
+        inputData = {'doctype':'Properties','property_name':company.company_name,"property_code":company.name,'contact_number':company.phone_number,'gst_number':company.gst_number,'gsp_provider':company.provider}
         if company.proxy == 1:
             proxyhost = company.proxy_url
             proxyhost = proxyhost.replace("http://","@")
