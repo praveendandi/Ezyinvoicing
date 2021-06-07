@@ -14,11 +14,10 @@ def execute(filters=None):
 	try:
 		pd.set_option("display.max_rows", None, "display.max_columns", None)
 		columns = ["Original Invoice Number","Transaction type","Debit Note No / Credit Note No.","Debit Note / Credit Note Date","Month","CustomerGSTIN/UIN","Customer Name","Type","SAC / HSN CODE","Invoice value","Base Amount","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount"]
-		
 		fields = ['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category']
-		debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['>', filters['from_date']],'invoice_date':['<',filters['to_date']],'irn_generated':['like','%Success%'],'invoice_category':['=','Debit Invoice']},fields=fields,as_list=True)
-		credit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['>', filters['from_date']],'invoice_date':['<',filters['to_date']],'irn_generated':['like','%Success%'],'invoice_category':['=','Credit Invoice']},fields=fields,as_list=True)
-		sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['>', filters['from_date']],'invoice_date':['<',filters['to_date']],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
+		debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Debit Invoice']},fields=fields,as_list=True)
+		credit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Credit Invoice']},fields=fields,as_list=True)
+		sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
 
 		doc = debit_invoices+credit_invoices+sysCredit_invoices
 		if len(doc) == 0:
