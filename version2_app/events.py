@@ -221,7 +221,6 @@ def gspmeteringhook(doc,method=None):
     try: 
         company = frappe.get_last_doc('company')
         inputData = {"data":{"doctype":"Gsp Metering","property_code":company.name,'tax_payer_details':doc.tax_payer_details,'login':doc.login,'generate_irn':doc.generate_irn,'get_irn_details_by_doc':doc.get_irn_details_by_doc,'cancel_irn':doc.cancel_irn,'invoice_by_irn':doc.invoice_by_irn,'create_qr_image':doc.create_qr_image,'status':doc.status}}
-        inputData['data']['property_code'] ="HICC-01"
         print(inputData)
         headers = {'Content-Type': 'application/json'}
         if company.proxy == 1:
