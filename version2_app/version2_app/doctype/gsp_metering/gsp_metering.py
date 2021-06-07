@@ -143,7 +143,7 @@ def GstDataImportToLicensing():
                 if json_response.status_code==200:
                     pass
                 else:
-                    print(json_response.status,json_response)
+                    print(json_response.content,"   ***   ",json_response)
                     break
             return {"success":True,"message":"Data Updated successfully"}
         return {"success":True,"message":"No Data Available"}
