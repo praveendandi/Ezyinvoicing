@@ -103,7 +103,15 @@
   "b2b_to_credit",
   "manual_tax_invoice",
   "manual_credit_invoice",
-  "manual_debit_invoice"
+  "manual_debit_invoice",
+  "ipp_printer_file_path",
+  "change_invoice_reconciliation_invoice_number",
+  "disable_sez",
+  "whats_app",
+  "scenario_key",
+  "template_name",
+  "api_key",
+  "api"
  ],
  "fields": [
   {
@@ -452,7 +460,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn"
+   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt"
   },
   {
    "default": "0",
@@ -534,7 +542,7 @@
    "fieldname": "property_group",
    "fieldtype": "Select",
    "label": "Property Group",
-   "options": "Accor\nMarriott\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
+   "options": "Accor\nMarriott\nHolidayIn Express\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
   },
   {
    "default": "0",
@@ -625,6 +633,11 @@
    "label": "Scaneasy"
   },
   {
+   "fieldname": "ipp_printer_file_path",
+   "fieldtype": "Data",
+   "label": "Ipp Printer File Path"
+  },
+  {
    "default": "0",
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
@@ -652,11 +665,49 @@
    "fieldname": "manual_debit_invoice",
    "fieldtype": "Check",
    "label": "Manual Debit Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "change_invoice_reconciliation_invoice_number",
+   "fieldtype": "Check",
+   "label": "Change Invoice Reconciliation Invoice Number "
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_sez",
+   "fieldtype": "Check",
+   "label": "Disable Sez"
+  },
+  {
+   "default": "0",
+   "fieldname": "whats_app",
+   "fieldtype": "Check",
+   "label": "Whats App"
+  },
+  {
+   "fieldname": "scenario_key",
+   "fieldtype": "Data",
+   "label": "Scenario Key"
+  },
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "label": "Api Key"
+  },
+  {
+   "fieldname": "api",
+   "fieldtype": "Data",
+   "label": "Api"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-17 09:37:25.219191",
+ "modified": "2021-06-03 10:24:04.412259",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

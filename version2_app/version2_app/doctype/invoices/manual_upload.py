@@ -25,6 +25,7 @@ from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats imp
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.invoices.holiday_manual_upload import holidayinManualupload
 from version2_app.version2_app.doctype.invoices.opera_manula_bulkupload import operabulkupload
+from version2_app.version2_app.doctype.invoices.hyatt_manual_upload import hyattbulkupload
 from frappe.utils.background_jobs import enqueue
 
 
@@ -84,6 +85,11 @@ def manual_upload_data(data):
 			return output
 		if companyData.bulk_excel_upload_type == "Opera":
 			output = operabulkupload(data)
+			if output['success'] ==False:
+				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+			return output	
+		if companyData.bulk_excel_upload_type == "Hyatt":
+			output = hyattbulkupload(data)
 			if output['success'] ==False:
 				frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
 			return output	

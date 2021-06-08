@@ -1017,17 +1017,26 @@ def insert_invoice(data):
         else:
             debit_invoice = "No"	
 
+        
+        if data['total_invoice_amount'] == 0:
+            total = (value_after_gst + other_charges) - credit_value_after_gst
+            if (total>0 and total<1) or (total>-1 and total<1):
+                data['total_invoice_amount'] = 0
+            else:
+                data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
+
+
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
-            # irn_generated = "Zero Invoice"
-            # taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-            # data['taxpayer'] =taxpayer
-            # data['guest_data']['invoice_type'] = "B2C"
+
+
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
+                print("//////,,,,,,,,,,,")
                 roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
                 data['invoice_round_off_amount'] = roundoff_amount
+                print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
                 if abs(roundoff_amount)>6:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                         
@@ -1535,7 +1544,11 @@ def calulate_items(data):
                 if not sac_code_based_gst:
                     sac_code_based_gst = frappe.db.get_list(
                         'SAC HSN CODES',
-                        filters={'name': ['like', '%' + item_description + '%']})
+                        filters={'name': ['like', item_description + '%']})
+                    if len(sac_code_based_gst) > 0:
+                        sac_names = list(map(lambda x : x['name'], sac_code_based_gst))
+                        min_len_des = min(sac_names, key = len)
+                        sac_code_based_gst = [{"name":min_len_des}]
                 if len(sac_code_based_gst)>0:
                     sac_code_based_gst_rates = frappe.get_doc(
                     'SAC HSN CODES',sac_code_based_gst[0]['name'])	
@@ -2656,7 +2669,7 @@ def get_tax_payer_details(data):
                 data['apidata'], data['invoice'], data['code'])
             
             if response['success']:
-
+                company = frappe.get_doc('company',data['code'])
                 details = response['result']
                 if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
                     if (details['AddrBno'] != "") or (details['AddrBno'] !=
@@ -2694,6 +2707,8 @@ def get_tax_payer_details(data):
                 tax_payer.pincode = details['AddrPncd']
                 tax_payer.gst_status = details['Status']
                 tax_payer.tax_type = details['TxpType']
+                if company.disable_sez == 1:
+                    tax_payer.tax_type = "REG"
                 tax_payer.company = data['code']
                 tax_payer.trade_name = details['TradeName']
                 tax_payer.state_code = details['StateCode']

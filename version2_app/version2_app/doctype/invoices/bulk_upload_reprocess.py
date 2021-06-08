@@ -113,7 +113,31 @@ def BulkUploadReprocess(data):
 					item_dict['name'] = each['goods_desc']
 					item_dict['sort_order'] = sort_order
 					sort_order+=1
-					items.append(item_dict)	
+					items.append(item_dict)
+		elif company.bulk_excel_upload_type == "Hyatt":
+			line_items = json.loads(invoice_data.invoice_object_from_file)
+			# invoice_date = invoice_data.invoice_date
+			invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+			items = []
+			sort_order = 1
+			paymentTypes = GetPaymentTypes()
+			payment_Types  = [''.join(each) for each in paymentTypes['data']]
+			for each in line_items['data']:
+				print(each,"////")
+				if each['goods_desc'] not in payment_Types:
+					item_dict = {}
+					if "00:00:00" in each['invoicedate']:
+						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%d-%b-%Y %H:%M:%S').strftime(company.invoice_item_date_format)
+					else:
+						date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%d-%b-%Y').strftime(company.invoice_item_date_format)
+					# date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
+					item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
+					item_dict['item_value'] = each['invoiceamount']
+					item_dict['sac_code'] = str(each["taxcode_dsc"])
+					item_dict['name'] = each['goods_desc']
+					item_dict['sort_order'] = sort_order
+					sort_order+=1
+					items.append(item_dict)				
 		else:
 			pass
 		print(items)

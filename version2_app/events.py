@@ -12,6 +12,8 @@ import datetime
 import importlib.util
 import traceback
 from datetime import date, timedelta
+
+import shutil
 from frappe.utils import logger
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
@@ -35,25 +37,25 @@ def invoice_created(doc, method=None):
             bin_doc.save(ignore_permissions=True,ignore_version=True)
 
 def company_created(doc,method=None):
-	doc = frappe.db.get_list('company',filters={"docstatus":0},fields=["name","company_name","company_code","phone_number","gst_number","provider","ip_address","port"])
-	api="http://"+doc[0]["ip_address"]+":"+doc[0]["port"]+"/api/resource/Properties"
-	adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
-	insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
-	headers = {'content-type': 'application/json'}
-	r = requests.post(api,headers=headers,json=insert_dict)
+    doc = frappe.db.get_list('company',filters={"docstatus":0},fields=["name","company_name","company_code","phone_number","gst_number","provider","ip_address","port"])
+    api="http://"+doc[0]["ip_address"]+":"+doc[0]["port"]+"/api/resource/Properties"
+    adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
+    insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
+    headers = {'content-type': 'application/json'}
+    r = requests.post(api,headers=headers,json=insert_dict)
 
 def invoice_deleted(doc,method=None):
-	frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name,"company":doc.company})
-	soc_doc = frappe.new_doc("Socket Notification")
-	soc_doc.invoice_number = doc.name
-	soc_doc.guest_name = doc.guest_name
-	soc_doc.document_type = doc.invoice_category
-	soc_doc.room_number = doc.room_number
-	soc_doc.confirmation_number = doc.confirmation_number
-	soc_doc.print_by = doc.print_by
-	soc_doc.invoice_category = doc.invoice_category
-	soc_doc.record_type = "Delete"
-	soc_doc.insert(ignore_permissions=True)
+    frappe.publish_realtime("custom_socket", {'message':'Invoice deleted','type':"Delete invoice","invoice_number":doc.name,"company":doc.company})
+    soc_doc = frappe.new_doc("Socket Notification")
+    soc_doc.invoice_number = doc.name
+    soc_doc.guest_name = doc.guest_name
+    soc_doc.document_type = doc.invoice_category
+    soc_doc.room_number = doc.room_number
+    soc_doc.confirmation_number = doc.confirmation_number
+    soc_doc.print_by = doc.print_by
+    soc_doc.invoice_category = doc.invoice_category
+    soc_doc.record_type = "Delete"
+    soc_doc.insert(ignore_permissions=True)
 
 
 def invoiceCreated(doc):
@@ -88,27 +90,27 @@ def invoiceCreated(doc):
 
 
 def update_documentbin(filepath, error_log):
-	try:
-		bin_data = frappe.db.get_list('Document Bin', filters={'invoice_file': ['=', filepath]})
-		print(bin_data)
-		if len(bin_data)>0:
-			pass
-		else:
-			if '@' in filepath:
-				systemName = re.search('@(.*)@', filepath)
-				systemName = systemName.group(1)
-			else:
-				systemName = "NA"    
-			bin_doc = frappe.new_doc("Document Bin")
-			bin_doc.system_name = systemName
-			bin_doc.invoice_file = filepath
-			bin_doc.error_log =  error_log
-			bin_doc.insert(ignore_permissions=True)
-			frappe.db.commit()
-	except Exception as e:
-		print(str(e), "update_documentbin")
-		print(traceback.print_exc())
-		return {"success":False,"message":str(e)}
+    try:
+        bin_data = frappe.db.get_list('Document Bin', filters={'invoice_file': ['=', filepath]})
+        print(bin_data)
+        if len(bin_data)>0:
+            pass
+        else:
+            if '@' in filepath:
+                systemName = re.search('@(.*)@', filepath)
+                systemName = systemName.group(1)
+            else:
+                systemName = "NA"    
+            bin_doc = frappe.new_doc("Document Bin")
+            bin_doc.system_name = systemName
+            bin_doc.invoice_file = filepath
+            bin_doc.error_log =  error_log
+            bin_doc.insert(ignore_permissions=True)
+            frappe.db.commit()
+    except Exception as e:
+        print(str(e), "update_documentbin")
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 
 def fileCreated(doc, method=None):
@@ -145,56 +147,55 @@ def fileCreated(doc, method=None):
 		return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):
-	if doc.status=="Success":
-		company = frappe.get_last_doc('company')
-		frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
-		frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update","company":company.name})
+    if doc.status=="Success":
+        company = frappe.get_last_doc('company')
+        frappe.log_error("trigger socket bench update", " {'message':'bench  update started','type':'bench update'}")
+        frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update","company":company.name})
 
 
 def DocumentBinSocket(doc,method=None):
-	company = frappe.get_last_doc('company')
-	frappe.log_error("Document Bin Insert", " {'message':'Docuemnt Bin Insert'}")
-	frappe.publish_realtime("custom_socket", {'message':'Document Bin Insert','type':"document_bin_insert","data":doc.__dict__,"company":company.name})
+    company = frappe.get_last_doc('company')
+    frappe.log_error("Document Bin Insert", " {'message':'Docuemnt Bin Insert'}")
+    frappe.publish_realtime("custom_socket", {'message':'Document Bin Insert','type':"document_bin_insert","data":doc.__dict__,"company":company.name})
 
 def updateManager(doc, method=None):
-	try:
-		if doc.status!="Ongoing":
-			print("==========")
-			commands = ['git pull origin updates','systemctl nginx reload','systemctl nginx restart']
-			console_dump = ''
-			company = frappe.get_last_doc('company')
-			print(company)
-			# cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
-			# cwd = '/home/frappe/ezy-invoice-production'
-			cwd = company.angular_project_production_path
-			key = str(time.time())
-			# count = 0
-			for command in commands:
-				print(command,"    command")
-				terminal = Popen(shlex.split(command),
-								stdin=PIPE,
-								stdout=PIPE,
-								stderr=STDOUT,
-								cwd=cwd)
-				print(terminal,"//////////")                
-				# frappe.log_error("log error", terminal.stdout.read(1))
-				for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
-					console_dump += c
-			logged_command = " && ".join(commands)
-			frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed","company":company.name})
-			# frappe.log_error("Angular project pull", console_dump)
-			frappe.log_error("Angular project pull data","update manager")
-	except Exception as e:
-		print(str(e),"    updateManager")
+    try:
+        if doc.status!="Ongoing":
+            commands = ['git pull origin updates','systemctl nginx reload','systemctl nginx restart']
+            console_dump = ''
+            company = frappe.get_last_doc('company')
+            print(company)
+            # cwd = '/home/caratred/Documents/angular/ezy-invoice-production'
+            # cwd = '/home/frappe/ezy-invoice-production'
+            cwd = company.angular_project_production_path
+            key = str(time.time())
+            # count = 0
+            for command in commands:
+                print(command,"    command")
+                terminal = Popen(shlex.split(command),
+                                stdin=PIPE,
+                                stdout=PIPE,
+                                stderr=STDOUT,
+                                cwd=cwd)
+                print(terminal,"//////////")                
+                # frappe.log_error("log error", terminal.stdout.read(1))
+                for c in iter(lambda: safe_decode(terminal.stdout.read(1)), ''):
+                    console_dump += c
+            logged_command = " && ".join(commands)
+            frappe.publish_realtime("custom_socket", {'message':'bench update completed','type':"bench completed","company":company.name})
+            # frappe.log_error("Angular project pull", console_dump)
+            frappe.log_error("Angular project pull data","update manager")
+    except Exception as e:
+        print(str(e),"    updateManager")
 
-		
+        
 
 def safe_decode(string, encoding='utf-8'):
-	try:
-		string = string.decode(encoding)
-	except Exception:
-		pass
-	return string
+    try:
+        string = string.decode(encoding)
+    except Exception:
+        pass
+    return string
 
 
 def information_folio_created(doc, method=None):
@@ -336,33 +337,41 @@ def create_pos_bill(doc, method=None):
 
 
 def deleteemailfilesdaily():
-	try:
-		company = frappe.get_last_doc('company')
-		lastdate = date.today() - timedelta(days=1)
-		print(lastdate)
-		emaildata = frappe.db.get_list('Email Queue',filters={'creation': ['>',lastdate],'status':"Sent"},fields=['name', 'attachments'])
-		print(emaildata)
-		filelist = []
-		for each in emaildata:
-			value = json.loads(each.attachments)
-			filelist.append(value[0]['fid'])
-			delete = frappe.delete_doc("File",value[0]['fid'])
-			print(delete)
-		lastdate = date.today() - timedelta(days=6)
-		data = frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""",lastdate)
-		print(data)
-		frappe.db.commit()
-		return {"success":True}
-	except Exception as e:
-		return {"success":False,"message":str(e)}
+    try:
+        company = frappe.get_last_doc('company')
+        lastdate = date.today() - timedelta(days=1)
+        print(lastdate)
+        emaildata = frappe.db.get_list('Email Queue',filters={'creation': ['>',lastdate],'status':"Sent"},fields=['name', 'attachments'])
+        print(emaildata)
+        filelist = []
+        for each in emaildata:
+            value = json.loads(each.attachments)
+            filelist.append(value[0]['fid'])
+            delete = frappe.delete_doc("File",value[0]['fid'])
+            print(delete)
+        lastdate = date.today() - timedelta(days=6)
+        data = frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""",lastdate)
+        print(data)
+        frappe.db.commit()
+        return {"success":True}
+    except Exception as e:
+        return {"success":False,"message":str(e)}
 
 def dailyDeletedocumentBin():
-	try:
-		company = frappe.get_last_doc('company')
-		lastdate = date.today() - timedelta(days=6)
-		data = frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""",lastdate)
-		print(data)
-		frappe.db.commit()
-		return {"success":True}
-	except Exception as e:
-		return {"success":False,"message":str(e)}	
+    try:
+        company = frappe.get_last_doc('company')
+        lastdate = date.today() - timedelta(days=6)
+        data = frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""",lastdate)
+        print(data)
+        frappe.db.commit()
+        return {"success":True}
+    except Exception as e:
+        return {"success":False,"message":str(e)}	
+
+def dailyIppprinterFiles():
+    try:
+        company = frappe.get_last_doc('company')
+        shutil.rmtree(company.ipp_printer_file_path)
+        os.mkdir(company.ipp_printer_file_path)
+    except Exception as e:
+        print(str(e))

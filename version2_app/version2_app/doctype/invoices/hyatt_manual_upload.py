@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import frappe
 # from frappe import enqueue
 from frappe.model.document import Document
@@ -10,89 +11,91 @@ import string
 from frappe.utils import get_site_name
 import pandas as pd
 import numpy as np
+import time
+import json
+from frappe.utils.background_jobs import enqueue
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 
-pd.set_option("display.max_rows", None, "display.max_columns", None)
+
 
 @frappe.whitelist(allow_guest=True)
-def holidayinManualupload(data):
+def hyattbulkupload(data):
     try:
-        # data={"invoice_file":"/private/files/3340 report.xlsx","company":"HIEHH-01"}
-        print("startt--------------------------",data)
+        print("startt--------------------------")
         start_time = datetime.datetime.now()
         folder_path = frappe.utils.get_bench_path()
         items_data_file = data['invoice_file']
-
-        company = data['company']
+        
         companyData = frappe.get_doc('company',data['company'])
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-        if ".csv" in items_file_path:
-            try:
-                items_dataframe = pd.read_csv(items_file_path)
-            except UnicodeDecodeError:
-                items_dataframe = pd.read_csv(items_file_path,encoding ='latin1')
-        else:
-            items_dataframe = pd.read_excel(items_file_path)
-
-        # items_dataframe = pd.read_excel(items_file_path)
-        items_dataframe = items_dataframe.fillna('empty')
-        items_dataframe = items_dataframe.sort_values("taxinvnum")
-        invoice_columns = list(items_dataframe.columns.values)
-        invoice_num = list(set(items_dataframe['taxinvnum']))
-        company_check_columns = companyData.bulk_import_invoice_headers
-        company_check_columns = company_check_columns.split(",")
-        if company_check_columns != invoice_columns:
+        items_dataframe = pd.read_csv(items_file_path)
+        
+        columnslist = items_dataframe.columns.values.tolist()
+        columnslist = columnslist[0].split("|")
+        check_columns = companyData.bulk_import_invoice_headers
+        company_check_columns = check_columns.split(",")
+        if company_check_columns != columnslist:
             frappe.db.delete('File', {'file_url': data['invoice_file']})
             frappe.db.commit()
             frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
             return {"success":False,"message":"Invoice data File mismatch"}
-        # print(items_dataframe)
-        output = items_dataframe.to_dict('records')
+        listdata = items_dataframe.head(3)
+        valuesdata = items_dataframe.values.tolist()
         list_data={}
         input_data = []
         invoice_referrence_objects = {}
-        for each in output:
-            totalitemAmount = each['invoiceamount']
-            each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
-            each['invoiceamount'] = round(each['invoiceamount'],2)
-            each['taxcode_dsc'] = str(each['taxcode_dsc'])
-            # print(each['taxinvnum'],len(each['taxinvnum']))
-            del each['accountdate']# = str(each['accountdate'])
-            del each['arrdate']# = str(each['arrdate'])
-            del each['depdate']# = str(each['depdate'])
-            del each['org_invoicedate']
-                
+        for each in valuesdata:
+            # print(each)
+            # ['Satoshi Inatomi', '', 'HIGH', '0809', '1762', '01-APR-2021', 'CREDIT INVOICE', '5301', '999712', 'Guest Laundry', 'N', '-237.01', '', '226.85', '0.00', '0.00', '0.00', '0.00', '0.00', '', '', '', '', 'NONTAX']
+            val = each[0].split("|")
+            if len(val[1])>5:
+                invoice_type = "B2B"
+            else:
+                val[1] = "empty"	
+                invoice_type = "B2C"
+            if val[13]=='':
+                continue
+
+            each = {"invoicedate":val[5],"taxinvnum":val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
+            # print(each)
+            if each['invoice_category'] == "CREDIT INVOICE":
+                each['invoice_category'] = "Credit Invoice"
+            if each['invoice_category'] == "TAX INVOICE":
+                each['invoice_category'] = "Tax Invoice"
+            if each['invoice_category'] == "DEBIT INVOICE":
+                each['invoice_category'] = "Debit Invoice"        
+            # total_invoice_amount = float(val[-1])+float(val[])
+            sgst = 0 if val[14]!="" else float(val[14])
+            cgst = 0 if val[15]!="" else float(val[15])
+            igst = 0 if val[16]!="" else float(val[16])
+            cess = 0 if val[17]!="" else float(val[17])
+            total_invoice_amount = float(val[11])
+            each["total_invoice_amount"] = total_invoice_amount
             if each['taxinvnum'] not in invoice_referrence_objects:
-                
+                    
                 invoice_referrence_objects[each['taxinvnum']] = []
                 invoice_referrence_objects[each['taxinvnum']].append(each)
             else:
                 invoice_referrence_objects[each['taxinvnum']].append(each)
-            
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             each['invoicedate'] = str(each['invoicedate'])
             if each['goods_desc'] not in payment_Types:
-                # totalitemAmount = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
-                if "00:00:00" in each['invoicedate']:
-                    item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
-                else:
-                    item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
-
-                # item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+                
+                
+                item_date = datetime.datetime.strptime(each['invoicedate'],'%d-%b-%Y').strftime(companyData.invoice_item_date_format)
                 if 'invoice_number' not in list_data:
-                    
-                    list_data['invoice_category'] = "Tax Invoice"
+                    list_data['invoice_category'] = each['invoice_category']
                     list_data['invoice_number'] = each['taxinvnum']
                     list_data['invoice_date'] = each['invoicedate']
                     list_data['room_number'] = 1
                     list_data['guest_name'] = each['guestname']
-                    # amount = #+each['sgstamount']+each['sgstamount']+each['ngstamount']
-                    list_data['total_invoice_amount'] = totalitemAmount
+                    # amount = each['invoiceamount']+each['sgstamount']+each['sgstamount']+each['ngstamount']
+                    list_data['total_invoice_amount'] = each['total_invoice_amount']
                     list_data['gstNumber'] = each['taxid']
                     item_list = {'date':item_date,'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc'])}
                     items = []
@@ -106,19 +109,19 @@ def holidayinManualupload(data):
                 else:
                     if list_data['invoice_number'] == each['taxinvnum'] :
                         # amount = list_data['invoiceamount']+list_data['sgstamount']+list_data['sgstamount']+list_data['ngstamount']
-                        list_data['total_invoice_amount'] = list_data['total_invoice_amount']+totalitemAmount #+each['sgstamount']+each['sgstamount']+each['ngstamount']
+                        list_data['total_invoice_amount'] = each['total_invoice_amount']
                         items = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1}
                         list_data['items'].extend([items])
                     else:
                         input_data.append(list_data)
                         list_data = {}
-                        list_data['invoice_category'] = "Tax Invoice"
+                        list_data['invoice_category'] = each['invoice_category']
                         list_data['invoice_number'] = each['taxinvnum']
                         list_data['invoice_date'] = each['invoicedate']
                         list_data['room_number'] = 1
                         list_data['guest_name'] = each['guestname']
-                        # amount = each['invoiceamount']#+each['sgstamount']+each['sgstamount']+each['ngstamount']
-                        list_data['total_invoice_amount'] = totalitemAmount
+                        # amount = each['invoiceamount']+each['sgstamount']+each['sgstamount']+each['ngstamount']
+                        list_data['total_invoice_amount'] = each['total_invoice_amount']
                         list_data['gstNumber'] = each['taxid']
                         # list_data['total_invoice_amount'] = each['SUMFT_DEBITPERtaxinvnum']
                         item_list = {'date':item_date,"sac_code":str(each['taxcode_dsc']),'item_value':each['invoiceamount'],'name':each['goods_desc'],'sort_order':1}
@@ -130,20 +133,17 @@ def holidayinManualupload(data):
                         list_data['place_of_supply'] = companyData.state_code
                         list_data['invoice_item_date_format'] = companyData.invoice_item_date_format
                         list_data['guest_data'] = {'invoice_category':list_data['invoice_category']}
-        
-        gstNumber = ''
         output_date = []
         # print(len(input_data),"lemnnnnnn output")
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":company})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":data['company']})
         countIn = 1
         print(len(input_data),"count")
-        if input_data == [] and len(list_data)>0:
-            input_data.append(list_data)
+
         for each in input_data:
+            # print(each)
             each['gstNumber'] = str(each['gstNumber'])
-            # each['total_invoice_amount']= 10000
-            print(each['invoice_number'],"       invoice Number ",countIn)
+            
             check_invoice = check_invoice_exists(str(each['invoice_number']))
             if check_invoice['success']==True:
                 inv_data = check_invoice['data']
@@ -155,14 +155,13 @@ def holidayinManualupload(data):
                     reupload = False	
             else:
                 reupload = False	
-            if each['invoice_category'] == "empty":
-                each['invoice_category'] = "Tax Invoice"
+            
             each['invoice_from'] = "File"
             each['company_code'] = data['company']
             
             each['invoice_date'] = each['invoice_date'].replace(" 00:00:00","")
             
-            date_time_obj = datetime.datetime.strptime(each['invoice_date'],'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+            date_time_obj = datetime.datetime.strptime(each['invoice_date'],'%d-%b-%Y').strftime('%d-%b-%y %H:%M:%S')
             each['invoice_date'] = date_time_obj
             each['mode'] = companyData.mode
             each['invoice_file'] = ""
@@ -177,12 +176,12 @@ def holidayinManualupload(data):
             each['print_by'] = "System"
             each['start_time'] = str(datetime.datetime.utcnow())
             each['name'] = each['guest_name']
-            error_data = {"invoice_type":'B2B' if gstNumber != "" else 'B2C',"invoice_number":each['invoice_number'],"company_code":data['company'],"invoice_date":each['invoice_date']}
+            error_data = {"invoice_type":'B2B' if each['gstNumber'] != '' else 'B2C',"invoice_number":each['invoice_number'],"company_code":data['company'],"invoice_date":each['invoice_date']}
             error_data['invoice_file'] = ""
             error_data['guest_name'] = each['guest_name']
-            error_data['gst_number'] = each['gstNumber']
+            error_data['gst_number'] = ''
             if each['invoice_type'] == "B2C":
-                error_data['gst_number'] == ""
+                error_data['gst_number'] == " "
             error_data['state_code'] =  " "
             error_data['room_number'] = each['room_number']
             error_data['pincode'] = ""
@@ -191,20 +190,17 @@ def holidayinManualupload(data):
             error_data['invoice_from'] = "File"
             each['sez'] = 0
             sez = 0
-
+            # print(len(each['gstNumber']),"lennn",each['gstNumber'],each['invoice_type'])
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-
             if len(each['gstNumber']) < 15 and len(each['gstNumber'])>0:
-                error_data['error_message'] = "Invalid GstNumber "+each['gstNumber']
+                error_data['error_message'] = "Invalid GstNumber"
                 error_data['amened'] = 'No'
-                error_data['invoice_type'] = "B2B"
-                error_data['gst_number'] = each['gstNumber']
+                
                 errorcalulateItemsApiResponse = calulate_items(each)
-                error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
                 if errorcalulateItemsApiResponse['success'] == True:
                     error_data['items_data'] = errorcalulateItemsApiResponse['data']
                 errorInvoice = Error_Insert_invoice(error_data)
-                print("Error:  *******The given gst number is not a vaild one")
+                print("Error:  *******The given gst number is not a vaild one**********")
                 B2B = "B2B"
                 B2C = np.nan
                 output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -269,7 +265,6 @@ def holidayinManualupload(data):
                                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     # print("B2B insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                         else:
-                        
                             error_data['error_message'] = calulateItemsApiResponse['message']
                             error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
                             errorInvoice = Error_Insert_invoice(error_data)
@@ -279,12 +274,10 @@ def holidayinManualupload(data):
                             output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
                     else:
-                        error_data['error_message'] = "Invalid GstNumber "+each['gstNumber']
+                        error_data['error_message'] = "Invalid GstNumber"
                         error_data['amened'] = 'No'
-                        error_data['invoice_type'] = "B2B"
-                        error_data['gst_number'] = each['gstNumber']
+                        
                         errorcalulateItemsApiResponse = calulate_items(each)
-                        error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
                         if errorcalulateItemsApiResponse['success'] == True:
                             error_data['items_data'] = errorcalulateItemsApiResponse['data']
                         errorInvoice = Error_Insert_invoice(error_data)
@@ -298,7 +291,6 @@ def holidayinManualupload(data):
                     error_data['amened'] = 'No'
                     
                     errorcalulateItemsApiResponse = calulate_items(each)
-                    error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
                     if errorcalulateItemsApiResponse['success'] == True:
                         error_data['items_data'] = errorcalulateItemsApiResponse['data']
                     errorInvoice = Error_Insert_invoice(error_data)
@@ -360,23 +352,20 @@ def holidayinManualupload(data):
                     errorInvoice = Error_Insert_invoice(error_data)
                     B2C = "B2C"
                     B2B = np.nan
-                    
+                    print(errorInvoice)
                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":data['company']})
             countIn+=1
         df = pd.DataFrame(output_date)
         df = df.groupby('date').count().reset_index()
         output_data = df.to_dict('records')
         InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":data['company']})
         # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
+        print(str(e),"   Opera manual ")
         print(traceback.print_exc())
-        frappe.db.delete('File', {'file_url': data['invoice_file']})
-        # frappe.db.delete('File',{'file_url': data['gst_file']})
-        frappe.db.commit()
-        print(str(e),"   manual_upload")
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":str(e),"company":data['company']})
-        return {"success":False,"message":str(e)}
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
+        return {"success":False,"message":str(e)}    
