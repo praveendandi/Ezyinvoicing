@@ -8,6 +8,7 @@ import json
 from frappe.utils import logger
 from frappe.utils import get_site_name
 import time
+import traceback,os,sys
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
@@ -21,6 +22,9 @@ def check_company_exist_for_Irn(code):
 		company = frappe.get_doc('company', code)
 		return {"success":True,"data":company}
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing check_company_exist_for_Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+
 		print(e,"check company exist")
 		return {"success":False,"message":e}
 
@@ -89,6 +93,8 @@ def attach_qr_code(invoice_number, gsp,code):
 			invoice.save()
 		return
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing attach_qr_code","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		print(e, "attach qr code")
 
 
@@ -167,6 +173,8 @@ def create_credit_qr_image(invoice_number, gsp):
 
 		return {"succes":True,"message":"QR Generated Successfully"}
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing create_credit_qr_image","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		print(e, " credit qr image")
 
 def request_get_data(api, headers,invoice,code):
@@ -199,6 +207,8 @@ def request_get_data(api, headers,invoice,code):
 		else:
 			print(raw_response.text)
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing request_get_data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		print(e,"request get")
 
 
@@ -284,6 +294,8 @@ def get_tax_payer_details_data(data):
 			return {"success":True,"data":doc}
 	except Exception as e:
 		print(e,"get tax payers")
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing get_tax_payer_details_data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":e}
 	   
 
@@ -349,6 +361,8 @@ def creditgsp_api_data(data):
 		return {"success":True,"data":api_details}
 	except Exception as e:
 		print(e,"gsp api details")
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing credit_gsp_api_data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}
 
 def insert_credit_items(items,invoice_number):
@@ -366,6 +380,8 @@ def insert_credit_items(items,invoice_number):
 		return {"sucess":True,"data":doc}
 				# print(doc)
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing insert_credit_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		print(e,"insert itemns api")
 		return {"success":False,"message":e}
 
@@ -384,6 +400,8 @@ def insert_discount_items(items,invoice_number):
 		return {"sucess":True,"data":doc}
 				# print(doc)
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing insert_discount_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		print(e,"insert itemns api")
 		return {"success":False,"message":e}
 
@@ -625,8 +643,10 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 		return response
 	except Exception as e:
 		print(str(e), "Credit generate Irn")
-		frappe.log_error(frappe.get_traceback(),invoice_number)
+		# frappe.log_error(frappe.get_traceback(),invoice_number)
 		logger.error(f"{invoice_number},     Credit Generate Irn,   {str(e)}")
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing CreditgenerateIrn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success": False, "message": str(e)}
 
 
@@ -673,7 +693,9 @@ def postIrn(gst_data, gsp,company,invoice_number):
 		# print(irn_response.text)
 	except Exception as e:
 		print(e, "post irn credit")
-		frappe.log_error(frappe.get_traceback(),invoice_number)
+		# frappe.log_error(frappe.get_traceback(),invoice_number)
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing postIrn Credit","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		logger.error(f"{invoice_number},     Credit Generate Irn,   {str(e)}")
 		return {"success": False, 'message':str(e)}
 

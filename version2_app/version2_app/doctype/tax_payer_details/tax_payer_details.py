@@ -16,76 +16,79 @@ Headers = {
     'Content-Type': 'application/json'
 } 
 import datetime
+import os,sys,traceback
 
 @frappe.whitelist(allow_guest=True)
 def getTaxPayerDetails(data):
+    try:
+        if data['type'] == "All":
+            if data['status'] == "All":
+                taxpayerdata = frappe.db.get_list('TaxPayerDetail',
+                    # filters={
+                    # 	'Status': data['status']
+                    # },
+                    fields=['gst_number','legal_name','trade_name','creation','status'],
+                    order_by=data['sortKey'],
+                    start=data['start'],
+                    page_length=data['end'],
+                    as_list=True
+                )
+            else:
+                taxpayerdata = frappe.db.get_list('TaxPayerDetail',
+                    filters={
+                        'Status': data['status']
+                    },
+                    fields=['gst_number','legal_name','trade_name','creation','status'],
+                    order_by=data['sortKey'],
+                    start=data['start'],
+                    page_length=data['end'],
+                    as_list=True
+                )
 
-    if data['type'] == "All":
-        if data['status'] == "All":
-            taxpayerdata = frappe.db.get_list('TaxPayerDetail',
-                # filters={
-                # 	'Status': data['status']
-                # },
-                fields=['gst_number','legal_name','trade_name','creation','status'],
-                order_by=data['sortKey'],
-                start=data['start'],
-                page_length=data['end'],
-                as_list=True
-            )
         else:
             taxpayerdata = frappe.db.get_list('TaxPayerDetail',
-                filters={
-                    'Status': data['status']
-                },
-                fields=['gst_number','legal_name','trade_name','creation','status'],
-                order_by=data['sortKey'],
-                start=data['start'],
-                page_length=data['end'],
-                as_list=True
+            filters={
+                data['key']: ['like', '%'+data['value']+'%']
+            },
+            fields=['gst_number','legal_name','trade_name','creation','status'],
+            order_by=data['sortKey'],
+            start=data['start'],
+            page_length=data['end'],
+            as_list=True)
+        data = []
+        indata = []
+        countquery = frappe.db.get_list('TaxPayerDetail',
+                fields=['count(name) as count']
             )
-
-    else:
-        taxpayerdata = frappe.db.get_list('TaxPayerDetail',
-        filters={
-            data['key']: ['like', '%'+data['value']+'%']
-        },
-        fields=['gst_number','legal_name','trade_name','creation','status'],
-        order_by=data['sortKey'],
-        start=data['start'],
-        page_length=data['end'],
-        as_list=True)
-    data = []
-    indata = []
-    countquery = frappe.db.get_list('TaxPayerDetail',
-            fields=['count(name) as count']
-        )
-    count={"gstCount":countquery[0]['count']}
-    for each in list(taxpayerdata):
-        listData = {}
-        listData['gstNumber'] = each[0]
-        listData['trade_name'] = each[2]
-        listData['legal_name'] = each[1]
-        listData['creation'] = each[3]
-        listData['status'] = each[4]
-        invoiceData = frappe.db.get_list('Invoices',filters={'gst_number':each[0]},fields=['has_credit_items','name','invoice_number'],as_list=True)
-        # listData['']
-        listData['invoice_count'] = len(list(invoiceData))
-        # credit_count = [x for x in list(invoiceData) if "Yes" in list(x)]
-        creditCount = 0
-        for each in list(invoiceData):
-            if "Yes" in list(each):
-                creditCount+=1
-        listData['credit_count'] = creditCount
-        data.append(listData)
-        
-    return {"success":True,"data":data,"count":count}
+        count={"gstCount":countquery[0]['count']}
+        for each in list(taxpayerdata):
+            listData = {}
+            listData['gstNumber'] = each[0]
+            listData['trade_name'] = each[2]
+            listData['legal_name'] = each[1]
+            listData['creation'] = each[3]
+            listData['status'] = each[4]
+            invoiceData = frappe.db.get_list('Invoices',filters={'gst_number':each[0]},fields=['has_credit_items','name','invoice_number'],as_list=True)
+            # listData['']
+            listData['invoice_count'] = len(list(invoiceData))
+            # credit_count = [x for x in list(invoiceData) if "Yes" in list(x)]
+            creditCount = 0
+            for each in list(invoiceData):
+                if "Yes" in list(each):
+                    creditCount+=1
+            listData['credit_count'] = creditCount
+            data.append(listData)
+            
+        return {"success":True,"data":data,"count":count}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing getTaxPayerDetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))    
+        return {"success": False, "message":str(e)}
 
 def request_get(api, data,company):
     try:
         
-    
-        # print(api,data,company,company['proxy'])
-        # print(company.proxy)
+
         headerData = {
             "user_name": data['apidata']["username"],
             "password": data['apidata']["password"],
@@ -116,6 +119,8 @@ def request_get(api, data,company):
         else:
             print(raw_response)
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing request_get","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e,"request get")
 
 @frappe.whitelist(allow_guest=True)
@@ -213,5 +218,7 @@ def TaxPayerDetails(data):
             return {"success":True,"data":tay_payer_details,"update":True}
     except Exception as e:
         print(e,"get tax payers")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing TaxPayerDetail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":e}
 

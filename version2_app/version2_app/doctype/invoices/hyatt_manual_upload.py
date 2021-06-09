@@ -6,7 +6,7 @@ from datetime import date
 import requests
 import datetime
 import random
-import traceback
+import traceback,os,sys
 import string
 from frappe.utils import get_site_name
 import pandas as pd
@@ -367,5 +367,7 @@ def hyattbulkupload(data):
     except Exception as e:
         print(str(e),"   Opera manual ")
         print(traceback.print_exc())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing hyattbulkupload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
         return {"success":False,"message":str(e)}    
