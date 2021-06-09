@@ -11,6 +11,7 @@ import sys
 import datetime
 import importlib.util
 import traceback
+import requests
 from datetime import date, timedelta
 
 import shutil
@@ -114,37 +115,37 @@ def update_documentbin(filepath, error_log):
 
 
 def fileCreated(doc, method=None):
-	try:
-		if 'job-' in doc.file_name:
-			if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
-				update_documentbin(doc.file_url,"")
-				abs_path = os.path.dirname(os.getcwd())
-				company_doc = frappe.get_doc("company",doc.attached_to_name)
-				new_parsers = company_doc.new_parsers
-				if new_parsers == 0:
-					file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
-				else:
-					file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
-				module_name = 'file_parsing'
-				spec = importlib.util.spec_from_file_location(module_name, file_path)
-				module = importlib.util.module_from_spec(spec)
-				spec.loader.exec_module(module)
-				module.file_parsing(doc.file_url)
-				frappe.log_error(traceback.print_exc())
-				logger.error(f"fileCreated,   {traceback.print_exc()}")
-		else:
-			if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
-				update_documentbin(doc.file_url,"")
+    try:
+        if 'job-' in doc.file_name:
+            if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
+                update_documentbin(doc.file_url,"")
+                abs_path = os.path.dirname(os.getcwd())
+                company_doc = frappe.get_doc("company",doc.attached_to_name)
+                new_parsers = company_doc.new_parsers
+                if new_parsers == 0:
+                    file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                else:
+                    file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                module_name = 'file_parsing'
+                spec = importlib.util.spec_from_file_location(module_name, file_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                module.file_parsing(doc.file_url)
+                frappe.log_error(traceback.print_exc())
+                logger.error(f"fileCreated,   {traceback.print_exc()}")
+        else:
+            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
+                update_documentbin(doc.file_url,"")
 
-			print('Normal File')
-		logger.error(f"fileCreated,   {traceback.print_exc()}")
-	except Exception as e:
-		frappe.log_error(traceback.print_exc())
-		logger.error(f"fileCreated,   {traceback.print_exc()}")
-		print(str(e), "fileCreated")
-		update_documentbin(doc.file_url,str(e))
-		print(traceback.print_exc())
-		return {"success":False,"message":str(e)}
+            print('Normal File')
+        logger.error(f"fileCreated,   {traceback.print_exc()}")
+    except Exception as e:
+        frappe.log_error(traceback.print_exc())
+        logger.error(f"fileCreated,   {traceback.print_exc()}")
+        print(str(e), "fileCreated")
+        update_documentbin(doc.file_url,str(e))
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):
     if doc.status=="Success":
@@ -357,6 +358,86 @@ def deleteemailfilesdaily():
     except Exception as e:
         return {"success":False,"message":str(e)}
 
+
+def gspmeteringhook(doc,method=None):
+    try: 
+        company = frappe.get_last_doc('company')
+        inputData = {"data":{"doctype":"Gsp Metering","property_code":company.name,'tax_payer_details':doc.tax_payer_details,'login':doc.login,'generate_irn':doc.generate_irn,'get_irn_details_by_doc':doc.get_irn_details_by_doc,'cancel_irn':doc.cancel_irn,'invoice_by_irn':doc.invoice_by_irn,'create_qr_image':doc.create_qr_image,'status':doc.status}}
+        print(inputData)
+        headers = {'Content-Type': 'application/json'}
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                }
+            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,proxies=proxies,verify=False)
+        else:
+            if company.skip_ssl_verify == 1:
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
+            else:
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+        print(json_response,"/////////")
+        return json_response     
+    except Exception as e:
+        print(str(e))    
+
+def taxpayerhook(doc,method=None):
+    try:
+        company = frappe.get_doc('company',doc.company)
+        headers = {'Content-Type': 'application/json'}
+        
+        inputData = {'doctype':'TaxPayerDetail','gst_number':doc.gst_number,'legal_name':doc.legal_name,'email':doc.email,'address_1':doc.address_1,'address_2':doc.address_2,'location':doc.location,'pincode':doc.pincode,'gst_status':doc.gst_status,'tax_type':doc.tax_type,'trade_name':doc.trade_name,'phone_number':doc.phone_number,'state_code':doc.state_code,'address_floor_number':doc.address_floor_number,'address_street':doc.address_street,'status':doc.status,'block_status':doc.block_status}
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                }
+            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,proxies=proxies,verify=False)
+        else:
+            if company.skip_ssl_verify == 1:
+                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
+            else:
+                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+        if insertTaxpayer.status_code==200:
+            print("--------- Taxpayer hook")
+        return insertTaxpayer            
+    except Exception as e:
+        print(str(e))  
+
+
+
+def InvoiceDataTolicensing():
+    company = frappe.get_last_doc('company')
+    today = date.today()# - timedelta(days=43)
+    Invoice_count = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]],'mode':'Testing'},fields=['count(name) as count','invoice_category','mode'],group_by='invoice_category')
+    Invoice_count2 = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]],'mode':'Production'},fields=['count(name) as count','invoice_category','mode'],group_by='invoice_category')
+    print(Invoice_count,".a.a.a.a.a.")
+    print(Invoice_count2)
+    headers = {'Content-Type': 'application/json'}
+    
+    if len(Invoice_count)>0:
+        inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Testing"}}
+        for each in Invoice_count:
+            if each['invoice_category'] == "Tax Invoice":
+                inputData['data']['taxinvoices'] = each['count']
+            if each['invoice_category'] == "Debit Invoice":
+                inputData['data']['debitinvoices'] = each['count']
+            if each['invoice_category'] == "Credit Invoice":
+                inputData['data']['creditinvoices'] = each['count']        
+        json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)
+    
+    if len(Invoice_count2)>0:
+        inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Production"}}
+        for each in Invoice_count2:
+            if each['invoice_category'] == "Tax Invoice":
+                inputData['data']['taxinvoices'] = each['count']
+            if each['invoice_category'] == "Debit Invoice":
+                inputData['data']['debitinvoices'] = each['count']
+            if each['invoice_category'] == "Credit Invoice":
+                inputData['data']['creditinvoices'] = each['count']
+        json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)         
 def dailyDeletedocumentBin():
     try:
         company = frappe.get_last_doc('company')

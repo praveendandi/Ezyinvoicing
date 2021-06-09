@@ -84,6 +84,8 @@
   "sc_sac_code",
   "system_storage_path",
   "reconciliation_format",
+  "reverse_calculation",
+  "system_storage_path",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -571,6 +573,11 @@
    "fieldname": "custom_e_tax_invoice_footer_image",
    "fieldtype": "Attach",
    "label": "Custom E Tax Invoice Footer Image"
+  },
+  {
+   "fieldname": "licensing_host",
+   "fieldtype": "Data",
+   "label": "Licensing Host"
   },
   {
    "default": "0",

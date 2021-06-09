@@ -726,6 +726,12 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
                                             headers=headers,
                                             json=payload,
                                             proxies=proxies,verify=False)
+        if cancel_response.status_code == 200:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","cancel_irn":'True',"status":"Success","company":company.name})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+        else:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","cancel_irn":'True',"status":"Failed","company":company.name})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)									
         repsone = cancel_response.json()
         return repsone
     except Exception as e:
@@ -782,7 +788,13 @@ def create_qr_image(invoice_number, gsp):
             qr_response = requests.get(gsp['generate_qr_code'],
                                        headers=headers,
                                        stream=True,
-                                       proxies=proxies,verify=False)						   
+                                       proxies=proxies,verify=False)	
+        if qr_response.status_code==200:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+        else:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)								   					   
         file_name = invoice_number + "qr.png"
         full_file_path = path + file_name
         with open(full_file_path, "wb") as f:
@@ -849,10 +861,14 @@ def postIrn(gst_data, gsp, company, invoice_number):
 
         # print(irn_response.text)
         if irn_response.status_code == 200:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company.name})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             return irn_response.json()
         else:
             message_error = str(irn_response.text)
             logger.error(f"{invoice_number},     postIrn,   {message_error}")
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company.name})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             return {"success": False, 'message': irn_response.text}
         # print(irn_response.text)
     except Exception as e:
@@ -2661,87 +2677,108 @@ def get_tax_payer_details(data):
     get TaxPayerDetail from gsp   gstNumber, code, apidata
     '''
     try:
-        tay_payer_details = frappe.db.get_value('TaxPayerDetail',
-                                                data['gstNumber'])
+        company = frappe.get_doc('company',data['code'])
+        headers = {'Content-Type': 'application/json'}
+        tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
         if tay_payer_details is None:
-            response = request_get(
-                data['apidata']['get_taxpayer_details'] + data['gstNumber'],
-                data['apidata'], data['invoice'], data['code'])
-            
-            if response['success']:
-                company = frappe.get_doc('company',data['code'])
-                details = response['result']
-                if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
-                    if (details['AddrBno'] != "") or (details['AddrBno'] !=
-                                                        ""):
-                        details['AddrBnm'] = details['AddrBno']
-                if (details['AddrBno'] == "") or (details['AddrBno'] == None):
-                    if (details['AddrBnm'] != "") or (details['AddrBnm'] !=
-                                                        None):
-                        details['AddrBno'] = details['AddrBnm']
-                if (details['TradeName'] == "") or (details['TradeName']
-                                                    == None):
-                    if (details['LegalName'] != "") or (details['TradeName'] !=
-                                                        None):
-                        details['TradeName'] = details['LegalName']
-                if (details['LegalName'] == "") or (details['LegalName']
-                                                    == None):
-                    if (details['TradeName'] != "") or (details['TradeName'] !=
-                                                        None):
-                        details['LegalName'] = details['TradeName']
-                if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
-                    details['AddrLoc'] = "New Delhi"
-
-                if len(details["AddrBnm"]) < 3:
-                    details["AddrBnm"] = details["AddrBnm"] + "    "
-                if len(details["AddrBno"]) < 3:
-                    details["AddrBno"] = details["AddrBno"] + "    "
-                tax_payer = frappe.new_doc('TaxPayerDetail')
-                tax_payer.gst_number = details['Gstin']
-                tax_payer.email = " "
-                tax_payer.phone_number = " "
-                tax_payer.legal_name = details['LegalName']
-                tax_payer.address_1 = details['AddrBnm']
-                tax_payer.address_2 = details['AddrBno']
-                tax_payer.location = details['AddrLoc']
-                tax_payer.pincode = details['AddrPncd']
-                tax_payer.gst_status = details['Status']
-                tax_payer.tax_type = details['TxpType']
-                if company.disable_sez == 1:
-                    tax_payer.tax_type = "REG"
-                tax_payer.company = data['code']
-                tax_payer.trade_name = details['TradeName']
-                tax_payer.state_code = details['StateCode']
-                tax_payer.last_fetched = datetime.date.today()
-                tax_payer.address_floor_number = details['AddrFlno']
-                tax_payer.address_street = details['AddrSt']
-                tax_payer.block_status = ''
-                tax_payer.status = details['Status']
-                if details['Status'] == "ACT":
-                    tax_payer.status = 'Active'
-                    doc = tax_payer.insert(ignore_permissions=True)
-                    return {"success": True, "data": doc}
+            if company.proxy == 1:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                                'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+                json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,proxies=proxies,verify=False)
+            else:
+                if company.skip_ssl_verify == 1:
+                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                 else:
-                    tax_payer.status = 'In-Active'
-                    doc = tax_payer.insert(ignore_permissions=True)
+                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+            if json_response.content:
+                response = request_get(
+                    data['apidata']['get_taxpayer_details'] + data['gstNumber'],
+                    data['apidata'], data['invoice'], data['code'])
+                
+                if response['success']:
+                    company = frappe.get_doc('company',data['code'])
+                    details = response['result']
+                    if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
+                        if (details['AddrBno'] != "") or (details['AddrBno'] !=
+                                                            ""):
+                            details['AddrBnm'] = details['AddrBno']
+                    if (details['AddrBno'] == "") or (details['AddrBno'] == None):
+                        if (details['AddrBnm'] != "") or (details['AddrBnm'] !=
+                                                            None):
+                            details['AddrBno'] = details['AddrBnm']
+                    if (details['TradeName'] == "") or (details['TradeName']
+                                                        == None):
+                        if (details['LegalName'] != "") or (details['TradeName'] !=
+                                                            None):
+                            details['TradeName'] = details['LegalName']
+                    if (details['LegalName'] == "") or (details['LegalName']
+                                                        == None):
+                        if (details['TradeName'] != "") or (details['TradeName'] !=
+                                                            None):
+                            details['LegalName'] = details['TradeName']
+                    if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
+                        details['AddrLoc'] = "New Delhi"
+
+                    if len(details["AddrBnm"]) < 3:
+                        details["AddrBnm"] = details["AddrBnm"] + "    "
+                    if len(details["AddrBno"]) < 3:
+                        details["AddrBno"] = details["AddrBno"] + "    "
+                    tax_payer = frappe.new_doc('TaxPayerDetail')
+                    tax_payer.gst_number = details['Gstin']
+                    tax_payer.email = " "
+                    tax_payer.phone_number = " "
+                    tax_payer.legal_name = details['LegalName']
+                    tax_payer.address_1 = details['AddrBnm']
+                    tax_payer.address_2 = details['AddrBno']
+                    tax_payer.location = details['AddrLoc']
+                    tax_payer.pincode = details['AddrPncd']
+                    tax_payer.gst_status = details['Status']
+                    tax_payer.tax_type = details['TxpType']
+                    if company.disable_sez == 1:
+                        tax_payer.tax_type = "REG"
+                    tax_payer.company = data['code']
+                    tax_payer.trade_name = details['TradeName']
+                    tax_payer.state_code = details['StateCode']
+                    tax_payer.last_fetched = datetime.date.today()
+                    tax_payer.address_floor_number = details['AddrFlno']
+                    tax_payer.address_street = details['AddrSt']
+                    tax_payer.block_status = ''
+                    tax_payer.status = details['Status']
+                    if details['Status'] == "ACT":
+                        tax_payer.status = 'Active'
+                        doc = tax_payer.insert(ignore_permissions=True)
+                        return {"success": True, "data": doc}
+                    else:
+                        tax_payer.status = 'In-Active'
+                        doc = tax_payer.insert(ignore_permissions=True)
+                        return {
+                            "success": False,
+                            "message": "Gst Number is Inactive"
+                        }
+                else:
+                    print("Unknown error in get taxpayer details get call  ",
+                            response)
+                    error_message = "Invalid GstNumber "+data['gstNumber']
+                    frappe.log_error(frappe.get_traceback(), data['gstNumber'])
+                    logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
                     return {
                         "success": False,
-                        "message": "Gst Number is Inactive"
+                        "message": error_message,
+                        "response": response
                     }
+                  
             else:
-                print("Unknown error in get taxpayer details get call  ",
-                        response)
-                error_message = "Invalid GstNumber "+data['gstNumber']
-                frappe.log_error(frappe.get_traceback(), data['gstNumber'])
-                logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
-                return {
-                    "success": False,
-                    "message": error_message,
-                    "response": response
-                }
+                json_response['doctype'] ="TaxPayerDetail"
+                doc = frappe.get_doc(json_response)
+                doc.insert(ignore_permissions=True, ignore_links=True)
+                get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
+                return {"success": True, "data": get_doc}
         else:
             doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
-            return {"success": True, "data": doc}
+            headers = {'Content-Type': 'application/json'}
+            return {"success": True, "data": doc}  
     except Exception as e:
         print(e, "get tax payers")
         frappe.log_error(frappe.get_traceback())
@@ -2798,13 +2835,16 @@ def login_gsp(code,mode):
             'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
         ],
                                   as_dict=1)
+        # company = frappe.get_doc('company',code)						  
         if mode == 'Testing':
             headers = {
                 "gspappid": gsp["gsp_test_app_id"],
                 "gspappsecret": gsp["gsp_test_app_secret"],
             }
             login_response = request_post(gsp['auth_test'], code, headers)
-
+            print("***********88")
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
             gsp_update.gsp_test_token_expired_on = login_response['expires_in']
             gsp_update.gsp_test_token = login_response['access_token']
@@ -2816,12 +2856,16 @@ def login_gsp(code,mode):
                 "gspappsecret": gsp["gsp_prod_app_secret"]
             }
             login_response = request_post(gsp['auth_prod'], code, headers)
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
             gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
             gsp_update.gsp_prod_token = login_response['access_token']
             gsp_update.save(ignore_permissions=True)
             return True
     except Exception as e:
+        insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
+        insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
         print(e, "login gsp")
 
 @frappe.whitelist()
@@ -2841,7 +2885,8 @@ def updatelogin_gsp(data):
                 "gspappsecret": gsp["gsp_test_app_secret"],
             }
             login_response = request_post(gsp['auth_test'], code, headers)
-
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
             gsp_update.gsp_test_token_expired_on = login_response['expires_in']
             gsp_update.gsp_test_token = login_response['access_token']
@@ -2854,6 +2899,8 @@ def updatelogin_gsp(data):
                 "gspappsecret": gsp["gsp_prod_app_secret"]
             }
             login_response = request_post(gsp['auth_prod'], code, headers)
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
             gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
             gsp_update.gsp_prod_token = login_response['access_token']
@@ -2861,6 +2908,8 @@ def updatelogin_gsp(data):
             gsp_update.save(ignore_permissions=True)
             return True
     except Exception as e:
+        insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
+        insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
         print(e, "login gsp")
 
 @frappe.whitelist()
@@ -3072,8 +3121,12 @@ def request_get(api, headers, invoice, code):
             raw_response = requests.get(api, headers=headers, proxies=proxies,verify=False)
         # print(raw_response.json())
         if raw_response.status_code == 200:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","tax_payer_details":'True',"status":"Success","company":code})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             return raw_response.json()
         else:
+            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","tax_payer_details":'True',"status":"Failed","company":code})
+            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             print(raw_response.text)
     except Exception as e:
         print(e, "request get")
