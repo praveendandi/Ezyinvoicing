@@ -32,7 +32,10 @@ def operabulkupload(data):
 		companyData = frappe.get_doc('company',data['company'])
 		site_folder_path = companyData.site_name
 		items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-		items_dataframe = pd.read_excel(items_file_path)
+		if ".CSV" in items_file_path:
+			items_dataframe = pd.read_csv(items_file_path)
+		else:
+			items_dataframe = pd.read_excel(items_file_path)
 		
 		columnslist = items_dataframe.columns.values.tolist()
 		columnslist = columnslist[0].split("|")
@@ -62,7 +65,7 @@ def operabulkupload(data):
 			else:
 				val[7] = "empty"	
 				
-			each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[44]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
+			each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[43]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
 			# total_invoice_amount = float(val[-1])+float(val[])
 			sgst = 0 if val[46]!="" else float(val[46])
 			cgst = 0 if val[47]!="" else float(val[47])
