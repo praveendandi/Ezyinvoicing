@@ -10,7 +10,6 @@ frappe.utils.logger.set_log_level("DEBUG")
 @frappe.whitelist(allow_guest=True)
 def sendInvoicesToWhatsApp(data):
     try:
-        print(insert)
         company = frappe.get_last_doc('company')
         # notid_data = frappe.db.get_list('WhatsApp Credentials', {'notification_type': data['notification_type']}, ['scenario_key', 'template_name','notification_type','api_key','api'])
         if company.whats_app == 1:
