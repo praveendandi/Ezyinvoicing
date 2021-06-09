@@ -8,6 +8,7 @@ from frappe.model.document import Document
 from datetime import datetime, date
 import re
 from frappe.utils import logger
+import sys, os, traceback
 frappe.utils.logger.set_log_level("DEBUG")
 
 
@@ -87,5 +88,6 @@ def create_pos_bills(bills):
 
         return True
     except Exception as e:
-        frappe.log_error("create_pos_bills",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy passport_address","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False, "error":str(e)}
