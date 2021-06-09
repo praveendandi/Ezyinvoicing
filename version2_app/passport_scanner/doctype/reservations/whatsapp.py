@@ -1,6 +1,7 @@
 import frappe
 import requests
 import json
+import sys, os, traceback
 from frappe.utils import logger
 
 
@@ -9,6 +10,7 @@ frappe.utils.logger.set_log_level("DEBUG")
 @frappe.whitelist(allow_guest=True)
 def sendInvoicesToWhatsApp(data):
     try:
+        print(insert)
         company = frappe.get_last_doc('company')
         # notid_data = frappe.db.get_list('WhatsApp Credentials', {'notification_type': data['notification_type']}, ['scenario_key', 'template_name','notification_type','api_key','api'])
         if company.whats_app == 1:
@@ -39,6 +41,7 @@ def sendInvoicesToWhatsApp(data):
             print(r.json())		
             return {"success":True, "message":"Invoice sent successfully"}
     except Exception as e:
-        frappe.log_error("sendInvoicesToWhatsApp",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy sendInvoicesToWhatsApp","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 

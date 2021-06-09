@@ -15,6 +15,7 @@ import sys
 import os
 import re
 import xmltodict
+import traceback
 import numpy as np
 from scipy import ndimage
 from PIL import Image
@@ -75,7 +76,8 @@ def file_parsing():
                             frappe.db.commit()
         return {"success":True,"message":"Reservations successfully added"}
     except Exception as e:
-        frappe.log_error("file_parsing",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy file_parsing","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 CASCADE = os.path.join(abs_path,"apps/version2_app/version2_app/passport_scanner/doctype/reservations/","Har_cascade.xml")
@@ -99,7 +101,8 @@ def detect_faces(image_path, number):
             break
         return {"success":True, "data":face_path}
     except IndexError as e:
-        frappe.log_error("detect_faces",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy detect_faces","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 def text_getter(image_file):
@@ -133,7 +136,8 @@ def text_getter(image_file):
             response['responses'][0]) > 0 else ''
         return {"success":True, "data":text}
     except Exception as e:
-        frappe.log_error("text_getter",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy text_getter","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 def aadhar_detect_text(image_file, doc_type):
@@ -218,7 +222,8 @@ def aadhar_detect_text(image_file, doc_type):
             state = ''   
             return {"success": True,"data": {'person_address': person_address, "postal_code": postal_code, "state": state}}
     except Exception as e:
-        frappe.log_error("aadhar_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy aadhar_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
 
 def imgdeskew(image):
@@ -250,7 +255,8 @@ def imgdeskew(image):
             os.remove(basedir+company.site_name+"/private/files/aadhar_cropped_skewed_image.jpeg")
             return {"success": True, "data": base64_string}
     except Exception as e:
-        frappe.log_error("imgdeskew",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy imgdeskewu","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})    
 
 
@@ -278,7 +284,8 @@ def image_processing(image):
         output = output_data["data"]
         return {"success":True, "data": output}
     except Exception as e:
-        frappe.log_error("image_processing",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy image_processing","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
 
 # API to scan aadhar card images
@@ -351,7 +358,8 @@ def scan_aadhar():
             f.write(imgdata)
 
         details = {"base64_string": cropped_aadhar}
-        frappe.log_error("scan_aadhar",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_aadhar","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"error": str(e), "success": False, "aadhar_details": details,"message":"Unable to scan Aadhar"})
     except Exception as e:
         base = frappe.local.form_dict.get("aadhar_image")
@@ -368,7 +376,8 @@ def scan_aadhar():
             return {"success": False,"error": croppedaadhar["message"],"message":"Unable to scan Aadhar"}
         cropped_aadhar = croppedaadhar["data"]
         details = {"base64_string": cropped_aadhar}
-        frappe.log_error("scan_aadhar",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_aadhar","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"error": str(e), "success": False, "aadhar_details": details,"message":"Unable to scan Aadhar"})
 
 
@@ -537,7 +546,8 @@ def license_detect_text(image_file):
         # logger.info(f"time elapsed for parse text is{time.time()-req_time}")
         return {"success":True,"data":details}
     except Exception as e:
-        frappe.log_error("license_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy license_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
 
 # API to scan driving license images
@@ -610,7 +620,8 @@ def scan_driving_license():
         driving_cropped = drivingcropped["data"]
         details = {'base64_string': driving_cropped}
         os.remove(filename)
-        frappe.log_error("scan_driving",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_driving","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False, "driving_details": details})
     except Exception as e:
         base = frappe.local.form_dict.get("driving_image")
@@ -626,7 +637,8 @@ def scan_driving_license():
         driving_cropped = drivingcropped["data"]
         details = {'base64_string': driving_cropped}
         os.remove(filename)
-        frappe.log_error("scan_driving",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_driving","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False, "driving_details": details})
 
 
@@ -686,7 +698,8 @@ def pan_detect_text(image_file):
         details = {"name":name,"father_name":father_name,"pan_no":bca[0],"date_of_birth":parsed_birth,"pan_face":image_string}
         return {"success":True, "data": details}
     except Exception as e:
-        frappe.log_error("pan_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy pan_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})   
 
 # API to scan pan card images
@@ -708,10 +721,12 @@ def scan_pancard():
         os.remove(filename)
         return ({"success": True, "details": details})
     except IndexError as e:
-        frappe.log_error("PanCardDetail",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_pancard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False})
     except Exception as e:
-        frappe.log_error("PanCardDetail",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_pancard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success": False, "message": str(e)})
 
 
@@ -946,10 +961,12 @@ def voter_detect_text(image_file, doc_type):
             # logger.info(f"time elapsed for parse text is {time.time()-req_time}")
             return {"success":True,"data":{"person_address": person_address, "Date_of_birth": date_of_birth, "postal_code": postal_code, "state": state}}
     except IndexError as e:
-        frappe.log_error("voter_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy voter_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
     except Exception as e:
-        frappe.log_error("voter_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy voter_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
 
 # API to scan voter card images
@@ -1043,7 +1060,8 @@ def scan_votercard():
         voter_cropped = votercropped["data"]
         details = {"base64_string": voter_cropped}
         os.remove(filename)
-        frappe.log_error("Votefront",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_votercard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False, "voter_details": details})
     except Exception as e:
         print(str(e))
@@ -1061,7 +1079,8 @@ def scan_votercard():
         voter_cropped = votercropped["data"]
         details = {"base64_string": voter_cropped}
         os.remove(filename)
-        frappe.log_error("Votefront",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy scan_votercard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False, "voter_details": details})
 
 class customException(Exception):
@@ -1338,13 +1357,16 @@ def pass_detect_text(image_file):
             #     details={"type":"partial data","message":"image not scaned properly"}
             #     return details
     except IndexError as e:
-        frappe.log_error("pass_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False, "type":"partial data","message":str(e)})
     except NoneType as e:
-        frappe.log_error("pass_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False, "type":"partial data","message":str(e)})
     except Exception as e:
-        frappe.log_error("pass_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False, "type":"partial data","message":str(e)})
 
 def rotate(imagepath,number):
@@ -1428,13 +1450,16 @@ def passportvisadetails():
         #     f"time elapsed for api request is{time.time()-api_time}")
         return ({"success": True, "details": details})
     except OSError as e:
-        frappe.log_error("passportvisadetails",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy passportvisadetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"error": "Unable to scan your id, please try again", "success": False})
     except IndexError as e:
-        frappe.log_error("passportvisadetails",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy passportvisadetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": "Unable to scan your id, please try again", "success": False})
     except Exception as e:
-        frappe.log_error("passportvisadetails",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy passportvisadetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success": False, "message": "Unable to scan your id, please try again"})
 
 def passport_address_detect_text(image_file):
@@ -1487,7 +1512,8 @@ def passport_address_detect_text(image_file):
 
         return {"success":True,"data":{"personaddress": re.sub("[^a-zA-Z0-9:\s,-]|", "", person_address)}}
     except Exception as e:
-        frappe.log_error("passport_address_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy passport_address_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
 
 # API to passort address images
@@ -1508,7 +1534,8 @@ def passport_address():
 
         return ({"data": details, "success": True})
     except Exception as e:
-        frappe.log_error("passportaddress",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy passport_address","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return({"success": False, "message": "Unable to scan your id, please try again"})
 
 # def qr_scan(img_path):
@@ -1600,7 +1627,8 @@ def qr_detect_text(image_file):
         print("details:", details)
         return {"success":True,"data":details}
     except Exception as e:
-        frappe.log_error("qr_detect_text",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy qr_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})
 
 # API to scan QR-Visa and E-Visa images
@@ -1681,5 +1709,6 @@ def other_images():
         # logger.info("Image Cropped and Skewed successfully")
         return ({"success": True, "otherimage_details": details})
     except Exception as e:
-        frappe.log_error("Other_images",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy other_images","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False})
