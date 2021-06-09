@@ -27,7 +27,7 @@ def sendInvoicesToWhatsApp(data):
                     "whatsApp": {
                         "templateName": "invoice",
                         "mediaTemplateData": {
-                            "header": {"documentUrl":(company.domain_url+invData.invoice_file).replace("//","/"),"documentFilename":"Invoice"+data['invoice_number']},
+                            "header": {"documentUrl":str(company.domain_url+invData.invoice_file),"documentFilename":"Invoice"+data['invoice_number']},
                             "body": {
                                 "placeholders": [invData.guest_name,str(invData.invoice_date)]
                             }
