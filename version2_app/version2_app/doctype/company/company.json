@@ -84,8 +84,6 @@
   "sc_sac_code",
   "system_storage_path",
   "reconciliation_format",
-  "reverse_calculation",
-  "system_storage_path",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -113,7 +111,8 @@
   "scenario_key",
   "template_name",
   "api_key",
-  "api"
+  "api",
+  "domain_url"
  ],
  "fields": [
   {
@@ -710,11 +709,16 @@
    "fieldname": "api",
    "fieldtype": "Data",
    "label": "Api"
+  },
+  {
+   "fieldname": "domain_url",
+   "fieldtype": "Data",
+   "label": "Domain URL"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-03 10:24:04.412259",
+ "modified": "2021-06-09 18:38:01.027183",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
