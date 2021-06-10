@@ -24,6 +24,7 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 @frappe.whitelist(allow_guest=True)
 def operabulkupload(data):
 	try:
+		company_list = ["ICSJWMA-01"]
 		print("startt--------------------------")
 		start_time = datetime.datetime.now()
 		folder_path = frappe.utils.get_bench_path()
@@ -60,19 +61,42 @@ def operabulkupload(data):
 			# print(each)
 			val = each[0].split("|")
 			print(val)
-			if len(val[7])>5:
-				invoice_type = "B2B"
+			if companyData.name in company_list:
+				if len(val[7])>5:
+					invoice_type = "B2B"
+				else:
+					val[7] = "empty"
+				each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[20],"guestname":val[8],"invoiceamount":float(val[31]),"taxcode_dsc":val[22],"sgst":val[33],"cgst":val[34],"igst":val[35],"cess":val[36]}
+				# total_invoice_amount = float(val[-1])+float(val[])
+				sgst = 0 if val[33]!="" else float(val[33])
+				cgst = 0 if val[34]!="" else float(val[34])
+				igst = 0 if val[35]!="" else float(val[35])
+				cess = 0 if val[36]!="" else float(val[36])
+				# total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
+				each["total_invoice_amount"] = float(val[-1])
+				# if each['taxinvnum'] not in invoice_referrence_objects:
+						
+				# 	invoice_referrence_objects[each['taxinvnum']] = []
+				# 	invoice_referrence_objects[each['taxinvnum']].append(each)
+				# else:
+				# 	invoice_referrence_objects[each['taxinvnum']].append(each)
+				# paymentTypes = GetPaymentTypes()
+				# payment_Types  = [''.join(each) for each in paymentTypes['data']]
+				# each['invoicedate'] = str(each['invoicedate'])	
 			else:
-				val[7] = "empty"	
-				
-			each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[43]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
-			# total_invoice_amount = float(val[-1])+float(val[])
-			sgst = 0 if val[46]!="" else float(val[46])
-			cgst = 0 if val[47]!="" else float(val[47])
-			igst = 0 if val[48]!="" else float(val[48])
-			cess = 0 if val[49]!="" else float(val[49])
-			total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
-			each["total_invoice_amount"] = total_invoice_amount
+				if len(val[7])>5:
+					invoice_type = "B2B"
+				else:
+					val[7] = "empty"	
+					
+				each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[43]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
+				# total_invoice_amount = float(val[-1])+float(val[])
+				sgst = 0 if val[46]!="" else float(val[46])
+				cgst = 0 if val[47]!="" else float(val[47])
+				igst = 0 if val[48]!="" else float(val[48])
+				cess = 0 if val[49]!="" else float(val[49])
+				total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
+				each["total_invoice_amount"] = total_invoice_amount
 			if each['taxinvnum'] not in invoice_referrence_objects:
 					
 				invoice_referrence_objects[each['taxinvnum']] = []
@@ -193,7 +217,7 @@ def operabulkupload(data):
 			if len(each['gstNumber']) < 15 and len(each['gstNumber'])>0:
 				error_data['error_message'] = "Invalid GstNumber"
 				error_data['amened'] = 'No'
-				
+				error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
 				errorcalulateItemsApiResponse = calulate_items(each)
 				if errorcalulateItemsApiResponse['success'] == True:
 					error_data['items_data'] = errorcalulateItemsApiResponse['data']
