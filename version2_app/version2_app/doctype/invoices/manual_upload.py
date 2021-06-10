@@ -35,7 +35,7 @@ def manual_upload(data):
             event="data_import",
             now=False,
             data = data,
-			is_async = False,
+			is_async = True,
 			)		
     return True    
 

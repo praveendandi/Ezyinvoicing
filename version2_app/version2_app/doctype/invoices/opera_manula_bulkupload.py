@@ -60,7 +60,7 @@ def operabulkupload(data):
         for each in valuesdata:
             # print(each)
             val = each[0].split("|")
-            print(val)
+            # print(val)
             if companyData.name in company_list:
                 if len(val[7])>5:
                     invoice_type = "B2B"
