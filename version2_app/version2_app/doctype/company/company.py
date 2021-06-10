@@ -150,7 +150,7 @@ def gitCurrentBranchCommit():
     except Exception as e:
         print("git branch commit id:  ", str(e))
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing getCurrentBranchCommit","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing gitCurrentBranchCommit GIT","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -165,7 +165,7 @@ def gitUiBranchCommit(company):
         return {"success": True, "message": b}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing gitUiBranchCommit","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing gitUiBranchCommit GIT","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print("git branch commit id:  ", str(e))
         return {"success": False, "message": str(e)}
 
@@ -201,7 +201,7 @@ def gitpull(data):
         frappe.db.commit()
         print("git branch commit id:  ", str(e))
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing gitpull","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing gitpull GIT","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -277,7 +277,7 @@ def addsacindex():
     except Exception as e:
         print("addsacindex", str(e))
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing addsacindex","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing addsacindex SAC","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -596,7 +596,7 @@ def bench_migrate():
     except Exception as e:
         print(str(e),"      bench_migrate")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing bench_migrate","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing bench_migrate Migrate","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"messgae":str(e)}                                
 
 
@@ -663,7 +663,7 @@ def updateUiProd(company):
         frappe.log_error("Angular project pull data","updateUiProd")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing updateUiProd","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing updateUiProd GIT","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e),"    updateUiProd")
 
 
@@ -692,7 +692,7 @@ def updateProxySettings(data):
             return {"success":False,"message":"No Proxy Settings"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing updateProxySettings","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing updateProxySettings Proxy","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e),"  updateProxySettings  ")
         return {"success":False,"message":str(e)}    
 
@@ -722,7 +722,7 @@ def reprocess_error_documentbin_invoices(docdate):
             return {"success":False, "message":"no data found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing reprocess_error_documentbin_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing reprocess_error_documentbin_invoices Document bin","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print("reprocess_error_inoices", str(e))
         return {"success":False,"message":str(e)}
         
