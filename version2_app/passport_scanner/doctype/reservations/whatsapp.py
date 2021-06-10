@@ -14,6 +14,7 @@ def sendInvoicesToWhatsApp(data):
         # notid_data = frappe.db.get_list('WhatsApp Credentials', {'notification_type': data['notification_type']}, ['scenario_key', 'template_name','notification_type','api_key','api'])
         if company.whats_app == 1:
             invData = frappe.get_doc('Invoices',data['invoice_number'])
+            print(company.domain_url+invData.invoice_file,"-------------------")
             print((company.host+invData.invoice_file).replace("//","/"))
             headers = {'Authorization': 'App '+company.api_key}# 2e9e6626d70f854946b88eb638fbe03b-953c7fcf-71ef-433a-a48a-1ad7855a4089'}
             input_data={"scenarioKey": company.scenario_key,
