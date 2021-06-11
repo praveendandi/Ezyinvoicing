@@ -36,7 +36,7 @@ def invoice_created(doc, method=None):
                 bin_doc.save(ignore_permissions=True,ignore_version=True)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoice_created","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))            
+        frappe.log_error("Ezy-invoicing invoice_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))            
         return {"success":False,"message":str(e)}
 
 def company_created(doc,method=None):
@@ -49,7 +49,7 @@ def company_created(doc,method=None):
         r = requests.post(api,headers=headers,json=insert_dict)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing company_created","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))   
+        frappe.log_error("Ezy-invoicing company_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))   
         return {"success":False,"message":str(e)}
 
 def invoice_deleted(doc,method=None):
@@ -67,7 +67,7 @@ def invoice_deleted(doc,method=None):
         soc_doc.insert(ignore_permissions=True)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoice_deleted","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing invoice_deleted Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 def invoiceCreated(doc):
@@ -97,7 +97,7 @@ def invoiceCreated(doc):
     except Exception as e:
         print(str(e), "Invoice Created Socket Method")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoiceCreated","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing invoiceCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
@@ -125,7 +125,7 @@ def update_documentbin(filepath, error_log):
         print(str(e), "update_documentbin")
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing update_documentbin","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing update_documentbin Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 
@@ -159,7 +159,7 @@ def fileCreated(doc, method=None):
         logger.error(f"fileCreated,   {traceback.print_exc()}")
         print(str(e), "fileCreated")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing fileCreated","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         update_documentbin(doc.file_url,str(e))
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
@@ -172,7 +172,7 @@ def Updateemitsocket(doc,method=None):
             frappe.publish_realtime("custom_socket", {'message':'bench  update started','type':"bench update","company":company.name})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing Updateemitsocket","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing Updateemitsocket Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 def DocumentBinSocket(doc,method=None):
@@ -182,7 +182,7 @@ def DocumentBinSocket(doc,method=None):
         frappe.publish_realtime("custom_socket", {'message':'Document Bin Insert','type':"document_bin_insert","data":doc.__dict__,"company":company.name})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing DocumentBinSocket","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing DocumentBinSocket Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 def updateManager(doc, method=None):
@@ -215,7 +215,7 @@ def updateManager(doc, method=None):
             frappe.log_error("Angular project pull data","update manager")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing updateManager","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing updateManager Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e),"    updateManager")
 
         
@@ -247,7 +247,7 @@ def deleteemailfilesdaily():
         return {"success":True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing deletemailfilesdaily","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing deletemailfilesdaily Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 
@@ -273,7 +273,7 @@ def gspmeteringhook(doc,method=None):
         return json_response     
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing gspmeteringhook","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing gspmeteringhook Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))    
 
 def taxpayerhook(doc,method=None):
@@ -299,7 +299,7 @@ def taxpayerhook(doc,method=None):
         return insertTaxpayer            
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing taxpayerhook","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing taxpayerhook Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))  
 
 
@@ -338,7 +338,7 @@ def InvoiceDataTolicensing():
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing InvoiceDataToLicensing","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing InvoiceDataToLicensing Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 
 
 
@@ -352,7 +352,7 @@ def dailyDeletedocumentBin():
         return {"success":True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing dailyDeletedocumentBin","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing dailyDeletedocumentBin Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}	
 
 def dailyIppprinterFiles():
@@ -362,5 +362,5 @@ def dailyIppprinterFiles():
         os.mkdir(company.ipp_printer_file_path)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing dailyIppprinterFiles","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing dailyIppprinterFiles Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))

@@ -214,5 +214,5 @@ def BulkUploadReprocess(data):
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing BulkUploadReprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing BulkUploadReprocess Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}  				

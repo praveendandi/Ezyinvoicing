@@ -379,6 +379,6 @@ def holidayinManualupload(data):
         frappe.db.commit()
         print(str(e),"   manual_upload")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing holidayinManualupload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing holidayinManualupload Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":str(e),"company":data['company']})
         return {"success":False,"message":str(e)}

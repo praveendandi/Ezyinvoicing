@@ -24,6 +24,7 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 @frappe.whitelist(allow_guest=True)
 def operabulkupload(data):
     try:
+        company_list = ["ICSJWMA-01"]
         print("startt--------------------------")
         start_time = datetime.datetime.now()
         folder_path = frappe.utils.get_bench_path()
@@ -32,7 +33,10 @@ def operabulkupload(data):
         companyData = frappe.get_doc('company',data['company'])
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-        items_dataframe = pd.read_excel(items_file_path)
+        if ".CSV" in items_file_path:
+            items_dataframe = pd.read_csv(items_file_path)
+        else:
+            items_dataframe = pd.read_excel(items_file_path)
         
         columnslist = items_dataframe.columns.values.tolist()
         columnslist = columnslist[0].split("|")
@@ -56,20 +60,35 @@ def operabulkupload(data):
         for each in valuesdata:
             # print(each)
             val = each[0].split("|")
-            print(val)
-            if len(val[7])>5:
-                invoice_type = "B2B"
+            # print(val)
+            if companyData.name in company_list:
+                if len(val[7])>5:
+                    invoice_type = "B2B"
+                else:
+                    val[7] = "empty"
+                each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[20],"guestname":val[8],"invoiceamount":float(val[31]),"taxcode_dsc":val[22],"sgst":val[33],"cgst":val[34],"igst":val[35],"cess":val[36]}
+                # total_invoice_amount = float(val[-1])+float(val[])
+                sgst = 0 if val[33]!="" else float(val[33])
+                cgst = 0 if val[34]!="" else float(val[34])
+                igst = 0 if val[35]!="" else float(val[35])
+                cess = 0 if val[36]!="" else float(val[36])
+                # total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
+                each["total_invoice_amount"] = float(val[-1])
+                    
             else:
-                val[7] = "empty"	
-                
-            each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[44]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
-            # total_invoice_amount = float(val[-1])+float(val[])
-            sgst = 0 if val[46]!="" else float(val[46])
-            cgst = 0 if val[47]!="" else float(val[47])
-            igst = 0 if val[48]!="" else float(val[48])
-            cess = 0 if val[49]!="" else float(val[49])
-            total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
-            each["total_invoice_amount"] = total_invoice_amount
+                if len(val[7])>5:
+                    invoice_type = "B2B"
+                else:
+                    val[7] = "empty"	
+                    
+                each = {"invoicedate":val[6],"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[43]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
+                # total_invoice_amount = float(val[-1])+float(val[])
+                sgst = 0 if val[46]!="" else float(val[46])
+                cgst = 0 if val[47]!="" else float(val[47])
+                igst = 0 if val[48]!="" else float(val[48])
+                cess = 0 if val[49]!="" else float(val[49])
+                total_invoice_amount = float(val[-1])+sgst+igst+cess+cgst
+                each["total_invoice_amount"] = total_invoice_amount
             if each['taxinvnum'] not in invoice_referrence_objects:
                     
                 invoice_referrence_objects[each['taxinvnum']] = []
@@ -188,14 +207,14 @@ def operabulkupload(data):
             # print(len(each['gstNumber']),"lennn",each['gstNumber'],each['invoice_type'])
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
             if len(each['gstNumber']) < 15 and len(each['gstNumber'])>0:
-                error_data['error_message'] = "Invalid GstNumber"
+                error_data['error_message'] = "Invalid GstNumber999"
                 error_data['amened'] = 'No'
-                
+                error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
                 errorcalulateItemsApiResponse = calulate_items(each)
                 if errorcalulateItemsApiResponse['success'] == True:
                     error_data['items_data'] = errorcalulateItemsApiResponse['data']
                 errorInvoice = Error_Insert_invoice(error_data)
-                print("Error:  *******The given gst number is not a vaild one**********")
+                print("Error:  *******The given gst number is not a vaild one-----------")
                 B2B = "B2B"
                 B2C = np.nan
                 output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -363,6 +382,6 @@ def operabulkupload(data):
         print(str(e),"   Opera manual ")
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing operabulkupload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing operabulkupload Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
         return {"success":False,"message":str(e)}    

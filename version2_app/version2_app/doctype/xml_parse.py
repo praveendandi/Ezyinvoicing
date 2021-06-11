@@ -122,7 +122,7 @@ def extract_xml(file_list):
         return True
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing extract_xml","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing extract_xml Reconciliation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
@@ -147,7 +147,7 @@ def invoice_check(data):
         return data
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoice_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing invoice_check Reconciliation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False, "message": str(e)}    
             
 

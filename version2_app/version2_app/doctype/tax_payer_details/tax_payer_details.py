@@ -82,7 +82,7 @@ def getTaxPayerDetails(data):
         return {"success":True,"data":data,"count":count}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing getTaxPayerDetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))    
+        frappe.log_error("Ezy-invoicing getTaxPayerDetails Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))    
         return {"success": False, "message":str(e)}
 
 def request_get(api, data,company):
@@ -120,7 +120,7 @@ def request_get(api, data,company):
             print(raw_response)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing request_get","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing request_get Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e,"request get")
 
 @frappe.whitelist(allow_guest=True)
@@ -219,6 +219,6 @@ def TaxPayerDetails(data):
     except Exception as e:
         print(e,"get tax payers")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing TaxPayerDetail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing TaxPayerDetails Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":e}
 

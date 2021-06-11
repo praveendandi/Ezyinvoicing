@@ -416,7 +416,7 @@ def manual_upload_data(data):
         # frappe.log_error(frappe.get_traceback(), 'enques')
         # make_error_snapshot(e)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing manual_upload_data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing manual_upload_data Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
         return {"success":False,"message":str(e)}    
 

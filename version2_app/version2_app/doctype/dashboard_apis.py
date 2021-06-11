@@ -14,7 +14,7 @@ def invoicecategorycount():
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoicecategorycount","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing invoicecategorycount Dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}   
 
 @frappe.whitelist(allow_guest=True)
@@ -29,7 +29,7 @@ def invoicedetailscount(data):
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoicedetailscount","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing invoicedetailscount Dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
@@ -64,7 +64,7 @@ def GSTR1Statistics(data):
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing GSTR1Statistics","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing GSTR1Statistics Dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}
 
 
@@ -79,7 +79,7 @@ def invoicereconsiliationcount(data):
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing invoicereconsiliationcount","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing invoicereconsiliationcount Dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}
 
 

@@ -507,7 +507,7 @@ def attach_qr_code(invoice_number, gsp, code):
         return {"message":"Qr Generated Succesfull","success":True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing attach_qr_code","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing attach_qr_code Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach qr code")
 
 
@@ -702,7 +702,7 @@ def send_invoicedata_to_gcb(invoice_number):
     except Exception as e:
         print(e, "send invoicedata to gcb")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing send_invoi","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing send_invoicedata_to_gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -750,7 +750,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
         print("cancel irn", e)
         # frappe.log_error(frappe.get_traceback(), invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing cancel_irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing cancel_irn Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         logger.error(f"{invoice_number},     cancel_irn,   {str(e)}")
         return {"success": False, "message": str(e)}
 
@@ -838,7 +838,7 @@ def create_qr_image(invoice_number, gsp):
         print(e, "qr image")
         # frappe.log_error(frappe.get_traceback(),invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing create_qr_image","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing create_qr_image Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         logger.error(f"{invoice_number},     create_qr_image,   {str(e)}")
         return {"success": False, "message": str(e)}
 
@@ -891,7 +891,7 @@ def postIrn(gst_data, gsp, company, invoice_number):
         print(e, "post irn")
         # frappe.log_error(frappe.get_traceback(), invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing postIrn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing postIrn Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         logger.error(f"{invoice_number},     postIrn,   {str(e)}")
         return {"success": False, "message": str(e)}
 
@@ -2816,7 +2816,7 @@ def get_tax_payer_details(data):
         print(e, "get tax payers")
         # frappe.log_error(frappe.get_traceback())
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing get_tax_payer_details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing get_tax_payer_details Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         logger.error(f"get_tax_payer_details,   {str(e)}")
         return {"success": False, "message": str(e)}
 
@@ -2865,7 +2865,7 @@ def check_token_is_valid(data):
     except Exception as e:
         print(e, "check token is valid")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_token_is_valid","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing check_token_is_valid Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -2908,7 +2908,7 @@ def login_gsp(code,mode):
         insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
         insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing login_gsp","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing login_gsp Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "login gsp")
 
 @frappe.whitelist()
@@ -2954,7 +2954,7 @@ def updatelogin_gsp(data):
         insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
         insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing updatelogin_gsp","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing updatelogin_gsp Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "login gsp")
 
 @frappe.whitelist()
@@ -3020,7 +3020,7 @@ def gsp_api_data(data):
     except Exception as e:
         print(e,"gsp api details")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing gsp_api_data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing gsp_api_data Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
         
 
@@ -3109,7 +3109,7 @@ def gsp_api_data_for_irn(data):
     except Exception as e:
         print(e, "gsp api details for irn")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing gsp_api_data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing gsp_api_data_for_irn Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -3140,7 +3140,7 @@ def request_post(url, code, headers=None):
             print(data)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing request_post","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing request_post Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "request post")
 
 
@@ -3181,7 +3181,7 @@ def request_get(api, headers, invoice, code):
             print(raw_response.text)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing request_get","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing request_get Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "request get")
 
 
