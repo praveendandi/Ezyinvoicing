@@ -2710,7 +2710,6 @@ def get_tax_payer_details(data):
     get TaxPayerDetail from gsp   gstNumber, code, apidata
     '''
     try:
-        print(data,"========================")
         company = frappe.get_doc('company',data['code'])
         headers = {'Content-Type': 'application/json'}
         tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
