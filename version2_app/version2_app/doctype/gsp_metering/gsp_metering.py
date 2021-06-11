@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 import calendar
 import frappe
-import traceback
+import traceback,os,sys
 import requests
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -100,6 +100,8 @@ def gspmeteringdata(data):
         return {"success":True,"data":data_dict}
     except Exception as e:
         print(traceback.print_exc())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing gspmeteringdata","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}  
 
 
@@ -149,6 +151,8 @@ def GstDataImportToLicensing():
         return {"success":True,"message":"No Data Available"}
     except Exception as e:
         print(traceback.print_exc())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing GstDataImportToLicensing","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e),"message2":traceback.print_exc()}
 
 

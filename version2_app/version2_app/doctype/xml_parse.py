@@ -1,7 +1,7 @@
 import json
 import xmltodict
 import frappe
-import os
+import os,traceback,sys
 import re
 import requests
 import json
@@ -121,6 +121,8 @@ def extract_xml(file_list):
                     reconciliations_doc.save()
         return True
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing extract_xml Reconciliation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
@@ -128,20 +130,25 @@ def extract_xml(file_list):
 
 @frappe.whitelist(allow_guest=True)
 def invoice_check(data):
-    filte=frappe.db.get_values('Invoice Reconciliations',filters={'bill_generation_date':['=', data["date"]]})
-    invoice=frappe.db.get_values('Invoices',{"docstatus":0},"name")
-    invoice=list(sum(invoice, ()))
-    filte=list(sum(filte, ()))
-    print(invoice)
-    print(filte)
-    data=[]
-    for each in filte:
-        if each in invoice:
-            data.append({"Invoice Number":each, "Invoice Found":"Yes"})
-        else:
-            data.append({"Invoice Number":each, "Invoice Found":"No"})
-    print(data)
-    return data
+    try:
+        filte=frappe.db.get_values('Invoice Reconciliations',filters={'bill_generation_date':['=', data["date"]]})
+        invoice=frappe.db.get_values('Invoices',{"docstatus":0},"name")
+        invoice=list(sum(invoice, ()))
+        filte=list(sum(filte, ()))
+        print(invoice)
+        print(filte)
+        data=[]
+        for each in filte:
+            if each in invoice:
+                data.append({"Invoice Number":each, "Invoice Found":"Yes"})
+            else:
+                data.append({"Invoice Number":each, "Invoice Found":"No"})
+        print(data)
+        return data
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing invoice_check Reconciliation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False, "message": str(e)}    
             
 
 

@@ -1,6 +1,6 @@
 import frappe
 from frappe.model.document import Document
-import os
+import os,sys,traceback
 import requests
 import json
 import string
@@ -82,6 +82,8 @@ def Report_Download(data):
 
     except Exception as e:
         print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing Report_Download","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return{"success":False,"message":str(e)}   
 
 
@@ -96,4 +98,6 @@ def Report_Delete(data):
         return{"success":True}
     except Exception as e:
         print(str(e),"  Report Delete")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing Report_Delete","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return{"success":False,"message":str(e)}    

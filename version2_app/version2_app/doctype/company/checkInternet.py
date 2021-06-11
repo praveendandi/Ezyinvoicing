@@ -1,5 +1,5 @@
 import frappe
-import requests
+import requests,os,sys,traceback
 @frappe.whitelist(allow_guest=True)
 def CheckInternetConnection():
     try:
@@ -28,5 +28,7 @@ def CheckInternetConnection():
             return False
     except Exception as e:
         print(str(e), "      CheckInternet")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing CheckInternetConnection","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return False        
 

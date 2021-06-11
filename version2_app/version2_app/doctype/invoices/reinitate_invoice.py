@@ -5,7 +5,7 @@ import requests
 import datetime
 import json
 import random
-import traceback
+import traceback,os,sys
 import string,math
 from frappe.utils import get_site_name
 import time
@@ -324,6 +324,8 @@ def Reinitiate_invoice(data):
             update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
         return {"success":True,"data":returnData}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing Reinitiate_invoice","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e,"reinitaite invoice", traceback.print_exc())
         return {"success":False,"message":str(e)}
 
@@ -1002,6 +1004,8 @@ def reprocess_calulate_items(data):
             return {"success": False}
     except Exception as e:
         print(e, "calculation api")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing reprocess_calulate_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -1073,6 +1077,8 @@ def auto_adjustment(data):
                 return {"success": False, "message": reinitate["message"]}
             return {"success": True, "message": "Adjustment was successfully adjusted"}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing auto_adjustment","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "auto_adjustment")
         return {"success": False, "message": str(e)}
 
@@ -1161,5 +1167,7 @@ def b2b_success_to_credit_note(data):
             # frappe.db.commit()
             return {"success": True, "message": "Credit Note Raised Successfully"}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing b2b_success_to_credit_note","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach b2c qrcode")
         return {"success": False, "message": str(e)}
