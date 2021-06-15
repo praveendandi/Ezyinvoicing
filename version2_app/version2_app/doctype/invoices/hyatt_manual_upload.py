@@ -66,9 +66,9 @@ def hyattbulkupload(data):
                 if sac_desc.bulk_upload_service_charge ==1:
                     if sac_desc.one_sc_applies_to_all == 1:
                         # vatamount = (vat_rate_percentage * scharge_value) / 100.0
-                        itemcharge = (each['invoiceamount']*companyData.service_charge_percentage)/100.0
+                        itemcharge = (each['invoiceamount']*companyData.service_charge_percentage)/(100.0+companyData.service_charge_percentage)
                     else:
-                        itemcharge = (each['invoiceamount']*sac_desc.service_charge_rate)/100.0
+                        itemcharge = (each['invoiceamount']*sac_desc.service_charge_rate)/(100.0+sac_desc.service_charge_rate)
 
                     each['invoiceamount'] = each['invoiceamount'] - itemcharge    
             if each['invoice_category'] == "CREDIT INVOICE":
