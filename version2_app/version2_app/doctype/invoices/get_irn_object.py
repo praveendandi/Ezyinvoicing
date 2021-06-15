@@ -7,7 +7,7 @@ from version2_app.version2_app.doctype.invoices.invoices import check_company_ex
 import pandas as pd
 import json
 import string
-import qrcode
+import qrcode,sys,traceback
 import os, os.path
 import random, string
 from random import randint
@@ -302,4 +302,6 @@ def IrnObject(invoice_number):
 		return {"success":True,"data":gst_data}
 	except Exception as e:
 		print(str(e))
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing IrnObject","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}

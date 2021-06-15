@@ -3,7 +3,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import get_site_name
 import time
-import os
+import os,sys,traceback
 import datetime
 import json
 
@@ -168,6 +168,8 @@ def TotalMismatchError(data,calculated_data):
 		updateInvoi = frappe.get_doc('Invoices', invName)
 		return {"success":True,"invoice_number":data['guest_data']['invoice_number'],'items':data['items_data'],"data":updateInvoi}
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing TotalMismatchError","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}    
 		
 
@@ -196,6 +198,8 @@ def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
 			igst_percentage = 0
 		return {"success":True,"gst_percentage":gst_percentage,"igst_percentage":igst_percentage}
 	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing CheckRatePercentages","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}
 
 
@@ -444,7 +448,8 @@ def error_invoice_calculation(data,data1):
 		doc.save(ignore_permissions=True, ignore_version=True)
 		return True
 	except Exception as e:
-		print(str(e))
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing error_invoice_calculation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		print(traceback.format_exc())
 		return False
 
@@ -474,6 +479,8 @@ def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
 		frappe.log_error(traceback.print_exc())
 		logger.error(f"fileCreated,   {traceback.print_exc()}")
 	except Exception as e:
-		frappe.log_error(traceback.print_exc())
+		# frappe.log_error(traceback.print_exc())
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing update_document_bin","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		logger.error(f"fileCreated,   {traceback.print_exc()}")
 		return {"success":False,"message":str(e)}
