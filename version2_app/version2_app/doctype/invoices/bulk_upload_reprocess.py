@@ -123,7 +123,6 @@ def BulkUploadReprocess(data):
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             for each in line_items['data']:
-                print(each,"////")
                 if each['goods_desc'] not in payment_Types:
                     item_dict = {}
                     if "00:00:00" in each['invoicedate']:
