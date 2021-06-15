@@ -2714,7 +2714,7 @@ def get_tax_payer_details(data):
         headers = {'Content-Type': 'application/json'}
         tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
         if tay_payer_details is None:
-            if company.licensing_host is not None:
+            if company.mode=="Production":
                 if company.proxy == 1:
                     proxyhost = company.proxy_url
                     proxyhost = proxyhost.replace("http://","@")
@@ -2726,8 +2726,90 @@ def get_tax_payer_details(data):
                         json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                     else:
                         json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
-                # if json_response.content:
-            else:    
+                if json_response.content:
+                    response = request_get(
+                        data['apidata']['get_taxpayer_details'] + data['gstNumber'],
+                        data['apidata'], data['invoice'], data['code'])
+                    
+                    if response['success']:
+                        company = frappe.get_doc('company',data['code'])
+                        details = response['result']
+                        if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
+                            if (details['AddrBno'] != "") or (details['AddrBno'] !=
+                                                                ""):
+                                details['AddrBnm'] = details['AddrBno']
+                        if (details['AddrBno'] == "") or (details['AddrBno'] == None):
+                            if (details['AddrBnm'] != "") or (details['AddrBnm'] !=
+                                                                None):
+                                details['AddrBno'] = details['AddrBnm']
+                        if (details['TradeName'] == "") or (details['TradeName']
+                                                            == None):
+                            if (details['LegalName'] != "") or (details['TradeName'] !=
+                                                                None):
+                                details['TradeName'] = details['LegalName']
+                        if (details['LegalName'] == "") or (details['LegalName']
+                                                            == None):
+                            if (details['TradeName'] != "") or (details['TradeName'] !=
+                                                                None):
+                                details['LegalName'] = details['TradeName']
+                        if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
+                            details['AddrLoc'] = "      "
+
+                        if len(details["AddrBnm"]) < 3:
+                            details["AddrBnm"] = details["AddrBnm"] + "    "
+                        if len(details["AddrBno"]) < 3:
+                            details["AddrBno"] = details["AddrBno"] + "    "
+                        tax_payer = frappe.new_doc('TaxPayerDetail')
+                        tax_payer.gst_number = details['Gstin']
+                        tax_payer.email = " "
+                        tax_payer.phone_number = " "
+                        tax_payer.legal_name = details['LegalName']
+                        tax_payer.address_1 = details['AddrBnm']
+                        tax_payer.address_2 = details['AddrBno']
+                        tax_payer.location = details['AddrLoc']
+                        tax_payer.pincode = details['AddrPncd']
+                        tax_payer.gst_status = details['Status']
+                        tax_payer.tax_type = details['TxpType']
+                        if company.disable_sez == 1:
+                            tax_payer.tax_type = "REG"
+                        tax_payer.company = data['code']
+                        tax_payer.trade_name = details['TradeName']
+                        tax_payer.state_code = details['StateCode']
+                        tax_payer.last_fetched = datetime.date.today()
+                        tax_payer.address_floor_number = details['AddrFlno']
+                        tax_payer.address_street = details['AddrSt']
+                        tax_payer.block_status = ''
+                        tax_payer.status = details['Status']
+                        if details['Status'] == "ACT":
+                            tax_payer.status = 'Active'
+                            doc = tax_payer.insert(ignore_permissions=True)
+                            return {"success": True, "data": doc}
+                        else:
+                            tax_payer.status = 'In-Active'
+                            doc = tax_payer.insert(ignore_permissions=True)
+                            return {
+                                "success": False,
+                                "message": "Gst Number is Inactive"
+                            }
+                    else:
+                        print("Unknown error in get taxpayer details get call  ",
+                                response)
+                        error_message = "Invalid GstNumber "+data['gstNumber']
+                        frappe.log_error(frappe.get_traceback(), data['gstNumber'])
+                        logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
+                        return {
+                            "success": False,
+                            "message": error_message,
+                            "response": response
+                        }
+                  
+                else:
+                    json_response['doctype'] ="TaxPayerDetail"
+                    doc = frappe.get_doc(json_response)
+                    doc.insert(ignore_permissions=True, ignore_links=True)
+                    get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
+                    return {"success": True, "data": get_doc}
+            else:
                 response = request_get(
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
                     data['apidata'], data['invoice'], data['code'])
@@ -2754,7 +2836,7 @@ def get_tax_payer_details(data):
                                                             None):
                             details['LegalName'] = details['TradeName']
                     if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
-                        details['AddrLoc'] = "New Delhi"
+                        details['AddrLoc'] = "      "
 
                     if len(details["AddrBnm"]) < 3:
                         details["AddrBnm"] = details["AddrBnm"] + "    "
@@ -2803,13 +2885,6 @@ def get_tax_payer_details(data):
                         "message": error_message,
                         "response": response
                     }
-                  
-            # else:
-            #     json_response['doctype'] ="TaxPayerDetail"
-            #     doc = frappe.get_doc(json_response)
-            #     doc.insert(ignore_permissions=True, ignore_links=True)
-            #     get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
-            #     return {"success": True, "data": get_doc}
         else:
             doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
             headers = {'Content-Type': 'application/json'}

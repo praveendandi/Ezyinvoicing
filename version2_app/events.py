@@ -257,7 +257,7 @@ def gspmeteringhook(doc,method=None):
         inputData = {"data":{"doctype":"Gsp Metering","property_code":company.name,'tax_payer_details':doc.tax_payer_details,'login':doc.login,'generate_irn':doc.generate_irn,'get_irn_details_by_doc':doc.get_irn_details_by_doc,'cancel_irn':doc.cancel_irn,'invoice_by_irn':doc.invoice_by_irn,'create_qr_image':doc.create_qr_image,'status':doc.status}}
         print(inputData)
         headers = {'Content-Type': 'application/json'}
-        if company.licensing_host is not None:
+        if company.mode == "Production":
             if company.proxy == 1:
                 proxyhost = company.proxy_url
                 proxyhost = proxyhost.replace("http://","@")
@@ -272,7 +272,7 @@ def gspmeteringhook(doc,method=None):
                     json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
             print(json_response,"/////////")
             return json_response
-        print("licensing_host is None gspmeteringhook")         
+        print("Property is in Testing Mode gspmeteringhook")         
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing gspmeteringhook Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -284,7 +284,7 @@ def taxpayerhook(doc,method=None):
         headers = {'Content-Type': 'application/json'}
         
         inputData = {'doctype':'TaxPayerDetail','gst_number':doc.gst_number,'legal_name':doc.legal_name,'email':doc.email,'address_1':doc.address_1,'address_2':doc.address_2,'location':doc.location,'pincode':doc.pincode,'gst_status':doc.gst_status,'tax_type':doc.tax_type,'trade_name':doc.trade_name,'phone_number':doc.phone_number,'state_code':doc.state_code,'address_floor_number':doc.address_floor_number,'address_street':doc.address_street,'status':doc.status,'block_status':doc.block_status}
-        if company.licensing_host is not None:
+        if company.mode =="Production":
             if company.proxy == 1:
                 proxyhost = company.proxy_url
                 proxyhost = proxyhost.replace("http://","@")
@@ -300,7 +300,7 @@ def taxpayerhook(doc,method=None):
             if insertTaxpayer.status_code==200:
                 print("--------- Taxpayer hook")
             return insertTaxpayer
-        print("licensing_host is None taxpayerhook")                 
+        print("Property is in Testing Mode taxpayerhook")                 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing taxpayerhook Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -311,34 +311,36 @@ def taxpayerhook(doc,method=None):
 def InvoiceDataTolicensing():
     try:
         company = frappe.get_last_doc('company')
-        today = date.today()# - timedelta(days=43)
-        Invoice_count = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]],'mode':'Testing'},fields=['count(name) as count','invoice_category','mode'],group_by='invoice_category')
-        Invoice_count2 = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]],'mode':'Production'},fields=['count(name) as count','invoice_category','mode'],group_by='invoice_category')
-        print(Invoice_count,".a.a.a.a.a.")
-        print(Invoice_count2)
-        headers = {'Content-Type': 'application/json'}
-        
-        if len(Invoice_count)>0:
-            inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Testing"}}
-            for each in Invoice_count:
-                if each['invoice_category'] == "Tax Invoice":
-                    inputData['data']['taxinvoices'] = each['count']
-                if each['invoice_category'] == "Debit Invoice":
-                    inputData['data']['debitinvoices'] = each['count']
-                if each['invoice_category'] == "Credit Invoice":
-                    inputData['data']['creditinvoices'] = each['count']        
-            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)
-        
-        if len(Invoice_count2)>0:
-            inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Production"}}
-            for each in Invoice_count2:
-                if each['invoice_category'] == "Tax Invoice":
-                    inputData['data']['taxinvoices'] = each['count']
-                if each['invoice_category'] == "Debit Invoice":
-                    inputData['data']['debitinvoices'] = each['count']
-                if each['invoice_category'] == "Credit Invoice":
-                    inputData['data']['creditinvoices'] = each['count']
-            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)         
+        if company.mode == "Production":
+            today = date.today()# - timedelta(days=43)
+            Invoice_count = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]],'mode':'Testing'},fields=['count(name) as count','invoice_category','mode'],group_by='invoice_category')
+            Invoice_count2 = frappe.db.get_list('Invoices',filters={'creation':["Between",[today, today]],'mode':'Production'},fields=['count(name) as count','invoice_category','mode'],group_by='invoice_category')
+            print(Invoice_count,".a.a.a.a.a.")
+            print(Invoice_count2)
+            headers = {'Content-Type': 'application/json'}
+            
+            if len(Invoice_count)>0:
+                inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Testing"}}
+                for each in Invoice_count:
+                    if each['invoice_category'] == "Tax Invoice":
+                        inputData['data']['taxinvoices'] = each['count']
+                    if each['invoice_category'] == "Debit Invoice":
+                        inputData['data']['debitinvoices'] = each['count']
+                    if each['invoice_category'] == "Credit Invoice":
+                        inputData['data']['creditinvoices'] = each['count']        
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)
+            
+            if len(Invoice_count2)>0:
+                inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Production"}}
+                for each in Invoice_count2:
+                    if each['invoice_category'] == "Tax Invoice":
+                        inputData['data']['taxinvoices'] = each['count']
+                    if each['invoice_category'] == "Debit Invoice":
+                        inputData['data']['debitinvoices'] = each['count']
+                    if each['invoice_category'] == "Credit Invoice":
+                        inputData['data']['creditinvoices'] = each['count']
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)         
+        print("Property is in Testing Mode InvoiceDataTolicensing")
     except Exception as e:
         print(traceback.print_exc())
         exc_type, exc_obj, exc_tb = sys.exc_info()

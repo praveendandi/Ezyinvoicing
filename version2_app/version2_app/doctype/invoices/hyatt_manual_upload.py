@@ -195,6 +195,7 @@ def hyattbulkupload(data):
             error_data['room_number'] = each['room_number']
             error_data['pincode'] = ""
             error_data['total_invoice_amount'] = each['total_invoice_amount']
+            error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
             error_data['sez'] = 0
             error_data['invoice_from'] = "File"
             each['sez'] = 0
