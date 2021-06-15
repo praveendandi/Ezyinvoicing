@@ -1093,7 +1093,7 @@ def b2b_success_to_credit_note(data):
         total_data = {}
         if len(invoice_data) > 0:
             invoice_number = data["invoice_number"]+"-1"
-            invoice_date = date_time_obj = datetime.datetime.strptime(str(invoice_data[0]["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+            invoice_date = datetime.datetime.strptime(str(data["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
             for item_each in item_data:
                 sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
