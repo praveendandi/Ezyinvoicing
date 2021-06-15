@@ -224,20 +224,22 @@ def gspmeteringhook(doc,method=None):
         inputData['data']['property_code'] ="HICC-01"
         print(inputData)
         headers = {'Content-Type': 'application/json'}
-        if company.proxy == 1:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://","@")
-            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-                                }
-            json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,proxies=proxies,verify=False)
-        else:
-            if company.skip_ssl_verify == 1:
-                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
+        if company.licensing_host is not None:
+            if company.proxy == 1:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                                'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                    }
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,proxies=proxies,verify=False)
             else:
-                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
-        print(json_response,"/////////")
-        return json_response     
+                if company.skip_ssl_verify == 1:
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
+                else:
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+            print(json_response,"/////////")
+            return json_response
+        print("licensing_host is None gspmeteringhook")         
     except Exception as e:
         print(str(e))    
 
@@ -247,21 +249,23 @@ def taxpayerhook(doc,method=None):
         headers = {'Content-Type': 'application/json'}
         
         inputData = {'doctype':'TaxPayerDetail','gst_number':doc.gst_number,'legal_name':doc.legal_name,'email':doc.email,'address_1':doc.address_1,'address_2':doc.address_2,'location':doc.location,'pincode':doc.pincode,'gst_status':doc.gst_status,'tax_type':doc.tax_type,'trade_name':doc.trade_name,'phone_number':doc.phone_number,'state_code':doc.state_code,'address_floor_number':doc.address_floor_number,'address_street':doc.address_street,'status':doc.status,'block_status':doc.block_status}
-        if company.proxy == 1:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://","@")
-            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
-                                }
-            insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,proxies=proxies,verify=False)
-        else:
-            if company.skip_ssl_verify == 1:
-                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
+        if company.licensing_host is not None:
+            if company.proxy == 1:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                                'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                    }
+                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,proxies=proxies,verify=False)
             else:
-                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
-        if insertTaxpayer.status_code==200:
-            print("--------- Taxpayer hook")
-        return insertTaxpayer            
+                if company.skip_ssl_verify == 1:
+                    insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
+                else:
+                    insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+            if insertTaxpayer.status_code==200:
+                print("--------- Taxpayer hook")
+            return insertTaxpayer
+        print("licensing_host is None taxpayerhook")                 
     except Exception as e:
         print(str(e))  
 

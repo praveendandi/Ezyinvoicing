@@ -2681,18 +2681,20 @@ def get_tax_payer_details(data):
         headers = {'Content-Type': 'application/json'}
         tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
         if tay_payer_details is None:
-            if company.proxy == 1:
-                proxyhost = company.proxy_url
-                proxyhost = proxyhost.replace("http://","@")
-                proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
-                                'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
-                json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,proxies=proxies,verify=False)
-            else:
-                if company.skip_ssl_verify == 1:
-                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
+            if company.licensing_host is not None:
+                if company.proxy == 1:
+                    proxyhost = company.proxy_url
+                    proxyhost = proxyhost.replace("http://","@")
+                    proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                                    'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,proxies=proxies,verify=False)
                 else:
-                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
-            if json_response.content:
+                    if company.skip_ssl_verify == 1:
+                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
+                    else:
+                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+                # if json_response.content:
+            else:    
                 response = request_get(
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
                     data['apidata'], data['invoice'], data['code'])
@@ -2769,12 +2771,12 @@ def get_tax_payer_details(data):
                         "response": response
                     }
                   
-            else:
-                json_response['doctype'] ="TaxPayerDetail"
-                doc = frappe.get_doc(json_response)
-                doc.insert(ignore_permissions=True, ignore_links=True)
-                get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
-                return {"success": True, "data": get_doc}
+            # else:
+            #     json_response['doctype'] ="TaxPayerDetail"
+            #     doc = frappe.get_doc(json_response)
+            #     doc.insert(ignore_permissions=True, ignore_links=True)
+            #     get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
+            #     return {"success": True, "data": get_doc}
         else:
             doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
             headers = {'Content-Type': 'application/json'}
