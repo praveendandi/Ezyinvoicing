@@ -8,6 +8,7 @@ import datetime
 import random
 import traceback,os,sys
 import string
+import xmltodict
 from frappe.utils import get_site_name
 import pandas as pd
 import numpy as np
@@ -35,7 +36,7 @@ def manual_upload(data):
             event="data_import",
             now=False,
             data = data,
-            is_async = True,
+            is_async = False,
             )		
     return True    
 
@@ -65,19 +66,55 @@ def manual_upload_data(data):
             return output	
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-        items_dataframe = pd.read_excel(items_file_path)
-        items_dataframe = items_dataframe.fillna('empty')	
-        items_dataframe['Gst Number'] = "NoGst"
-        invoice_columns = list(items_dataframe.columns.values)
-        invoice_num = list(set(items_dataframe['BILL_NO']))
-        company_check_columns = companyData.bulk_import_invoice_headers
-        company_check_columns = company_check_columns.split(",")
-        if company_check_columns != invoice_columns:
-            frappe.db.delete('File', {'file_url': data['invoice_file']})
-            frappe.db.delete('File',{'file_url': data['gst_file']})
-            frappe.db.commit()
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
-            return {"success":False,"message":"Invoice data mismatch"}
+
+        paymentTypes = GetPaymentTypes()
+        paymentTypes  = [''.join(each) for each in paymentTypes['data']]
+        input_data = []
+        print(paymentTypes)
+        invoice_referrence_objects = {}
+        with open(items_file_path) as xml_file:
+            data_dict = xmltodict.parse(xml_file.read())
+        for each in data_dict['FOLIO_DETAILS']['LIST_G_BILL_NO']['G_BILL_NO']:
+
+            # item_date = datetime.datetime.strptime(each['BILL_GENERATION_DATE'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+            if each['SUMFT_DEBITPERBILL_NO'] is None:
+                each['SUMFT_DEBITPERBILL_NO'] = each['SUMFT_CREDITPERBILL_NO']
+            list_data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
+                    'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
+                    'gstNumber':'empty','company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
+                    'guest_data':{'invoice_category':each['FOLIO_TYPE']}}
+            
+            items = []
+            if isinstance(each['LIST_G_TRX_NO']['G_TRX_NO'], list):
+                for y,x in enumerate(each['LIST_G_TRX_NO']['G_TRX_NO']):
+                    # print(x['TRANSACTION_DESCRIPTION']+"/////")
+                    if x['TRANSACTION_DESCRIPTION'] in paymentTypes or "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                        continue
+                    item_date = datetime.datetime.strptime(x['TRX_DATE'],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
+                    if x['FT_DEBIT'] is None:
+                        x['FT_DEBIT'] = x['FT_CREDIT']
+                    items_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':int(y)+1,"sac_code":'No Sac'}
+                    # print(dict(x))
+                    items.append(items_dict)
+            else:
+
+                x = dict(each['LIST_G_TRX_NO']['G_TRX_NO'])
+                # print(x['TRANSACTION_DESCRIPTION']+"/////////")
+                if x['TRANSACTION_DESCRIPTION'] in paymentTypes or "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                        continue
+                if x['FT_DEBIT'] is None:
+                    x['FT_DEBIT'] = x['FT_CREDIT']    
+                item_date = datetime.datetime.strptime(x['TRX_DATE'],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
+                items.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
+            list_data['items'] = items
+            invoice_referrence_objects[each['BILL_NO']] = list_data
+            input_data.append(list_data)
+        # if company_check_columns != invoice_columns:
+        #     frappe.db.delete('File', {'file_url': data['invoice_file']})
+        #     frappe.db.delete('File',{'file_url': data['gst_file']})
+        #     frappe.db.commit()
+        #     frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
+        #     return {"success":False,"message":"Invoice data mismatch"}
 
         gst_data_file = data['gst_file']
         gst_file_path = folder_path+'/sites/'+site_folder_path+gst_data_file
@@ -85,103 +122,53 @@ def manual_upload_data(data):
         columns = list(gst_dataframe.columns.values)
         gst_data = gst_dataframe.values.tolist()
         gst_data.insert(0,columns)
-        gst_list = []
+        gst_dict = {}
         count = gst_data[0][0].split("|")
         if companyData.bulk_import_gst_count != len(count):
-            frappe.db.delete('File', {'file_url': data['invoice_file']})
-            frappe.db.delete('File',{'file_url': data['gst_file']})
+            # frappe.db.delete('File', {'file_url': data['invoice_file']})
+            # frappe.db.delete('File',{'file_url': data['gst_file']})
             frappe.db.commit()
             frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":"Gst data mismatch","company":company})
             return {"success":False,"message":"Gst data mismatch"}
         for each in gst_data:
             if each[0][0]=="|":
-                inv = each[0].split("|")
+                # inv = each[0].split("|")
+                pass
             else:
-                inv = each[0].split("|")
-                
-                items_dataframe.loc[items_dataframe.BILL_NO==int(inv[1]),'Gst Number'] = inv[0]
-                
+                inv = each[0].split("|")                
                 inv[0] = inv[0].replace("\t\t\t","")
-                gst_list.append({"gst_number":inv[0],"invoice_number":inv[1]})
+                gst_dict[inv[1]] = inv[0]
 
-        input_data = []
-        items_dataframe.loc[(items_dataframe.FOLIO_TYPE=="CREDIT TAX INVOICE"),'FOLIO_TYPE'] = 'Credit Invoice'
-        items_dataframe.loc[(items_dataframe.FOLIO_TYPE=="CREDIT INVOICE"),'FOLIO_TYPE'] = 'Credit Invoice'
-        items_dataframe.loc[(items_dataframe.FOLIO_TYPE=="TAX INVOICE"),'FOLIO_TYPE'] = 'Tax Invoice'
-        output = items_dataframe.to_dict('records')
-        list_data={}
-        invoice_referrence_objects = {}
-        for each in output:
-            del each['BILL_GENERATION_DATE_CHAR']
-            del each['TRX_DATE']
-            each['BILL_GENERATION_DATE'] = str(each['BILL_GENERATION_DATE'])
-            if each['FOLIO_TYPE'] == "SUMFT_DEBITPERREPORT" or each['TRANSACTION_DESCRIPTION']== 'empty':
-                break
-            
-            if each['BILL_NO'] not in invoice_referrence_objects:
-                
-                invoice_referrence_objects[each['BILL_NO']] = []
-                invoice_referrence_objects[each['BILL_NO']].append(each)
-            else:
-                invoice_referrence_objects[each['BILL_NO']].append(each)
-            if "CGST" in each['TRANSACTION_DESCRIPTION'] or "SGST" in each['TRANSACTION_DESCRIPTION'] or "IGST" in each['TRANSACTION_DESCRIPTION']:
-                continue
-            paymentTypes = GetPaymentTypes()
-            payment_Types  = [''.join(each) for each in paymentTypes['data']]
-            
-            if each['TRANSACTION_DESCRIPTION'] not in payment_Types:
-                each['BILL_GENERATION_DATE'] = str(each['BILL_GENERATION_DATE'])
-                item_date = datetime.datetime.strptime(each['BILL_GENERATION_DATE'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
-                if 'invoice_number' not in list_data:
-                    list_data['invoice_category'] = each['FOLIO_TYPE']
-                    list_data['invoice_number'] = each['BILL_NO']
-                    list_data['invoice_date'] = each['BILL_GENERATION_DATE']
-                    list_data['room_number'] = each['ROOM']
-                    list_data['guest_name'] = each['DISPLAY_NAME']
-                    list_data['total_invoice_amount'] = each['SUMFT_DEBITPERBILL_NO']
-                    list_data['gstNumber'] = each['Gst Number']
-                    item_list = {'date':item_date,'item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'}
-                    items = []
-                    items.append(item_list)
-                    list_data['items'] = items
-                    list_data['company_code'] = data['company']
-                    list_data['invoice_number'] = each['BILL_NO']
-                    list_data['place_of_supply'] = companyData.state_code
-                    list_data['invoice_item_date_format'] = companyData.invoice_item_date_format
-                    list_data['guest_data'] = {'invoice_category':list_data['invoice_category']}
-                else:
-                    if list_data['invoice_number'] == each['BILL_NO']:
-                        items = {'date':item_date,"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
-                        list_data['items'].extend([items])
-                    else:
-                        input_data.append(list_data)
-                        list_data = {}
-                        list_data['invoice_category'] = each['FOLIO_TYPE']
-                        list_data['invoice_number'] = each['BILL_NO']
-                        list_data['invoice_date'] = each['BILL_GENERATION_DATE']
-                        list_data['room_number'] = each['ROOM']
-                        list_data['guest_name'] = each['DISPLAY_NAME']
-                        list_data['gstNumber'] = each['Gst Number']
-                        list_data['total_invoice_amount'] = each['SUMFT_DEBITPERBILL_NO']
-                        item_list = {'date':item_date,"sac_code":'No Sac','item_value':each['FT_DEBIT'],'name':each['TRANSACTION_DESCRIPTION'],'sort_order':1}
-                        items = []
-                        items.append(item_list)
-                        list_data['items'] = items
-                        list_data['company_code'] = data['company']
-                        list_data['invoice_number'] = each['BILL_NO']
-                        list_data['place_of_supply'] = companyData.state_code
-                        list_data['invoice_item_date_format'] = companyData.invoice_item_date_format
-                        list_data['guest_data'] = {'invoice_category':list_data['invoice_category']}
         
-        gstNumber = ''
+        
+        
         output_date = []
         # print(len(input_data),"lemnnnnnn output")
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":company})
         countIn = 1
         for each in input_data:
+            print(invoice_referrence_objects[each['invoice_number']],"--------")
+            if each['invoice_category'] == "CREDIT TAX INVOICE":
+                each['invoice_category'] = "Credit Invoice"
+            elif each['invoice_category'] == "CREDIT INVOICE":
+                each['invoice_category'] = "Credit Invoice"
+            elif each['invoice_category'] == "TAX INVOICE":
+                each['invoice_category'] = "Tax Invoice"
+            else:
+                each['invoice_category'] = "Tax Invoice"
+
+            # print(each)
+            if each['invoice_number'] in gst_dict:
+                each['invoice_type'] = "B2B"
+                invoice_referrence_objects[each['invoice_number']['gstNumber']] = gst_dict[each['invoice_number']]
+                each['gstNumber'] = gst_dict[each['invoice_number']]
+            else:
+                each['invoice_type'] = "B2C"
+                each['gstNumber'] = ""
+
             print(countIn,"////////")
-            print(each['invoice_number'],"ionvvvvvvvvvnum")
+            # print(each['invoice_number'],"ionvvvvvvvvvnum")
             check_invoice = check_invoice_exists(str(each['invoice_number']))
             if check_invoice['success']==True:
                 inv_data = check_invoice['data']
@@ -201,29 +188,24 @@ def manual_upload_data(data):
             each['invoice_date'] = each['invoice_date'].replace("/","-")
             each['invoice_date'] = each['invoice_date'].replace("00:00:00","")
             date_time_obj = (each['invoice_date'].split(":")[-1]).strip()
-            date_time_obj = datetime.datetime.strptime(date_time_obj,'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+            date_time_obj = datetime.datetime.strptime(date_time_obj,'%d-%b-%y').strftime('%d-%b-%y %H:%M:%S')
             each['invoice_date'] = date_time_obj
             each['mode'] = companyData.mode
             each['invoice_file'] = ""
-            each['gstNumber'] = each['gstNumber'].strip()
-            if each['gstNumber'] == "NoGst":
-                each['invoice_type'] = "B2C"
-                each['gstNumber']=""
-            else:
-                each['invoice_type'] = "B2B"
-                invoice_referrence_objects[each['invoice_number']][0]['gstNumber'] = each['gstNumber']
+            
             each['confirmation_number'] = each['invoice_number']
             each['print_by'] = "System"
             each['start_time'] = str(datetime.datetime.utcnow())
             each['name'] = each['guest_name']
-            error_data = {"invoice_type":'B2B' if gstNumber != '' else 'B2C',"invoice_number":each['invoice_number'],"company_code":data['company'],"invoice_date":each['invoice_date']}
+            error_data = {"invoice_type":'B2B' if each['gstNumber'] != '' else 'B2C',"invoice_number":each['invoice_number'],"company_code":data['company'],"invoice_date":each['invoice_date']}
             error_data['invoice_file'] = ""
             error_data['guest_name'] = each['guest_name']
-            error_data['gst_number'] = ''
+            error_data['gst_number'] = each['gstNumber']
             if each['invoice_type'] == "B2C":
-                error_data['gst_number'] == " "
+                error_data['gst_number'] == ""
             error_data['state_code'] =  " "
             error_data['room_number'] = each['room_number']
+            error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
             error_data['pincode'] = ""
             error_data['total_invoice_amount'] = each['total_invoice_amount']
             error_data['sez'] = 0
@@ -408,9 +390,9 @@ def manual_upload_data(data):
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
         print(traceback.print_exc())
-        frappe.db.delete('File', {'file_url': data['invoice_file']})
-        if "gst_file" in data:
-            frappe.db.delete('File',{'file_url': data['gst_file']})
+        # frappe.db.delete('File', {'file_url': data['invoice_file']})
+        # if "gst_file" in data:
+        #     frappe.db.delete('File',{'file_url': data['gst_file']})
         frappe.db.commit()
         print(str(e),"   manual_upload")
         # frappe.log_error(frappe.get_traceback(), 'enques')
