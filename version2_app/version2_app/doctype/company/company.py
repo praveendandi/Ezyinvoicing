@@ -725,4 +725,27 @@ def reprocess_error_documentbin_invoices(docdate):
         frappe.log_error("Ezy-invoicing reprocess_error_documentbin_invoices Document bin","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print("reprocess_error_inoices", str(e))
         return {"success":False,"message":str(e)}
-        
+
+
+@frappe.whitelist(allow_guest=True)
+def updateInvoiceSupTyp():
+    try:
+        data = frappe.db.get_list('Invoices',
+                                    filters={
+                                        'suptyp': None,
+                                    },
+                                    fields=["name"])
+        if len(data) > 0:
+            updatetax = frappe.db.sql(
+                """update tabInvoices set suptyp='B2B' where suptyp='None'"""
+            )
+            frappe.db.commit()
+            return {"success":True,"message":"Successfully Updated"}
+        return {"success":False,"message":"No data"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing updateInvoiceSupTyp","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print("updateInvoiceSupTyp", traceback.print_exc())
+        return {"success":False,"message":str(e)}    
+
+
