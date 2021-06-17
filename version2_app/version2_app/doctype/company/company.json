@@ -81,8 +81,6 @@
   "sc_sac_code",
   "system_storage_path",
   "reconciliation_format",
-  "reverse_calculation",
-  "system_storage_path",
   "auto_adjustment",
   "property_group",
   "custom_e_tax_invoice",
@@ -519,11 +517,11 @@
    "label": "System Storage Path"
   },
   {
-   "default": "Credit",
+   "default": "Automatic",
    "fieldname": "auto_adjustment",
    "fieldtype": "Select",
    "label": "Auto Adjustment",
-   "options": "Automatic\nManual\nCredit"
+   "options": "Automatic\nManual"
   },
   {
    "fieldname": "property_group",
@@ -619,7 +617,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-26 16:08:34.866989",
+ "modified": "2021-06-17 13:53:44.524359",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

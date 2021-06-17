@@ -187,7 +187,7 @@ def generateIrn(data):
             "Version": "1.1",
             "TranDtls": {
                 "TaxSch": "GST",
-                "SupTyp": "B2B",
+                "SupTyp": invoice.suptyp,
                 "RegRev": "N",
                 "IgstOnIntra": "Y" if invoice.place_of_supply == company_details['data'].state_code and invoice.sez == 1 else "N"
             },
