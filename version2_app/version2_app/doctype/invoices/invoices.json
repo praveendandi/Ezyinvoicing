@@ -136,7 +136,8 @@
   "change_gst_number",
   "debit_invoice",
   "note",
-  "credit_note_raised"
+  "credit_note_raised",
+  "suptyp"
  ],
  "fields": [
   {
@@ -889,12 +890,19 @@
    "fieldtype": "Select",
    "label": "Credit Note Raised",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "B2B",
+   "fieldname": "suptyp",
+   "fieldtype": "Select",
+   "label": "SupTyp",
+   "options": "B2B\nSEZWP\nSEZWOP"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-05-05 12:39:38.710147",
+ "modified": "2021-06-17 08:33:46.654914",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
