@@ -378,7 +378,7 @@ def updatepropertiesdetails():
     try: 
         gspdetails = frappe.get_last_doc('GSP APIS')
         company = frappe.get_last_doc("company")
-        inputData = {"data":{"doctype":"Properties","company_code":company.name,"api_key":gspdetails.gsp_prod_app_id,'api_secret':gspdetails.gsp_prod_app_secret,'gst_prod_username':gspdetails.gst__prod_username,'gst_prod_password':gspdetails.gst_prod_password,"gsp_test_app_id":gspdetails.gsp_test_app_id,"gsp_test_app_secret":gspdetails.gsp_test_app_secret,"gst_test_username":gspdetails.gst__test_username,"gst_test_password":gspdetails.gst_test_password,"groups":company.property_group}}
+        inputData = {"data":{"doctype":"Properties","company_code":company.name,"api_key":gspdetails.gsp_prod_app_id,'api_secret':gspdetails.gsp_prod_app_secret,'gst_prod_username':gspdetails.gst__prod_username,'gst_prod_password':gspdetails.gst_prod_password,"gsp_test_app_id":gspdetails.gsp_test_app_id,"gsp_test_app_secret":gspdetails.gsp_test_app_secret,"gst_test_username":gspdetails.gst__test_username,"gst_test_password":gspdetails.gst_test_password,"groups":company.property_group,"mode":company.mode}}
         headers = {'Content-Type': 'application/json'}
         if company.mode == "Production":
             if company.proxy == 1:
