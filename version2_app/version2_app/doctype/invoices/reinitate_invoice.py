@@ -316,7 +316,7 @@ def Reinitiate_invoice(data):
         if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
             tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
             if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-                if (invoice_data.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ":
+                if (invoice_data.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or invoice_data.sez==1:
                     pass
                 else:
                     data = {'invoice_number': invoice_data.name,'generation_type': "System"}
