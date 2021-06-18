@@ -13,3 +13,5 @@ opencv-python
 Pillow
 dateparser
 pyzbar
+text-to-image
+Pillow
