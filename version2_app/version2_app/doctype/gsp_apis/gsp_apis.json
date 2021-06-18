@@ -220,11 +220,6 @@
    "label": "GSP PROD App Secret"
   },
   {
-   "fieldname": "gst__prod_username",
-   "fieldtype": "Data",
-   "label": "GST  PROD Username"
-  },
-  {
    "fieldname": "gst_prod_password",
    "fieldtype": "Data",
    "label": "GST PROD Password"
@@ -302,11 +297,16 @@
    "fieldname": "test_token_generated_on",
    "fieldtype": "Datetime",
    "label": "Test Token Generated On "
+  },
+  {
+   "fieldname": "gst__prod_username",
+   "fieldtype": "Data",
+   "label": "GST  PROD Username"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-02-11 12:06:27.083431",
+ "modified": "2021-06-18 10:34:55.603120",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "GSP APIS",
