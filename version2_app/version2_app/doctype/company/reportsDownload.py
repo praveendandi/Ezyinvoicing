@@ -104,20 +104,27 @@ def Report_Delete(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def xlsx_workbook(data):
-    company = frappe.get_doc('company',data['company'])
-    host = company.host
+def xlsx_workbook():
+    # company = frappe.get_doc('company',data['company'])
+    # host = company.host
     folder_path = frappe.utils.get_bench_path()
     # fileName = data['report_name'].replace(" ","")
-    workbook = xlsxwriter.Workbook(home+'/workbook.xlsx')
-    worksheet = workbook.add_worksheet()
+    workbook = xlsxwriter.Workbook('/home/caratred/workbook.xlsx')
+    # worksheet = workbook.add_worksheet()
     header = list(string.ascii_letters[26:52])
-    columnscount = data['columns']
+    # columnscount = data['columns']
 
     merge_format = workbook.add_format({
             'bold': 1,
             'border': 1,
             'align': 'center',
             'valign': 'distributed'})
+
     worksheet1 = workbook.add_worksheet("sample")
+    worksheet2 = workbook.add_worksheet("fun")
+
+    worksheet1.write('A1', 123)
+    worksheet2.write('A1', 333)
+    workbook.close()
+    return True
         
