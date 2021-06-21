@@ -101,3 +101,23 @@ def Report_Delete(data):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing Report_Delete","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return{"success":False,"message":str(e)}    
+
+
+@frappe.whitelist(allow_guest=True)
+def xlsx_workbook(data):
+    company = frappe.get_doc('company',data['company'])
+    host = company.host
+    folder_path = frappe.utils.get_bench_path()
+    # fileName = data['report_name'].replace(" ","")
+    workbook = xlsxwriter.Workbook(home+'/workbook.xlsx')
+    worksheet = workbook.add_worksheet()
+    header = list(string.ascii_letters[26:52])
+    columnscount = data['columns']
+
+    merge_format = workbook.add_format({
+            'bold': 1,
+            'border': 1,
+            'align': 'center',
+            'valign': 'distributed'})
+    worksheet1 = workbook.add_worksheet("sample")
+        
