@@ -23,6 +23,7 @@ def Reinitiate_invoice(data):
     insert invoice data     data, company_code, taxpayer,items_data
     '''
     try:
+        print(data['total_invoice_amount'],"*****")
         generateb2cQr = True	
         total_invoice_amount = data['total_invoice_amount']
         # del data['total_invoice_amount']
@@ -157,12 +158,13 @@ def Reinitiate_invoice(data):
 
         
         if data['total_invoice_amount'] == 0:
+            print("///////")
             total = (value_after_gst + other_charges) - credit_value_after_gst
             if (total>0 and total<1) or (total>-1 and total<1):
                 data['total_invoice_amount'] = 0
             else:
                 data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
-
+                print(data['total_invoice_amount'],"--------")
         if "address_1" not in data['taxpayer']:
             data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
         if '-' in str(sales_amount_after_tax):
@@ -251,7 +253,7 @@ def Reinitiate_invoice(data):
         
 
         doc.irn_generated=irn_generated
-        invoice_round_off_amount =  float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
+        invoice_round_off_amount =  float(data['total_invoice_amount']) - float(abs(pms_invoice_summary+other_charges))
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
             if len(data['items_data'])==0:
                 doc.ready_to_generate_irn = "No"
@@ -314,7 +316,7 @@ def Reinitiate_invoice(data):
         if invoice_data.invoice_type == "B2B" and invoice_data.invoice_from=="Pms":
             tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
             if invoice_data.irn_generated == "Pending" and company.allow_auto_irn == 1:
-                if (invoice_data.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1:
+                if (invoice_data.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or invoice_data.sez==1:
                     pass
                 else:
                     data = {'invoice_number': invoice_data.name,'generation_type': "System"}

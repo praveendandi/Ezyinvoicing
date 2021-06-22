@@ -1,3 +1,4 @@
+from requests.exceptions import RetryError
 import frappe, requests, json
 
 from version2_app.parsers import *
@@ -370,3 +371,32 @@ def dailyIppprinterFiles():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing dailyIppprinterFiles Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))
+
+
+@frappe.whitelist(allow_guest=True)
+def updatepropertiesdetails():
+    try: 
+        gspdetails = frappe.get_last_doc('GSP APIS')
+        company = frappe.get_last_doc("company")
+        inputData = {"data":{"doctype":"Properties","company_code":company.name,"api_key":gspdetails.gsp_prod_app_id,'api_secret':gspdetails.gsp_prod_app_secret,'gst_prod_username':gspdetails.gst__prod_username,'gst_prod_password':gspdetails.gst_prod_password,"gsp_test_app_id":gspdetails.gsp_test_app_id,"gsp_test_app_secret":gspdetails.gsp_test_app_secret,"gst_test_username":gspdetails.gst__test_username,"gst_test_password":gspdetails.gst_test_password,"groups":company.property_group,"mode":company.mode}}
+        headers = {'Content-Type': 'application/json'}
+        if company.mode == "Production":
+            if company.proxy == 1:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                                'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost
+                                    }
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData,proxies=proxies,verify=False)
+            else:
+                if company.skip_ssl_verify == 1:
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData,verify=False)
+                else:
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData)
+            print(json_response,"/////////")
+            return json_response.json()
+        return {"success":True, "message":"Property is in Testing Mode"}         
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-updatepropertiesdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
