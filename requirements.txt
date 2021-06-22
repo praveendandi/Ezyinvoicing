@@ -15,3 +15,4 @@ dateparser
 pyzbar
 text-to-image
 Pillow
+scipy
