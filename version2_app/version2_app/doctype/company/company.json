@@ -30,6 +30,7 @@
   "pincode",
   "font_file",
   "b2c_qr_type",
+  "b2c_online_payments",
   "merchant_virtual_payment_address",
   "section_break_22",
   "qr_rect_x0",
@@ -67,6 +68,7 @@
   "bulk_import_invoice_headers",
   "bulk_import_gst_count",
   "tax_invoice_to_manual",
+  "disable_credit_note",
   "bulk_excel_upload_type",
   "new_parsers",
   "parsers_branch_name",
@@ -80,23 +82,7 @@
   "irn_qr_size",
   "sc_sac_code",
   "system_storage_path",
-  "reconciliation_format",
-  "auto_adjustment",
-  "property_group",
-  "custom_e_tax_invoice",
-  "custom_e_tax_invoice_logo",
-  "custom_e_tax_invoice_logo_image",
-  "custom_e_tax_invoice_footer",
-  "custom_e_tax_invoice_footer_image",
-  "licensing_host",
-  "skip_ssl_verify",
-  "b2b_to_credit",
-  "manual_tax_invoice",
-  "manual_credit_invoice",
-  "manual_debit_invoice",
-  "ipp_printer_file_path",
-  "change_invoice_reconciliation_invoice_number",
-  "disable_sez"
+  "skip_ssl_verify"
  ],
  "fields": [
   {
@@ -445,7 +431,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt"
+   "options": "None\nMarriot\nOpera\nHolidayIn"
   },
   {
    "default": "0",
@@ -506,118 +492,33 @@
    "options": "Small\nLarge"
   },
   {
-   "fieldname": "reconciliation_format",
-   "fieldtype": "Select",
-   "label": "Reconciliation Format",
-   "options": "Accor\nMarriott"
-  },
-  {
    "fieldname": "system_storage_path",
    "fieldtype": "Data",
    "label": "System Storage Path"
   },
   {
-   "default": "Automatic",
-   "fieldname": "auto_adjustment",
+   "default": "No",
+   "fieldname": "b2c_online_payments",
    "fieldtype": "Select",
-   "label": "Auto Adjustment",
-   "options": "Automatic\nManual"
-  },
-  {
-   "fieldname": "property_group",
-   "fieldtype": "Select",
-   "label": "Property Group",
-   "options": "Accor\nMarriott\nHolidayIn Express\nIHG\nRadisson\nLalit\nJaypee\nPride\nEros\nHyatt\nOthers"
+   "label": "B2C Online Payments",
+   "options": "Yes\nNo"
   },
   {
    "default": "0",
-   "fieldname": "custom_e_tax_invoice",
+   "fieldname": "disable_credit_note",
    "fieldtype": "Check",
-   "label": "Custom E Tax Invoice"
-  },
-  {
-   "default": "0",
-   "fieldname": "custom_e_tax_invoice_logo",
-   "fieldtype": "Check",
-   "label": "Custom E Tax Invoice Logo"
-  },
-  {
-   "fieldname": "custom_e_tax_invoice_logo_image",
-   "fieldtype": "Attach",
-   "label": "Custom E Tax Invoice Logo Image"
-  },
-  {
-   "default": "0",
-   "fieldname": "custom_e_tax_invoice_footer",
-   "fieldtype": "Check",
-   "label": "Custom E Tax Invoice Footer"
-  },
-  {
-   "fieldname": "custom_e_tax_invoice_footer_image",
-   "fieldtype": "Attach",
-   "label": "Custom E Tax Invoice Footer Image"
-  },
-  {
-   "fieldname": "licensing_host",
-   "fieldtype": "Data",
-   "label": "Licensing Host"
+   "label": "Disable Credit Note"
   },
   {
    "default": "0",
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"
-  },
-  {
-   "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
-   "label": "Ipp Printer File Path"
-  },
-  {
-   "default": "0",
-   "fieldname": "b2b_to_credit",
-   "fieldtype": "Check",
-   "label": "B2B To Credit"
-  },
-  {
-   "fieldname": "licensing_host",
-   "fieldtype": "Data",
-   "label": "Licensing Host"
-  },
-  {
-   "default": "1",
-   "fieldname": "manual_tax_invoice",
-   "fieldtype": "Check",
-   "label": "Manual Tax Invoice"
-  },
-  {
-   "default": "1",
-   "fieldname": "manual_credit_invoice",
-   "fieldtype": "Check",
-   "label": "Manual Credit Invoice"
-  },
-  {
-   "default": "1",
-   "fieldname": "manual_debit_invoice",
-   "fieldtype": "Check",
-   "label": "Manual Debit Invoice"
-  },
-  {
-   "default": "0",
-   "fieldname": "change_invoice_reconciliation_invoice_number",
-   "fieldtype": "Check",
-   "label": "Change Invoice Reconciliation Invoice Number "
-  },
-  {
-   "default": "0",
-   "fieldname": "disable_sez",
-   "fieldtype": "Check",
-   "label": "Disable Sez"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-17 13:53:44.524359",
+ "modified": "2021-06-22 15:51:30.667809",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
@@ -644,18 +545,6 @@
    "read": 1,
    "report": 1,
    "role": "Guest",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Administrator",
    "share": 1,
    "write": 1
   },

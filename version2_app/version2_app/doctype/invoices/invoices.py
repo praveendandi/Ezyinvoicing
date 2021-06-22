@@ -563,7 +563,8 @@ def send_invoicedata_to_gcb(invoice_number):
                 "issued_by": "ezyinvoicing",
                 "items_count": items_count,
                 "hsn_code": hsn_code.rstrip(', '),
-                "company": company.name
+                "company": company.name,
+                "showpaybutton": company.b2c_online_payments
             }
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
