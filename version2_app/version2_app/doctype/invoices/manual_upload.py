@@ -43,7 +43,7 @@ def manual_upload(data):
 @frappe.whitelist(allow_guest=True)
 def manual_upload_data(data):
     try:
-        print("startt--------------------------")
+        print("startt--------------------------",data)
         start_time = datetime.datetime.now()
         folder_path = frappe.utils.get_bench_path()
         items_data_file = data['invoice_file']
@@ -70,7 +70,6 @@ def manual_upload_data(data):
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         input_data = []
-        print(paymentTypes)
         invoice_referrence_objects = {}
         with open(items_file_path) as xml_file:
             data_dict = xmltodict.parse(xml_file.read())
@@ -99,7 +98,6 @@ def manual_upload_data(data):
             else:
 
                 x = dict(each['LIST_G_TRX_NO']['G_TRX_NO'])
-                # print(x['TRANSACTION_DESCRIPTION']+"/////////")
                 if x['TRANSACTION_DESCRIPTION'] in paymentTypes or "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
                         continue
                 if x['FT_DEBIT'] is None:
@@ -141,7 +139,6 @@ def manual_upload_data(data):
 
         
         
-        print(gst_dict,len(gst_dict))
         output_date = []
         # print(len(input_data),"lemnnnnnn output")
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}

@@ -1094,7 +1094,7 @@ def b2b_success_to_credit_note(data):
         invoice_data = frappe.db.get_all('Invoices', filters={"name":data["invoice_number"]},fields=["*"])
         total_data = {}
         if len(invoice_data) > 0:
-            invoice_number = data["invoice_number"]+"-1"
+            invoice_number = data["invoice_number"]+"CN"
             invoice_date = datetime.datetime.strptime(str(data["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
             for item_each in item_data:
