@@ -104,9 +104,9 @@ def Report_Delete(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def xlsx_workbook():
+def xlsx_workbook(data):
     # company = frappe.get_doc('company',data['company'])
-    # host = company.host
+
     folder_path = frappe.utils.get_bench_path()
     # fileName = data['report_name'].replace(" ","")
     workbook = xlsxwriter.Workbook('/home/caratred/workbook.xlsx')
