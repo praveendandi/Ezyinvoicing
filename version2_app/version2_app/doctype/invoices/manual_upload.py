@@ -141,7 +141,7 @@ def manual_upload_data(data):
 
         
         
-        
+        print(gst_dict,len(gst_dict))
         output_date = []
         # print(len(input_data),"lemnnnnnn output")
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
@@ -161,7 +161,7 @@ def manual_upload_data(data):
             # print(each)
             if each['invoice_number'] in gst_dict:
                 each['invoice_type'] = "B2B"
-                invoice_referrence_objects[each['invoice_number']['gstNumber']] = gst_dict[each['invoice_number']]
+                invoice_referrence_objects[each['invoice_number']]['gstNumber'] = gst_dict[each['invoice_number']]
                 each['gstNumber'] = gst_dict[each['invoice_number']]
             else:
                 each['invoice_type'] = "B2C"
