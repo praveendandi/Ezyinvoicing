@@ -11,6 +11,7 @@ import wget
 import pandas as pd
 from urllib.parse import urljoin
 from urllib.request import pathname2url
+from version2_app.version2_app.doctype.company.workbook_sheets import B2B_Invoices
 from os.path import expanduser
 home = expanduser("~")
 
@@ -109,22 +110,37 @@ def xlsx_workbook(data):
 
     folder_path = frappe.utils.get_bench_path()
     # fileName = data['report_name'].replace(" ","")
-    workbook = xlsxwriter.Workbook('/home/caratred/workbook.xlsx')
+    workbook = xlsxwriter.Workbook(home+'/'+'workbook.xlsx')
     # worksheet = workbook.add_worksheet()
     header = list(string.ascii_letters[26:52])
     # columnscount = data['columns']
+    b2bdata = B2B_Invoices(data)
+    header = list(string.ascii_letters[26:52])
+    columnscount = b2bdata[0]
+    
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
 
     merge_format = workbook.add_format({
             'bold': 1,
             'border': 1,
             'align': 'center',
             'valign': 'distributed'})
+    merge_format.set_text_wrap()
+    worksheet1 = workbook.add_worksheet("B2B")
+    worksheet1.set_column(header[0]+":"+header[-1], 14)
+    worksheet1.write_row('A1', columnscount,merge_format)
+    num = 2
+    for each in b2bdata[1]:
+        worksheet1.write_row('A'+str(num), each)
+        num+=1
+    # worksheet2 = workbook.add_worksheet("fun")
 
-    worksheet1 = workbook.add_worksheet("sample")
-    worksheet2 = workbook.add_worksheet("fun")
-
-    worksheet1.write('A1', 123)
-    worksheet2.write('A1', 333)
+    # worksheet1.write('A1', 123)
+    # worksheet2.write('A1', 333)
     workbook.close()
     return True
         
