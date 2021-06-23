@@ -433,7 +433,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 		#gst data
 		# print(taxpayer_details,"taxxxxxx")
 		if invoice.invoice_category == "Credit Invoice":
-			invoice_numberIrn = invoice.invoice_number + 'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
+			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) + 'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
 		else:
 			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
 		# irnInvoiceNumber = 
