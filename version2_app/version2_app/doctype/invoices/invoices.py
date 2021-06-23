@@ -1361,7 +1361,7 @@ def insert_items(items, invoice_number):
         b = frappe.db.commit()
         if len(items)>0:
             for item in items:
-                # print(item)
+                print(item,"---------")
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
@@ -1377,7 +1377,7 @@ def insert_items(items, invoice_number):
         return {"sucess": True, "data": 'doc'}
         # print(doc)
     except Exception as e:
-        print(e,"**********  insert itemns api")
+        print(traceback.print_exc(),"**********  insert itemns api")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing insert_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}

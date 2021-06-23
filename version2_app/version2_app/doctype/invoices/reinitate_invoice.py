@@ -1093,8 +1093,9 @@ def b2b_success_to_credit_note(data):
         # invoice_data = frappe.db.get_value('Invoices', data["invoice_number"], ['invoice_number', 'guest_name',"gst_number","invoice_file","room_number","invoice_type","invoice_date","legal_name","address_1","address_2","email","trade_name","phone_number","state_code","location","pincode","irn_cancelled","other_charges","company","confirmation_number","invoice_from","print_by","has_discount_items","invoice_category","sez","converted_from_b2b","allowance_invoice","converted_from_tax_invoices_to_manual_tax_invoices"], as_dict=1)
         invoice_data = frappe.db.get_all('Invoices', filters={"name":data["invoice_number"]},fields=["*"])
         total_data = {}
+        # print(invoice_data)
         if len(invoice_data) > 0:
-            invoice_number = data["invoice_number"]+"-1"
+            invoice_number = data["invoice_number"]+"CN"
             invoice_date = datetime.datetime.strptime(str(data["invoice_date"]),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
             for item_each in item_data:
@@ -1167,9 +1168,54 @@ def b2b_success_to_credit_note(data):
             # parent_activity = frappe.get_doc({'doctype': 'Version','data': '<!DOCTYPE html><html><body><p>{}</p></body></html>'.format(subject1),"ref_doctype":"Invoices","docname":data["invoice_number"]})
             # parent_activity.insertS(ignore_permissions=True,ignore_version=True)
             # frappe.db.commit()
+            # if data['tax_invoice'] == "Yes":
+
             return {"success": True, "message": "Credit Note Raised Successfully"}
+
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing b2b_success_to_credit_note","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach b2c qrcode")
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def raise_credit_taxinvoice(invoice_number):
+    try:
+        doc_details = frappe.get_doc("Invoices",invoice_number)
+        data = dict(doc_details.__dict__)
+
+        data['name'] = data['name']+"-1"
+        data['invoice_number'] = data['name']
+        data['irn_generated'] = "Pending"
+        data['qr_code_generated'] = "Pending"
+        data['signed_invoice_generated']= 'No'
+        # items = data['items']
+        items = [item.__dict__ for item in data['items']]
+        del data['items']
+        del data['gst_summary']
+        del data['sac_hsn_based_taxes']
+        del data['irn_number']
+        del data['qr_code']
+        del data['qr_code_image']
+        del data['signed_invoice']
+        del data['ack_no']
+        del data['ack_date']
+        del data['error_message']
+        del data['irn_generated_time']
+        del data['credit_signed_invoice_generated']
+        del data['credit_irn_cancelled']
+        del data['irn_process_time']
+        del data['irn_generated_type']
+        del data['credit_note_raised']
+        insertdoc = frappe.get_doc(data)
+
+        insertdoc.insert(ignore_permissions=True, ignore_links=True)
+        itemsInsert = insert_items(items,data['name'])
+        taxSummariesInsert = TaxSummariesInsert(items, data['name'])
+        hsnbasedtaxcodes = insert_hsn_code_based_taxes(items, data['name'],"Invoice")
+    except Exception as e:
+        print(traceback.print_exc())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing raise_credit_taxinvoice","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
