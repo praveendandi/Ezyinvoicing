@@ -557,13 +557,13 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 					"CesRt":
 					item.cess,
 					"CesAmt":
-					abs(item.cess_amount),
+					abs(round(item.cess_amount, 2)),
 					"CesNonAdvlAmt":
 					0,
 					"StateCesRt":
 					item.state_cess,
 					"StateCesAmt":
-					abs(item.state_cess_amount),
+					abs(round(item.state_cess_amount,2)),
 					"StateCesNonAdvlAmt":
 					0,
 					"OthChrg":
@@ -585,7 +585,6 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 			"TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
 			"TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
 		}
-		# print(gst_data)
 		
 		response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
 		if response['success']==True:
@@ -640,7 +639,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 					invoice.save(ignore_permissions=True,ignore_version=True)
 					frappe.db.commit()
 					return {"success": True, "message": response_error_message}
-	
+
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'
 			invoice.credit_irn_error_message = response['message'][6:]
