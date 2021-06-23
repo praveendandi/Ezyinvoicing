@@ -433,7 +433,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 		#gst data
 		# print(taxpayer_details,"taxxxxxx")
 		if invoice.invoice_category == "Credit Invoice":
-			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
+			invoice_numberIrn = invoice.invoice_number + 'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number
 		else:
 			invoice_numberIrn = invoice.invoice_number + str(random.randint(0, 100)) +'T' if company_details['data'].mode == 'Testing' else invoice.invoice_number+"ACN"
 		# irnInvoiceNumber = 
@@ -631,9 +631,15 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 					invoice.credit_ack_date = response['result'][0]['Desc']['AckDt']
 					invoice.irn_generated_type = generation_type
 					invoice.credit_irn_generated = "Success"
+					invoice.irn_generated = "Success"
 					invoice.credit_qr_code_generated = "Success"
 					# invoice.credit_qr_code_image = ""
-					invoice.save(ignore_permissions=True, ignore_version=True)
+					invoice.credit_irn_generated = 'Failed'
+					invoice.credit_irn_error_message = response['message'][6:]
+					response_error_message = response['message']
+					invoice.save(ignore_permissions=True,ignore_version=True)
+					frappe.db.commit()
+					return {"success": True, "message": response_error_message}
 	
 			invoice = frappe.get_doc('Invoices', invoice_number)
 			invoice.credit_irn_generated = 'Failed'
