@@ -96,7 +96,8 @@
   "manual_debit_invoice",
   "ipp_printer_file_path",
   "change_invoice_reconciliation_invoice_number",
-  "disable_sez"
+  "disable_sez",
+  "b2c_online_payments"
  ],
  "fields": [
   {
@@ -506,15 +507,28 @@
    "options": "Small\nLarge"
   },
   {
+   "fieldname": "system_storage_path",
+   "fieldtype": "Data",
+   "label": "System Storage Path"
+  },
+  {
+   "default": "No",
+   "fieldname": "b2c_online_payments",
+   "fieldtype": "Select",
+   "label": "B2C Online Payments",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_ssl_verify",
+   "fieldtype": "Check",
+   "label": "Skip SSL Verify"
+  },
+  {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
    "label": "Reconciliation Format",
    "options": "Accor\nMarriott"
-  },
-  {
-   "fieldname": "system_storage_path",
-   "fieldtype": "Data",
-   "label": "System Storage Path"
   },
   {
    "default": "Automatic",
@@ -564,25 +578,9 @@
   },
   {
    "default": "0",
-   "fieldname": "skip_ssl_verify",
-   "fieldtype": "Check",
-   "label": "Skip SSL Verify"
-  },
-  {
-   "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
-   "label": "Ipp Printer File Path"
-  },
-  {
-   "default": "0",
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
    "label": "B2B To Credit"
-  },
-  {
-   "fieldname": "licensing_host",
-   "fieldtype": "Data",
-   "label": "Licensing Host"
   },
   {
    "default": "1",
@@ -603,6 +601,11 @@
    "label": "Manual Debit Invoice"
   },
   {
+   "fieldname": "ipp_printer_file_path",
+   "fieldtype": "Data",
+   "label": "Ipp Printer File Path"
+  },
+  {
    "default": "0",
    "fieldname": "change_invoice_reconciliation_invoice_number",
    "fieldtype": "Check",
@@ -617,7 +620,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-17 13:53:44.524359",
+ "modified": "2021-06-23 10:22:07.598824",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

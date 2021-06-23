@@ -60,7 +60,7 @@ def hyattbulkupload(data):
             if val[13]=='':
                 continue
 
-            each = {"invoicedate":val[5],"taxinvnum":val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
+            each = {"invoicedate":val[5],"taxinvnum":"HRC"+val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
             if frappe.db.exists("SAC HSN CODES",each['goods_desc']):
                 sac_desc = frappe.get_doc("SAC HSN CODES",each['goods_desc'])
                 if sac_desc.bulk_upload_service_charge ==1:
