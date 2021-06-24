@@ -84,28 +84,51 @@ def manual_upload_data(data):
                     'guest_data':{'invoice_category':each['FOLIO_TYPE']}}
             
             items = []
+            items_pdf = []
             if isinstance(each['LIST_G_TRX_NO']['G_TRX_NO'], list):
                 for y,x in enumerate(each['LIST_G_TRX_NO']['G_TRX_NO']):
-                    # print(x['TRANSACTION_DESCRIPTION']+"/////")
-                    if x['TRANSACTION_DESCRIPTION'] in paymentTypes or "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
-                        continue
+                    items_pdf_dict={}
                     item_date = datetime.datetime.strptime(x['TRX_DATE'],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
-                    if x['FT_DEBIT'] is None:
-                        x['FT_DEBIT'] = x['FT_CREDIT']
-                    items_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':int(y)+1,"sac_code":'No Sac'}
-                    # print(dict(x))
-                    items.append(items_dict)
+                    if x['TRANSACTION_DESCRIPTION'] in paymentTypes:# 
+                        if x['FT_CREDIT'] is None:
+                            x['FT_CREDIT'] = x['FT_DEBIT']
+                        items_pdf_dict = {'date':item_date,'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
+                        # continue
+                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                        items_pdf_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
+                    
+                    # if x['FT_DEBIT'] is None:
+                    #     x['FT_DEBIT'] = x['FT_CREDIT']
+                    else:
+                        items_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':int(y)+1,"sac_code":'No Sac'}
+                        # print(dict(x))
+                        items.append(items_dict)
+                        items_pdf.append(items_dict)
+                    if len(items_pdf_dict)>0:
+                        items_pdf.append(items_pdf_dict) 
             else:
-
+                items_pdf_dict={}
                 x = dict(each['LIST_G_TRX_NO']['G_TRX_NO'])
-                if x['TRANSACTION_DESCRIPTION'] in paymentTypes or "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
-                        continue
-                if x['FT_DEBIT'] is None:
-                    x['FT_DEBIT'] = x['FT_CREDIT']    
                 item_date = datetime.datetime.strptime(x['TRX_DATE'],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
-                items.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
+                
+                if x['TRANSACTION_DESCRIPTION'] in paymentTypes:# or "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                    if x['FT_CREDIT'] is None:
+                        x['FT_CREDIT'] = x['FT_DEBIT']
+                    items_pdf_dict = {'date':item_date,'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
+                # if x['FT_DEBIT'] is None:
+                #     x['FT_DEBIT'] = x['FT_CREDIT']    
+                elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                    items_pdf_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
+                else:
+                    items.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
+                    items_pdf.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
+
+
             list_data['items'] = items
-            invoice_referrence_objects[each['BILL_NO']] = list_data
+            refobj = list_data.copy()
+            del refobj['items']
+            refobj['items'] = items_pdf
+            invoice_referrence_objects[each['BILL_NO']] = refobj
             input_data.append(list_data)
         # if company_check_columns != invoice_columns:
         #     frappe.db.delete('File', {'file_url': data['invoice_file']})

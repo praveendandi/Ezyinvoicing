@@ -82,7 +82,10 @@ def BulkUploadReprocess(data):
                     error_data['gst_number'] = gstNumber
                     error_data['invoice_type'] = "B2B"
             for each in line_items['data']['items']:
+
                 if each['name'] not in payment_Types:
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or "VAT" in each["name"]:
+                        continue
                     item_dict = {}
                     date_time_obj = datetime.datetime.strptime(each['date'],'%d-%m-%y').strftime(company.invoice_item_date_format)
                     item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
