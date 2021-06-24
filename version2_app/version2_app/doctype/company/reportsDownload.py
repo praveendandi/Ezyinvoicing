@@ -130,7 +130,7 @@ def xlsx_workbook(data):
             'valign': 'distributed'})
     merge_format.set_text_wrap()
     worksheet1 = workbook.add_worksheet("B2B")
-    worksheet1.set_column(header[0]+":"+header[-1], 14)
+    worksheet1.set_column(header[0]+":"+header[-1])
     worksheet1.write_row('A1', columnscount,merge_format)
     num = 2
     for each in b2bdata[1]:
@@ -149,7 +149,7 @@ def xlsx_workbook(data):
             header2.append('A'+i)
         header.extend(header2)
     worksheet2 = workbook.add_worksheet("B2CL")
-    worksheet2.set_column(header[0]+":"+header[-1], 14)
+    worksheet2.set_column(header[0]+":"+header[-1])
     worksheet2.write_row('A1', columnscount,merge_format)
     num = 2
     for each in b2cldata[1]:
@@ -165,7 +165,7 @@ def xlsx_workbook(data):
             header2.append('A'+i)
         header.extend(header2)
     worksheet3 = workbook.add_worksheet("B2CS")
-    worksheet3.set_column(header[0]+":"+header[-1], 14)
+    worksheet3.set_column(header[0]+":"+header[-1])
     worksheet3.write_row('A1', columnscount,merge_format)
     num = 2
     for each in b2csdata[1]:
@@ -181,13 +181,28 @@ def xlsx_workbook(data):
             header2.append('A'+i)
         header.extend(header2)
     worksheet4 = workbook.add_worksheet("HSN SAC Summary")
-    worksheet4.set_column(header[0]+":"+header[-1], 14)
+    worksheet4.set_column(header[0]+":"+header[-1])
     worksheet4.write_row('A1', columnscount,merge_format)
     num = 2
     for each in hsnsacdata[1]:
-        print(each)
         worksheet4.write_row('A'+str(num), each)
-        num+=1     
+        num+=1 
+    #DebitCreditNote
+    debitcreditnote = DebitCreditNote(data)
+    columnscount = debitcreditnote[0]
+    
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
+    worksheet5 = workbook.add_worksheet("CDNR")
+    worksheet5.set_column(header[0]+":"+header[-1])
+    worksheet5.write_row('A1', columnscount,merge_format)
+    num = 2
+    for each in debitcreditnote[1]:
+        worksheet5.write_row('A'+str(num), each)
+        num+=1  
     workbook.close()
     return True
         

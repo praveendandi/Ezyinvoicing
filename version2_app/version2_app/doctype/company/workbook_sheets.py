@@ -238,8 +238,8 @@ def DebitCreditNote(data):
         sys_names_list = [list(x) for x in sysCredit_invoices]
         sys_names = [x[0]+"ACN" for x in sys_names_list]
         # print(invoice_names)
-        items_fields = ['parent','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
-        items_columns = ['invoice_number','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
+        items_fields = ['parent','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount','cgst','sgst','igst']
+        items_columns = ['invoice_number','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount','cgst','sgst','igst']
         if len(debit_invoices)>0:
             items_debit_doc = frappe.db.get_list('Items',filters={'parent':['in',debit_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
         else:
@@ -258,10 +258,10 @@ def DebitCreditNote(data):
         items_df = pd.DataFrame(items_doc,columns=items_columns)
         items_df = items_df.round(2)
         # print(items_df)
-        items_df["gst_cess_rate"] = items_df['cess'] + items_df['state_cess']
+        # items_df["gst_cess_rate"] = items_df['cess'] + items_df['state_cess']
         items_df["gst_cess_amount"] = items_df['cess_amount'] + items_df['state_cess_amount']
-        del items_df['cess']
-        del items_df['state_cess']
+        # del items_df['cess']
+        # del items_df['state_cess']
         del items_df['cess_amount']
         del items_df['state_cess_amount']
         
@@ -277,28 +277,26 @@ def DebitCreditNote(data):
         
         mergedDf = pd.merge(invoice_df, grouped_df)		
         mergedDf["Taxable Value"] = mergedDf['item_value']
-
-        mergedDf.loc[(mergedDf.invoice_category=="Tax Invoice"),'invoice_category'] = 'Credit Note For Sales'
-        mergedDf.loc[(mergedDf.invoice_category=="Debit Invoice"),'invoice_category'] = 'Debit Note'
-        mergedDf.loc[(mergedDf.invoice_category=="Credit Invoice"),'invoice_category'] = 'Credit Note For Sales'
-
-        mergedDf.rename(columns={'invoice_category':'Transaction type','tax_invoice_referrence_number':'Original Invoice Number','invoice_number': 'Debit Note No / Credit Note No.', 'invoice_date': 'Debit Note / Credit Note Date','gst_number':'CustomerGSTIN/UIN','invoice_type':'Type','trade_name':'Customer Name','sac_code':'SAC / HSN CODE','gst_rate':'Total GST RATE %','item_value':'Base Amount','item_value_after_gst':'Invoice value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount'}, inplace=True)
+        mergedDf['Reverse Charge'] = "No"
+        mergedDf['rate'] = mergedDf['gst_rate']
+        # mergedDf.loc[(mergedDf.invoice_category=="Tax Invoice"),'invoice_category'] = 'Credit Note For Sales'
+        # mergedDf.loc[(mergedDf.invoice_category=="Debit Invoice"),'invoice_category'] = 'Debit Note'
+        # mergedDf.loc[(mergedDf.invoice_category=="Credit Invoice"),'invoice_category'] = 'Credit Note For Sales'
+        columns_dict ={'gst_number':'GSTIN/UIN of Recipient','guest_name':'Receiver Name','invoice_number':'Note Number','invoice_date':'Note Date','invoice_category':'Note Type','place_of_supply':'Place Of Supply','Reverse Charge':'Reverse Charge','suptyp':'Note Supply Type','item_value_after_gst':'Note Value','gst_rate':'Applicable % of Tax Rate','rate':'Rate','item_value':'Taxable Value','igst_amount':'Integrated Tax Amount','cgst_amount':'Central Tax Amount','sgst_amount':'State/UT Tax Amount','gst_cess_amount':'Cess Amount'}
+        # columns = ['GSTIN/UIN of Recipient','Receiver Name','Note Number','Note Date','Note Type','Place Of Supply','Reverse Charge','Note Supply Type','Note Value','Applicable % of Tax Rate','Rate','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','Cess Amount']
+        mergedDf.rename(columns=columns_dict, inplace=True)
         
-        mergedDf['Month'] = pd.DatetimeIndex(mergedDf['Debit Note / Credit Note Date']).month
-        mergedDf['Month'] = mergedDf['Month'].apply(lambda x: calendar.month_abbr[x])
+        # mergedDf['Month'] = pd.DatetimeIndex(mergedDf['Debit Note / Credit Note Date']).month
+        # mergedDf['Month'] = mergedDf['Month'].apply(lambda x: calendar.month_abbr[x])
 
         mergedDf = mergedDf[columns]
         
-        # mergedDf.update(mergedDf.select_dtypes(include=[np.number]).abs())
-        mergedDf = mergedDf.sort_values(by=['Debit Note No / Credit Note No.'])
-        # mergedDf = mergedDf.abs()
-        mergedDf['Invoice value'] = mergedDf['Invoice value'].abs()
-        mergedDf['Base Amount'] = mergedDf['Base Amount'].abs()
+        mergedDf['Note Value'] = mergedDf['Note Value'].abs()
         mergedDf['Taxable Value'] = mergedDf['Taxable Value'].abs()
-        mergedDf['IGST Amount'] = mergedDf['IGST Amount'].abs()
-        mergedDf['CGST Amount'] = mergedDf['CGST Amount'].abs()
-        mergedDf['SGST / UT GST Amount'] = mergedDf['SGST / UT GST Amount'].abs()
-        mergedDf['GST Compensation Cess Amount'] = mergedDf['GST Compensation Cess Amount'].abs()
+        mergedDf['Integrated Tax Amount'] = mergedDf['Integrated Tax Amount'].abs()
+        mergedDf['Central Tax Amount'] = mergedDf['Central Tax Amount'].abs()
+        mergedDf['State/UT Tax Amount'] = mergedDf['State/UT Tax Amount'].abs()
+        mergedDf['Cess Amount'] = mergedDf['Cess Amount'].abs()
         data = mergedDf.values.tolist()
         
         return columns, data
