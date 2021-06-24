@@ -11,7 +11,7 @@ import wget
 import pandas as pd
 from urllib.parse import urljoin
 from urllib.request import pathname2url
-from version2_app.version2_app.doctype.company.workbook_sheets import B2B_Invoices
+from version2_app.version2_app.doctype.company.workbook_sheets import *
 from os.path import expanduser
 home = expanduser("~")
 
@@ -115,7 +115,6 @@ def xlsx_workbook(data):
     header = list(string.ascii_letters[26:52])
     # columnscount = data['columns']
     b2bdata = B2B_Invoices(data)
-    header = list(string.ascii_letters[26:52])
     columnscount = b2bdata[0]
     
     if len(columnscount)>26:
@@ -141,6 +140,54 @@ def xlsx_workbook(data):
 
     # worksheet1.write('A1', 123)
     # worksheet2.write('A1', 333)
+    b2cldata = B2CL_Invoices(data)
+    columnscount = b2cldata[0]
+    
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
+    worksheet2 = workbook.add_worksheet("B2CL")
+    worksheet2.set_column(header[0]+":"+header[-1], 14)
+    worksheet2.write_row('A1', columnscount,merge_format)
+    num = 2
+    for each in b2cldata[1]:
+        worksheet2.write_row('A'+str(num), each)
+        num+=1    
+    # B2CS_Invoices
+    b2csdata = B2CS_Invoices(data)
+    columnscount = b2csdata[0]
+    
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
+    worksheet3 = workbook.add_worksheet("B2CS")
+    worksheet3.set_column(header[0]+":"+header[-1], 14)
+    worksheet3.write_row('A1', columnscount,merge_format)
+    num = 2
+    for each in b2csdata[1]:
+        worksheet3.write_row('A'+str(num), each)
+        num+=1 
+    #HSN_SAC_SUMMARY_REPORT
+    hsnsacdata = HSN_SAC_SUMMARY_REPORT(data)
+    columnscount = hsnsacdata[0]
+    
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
+    worksheet4 = workbook.add_worksheet("HSN SAC Summary")
+    worksheet4.set_column(header[0]+":"+header[-1], 14)
+    worksheet4.write_row('A1', columnscount,merge_format)
+    num = 2
+    for each in hsnsacdata[1]:
+        print(each)
+        worksheet4.write_row('A'+str(num), each)
+        num+=1     
     workbook.close()
     return True
         
