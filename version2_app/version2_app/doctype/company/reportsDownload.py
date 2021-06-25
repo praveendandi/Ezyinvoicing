@@ -114,6 +114,8 @@ def xlsx_workbook(data):
     # worksheet = workbook.add_worksheet()
     header = list(string.ascii_letters[26:52])
     # columnscount = data['columns']
+
+    #B2B_Invoices
     b2bdata = B2B_Invoices(data)
     columnscount = b2bdata[0]
     
@@ -136,13 +138,10 @@ def xlsx_workbook(data):
     for each in b2bdata[1]:
         worksheet1.write_row('A'+str(num), each)
         num+=1
-    # worksheet2 = workbook.add_worksheet("fun")
-
-    # worksheet1.write('A1', 123)
-    # worksheet2.write('A1', 333)
+    header = list(string.ascii_letters[26:52])
     b2cldata = B2CL_Invoices(data)
     columnscount = b2cldata[0]
-    
+    print(columnscount,"b2cl")
     if len(columnscount)>26:
         header2 = []
         for i in header:
@@ -154,8 +153,10 @@ def xlsx_workbook(data):
     num = 2
     for each in b2cldata[1]:
         worksheet2.write_row('A'+str(num), each)
-        num+=1    
+        num+=1  
+
     # B2CS_Invoices
+    header = list(string.ascii_letters[26:52])
     b2csdata = B2CS_Invoices(data)
     columnscount = b2csdata[0]
     
@@ -171,7 +172,22 @@ def xlsx_workbook(data):
     for each in b2csdata[1]:
         worksheet3.write_row('A'+str(num), each)
         num+=1 
+
+
+    #Excempted
+    columnscount = ['Description','Nil Rated Supplies','Exempted(other than nil rated/non GST supply)','Non-GST Supplies']
+    header = list(string.ascii_letters[26:52])
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
+    worksheet5 = workbook.add_worksheet("EXEMP")
+    worksheet5.set_column(header[0]+":"+header[-1])
+    worksheet5.write_row('A1', columnscount,merge_format)  
+
     #HSN_SAC_SUMMARY_REPORT
+    header = list(string.ascii_letters[26:52])
     hsnsacdata = HSN_SAC_SUMMARY_REPORT(data)
     columnscount = hsnsacdata[0]
     
@@ -180,14 +196,16 @@ def xlsx_workbook(data):
         for i in header:
             header2.append('A'+i)
         header.extend(header2)
-    worksheet4 = workbook.add_worksheet("HSN SAC Summary")
-    worksheet4.set_column(header[0]+":"+header[-1])
-    worksheet4.write_row('A1', columnscount,merge_format)
+    worksheet5 = workbook.add_worksheet("HSN SAC Summary")
+    worksheet5.set_column(header[0]+":"+header[-1])
+    worksheet5.write_row('A1', columnscount,merge_format)
     num = 2
     for each in hsnsacdata[1]:
-        worksheet4.write_row('A'+str(num), each)
+        worksheet5.write_row('A'+str(num), each)
         num+=1 
+
     #DebitCreditNote
+    header = list(string.ascii_letters[26:52])
     debitcreditnote = DebitCreditNote(data)
     columnscount = debitcreditnote[0]
     
@@ -196,13 +214,26 @@ def xlsx_workbook(data):
         for i in header:
             header2.append('A'+i)
         header.extend(header2)
-    worksheet5 = workbook.add_worksheet("CDNR")
-    worksheet5.set_column(header[0]+":"+header[-1])
-    worksheet5.write_row('A1', columnscount,merge_format)
+    worksheet6 = workbook.add_worksheet("CDNR")
+    worksheet6.set_column(header[0]+":"+header[-1])
+    worksheet6.write_row('A1', columnscount,merge_format)
     num = 2
     for each in debitcreditnote[1]:
-        worksheet5.write_row('A'+str(num), each)
-        num+=1  
+        worksheet6.write_row('A'+str(num), each)
+        num+=1
+    
+    
+    #ATADJ
+    columnscount=['Place Of Supply','Applicable % of Tax Rate','Rate','Gross Advance Received/Adjusted','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','Cess Amount']
+    header = list(string.ascii_letters[26:52])
+    if len(columnscount)>26:
+        header2 = []
+        for i in header:
+            header2.append('A'+i)
+        header.extend(header2)
+    worksheet7 = workbook.add_worksheet("ATADJ")
+    worksheet7.set_column(header[0]+":"+header[-1])
+    worksheet7.write_row('A1', columnscount,merge_format)      
     workbook.close()
     return True
         
