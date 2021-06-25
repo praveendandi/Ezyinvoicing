@@ -295,4 +295,69 @@ def DebitCreditNote(data):
     except Exception as e:
         # print(str(e))
         print(traceback.print_exc())
-        return {"success":False,"message":str(e)}           
+        return {"success":False,"message":str(e)}   
+
+@frappe.whitelist(allow_guest=True)
+def Excempted(data):
+    try:
+        pd.set_option("display.max_rows", None, "display.max_columns", None)
+        
+        # columns = ['HSN','Description','UQC','Total Quantity','Total Value','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','State Cess Amount','Central Cess Amount']
+        columns = ['Description','Nil Rated Supplies','Exempted(other than nil rated/non GST supply)','Non-GST Supplies']
+        fields = ['invoice_number','place_of_supply','invoice_type']
+        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
+        if len(doc) == 0:
+            data = []
+            return columns,data
+        doc_list = [list(x) for x in doc]
+        invoice_names = [x[0] for x in doc_list]
+        
+        items_fields = ['parent','sac_code','item_value','item_value_after_gst','taxable','type']
+        items_columns = ['invoice_number','sac_code','item_value','item_value_after_gst','taxable','type']
+        items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
+        items_df = pd.DataFrame(items_doc,columns=items_columns)
+        items_df = items_df.round(2)
+        # print(items_df.head())
+        invoice_df = pd.DataFrame(doc,columns=fields)
+        mergedDf = pd.merge(invoice_df, items_df)
+        latest_invoice = frappe.get_last_doc('Invoices')
+
+        company = frappe.get_doc('company',latest_invoice.company)
+        mergedDf.loc[(mergedDf.place_of_supply!=company.state_code),'place_of_supply'] = "inter"
+    
+        mergedDf = mergedDf.groupby(["taxable","type",'place_of_supply','invoice_type'],as_index=False).sum().round(2)
+        output_data = mergedDf.to_dict('records')
+
+        interstate_b2b = ['Inter-State supplies to registered persons','','','']
+        intrastate_b2b = ['Intra-State supplies to registered persons','','','']
+        interstate_b2c = ['Inter-State supplies to unregistered persons','','','']
+        intrastate_b2c = ['Intra-State supplies to unregistered persons','','','']
+        for each in output_data:
+            print(each)
+            if each['taxable'] == 'No' and each['invoice_type'] == 'B2B' and each['place_of_supply']!=company.state_code:
+                interstate_b2b[3] = each['item_value_after_gst']
+            if each['taxable'] == 'No' and each['invoice_type'] == 'B2B' and each['place_of_supply']==company.state_code:     
+                intrastate_b2b[3] = each['item_value_after_gst']
+            if each['taxable'] == 'No' and each['invoice_type'] == 'B2C' and each['place_of_supply']!=company.state_code:
+                interstate_b2c[3] = each['item_value_after_gst']
+            if each['taxable'] == 'No' and each['invoice_type'] == 'B2C' and each['place_of_supply']==company.state_code:     
+                intrastate_b2c[3] = each['item_value_after_gst']  
+            
+            if each['taxable'] == 'Yes' and each['invoice_type'] == 'B2B' and each['place_of_supply']!=company.state_code and each['type'] == "Excempted":
+                interstate_b2b[2] = each['item_value_after_gst']
+            if each['taxable'] == 'Yes' and each['invoice_type'] == 'B2B' and each['place_of_supply']==company.state_code and each['type'] == "Excempted":     
+                intrastate_b2b[2] = each['item_value_after_gst']
+            if each['taxable'] == 'Yes' and each['invoice_type'] == 'B2C' and each['place_of_supply']!=company.state_code and each['type'] == "Excempted":
+                interstate_b2c[2] = each['item_value_after_gst']
+            if each['taxable'] == 'Yes' and each['invoice_type'] == 'B2C' and each['place_of_supply']==company.state_code and each['type'] == "Excempted":     
+                intrastate_b2c[2] = each['item_value_after_gst']         
+        # print(interstate_b2b)
+        # print(interstate_b2c)
+        # print(intrastate_b2b)
+        # print(intrastate_b2c)
+        data = [interstate_b2b,intrastate_b2b,interstate_b2c,intrastate_b2c]
+        return columns, data
+    except Exception as e:
+        # print(str(e))
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)} 

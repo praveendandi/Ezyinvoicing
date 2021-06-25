@@ -56,6 +56,7 @@ def Report_Download(data):
                 files=files_new,
                 data=payload_new).json()
             url = upload_report['message']['file_url']
+            os.remove(home+'/'+fileName+'.xlsx')
             return url
         elif data['file_type'] == "CSV":
             fileName = data['report_name'].replace(" ","")
@@ -106,7 +107,7 @@ def Report_Delete(data):
 
 @frappe.whitelist(allow_guest=True)
 def xlsx_workbook(data):
-    # company = frappe.get_doc('company',data['company'])
+    company = frappe.get_doc('company',data['company'])
 
     folder_path = frappe.utils.get_bench_path()
     # fileName = data['report_name'].replace(" ","")
@@ -175,16 +176,25 @@ def xlsx_workbook(data):
 
 
     #Excempted
-    columnscount = ['Description','Nil Rated Supplies','Exempted(other than nil rated/non GST supply)','Non-GST Supplies']
     header = list(string.ascii_letters[26:52])
+    excempted = Excempted(data)
+    columnscount = excempted[0]
+    
     if len(columnscount)>26:
         header2 = []
         for i in header:
             header2.append('A'+i)
         header.extend(header2)
+
     worksheet5 = workbook.add_worksheet("EXEMP")
     worksheet5.set_column(header[0]+":"+header[-1])
-    worksheet5.write_row('A1', columnscount,merge_format)  
+    worksheet5.write_row('A1', columnscount,merge_format)
+    num = 2
+    print(excempted)
+    for each in excempted[1]:
+        worksheet5.write_row('A'+str(num), each)
+        num+=1 
+
 
     #HSN_SAC_SUMMARY_REPORT
     header = list(string.ascii_letters[26:52])
@@ -235,5 +245,15 @@ def xlsx_workbook(data):
     worksheet7.set_column(header[0]+":"+header[-1])
     worksheet7.write_row('A1', columnscount,merge_format)      
     workbook.close()
-    return True
+    files_new = {"file": open(home+'/'+'workbook.xlsx', 'rb')}
+    payload_new = {
+        "is_private": 1,
+        "folder": "Home"}
+    upload_report = requests.post(
+        company.host + "api/method/upload_file",
+        files=files_new,
+        data=payload_new).json()
+    url = upload_report['message']['file_url']
+    os.remove(home+'/'+'workbook.xlsx')
+    return url
         
