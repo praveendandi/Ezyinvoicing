@@ -16,7 +16,6 @@ def execute(filters=None):
 		if len(doc) == 0:
 			data = []
 			return columns,data
-		
 		mergedDf = pd.DataFrame(doc,columns=fields)
 		mergedDf.rename(columns={'bill_number':'Invoice Number','bill_generation_date':'Invoice Date','folio_type':'Invoice Category','room':'Room No','display_name':'Guest Name'}, inplace=True)
 		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
