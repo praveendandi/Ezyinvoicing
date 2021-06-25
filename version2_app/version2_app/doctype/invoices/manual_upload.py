@@ -94,7 +94,7 @@ def manual_upload_data(data):
                             x['FT_CREDIT'] = x['FT_DEBIT']
                         items_pdf_dict = {'date':item_date,'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
                         # continue
-                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION']:
                         items_pdf_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
                     
                     # if x['FT_DEBIT'] is None:
@@ -119,7 +119,7 @@ def manual_upload_data(data):
                     items_pdf_dict = {'date':item_date,'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
                 # if x['FT_DEBIT'] is None:
                 #     x['FT_DEBIT'] = x['FT_CREDIT']    
-                elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION']:
+                elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION']:
                     items_pdf_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
                 else:
                     items.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
