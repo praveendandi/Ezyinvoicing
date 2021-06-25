@@ -59,6 +59,7 @@ def Report_Download(data):
             os.remove(home+'/'+fileName+'.xlsx')
             return url
         elif data['file_type'] == "CSV":
+            company = frappe.get_doc('company',data['company'])
             fileName = data['report_name'].replace(" ","")
             df = pd.DataFrame(data['values'], columns = data['columns']) 
             print(df)
@@ -71,7 +72,7 @@ def Report_Download(data):
             pathname = 'path/to/file/or/folder/'  
             # url = urllib.pathname2url(home+'/'+fileName+'.csv')  
             upload_report = requests.post(
-                host + "api/method/upload_file",
+                company.host + "api/method/upload_file",
                 files=files_new,
                 data=payload_new).json()
             url = upload_report['message']['file_url']
