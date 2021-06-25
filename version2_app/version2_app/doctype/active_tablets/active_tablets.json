@@ -49,12 +49,13 @@
   {
    "fieldname": "device_name",
    "fieldtype": "Data",
-   "label": "Device Name"
+   "label": "Device Name",
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-17 10:54:09.360017",
+ "modified": "2021-06-25 09:29:04.186668",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Active Tablets",

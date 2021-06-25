@@ -165,7 +165,11 @@ doc_events = {
 	},
 	"TaxPayerDetail":{
 		'after_insert':"version2_app.events.taxpayerhook"
-	}
+	},
+    "Promotions":{
+        'after_insert':"version2_app.events.promotionsSocket",
+        "on_trash": "version2_app.events.deletePromotionsSocket",       
+    }
 	
 
 }

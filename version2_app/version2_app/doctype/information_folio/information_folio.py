@@ -122,5 +122,7 @@ def update_signature(name=None, signature=None, work_station=None, tab=None, doc
     }
     frappe.publish_realtime(
         "custom_socket", {'message': 'Signature Updated', 'data': data})
+    frappe.publish_realtime(
+        "custom_socket", {'message': doctype+' Signature Updated', 'data': data})
 
     return True

@@ -15,4 +15,10 @@ class Promotions(Document):
 def update_promotions(name=None, status=None):
     doc = frappe.db.set_value('Promotions', name,'status', status, update_modified=False)
     frappe.db.commit()
+    data = {
+        'name': name,
+        'status': status
+    }
+    frappe.publish_realtime(
+        "custom_socket", {'message': 'Promotions Updated', 'data': data})
     return True

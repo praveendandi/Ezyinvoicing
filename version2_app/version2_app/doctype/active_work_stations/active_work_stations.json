@@ -10,7 +10,8 @@
   "ip_address",
   "connected_on",
   "socket_id",
-  "status"
+  "status",
+  "username"
  ],
  "fields": [
   {
@@ -38,11 +39,17 @@
    "fieldname": "status",
    "fieldtype": "Data",
    "label": "Status"
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "UserName"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-05 14:24:05.130583",
+ "modified": "2021-06-25 11:04:35.950672",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Active Work Stations",

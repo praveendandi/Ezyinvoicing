@@ -214,8 +214,11 @@ def information_folio_created(doc, method=None):
 
 def tablet_mapping(doc, method=None):
     try:
-        print(doc.name, "hello hiee")
+        print(doc.name, "hello hiee","$$$$$$$$$$$$$$$$")
         # if
+        workstation = frappe.get_doc("Active Work Stations",doc.work_station)
+        workstation.username = doc.username
+        workstation.save(ignore_permissions=True,ignore_version=True)
         frappe.publish_realtime(
             "custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
@@ -226,11 +229,11 @@ def tablet_mapping(doc, method=None):
 def remove_mapping(doc, method=None):
     try:
         print(doc.__dict__, "hello hiee removing mapping &&&&&&&77")
-        # if
+        tablet = frappe.db.get_value("Active Tablets",doc.tablet,"tablet")
         frappe.publish_realtime(
             "custom_socket", {'message': 'Remove Tablet config', 'data': doc.__dict__})
         frappe.publish_realtime(
-            "custom_socket", {'message': 'Tablet Config Disconnected', 'data': doc.__dict__})
+            "custom_socket", {'message': 'Tablet Config Disconnected', 'data': doc.__dict__,"tablet":tablet})
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
     except Exception as e:
         print(e)
@@ -249,10 +252,9 @@ def tablet_connected(doc, method=None):
 
 def tablet_disconnected(doc, method=None):
     try:
-        print(doc.name, "hello hiee")
         # if
         # config_doc = frappe.db.exists({
-        #     'doctype': 'Tablet Config',
+        #     'doctype': 'Tablet Config',Tablet Map
         #     'tablet': doc.name,
         # })
         # print(config_doc,"hello*************8")
@@ -280,7 +282,11 @@ def workstation_disconnected(doc, method=None):
 
 def update_tablet_status(doc, method=None):
     try:
-        print(doc.name, "hello hiee")
+        print(doc.name, "hello hiee","=====================")
+        table_config = frappe.db.get_value("Tablet Config",{"tablet":doc.name},["work_station","username"])
+        workstation = frappe.get_doc("Active Work Stations",table_config[0])
+        workstation.username = table_config[1]
+        workstation.save(ignore_permissions=True,ignore_version=True)
         frappe.publish_realtime(
             "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
     except Exception as e:
@@ -454,5 +460,19 @@ def dailyIppprinterFiles():
         company = frappe.get_last_doc('company')
         shutil.rmtree(company.ipp_printer_file_path)
         os.mkdir(company.ipp_printer_file_path)
+    except Exception as e:
+        print(str(e))
+
+def promotionsSocket(doc,method=None):
+    try:
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Promotions Created', 'data': doc.__dict__})
+    except Exception as e:
+        print(str(e))
+
+def deletePromotionsSocket(doc,method=None):
+    try:
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Promotions Deleted', 'data': doc.__dict__})
     except Exception as e:
         print(str(e))
