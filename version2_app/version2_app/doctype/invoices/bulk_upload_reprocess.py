@@ -65,6 +65,7 @@ def BulkUploadReprocess(data):
                     items.append(item_dict)
         elif company.bulk_excel_upload_type == "Marriot":
             line_items = json.loads(invoice_data.invoice_object_from_file)
+            
             # invoice_date = invoice_data.invoice_date
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             items = []
@@ -80,14 +81,17 @@ def BulkUploadReprocess(data):
                     invoiceType = "B2B"
                     error_data['gst_number'] = gstNumber
                     error_data['invoice_type'] = "B2B"
-            for each in line_items['data']:
-                if each['TRANSACTION_DESCRIPTION'] not in payment_Types:
+            for each in line_items['data']['items']:
+
+                if each['name'] not in payment_Types:
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or "VAT" in each["name"]:
+                        continue
                     item_dict = {}
-                    date_time_obj = datetime.datetime.strptime(each['BILL_GENERATION_DATE'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
+                    date_time_obj = datetime.datetime.strptime(each['date'],'%d-%m-%y').strftime(company.invoice_item_date_format)
                     item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
-                    item_dict['item_value'] = each['FT_DEBIT']
+                    item_dict['item_value'] = each['item_value']
                     item_dict['sac_code'] = "No Sac"
-                    item_dict['name'] = each['TRANSACTION_DESCRIPTION']
+                    item_dict['name'] = each['name']
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	

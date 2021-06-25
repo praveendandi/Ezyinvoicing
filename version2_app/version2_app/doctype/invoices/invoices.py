@@ -2037,6 +2037,7 @@ def calulate_items(data):
                         else:
                             pass	
                         if "-" in str(item['item_value']):
+                            ItemMode = "Credit"
                             companyDetails = frappe.get_doc('company', data['company_code'])
                             if invoice_category == "Tax Invoice" or invoice_category == "Debit Invoice":
                                 if companyDetails.allowance_type == "Credit":
