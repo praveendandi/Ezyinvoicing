@@ -1144,7 +1144,6 @@ def b2b_success_to_credit_note(data):
                     return {"success": False, "message": "Please adjust the items manually before converting to credit."}
                 item_data.extend([items for items in positive_data if abs(items["item_value"]) != 0])
             for items in item_data:
-                print(items)
                 item_date = datetime.datetime.strptime(str(items["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
                 total_items.append({"date":item_date, "item_value":-abs(items["item_value"]),"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"],"sgst":items["sgst"],"cgst":items["sgst"],"igst":items["igst"]})
             calulate_items_data = {"items":total_items,"invoice_number":invoice_number,"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}
@@ -1164,6 +1163,8 @@ def b2b_success_to_credit_note(data):
             doc_invoice = frappe.get_doc("Invoices",data["invoice_number"])
             doc_invoice.credit_note_raised = "Yes"
             doc_invoice.save(ignore_permissions=True,ignore_version=True)
+            if data['taxinvoice'] == "Yes":
+                raise_credit_taxinvoice(data['invoice_number'])
             # subject1 = 'Credit Note Created and Invoice Number is {}'.format(invoice_number)
             # parent_activity = frappe.get_doc({'doctype': 'Version','data': '<!DOCTYPE html><html><body><p>{}</p></body></html>'.format(subject1),"ref_doctype":"Invoices","docname":data["invoice_number"]})
             # parent_activity.insertS(ignore_permissions=True,ignore_version=True)
