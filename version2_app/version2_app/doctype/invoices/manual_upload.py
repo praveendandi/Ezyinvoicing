@@ -36,7 +36,7 @@ def manual_upload(data):
             event="data_import",
             now=False,
             data = data,
-            is_async = True,
+            is_async = False,
             )		
     return True    
 
@@ -100,6 +100,8 @@ def manual_upload_data(data):
                     # if x['FT_DEBIT'] is None:
                     #     x['FT_DEBIT'] = x['FT_CREDIT']
                     else:
+                        if x['FT_DEBIT'] is None:
+                            x['FT_DEBIT'] = x['FT_CREDIT']
                         items_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':int(y)+1,"sac_code":'No Sac'}
                         # print(dict(x))
                         items.append(items_dict)
