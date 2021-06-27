@@ -1,7 +1,7 @@
 {
  "actions": [],
  "autoname": "field:printer_ip",
- "creation": "2021-06-25 17:26:22.641937",
+ "creation": "2021-06-27 12:26:59.091940",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -25,7 +25,6 @@
    "label": "Last Used"
   },
   {
-   "default": "Enable",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
@@ -34,7 +33,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-27 11:50:53.492329",
+ "modified": "2021-06-27 12:27:16.287296",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Printers",
@@ -49,18 +48,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "All",
    "share": 1,
    "write": 1
   }

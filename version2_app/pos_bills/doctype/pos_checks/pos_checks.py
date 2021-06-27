@@ -19,6 +19,7 @@ class POSChecks(Document):
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(data):
 	try:
+		print(data,"---------------------------")
 		company_doc = frappe.get_doc("company",data["company"])
 		data["mode"] = company_doc.mode
 		data["doctype"] = "POS Checks"
