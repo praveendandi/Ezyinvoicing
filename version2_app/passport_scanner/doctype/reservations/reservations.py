@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 import base64, time
-import cv2
+# import cv2
 import datetime
 import dateparser
 import frappe
