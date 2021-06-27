@@ -107,6 +107,46 @@ doc_events = {
 		# "on_cancel": "method",
 		# "on_trash": "method"
 	},
+    "Tablet Config": {
+        "after_insert": "version2_app.events.tablet_mapping",
+        "on_trash": "version2_app.events.remove_mapping",
+    },
+    "Redg Card": {
+        "after_insert": "version2_app.events.create_redg_card",
+        "on_trash": "version2_app.events.create_redg_card",
+    },
+    "Paidout Receipts": {
+        "after_insert": "version2_app.events.create_paidout_receipt",
+        "on_trash": "version2_app.events.create_paidout_receipt",
+    },
+    "Advance Deposits": {
+        "after_insert": "version2_app.events.create_advance_deposits",
+        "on_trash": "version2_app.events.create_advance_deposits",
+    },
+    "Payment Receipts": {
+        "after_insert": "version2_app.events.create_payment_receipts",
+        "on_trash": "version2_app.events.create_payment_receipts",
+    },
+    "Encashment Certificates": {
+        "after_insert": "version2_app.events.create_encashment_certificates",
+        "on_trash": "version2_app.events.create_encashment_certificates",
+    },
+    "Pos Bills": {
+        "after_insert": "version2_app.events.create_pos_bill",
+        # "on_trash": "version2_app.events.create_encashment_certificates",
+    },
+    "Active Tablets": {
+        "after_insert": "version2_app.events.tablet_connected",
+        "on_trash": "version2_app.events.tablet_disconnected",
+        "on_update": "version2_app.events.update_tablet_status",
+    },
+    "Active Work Stations": {
+        "on_trash": "version2_app.events.workstation_disconnected",
+    },
+    "Information Folio": {
+        "after_insert": "version2_app.events.information_folio_created",
+        "on_update": "version2_app.events.information_folio_created",
+    },
 	"File":{
 		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
@@ -125,12 +165,16 @@ doc_events = {
 	},
 	"TaxPayerDetail":{
 		'after_insert':"version2_app.events.taxpayerhook"
-	}
+	},
+    "Promotions":{
+        'after_insert':"version2_app.events.promotionsSocket",
+        "on_trash": "version2_app.events.deletePromotionsSocket",       
+    }
 	
 
 }
 
-# Scheduled Tasks
+# Scheduled Tasks/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/emailTemplat.py
 # ---------------
 scheduler_events = {
 	
@@ -144,8 +188,24 @@ scheduler_events = {
 }	
 
 
+scheduler_events = {
+    "all": [
+        "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+    ],
+    "cron": {
+        "1-59 * * * *": [
+            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+        ],
+        "09 11 * * * *": [
+            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+        ]},
+    "daily": [
+        "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
+        "version2_app.events.deleteemailfilesdaily"
+    ]
+}
 # scheduler_events = {
-	
+
 # 	"all": [
 # 		"version2_app.tasks.all"
 # 	],
@@ -185,4 +245,3 @@ scheduler_events = {
 # exempt linked doctypes from being automatically cancelled
 #
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
-

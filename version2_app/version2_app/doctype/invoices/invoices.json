@@ -137,7 +137,9 @@
   "debit_invoice",
   "note",
   "credit_note_raised",
-  "suptyp"
+  "suptyp",
+  "signature",
+  "credit_note_raised"
  ],
  "fields": [
   {
@@ -883,6 +885,11 @@
    "fieldname": "note",
    "fieldtype": "HTML Editor",
    "label": "Note"
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
   },
   {
    "default": "No",

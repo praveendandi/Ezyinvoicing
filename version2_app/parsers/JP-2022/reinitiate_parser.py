@@ -107,6 +107,8 @@ def reinitiateInvoice(data):
 		if check_invoice['success']==True:
 			inv_data = check_invoice['data']
 			invoiceNumber = inv_data.name
+			if inv_data.change_gst_number == "No":
+				gstNumber = inv_data.gst_number
 		if invoiceNumber != reupload_inv_number:
 			return {"success":False,"message":"Incorrect Invoice Attempted"}
 		
@@ -156,7 +158,9 @@ def reinitiateInvoice(data):
 		paymentTypes = GetPaymentTypes()
 		payment_Types  = [''.join(each) for each in paymentTypes['data']]
 		for each in items:
-			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name'] and ("XX/XX" not in i or "XXXXX" not in i):
+			print(each)
+			if "CGST" not in each["name"] and "SGST" not in each["name"] and "CESS" not in each["name"] and "VAT" not in each["name"] and "Cess" not in each["name"] and "Vat" not in each["name"] and "IGST" not in each["name"] and "Service Charge" not in each['name'] and "Service Tax" not in each['name']:
+				print(each)
 				if each["name"] not in payment_Types:
 					total_items.append(each)
 
@@ -218,7 +222,8 @@ def reinitiateInvoice(data):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
+			if errorcalulateItemsApiResponse['success'] == True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}

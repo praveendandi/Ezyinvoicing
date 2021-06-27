@@ -1,0 +1,86 @@
+{
+ "actions": [],
+ "autoname": "field:socket_id",
+ "creation": "2021-04-02 14:51:46.789193",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "work_station",
+  "ip_address",
+  "connected_on",
+  "socket_id",
+  "status",
+  "username"
+ ],
+ "fields": [
+  {
+   "fieldname": "work_station",
+   "fieldtype": "Data",
+   "label": "Work Station"
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "label": "Ip Address"
+  },
+  {
+   "fieldname": "connected_on",
+   "fieldtype": "Data",
+   "label": "Connected On"
+  },
+  {
+   "fieldname": "socket_id",
+   "fieldtype": "Data",
+   "label": "Socket Id",
+   "unique": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "UserName"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-06-25 11:04:35.950672",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Active Work Stations",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

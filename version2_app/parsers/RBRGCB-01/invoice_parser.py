@@ -188,7 +188,7 @@ def file_parsing(filepath):
 		guest['items'] = total_items
 		guest['invoice_type'] = 'B2B' if gstNumber != '' else 'B2C'
 		guest['gstNumber'] = gstNumber
-		guest['room_number'] = int(roomNumber)
+		guest['room_number'] = int(roomNumber) if roomNumber != '' else 0
 		guest['company_code'] = "RBRGCB-01"
 		guest['confirmation_number'] = conf_number
 		guest['start_time'] = str(start_time)
@@ -234,7 +234,8 @@ def file_parsing(filepath):
 			error_data['amened'] = amened
 			
 			errorcalulateItemsApiResponse = calulate_items({'items':guest['items'],"invoice_number":guest['invoice_number'],"company_code":company_code['code'],"invoice_item_date_format":companyCheckResponse['data'].invoice_item_date_format})
-			error_data['items_data'] = errorcalulateItemsApiResponse['data']
+			if errorcalulateItemsApiResponse['success'] == True:
+				error_data['items_data'] = errorcalulateItemsApiResponse['data']
 			errorInvoice = Error_Insert_invoice(error_data)
 			print("Error:  *******The given gst number is not a vaild one**********")
 			return {"success":False,"message":"Invalid GstNumber"}

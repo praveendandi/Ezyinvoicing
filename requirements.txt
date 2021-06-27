@@ -10,3 +10,10 @@ ippserver
 pycups
 xmltodict
 python-escpos==2.2.0
+opencv-python
+Pillow
+dateparser
+pyzbar
+text-to-image
+Pillow
+scipy
