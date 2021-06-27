@@ -9,3 +9,4 @@ watchdog
 ippserver
 pycups
 xmltodict
+python-escpos==2.2.0

@@ -1,29 +1,79 @@
 {
  "actions": [],
+ "autoname": "field:outlet_name",
  "creation": "2021-06-25 17:24:17.347033",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "outlet_name",
-  "printers"
+  "static_payment_qr_code",
+  "outlet_logo",
+  "payment_mode",
+  "void",
+  "start",
+  "cancelled",
+  "closed",
+  "print"
  ],
  "fields": [
   {
    "fieldname": "outlet_name",
    "fieldtype": "Data",
-   "label": "Outlet Name"
+   "label": "Outlet Name",
+   "unique": 1
   },
   {
-   "fieldname": "printers",
-   "fieldtype": "Table",
-   "label": "Printers",
-   "options": "Printer Details"
+   "fieldname": "static_payment_qr_code",
+   "fieldtype": "Attach",
+   "label": "Static Payment QR Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "outlet_logo",
+   "fieldtype": "Attach",
+   "label": "Outlet Logo",
+   "reqd": 1
+  },
+  {
+   "default": "Static",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Payment Mode",
+   "options": "Static\nDynamic"
+  },
+  {
+   "fieldname": "void",
+   "fieldtype": "Data",
+   "label": "Void"
+  },
+  {
+   "fieldname": "start",
+   "fieldtype": "Data",
+   "label": "Start"
+  },
+  {
+   "fieldname": "cancelled",
+   "fieldtype": "Data",
+   "label": "Cancelled"
+  },
+  {
+   "fieldname": "closed",
+   "fieldtype": "Data",
+   "label": "Closed"
+  },
+  {
+   "default": "No",
+   "fieldname": "print",
+   "fieldtype": "Select",
+   "label": "Print",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-25 17:27:16.273479",
+ "modified": "2021-06-27 11:13:46.480833",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",

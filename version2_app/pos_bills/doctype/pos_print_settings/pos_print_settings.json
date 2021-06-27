@@ -1,50 +1,43 @@
 {
  "actions": [],
- "creation": "2021-06-25 17:31:31.474168",
+ "creation": "2021-06-27 10:28:54.169182",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "check_no",
   "outlet",
-  "printer_ip",
-  "total_amount",
-  "pos_bill"
+  "printer",
+  "mapped_on"
  ],
  "fields": [
   {
-   "fieldname": "check_no",
-   "fieldtype": "Data",
-   "label": "Check No"
-  },
-  {
    "fieldname": "outlet",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Outlet",
-   "options": "Outlets"
+   "options": "Outlets",
+   "reqd": 1
   },
   {
-   "fieldname": "printer_ip",
-   "fieldtype": "Data",
-   "label": "Printer IP"
+   "fieldname": "printer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Printer",
+   "options": "POS Printers",
+   "reqd": 1
   },
   {
-   "fieldname": "total_amount",
-   "fieldtype": "Data",
-   "label": "Total Amount"
-  },
-  {
-   "fieldname": "pos_bill",
-   "fieldtype": "Attach",
-   "label": "Pos Bill"
+   "fieldname": "mapped_on",
+   "fieldtype": "Datetime",
+   "label": "Mapped On"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-25 17:31:31.474168",
+ "modified": "2021-06-27 11:14:36.912844",
  "modified_by": "Administrator",
  "module": "POS Bills",
- "name": "POS Bill Logs",
+ "name": "POS Print Settings",
  "owner": "Administrator",
  "permissions": [
   {
