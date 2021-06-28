@@ -1060,7 +1060,9 @@ def insert_invoice(data):
             else:
                 data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
 
-
+        if "raise_credit" in data:
+            data['total_invoice_amount'] = float(pms_invoice_summary+other_charges)#value_after_gst + other_charges + credit_value_after_gst
+            print("----------------",data['total_invoice_amount'])
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
 
@@ -1068,7 +1070,6 @@ def insert_invoice(data):
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
-                print("//////,,,,,,,,,,,")
                 roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
                 data['invoice_round_off_amount'] = roundoff_amount
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
