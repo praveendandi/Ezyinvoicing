@@ -1,6 +1,5 @@
 {
  "actions": [],
- "autoname": "field:printer_ip",
  "creation": "2021-06-27 12:26:59.091940",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -33,7 +32,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-27 12:27:16.287296",
+ "modified": "2021-06-28 16:33:14.036179",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Printers",

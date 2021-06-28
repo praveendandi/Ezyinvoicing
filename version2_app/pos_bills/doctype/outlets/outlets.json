@@ -1,6 +1,5 @@
 {
  "actions": [],
- "autoname": "field:outlet_name",
  "creation": "2021-06-25 17:24:17.347033",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -14,7 +13,8 @@
   "start",
   "cancelled",
   "closed",
-  "print"
+  "print",
+  "printer_mapped"
  ],
  "fields": [
   {
@@ -69,11 +69,17 @@
    "fieldtype": "Select",
    "label": "Print",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "0",
+   "fieldname": "printer_mapped",
+   "fieldtype": "Check",
+   "label": "Printer Mapped"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-27 11:13:46.480833",
+ "modified": "2021-06-28 16:33:51.355287",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",
