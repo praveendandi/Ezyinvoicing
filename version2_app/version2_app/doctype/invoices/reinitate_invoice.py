@@ -23,8 +23,10 @@ def Reinitiate_invoice(data):
     insert invoice data     data, company_code, taxpayer,items_data
     '''
     try:
-        print(data['total_invoice_amount'],"*****")
-        generateb2cQr = True	
+        generateb2cQr = True
+        if data['total_invoice_amount'] =="":
+            data['total_invoice_amount'] = 0
+
         total_invoice_amount = data['total_invoice_amount']
         # del data['total_invoice_amount']
         company = frappe.get_doc('company',data['company_code'])
@@ -190,6 +192,7 @@ def Reinitiate_invoice(data):
         # else:
         # 	invoice_category = doc.invoice_category	
         invoice_from = doc.invoice_from
+        
         converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
         doc.total_inovice_amount = total_invoice_amount
         doc.invoice_number=data['guest_data']['invoice_number']
@@ -253,6 +256,7 @@ def Reinitiate_invoice(data):
         
 
         doc.irn_generated=irn_generated
+        print(data['total_invoice_amount'],type(data['total_invoice_amount']))
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float(abs(pms_invoice_summary+other_charges))
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
             if len(data['items_data'])==0:
