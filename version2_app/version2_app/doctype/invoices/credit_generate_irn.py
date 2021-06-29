@@ -534,8 +534,8 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
                     "N",
 					"HsnCd":
 					item.sac_code if item.sac_code != 'No SAC' else '',
-					"Qty":
-					1,
+					"Qty":int(item.quantity),
+                    "Unit":item.unit_of_measurement,
 					"FreeQty":
 					0,
 					"UnitPrice":
