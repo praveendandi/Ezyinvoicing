@@ -114,7 +114,17 @@
   "template_name",
   "api_key",
   "api",
-  "domain_url"
+  "domain_url",
+  "void_check_reference",
+  "void_total_amt_regex",
+  "closed_check_reference",
+  "normal_check_total_amt_regex",
+  "check_number_reference",
+  "check_number_regex",
+  "table_number_reference",
+  "table_number_regex",
+  "guest_number_reference",
+  "guest_number_regex"
  ],
  "fields": [
   {
@@ -736,11 +746,61 @@
    "fieldname": "domain_url",
    "fieldtype": "Data",
    "label": "Domain URL"
+  },
+  {
+   "fieldname": "void_check_reference",
+   "fieldtype": "Data",
+   "label": "Void Check Reference"
+  },
+  {
+   "fieldname": "void_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Void Total Amt Regex"
+  },
+  {
+   "fieldname": "closed_check_reference",
+   "fieldtype": "Data",
+   "label": "Closed Check Reference"
+  },
+  {
+   "fieldname": "normal_check_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Normal Check Total Amt Regex"
+  },
+  {
+   "fieldname": "check_number_reference",
+   "fieldtype": "Data",
+   "label": "Check Number Reference"
+  },
+  {
+   "fieldname": "check_number_regex",
+   "fieldtype": "Data",
+   "label": "Check Number Regex"
+  },
+  {
+   "fieldname": "table_number_reference",
+   "fieldtype": "Data",
+   "label": "Table Number Reference"
+  },
+  {
+   "fieldname": "table_number_regex",
+   "fieldtype": "Data",
+   "label": "Table Number Regex"
+  },
+  {
+   "fieldname": "guest_number_reference",
+   "fieldtype": "Data",
+   "label": "Guest Number Reference"
+  },
+  {
+   "fieldname": "guest_number_regex",
+   "fieldtype": "Data",
+   "label": "Guest Number Regex"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-09 18:38:01.027183",
+ "modified": "2021-06-28 17:58:07.628561",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
