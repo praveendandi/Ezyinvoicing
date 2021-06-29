@@ -21,30 +21,32 @@ class POSChecks(Document):
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(data):
 	try:
-		company_doc = frappe.get_doc("company",data["company"])
-		data["mode"] = company_doc.mode
-		data["doctype"] = "POS Checks"
-		outlet_doc = frappe.get_doc("Outlets",data["outlet"])
-		outlet_printer = frappe.db.get_value("POS Print Settings",{"outlet":outlet_doc.name},"printer") 
-		extract_bills = extract_data(data["payload"],company_doc)
-		if extract_bills["success"] == False:
-			return extract_bills["message"]
-		data.update(extract_bills["data"])
-		if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
-			folder_path = frappe.utils.get_bench_path()
-			path = folder_path + '/sites/' + company_doc.site_name +"/public"
-			logopath = path+outlet_doc.outlet_logo
-			qrpath = path+outlet_doc.static_payment_qr_code
-			if outlet_doc.payment_mode == "Dynamic":
-				short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
-				if short_url["success"]:
-					give_print(data["payload"],outlet_printer,logopath,qrpath,short_url['short_url'])
+		raw_data = data["payload"].split("\n")
+		if len(raw_data) > 5:
+			company_doc = frappe.get_doc("company",data["company"])
+			data["mode"] = company_doc.mode
+			data["doctype"] = "POS Checks"
+			outlet_doc = frappe.get_doc("Outlets",data["outlet"])
+			outlet_printer = frappe.db.get_value("POS Print Settings",{"outlet":outlet_doc.name},"printer") 
+			extract_bills = extract_data(data["payload"],company_doc)
+			if extract_bills["success"] == False:
+				return extract_bills["message"]
+			data.update(extract_bills["data"])
+			if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
+				folder_path = frappe.utils.get_bench_path()
+				path = folder_path + '/sites/' + company_doc.site_name +"/public"
+				logopath = path+outlet_doc.outlet_logo
+				qrpath = path+outlet_doc.static_payment_qr_code
+				if outlet_doc.payment_mode == "Dynamic":
+					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
+					if short_url["success"]:
+						give_print(data["payload"],outlet_printer,logopath,qrpath,short_url['short_url'])
+						data["printed"] = 1
+				else:
+					give_print(data["payload"],outlet_printer,logopath,qrpath)
 					data["printed"] = 1
-			else:
-				give_print(data["payload"],outlet_printer,logopath,qrpath)
-				data["printed"] = 1
-		doc = frappe.get_doc(data)
-		doc.insert(ignore_permissions=True,ignore_links=True)
+			doc = frappe.get_doc(data)
+			doc.insert(ignore_permissions=True,ignore_links=True)
 	except Exception as e:
 		print(str(e))
 		exc_type, exc_obj, exc_tb = sys.exc_info()
