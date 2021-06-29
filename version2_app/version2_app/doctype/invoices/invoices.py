@@ -1060,7 +1060,9 @@ def insert_invoice(data):
             else:
                 data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
 
-
+        if "raise_credit" in data:
+            data['total_invoice_amount'] = float(pms_invoice_summary+other_charges)#value_after_gst + other_charges + credit_value_after_gst
+            print("----------------",data['total_invoice_amount'])
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
 
@@ -1068,7 +1070,6 @@ def insert_invoice(data):
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
-                print("//////,,,,,,,,,,,")
                 roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
                 data['invoice_round_off_amount'] = roundoff_amount
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
@@ -1361,7 +1362,7 @@ def insert_items(items, invoice_number):
         b = frappe.db.commit()
         if len(items)>0:
             for item in items:
-                # print(item)
+                print(item,"---------")
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
@@ -1377,7 +1378,7 @@ def insert_items(items, invoice_number):
         return {"sucess": True, "data": 'doc'}
         # print(doc)
     except Exception as e:
-        print(e,"**********  insert itemns api")
+        print(traceback.print_exc(),"**********  insert itemns api")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing insert_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
