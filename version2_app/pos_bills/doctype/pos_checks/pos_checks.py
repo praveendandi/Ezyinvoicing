@@ -21,7 +21,8 @@ class POSChecks(Document):
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(data):
 	try:
-		raw_data = data["payload"]
+		raw_data = data["payload"].split("\n")
+		print(raw_data)
 		if len(raw_data) > 5:
 			company_doc = frappe.get_doc("company",data["company"])
 			data["mode"] = company_doc.mode
