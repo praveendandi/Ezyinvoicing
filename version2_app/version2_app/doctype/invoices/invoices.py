@@ -3290,8 +3290,6 @@ def check_invoice_file_exists(data):
         return {"success": False, "message": "sample"}
     except Exception as e:
         print(e, "check file exist")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_invoice_file_exists","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -3322,8 +3320,6 @@ def check_invoice_exists(invoice_number):
         return {"success":False}	
     except Exception as e:
         print(e, "check invoice exist")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_invoice_exists","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
