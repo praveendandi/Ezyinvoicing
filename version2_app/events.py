@@ -47,7 +47,7 @@ def company_created(doc,method=None):
         adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
         insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
         headers = {'content-type': 'application/json'}
-        r = requests.post(api,headers=headers,json=insert_dict)
+        r = requests.post(api,headers=headers,json=insert_dict,verify=False)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing company_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))   
@@ -270,7 +270,7 @@ def gspmeteringhook(doc,method=None):
                 if company.skip_ssl_verify == 1:
                     json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
                 else:
-                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
             print(json_response,"/////////")
             return json_response
         print("Property is in Testing Mode gspmeteringhook")         
@@ -297,7 +297,7 @@ def taxpayerhook(doc,method=None):
                 if company.skip_ssl_verify == 1:
                     insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
                 else:
-                    insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+                    insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
             if insertTaxpayer.status_code==200:
                 print("--------- Taxpayer hook")
             return insertTaxpayer
@@ -329,7 +329,7 @@ def InvoiceDataTolicensing():
                         inputData['data']['debitinvoices'] = each['count']
                     if each['invoice_category'] == "Credit Invoice":
                         inputData['data']['creditinvoices'] = each['count']        
-                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData,verify=False)
             
             if len(Invoice_count2)>0:
                 inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Production"}}
@@ -340,7 +340,7 @@ def InvoiceDataTolicensing():
                         inputData['data']['debitinvoices'] = each['count']
                     if each['invoice_category'] == "Credit Invoice":
                         inputData['data']['creditinvoices'] = each['count']
-                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)         
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData,verify=False)         
         print("Property is in Testing Mode InvoiceDataTolicensing")
     except Exception as e:
         print(traceback.print_exc())
@@ -392,8 +392,7 @@ def updatepropertiesdetails():
                 if company.skip_ssl_verify == 1:
                     json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData,verify=False)
                 else:
-                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData)
-            print(json_response,"/////////")
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData,verify=False)
             return json_response.json()
         return {"success":True, "message":"Property is in Testing Mode"}         
     except Exception as e:

@@ -571,7 +571,7 @@ def send_invoicedata_to_gcb(invoice_number):
                     json_response = requests.post(
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
                         headers=headers,
-                        json=b2c_data)
+                        json=b2c_data,verify=False)
                 else:
                     json_response = requests.post(
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
@@ -620,8 +620,8 @@ def send_invoicedata_to_gcb(invoice_number):
                             "vpa": company.merchant_virtual_payment_address,
                             "name": company.merchant_name,
                             "txnReference": invoice_number,
-                            "amount": '%.2f' % doc.pms_invoice_summary
-                        })
+                            "amount": '%.2f' % doc.pms_invoice_summary},
+                        verify=False)
                 else:
                     generate_qr = requests.post(
                         "https://upiqr.in/api/qr?format=png",
@@ -722,7 +722,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
             if company.skip_ssl_verify == 0:
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
-                                                json=payload)
+                                                json=payload,verify=False)
             else:
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
@@ -787,7 +787,7 @@ def create_qr_image(invoice_number, gsp):
             if company.skip_ssl_verify == 0:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
-                                        stream=True)
+                                        stream=True,verify=False)
             else:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
@@ -857,7 +857,7 @@ def postIrn(gst_data, gsp, company, invoice_number):
             if company.skip_ssl_verify == 0:
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
-                                            json=gst_data)
+                                            json=gst_data,verify=False)
             else:
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
@@ -2728,7 +2728,7 @@ def get_tax_payer_details(data):
                     if company.skip_ssl_verify == 1:
                         json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                     else:
-                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                 if json_response.content:
                     response = request_get(
                         data['apidata']['get_taxpayer_details'] + data['gstNumber'],
@@ -3198,7 +3198,7 @@ def request_post(url, code, headers=None):
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
-                data = requests.post(url, headers=headers)
+                data = requests.post(url, headers=headers,verify=False)
             else:
                 data = requests.post(url, headers=headers,verify=False)	
         else:
@@ -3236,7 +3236,7 @@ def request_get(api, headers, invoice, code):
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
-                raw_response = requests.get(api, headers=headers)
+                raw_response = requests.get(api, headers=headers,verify=False)
             else:
                 raw_response = requests.get(api, headers=headers,verify=False)
 

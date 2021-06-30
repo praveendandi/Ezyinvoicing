@@ -1,4 +1,3 @@
-import requests
 import random
 import datetime,os,sys,traceback
 import json
