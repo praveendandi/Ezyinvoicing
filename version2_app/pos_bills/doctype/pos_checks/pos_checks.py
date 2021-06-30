@@ -28,7 +28,8 @@ def create_pos_bills(data):
 			data["mode"] = company_doc.mode
 			data["doctype"] = "POS Checks"
 			outlet_doc = frappe.get_doc("Outlets",data["outlet"])
-			outlet_printer = frappe.db.get_value("POS Print Settings",{"outlet":outlet_doc.name},"printer") 
+			outlet_printer = frappe.db.get_value("POS Print Settings",{"outlet":outlet_doc.name},"printer")
+			printer_doc = frappe.get_doc("POS Printers",outlet_printer)
 			extract_bills = extract_data(data["payload"],company_doc)
 			if extract_bills["success"] == False:
 				return extract_bills["message"]
@@ -41,10 +42,10 @@ def create_pos_bills(data):
 				if outlet_doc.payment_mode == "Dynamic":
 					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
 					if short_url["success"]:
-						give_print(data["payload"],outlet_printer,logopath,qrpath,short_url['short_url'])
+						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,short_url['short_url'])
 						data["printed"] = 1
 				else:
-					give_print(data["payload"],outlet_printer,logopath,qrpath)
+					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath)
 					data["printed"] = 1
 			doc = frappe.get_doc(data)
 			doc.insert(ignore_permissions=True,ignore_links=True)
