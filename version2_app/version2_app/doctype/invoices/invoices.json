@@ -138,8 +138,7 @@
   "note",
   "credit_note_raised",
   "suptyp",
-  "signature",
-  "credit_note_raised"
+  "signature"
  ],
  "fields": [
   {
@@ -909,7 +908,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-06-17 08:33:46.654914",
+ "modified": "2021-06-30 11:32:48.045923",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
