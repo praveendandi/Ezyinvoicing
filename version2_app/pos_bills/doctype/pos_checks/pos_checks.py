@@ -154,13 +154,15 @@ def print_pos_bill(data):
 	try:
 		check_doc = frappe.get_doc("POS Checks",data["name"])
 		company_doc = frappe.get_doc("company",check_doc.company)
-		outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode"],as_dict=1)
+		outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
+		printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
+		printer_doc = frappe.get_doc("POS Printers",printer_settings)
 		folder_path = frappe.utils.get_bench_path()
 		path = folder_path + '/sites/' + company_doc.site_name +"/public"
 		logopath = path+outlet_values[0]["outlet_logo"]
 		qr_path = path+outlet_values[0]["static_payment_qr_code"]
 		b = (check_doc.payload).encode('utf-8')
-		kitchen = Network(check_doc.printer_ip)  # Printer IP Address
+		kitchen = Network(printer_doc.printer_ip)  # Printer IP Address
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logopath)
 		kitchen.hw('INIT')
