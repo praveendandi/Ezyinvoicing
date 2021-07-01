@@ -107,7 +107,7 @@ def Report_Delete(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def xlsx_workbook(data):
+def gstr1_excel_workbook(data):
     company = frappe.get_doc('company',data['company'])
 
     folder_path = frappe.utils.get_bench_path()
