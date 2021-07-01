@@ -126,7 +126,7 @@ def create_credit_qr_image(invoice_number, gsp):
 			if company.skip_ssl_verify == 0:
 				qr_response = requests.get(gsp['generate_qr_code'],
 											headers=headers,
-											stream=True)
+											stream=True,verify=False)
 			else:
 				qr_response = requests.get(gsp['generate_qr_code'],
 										headers=headers,
@@ -190,7 +190,7 @@ def request_get_data(api, headers,invoice,code):
 		}
 		if company.proxy == 0:
 			if company.skip_ssl_verify == 0:
-				raw_response = requests.get(api, headers=headers)
+				raw_response = requests.get(api, headers=headers,verify=False)
 			else:
 				raw_response = requests.get(api, headers=headers,verify=False)
 
@@ -530,11 +530,12 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
 					"PrdDesc":
 					item.item_name,
 					"IsServc":
-					"Y",
+					"Y" if item.item_type == "SAC" else
+                    "N",
 					"HsnCd":
 					item.sac_code if item.sac_code != 'No SAC' else '',
-					"Qty":
-					1,
+					"Qty":int(item.quantity),
+                    "Unit":item.unit_of_measurement,
 					"FreeQty":
 					0,
 					"UnitPrice":
@@ -670,7 +671,7 @@ def postIrn(gst_data, gsp,company,invoice_number):
 			if company['data'].skip_ssl_verify ==0:
 				irn_response = requests.post(gsp['generate_irn'],
 												headers=headers,
-												json=gst_data)
+												json=gst_data,verify=False)
 			else:
 				irn_response = requests.post(gsp['generate_irn'],
 											headers=headers,

@@ -571,7 +571,7 @@ def send_invoicedata_to_gcb(invoice_number):
                     json_response = requests.post(
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
                         headers=headers,
-                        json=b2c_data)
+                        json=b2c_data,verify=False)
                 else:
                     json_response = requests.post(
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
@@ -620,8 +620,8 @@ def send_invoicedata_to_gcb(invoice_number):
                             "vpa": company.merchant_virtual_payment_address,
                             "name": company.merchant_name,
                             "txnReference": invoice_number,
-                            "amount": '%.2f' % doc.pms_invoice_summary
-                        })
+                            "amount": '%.2f' % doc.pms_invoice_summary},
+                        verify=False)
                 else:
                     generate_qr = requests.post(
                         "https://upiqr.in/api/qr?format=png",
@@ -722,7 +722,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
             if company.skip_ssl_verify == 0:
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
-                                                json=payload)
+                                                json=payload,verify=False)
             else:
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
@@ -787,7 +787,7 @@ def create_qr_image(invoice_number, gsp):
             if company.skip_ssl_verify == 0:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
-                                        stream=True)
+                                        stream=True,verify=False)
             else:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
@@ -857,7 +857,7 @@ def postIrn(gst_data, gsp, company, invoice_number):
             if company.skip_ssl_verify == 0:
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
-                                            json=gst_data)
+                                            json=gst_data,verify=False)
             else:
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
@@ -1060,7 +1060,9 @@ def insert_invoice(data):
             else:
                 data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
 
-
+        if "raise_credit" in data:
+            data['total_invoice_amount'] = float(pms_invoice_summary+other_charges)#value_after_gst + other_charges + credit_value_after_gst
+            print("----------------",data['total_invoice_amount'])
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
 
@@ -1068,7 +1070,6 @@ def insert_invoice(data):
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
-                print("//////,,,,,,,,,,,")
                 roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
                 data['invoice_round_off_amount'] = roundoff_amount
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
@@ -1361,7 +1362,7 @@ def insert_items(items, invoice_number):
         b = frappe.db.commit()
         if len(items)>0:
             for item in items:
-                # print(item)
+                print(item,"---------")
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
@@ -1377,7 +1378,7 @@ def insert_items(items, invoice_number):
         return {"sucess": True, "data": 'doc'}
         # print(doc)
     except Exception as e:
-        print(e,"**********  insert itemns api")
+        print(traceback.print_exc(),"**********  insert itemns api")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing insert_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
@@ -2727,7 +2728,7 @@ def get_tax_payer_details(data):
                     if company.skip_ssl_verify == 1:
                         json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                     else:
-                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                 if json_response.content:
                     response = request_get(
                         data['apidata']['get_taxpayer_details'] + data['gstNumber'],
@@ -3197,7 +3198,7 @@ def request_post(url, code, headers=None):
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
-                data = requests.post(url, headers=headers)
+                data = requests.post(url, headers=headers,verify=False)
             else:
                 data = requests.post(url, headers=headers,verify=False)	
         else:
@@ -3235,7 +3236,7 @@ def request_get(api, headers, invoice, code):
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
-                raw_response = requests.get(api, headers=headers)
+                raw_response = requests.get(api, headers=headers,verify=False)
             else:
                 raw_response = requests.get(api, headers=headers,verify=False)
 
@@ -3289,8 +3290,6 @@ def check_invoice_file_exists(data):
         return {"success": False, "message": "sample"}
     except Exception as e:
         print(e, "check file exist")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_invoice_file_exists","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -3321,8 +3320,6 @@ def check_invoice_exists(invoice_number):
         return {"success":False}	
     except Exception as e:
         print(e, "check invoice exist")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_invoice_exists","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
