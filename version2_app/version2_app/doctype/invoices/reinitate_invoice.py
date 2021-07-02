@@ -325,9 +325,11 @@ def Reinitiate_invoice(data):
                 else:
                     data = {'invoice_number': invoice_data.name,'generation_type': "System"}
                     irn_generate = generateIrn(data)	
+
         returnData = frappe.get_doc('Invoices',invoice_data.name)
-        if returnData.invoice_from=="Pms":		
-            update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
+        # if returnData.invoice_from=="Pms":		
+        #     update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
+        
         return {"success":True,"data":returnData}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

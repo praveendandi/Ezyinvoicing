@@ -97,7 +97,8 @@
   "ipp_printer_file_path",
   "change_invoice_reconciliation_invoice_number",
   "disable_sez",
-  "b2c_online_payments"
+  "b2c_online_payments",
+  "referrence_separator_type"
  ],
  "fields": [
   {
@@ -616,11 +617,17 @@
    "fieldname": "disable_sez",
    "fieldtype": "Check",
    "label": "Disable Sez"
+  },
+  {
+   "fieldname": "referrence_separator_type",
+   "fieldtype": "Select",
+   "label": "Referrence Separator Type",
+   "options": "Tilda\nHash\nNone"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-23 10:22:07.598824",
+ "modified": "2021-07-02 17:02:29.784949",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

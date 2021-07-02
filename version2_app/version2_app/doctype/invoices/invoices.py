@@ -9,6 +9,7 @@ import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
+from version2_app.version2_app.doctype.invoices.referrence_payments_parser import paymentsAndReferences
 import pandas as pd
 import traceback
 import json
@@ -1362,7 +1363,6 @@ def insert_items(items, invoice_number):
         b = frappe.db.commit()
         if len(items)>0:
             for item in items:
-                print(item,"---------")
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
@@ -1373,6 +1373,8 @@ def insert_items(items, invoice_number):
                     item['is_credit_item'] = "No"
                 doc = frappe.get_doc(item)
                 doc.insert(ignore_permissions=True, ignore_links=True)
+            inv = frappe.get_doc('Invoices', invoice_number)    
+            paymentsAndReferences({"company":inv.company,"invoice_number":invoice_number})
             return {"sucess": True, "data": 'doc'}
             
         return {"sucess": True, "data": 'doc'}
