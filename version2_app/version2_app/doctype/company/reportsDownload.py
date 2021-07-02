@@ -7,6 +7,7 @@ import string
 import frappe
 from frappe.utils import get_site_name
 import xlsxwriter
+
 import wget
 import pandas as pd
 from urllib.parse import urljoin
@@ -143,7 +144,6 @@ def gstr1_excel_workbook(data):
     header = list(string.ascii_letters[26:52])
     b2cldata = B2CL_Invoices(data)
     columnscount = b2cldata[0]
-    print(columnscount,"b2cl")
     if len(columnscount)>26:
         header2 = []
         for i in header:
@@ -191,7 +191,6 @@ def gstr1_excel_workbook(data):
     worksheet5.set_column(header[0]+":"+header[-1])
     worksheet5.write_row('A1', columnscount,merge_format)
     num = 2
-    print(excempted)
     for each in excempted[1]:
         worksheet5.write_row('A'+str(num), each)
         num+=1 
@@ -256,5 +255,6 @@ def gstr1_excel_workbook(data):
         data=payload_new).json()
     url = upload_report['message']['file_url']
     os.remove(home+'/'+'workbook.xlsx')
+    
     return url
         

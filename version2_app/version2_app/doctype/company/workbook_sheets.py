@@ -13,7 +13,7 @@ def B2B_Invoices(data):
         columns = ['GSTIN','Receiver Name','Invoice Number','Invoice Date','Invoice Value','Place Of Supply','Reverse Charge','Applicable% of Tax Rate','Invoice Type','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','Cess Amount']
         print(len(columns),"columns,,,,",columns)
         fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply']
-        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'invoice_type':['=','B2B']},fields=fields,as_list=True)
+        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'invoice_type':['=','B2B']},fields=fields,as_list=True)
         if len(doc) == 0:
             data = []
             
@@ -70,7 +70,7 @@ def B2CL_Invoices(data):
         
         columns = ['Invoice Number','Invoice Date','Invoice Value','Place Of Supply','Applicable % of Tax Rate','Rate','Taxable Value','Integrated Tax Amount','Cess Amount']
         fields = ['invoice_number','invoice_date','invoice_type','place_of_supply']
-        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'invoice_type':['=','B2C'],'sales_amount_after_tax':['>=',250000],'place_of_supply':["!=",company.state_code]},fields=fields,as_list=True)
+        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'invoice_type':['=','B2C'],'sales_amount_after_tax':['>=',250000],'place_of_supply':["!=",company.state_code]},fields=fields,as_list=True)
         if len(doc) == 0:
             data = []
             return columns,data
@@ -119,7 +119,7 @@ def B2CS_Invoices(data):
         
         columns = ['Invoice Number','Invoice Date','Invoice Value','Place Of Supply','Applicable % of Tax Rate','Rate','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','Cess Amount']
         fields = ['invoice_number','invoice_date','invoice_type','place_of_supply']
-        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'invoice_type':['=','B2C'],'sales_amount_after_tax':['<=',250000],'place_of_supply':["=",company.state_code]},fields=fields,as_list=True)
+        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'invoice_type':['=','B2C'],'sales_amount_after_tax':['<=',250000],'place_of_supply':["=",company.state_code]},fields=fields,as_list=True)
         if len(doc) == 0:
             data = []
             
@@ -165,7 +165,7 @@ def HSN_SAC_SUMMARY_REPORT(data):
         
         columns = ['HSN','Description','UQC','Total Quantity','Total Value','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','State Cess Amount','Central Cess Amount']
         fields = ['invoice_number']
-        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice']},fields=fields,as_list=True)
+        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice']},fields=fields,as_list=True)
         if len(doc) == 0:
             data = []
             
@@ -218,9 +218,9 @@ def DebitCreditNote(data):
         columns = ['GSTIN/UIN of Recipient','Receiver Name','Note Number','Note Date','Note Type','Place Of Supply','Reverse Charge','Note Supply Type','Note Value','Applicable % of Tax Rate','Rate','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','Cess Amount']
         
         fields = ['invoice_number', 'invoice_date','guest_name','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','place_of_supply','suptyp']
-        debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Debit Invoice']},fields=fields,as_list=True)
-        credit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Credit Invoice']},fields=fields,as_list=True)
-        sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
+        debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Debit Invoice']},fields=fields,as_list=True)
+        credit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Credit Invoice']},fields=fields,as_list=True)
+        sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
 
         doc = debit_invoices+credit_invoices+sysCredit_invoices
         if len(doc) == 0:
@@ -305,7 +305,7 @@ def Excempted(data):
         # columns = ['HSN','Description','UQC','Total Quantity','Total Value','Taxable Value','Integrated Tax Amount','Central Tax Amount','State/UT Tax Amount','State Cess Amount','Central Cess Amount']
         columns = ['Description','Nil Rated Supplies','Exempted(other than nil rated/non GST supply)','Non-GST Supplies']
         fields = ['invoice_number','place_of_supply','invoice_type']
-        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['from_date'],data['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
+        doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(data['fromdate'],data['todate'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
         if len(doc) == 0:
             data = []
             return columns,data
@@ -333,7 +333,6 @@ def Excempted(data):
         interstate_b2c = ['Inter-State supplies to unregistered persons','','','']
         intrastate_b2c = ['Intra-State supplies to unregistered persons','','','']
         for each in output_data:
-            print(each)
             if each['taxable'] == 'No' and each['invoice_type'] == 'B2B' and each['place_of_supply']!=company.state_code:
                 interstate_b2b[3] = each['item_value_after_gst']
             if each['taxable'] == 'No' and each['invoice_type'] == 'B2B' and each['place_of_supply']==company.state_code:     
@@ -351,10 +350,7 @@ def Excempted(data):
                 interstate_b2c[2] = each['item_value_after_gst']
             if each['taxable'] == 'Yes' and each['invoice_type'] == 'B2C' and each['place_of_supply']==company.state_code and each['type'] == "Excempted":     
                 intrastate_b2c[2] = each['item_value_after_gst']         
-        # print(interstate_b2b)
-        # print(interstate_b2c)
-        # print(intrastate_b2b)
-        # print(intrastate_b2c)
+
         data = [interstate_b2b,intrastate_b2b,interstate_b2c,intrastate_b2c]
         return columns, data
     except Exception as e:
