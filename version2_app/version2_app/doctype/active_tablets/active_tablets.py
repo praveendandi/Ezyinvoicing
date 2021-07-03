@@ -37,3 +37,17 @@ def updateTab(name=None,status=None):
     doc.status = status
     doc.save()
     return True
+
+
+@frappe.whitelist(allow_guest=True)
+def createTab(data):
+    try:
+        if frappe.db.exists("Active Tablets",data["uuid"]):
+            doc = frappe.get_doc("Active Tablets",data["uuid"])
+            doc.socket_id = data["socket_id"]
+            doc.save(ignore_permissions=True,ignore_version=True)
+        else:
+            doc = frappe.get_doc(data)
+            doc.insert(ignore_permissions=True)
+    except Exception as e:
+        print(str(e))
