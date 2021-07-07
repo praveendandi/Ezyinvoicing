@@ -11,7 +11,8 @@
   "connected_on",
   "socket_id",
   "status",
-  "username"
+  "username",
+  "mode"
  ],
  "fields": [
   {
@@ -33,9 +34,11 @@
   {
    "fieldname": "socket_id",
    "fieldtype": "Data",
-   "label": "Socket Id"
+   "label": "Socket Id",
+   "unique": 1
   },
   {
+   "default": "In Active",
    "fieldname": "status",
    "fieldtype": "Data",
    "label": "Status"
@@ -45,11 +48,17 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "UserName"
+  },
+  {
+   "default": "Not Connected",
+   "fieldname": "mode",
+   "fieldtype": "Data",
+   "label": "Mode"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-02 17:14:12.780836",
+ "modified": "2021-07-06 14:16:58.574869",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Active Work Stations",

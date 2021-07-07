@@ -28,7 +28,8 @@
   {
    "fieldname": "socket_id",
    "fieldtype": "Data",
-   "label": "socket Id"
+   "label": "socket Id",
+   "unique": 1
   },
   {
    "fieldname": "connected_on",
@@ -55,7 +56,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-02 17:48:54.487266",
+ "modified": "2021-07-06 14:18:04.210556",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Active Tablets",

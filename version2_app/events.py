@@ -315,11 +315,12 @@ def workstation_disconnected(doc, method=None):
 
 def update_tablet_status(doc, method=None):
     try:
-        print(doc.name, "hello hiee","=====================")
         table_config = frappe.db.get_value("Tablet Config",{"tablet":doc.name},["work_station","username"])
         workstation = frappe.get_doc("Active Work Stations",table_config[0])
         workstation.username = table_config[1]
         workstation.save(ignore_permissions=True,ignore_version=True)
+        data = doc.__dict__
+        data["workstation"] = workstation.work_station
         frappe.publish_realtime(
             "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
     except Exception as e:
