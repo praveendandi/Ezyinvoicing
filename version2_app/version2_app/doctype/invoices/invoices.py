@@ -2272,7 +2272,7 @@ def calulate_items(data):
                 "is_service_charge_item": "No",
                 "sac_index": sac_code_based_gst_rates.sac_index,
                 "line_edit_net":net_value,
-                "item_reference":item["item_reference"]
+                "item_reference":item["item_reference"] if "item_reference" in item else ""
             })
         total_items.extend(second_list)	
         return {"success": True, "data": total_items}
