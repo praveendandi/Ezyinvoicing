@@ -98,7 +98,9 @@
   "change_invoice_reconciliation_invoice_number",
   "disable_sez",
   "b2c_online_payments",
-  "create_taxinvoice_raisecredit"
+  "create_taxinvoice_raisecredit",
+  "referrence_separator_type",
+  "payment_reconciliation"
  ],
  "fields": [
   {
@@ -623,11 +625,23 @@
    "fieldtype": "Select",
    "label": "Create TaxInvoice RaiseCredit",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "referrence_separator_type",
+   "fieldtype": "Select",
+   "label": "Referrence Separator Type",
+   "options": "Tilda\nHash\nNone"
+  },
+  {
+   "default": "0",
+   "fieldname": "payment_reconciliation",
+   "fieldtype": "Check",
+   "label": "Payment Reconciliation"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-05 10:09:48.997492",
+ "modified": "2021-07-09 12:45:18.805069",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
