@@ -40,7 +40,8 @@
   "is_service_charge_item",
   "is_manual_edit",
   "discount_value",
-  "line_edit_net"
+  "line_edit_net",
+  "item_reference"
  ],
  "fields": [
   {
@@ -254,12 +255,17 @@
    "fieldtype": "Select",
    "label": "Line Edit Net",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "item_reference",
+   "fieldtype": "Data",
+   "label": "Item Reference"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-05-31 09:37:16.016763",
+ "modified": "2021-07-08 16:51:29.719164",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",

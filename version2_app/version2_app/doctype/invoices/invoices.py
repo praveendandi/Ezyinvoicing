@@ -2267,7 +2267,8 @@ def calulate_items(data):
                 "unit_of_measurement_description":final_item['unit_of_measurement_description'],
                 "is_service_charge_item": "No",
                 "sac_index": sac_code_based_gst_rates.sac_index,
-                "line_edit_net":net_value
+                "line_edit_net":net_value,
+                "item_reference":item["item_reference"]
             })
         total_items.extend(second_list)	
         return {"success": True, "data": total_items}
