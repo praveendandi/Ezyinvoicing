@@ -8,7 +8,9 @@
   "invoice_number",
   "date",
   "payment",
-  "item_value"
+  "item_value",
+  "payment_reference",
+  "card_details"
  ],
  "fields": [
   {
@@ -31,11 +33,21 @@
    "fieldname": "item_value",
    "fieldtype": "Float",
    "label": "Item Value"
+  },
+  {
+   "fieldname": "payment_reference",
+   "fieldtype": "Data",
+   "label": "Payment Reference"
+  },
+  {
+   "fieldname": "card_details",
+   "fieldtype": "Data",
+   "label": "Card Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-02 15:08:31.394206",
+ "modified": "2021-07-08 16:12:29.766821",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoice Payments",

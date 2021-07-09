@@ -19,14 +19,18 @@ folder_path = frappe.utils.get_bench_path()
 
 def funForTilda(raw_data):
     items = [] 
+    PaymentsData = []
     itemsort = 0
-    for i in raw_data:
+    for ind, i in enumerate(raw_data):
         pattern = re.compile("^([0-9]{2}\-[0-9]{2}\-[0-9]{2})+")
         check_date = re.findall(pattern, i)
         if len(check_date) > 0:
             item = dict()
             item_value = ""
+            name = ""
             dt = i.strip()
+            paymentTypes = GetPaymentTypes()
+            paymentTypes  = [''.join(item) for item in paymentTypes['data']] 
             for index, j in enumerate(i.split(' ')):
                 val = dt.split(" ")
                 if index == 0 and len(val)>1:
@@ -39,9 +43,11 @@ def funForTilda(raw_data):
                     if "~" in i:
                         ending_index = i.find("~")
                         item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+                        name = item["name"]
                     else:
                         ending_index = i.find(item_value)
                         item["name"] = ((i[starting_index:ending_index]).strip()).replace("  "," ")
+                        name = item["name"]
                 if len(val)>1:		
                     if 'SAC' in j:
                         item['sac_code'] = ''.join(filter(lambda j: j.isdigit(), j))
@@ -51,21 +57,28 @@ def funForTilda(raw_data):
                     item['sort_order'] =  itemsort+1
                 if "~" in i:
                     start_index = i.find("~")
-                    end_index = i.find(str(item["item_value"]))
+                    end_index = i.find(item_value)
                     item['referrence'] = i[start_index:end_index].replace("~","")
                 if "~" not in i:
                     if item!={}:
                         item['referrence'] =" "
+                item["card_number"] = ""
+            if name in paymentTypes:
+                next_to_item = raw_data[ind+1]
+                if "Total" not in next_to_item:
+                    item["card_number"] = next_to_item.replace("XX/XX","")
+                PaymentsData.append(item)
             itemsort+=1
             if item !={}:
                 items.append(item)
-    return items            
+    return PaymentsData            
 
 
 def funForHash(raw_data):
     items = [] 
     itemsort = 0
     for i in raw_data:
+        # print(i,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         i = i.strip()
         pattern = re.compile("^([0-9]{4}\-[0-9]{2}\-[0-9]{2})+")
         check_date = re.findall(pattern, i)
@@ -121,13 +134,14 @@ def funForHash(raw_data):
                 if "#" in i:
                     start_index = i.find("#")
                     end_index = i.find(str(item["item_value"]))
-                    print(i," ",len(i)," ",item["item_value"])
-                    item['referrence'] = i[start_index:end_index].replace("#","")
+                    # print(i," ",len(i)," ",item["item_value"])
+                    sub = i[start_index:end_index].replace("#","")
+                    item['referrence']=re.sub(" .*", "",sub)
                 if "#" not in i:
                     if item!={}:
                         item['referrence'] =" "
             itemsort+=1
-            print(item,"====item")
+            # print(item,"====item")
             if item !={}:
 
                 items.append(item)
@@ -175,7 +189,7 @@ def paymentsAndReferences(data):
                 PaymentsData.append(each)
             else:
                 total_items.append(each)
-        print(PaymentsData,"-=-=-apsspsj")        
+        # print(PaymentsData,"-=-=-apsspsj")        
         itemsData = {"invoice_number":data["invoice_number"],"items":total_items}
         updateitems(itemsData)
         paymentsinfo = {"invoice_number":data["invoice_number"],"items":PaymentsData}

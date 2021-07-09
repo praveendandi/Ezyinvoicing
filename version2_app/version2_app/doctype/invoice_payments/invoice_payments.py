@@ -20,9 +20,8 @@ def insert_invoice_payments(data):
         company = frappe.get_last_doc('company')
         if len(data['items'])>0:
             for item in data['items']:
-                print(item,"---------")
                 date_time_obj = datetime.datetime.strptime(item['date'],company.invoice_item_date_format).strftime('%Y-%m-%d')
-                doc = frappe.get_doc({"doctype":"Invoice Payments","invoice_number":data['invoice_number'],"date":date_time_obj,"payment":item['name'],'item_value':item['item_value']})
+                doc = frappe.get_doc({"doctype":"Invoice Payments","invoice_number":data['invoice_number'],"date":date_time_obj,"payment":item['name'],'item_value':item['item_value'],"card_details":item["card_number"].strip(),"payment_reference":item["referrence"]})
                 doc.insert(ignore_permissions=True)
                 frappe.db.commit()
         return {"sucess": True, "data": 'doc'}

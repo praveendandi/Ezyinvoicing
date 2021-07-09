@@ -21,6 +21,7 @@ def updateitems(data):
 				doc = frappe.get_doc("Items",itemdoc[0]['name'])
 				doc.referrence = each['referrence']
 				doc.save()
+		frappe.db.commit()
 		return {"success":True}
 	except Exception as e:
 		print(str(e))	
