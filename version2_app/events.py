@@ -399,3 +399,24 @@ def updatepropertiesdetails():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-updatepropertiesdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+
+
+
+
+@frappe.whitelist(allow_guest=True)
+def block_irn():
+    try: 
+        company = frappe.get_last_doc("company")
+        url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
+        json_property = url_property.json()
+        if url_property.status_code == 200:
+            company.block_irn = json_property["data"]["block_irn"]
+            company.block_print = json_property["data"]["block_print"]
+            company.save(ignore_permissions=True)
+            frappe.db.commit()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-block-IRN","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+        
