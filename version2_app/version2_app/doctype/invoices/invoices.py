@@ -143,13 +143,15 @@ class Invoices(Document):
 def generateIrn(data):
     try:
         print(data)
+        company = frappe.get_last_doc("company")
         invoice_number = data['invoice_number']
 
         generation_type = data['generation_type']
-        # get invoice details
-        
+        # get invoice detail
         start_time = datetime.datetime.utcnow()
         invoice = frappe.get_doc('Invoices', invoice_number)
+        if company.block_irn == "True":
+            return {"success":False,"message":"IRN has been Blocked"}
         if invoice.irn_generated == "Success":
             return {"success":True,"message":"Already IRN Generated"}
         if invoice.invoice_type=="B2C":
