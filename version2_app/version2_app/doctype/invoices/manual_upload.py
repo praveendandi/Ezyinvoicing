@@ -66,7 +66,7 @@ def manual_upload_data(data):
             return output	
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-
+        print("-----------------------------------------------")
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         input_data = []
@@ -138,7 +138,7 @@ def manual_upload_data(data):
         #     frappe.db.commit()
         #     frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
         #     return {"success":False,"message":"Invoice data mismatch"}
-
+        print("[===============[===================")
         gst_data_file = data['gst_file']
         gst_file_path = folder_path+'/sites/'+site_folder_path+gst_data_file
         gst_dataframe = pd.read_csv(gst_file_path)
@@ -238,7 +238,7 @@ def manual_upload_data(data):
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
 
             if len(each['gstNumber']) < 15 and len(each['gstNumber'])>0:
-                error_data['error_message'] = "Invalid GstNumber"
+                error_data['error_message'] = "Invalid GstNumber " + each['gstNumber']
                 error_data['amened'] = 'No'
                 
                 errorcalulateItemsApiResponse = calulate_items(each)
@@ -319,7 +319,7 @@ def manual_upload_data(data):
                             output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
                     else:
-                        error_data['error_message'] = "Invalid GstNumber"
+                        error_data['error_message'] = "Invalid GstNumber " + each['gstNumber']
                         error_data['amened'] = 'No'
                         
                         errorcalulateItemsApiResponse = calulate_items(each)
