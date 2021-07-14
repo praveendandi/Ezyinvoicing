@@ -545,6 +545,8 @@ def send_invoicedata_to_gcb(invoice_number):
         items_count = 0
         hsn_code = ""
         headers = {'Content-Type': 'application/json'}
+        if company.block_irn == "True":
+            return {"success":False,"message":"QR has been Blocked"}
         if company.b2c_qr_type == "Invoice Details":
             if company.proxy == 1:
                 proxyhost = company.proxy_url
