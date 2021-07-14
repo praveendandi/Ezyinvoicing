@@ -153,7 +153,7 @@ def fileCreated(doc, method=None):
                 logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
             company = frappe.get_last_doc("company")
-            if company_doc.block_print == "True":
+            if company.block_print == "True":
                 return {"success":False,"message":"Print has been Blocked"}
             if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                 update_documentbin(doc.file_url,"")
@@ -408,11 +408,10 @@ def updatepropertiesdetails():
 
 
 
-
+@frappe.whitelist(allow_guest=True)
 def block_irn():
     try: 
         company = frappe.get_last_doc("company")
-        print(company,"///////////////////")
         url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
         json_property = url_property.json()
         if url_property.status_code == 200:
