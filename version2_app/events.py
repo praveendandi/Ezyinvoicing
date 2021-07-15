@@ -138,6 +138,8 @@ def fileCreated(doc, method=None):
                 abs_path = os.path.dirname(os.getcwd())
                 company_doc = frappe.get_doc("company",doc.attached_to_name)
                 new_parsers = company_doc.new_parsers
+                if company_doc.block_print == "True":
+                    return {"success":False,"message":"Print has been Blocked"}
                 if new_parsers == 0:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 else:
@@ -150,6 +152,9 @@ def fileCreated(doc, method=None):
                 frappe.log_error(traceback.print_exc())
                 logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
+            company = frappe.get_last_doc("company")
+            if company.block_print == "True":
+                return {"success":False,"message":"Print has been Blocked"}
             if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                 update_documentbin(doc.file_url,"")
 
@@ -399,3 +404,23 @@ def updatepropertiesdetails():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-updatepropertiesdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+
+
+
+@frappe.whitelist(allow_guest=True)
+def block_irn():
+    try: 
+        company = frappe.get_last_doc("company")
+        url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
+        json_property = url_property.json()
+        if url_property.status_code == 200:
+            company.block_irn = json_property["data"]["block_irn"]
+            company.block_print = json_property["data"]["block_print"]
+            company.save(ignore_permissions=True)
+            frappe.db.commit()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-block-IRN","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+        
