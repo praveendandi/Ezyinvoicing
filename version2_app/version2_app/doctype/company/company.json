@@ -622,6 +622,12 @@
    "label": "Disable Sez"
   },
   {
+    "default": "0",
+    "fieldname": "payment_reconciliation",
+    "fieldtype": "Check",
+    "label": "Payment Reconciliation"
+   },
+  {
    "fieldname": "referrence_separator_type",
    "fieldtype": "Select",
    "label": "Referrence Separator Type",

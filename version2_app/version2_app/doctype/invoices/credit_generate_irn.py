@@ -413,7 +413,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
         company = frappe.get_last_doc("company")
         # get seller details
         if company.block_irn == "True":
-            return {"success":False,"message":"IRN has been Blocked"}
+            return {"success":False,"message":"IRN/QR Services has been Blocked"}
         if irnobjName == None:
             IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category})
             irnobj = IRNObjectdoc.insert(ignore_permissions=True, ignore_links=True)

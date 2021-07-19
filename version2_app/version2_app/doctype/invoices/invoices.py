@@ -151,7 +151,7 @@ def generateIrn(data):
         start_time = datetime.datetime.utcnow()
         invoice = frappe.get_doc('Invoices', invoice_number)
         if company.block_irn == "True":
-            return {"success":False,"message":"IRN has been Blocked"}
+            return {"success":False,"message":"IRN/QR Services has been Blocked"}
         if invoice.irn_generated == "Success":
             return {"success":True,"message":"Already IRN Generated"}
         if invoice.invoice_type=="B2C":
@@ -546,7 +546,7 @@ def send_invoicedata_to_gcb(invoice_number):
         hsn_code = ""
         headers = {'Content-Type': 'application/json'}
         if company.block_irn == "True":
-            return {"success":False,"message":"QR has been Blocked"}
+            return {"success":False,"message":"IRN/QR Services has been Blocked"}
         if company.b2c_qr_type == "Invoice Details":
             if company.proxy == 1:
                 proxyhost = company.proxy_url
