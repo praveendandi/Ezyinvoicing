@@ -101,7 +101,8 @@
   "referrence_separator_type",
   "block_irn",
   "block_print",
-  "block_irn_information"
+  "block_irn_information",
+  "payment_reconciliation"
  ],
  "fields": [
   {
@@ -622,11 +623,11 @@
    "label": "Disable Sez"
   },
   {
-    "default": "0",
-    "fieldname": "payment_reconciliation",
-    "fieldtype": "Check",
-    "label": "Payment Reconciliation"
-   },
+   "default": "0",
+   "fieldname": "payment_reconciliation",
+   "fieldtype": "Check",
+   "label": "Payment Reconciliation"
+  },
   {
    "fieldname": "referrence_separator_type",
    "fieldtype": "Select",
@@ -653,7 +654,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-12 12:35:22.232607",
+ "modified": "2021-07-19 10:27:24.390147",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
