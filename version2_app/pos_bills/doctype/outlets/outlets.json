@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "autoname": "field:outlet_name",
  "creation": "2021-06-25 17:24:17.347033",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -79,7 +80,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-29 13:01:03.883831",
+ "modified": "2021-07-12 15:20:28.265247",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",

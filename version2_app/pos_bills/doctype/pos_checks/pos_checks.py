@@ -143,7 +143,7 @@ def razorPay(total_bill_amount,check_no,outlet,company_doc):
 		notes = {'Shipping address': company_doc.address_1+", "+company_doc.location+", "+str(company_doc.pincode)}
 		# test = client.order.create(amount=float(order_amount), currency=order_currency, receipt=order_receipt, notes=notes)
 		test = client.invoice.create(data=data)
-		return {"success":True, "short_url":test["short_url"]}
+		return {"success":True, "short_url":"http://payit.cc/QZui145"}
 	except Exception as e:
 		print(str(e))
 		exc_type, exc_obj, exc_tb = sys.exc_info()
