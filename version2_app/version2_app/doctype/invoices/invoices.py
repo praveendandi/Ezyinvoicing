@@ -1670,7 +1670,7 @@ def calulate_items(data):
                                 vatamount = 0
                                 service_dict['vat_amount'] = 0
                                 service_dict['vat'] = 0
-                            if sac_code_based_gst_rates.central_cess_rate>0:
+                            if sac_code_based_gst_rates.central_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                                 centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
                                 service_dict['cess_amount'] = centralcessamount
                                 service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
@@ -1678,7 +1678,7 @@ def calulate_items(data):
                                 centralcessamount = 0
                                 service_dict['cess_amount'] = 0
                                 service_dict['cess'] = 0
-                            if sac_code_based_gst_rates.state_cess_rate>0:
+                            if sac_code_based_gst_rates.state_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                                 statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
                                 service_dict['state_cess_amount'] = statecessamount
                                 service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
@@ -1814,7 +1814,7 @@ def calulate_items(data):
                         vatamount = 0
                         service_dict['vat_amount'] = 0
                         service_dict['vat'] = 0
-                    if sac_code_based_gst_rates.central_cess_rate>0:
+                    if sac_code_based_gst_rates.central_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
                         service_dict['cess_amount'] = centralcessamount
                         service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
@@ -1822,7 +1822,7 @@ def calulate_items(data):
                         centralcessamount = 0
                         service_dict['cess_amount'] = 0
                         service_dict['cess'] = 0
-                    if sac_code_based_gst_rates.state_cess_rate>0:
+                    if sac_code_based_gst_rates.state_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
                         service_dict['state_cess_amount'] = statecessamount
                         service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate

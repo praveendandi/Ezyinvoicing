@@ -33,7 +33,8 @@
   "exempted",
   "sac_index",
   "ignore_non_taxable_items",
-  "bulk_upload_service_charge"
+  "bulk_upload_service_charge",
+  "disable_cess_for_sc"
  ],
  "fields": [
   {
@@ -209,11 +210,17 @@
    "fieldname": "bulk_upload_service_charge",
    "fieldtype": "Check",
    "label": " Bulk Upload Service charge"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_cess_for_sc",
+   "fieldtype": "Check",
+   "label": "Disable Cess For SC"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-04 18:46:29.901372",
+ "modified": "2021-07-20 14:37:03.279780",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
