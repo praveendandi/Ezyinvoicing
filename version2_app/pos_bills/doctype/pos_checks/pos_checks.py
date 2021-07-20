@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
 import traceback, sys
+import requests, json
 import os,re
 import razorpay
 from escpos.printer import Network
@@ -22,7 +23,6 @@ class POSChecks(Document):
 def create_pos_bills(data):
 	try:
 		raw_data = data["payload"].split("\n")
-		print(raw_data)
 		if len(raw_data) > 5:
 			company_doc = frappe.get_doc("company",data["company"])
 			data["mode"] = company_doc.mode
@@ -34,11 +34,11 @@ def create_pos_bills(data):
 			if extract_bills["success"] == False:
 				return extract_bills["message"]
 			data.update(extract_bills["data"])
+			folder_path = frappe.utils.get_bench_path()
+			path = folder_path + '/sites/' + company_doc.site_name +"/public"
+			logopath = path+outlet_doc.outlet_logo
+			qrpath = path+outlet_doc.static_payment_qr_code
 			if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
-				folder_path = frappe.utils.get_bench_path()
-				path = folder_path + '/sites/' + company_doc.site_name +"/public"
-				logopath = path+outlet_doc.outlet_logo
-				qrpath = path+outlet_doc.static_payment_qr_code
 				if outlet_doc.payment_mode == "Dynamic":
 					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
 					if short_url["success"]:
@@ -47,6 +47,13 @@ def create_pos_bills(data):
 				else:
 					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath)
 					data["printed"] = 1
+			if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
+				pos_bills = send_pos_bills_gcb(company_doc,data)
+				if pos_bills["success"] == False:
+					return pos_bills["message"]
+				qrurl = company_doc.b2c_qr_url + pos_bills['data']
+				give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,qrurl)
+				data["gcp_file_url"] = pos_bills['data']
 			doc = frappe.get_doc(data)
 			doc.insert(ignore_permissions=True,ignore_links=True)
 	except Exception as e:
@@ -64,16 +71,21 @@ def extract_data(payload,company_doc):
 		for line in raw_data:
 			if company_doc.closed_check_reference in payload and company_doc.void_check_reference not in payload:
 				data["check_type"] = "Check Closed"
-				total_amount = "0.00"
+				if company_doc.void_total_amt_regex: 
+					if re.match(company_doc.void_total_amt_regex,line.strip()):
+						total_amount_regex = re.findall("\d+\.\d+",line.replace(" ",""))
+						total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
+				else:
+					total_amount = "0.00"
 			elif company_doc.void_check_reference in payload:
 				data["check_type"] = "Closed Void Check"
 				if re.match(company_doc.void_total_amt_regex,line.strip()):
-					total_amount_regex = re.findall("\d.+",line.replace(" ",""))
+					total_amount_regex = re.findall("\d+\.\d+",line.replace(" ",""))
 					total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
 			else:
 				data["check_type"] = "Normal Check"
 				if re.match(company_doc.normal_check_total_amt_regex,line.strip()):
-					total_amount_regex = re.findall("\d.+",line.replace(" ",""))
+					total_amount_regex = re.findall("\d+\.\d+",line.replace(" ",""))
 					total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
 			if company_doc.check_number_reference in line:
 				check_regex = re.findall(company_doc.check_number_regex, line.strip())
@@ -143,7 +155,7 @@ def razorPay(total_bill_amount,check_no,outlet,company_doc):
 		notes = {'Shipping address': company_doc.address_1+", "+company_doc.location+", "+str(company_doc.pincode)}
 		# test = client.order.create(amount=float(order_amount), currency=order_currency, receipt=order_receipt, notes=notes)
 		test = client.invoice.create(data=data)
-		return {"success":True, "short_url":"http://payit.cc/QZui145"}
+		return {"success":True, "short_url":test["short_url"]}
 	except Exception as e:
 		print(str(e))
 		exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -172,18 +184,71 @@ def print_pos_bill(data):
 		kitchen._raw(b)
 		kitchen.hw('INIT')
 		kitchen.set("CENTER", "A", "B")
-		if outlet_values[0]["payment_mode"]=="Dynamic":
-			razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
-			if razor_pay["success"] == False:
-				return razor_pay["message"]
-			kitchen.qr(razor_pay['short_url'],size=7)
+		if check_doc.check_type == "Normal Check":
+			if outlet_values[0]["payment_mode"]=="Dynamic":
+				razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
+				if razor_pay["success"] == False:
+					return razor_pay["message"]
+				kitchen.qr(razor_pay['short_url'],size=7)
+				kitchen.hw('INIT')
+			else:
+				kitchen.image(qr_path)
+				kitchen.hw('INIT')
+		elif check_doc.check_type == "Check Closed":
+			qrurl = company_doc.b2c_qr_url + check_doc.gcp_file_url
+			kitchen.qr(qrurl,size=7)
 			kitchen.hw('INIT')
 		else:
-			kitchen.image(qr_path)
-			kitchen.hw('INIT')
+			pass
 		kitchen.cut()
 		return {"success":True,"message":"Printed Successfully"}
 	except Exception as e:
 		exc_type, exc_obj, exc_tb = sys.exc_info()
 		frappe.log_error("Ezy-invoicing give print","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+		return {"success":False,"message":str(e)}
+	
+
+def send_pos_bills_gcb(company,b2c_data):
+	try:
+		# b2c_data = json.dumps(data)
+		b2c_data["invoice_number"] = b2c_data["check_no"]
+		b2c_data["pos"] = True
+		if company.proxy == 1:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+		headers = {'Content-Type': 'application/json'}
+		if company.proxy == 0:
+			if company.skip_ssl_verify == 0:
+				json_response = requests.post(
+					"https://gst.caratred.in/ezy/api/addJsonToGcb",
+					headers=headers,
+					json=b2c_data,verify=False)
+			else:
+				json_response = requests.post(
+					"https://gst.caratred.in/ezy/api/addJsonToGcb",
+					headers=headers,
+					json=b2c_data,verify=False)
+			response = json_response.json()
+			if response["success"] == False:
+				return {
+					"success": False,
+					"message": response["message"]
+				}
+		else:
+			json_response = requests.post(
+				"https://gst.caratred.in/ezy/api/addJsonToGcb",
+				headers=headers,
+				json=b2c_data,
+				proxies=proxies,verify=False)
+			response = json_response.json()
+			if response["success"] == False:
+				return {
+					"success": False,
+					"message": response["message"]
+				}
+		return {"success":True, "data": response['data']}
+	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing send pos bills gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}

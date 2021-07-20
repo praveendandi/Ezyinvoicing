@@ -118,13 +118,15 @@
   "void_check_reference",
   "void_total_amt_regex",
   "closed_check_reference",
+  "closed_check_total_amt_regex",
   "normal_check_total_amt_regex",
   "check_number_reference",
   "check_number_regex",
   "table_number_reference",
   "table_number_regex",
   "guest_number_reference",
-  "guest_number_regex"
+  "guest_number_regex",
+  "print_check_type"
  ],
  "fields": [
   {
@@ -796,11 +798,21 @@
    "fieldname": "guest_number_regex",
    "fieldtype": "Data",
    "label": "Guest Number Regex"
+  },
+  {
+   "fieldname": "closed_check_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Closed Check Total Amt Regex"
+  },
+  {
+   "fieldname": "print_check_type",
+   "fieldtype": "Data",
+   "label": "Print Check Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-28 17:58:07.628561",
+ "modified": "2021-07-19 15:22:30.500523",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
