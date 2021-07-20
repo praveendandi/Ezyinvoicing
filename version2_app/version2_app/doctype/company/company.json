@@ -126,7 +126,12 @@
   "table_number_regex",
   "guest_number_reference",
   "guest_number_regex",
-  "print_check_type"
+  "print_check_type",
+  "referrence_separator_type",
+  "block_irn",
+  "block_print",
+  "block_irn_information",
+  "payment_reconciliation"
  ],
  "fields": [
   {
@@ -808,11 +813,40 @@
    "fieldname": "print_check_type",
    "fieldtype": "Data",
    "label": "Print Check Type"
+  },
+  {
+   "default": "0",
+   "fieldname": "payment_reconciliation",
+   "fieldtype": "Check",
+   "label": "Payment Reconciliation"
+  },
+  {
+   "fieldname": "referrence_separator_type",
+   "fieldtype": "Select",
+   "label": "Referrence Separator Type",
+   "options": "Tilda\nHash\nNone"
+  },
+  {
+   "fieldname": "block_irn",
+   "fieldtype": "Select",
+   "label": "Block Irn",
+   "options": "True\nFalse"
+  },
+  {
+   "fieldname": "block_print",
+   "fieldtype": "Select",
+   "label": "Block Print",
+   "options": "True\nFalse"
+  },
+  {
+   "fieldname": "block_irn_information",
+   "fieldtype": "Data",
+   "label": "Block Irn Information"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-19 15:22:30.500523",
+ "modified": "2021-07-19 10:27:24.390147",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

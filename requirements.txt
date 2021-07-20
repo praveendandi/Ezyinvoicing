@@ -16,3 +16,4 @@ pyzbar
 text-to-image
 Pillow
 scipy
+pytesseract
