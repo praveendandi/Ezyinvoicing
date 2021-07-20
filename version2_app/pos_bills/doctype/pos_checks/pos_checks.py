@@ -38,21 +38,22 @@ def create_pos_bills(data):
 			path = folder_path + '/sites/' + company_doc.site_name +"/public"
 			logopath = path+outlet_doc.outlet_logo
 			qrpath = path+outlet_doc.static_payment_qr_code
+			port = int(printer_doc.port) if printer_doc.printer_ip != "" else 9100
 			if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
 				if outlet_doc.payment_mode == "Dynamic":
 					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
 					if short_url["success"]:
-						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,short_url['short_url'])
+						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,short_url['short_url'])
 						data["printed"] = 1
 				else:
-					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath)
+					give_print(data["payload"],printer_doc.printer_ip,logopath,port,qrpath)
 					data["printed"] = 1
 			if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
 				pos_bills = send_pos_bills_gcb(company_doc,data)
 				if pos_bills["success"] == False:
 					return pos_bills["message"]
 				qrurl = company_doc.b2c_qr_url + pos_bills['data']
-				give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,qrurl)
+				give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,qrurl)
 				data["gcp_file_url"] = pos_bills['data']
 			doc = frappe.get_doc(data)
 			doc.insert(ignore_permissions=True,ignore_links=True)
@@ -111,10 +112,10 @@ def extract_data(payload,company_doc):
 		frappe.log_error("Ezy-invoicing extract data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}
 
-def give_print(text, ip, logo_path, qr_path,short_url=''):
+def give_print(text, ip, logo_path, qr_path,port,short_url=''):
 	try:
 		b = text.encode('utf-8')
-		kitchen = Network(ip)  # Printer IP Address
+		kitchen = Network(ip,port)  # Printer IP Address
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logo_path)
 		kitchen.hw('INIT')
@@ -175,7 +176,7 @@ def print_pos_bill(data):
 		logopath = path+outlet_values[0]["outlet_logo"]
 		qr_path = path+outlet_values[0]["static_payment_qr_code"]
 		b = (check_doc.payload).encode('utf-8')
-		kitchen = Network(printer_doc.printer_ip)  # Printer IP Address
+		kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logopath)
 		kitchen.hw('INIT')
