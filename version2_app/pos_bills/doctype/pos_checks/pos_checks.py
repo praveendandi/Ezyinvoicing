@@ -38,7 +38,7 @@ def create_pos_bills(data):
 			path = folder_path + '/sites/' + company_doc.site_name +"/public"
 			logopath = path+outlet_doc.outlet_logo
 			qrpath = path+outlet_doc.static_payment_qr_code
-			port = int(printer_doc.port) if printer_doc.printer_ip != "" else 9100
+			port = int(printer_doc.port) if printer_doc.port != "" else 9100
 			if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
 				if outlet_doc.payment_mode == "Dynamic":
 					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
