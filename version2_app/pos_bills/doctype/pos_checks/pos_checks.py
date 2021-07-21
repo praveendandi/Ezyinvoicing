@@ -46,7 +46,7 @@ def create_pos_bills(data):
 						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,short_url['short_url'])
 						data["printed"] = 1
 				else:
-					give_print(data["payload"],printer_doc.printer_ip,logopath,port,qrpath)
+					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port)
 					data["printed"] = 1
 			if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
 				pos_bills = send_pos_bills_gcb(company_doc,data)
