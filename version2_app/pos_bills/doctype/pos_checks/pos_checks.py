@@ -115,7 +115,7 @@ def extract_data(payload,company_doc):
 def give_print(text, ip, logo_path, qr_path,port,short_url=''):
 	try:
 		b = text.encode('utf-8')
-		kitchen = Network(ip,port)  # Printer IP Address
+		kitchen = Network(ip,int(port))  # Printer IP Address
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logo_path)
 		kitchen.hw('INIT')
