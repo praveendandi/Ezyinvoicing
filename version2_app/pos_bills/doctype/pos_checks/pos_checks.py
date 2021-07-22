@@ -55,6 +55,7 @@ def create_pos_bills(data):
 				qrurl = company_doc.b2c_qr_url + pos_bills['data']
 				give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,qrurl)
 				data["gcp_file_url"] = pos_bills['data']
+				data["printed"] = 1
 			doc = frappe.get_doc(data)
 			doc.insert(ignore_permissions=True,ignore_links=True)
 	except Exception as e:
