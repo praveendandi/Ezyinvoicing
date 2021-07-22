@@ -2061,7 +2061,7 @@ def calulate_items(data):
                         else:
                             final_item['item_mode'] = "Debit"
                 if "state_code" in data:
-                    if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01") and data["state_code"] == companyDetails.state_code:
+                    if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01" or data["company_code"] == "KMH-01") and data["state_code"] == companyDetails.state_code:
                         final_item["state_cess_amount"] = 0
                         final_item['state_cess'] = 0
                     else:
