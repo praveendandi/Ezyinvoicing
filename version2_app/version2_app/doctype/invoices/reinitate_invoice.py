@@ -325,9 +325,11 @@ def Reinitiate_invoice(data):
                 else:
                     data = {'invoice_number': invoice_data.name,'generation_type': "System"}
                     irn_generate = generateIrn(data)	
+
         returnData = frappe.get_doc('Invoices',invoice_data.name)
-        if returnData.invoice_from=="Pms":		
-            update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
+        # if returnData.invoice_from=="Pms":		
+        #     update_document_bin(returnData.print_by,returnData.invoice_category,"","Duplicate",returnData.invoice_file)	
+        
         return {"success":True,"data":returnData}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -1168,7 +1170,7 @@ def b2b_success_to_credit_note(data):
             doc_invoice.credit_note_raised = "Yes"
             doc_invoice.save(ignore_permissions=True,ignore_version=True)
             if data['taxinvoice'] == "Yes":
-                raise_credit_taxinvoice(data['invoice_number'],data['invoice_date'])
+                raise_credit_taxinvoice(data['invoice_number'],data['invoice_date'],data['taxinvoice_number'])
             # subject1 = 'Credit Note Created and Invoice Number is {}'.format(invoice_number)
             # parent_activity = frappe.get_doc({'doctype': 'Version','data': '<!DOCTYPE html><html><body><p>{}</p></body></html>'.format(subject1),"ref_doctype":"Invoices","docname":data["invoice_number"]})
             # parent_activity.insertS(ignore_permissions=True,ignore_version=True)
@@ -1185,12 +1187,12 @@ def b2b_success_to_credit_note(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def raise_credit_taxinvoice(invoice_number,invdate):
+def raise_credit_taxinvoice(invoice_number,invdate,taxinvoice_number):
     try:
         doc_details = frappe.get_doc("Invoices",invoice_number)
         data = dict(doc_details.__dict__)
 
-        data['name'] = data['name']+"-1"
+        data['name'] = taxinvoice_number
         data['invoice_number'] = data['name']
         data['irn_generated'] = "Pending"
         data['qr_code_generated'] = "Pending"

@@ -18,3 +18,4 @@ Pillow
 scipy
 pytesseract
 pdf2image
+pytesseract

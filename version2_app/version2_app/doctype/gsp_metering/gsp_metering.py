@@ -128,7 +128,7 @@ def GstDataImportToLicensing():
             if company.skip_ssl_verify == 1:
                 insertTaxpayer = requests.post(company.licensing_host+"/api/resource/Properties",headers=headers,json=inputData,verify=False)
             else:
-                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/Properties",headers=headers,json=inputData)
+                insertTaxpayer = requests.post(company.licensing_host+"/api/resource/Properties",headers=headers,json=inputData,verify=False)
         all_data = frappe.db.get_all('TaxPayerDetail',fields=['gst_number','legal_name','email','address_1','address_2','location','pincode','gst_status','tax_type','trade_name','phone_number','state_code','address_floor_number','address_street','status','block_status'])
         if len(all_data)>0:
             for each in all_data:
@@ -140,7 +140,7 @@ def GstDataImportToLicensing():
                     if company.skip_ssl_verify == 1:
                         json_response = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=each,verify=False)
                     else:
-                        json_response = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=each)    
+                        json_response = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=each,verify=False)    
 
                 if json_response.status_code==200:
                     pass

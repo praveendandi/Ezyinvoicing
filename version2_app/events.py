@@ -50,7 +50,7 @@ def company_created(doc,method=None):
         adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
         insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
         headers = {'content-type': 'application/json'}
-        r = requests.post(api,headers=headers,json=insert_dict)
+        r = requests.post(api,headers=headers,json=insert_dict,verify=False)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing company_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))   
@@ -142,6 +142,8 @@ def fileCreated(doc, method=None):
                 abs_path = os.path.dirname(os.getcwd())
                 company_doc = frappe.get_doc("company",doc.attached_to_name)
                 new_parsers = company_doc.new_parsers
+                if company_doc.block_print == "True":
+                    return {"success":False,"message":"Print has been Blocked"}
                 if new_parsers == 0:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 else:
@@ -154,6 +156,9 @@ def fileCreated(doc, method=None):
                 frappe.log_error(traceback.print_exc())
                 logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
+            company = frappe.get_last_doc("company")
+            if company.block_print == "True":
+                return {"success":False,"message":"Print has been Blocked"}
             if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                 update_documentbin(doc.file_url,"")
 
@@ -321,6 +326,7 @@ def update_tablet_status(doc, method=None):
         workstation.save(ignore_permissions=True,ignore_version=True)
         data = doc.__dict__
         data["workstation"] = workstation.work_station
+        data["workstation_status"] = workstation.status
         frappe.publish_realtime(
             "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
     except Exception as e:
@@ -419,7 +425,7 @@ def gspmeteringhook(doc,method=None):
                 if company.skip_ssl_verify == 1:
                     json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
                 else:
-                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData)
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.gspmetering_post",headers=headers,json=inputData,verify=False)
             print(json_response,"/////////")
             return json_response
         print("Property is in Testing Mode gspmeteringhook")         
@@ -446,7 +452,7 @@ def taxpayerhook(doc,method=None):
                 if company.skip_ssl_verify == 1:
                     insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
                 else:
-                    insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData)
+                    insertTaxpayer = requests.post(company.licensing_host+"/api/resource/TaxPayerDetail",headers=headers,json=inputData,verify=False)
             if insertTaxpayer.status_code==200:
                 print("--------- Taxpayer hook")
             return insertTaxpayer
@@ -478,7 +484,7 @@ def InvoiceDataTolicensing():
                         inputData['data']['debitinvoices'] = each['count']
                     if each['invoice_category'] == "Credit Invoice":
                         inputData['data']['creditinvoices'] = each['count']        
-                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData,verify=False)
             
             if len(Invoice_count2)>0:
                 inputData = {"data":{"date":str(today),"property_code":company.name,"mode":"Production"}}
@@ -489,7 +495,7 @@ def InvoiceDataTolicensing():
                         inputData['data']['debitinvoices'] = each['count']
                     if each['invoice_category'] == "Credit Invoice":
                         inputData['data']['creditinvoices'] = each['count']
-                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData)         
+                json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.getcount.invoice_post",headers=headers,json=inputData,verify=False)         
         print("Property is in Testing Mode InvoiceDataTolicensing")
     except Exception as e:
         print(traceback.print_exc())
@@ -541,8 +547,7 @@ def updatepropertiesdetails():
                 if company.skip_ssl_verify == 1:
                     json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData,verify=False)
                 else:
-                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData)
-            print(json_response,"/////////")
+                    json_response = requests.post(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.properties.properties.update_property_status",headers=headers,json=inputData,verify=False)
             return json_response.json()
         return {"success":True, "message":"Property is in Testing Mode"}         
     except Exception as e:
@@ -562,3 +567,23 @@ def deletePromotionsSocket(doc,method=None):
             "custom_socket", {'message': 'Promotions Deleted', 'data': doc.__dict__})
     except Exception as e:
         print(str(e))
+
+
+
+
+@frappe.whitelist(allow_guest=True)
+def block_irn():
+    try: 
+        company = frappe.get_last_doc("company")
+        url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
+        json_property = url_property.json()
+        if url_property.status_code == 200:
+            company.block_irn = json_property["data"]["block_irn"]
+            company.block_print = json_property["data"]["block_print"]
+            company.save(ignore_permissions=True)
+            frappe.db.commit()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-block-IRN","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+        

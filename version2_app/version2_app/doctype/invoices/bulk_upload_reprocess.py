@@ -20,19 +20,22 @@ def BulkUploadReprocess(data):
     try:
         invoice_number = data['invoice_number']
         invoice_data = frappe.get_doc('Invoices',invoice_number)
-
+        line_items = json.loads(invoice_data.invoice_object_from_file)
+        # print(line_items)
+        invoice_total_amount = line_items['data']['total_invoice_amount']
+        # print(invoice_total_amount,"=-=-=-=-=-=-")
         company = frappe.get_doc('company',invoice_data.company)
         gstNumber = invoice_data.gst_number 
         invoiceType = invoice_data.invoice_type
         error_data ={}
         error_data['room_number'] = invoice_data.room_number
-        error_data['total_invoice_amount'] = invoice_data.total_invoice_amount
+        error_data['total_invoice_amount'] = invoice_total_amount
         error_data['invoice_number'] = invoice_number
         error_data['gst_number'] = invoice_data.gst_number
         error_data['company_code'] = invoice_data.company
         each = {}
         if company.bulk_excel_upload_type == "HolidayIn":
-            line_items = json.loads(invoice_data.invoice_object_from_file)
+            # line_items = json.loads(invoice_data.invoice_object_from_file)
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             items = []
             sort_order = 1
@@ -64,7 +67,7 @@ def BulkUploadReprocess(data):
                     sort_order+=1
                     items.append(item_dict)
         elif company.bulk_excel_upload_type == "Marriot":
-            line_items = json.loads(invoice_data.invoice_object_from_file)
+            # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
@@ -96,7 +99,7 @@ def BulkUploadReprocess(data):
                     sort_order+=1
                     items.append(item_dict)	
         elif company.bulk_excel_upload_type == "Opera":
-            line_items = json.loads(invoice_data.invoice_object_from_file)
+            # line_items = json.loads(invoice_data.invoice_object_from_file)
             # invoice_date = invoice_data.invoice_date
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             items = []
@@ -119,7 +122,7 @@ def BulkUploadReprocess(data):
                     sort_order+=1
                     items.append(item_dict)
         elif company.bulk_excel_upload_type == "Hyatt":
-            line_items = json.loads(invoice_data.invoice_object_from_file)
+            # line_items = json.loads(invoice_data.invoice_object_from_file)
             # invoice_date = invoice_data.invoice_date
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             items = []
@@ -143,7 +146,7 @@ def BulkUploadReprocess(data):
                     items.append(item_dict)				
         else:
             pass
-        print(items)
+        # print(items)
         calculate_data = {}
         calculate_data['items'] = items
         calculate_data['invoice_number'] = invoice_number
@@ -169,7 +172,7 @@ def BulkUploadReprocess(data):
 
                             guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoice_data.invoice_type,
                                             "gstNumber":invoice_data.gst_number,"room_number":invoice_data.room_number,"company_code":company.name,"confirmation_number":invoice_data.confirmation_number,"start_time":str(datetime.datetime.now()),"print_by":invoice_data.print_by,"invoice_category":invoice_data.invoice_category,"invoice_file":invoice_data.invoice_file}
-                            reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_data.total_invoice_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
+                            reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_total_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
                             taxpayer_details = {"gst_number":invoice_data.gst_number,"legal_name":invoice_data.legal_name,"email":invoice_data.email,"address_1":invoice_data.address_1,"address_2":invoice_data.address_1,"trade_name":invoice_data.trade_name,"location":invoice_data.location,"pincode":invoice_data.pincode,"phone_number":invoice_data.phone_number,"state_code":invoice_data.state_code}
                             reinitiate_data['taxpayer']= taxpayer
                             reinitiate_data['guest_data'] = guest_data
@@ -202,7 +205,7 @@ def BulkUploadReprocess(data):
 
                 guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoice_data.invoice_type,
                                 "gstNumber":invoice_data.gst_number,"room_number":invoice_data.room_number,"company_code":company.name,"confirmation_number":invoice_data.confirmation_number,"start_time":str(datetime.datetime.now()),"print_by":invoice_data.print_by,"invoice_category":invoice_data.invoice_category,"invoice_file":invoice_data.invoice_file}
-                reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_data.total_invoice_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
+                reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_total_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
                 taxpayer_details = {"gst_number":invoice_data.gst_number,"legal_name":invoice_data.legal_name,"email":invoice_data.email,"address_1":invoice_data.address_1,"address_2":invoice_data.address_1,"trade_name":invoice_data.trade_name,"location":invoice_data.location,"pincode":invoice_data.pincode,"phone_number":invoice_data.phone_number,"state_code":invoice_data.state_code}
                 reinitiate_data['taxpayer']= taxpayer_details
                 reinitiate_data['guest_data'] = guest_data

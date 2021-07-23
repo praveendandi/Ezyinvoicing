@@ -98,7 +98,7 @@ def request_get(api, data,company):
         }
         # print(headerData)
         if company['proxy'] == 0:
-            raw_response = requests.get(api, headers=headerData)
+            raw_response = requests.get(api, headers=headerData,verify=False)
         else:
             proxyhost = company['proxy_url']
             proxyhost = proxyhost.replace("http://","@")

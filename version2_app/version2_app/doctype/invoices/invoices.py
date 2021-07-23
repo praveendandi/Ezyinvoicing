@@ -9,6 +9,7 @@ import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
+from version2_app.version2_app.doctype.invoices.referrence_payments_parser import paymentsAndReferences
 import pandas as pd
 import traceback
 import json
@@ -142,13 +143,15 @@ class Invoices(Document):
 def generateIrn(data):
     try:
         print(data)
+        company = frappe.get_last_doc("company")
         invoice_number = data['invoice_number']
 
         generation_type = data['generation_type']
-        # get invoice details
-        
+        # get invoice detail
         start_time = datetime.datetime.utcnow()
         invoice = frappe.get_doc('Invoices', invoice_number)
+        if company.block_irn == "True":
+            return {"success":False,"message":"IRN/QR Services has been Blocked"}
         if invoice.irn_generated == "Success":
             return {"success":True,"message":"Already IRN Generated"}
         if invoice.invoice_type=="B2C":
@@ -542,6 +545,8 @@ def send_invoicedata_to_gcb(invoice_number):
         items_count = 0
         hsn_code = ""
         headers = {'Content-Type': 'application/json'}
+        if company.block_irn == "True":
+            return {"success":False,"message":"IRN/QR Services has been Blocked"}
         if company.b2c_qr_type == "Invoice Details":
             if company.proxy == 1:
                 proxyhost = company.proxy_url
@@ -571,7 +576,7 @@ def send_invoicedata_to_gcb(invoice_number):
                     json_response = requests.post(
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
                         headers=headers,
-                        json=b2c_data)
+                        json=b2c_data,verify=False)
                 else:
                     json_response = requests.post(
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
@@ -620,8 +625,8 @@ def send_invoicedata_to_gcb(invoice_number):
                             "vpa": company.merchant_virtual_payment_address,
                             "name": company.merchant_name,
                             "txnReference": invoice_number,
-                            "amount": '%.2f' % doc.pms_invoice_summary
-                        })
+                            "amount": '%.2f' % doc.pms_invoice_summary},
+                        verify=False)
                 else:
                     generate_qr = requests.post(
                         "https://upiqr.in/api/qr?format=png",
@@ -722,7 +727,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
             if company.skip_ssl_verify == 0:
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
-                                                json=payload)
+                                                json=payload,verify=False)
             else:
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
@@ -787,7 +792,7 @@ def create_qr_image(invoice_number, gsp):
             if company.skip_ssl_verify == 0:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
-                                        stream=True)
+                                        stream=True,verify=False)
             else:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
@@ -857,7 +862,7 @@ def postIrn(gst_data, gsp, company, invoice_number):
             if company.skip_ssl_verify == 0:
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
-                                            json=gst_data)
+                                            json=gst_data,verify=False)
             else:
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
@@ -1362,7 +1367,6 @@ def insert_items(items, invoice_number):
         b = frappe.db.commit()
         if len(items)>0:
             for item in items:
-                print(item,"---------")
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
@@ -1373,6 +1377,10 @@ def insert_items(items, invoice_number):
                     item['is_credit_item'] = "No"
                 doc = frappe.get_doc(item)
                 doc.insert(ignore_permissions=True, ignore_links=True)
+            inv = frappe.get_doc('Invoices', invoice_number)
+            company = frappe.get_doc('company',inv.company)
+            if company.payment_reconciliation == 1:
+                paymentsAndReferences({"company":inv.company,"invoice_number":invoice_number})
             return {"sucess": True, "data": 'doc'}
             
         return {"sucess": True, "data": 'doc'}
@@ -1662,7 +1670,7 @@ def calulate_items(data):
                                 vatamount = 0
                                 service_dict['vat_amount'] = 0
                                 service_dict['vat'] = 0
-                            if sac_code_based_gst_rates.central_cess_rate>0:
+                            if sac_code_based_gst_rates.central_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                                 centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
                                 service_dict['cess_amount'] = centralcessamount
                                 service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
@@ -1670,7 +1678,7 @@ def calulate_items(data):
                                 centralcessamount = 0
                                 service_dict['cess_amount'] = 0
                                 service_dict['cess'] = 0
-                            if sac_code_based_gst_rates.state_cess_rate>0:
+                            if sac_code_based_gst_rates.state_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                                 statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
                                 service_dict['state_cess_amount'] = statecessamount
                                 service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
@@ -1806,7 +1814,7 @@ def calulate_items(data):
                         vatamount = 0
                         service_dict['vat_amount'] = 0
                         service_dict['vat'] = 0
-                    if sac_code_based_gst_rates.central_cess_rate>0:
+                    if sac_code_based_gst_rates.central_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
                         service_dict['cess_amount'] = centralcessamount
                         service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
@@ -1814,7 +1822,7 @@ def calulate_items(data):
                         centralcessamount = 0
                         service_dict['cess_amount'] = 0
                         service_dict['cess'] = 0
-                    if sac_code_based_gst_rates.state_cess_rate>0:
+                    if sac_code_based_gst_rates.state_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
                         service_dict['state_cess_amount'] = statecessamount
                         service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
@@ -2053,7 +2061,7 @@ def calulate_items(data):
                         else:
                             final_item['item_mode'] = "Debit"
                 if "state_code" in data:
-                    if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01") and data["state_code"] == companyDetails.state_code:
+                    if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01" or data["company_code"] == "KMH-01") and data["state_code"] == companyDetails.state_code:
                         final_item["state_cess_amount"] = 0
                         final_item['state_cess'] = 0
                     else:
@@ -2267,7 +2275,8 @@ def calulate_items(data):
                 "unit_of_measurement_description":final_item['unit_of_measurement_description'],
                 "is_service_charge_item": "No",
                 "sac_index": sac_code_based_gst_rates.sac_index,
-                "line_edit_net":net_value
+                "line_edit_net":net_value,
+                "item_reference":item["item_reference"] if "item_reference" in item else ""
             })
         total_items.extend(second_list)	
         return {"success": True, "data": total_items}
@@ -2728,7 +2737,7 @@ def get_tax_payer_details(data):
                     if company.skip_ssl_verify == 1:
                         json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                     else:
-                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers)
+                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                 if json_response.content:
                     response = request_get(
                         data['apidata']['get_taxpayer_details'] + data['gstNumber'],
@@ -3198,7 +3207,7 @@ def request_post(url, code, headers=None):
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
-                data = requests.post(url, headers=headers)
+                data = requests.post(url, headers=headers,verify=False)
             else:
                 data = requests.post(url, headers=headers,verify=False)	
         else:
@@ -3236,7 +3245,7 @@ def request_get(api, headers, invoice, code):
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
-                raw_response = requests.get(api, headers=headers)
+                raw_response = requests.get(api, headers=headers,verify=False)
             else:
                 raw_response = requests.get(api, headers=headers,verify=False)
 
@@ -3290,8 +3299,6 @@ def check_invoice_file_exists(data):
         return {"success": False, "message": "sample"}
     except Exception as e:
         print(e, "check file exist")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_invoice_file_exists","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
@@ -3322,8 +3329,6 @@ def check_invoice_exists(invoice_number):
         return {"success":False}	
     except Exception as e:
         print(e, "check invoice exist")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing check_invoice_exists","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
