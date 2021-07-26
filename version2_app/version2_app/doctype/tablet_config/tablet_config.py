@@ -132,15 +132,3 @@ def removeAllDevices():
     return True
 
 
-# @frappe.whitelist(allow_guest=True)
-# def resetDevice(data):
-#     try:
-#         doc = frappe.get_doc("Tablet Config",data["name"])
-#         workstation_doc = frappe.get_doc("Active Work Stations", doc.work_station)
-#         workstation_doc.status = "In Active"
-#         workstation_doc.mode = "Not Completed"
-#         workstation_doc.save(ignore_permissions=True, ignore_version=True)
-#         doc.delete()
-#         pass
-#     except Exception as e:
-#         return {"success":False,"message":str(e)}
