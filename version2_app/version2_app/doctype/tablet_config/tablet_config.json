@@ -63,6 +63,7 @@
    "label": "Tablet Socket ID"
   },
   {
+   "default": "Active",
    "fieldname": "mode",
    "fieldtype": "Data",
    "label": "Mode"
@@ -70,7 +71,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-06 11:55:12.807596",
+ "modified": "2021-07-27 10:35:39.639953",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Tablet Config",
