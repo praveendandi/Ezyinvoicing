@@ -3634,6 +3634,7 @@ def get_taxpayerdetails(data):
                     tax_payer.legal_name = details['LegalName']
                     tax_payer.address_1 = details['AddrBnm']
                     tax_payer.address_2 = details['AddrBno']
+                    details["AddrLoc"] = (details['AddrLoc']).replace('.', '')
                     tax_payer.location = details['AddrLoc'] if details['AddrLoc'] != "" else details['AddrSt'] 
                     tax_payer.pincode = details['AddrPncd']
                     tax_payer.gst_status = details['Status']
