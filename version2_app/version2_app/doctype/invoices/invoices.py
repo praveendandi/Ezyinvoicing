@@ -1670,7 +1670,7 @@ def calulate_items(data):
                                 vatamount = 0
                                 service_dict['vat_amount'] = 0
                                 service_dict['vat'] = 0
-                            if sac_code_based_gst_rates.central_cess_rate>0:
+                            if sac_code_based_gst_rates.central_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                                 centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
                                 service_dict['cess_amount'] = centralcessamount
                                 service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
@@ -1678,7 +1678,7 @@ def calulate_items(data):
                                 centralcessamount = 0
                                 service_dict['cess_amount'] = 0
                                 service_dict['cess'] = 0
-                            if sac_code_based_gst_rates.state_cess_rate>0:
+                            if sac_code_based_gst_rates.state_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                                 statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
                                 service_dict['state_cess_amount'] = statecessamount
                                 service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
@@ -1814,7 +1814,7 @@ def calulate_items(data):
                         vatamount = 0
                         service_dict['vat_amount'] = 0
                         service_dict['vat'] = 0
-                    if sac_code_based_gst_rates.central_cess_rate>0:
+                    if sac_code_based_gst_rates.central_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         centralcessamount = (sac_code_based_gst_rates.central_cess_rate * scharge_value) / 100.0
                         service_dict['cess_amount'] = centralcessamount
                         service_dict['cess'] = sac_code_based_gst_rates.central_cess_rate
@@ -1822,7 +1822,7 @@ def calulate_items(data):
                         centralcessamount = 0
                         service_dict['cess_amount'] = 0
                         service_dict['cess'] = 0
-                    if sac_code_based_gst_rates.state_cess_rate>0:
+                    if sac_code_based_gst_rates.state_cess_rate>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         statecessamount = (sac_code_based_gst_rates.state_cess_rate * scharge_value) / 100.0
                         service_dict['state_cess_amount'] = statecessamount
                         service_dict['state_cess'] = sac_code_based_gst_rates.state_cess_rate
@@ -2060,22 +2060,22 @@ def calulate_items(data):
                             final_item['item_mode'] = ItemMode
                         else:
                             final_item['item_mode'] = "Debit"
-                if "state_code" in data:
-                    if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01") and data["state_code"] == companyDetails.state_code:
-                        final_item["state_cess_amount"] = 0
-                        final_item['state_cess'] = 0
-                    else:
-                        final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-                        if sac_code_based_gst_rates.state_cess_rate > 0:
-                            final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
-                        else:
-                            final_item["state_cess_amount"] = 0
+                # if "state_code" in data:
+                #     if (data["company_code"] == "NKIP-01" or data["company_code"] == "CPK-01" or data["company_code"] == "KMH-01") and data["state_code"] == companyDetails.state_code:
+                #         final_item["state_cess_amount"] = 0
+                #         final_item['state_cess'] = 0
+                #     else:
+                #         final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+                #         if sac_code_based_gst_rates.state_cess_rate > 0:
+                #             final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
+                #         else:
+                #             final_item["state_cess_amount"] = 0
+                # else:
+                final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
+                if sac_code_based_gst_rates.state_cess_rate > 0:
+                    final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
                 else:
-                    final_item['state_cess'] = sac_code_based_gst_rates.state_cess_rate
-                    if sac_code_based_gst_rates.state_cess_rate > 0:
-                        final_item["state_cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.state_cess_rate/100))
-                    else:
-                        final_item["state_cess_amount"] = 0
+                    final_item["state_cess_amount"] = 0
                 final_item['cess'] = sac_code_based_gst_rates.central_cess_rate
                 if sac_code_based_gst_rates.central_cess_rate > 0:
                     final_item["cess_amount"] = (item["item_value"]*(sac_code_based_gst_rates.central_cess_rate/100))
@@ -2825,7 +2825,6 @@ def get_tax_payer_details(data):
                 response = request_get(
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
                     data['apidata'], data['invoice'], data['code'])
-                
                 if response['success']:
                     company = frappe.get_doc('company',data['code'])
                     details = response['result']
@@ -3585,7 +3584,132 @@ def attach_b2c_qrcode(data):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing attach_b2c_qrcode","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": e}
-    
+
+@frappe.whitelist(allow_guest=True)
+def get_taxpayerdetails(data):
+    try:
+        company = frappe.get_last_doc("company")
+        gspApiDataResponse = gsp_api_data({"code":company.name,"mode":company.mode,"provider":company.provider})
+        if gspApiDataResponse['success'] == True:
+            checkTokenIsValidResponse = check_token_is_valid({"code":company.name,"mode":company.mode})
+            if checkTokenIsValidResponse['success'] == True:
+                gst_data = gspApiDataResponse['data']
+                response = request_get(
+                    gst_data['get_taxpayer_details'] + data["gstNumber"],
+                    gst_data, data['invoice_number'], company.name)
+                if response['success']:
+                    details = response['result']
+                    if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
+                        if (details['AddrBno'] != "") or (details['AddrBno'] !=
+                                                            ""):
+                            details['AddrBnm'] = details['AddrBno']
+                    if (details['AddrBno'] == "") or (details['AddrBno'] == None):
+                        if (details['AddrBnm'] != "") or (details['AddrBnm'] !=
+                                                            None):
+                            details['AddrBno'] = details['AddrBnm']
+                    if (details['TradeName'] == "") or (details['TradeName']
+                                                        == None):
+                        if (details['LegalName'] != "") or (details['TradeName'] !=
+                                                            None):
+                            details['TradeName'] = details['LegalName']
+                    if (details['LegalName'] == "") or (details['LegalName']
+                                                        == None):
+                        if (details['TradeName'] != "") or (details['TradeName'] !=
+                                                            None):
+                            details['LegalName'] = details['TradeName']
+                    if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
+                        details['AddrLoc'] = "      "
+
+                    if len(details["AddrBnm"]) < 3:
+                        details["AddrBnm"] = details["AddrBnm"] + "    "
+                    if len(details["AddrBno"]) < 3:
+                        details["AddrBno"] = details["AddrBno"] + "    "
+                    if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
+                        tax_payer = frappe.get_doc('TaxPayerDetail', data["gstNumber"])
+                    else:
+                        tax_payer = frappe.new_doc('TaxPayerDetail')
+                        tax_payer.gst_number = details['Gstin']
+                    tax_payer.email = " "
+                    tax_payer.phone_number = " "
+                    tax_payer.legal_name = details['LegalName']
+                    tax_payer.address_1 = details['AddrBnm']
+                    tax_payer.address_2 = details['AddrBno']
+                    tax_payer.location = details['AddrLoc'] if details['AddrLoc'] != "" else details['AddrSt'] 
+                    tax_payer.pincode = details['AddrPncd']
+                    tax_payer.gst_status = details['Status']
+                    tax_payer.tax_type = details['TxpType']
+                    if company.disable_sez == 1:
+                        tax_payer.tax_type = "REG"
+                    tax_payer.company = company.name
+                    tax_payer.trade_name = details['TradeName']
+                    tax_payer.state_code = details['StateCode']
+                    tax_payer.last_fetched = datetime.date.today()
+                    tax_payer.address_floor_number = details['AddrFlno']
+                    tax_payer.address_street = details['AddrSt']
+                    tax_payer.block_status = ''
+                    tax_payer.status = details['Status']
+                    invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
+                    invoice_doc.gst_number = details['Gstin']
+                    invoice_doc.legal_name = details['LegalName']
+                    invoice_doc.trade_name = details['TradeName']
+                    invoice_doc.state_code = details['StateCode']
+                    invoice_doc.address_1 = details['AddrBnm']
+                    invoice_doc.address_2 = details['AddrBno']
+                    invoice_doc.location = details['AddrLoc'] if details['AddrLoc'] != "" else details['AddrSt']
+                    invoice_doc.pincode = details['AddrPncd']
+                    if details['Status'] == "ACT":
+                        tax_payer.status = 'Active'
+                        if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
+                            doc = tax_payer.save(ignore_permissions=True, ignore_version=True)
+                            frappe.db.commit()
+                            invoice_doc.save(ignore_permissions=True, ignore_version=True)
+                            frappe.db.commit()
+                        else:
+                            doc = tax_payer.insert(ignore_permissions=True)
+                            frappe.db.commit()
+                        return {"success": True, "data": doc}
+                    
+                    else:
+                        tax_payer.status = 'In-Active'
+                        if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
+                            doc = tax_payer.save(ignore_permissions=True, ignore_version=True)
+                            frappe.db.commit()
+                            invoice_doc.save(ignore_permissions=True, ignore_version=True)
+                            frappe.db.commit()
+                        else:
+                            doc = tax_payer.insert(ignore_permissions=True)
+                            frappe.db.commit()
+                        return {
+                            "success": False,
+                            "message": "Gst Number is Inactive"
+                        }
+                else:
+                    print("Unknown error in get taxpayer details get call  ",
+                            response)
+                    error_message = "Invalid GstNumber "+data['gstNumber']
+                    frappe.log_error(frappe.get_traceback(), data['gstNumber'])
+                    logger.error(f"{data['gstNumber']},     get_tax_payer_details,   {response['message']}")
+                    return {
+                        "success": False,
+                        "message": error_message,
+                        "response": response
+                    }
+                # getTaxPayerDetailsResponse = get_tax_payer_details({"gstNumber":data["gstNumber"],"code":company.name,"invoice":data["invoice_number"],"apidata":gspApiDataResponse['data']})
+                # if getTaxPayerDetailsResponse['success'] == True:
+                #     return {"success":True,"data":getTaxPayerDetailsResponse['data'].__dict__}
+                # else:
+                #     return getTaxPayerDetailsResponse
+            else:
+                return checkTokenIsValidResponse
+        else:
+            return gspApiDataResponse
+    except Exception as e:
+        print(e, "attach b2c qrcode")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing get_taxpayerdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success": False, "message": e}   
+
+ 
 # @frappe.whitelist(allow_guest=True)
 # def b2b_success_to_credit_note(data):
 # 	try:
