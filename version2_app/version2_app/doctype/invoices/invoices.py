@@ -3662,14 +3662,14 @@ def get_taxpayerdetails(data):
                     invoice_doc.state_code = details['StateCode']
                     invoice_doc.address_1 = details['AddrBnm']
                     invoice_doc.address_2 = details['AddrBno']
-                    if details['AddrBnm'].strip() != "" and details["AddrLoc"] == "":
-                        tax_payer.location = details['AddrSt']
+                    if details['AddrBnm'].strip() != "" and details["AddrLoc"].strip() == "":
+                        invoice_doc.location = details['AddrSt']
                         details["AddrLoc"] = details['AddrSt']
-                    elif details['AddrBno'].strip() != "" and details['AddrLoc'] == "":
-                        tax_payer.location = details['AddrBno']
+                    elif details['AddrBno'].strip() != "" and details['AddrLoc'].strip() == "":
+                        invoice_doc.location = details['AddrBno']
                         details["AddrLoc"] = details['AddrBno']
                     else:
-                        tax_payer.location = details['AddrLoc']
+                        invoice_doc.location = details['AddrLoc']
                     invoice_doc.pincode = details['AddrPncd']
                     if details['Status'] == "ACT":
                         tax_payer.status = 'Active'

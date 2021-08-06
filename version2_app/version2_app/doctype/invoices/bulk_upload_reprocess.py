@@ -21,8 +21,8 @@ def BulkUploadReprocess(data):
         invoice_number = data['invoice_number']
         invoice_data = frappe.get_doc('Invoices',invoice_number)
         line_items = json.loads(invoice_data.invoice_object_from_file)
-        # print(line_items)
-        invoice_total_amount = line_items['data']['total_invoice_amount']
+        invoice_total_amount = invoice_data.total_invoice_amount
+        print(invoice_total_amount)
         # print(invoice_total_amount,"=-=-=-=-=-=-")
         company = frappe.get_doc('company',invoice_data.company)
         gstNumber = invoice_data.gst_number 
