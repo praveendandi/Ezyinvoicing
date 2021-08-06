@@ -3662,10 +3662,10 @@ def get_taxpayerdetails(data):
                     invoice_doc.state_code = details['StateCode']
                     invoice_doc.address_1 = details['AddrBnm']
                     invoice_doc.address_2 = details['AddrBno']
-                    if details['AddrBnm'].strip() != "" and details["AddrLoc"] == "":
+                    if details['AddrBnm'].strip() != "" and details["AddrLoc"].strip() == "":
                         tax_payer.location = details['AddrSt']
                         details["AddrLoc"] = details['AddrSt']
-                    elif details['AddrBno'].strip() != "" and details['AddrLoc'] == "":
+                    elif details['AddrBno'].strip() != "" and details['AddrLoc'].strip() == "":
                         tax_payer.location = details['AddrBno']
                         details["AddrLoc"] = details['AddrBno']
                     else:
