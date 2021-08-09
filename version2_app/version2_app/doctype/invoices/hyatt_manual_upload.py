@@ -59,7 +59,6 @@ def hyattbulkupload(data):
                 invoice_type = "B2C"
             if val[13]=='':
                 continue
-
             each = {"invoicedate":val[5],"taxinvnum":"HRC"+val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
             if frappe.db.exists("SAC HSN CODES",each['goods_desc']):
                 sac_desc = frappe.get_doc("SAC HSN CODES",each['goods_desc'])
@@ -82,7 +81,8 @@ def hyattbulkupload(data):
             cgst = 0 if val[15]!="" else float(val[15])
             igst = 0 if val[16]!="" else float(val[16])
             cess = 0 if val[17]!="" else float(val[17])
-            total_invoice_amount = float(val[11])
+            total_invoice_amount = 0 if val[11]=="" else float(val[11]) 
+            # total_invoice_amount = float(val[11]) 
             each["total_invoice_amount"] = total_invoice_amount
             if each['taxinvnum'] not in invoice_referrence_objects:
                     
