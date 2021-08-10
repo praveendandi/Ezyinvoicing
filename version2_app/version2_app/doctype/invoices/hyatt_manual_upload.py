@@ -64,7 +64,7 @@ def hyattbulkupload(data):
             if companyData.name == "GHM-01":
                 inv_date = datetime.datetime.strptime(val[6],'%d-%m-%Y').strftime("%d-%b-%Y")
                 each = {"invoicedate":inv_date,"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[44]) if float(val[44]) != 0.00 else float(val[-14]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
-                time.sleep(2)
+                # time.sleep(2)
                 print(each,"-------------------------")
             else:
                 each = {"invoicedate":val[5],"taxinvnum":"HRC"+val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
