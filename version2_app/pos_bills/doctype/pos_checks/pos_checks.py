@@ -6,8 +6,9 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
+from termcolor import colored
 import traceback, sys
-import requests, json
+import requests, json, datetime
 import os,re
 import razorpay
 from escpos.printer import Network
@@ -38,22 +39,29 @@ def create_pos_bills(data):
 			path = folder_path + '/sites/' + company_doc.site_name +"/public"
 			logopath = path+outlet_doc.outlet_logo
 			qrpath = path+outlet_doc.static_payment_qr_code
+			if company_doc.enable_pos_extra_text == 1:
+				text = add_extra_text_while_print(data["check_no"],data["outlet"],company_doc)
+				if text["success"] == False:
+					return text
+				payload = text["string"]+data["payload"]+"\n"
+			else:
+				payload = data["payload"]
 			port = int(printer_doc.port) if printer_doc.port != "" else 9100
 			if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
 				if outlet_doc.payment_mode == "Dynamic":
 					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
 					if short_url["success"]:
-						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,short_url['short_url'])
+						give_print(payload,printer_doc.printer_ip,logopath,qrpath,port,short_url['short_url'])
 						data["printed"] = 1
 				else:
-					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port)
+					give_print(payload,printer_doc.printer_ip,logopath,qrpath,port)
 					data["printed"] = 1
 			if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
 				pos_bills = send_pos_bills_gcb(company_doc,data)
 				if pos_bills["success"] == False:
 					return pos_bills["message"]
 				qrurl = company_doc.b2c_qr_url + pos_bills['data']
-				give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,qrurl)
+				give_print(payload,printer_doc.printer_ip,logopath,qrpath,port,qrurl)
 				data["gcp_file_url"] = pos_bills['data']
 				data["printed"] = 1
 			doc = frappe.get_doc(data)
@@ -117,6 +125,7 @@ def give_print(text, ip, logo_path, qr_path,port,short_url=''):
 	try:
 		b = text.encode('utf-8')
 		kitchen = Network(ip,int(port))  # Printer IP Address
+		# kitchen = Network(ip)
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logo_path)
 		kitchen.hw('INIT')
@@ -164,11 +173,33 @@ def razorPay(total_bill_amount,check_no,outlet,company_doc):
 		frappe.log_error("Ezy-invoicing razorPay","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 		return {"success":False,"message":str(e)}
 
+def add_extra_text_while_print(check_no,outlet,company_doc):
+	try:
+		outlet_doc = frappe.get_doc("Outlets",outlet)
+		x = datetime.datetime.now()
+		company_name = '\033[ {} \033['.format(company_doc.company_name)+"\n"+company_doc.property_group+"\n"+company_doc.address_1+"\n"
+		address = company_doc.address_2+", "+company_doc.location
+		mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
+		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{}, CIN NO.:{}\nSERVICE TAX NO.: {}\nRETAIL INVOICE\nInvoice No {}\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,outlet_doc.service_tax_no,x.strftime("%y")+x.strftime("%m")+"-"+check_no)
+		return {"success":True,"string":company_name+address+mobile+gst_details}
+	except Exception as e:
+		print(str(e))
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing add_extra_text_while_print","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+		return {"success":False,"message":str(e)}
+
 @frappe.whitelist(allow_guest=True)
 def print_pos_bill(data):
 	try:
 		check_doc = frappe.get_doc("POS Checks",data["name"])
 		company_doc = frappe.get_doc("company",check_doc.company)
+		if company_doc.enable_pos_extra_text == 1:
+			text = add_extra_text_while_print(check_doc.check_no,check_doc.outlet,company_doc)
+			if text["success"] == False:
+				return text
+			payload = text["string"]+check_doc.payload+"\n"
+		else:
+			payload = check_doc.payload
 		outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
 		printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
 		printer_doc = frappe.get_doc("POS Printers",printer_settings)
@@ -176,8 +207,10 @@ def print_pos_bill(data):
 		path = folder_path + '/sites/' + company_doc.site_name +"/public"
 		logopath = path+outlet_values[0]["outlet_logo"]
 		qr_path = path+outlet_values[0]["static_payment_qr_code"]
-		b = (check_doc.payload).encode('utf-8')
+		b = (payload).encode('utf-8')
+		# b = (company_name+address+mobile+gst_details+check_doc.payload+"\n").encode('utf-8')
 		kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
+		# kitchen = Network(printer_doc.printer_ip)
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logopath)
 		kitchen.hw('INIT')

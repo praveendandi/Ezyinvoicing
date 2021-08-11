@@ -3634,8 +3634,15 @@ def get_taxpayerdetails(data):
                     tax_payer.legal_name = details['LegalName']
                     tax_payer.address_1 = details['AddrBnm']
                     tax_payer.address_2 = details['AddrBno']
-                    details["AddrLoc"] = (details['AddrLoc']).replace('.', '')
-                    tax_payer.location = details['AddrLoc'] if details['AddrLoc'] != "" else details['AddrSt'] 
+                    details["AddrLoc"] = details["AddrLoc"].strip()
+                    if details['AddrBnm'].strip() != "" and details["AddrLoc"] == "":
+                        tax_payer.location = details['AddrSt']
+                        details["AddrLoc"] = details['AddrSt']
+                    elif details['AddrBno'].strip() != "" and details['AddrLoc'] == "":
+                        tax_payer.location = details['AddrBno']
+                        details["AddrLoc"] = details['AddrBno']
+                    else:
+                        tax_payer.location = details['AddrLoc']
                     tax_payer.pincode = details['AddrPncd']
                     tax_payer.gst_status = details['Status']
                     tax_payer.tax_type = details['TxpType']
@@ -3656,7 +3663,15 @@ def get_taxpayerdetails(data):
                     invoice_doc.state_code = details['StateCode']
                     invoice_doc.address_1 = details['AddrBnm']
                     invoice_doc.address_2 = details['AddrBno']
-                    invoice_doc.location = details['AddrLoc'] if details['AddrLoc'] != "" else details['AddrSt']
+                    details["AddrLoc"] = details["AddrLoc"].strip()
+                    if details['AddrBnm'].strip() != "" and details["AddrLoc"].strip() == "":
+                        invoice_doc.location = details['AddrSt']
+                        details["AddrLoc"] = details['AddrSt']
+                    elif details['AddrBno'].strip() != "" and details['AddrLoc'].strip() == "":
+                        invoice_doc.location = details['AddrBno']
+                        details["AddrLoc"] = details['AddrBno']
+                    else:
+                        invoice_doc.location = details['AddrLoc']
                     invoice_doc.pincode = details['AddrPncd']
                     if details['Status'] == "ACT":
                         tax_payer.status = 'Active'

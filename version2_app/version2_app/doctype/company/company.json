@@ -131,7 +131,8 @@
   "block_irn",
   "block_print",
   "block_irn_information",
-  "payment_reconciliation"
+  "payment_reconciliation",
+  "enable_pos_extra_text"
  ],
  "fields": [
   {
@@ -842,11 +843,17 @@
    "fieldname": "block_irn_information",
    "fieldtype": "Data",
    "label": "Block Irn Information"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_pos_extra_text",
+   "fieldtype": "Check",
+   "label": "Enable POS Extra Text"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-19 10:27:24.390147",
+ "modified": "2021-08-11 15:39:14.571458",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
