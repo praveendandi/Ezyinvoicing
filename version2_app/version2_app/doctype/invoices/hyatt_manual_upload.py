@@ -28,12 +28,12 @@ def hyattbulkupload(data):
         start_time = datetime.datetime.now()
         folder_path = frappe.utils.get_bench_path()
         items_data_file = data['invoice_file']
-        
+
         companyData = frappe.get_doc('company',data['company'])
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
         items_dataframe = pd.read_csv(items_file_path)
-        
+
         columnslist = items_dataframe.columns.values.tolist()
         columnslist = columnslist[0].split("|")
         check_columns = companyData.bulk_import_invoice_headers
@@ -49,9 +49,11 @@ def hyattbulkupload(data):
         input_data = []
         invoice_referrence_objects = {}
         for each in valuesdata:
-            # print(each)
+            each[0]="|".join([str(i) for i in each ])
             # ['Satoshi Inatomi', '', 'HIGH', '0809', '1762', '01-APR-2021', 'CREDIT INVOICE', '5301', '999712', 'Guest Laundry', 'N', '-237.01', '', '226.85', '0.00', '0.00', '0.00', '0.00', '0.00', '', '', '', '', 'NONTAX']
             val = each[0].split("|")
+            print(val[7],"////////////////////////////////////////////////")
+            
             if len(val[1])>5:
                 invoice_type = "B2B"
             else:
@@ -59,7 +61,13 @@ def hyattbulkupload(data):
                 invoice_type = "B2C"
             if val[13]=='':
                 continue
-            each = {"invoicedate":val[5],"taxinvnum":"HRC"+val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
+            if companyData.name == "GHM-01":
+                inv_date = datetime.datetime.strptime(val[6],'%d-%m-%Y').strftime("%d-%b-%Y")
+                each = {"invoicedate":inv_date,"taxinvnum":val[5],"invoice_category":val[4],"room_number":1,"taxid":val[7],"goods_desc":val[33],"guestname":val[8],"invoiceamount":float(val[44]) if float(val[44]) != 0.00 else float(val[-14]),"taxcode_dsc":val[35],"sgst":val[46],"cgst":val[47],"igst":val[48],"cess":val[49]}
+                # time.sleep(2)
+                print(each,"-------------------------")
+            else:
+                each = {"invoicedate":val[5],"taxinvnum":"HRC"+val[4],"invoice_category":val[6],"room_number":val[3],"taxid":val[1],"goods_desc":val[9],"guestname":val[0],"invoiceamount":float(val[13]),"taxcode_dsc":val[8],"sgst":val[14],"cgst":val[15],"igst":val[16],"cess":val[17]}
             if frappe.db.exists("SAC HSN CODES",each['goods_desc']):
                 sac_desc = frappe.get_doc("SAC HSN CODES",each['goods_desc'])
                 if sac_desc.bulk_upload_service_charge ==1:
@@ -77,11 +85,19 @@ def hyattbulkupload(data):
             if each['invoice_category'] == "DEBIT INVOICE":
                 each['invoice_category'] = "Debit Invoice"        
             # total_invoice_amount = float(val[-1])+float(val[])
-            sgst = 0 if val[14]!="" else float(val[14])
-            cgst = 0 if val[15]!="" else float(val[15])
-            igst = 0 if val[16]!="" else float(val[16])
-            cess = 0 if val[17]!="" else float(val[17])
-            total_invoice_amount = 0 if val[11]=="" else float(val[11]) 
+            if companyData.name == "GHM-01":
+                sgst = 0 if val[-9]!="" else float(val[46])
+                cgst = 0 if val[-8]!="" else float(val[47])
+                igst = 0 if val[-7]!="" else float(val[48])
+                cess = 0 if val[-6]!="" else float(val[49])
+                # total_invoice_amount = 0 if val[11]=="" else float(val[-1]) 
+                total_invoice_amount = float(val[-1])
+            else:
+                sgst = 0 if val[14]!="" else float(val[14])
+                cgst = 0 if val[15]!="" else float(val[15])
+                igst = 0 if val[16]!="" else float(val[16])
+                cess = 0 if val[17]!="" else float(val[17])
+                total_invoice_amount = 0 if val[11]=="" else float(val[11])
             # total_invoice_amount = float(val[11]) 
             each["total_invoice_amount"] = total_invoice_amount
             if each['taxinvnum'] not in invoice_referrence_objects:
@@ -150,7 +166,6 @@ def hyattbulkupload(data):
         print(len(input_data),"count")
 
         for each in input_data:
-            # print(each)
             each['gstNumber'] = str(each['gstNumber'])
             
             check_invoice = check_invoice_exists(str(each['invoice_number']))
@@ -203,7 +218,7 @@ def hyattbulkupload(data):
             # print(len(each['gstNumber']),"lennn",each['gstNumber'],each['invoice_type'])
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
             if len(each['gstNumber']) < 15 and len(each['gstNumber'])>0:
-                error_data['error_message'] = "Invalid GstNumber"
+                error_data['error_message'] = each['gstNumber']+" "+"Invalid GstNumber"
                 error_data['amened'] = 'No'
                 
                 errorcalulateItemsApiResponse = calulate_items(each)
@@ -284,7 +299,7 @@ def hyattbulkupload(data):
                             output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
                     else:
-                        error_data['error_message'] = "Invalid GstNumber"
+                        error_data['error_message'] = each['gstNumber']+" "+"Invalid GstNumber"
                         error_data['amened'] = 'No'
                         
                         errorcalulateItemsApiResponse = calulate_items(each)
