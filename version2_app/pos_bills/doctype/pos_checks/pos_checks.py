@@ -190,8 +190,8 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
 		company_name = '\033[ {} \033['.format(company_doc.company_name)+"\n"+company_doc.property_group+"\n"+company_doc.address_1+"\n"
 		address = company_doc.address_2+", "+company_doc.location
 		mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
-		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{}\nSERVICE TAX NO.: {}\nRETAIL INVOICE\nInvoice No ".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.service_tax_no)
-		invoice_number = x.strftime("%y")+x.strftime("%m")+"-"+check_no + "\n"
+		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{}\nSERVICE TAX NO.: {}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.service_tax_no)
+		invoice_number = "Invoice No "+x.strftime("%y")+x.strftime("%m")+"-"+check_no + "\n"
 		return {"success":True,"string":company_name+address+mobile+gst_details,"invoice_number":invoice_number}
 	except Exception as e:
 		print(str(e))
