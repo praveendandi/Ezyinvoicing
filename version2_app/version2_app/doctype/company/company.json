@@ -452,7 +452,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt"
+   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai"
   },
   {
    "default": "0",
@@ -663,7 +663,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-06 12:19:40.140119",
+ "modified": "2021-08-13 14:37:12.212485",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
