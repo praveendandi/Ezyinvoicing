@@ -187,10 +187,10 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
 	try:
 		outlet_doc = frappe.get_doc("Outlets",outlet)
 		x = datetime.datetime.now()
-		company_name = '\033[ {} \033['.format(company_doc.company_name)+"\n"+company_doc.property_group+"\n"+company_doc.address_1+"\n"
+		company_name = '\033[ {} \033['.format(company_doc.company_name)+"\n"+company_doc.address_1+"\n"
 		address = company_doc.address_2+", "+company_doc.location
 		mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
-		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{}\nSERVICE TAX NO.: {}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.service_tax_no)
+		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no)
 		invoice_number = "Invoice No "+x.strftime("%y")+x.strftime("%m")+"-"+check_no + "\n"
 		return {"success":True,"string":company_name+address+mobile+gst_details,"invoice_number":invoice_number}
 	except Exception as e:
@@ -219,8 +219,8 @@ def print_pos_bill(data):
 		qr_path = path+outlet_values[0]["static_payment_qr_code"]
 		b = (check_doc.payload).encode('utf-8')
 		# b = (company_name+address+mobile+gst_details+check_doc.payload+"\n").encode('utf-8')
-		kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
-		# kitchen = Network(printer_doc.printer_ip)
+		# kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
+		kitchen = Network(printer_doc.printer_ip)
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logopath)
 		kitchen.hw('INIT')
