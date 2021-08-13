@@ -43,10 +43,15 @@ def updateTab(name=None,status=None):
 def createTab(data):
     try:
         company = frappe.get_last_doc('company')
+        print(data)
         if frappe.db.exists("Active Tablets",data["uuid"]):
             doc = frappe.get_doc("Active Tablets",data["uuid"])
             doc.socket_id = data["socket_id"]
             doc.save(ignore_permissions=True,ignore_version=True)
+            tablet_config = frappe.db.get_value("Tablet Config", {"work_station":data["work_station"],"tablet":data["uuid"]},["name"])
+            tablet_doc = frappe.get_doc("Tablet Config", tablet_config)
+            tablet_doc.tablet_socket_id = data["socket_id"]
+            tablet_doc.save(ignore_permissions=True,ignore_version=True)
         else:
             data["doctype"] = "Active Tablets"
             doc = frappe.get_doc(data)
@@ -58,6 +63,7 @@ def createTab(data):
             config_tab = frappe.get_doc(config_data)
             config_tab.insert(ignore_permissions=True)
             frappe.publish_realtime("custom_socket", {'message':'Tablet Configuration','type':"document_bin_insert","tablet_config":config_data,"company":company.name})
+            return {"success": True,"tablet_config":config_data,"company":company.name}
     except Exception as e:
         print(str(e))
 
