@@ -21,6 +21,9 @@
   "address_details_section",
   "address_1",
   "address_2",
+  "city",
+  "district",
+  "state",
   "state_code",
   "calculation_by",
   "merchant_name",
@@ -88,6 +91,13 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
+  "configiration_section",
+  "config",
+  "cform_user_name",
+  "cform_password",
+  "signezy",
+  "ezybills",
+  "scaneasy",
   "licensing_host",
   "skip_ssl_verify",
   "b2b_to_credit",
@@ -98,6 +108,23 @@
   "change_invoice_reconciliation_invoice_number",
   "disable_sez",
   "b2c_online_payments",
+  "pos_bills_module",
+  "whats_app",
+  "scenario_key",
+  "template_name",
+  "api_key",
+  "api",
+  "domain_url",
+  "void_check_reference",
+  "void_total_amt_regex",
+  "closed_check_reference",
+  "normal_check_total_amt_regex",
+  "check_number_reference",
+  "check_number_regex",
+  "table_number_reference",
+  "table_number_regex",
+  "guest_number_reference",
+  "guest_number_regex",
   "referrence_separator_type",
   "block_irn",
   "block_print",
@@ -584,6 +611,71 @@
   },
   {
    "default": "0",
+   "fieldname": "skip_ssl_verify",
+   "fieldtype": "Check",
+   "label": "Skip SSL Verify"
+  },
+  {
+   "fieldname": "configiration_section",
+   "fieldtype": "Section Break",
+   "label": "Configiration"
+  },
+  {
+   "fieldname": "config",
+   "fieldtype": "Table",
+   "label": "config",
+   "options": "CONFIGURATIONS"
+  },
+  {
+   "fieldname": "cform_user_name",
+   "fieldtype": "Data",
+   "label": "Cform user name"
+  },
+  {
+   "fieldname": "cform_password",
+   "fieldtype": "Password",
+   "label": "Cform password"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "default": "0",
+   "fieldname": "signezy",
+   "fieldtype": "Check",
+   "label": "Signezy"
+  },
+  {
+   "default": "0",
+   "fieldname": "ezybills",
+   "fieldtype": "Check",
+   "label": "Ezybills"
+  },
+  {
+   "default": "0",
+   "fieldname": "scaneasy",
+   "fieldtype": "Check",
+   "label": "Scaneasy"
+  },
+  {
+   "fieldname": "ipp_printer_file_path",
+   "fieldtype": "Data",
+   "label": "Ipp Printer File Path"
+  },
+  {
+   "default": "0",
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
    "label": "B2B To Credit"
@@ -622,6 +714,94 @@
    "fieldname": "disable_sez",
    "fieldtype": "Check",
    "label": "Disable Sez"
+  },
+  {
+   "default": "Disable",
+   "fieldname": "pos_bills_module",
+   "fieldtype": "Select",
+   "label": "POS Bills Module",
+   "options": "Enable\nDisable"
+  },
+  {
+   "default": "0",
+   "fieldname": "whats_app",
+   "fieldtype": "Check",
+   "label": "Whats App"
+  },
+  {
+   "fieldname": "scenario_key",
+   "fieldtype": "Data",
+   "label": "Scenario Key"
+  },
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "label": "Api Key"
+  },
+  {
+   "fieldname": "api",
+   "fieldtype": "Data",
+   "label": "Api"
+  },
+  {
+   "fieldname": "domain_url",
+   "fieldtype": "Data",
+   "label": "Domain URL"
+  },
+  {
+   "fieldname": "void_check_reference",
+   "fieldtype": "Data",
+   "label": "Void Check Reference"
+  },
+  {
+   "fieldname": "void_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Void Total Amt Regex"
+  },
+  {
+   "fieldname": "closed_check_reference",
+   "fieldtype": "Data",
+   "label": "Closed Check Reference"
+  },
+  {
+   "fieldname": "normal_check_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Normal Check Total Amt Regex"
+  },
+  {
+   "fieldname": "check_number_reference",
+   "fieldtype": "Data",
+   "label": "Check Number Reference"
+  },
+  {
+   "fieldname": "check_number_regex",
+   "fieldtype": "Data",
+   "label": "Check Number Regex"
+  },
+  {
+   "fieldname": "table_number_reference",
+   "fieldtype": "Data",
+   "label": "Table Number Reference"
+  },
+  {
+   "fieldname": "table_number_regex",
+   "fieldtype": "Data",
+   "label": "Table Number Regex"
+  },
+  {
+   "fieldname": "guest_number_reference",
+   "fieldtype": "Data",
+   "label": "Guest Number Reference"
+  },
+  {
+   "fieldname": "guest_number_regex",
+   "fieldtype": "Data",
+   "label": "Guest Number Regex"
   },
   {
    "default": "0",

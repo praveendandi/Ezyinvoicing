@@ -9,4 +9,13 @@ watchdog
 ippserver
 pycups
 xmltodict
+python-escpos==2.2.0
+Pillow
+dateparser
+pyzbar
+text-to-image
+Pillow
+scipy
+pytesseract
+pdf2image
 pytesseract

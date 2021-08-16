@@ -3,6 +3,8 @@ import frappe
 # from frappe import enqueue
 from frappe.model.document import Document
 from datetime import date
+# import async
+# import asyncio
 import requests
 import datetime
 import random
@@ -26,6 +28,30 @@ from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
 
 
 
+
+
+# @frappe.whitelist(allow_guest=True)
+# def manual_upload(data):
+# 	# try:
+# 	frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.manualuploadEnqueue",queue='default', timeout=None, event="BulkUpload", is_async=True, job_name="samplefunforqueue", now=True,arg1=data)
+# 	# data = frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.samplefunforqueue",queue='default', timeout=None, event=None, is_async=True, job_name="samplefunforqueue", now=True)
+# 	# print(data,type(data))
+# 	return {"success":True}
+# 	# except Exception as e:
+# 	# 	logger.error(f"manual upload queue  {str(e)}")
+# 	# 	return {"success":False,"message":str(e)}
+
+
+# def samplefunforqueue():
+# 	doc = frappe.get_doc("company","MJH-01")
+# 	doc.merchant_name = "sample"
+# 	doc.save()
+
+
+# @frappe.whitelist(allow_guest=True)
+# def manual_upload1(data):
+# 	return await manual_upload1(data).start()
+# 	# return True
 
 
 @frappe.whitelist(allow_guest=True)
@@ -186,6 +212,7 @@ def manual_upload_data(data):
             else:
                 each['invoice_category'] = "Tax Invoice"
 
+<<<<<<< HEAD
             # print(each)
             if each['invoice_number'] in gst_dict:
                 each['invoice_type'] = "B2B"
@@ -429,9 +456,69 @@ def manual_upload_data(data):
         frappe.log_error("Ezy-invoicing manual_upload_data Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
         return {"success":False,"message":str(e)}    
+=======
+							B2B=np.nan
+							B2C = "B2C"
+							output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+							# print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+					else:
+						insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each,"company_code":data['company'],"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
+						if insertInvoiceApiResponse['success']== True:
+							B2B=np.nan
+							B2C = "B2C"	 
+							if insertInvoiceApiResponse['data'].irn_generated == "Success":
+								output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+							elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
+								output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+							else:
+								output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+						else:
+							error_data['error_message'] = insertInvoiceApiResponse['message']
+							error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
+							errorInvoice = Error_Insert_invoice(error_data)
+							
+							B2B=np.nan
+							B2C = "B2C"
+							output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+							# print("B2B insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
+				else:
+						
+					error_data['error_message'] = calulateItemsApiResponse['message']
+					error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each['invoice_number']]}
+					errorInvoice = Error_Insert_invoice(error_data)
+					B2C = "B2C"
+					B2B = np.nan
+					
+					output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+					# print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
+			frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
+			countIn+=1
+		df = pd.DataFrame(output_date)
+		df = df.groupby('date').count().reset_index()
+		output_data = df.to_dict('records')
+		# data['UserName'] = "Ganesh"
+		InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file'],"gst_file":data['gst_file']})
+		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+		# return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
+		return {"success":True,"message":"Successfully Uploaded"}
+	except Exception as e:
+		print(traceback.print_exc())
+		frappe.db.delete('File', {'file_url': data['invoice_file']})
+		if "gst_file" in data:
+			frappe.db.delete('File',{'file_url': data['gst_file']})
+		frappe.db.commit()
+		print(str(e),"   manual_upload")
+		frappe.log_error(frappe.get_traceback(), 'enques')
+		# make_error_snapshot(e)
+		frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
+		return {"success":False,"message":str(e)}    
+<<<<<<< HEAD
+=======
+>>>>>>> passport-scanner
 
 
 
 
 
 
+>>>>>>> 216129b2e2b8106e0a27233e2bf639b0fdd947d8
