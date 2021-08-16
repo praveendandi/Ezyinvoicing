@@ -20,4 +20,3 @@ pytesseract
 pdf2image
 pytesseract
 # opencv-python
-termcolor
