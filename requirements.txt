@@ -19,3 +19,4 @@ scipy
 pytesseract
 pdf2image
 pytesseract
+opencv-python
