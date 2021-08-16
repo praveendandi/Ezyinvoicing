@@ -715,7 +715,7 @@ def reprocess_calulate_items(data):
                         vatamount = 0
                         service_dict['vat_amount'] = 0
                         service_dict['vat'] = 0
-                    if item["cess"]>0:
+                    if item["cess"]>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         centralcessamount = (item["cess"] * scharge_value) / 100.0
                         service_dict['cess_amount'] = centralcessamount
                         service_dict['cess'] = item["cess"]
@@ -723,7 +723,7 @@ def reprocess_calulate_items(data):
                         centralcessamount = 0
                         service_dict['cess_amount'] = 0
                         service_dict['cess'] = 0
-                    if item["state_cess"]>0:
+                    if item["state_cess"]>0 and sac_code_based_gst_rates.disable_cess_for_sc == 0:
                         statecessamount = (item["state_cess"] * scharge_value) / 100.0
                         service_dict['state_cess_amount'] = statecessamount
                         service_dict['state_cess'] = item["state_cess"]
