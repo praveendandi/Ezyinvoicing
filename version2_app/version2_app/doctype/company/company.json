@@ -98,13 +98,33 @@
   "change_invoice_reconciliation_invoice_number",
   "disable_sez",
   "b2c_online_payments",
+  "pos_bills_module",
+  "whats_app",
+  "scenario_key",
+  "template_name",
+  "api_key",
+  "api",
+  "domain_url",
+  "void_check_reference",
+  "void_total_amt_regex",
+  "closed_check_reference",
+  "closed_check_total_amt_regex",
+  "normal_check_total_amt_regex",
+  "check_number_reference",
+  "check_number_regex",
+  "table_number_reference",
+  "table_number_regex",
+  "guest_number_reference",
+  "guest_number_regex",
+  "print_check_type",
   "referrence_separator_type",
   "block_irn",
   "block_print",
   "block_irn_information",
   "payment_reconciliation",
   "disable_sac_edit",
-  "sign_ezy_module"
+  "sign_ezy_module",
+  "enable_pos_extra_text"
  ],
  "fields": [
   {
@@ -636,6 +656,104 @@
    "label": "Disable Sez"
   },
   {
+   "default": "Disable",
+   "fieldname": "pos_bills_module",
+   "fieldtype": "Select",
+   "label": "POS Bills Module",
+   "options": "Enable\nDisable"
+  },
+  {
+   "default": "0",
+   "fieldname": "whats_app",
+   "fieldtype": "Check",
+   "label": "Whats App"
+  },
+  {
+   "fieldname": "scenario_key",
+   "fieldtype": "Data",
+   "label": "Scenario Key"
+  },
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "label": "Api Key"
+  },
+  {
+   "fieldname": "api",
+   "fieldtype": "Data",
+   "label": "Api"
+  },
+  {
+   "fieldname": "domain_url",
+   "fieldtype": "Data",
+   "label": "Domain URL"
+  },
+  {
+   "fieldname": "void_check_reference",
+   "fieldtype": "Data",
+   "label": "Void Check Reference"
+  },
+  {
+   "fieldname": "void_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Void Total Amt Regex"
+  },
+  {
+   "fieldname": "closed_check_reference",
+   "fieldtype": "Data",
+   "label": "Closed Check Reference"
+  },
+  {
+   "fieldname": "normal_check_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Normal Check Total Amt Regex"
+  },
+  {
+   "fieldname": "check_number_reference",
+   "fieldtype": "Data",
+   "label": "Check Number Reference"
+  },
+  {
+   "fieldname": "check_number_regex",
+   "fieldtype": "Data",
+   "label": "Check Number Regex"
+  },
+  {
+   "fieldname": "table_number_reference",
+   "fieldtype": "Data",
+   "label": "Table Number Reference"
+  },
+  {
+   "fieldname": "table_number_regex",
+   "fieldtype": "Data",
+   "label": "Table Number Regex"
+  },
+  {
+   "fieldname": "guest_number_reference",
+   "fieldtype": "Data",
+   "label": "Guest Number Reference"
+  },
+  {
+   "fieldname": "guest_number_regex",
+   "fieldtype": "Data",
+   "label": "Guest Number Regex"
+  },
+  {
+   "fieldname": "closed_check_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Closed Check Total Amt Regex"
+  },
+  {
+   "fieldname": "print_check_type",
+   "fieldtype": "Data",
+   "label": "Print Check Type"
+  },
+  {
    "default": "0",
    "fieldname": "payment_reconciliation",
    "fieldtype": "Check",
@@ -648,14 +766,12 @@
    "options": "Tilda\nHash\nNone"
   },
   {
-   "default": "False",
    "fieldname": "block_irn",
    "fieldtype": "Select",
    "label": "Block Irn",
    "options": "True\nFalse"
   },
   {
-   "default": "False",
    "fieldname": "block_print",
    "fieldtype": "Select",
    "label": "Block Print",
@@ -668,6 +784,12 @@
   },
   {
    "default": "0",
+   "fieldname": "enable_pos_extra_text",
+   "fieldtype": "Check",
+   "label": "Enable POS Extra Text"
+  },
+  {
+   "default": "0",
    "fieldname": "disable_sac_edit",
    "fieldtype": "Check",
    "label": "Disable SAC Edit"
@@ -677,6 +799,7 @@
    "fieldname": "sign_ezy_module",
    "fieldtype": "Check",
    "label": "Sign Ezy Module"
+   
   }
  ],
  "index_web_pages_for_search": 1,

@@ -556,6 +556,7 @@ def updatepropertiesdetails():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-updatepropertiesdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
 def promotionsSocket(doc,method=None):
     try:
         frappe.publish_realtime(

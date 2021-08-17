@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "autoname": "field:outlet_name",
  "creation": "2021-06-25 17:24:17.347033",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -14,7 +15,13 @@
   "cancelled",
   "closed",
   "print",
-  "printer_mapped"
+  "printer_mapped",
+  "gstin",
+  "fssai",
+  "tin_no",
+  "cin_no",
+  "service_tax_no",
+  "website"
  ],
  "fields": [
   {
@@ -75,11 +82,41 @@
    "fieldname": "printer_mapped",
    "fieldtype": "Check",
    "label": "Printer Mapped"
+  },
+  {
+   "fieldname": "gstin",
+   "fieldtype": "Data",
+   "label": "GSTIN"
+  },
+  {
+   "fieldname": "fssai",
+   "fieldtype": "Data",
+   "label": "FSSAI"
+  },
+  {
+   "fieldname": "tin_no",
+   "fieldtype": "Data",
+   "label": "TIN NO"
+  },
+  {
+   "fieldname": "cin_no",
+   "fieldtype": "Data",
+   "label": "CIN NO"
+  },
+  {
+   "fieldname": "service_tax_no",
+   "fieldtype": "Data",
+   "label": "SERVICE TAX NO"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-29 13:01:03.883831",
+ "modified": "2021-08-11 15:27:55.225753",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",

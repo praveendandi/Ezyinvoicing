@@ -27,7 +27,6 @@ def pos_printer_settings(data):
 		else:
 			doc = frappe.db.get_list("Outlets",filters = {'outlet_name': ['like', '%'+data["value"]+'%']})
 			outlet_values = [j for each in doc for j in each.values()]
-			print(outlet_values)
 			if len(doc)>0:
 				setting_doc = frappe.db.get_list("POS Print Settings",filters={"outlet":["in",outlet_values]},fields=["name","outlet","printer"],start=data['start'],page_length=data['end'])
 				for each in setting_doc:
