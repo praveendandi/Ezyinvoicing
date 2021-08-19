@@ -26,7 +26,7 @@ def holidayinManualupload(data):
         start_time = datetime.datetime.now()
         folder_path = frappe.utils.get_bench_path()
         items_data_file = data['invoice_file']
-
+        folioid=""
         company = data['company']
         companyData = frappe.get_doc('company',data['company'])
         site_folder_path = companyData.site_name
@@ -63,6 +63,9 @@ def holidayinManualupload(data):
                 data1["invoiceamount"]=float(data1["invoiceamount"])
                 data1["sgstamount"]=float(data1["sgstamount"])
                 data1["ngstamount"]=float(data1["ngstamount"])
+                if "folioid" in data1:
+                    # global folioid
+                    folioid=data1["folioid"]
                 output.append(ast.literal_eval(json.dumps(data1)))
 
 
@@ -300,7 +303,7 @@ def holidayinManualupload(data):
                         #         break
                         # if each["sac_code"] == "Found":
                         if reupload==False:
-                            insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
+                            insertInvoiceApiResponse = insert_invoice({"folioid":folioid,"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:
                                 
                                 B2B = "B2B"
@@ -322,7 +325,7 @@ def holidayinManualupload(data):
                                 output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                         else:
-                            insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
+                            insertInvoiceApiResponse = Reinitiate_invoice({"folioid":folioid,"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:
                                 
                                 B2B = "B2B"
@@ -387,7 +390,7 @@ def holidayinManualupload(data):
                 # calulateItemsApiResponse = calulate_items(each)
                 # if each["sac_code"] == "Found":
                 if reupload==False:
-                    insertInvoiceApiResponse = insert_invoice({"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
+                    insertInvoiceApiResponse = insert_invoice({"folioid":folioid,"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                     if insertInvoiceApiResponse['success']== True:
                         B2B=np.nan
                         B2C = "B2C"	 
@@ -407,7 +410,7 @@ def holidayinManualupload(data):
                         output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                         # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                 else:
-                    insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
+                    insertInvoiceApiResponse = Reinitiate_invoice({"folioid":folioid,"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                     if insertInvoiceApiResponse['success']== True:
                         B2B=np.nan
                         B2C = "B2C"	 

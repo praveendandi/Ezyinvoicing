@@ -12,6 +12,7 @@
   "guest_name",
   "gst_number",
   "invoice_file",
+  "folioid",
   "column_break_5",
   "room_number",
   "invoice_type",
@@ -903,12 +904,17 @@
    "fieldtype": "Select",
    "label": "SupTyp",
    "options": "B2B\nSEZWP\nSEZWOP"
+  },
+  {
+   "fieldname": "folioid",
+   "fieldtype": "Data",
+   "label": "Folioid"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-07-12 15:46:34.792715",
+ "modified": "2021-08-19 12:21:42.349094",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
