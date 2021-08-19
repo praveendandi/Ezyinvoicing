@@ -1231,7 +1231,7 @@ def insert_invoice(data):
             "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
             "converted_tax_to_credit": data["converted_tax_to_credit"] if "converted_tax_to_credit" in data else "No",
             "debit_invoice":debit_invoice,
-            "folioid":data["folioid"],
+            "folioid":data["folioid"] if "folioid" in data else "",
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else ""
         })
         if data['amened'] == 'Yes':
@@ -3448,7 +3448,7 @@ def Error_Insert_invoice(data):
                 "place_of_supply":company.state_code,
                 "sez":sez,
                 "invoice_from":invoice_from,
-                "folioid":data["folioid"],
+                "folioid":data["folioid"] if "folioid" in data else "",
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
