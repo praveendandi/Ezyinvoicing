@@ -11,13 +11,13 @@ class TabletConfig(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
-def removeWorkstation(name=None):
-    # delete tablet config
-    # print(name, "name")
-    frappe.delete_doc('Tablet Config', name)
-    frappe.db.commit()
-    return True
+# @frappe.whitelist(allow_guest=True)
+# def removeWorkstation(name=None):
+#     # delete tablet config
+#     # print(name, "name")
+#     frappe.delete_doc('Tablet Config', name)
+#     frappe.db.commit()
+#     return True
 
 
 # @frappe.whitelist(allow_guest=True)
@@ -95,22 +95,21 @@ def removeWorkstation(name=None):
 def pushToTab(name=None, doc_name=None,doc_type=None):
     tablet_config_exist = frappe.db.exists('Tablet Config', name)
     # print(tablet_config_exist, "test")
-    print(doc_name,doc_type, "test")
     if tablet_config_exist is not None:
         tablet_config = frappe.get_doc('Tablet Config', name)
-        # print(tablet_config.__dict__, confirmation_no)
         doc_exist = frappe.db.exists(
             doc_type, doc_name)
         if doc_exist is not None:
             doc_data = frappe.get_doc(
                 doc_type, doc_name)
-            # print(information_folio.__dict__)
             data = {
                 'tablet_config': tablet_config.__dict__,
-                'doc_data': doc_data.__dict__
+                'doc_data': doc_data.__dict__,
+                'uuid':tablet_config.tablet
             }
             frappe.publish_realtime(
                 "custom_socket", {'message': 'Push To Tab', 'data': data})
+            return {"success":True, "data":data}
         else:
             return {'success': False, 'message': "No Doc Found"}
     else:
@@ -130,3 +129,5 @@ def removeAllDevices():
     frappe.db.commit()
     print("**********************************")
     return True
+
+

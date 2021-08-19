@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "field:socket_id",
+ "autoname": "field:work_station",
  "creation": "2021-04-02 14:51:46.789193",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -11,13 +11,15 @@
   "connected_on",
   "socket_id",
   "status",
-  "username"
+  "username",
+  "mode"
  ],
  "fields": [
   {
    "fieldname": "work_station",
    "fieldtype": "Data",
-   "label": "Work Station"
+   "label": "Work Station",
+   "unique": 1
   },
   {
    "fieldname": "ip_address",
@@ -36,6 +38,7 @@
    "unique": 1
   },
   {
+   "default": "In Active",
    "fieldname": "status",
    "fieldtype": "Data",
    "label": "Status"
@@ -45,11 +48,17 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "UserName"
+  },
+  {
+   "default": "Not Connected",
+   "fieldname": "mode",
+   "fieldtype": "Data",
+   "label": "Mode"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-25 11:04:35.950672",
+ "modified": "2021-07-06 14:16:58.574869",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Active Work Stations",
@@ -76,6 +85,18 @@
    "read": 1,
    "report": 1,
    "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
    "share": 1,
    "write": 1
   }

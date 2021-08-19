@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
-from termcolor import colored
 import traceback, sys
 import requests, json, datetime
 import os,re

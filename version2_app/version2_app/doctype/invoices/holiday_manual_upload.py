@@ -3,9 +3,10 @@ import frappe
 from frappe.model.document import Document
 from datetime import date
 import requests
-import datetime
+import datetime,ast
 import random, re
 import traceback,os,sys
+import xmltodict
 import string
 from frappe.utils import get_site_name
 import pandas as pd
@@ -32,25 +33,39 @@ def holidayinManualupload(data):
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
         if ".csv" in items_file_path:
             try:
-                items_dataframe = pd.read_csv(items_file_path)
+                items_dataframe = pd.read_csv(items_file_path,error_bad_lines=False,delimiter='|')
             except UnicodeDecodeError:
-                items_dataframe = pd.read_csv(items_file_path,encoding ='latin1')
+                items_dataframe = pd.read_csv(items_file_path,encoding ='latin1',error_bad_lines=False,delimiter='|')
+        elif ".xml" in items_file_path:
+            with open(items_file_path) as xml_file:
+                items_dataframe = xmltodict.parse(xml_file.read())
         else:
-            items_dataframe = pd.read_excel(items_file_path)
+            items_dataframe = pd.read_excel(items_file_path,error_bad_lines=False,delimiter='|')
 
         # items_dataframe = pd.read_excel(items_file_path)
-        items_dataframe = items_dataframe.fillna('empty')
-        items_dataframe = items_dataframe.sort_values("taxinvnum")
-        invoice_columns = list(items_dataframe.columns.values)
-        invoice_num = list(set(items_dataframe['taxinvnum']))
-        company_check_columns = companyData.bulk_import_invoice_headers
-        company_check_columns = company_check_columns.split(",")
-        if company_check_columns != invoice_columns:
-            frappe.db.delete('File', {'file_url': data['invoice_file']})
-            frappe.db.commit()
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
-            return {"success":False,"message":"Invoice data File mismatch"}
-        output = items_dataframe.to_dict('records')
+        if ".xml" not in items_file_path:
+            items_dataframe = items_dataframe.fillna('empty')
+            items_dataframe = items_dataframe.sort_values("taxinvnum")
+            invoice_columns = list(items_dataframe.columns.values)
+            invoice_num = list(set(items_dataframe['taxinvnum']))
+            company_check_columns = companyData.bulk_import_invoice_headers
+            company_check_columns = company_check_columns.split(",")
+            if company_check_columns != invoice_columns:
+                frappe.db.delete('File', {'file_url': data['invoice_file']})
+                frappe.db.commit()
+                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
+                return {"success":False,"message":"Invoice data File mismatch"}
+            output = items_dataframe.to_dict('records')
+        else:
+            output=[]
+            for item in items_dataframe["data"]["records"]["row"]:
+                data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
+                data1["invoiceamount"]=float(data1["invoiceamount"])
+                data1["sgstamount"]=float(data1["sgstamount"])
+                data1["ngstamount"]=float(data1["ngstamount"])
+                output.append(ast.literal_eval(json.dumps(data1)))
+
+
         list_data={}
         item_taxable = ""
         line_item_type = ""

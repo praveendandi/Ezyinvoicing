@@ -92,13 +92,6 @@
   "custom_e_tax_invoice_logo_image",
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
-  "configiration_section",
-  "config",
-  "cform_user_name",
-  "cform_password",
-  "signezy",
-  "ezybills",
-  "scaneasy",
   "licensing_host",
   "skip_ssl_verify",
   "b2b_to_credit",
@@ -133,6 +126,8 @@
   "block_print",
   "block_irn_information",
   "payment_reconciliation",
+  "disable_sac_edit",
+  "sign_ezy_module",
   "enable_pos_extra_text"
  ],
  "fields": [
@@ -482,7 +477,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt"
+   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai"
   },
   {
    "default": "0",
@@ -617,60 +612,6 @@
    "fieldname": "skip_ssl_verify",
    "fieldtype": "Check",
    "label": "Skip SSL Verify"
-  },
-  {
-   "fieldname": "configiration_section",
-   "fieldtype": "Section Break",
-   "label": "Configiration"
-  },
-  {
-   "fieldname": "config",
-   "fieldtype": "Table",
-   "label": "config",
-   "options": "CONFIGURATIONS"
-  },
-  {
-   "fieldname": "cform_user_name",
-   "fieldtype": "Data",
-   "label": "Cform user name"
-  },
-  {
-   "fieldname": "cform_password",
-   "fieldtype": "Password",
-   "label": "Cform password"
-  },
-  {
-   "fieldname": "city",
-   "fieldtype": "Data",
-   "label": "City"
-  },
-  {
-   "fieldname": "district",
-   "fieldtype": "Data",
-   "label": "District"
-  },
-  {
-   "fieldname": "state",
-   "fieldtype": "Data",
-   "label": "State"
-  },
-  {
-   "default": "0",
-   "fieldname": "signezy",
-   "fieldtype": "Check",
-   "label": "Signezy"
-  },
-  {
-   "default": "0",
-   "fieldname": "ezybills",
-   "fieldtype": "Check",
-   "label": "Ezybills"
-  },
-  {
-   "default": "0",
-   "fieldname": "scaneasy",
-   "fieldtype": "Check",
-   "label": "Scaneasy"
   },
   {
    "fieldname": "ipp_printer_file_path",
@@ -855,11 +796,24 @@
    "fieldname": "place_of_supply",
    "fieldtype": "Data",
    "label": "Place of supply"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_sac_edit",
+   "fieldtype": "Check",
+   "label": "Disable SAC Edit"
+  },
+  {
+   "default": "0",
+   "fieldname": "sign_ezy_module",
+   "fieldtype": "Check",
+   "label": "Sign Ezy Module"
+   
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-19 10:35:56.443251",
+ "modified": "2021-08-16 12:12:48.425284",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

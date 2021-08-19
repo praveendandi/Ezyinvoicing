@@ -253,12 +253,10 @@ def information_folio_created(doc, method=None):
 def tablet_mapping(doc, method=None):
     try:
         print(doc.name, "hello hiee","$$$$$$$$$$$$$$$$")
-        # if
         workstation = frappe.get_doc("Active Work Stations",doc.work_station)
         workstation.username = doc.username
         workstation.save(ignore_permissions=True,ignore_version=True)
-        frappe.publish_realtime(
-            "custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
+        frappe.publish_realtime("custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
     except Exception as e:
         print(e)
@@ -320,11 +318,17 @@ def workstation_disconnected(doc, method=None):
 
 def update_tablet_status(doc, method=None):
     try:
-        print(doc.name, "hello hiee","=====================")
-        table_config = frappe.db.get_value("Tablet Config",{"tablet":doc.name},["work_station","username"])
+        table_config = frappe.db.get_value("Tablet Config",{"tablet":doc.name},["work_station","username","tablet"])
+        tablet = frappe.get_doc("Active Tablets",table_config[2])
+        table_config_doc = frappe.get_doc("Tablet Config",table_config.name)
+        table_config_doc.tablet_socket_id = tablet.socket_id
+        table_config_doc.save(ignore_permissions=True,ignore_version=True)
         workstation = frappe.get_doc("Active Work Stations",table_config[0])
         workstation.username = table_config[1]
         workstation.save(ignore_permissions=True,ignore_version=True)
+        data = doc.__dict__
+        data["workstation"] = workstation.work_station
+        data["workstation_status"] = workstation.status
         frappe.publish_realtime(
             "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
     except Exception as e:
@@ -566,6 +570,8 @@ def deletePromotionsSocket(doc,method=None):
             "custom_socket", {'message': 'Promotions Deleted', 'data': doc.__dict__})
     except Exception as e:
         print(str(e))
+
+
 
 
 @frappe.whitelist(allow_guest=True)

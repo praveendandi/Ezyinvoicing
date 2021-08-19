@@ -24,6 +24,7 @@ from version2_app.version2_app.doctype.invoices.holiday_manual_upload import hol
 from version2_app.version2_app.doctype.invoices.opera_manula_bulkupload import operabulkupload
 from version2_app.version2_app.doctype.invoices.hyatt_manual_upload import hyattbulkupload
 from frappe.utils.background_jobs import enqueue
+from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
 
 
 
@@ -89,7 +90,12 @@ def manual_upload_data(data):
             output = hyattbulkupload(data)
             if output['success'] ==False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
-            return output	
+            return output
+        if companyData.bulk_excel_upload_type == "Hyatt Mumbai":
+            output = hyatt_mumbai(data)
+            if output['success'] == False:
+                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+            return output
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
         print("-----------------------------------------------")

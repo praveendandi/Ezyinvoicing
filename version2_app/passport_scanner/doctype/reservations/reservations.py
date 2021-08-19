@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-# Copyright (c) 2021, caratred and contributors
-# For license information, please see license.txt
+# # -*- coding: utf-8 -*-
+# # Copyright (c) 2021, caratred and contributors
+# # For license information, please see license.txt
 
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 # import base64, time
 # import cv2
 # import datetime
@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 # from collections import defaultdict, OrderedDict
 # from difflib import get_close_matches
 # from datetime import date
-from frappe.model.document import Document
+# from frappe.model.document import Document
 # # from pyzbar.pyzbar import decode, ZBarSymbol
 # from os.path import expanduser
 # from frappe.utils import logger
@@ -35,8 +35,8 @@ from frappe.model.document import Document
 # abs_path = os.path.dirname(os.getcwd())
 # basedir = abs_path+"/sites/"
 
-class Reservations(Document):
-    pass
+# class Reservations(Document):
+#     pass
 
 
 # @frappe.whitelist(allow_guest=True)
