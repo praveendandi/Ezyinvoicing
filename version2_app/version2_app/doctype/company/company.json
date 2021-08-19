@@ -24,6 +24,7 @@
   "city",
   "district",
   "state",
+  "place_of_supply",
   "state_code",
   "calculation_by",
   "merchant_name",
@@ -849,11 +850,16 @@
    "fieldname": "enable_pos_extra_text",
    "fieldtype": "Check",
    "label": "Enable POS Extra Text"
+  },
+  {
+   "fieldname": "place_of_supply",
+   "fieldtype": "Data",
+   "label": "Place of supply"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-11 15:39:14.571458",
+ "modified": "2021-08-19 10:35:56.443251",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
