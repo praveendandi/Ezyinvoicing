@@ -21,7 +21,7 @@ def TotalMismatchError(data,calculated_data):
 			invoice_from = "Pms"	
 		invType = data['guest_data']['invoice_type']
 		irn_generated = "Error"  
-		if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
+		if data['guest_data']['room_number'] == 0 and '-' not in str(calculated_data['sales_amount_after_tax']):
 			# data['guest_data']['invoice_category'] = "Debit Invoice"
 			debit_invoice = "Yes"
 		else:
