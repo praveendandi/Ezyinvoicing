@@ -21,6 +21,7 @@
   "address_details_section",
   "address_1",
   "address_2",
+  "place_of_supply",
   "state_code",
   "calculation_by",
   "merchant_name",
@@ -124,7 +125,8 @@
   "payment_reconciliation",
   "disable_sac_edit",
   "sign_ezy_module",
-  "enable_pos_extra_text"
+  "enable_pos_extra_text",
+  "create_taxinvoice_raisecredit"
  ],
  "fields": [
   {
@@ -789,6 +791,11 @@
    "label": "Enable POS Extra Text"
   },
   {
+   "fieldname": "place_of_supply",
+   "fieldtype": "Data",
+   "label": "Place of supply"
+  },
+  {
    "default": "0",
    "fieldname": "disable_sac_edit",
    "fieldtype": "Check",
@@ -799,12 +806,18 @@
    "fieldname": "sign_ezy_module",
    "fieldtype": "Check",
    "label": "Sign Ezy Module"
-   
+  },
+  {
+   "default": "No",
+   "fieldname": "create_taxinvoice_raisecredit",
+   "fieldtype": "Select",
+   "label": "Create taxinvoice Raisecredit",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-16 12:12:48.425284",
+ "modified": "2021-08-20 13:19:12.958230",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

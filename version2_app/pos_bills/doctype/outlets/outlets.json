@@ -21,7 +21,8 @@
   "tin_no",
   "cin_no",
   "service_tax_no",
-  "website"
+  "website",
+  "print_count"
  ],
  "fields": [
   {
@@ -112,11 +113,17 @@
    "fieldname": "website",
    "fieldtype": "Data",
    "label": "Website"
+  },
+  {
+   "default": "1",
+   "fieldname": "print_count",
+   "fieldtype": "Int",
+   "label": "Print Count"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-11 15:27:55.225753",
+ "modified": "2021-08-20 11:09:28.400121",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",
