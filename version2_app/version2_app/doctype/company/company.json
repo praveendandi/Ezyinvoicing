@@ -126,7 +126,8 @@
   "disable_sac_edit",
   "sign_ezy_module",
   "enable_pos_extra_text",
-  "create_taxinvoice_raisecredit"
+  "create_taxinvoice_raisecredit",
+  "qr_page"
  ],
  "fields": [
   {
@@ -813,11 +814,18 @@
    "fieldtype": "Select",
    "label": "Create taxinvoice Raisecredit",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "First",
+   "fieldname": "qr_page",
+   "fieldtype": "Select",
+   "label": "QR Page",
+   "options": "First\nLast"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-20 13:19:12.958230",
+ "modified": "2021-08-20 15:15:25.157186",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
