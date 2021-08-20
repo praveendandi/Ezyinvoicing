@@ -40,6 +40,7 @@ def create_pos_bills(data):
 			qrpath = path+outlet_doc.static_payment_qr_code
 			added_text = ""
 			invoice_number = ""
+			added_text1 = ""
 			if company_doc.enable_pos_extra_text == 1:
 				text = add_extra_text_while_print(data["check_no"],data["outlet"],company_doc)
 				if text["success"] == False:
@@ -51,17 +52,40 @@ def create_pos_bills(data):
 				if outlet_doc.payment_mode == "Dynamic":
 					short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
 					if short_url["success"]:
-						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,short_url['short_url'])
+						for count in range(0,outlet_doc.print_count):
+							print(count,"================================")
+							if outlet_doc.print_count > 1:
+								if count == 0:
+									added_text1 = "Guest Copy\n\n".encode("utf-8")
+								elif count == 1:
+									added_text1 = "Merchant Copy\n".encode("utf-8")
+								added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+							give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,short_url['short_url'])
 						data["printed"] = 1
 				else:
-					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number)
+					for count in range(0,outlet_doc.print_count):
+						if outlet_doc.print_count > 1:
+							if count == 0:
+								added_text1 = "Guest Copy\n\n".encode("utf-8")
+							elif count == 1:
+								added_text1 = "Merchant Copy\n".encode("utf-8")
+						
+							added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+						give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number)
 					data["printed"] = 1
 			if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
 				pos_bills = send_pos_bills_gcb(company_doc,data)
 				if pos_bills["success"] == False:
 					return pos_bills["message"]
 				qrurl = company_doc.b2c_qr_url + pos_bills['data']
-				give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
+				for count in range(0,outlet_doc.print_count):
+					if outlet_doc.print_count > 1:
+						if count == 0:
+							added_text1 = "Guest Copy\n\n".encode("utf-8")
+						elif count == 1:
+							added_text1 = "Merchant Copy\n".encode("utf-8")
+						added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+					give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
 				data["gcp_file_url"] = pos_bills['data']
 				data["printed"] = 1
 			doc = frappe.get_doc(data)
