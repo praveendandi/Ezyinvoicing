@@ -130,7 +130,7 @@ def holidayinManualupload(data):
                     list_data['invoice_category'] = "Tax Invoice"
                     list_data['invoice_number'] = each['taxinvnum']
                     list_data['invoice_date'] = each['invoicedate']
-                    list_data['room_number'] = 1
+                    list_data['room_number'] = 0
                     list_data['guest_name'] = each['guestname']
                     # amount = #+each['sgstamount']+each['sgstamount']+each['ngstamount']
                     list_data['total_invoice_amount'] = totalitemAmount
@@ -164,7 +164,7 @@ def holidayinManualupload(data):
                         list_data['invoice_category'] = "Tax Invoice"
                         list_data['invoice_number'] = each['taxinvnum']
                         list_data['invoice_date'] = each['invoicedate']
-                        list_data['room_number'] = 1
+                        list_data['room_number'] = 0
                         list_data['guest_name'] = each['guestname']
                         # amount = each['invoiceamount']#+each['sgstamount']+each['sgstamount']+each['ngstamount']
                         list_data['total_invoice_amount'] = totalitemAmount
@@ -248,7 +248,7 @@ def holidayinManualupload(data):
                 else:
                     each['invoice_type'] = "B2C"
                     each['gstNumber']=""
-            each['confirmation_number'] = each['invoice_number']
+            each['confirmation_number'] = ""
             each['print_by'] = "System"
             each['start_time'] = str(datetime.datetime.utcnow())
             each['name'] = each['guest_name']
