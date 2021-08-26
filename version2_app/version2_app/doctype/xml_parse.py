@@ -40,10 +40,11 @@ def extract_xml(file_list):
             for each in data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
                 each['BILL_NO'] = each["BILL_NO"].strip()
                 if company_doc.name=="RBBORRM-01":
-                    each['BILL_NO'] = each["BILL_NO"].lstrip('2018')
+                    check_val=each["BILL_NO"].startswith("2018")
+                    if check_val is True:
+                        each['BILL_NO']=each["BILL_NO"][4::]
                 if company_doc.change_invoice_reconciliation_invoice_number == 1:
                     each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
-                print(each['BILL_NO'])
                 if "-" in each["BILL_GENERATION_DATE"]:
                     convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
                 elif "." in each["BILL_GENERATION_DATE"]:
@@ -62,7 +63,7 @@ def extract_xml(file_list):
                         if frappe.db.exists('Invoices',each["BILL_NO"]):
                             bill_doc.invoice_found="Yes"
                             bill_doc.save()
-                else:    
+                else:  
                     doc=frappe.get_doc({"doctype":"Invoice Reconciliations","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"]})   
                     doc.insert(ignore_permissions=True)
                     frappe.db.commit()
