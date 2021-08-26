@@ -21,7 +21,7 @@ def pos_printer_settings(data):
 				for each in doc:
 					outlet_doc = frappe.get_doc("Outlets",each["outlet"])
 					printer_doc = frappe.get_doc("POS Printers", each["printer"])
-					total_data.append({"name":each["name"],"outlet":outlet_doc.outlet_name,"printer":printer_doc.printer_ip})
+					total_data.append({"name":each["name"],"outlet":outlet_doc.outlet_name,"printer":printer_doc.printer_ip,"printer_name":printer_doc.printer_name})
 			else:
 				return {"success":False,"message":"No data found"}
 		else:
@@ -32,7 +32,7 @@ def pos_printer_settings(data):
 				for each in setting_doc:
 					outlet_doc = frappe.get_doc("Outlets",each["outlet"])
 					printer_doc = frappe.get_doc("POS Printers", each["printer"])
-					total_data.append({"name":each["name"],"outlet":outlet_doc.outlet_name,"printer":printer_doc.printer_ip})
+					total_data.append({"name":each["name"],"outlet":outlet_doc.outlet_name,"printer":printer_doc.printer_ip,"printer_name":printer_doc.printer_name})
 			else:
 				return {"success":False,"message":"No data found"}
 		

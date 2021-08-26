@@ -243,8 +243,8 @@ def print_pos_bill(data):
 		qr_path = path+outlet_values[0]["static_payment_qr_code"]
 		b = (check_doc.payload).encode('utf-8')
 		# b = (company_name+address+mobile+gst_details+check_doc.payload+"\n").encode('utf-8')
-		# kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
-		kitchen = Network(printer_doc.printer_ip)
+		kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
+		# kitchen = Network(printer_doc.printer_ip)
 		kitchen.set("CENTER", "A", "B")
 		kitchen.image(img_source=logopath)
 		kitchen.hw('INIT')
