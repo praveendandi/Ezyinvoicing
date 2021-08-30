@@ -25,7 +25,7 @@ def hyatt_mumbai(data):
         gst_data={}
         gst_df=pd.read_excel(folder_path+'/sites/'+site_folder_path+invoice_data["gst_file"])
         # data_to_dict=gst_df
-        gst_df=gst_df.iloc[0:8]
+        # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
             gst_data[str(item["BILL_GENERATION_DATE"])]=item["TRX_CODE"]
@@ -103,11 +103,15 @@ def hyatt_mumbai(data):
             refobj['items'] = items_pdf
             invoice_referrence_objects[each['BILL_NO']] = refobj
             input_data.append(data)
+        # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})
         countIn = 1
         for each_item in input_data:
+            print(each_item,"++++++++++++++++++++++")
+            if "invoice_number" in each:
+                each["gstNumber"]=gst_data[each["invoice_number"]]
             if each_item['invoice_category'] == "CREDIT TAX INVOICE":
                 each_item['invoice_category'] = "Credit Invoice"
             elif each_item['invoice_category'] == "CREDIT INVOICE":
