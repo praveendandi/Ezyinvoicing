@@ -471,7 +471,9 @@ def testsample(file_path,company):
     
     companyData = frappe.get_doc('company',company)
     site_folder_path = companyData.site_name
-    with open(file_path) as xml_file:
+    folder_path = frappe.utils.get_bench_path()
+    items_file_path = folder_path+'/sites/'+site_folder_path+file_path
+    with open(items_file_path) as xml_file:
         items_dataframe = xmltodict.parse(xml_file.read())
     output=[]
     for item in items_dataframe["data"]["records"]["row"]:
