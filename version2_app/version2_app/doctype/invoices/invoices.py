@@ -1337,7 +1337,6 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
                     "type":sacType
                 }
                 for item in items:
-                    # print(item)
                     if item['sac_code'] == sac:
                         sac_tax['cgst'] += round(item['cgst_amount'],2)
                         sac_tax['sgst'] += round(item['sgst_amount'],2)

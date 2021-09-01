@@ -15,7 +15,7 @@ import numpy as np
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
-from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
+from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice,b2b_success_to_credit_note
 
 pd.set_option("display.max_rows", None, "display.max_columns", None)
 
@@ -467,8 +467,7 @@ def holidayinManualupload(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def testsample(file_path,company):
-    
+def testsample(file_path,company): 
     companyData = frappe.get_doc('company',company)
     site_folder_path = companyData.site_name
     folder_path = frappe.utils.get_bench_path()
@@ -498,8 +497,7 @@ def testsample(file_path,company):
             else:
                 if invoice_doc.invoice_type == "B2B":
                     error_invoice_numbers.append({"invoice_number":key,"GST Number":invoice_doc.gst_number,"Legal Name":invoice_doc.legal_name,"Guest Name":invoice_doc.guest_name,"item_count_in_xml":value,"item_count_in_ezy":items_count})
-    if error_invoice_numbers != {}:
-        print(error_invoice_numbers)
+    if len(error_invoice_numbers) > 0:
         ts = time.time()
         folder_path = frappe.utils.get_bench_path()
         items_file_path = home+'/'+str(ts).replace('.',"")+".xlsx"
@@ -516,5 +514,45 @@ def testsample(file_path,company):
             data=payload_new).json()
         url = upload_report['message']['file_url']
         return url
+    else:
+        return {"success": True,"message": "No data found"}
+
+
+@frappe.whitelist(allow_guest=True)
+def holidayinnerrorbulkreprocess(file_path,company):
+    try:
+        companyData = frappe.get_doc('company',company)
+        site_folder_path = companyData.site_name
+        folder_path = frappe.utils.get_bench_path()
+        items_file_path = folder_path+'/sites/'+site_folder_path+file_path
+        with open(items_file_path) as xml_file:
+            items_dataframe = xmltodict.parse(xml_file.read())
+        output=[]
+        for item in items_dataframe["data"]["records"]["row"]:
+            data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
+            data1["invoiceamount"]=float(data1["invoiceamount"])
+            data1["sgstamount"]=float(data1["sgstamount"])
+            data1["ngstamount"]=float(data1["ngstamount"])
+            if "folioid" in data1:
+                # global folioid
+                folioid=data1["folioid"]
+            output.append(ast.literal_eval(json.dumps(data1)))
+        df = pd.DataFrame(output)
+        group = df.groupby(['taxinvnum'])['taxinvnum'].count()
+        find = group.to_dict()
+        error_invoice_numbers = []
+        for key,value in find.items():
+            if frappe.db.exists("Invoices",key):
+                invoice_doc = frappe.get_doc("Invoices",key)
+                items_count = frappe.db.count('Items', {'parent': key})
+                if items_count == value:
+                    pass
+                else:
+                    if invoice_doc.invoice_type == "B2B":
+                        error_invoice_numbers.append(key)
+
+                        b2b_success_to_credit_note({"invoice_number":key,"taxinvoice":"No","invoice_date":invoice_doc.invoice_date})
+    except Exception as e:
+        print(str(e))
 
     
