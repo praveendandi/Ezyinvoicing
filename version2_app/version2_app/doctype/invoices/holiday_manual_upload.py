@@ -59,7 +59,7 @@ def holidayinManualupload(data):
                 frappe.db.commit()
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
                 return {"success":False,"message":"Invoice data File mismatch"}
-            output = items_dataframe.to_dict('records')
+            newoutput = items_dataframe.to_dict('records')
         else:
             output=[]
             for item in items_dataframe["data"]["records"]["row"]:
@@ -67,19 +67,20 @@ def holidayinManualupload(data):
                 data1["invoiceamount"]=float(data1["invoiceamount"])
                 data1["sgstamount"]=float(data1["sgstamount"])
                 data1["ngstamount"]=float(data1["ngstamount"])
-                print(data1,"===============================================")
                 if "folioid" in data1:
                     # global folioid
                     folioid=data1["folioid"]
                 output.append(ast.literal_eval(json.dumps(data1)))
-
+            df = pd.DataFrame(output)
+            dfoutput = df.sort_values(by='taxinvnum')
+            newoutput = dfoutput.T.to_dict().values()
 
         list_data={}
         item_taxable = ""
         line_item_type = ""
         input_data = []
         invoice_referrence_objects = {}
-        for each in output:
+        for each in newoutput:
             total_invoice_amount = each['invoiceamount']
             totalitemAmount = each['invoiceamount']
             each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
