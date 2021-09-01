@@ -7,6 +7,7 @@ import datetime,ast
 import random, re
 import traceback,os,sys
 import xmltodict
+import time
 import string
 from frappe.utils import get_site_name
 import pandas as pd
@@ -17,6 +18,9 @@ from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats imp
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 
 pd.set_option("display.max_rows", None, "display.max_columns", None)
+
+from os.path import expanduser
+home = expanduser("~")
 
 @frappe.whitelist(allow_guest=True)
 def holidayinManualupload(data):
@@ -159,8 +163,7 @@ def holidayinManualupload(data):
                         items = {'date':item_date,'item_value':each['invoiceamount'],'item_name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc']),"doctype":"Items","item_type":"SAC" if len(each['taxcode_dsc']) == 6 else "HSN","cgst": gst_percentage if each['sgstamount'] else 0,"sgst": gst_percentage if each['sgstamount'] else 0,
                         "igst": gst_percentage if each['ngstamount'] else 0,"item_taxable_value":csi,"gst_rate":gst_percentage*2,"item_value_after_gst":total_invoice_amount,"cess":0,"cess_amount":0,"state_cess":0,"state_cess_amount":0,"cgst_amount":each['sgstamount'],"sgst_amount":each['sgstamount'],"igst_amount":each["ngstamount"],"parent":each["taxinvnum"],
                         "parentfield":"items","parenttype":"invoices","sac_code_found":"Yes","other_charges":0,"vat_amount":0,"vat":0.0,"unit_of_measurement":"OTH","quantity":1,"unit_of_measurement_description":"OTHERS",
-                        "is_service_charge_item":"No","sac_index":"1","line_edit_net":"No","item_reference":"","other_charges":0,"taxable":item_taxable,"item_mode":"Debit" if "-" not in str(each['invoiceamount']) else "Credit","item_type":"SAC" if len(str(each['taxcode_dsc'])) == 6 else "HSN","description":each['goods_desc'],"type":line_item_type
-                    }
+                        "is_service_charge_item":"No","sac_index":"1","line_edit_net":"No","item_reference":"","other_charges":0,"taxable":item_taxable,"item_mode":"Debit" if "-" not in str(each['invoiceamount']) else "Credit","item_type":"SAC" if len(str(each['taxcode_dsc'])) == 6 else "HSN","description":each['goods_desc'],"type":line_item_type}
                         list_data['items'].extend([items])
                     else:
                         input_data.append(list_data)
@@ -178,8 +181,7 @@ def holidayinManualupload(data):
                         item_list = {'date':item_date,'item_value':each['invoiceamount'],'item_name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc']),"doctype":"Items","item_type":"SAC" if len(each['taxcode_dsc']) == 6 else "HSN","cgst": gst_percentage if each['sgstamount'] else 0,"sgst": gst_percentage if each['sgstamount'] else 0,
                         "igst": gst_percentage if each['ngstamount'] else 0,"item_taxable_value":csi,"gst_rate":gst_percentage*2,"item_value_after_gst":total_invoice_amount,"cess":0,"cess_amount":0,"state_cess":0,"state_cess_amount":0,"cgst_amount":each['sgstamount'],"sgst_amount":each['sgstamount'],"igst_amount":each["ngstamount"],"parent":each["taxinvnum"],
                         "parentfield":"items","parenttype":"invoices","sac_code_found":"Yes","other_charges":0,"vat_amount":0,"vat":0.0,"unit_of_measurement":"OTH","quantity":1,"unit_of_measurement_description":"OTHERS",
-                        "is_service_charge_item":"No","sac_index":"1","line_edit_net":"No","item_reference":"","other_charges":0,"taxable":item_taxable,"item_mode":"Debit" if "-" not in str(each['invoiceamount']) else "Credit","item_type":"SAC" if len(str(each['taxcode_dsc'])) == 6 else "HSN","description":each['goods_desc'],"type":line_item_type
-                    }
+                        "is_service_charge_item":"No","sac_index":"1","line_edit_net":"No","item_reference":"","other_charges":0,"taxable":item_taxable,"item_mode":"Debit" if "-" not in str(each['invoiceamount']) else "Credit","item_type":"SAC" if len(str(each['taxcode_dsc'])) == 6 else "HSN","description":each['goods_desc'],"type":line_item_type}
                         items = []
                         items.append(item_list)
                         list_data['items'] = items
@@ -463,3 +465,57 @@ def holidayinManualupload(data):
         frappe.log_error("Ezy-invoicing holidayinManualupload Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk_upload_data","message":str(e),"company":data['company']})
         return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def testsample(file_path,company):
+    
+    companyData = frappe.get_doc('company',company)
+    site_folder_path = companyData.site_name
+    folder_path = frappe.utils.get_bench_path()
+    items_file_path = folder_path+'/sites/'+site_folder_path+file_path
+    with open(items_file_path) as xml_file:
+        items_dataframe = xmltodict.parse(xml_file.read())
+    output=[]
+    for item in items_dataframe["data"]["records"]["row"]:
+        data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
+        data1["invoiceamount"]=float(data1["invoiceamount"])
+        data1["sgstamount"]=float(data1["sgstamount"])
+        data1["ngstamount"]=float(data1["ngstamount"])
+        if "folioid" in data1:
+            # global folioid
+            folioid=data1["folioid"]
+        output.append(ast.literal_eval(json.dumps(data1)))
+    df = pd.DataFrame(output)
+    group = df.groupby(['taxinvnum'])['taxinvnum'].count()
+    find = group.to_dict()
+    error_invoice_numbers = []
+    for key,value in find.items():
+        if frappe.db.exists("Invoices",key):
+            invoice_doc = frappe.get_doc("Invoices",key)
+            items_count = frappe.db.count('Items', {'parent': key})
+            if items_count == value:
+                print("------------------------------------")
+            else:
+                if invoice_doc.invoice_type == "B2B":
+                    error_invoice_numbers.append({"invoice_number":key,"GST Number":invoice_doc.gst_number,"Legal Name":invoice_doc.legal_name,"Guest Name":invoice_doc.guest_name,"item_count_in_xml":value,"item_count_in_ezy":items_count})
+    if error_invoice_numbers != {}:
+        print(error_invoice_numbers)
+        ts = time.time()
+        folder_path = frappe.utils.get_bench_path()
+        items_file_path = home+'/'+str(ts).replace('.',"")+".xlsx"
+        df2 = pd.DataFrame(error_invoice_numbers)
+        df2.to_excel(items_file_path,index=False)
+        files_new = {"file": open(items_file_path, 'rb')}
+        payload_new = {
+            "is_private": 1,
+            "folder": "Home"
+        }
+        upload_report = requests.post(
+            companyData.host + "api/method/upload_file",
+            files=files_new,
+            data=payload_new).json()
+        url = upload_report['message']['file_url']
+        return url
+
+    
