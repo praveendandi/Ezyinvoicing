@@ -26,55 +26,57 @@ home = expanduser("~")
 def holidayinManualupload(data):
     try:
         # data={"invoice_file":"/private/files/3340 report.xlsx","company":"HIEHH-01"}
-        print("startt--------------------------",data)
-        start_time = datetime.datetime.now()
-        folder_path = frappe.utils.get_bench_path()
-        items_data_file = data['invoice_file']
-        folioid=""
-        company = data['company']
         companyData = frappe.get_doc('company',data['company'])
-        site_folder_path = companyData.site_name
-        items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-        if ".csv" in items_file_path:
-            try:
-                items_dataframe = pd.read_csv(items_file_path,error_bad_lines=False,delimiter='|')
-            except UnicodeDecodeError:
-                items_dataframe = pd.read_csv(items_file_path,encoding ='latin1',error_bad_lines=False,delimiter='|')
-        elif ".xml" in items_file_path:
-            with open(items_file_path) as xml_file:
-                items_dataframe = xmltodict.parse(xml_file.read())
-        else:
-            items_dataframe = pd.read_excel(items_file_path,error_bad_lines=False,delimiter='|')
+        start_time = datetime.datetime.now()
+        company = data['company']
+        if "error_upload" not in data and data["error_upload"] == "No":
+            print("startt--------------------------",data)
+            folder_path = frappe.utils.get_bench_path()
+            items_data_file = data['invoice_file']
+            folioid=""
+            site_folder_path = companyData.site_name
+            items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
+            if ".csv" in items_file_path:
+                try:
+                    items_dataframe = pd.read_csv(items_file_path,error_bad_lines=False,delimiter='|')
+                except UnicodeDecodeError:
+                    items_dataframe = pd.read_csv(items_file_path,encoding ='latin1',error_bad_lines=False,delimiter='|')
+            elif ".xml" in items_file_path:
+                with open(items_file_path) as xml_file:
+                    items_dataframe = xmltodict.parse(xml_file.read())
+            else:
+                items_dataframe = pd.read_excel(items_file_path,error_bad_lines=False,delimiter='|')
 
-        # items_dataframe = pd.read_excel(items_file_path)
-        if ".xml" not in items_file_path:
-            items_dataframe = items_dataframe.fillna('empty')
-            items_dataframe = items_dataframe.sort_values("taxinvnum")
-            invoice_columns = list(items_dataframe.columns.values)
-            invoice_num = list(set(items_dataframe['taxinvnum']))
-            company_check_columns = companyData.bulk_import_invoice_headers
-            company_check_columns = company_check_columns.split(",")
-            if company_check_columns != invoice_columns:
-                frappe.db.delete('File', {'file_url': data['invoice_file']})
-                frappe.db.commit()
-                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
-                return {"success":False,"message":"Invoice data File mismatch"}
-            newoutput = items_dataframe.to_dict('records')
+            # items_dataframe = pd.read_excel(items_file_path)
+            if ".xml" not in items_file_path:
+                items_dataframe = items_dataframe.fillna('empty')
+                items_dataframe = items_dataframe.sort_values("taxinvnum")
+                invoice_columns = list(items_dataframe.columns.values)
+                invoice_num = list(set(items_dataframe['taxinvnum']))
+                company_check_columns = companyData.bulk_import_invoice_headers
+                company_check_columns = company_check_columns.split(",")
+                if company_check_columns != invoice_columns:
+                    frappe.db.delete('File', {'file_url': data['invoice_file']})
+                    frappe.db.commit()
+                    frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
+                    return {"success":False,"message":"Invoice data File mismatch"}
+                newoutput = items_dataframe.to_dict('records')
+            else:
+                output=[]
+                for item in items_dataframe["data"]["records"]["row"]:
+                    data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
+                    data1["invoiceamount"]=float(data1["invoiceamount"])
+                    data1["sgstamount"]=float(data1["sgstamount"])
+                    data1["ngstamount"]=float(data1["ngstamount"])
+                    if "folioid" in data1:
+                        # global folioid
+                        folioid=data1["folioid"]
+                    output.append(ast.literal_eval(json.dumps(data1)))
+                df = pd.DataFrame(output)
+                dfoutput = df.sort_values(by='taxinvnum')
+                newoutput = dfoutput.T.to_dict().values()
         else:
-            output=[]
-            for item in items_dataframe["data"]["records"]["row"]:
-                data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
-                data1["invoiceamount"]=float(data1["invoiceamount"])
-                data1["sgstamount"]=float(data1["sgstamount"])
-                data1["ngstamount"]=float(data1["ngstamount"])
-                if "folioid" in data1:
-                    # global folioid
-                    folioid=data1["folioid"]
-                output.append(ast.literal_eval(json.dumps(data1)))
-            df = pd.DataFrame(output)
-            dfoutput = df.sort_values(by='taxinvnum')
-            newoutput = dfoutput.T.to_dict().values()
-
+            newoutput = data["total_data"]
         list_data={}
         item_taxable = ""
         line_item_type = ""
@@ -451,7 +453,7 @@ def holidayinManualupload(data):
         df = pd.DataFrame(output_date)
         df = df.groupby('date').count().reset_index()
         output_data = df.to_dict('records')
-        InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file']})
+        InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'] if "username" in data else "","start_time":str(start_time),"referrence_file":data['invoice_file']})
         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
         # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
@@ -578,7 +580,47 @@ def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
         xml_file_path = folder_path+'/sites/'+site_folder_path+xml_file
         with open(xml_file_path) as xml_files:
             items_dataframe = xmltodict.parse(xml_files.read())
-        
+        output=[]
+        for item in items_dataframe["data"]["records"]["row"]:
+            data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
+            data1["invoiceamount"]=float(data1["invoiceamount"])
+            data1["sgstamount"]=float(data1["sgstamount"])
+            data1["ngstamount"]=float(data1["ngstamount"])
+            if "folioid" in data1:
+                # global folioid
+                folioid=data1["folioid"]
+            output.append(ast.literal_eval(json.dumps(data1)))
+        df = pd.DataFrame(output)
+        dfoutput = df.sort_values(by='taxinvnum')
+        newoutput = dfoutput.T.to_dict().values()
+        total_data = [y for x in data for y in newoutput if y["taxinvnum"] == x]
+        for each in total_data:
+            each["taxinvnum"] = each["taxinvnum"]+"-"
+        tax_invoice = holidayinManualupload({"total_data":total_data,"company":company,"error_upload":"yes","invoice_file":xml_file})
+        if tax_invoice["success"]==False:
+            return tax_invoice
+        cn_data = []
+        for number in data:
+            if frappe.db.exists("Invoices",number+"-"):
+                invoice_doc = frappe.get_doc("Invoices",number+"-")
+                cn_data.append({"Tax Invoice Number":number,"New Invoice Number":number+"-","GST Number":invoice_doc.gst_number,"Trade Name":invoice_doc.trade_name,"Sales Tax Amount":invoice_doc.pms_invoice_summary_without_gst})
+        if len(cn_data) > 0:
+            ts = time.time()
+            folder_path = frappe.utils.get_bench_path()
+            items_file_path = home+'/'+str(ts).replace('.',"")+".xlsx"
+            df2 = pd.DataFrame(cn_data)
+            df2.to_excel(items_file_path,index=False)
+            files_new = {"file": open(items_file_path, 'rb')}
+            payload_new = {
+                "is_private": 1,
+                "folder": "Home"
+            }
+            upload_report = requests.post(
+                companyData.host + "api/method/upload_file",
+                files=files_new,
+                data=payload_new).json()
+            url = upload_report['message']['file_url']
+            return url
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
