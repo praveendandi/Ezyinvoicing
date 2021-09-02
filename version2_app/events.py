@@ -7,10 +7,11 @@ import shlex
 import time
 import re
 from subprocess import Popen, PIPE, STDOUT
-import os
+import os,glob
 import sys
 import datetime
 import importlib.util
+from frappe.utils import cstr
 import traceback
 import requests
 from datetime import date, timedelta
@@ -590,3 +591,18 @@ def block_irn():
         frappe.log_error("Ezy-block-IRN","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
         
+@frappe.whitelist(allow_guest=True)
+def backup_file_perticulerdoctypes(data):
+    try:
+        get_company=frappe.get_doc("company",data["company_code"],fields=["host","site_name"])
+        site_name = cstr(frappe.local.site)
+        run_command=os.system('bench --site {} backup --only "company,SAC HSN CODES,Payment Types,GSP APIS"'.format(site_name))
+        cwd=cwd = os.getcwd() 
+        # site_name = cstr(frappe.local.site)
+        mypath = cwd+"/"+site_name+"/private/backups/*.gz"
+        filename=max(glob.glob(mypath), key=os.path.getmtime)
+        shutil.move(filename,cwd+"/"+site_name+"/public/files")
+        return get_company.host+"files/{}".format(os.path.basename(filename))
+    except Exception as e:
+        frappe.log_error("backupfile:"+str(e))
+    

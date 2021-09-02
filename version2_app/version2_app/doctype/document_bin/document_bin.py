@@ -3,10 +3,10 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe
+import frappe,glob
 import datetime,os,sys,traceback
 from datetime import timedelta,date
-
+from frappe.utils import cstr
 from frappe.model.document import Document
 
 class DocumentBin(Document):
@@ -33,6 +33,11 @@ def dailyDeletedocumentBin():
         data = frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""",lastdate)
         print(data)
         frappe.db.commit()
+        cwd=cwd = os.getcwd() 
+        site_name = cstr(frappe.local.site)
+        list_files=glob.glob(cwd+"/"+site_name+"/public/files/*.gz")
+        for each_file in list_files:
+            os.remove(each_file)
         return {"success":True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
