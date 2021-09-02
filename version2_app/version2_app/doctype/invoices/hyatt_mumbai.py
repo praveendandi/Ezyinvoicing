@@ -64,9 +64,9 @@ def hyatt_mumbai(data):
                         # else:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x["TRANSACTION_DESCRIPTION"],"taxinnum":x["TRX_NO"],'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
                         # continue
-                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION'] or "Cess" in x['TRANSACTION_DESCRIPTION'] or "CESS" in x['TRANSACTION_DESCRIPTION']:
+                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION'] or "Cess" in x['TRANSACTION_DESCRIPTION'] or "CESS" in x['TRANSACTION_DESCRIPTION'] or ('IGST' in x['TRANSACTION_DESCRIPTION'] and "Debit Note - IGST" not in x["TRANSACTION_DESCRIPTION"]):
+                        # if "%" in x["TRANSACTION_DESCRIPTION"]:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x["TRANSACTION_DESCRIPTION"],"taxinnum":x["TRX_NO"],'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
-                    
                     # if x['FT_DEBIT'] is None:
                     #     x['FT_DEBIT'] = x['FT_CREDIT']
                     else:
@@ -109,7 +109,6 @@ def hyatt_mumbai(data):
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})
         countIn = 1
         for each_item in input_data:
-            print(each_item,"++++++++++++++++++++++")
             if "invoice_number" in each:
                 each["gstNumber"]=gst_data[each["invoice_number"]]
             if each_item['invoice_category'] == "CREDIT TAX INVOICE":
