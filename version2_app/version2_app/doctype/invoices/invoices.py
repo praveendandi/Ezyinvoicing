@@ -1232,7 +1232,8 @@ def insert_invoice(data):
             "converted_tax_to_credit": data["converted_tax_to_credit"] if "converted_tax_to_credit" in data else "No",
             "debit_invoice":debit_invoice,
             "folioid":data["folioid"] if "folioid" in data else "",
-            "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else ""
+            "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
+            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else ""
         })
         if data['amened'] == 'Yes':
             invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -1352,6 +1353,7 @@ def insert_hsn_code_based_taxes(items, invoice_number,sacType):
                 # sac['total_amount'] = sac['cgst'] + sac['sgst'] + sac['igst'] + sac['cess']
                 doc = frappe.get_doc(sac)
                 doc.insert(ignore_permissions=True, ignore_links=True)
+                frappe.db.commit()
             return {"sucess": True, "data": 'doc'}
         return {"success":True, "data":'doc'}	
     except Exception as e:

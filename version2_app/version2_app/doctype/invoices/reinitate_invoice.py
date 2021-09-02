@@ -1102,7 +1102,10 @@ def b2b_success_to_credit_note(data):
         # print(invoice_data)
         if len(invoice_data) > 0:
             invoice_number = data["invoice_number"]+"CN"
-            invoice_date = datetime.datetime.strptime(str(datetime.datetime.today().date()),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+            if "holiday" in data and data["holiday"] == "Yes":
+                invoice_date = "31-aug-21 00:00:00"
+            else:
+                invoice_date = datetime.datetime.strptime(str(datetime.datetime.today().date()),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
             for item_each in item_data:
                 sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
@@ -1163,10 +1166,11 @@ def b2b_success_to_credit_note(data):
             else:
                 taxpayer = {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
                 tax_payer = taxpayer
-            reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes","tax_invoice_referrence_number":invoice_doc.name,"raise_credit":"Yes"})
+            reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes","tax_invoice_referrence_number":invoice_doc.name,"tax_invoice_referrence_date":data['invoice_date'] if "invoice_date" in data else "","raise_credit":"Yes"})
             if reinitate["success"] == False:
                 return {"success": False, "message": reinitate["message"]}
             doc_invoice = frappe.get_doc("Invoices",data["invoice_number"])
+            doc_invoice.invoice_object_from_file = invoice_doc.invoice_object_from_file
             doc_invoice.credit_note_raised = "Yes"
             doc_invoice.save(ignore_permissions=True,ignore_version=True)
             if data['taxinvoice'] == "Yes":

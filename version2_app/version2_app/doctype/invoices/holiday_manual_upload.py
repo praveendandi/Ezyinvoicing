@@ -59,7 +59,7 @@ def holidayinManualupload(data):
                 frappe.db.commit()
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
                 return {"success":False,"message":"Invoice data File mismatch"}
-            newoutput = items_dataframe.to_dict('records')
+            output = items_dataframe.to_dict('records')
         else:
             output=[]
             for item in items_dataframe["data"]["records"]["row"]:
@@ -71,16 +71,16 @@ def holidayinManualupload(data):
                     # global folioid
                     folioid=data1["folioid"]
                 output.append(ast.literal_eval(json.dumps(data1)))
-            df = pd.DataFrame(output)
-            dfoutput = df.sort_values(by='taxinvnum')
-            newoutput = dfoutput.T.to_dict().values()
+            # df = pd.DataFrame(output)
+            # dfoutput = df.sort_values(by='taxinvnum')
+            # newoutput = dfoutput.T.to_dict().values()
 
         list_data={}
         item_taxable = ""
         line_item_type = ""
         input_data = []
         invoice_referrence_objects = {}
-        for each in newoutput:
+        for each in output:
             total_invoice_amount = each['invoiceamount']
             totalitemAmount = each['invoiceamount']
             each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
@@ -526,34 +526,36 @@ def holidayinnerrorbulkreprocess(file_path,company):
         site_folder_path = companyData.site_name
         folder_path = frappe.utils.get_bench_path()
         items_file_path = folder_path+'/sites/'+site_folder_path+file_path
-        with open(items_file_path) as xml_file:
-            items_dataframe = xmltodict.parse(xml_file.read())
-        output=[]
-        for item in items_dataframe["data"]["records"]["row"]:
-            data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
-            data1["invoiceamount"]=float(data1["invoiceamount"])
-            data1["sgstamount"]=float(data1["sgstamount"])
-            data1["ngstamount"]=float(data1["ngstamount"])
-            if "folioid" in data1:
-                # global folioid
-                folioid=data1["folioid"]
-            output.append(ast.literal_eval(json.dumps(data1)))
-        df = pd.DataFrame(output)
-        group = df.groupby(['taxinvnum'])['taxinvnum'].count()
-        find = group.to_dict()
-        error_invoice_numbers = []
-        for key,value in find.items():
-            if frappe.db.exists("Invoices",key):
-                invoice_doc = frappe.get_doc("Invoices",key)
-                items_count = frappe.db.count('Items', {'parent': key})
-                if items_count == value:
-                    pass
-                else:
-                    if invoice_doc.invoice_type == "B2B":
-                        error_invoice_numbers.append(key)
-
-                        b2b_success_to_credit_note({"invoice_number":key,"taxinvoice":"No","invoice_date":invoice_doc.invoice_date})
+        newData = pd.read_excel(items_file_path)
+        # data = newData.T.to_dict().values()
+        data = newData.to_dict('records')
+        cn_data = []
+        for each in data:
+            if frappe.db.exists("Invoices",each["invoice_number"]):
+                invoice_doc = frappe.get_doc("Invoices",each["invoice_number"])
+                
+                raise_credit = b2b_success_to_credit_note({"invoice_number":each["invoice_number"],"taxinvoice":"No","invoice_date":invoice_doc.invoice_date,"holiday":"Yes"})
+                if raise_credit["success"] == False:
+                    return raise_credit
+                cn_data.append({"Tax Invoice Number":each["invoice_number"],"Credit Invoice Number":each["invoice_number"]+"CN","GST Number":invoice_doc.gst_number,"Trade Name":invoice_doc.trade_name})
+        if len(cn_data) > 0:
+            ts = time.time()
+            folder_path = frappe.utils.get_bench_path()
+            items_file_path = home+'/'+str(ts).replace('.',"")+".xlsx"
+            df2 = pd.DataFrame(cn_data)
+            df2.to_excel(items_file_path,index=False)
+            files_new = {"file": open(items_file_path, 'rb')}
+            payload_new = {
+                "is_private": 1,
+                "folder": "Home"
+            }
+            upload_report = requests.post(
+                companyData.host + "api/method/upload_file",
+                files=files_new,
+                data=payload_new).json()
+            url = upload_report['message']['file_url']
+            return url
     except Exception as e:
-        print(str(e))
-
-    
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
