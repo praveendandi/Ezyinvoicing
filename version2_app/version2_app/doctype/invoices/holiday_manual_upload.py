@@ -537,7 +537,12 @@ def holidayinnerrorbulkreprocess(file_path,company):
                 raise_credit = b2b_success_to_credit_note({"invoice_number":each["invoice_number"],"taxinvoice":"No","invoice_date":invoice_doc.invoice_date,"holiday":"Yes"})
                 if raise_credit["success"] == False:
                     return raise_credit
-                cn_data.append({"Tax Invoice Number":each["invoice_number"],"Credit Invoice Number":each["invoice_number"]+"CN","GST Number":invoice_doc.gst_number,"Trade Name":invoice_doc.trade_name})
+                if frappe.db.exists("Invoices",each["invoice_number"]+"CN"):
+                    credit_invoice_doc = frappe.get_doc("Invoices",each["invoice_number"]+"CN")
+                    sales_amount_after_tax = str(credit_invoice_doc.sales_amount_after_tax)
+                else:
+                    sales_amount_after_tax = ""
+                cn_data.append({"Tax Invoice Number":each["invoice_number"],"Credit Invoice Number":each["invoice_number"]+"CN","GST Number":invoice_doc.gst_number,"Trade Name":invoice_doc.trade_name,"Sales Tax Amount":sales_amount_after_tax})
         if len(cn_data) > 0:
             ts = time.time()
             folder_path = frappe.utils.get_bench_path()
