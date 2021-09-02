@@ -29,7 +29,9 @@ def holidayinManualupload(data):
         companyData = frappe.get_doc('company',data['company'])
         start_time = datetime.datetime.now()
         company = data['company']
-        if "error_upload" not in data and data["error_upload"] == "No":
+        if "error_upload" in data and data["error_upload"] == "yes":
+            newoutput = data["total_data"]
+        else:
             print("startt--------------------------",data)
             folder_path = frappe.utils.get_bench_path()
             items_data_file = data['invoice_file']
@@ -75,8 +77,6 @@ def holidayinManualupload(data):
                 df = pd.DataFrame(output)
                 dfoutput = df.sort_values(by='taxinvnum')
                 newoutput = dfoutput.T.to_dict().values()
-        else:
-            newoutput = data["total_data"]
         list_data={}
         item_taxable = ""
         line_item_type = ""
