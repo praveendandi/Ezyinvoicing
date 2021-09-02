@@ -59,7 +59,7 @@ def holidayinManualupload(data):
                 frappe.db.commit()
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data File mismatch","company":data['company']})
                 return {"success":False,"message":"Invoice data File mismatch"}
-            output = items_dataframe.to_dict('records')
+            newoutput = items_dataframe.to_dict('records')
         else:
             output=[]
             for item in items_dataframe["data"]["records"]["row"]:
@@ -71,16 +71,16 @@ def holidayinManualupload(data):
                     # global folioid
                     folioid=data1["folioid"]
                 output.append(ast.literal_eval(json.dumps(data1)))
-            # df = pd.DataFrame(output)
-            # dfoutput = df.sort_values(by='taxinvnum')
-            # newoutput = dfoutput.T.to_dict().values()
+            df = pd.DataFrame(output)
+            dfoutput = df.sort_values(by='taxinvnum')
+            newoutput = dfoutput.T.to_dict().values()
 
         list_data={}
         item_taxable = ""
         line_item_type = ""
         input_data = []
         invoice_referrence_objects = {}
-        for each in output:
+        for each in newoutput:
             total_invoice_amount = each['invoiceamount']
             totalitemAmount = each['invoiceamount']
             each['invoiceamount'] = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
@@ -564,3 +564,22 @@ def holidayinnerrorbulkreprocess(file_path,company):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
+    try:
+        companyData = frappe.get_doc('company',company)
+        site_folder_path = companyData.site_name
+        folder_path = frappe.utils.get_bench_path()
+        items_file_path = folder_path+'/sites/'+site_folder_path+file_path
+        newData = pd.read_excel(items_file_path)
+        # data = newData.T.to_dict().values()
+        data = newData['invoice_number'].tolist()
+        xml_file_path = folder_path+'/sites/'+site_folder_path+xml_file
+        with open(xml_file_path) as xml_files:
+            items_dataframe = xmltodict.parse(xml_files.read())
+        
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}   
