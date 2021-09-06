@@ -136,7 +136,7 @@ def update_documentbin(filepath, error_log):
 
 
 def fileCreated(doc, method=None):
-    try:
+    # try:
         if 'job-' in doc.file_name:
             if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
                 update_documentbin(doc.file_url,"")
@@ -165,15 +165,15 @@ def fileCreated(doc, method=None):
 
             print('Normal File')
         logger.error(f"fileCreated,   {traceback.print_exc()}")
-    except Exception as e:
-        # frappe.log_error(traceback.print_exc())
-        logger.error(f"fileCreated,   {traceback.print_exc()}")
-        print(str(e), "fileCreated")
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        update_documentbin(doc.file_url,str(e))
-        print(traceback.print_exc())
-        return {"success":False,"message":str(e)}
+    # except Exception as e:
+    #     # frappe.log_error(traceback.print_exc())
+    #     logger.error(f"fileCreated,   {traceback.print_exc()}")
+    #     print(str(e), "fileCreated")
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+    #     update_documentbin(doc.file_url,str(e))
+    #     print(traceback.print_exc())
+    #     return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):
     try:

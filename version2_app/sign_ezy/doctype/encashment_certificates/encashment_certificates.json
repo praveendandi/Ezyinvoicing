@@ -1,12 +1,12 @@
 {
  "actions": [],
- "creation": "2021-04-27 17:48:08.795103",
+ "creation": "2021-04-26 18:00:24.092616",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "file_path",
-  "status"
+  "signature"
  ],
  "fields": [
   {
@@ -15,19 +15,17 @@
    "label": "File Path"
   },
   {
-   "default": "Active",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Active\nIn-Active"
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-03 14:27:00.807047",
+ "modified": "2021-09-03 14:36:41.984610",
  "modified_by": "Administrator",
- "module": "Version2 App",
- "name": "Promotions",
+ "module": "Sign Ezy",
+ "name": "Encashment Certificates",
  "owner": "Administrator",
  "permissions": [
   {

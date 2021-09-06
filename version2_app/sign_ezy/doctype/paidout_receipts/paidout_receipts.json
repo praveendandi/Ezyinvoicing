@@ -1,33 +1,31 @@
 {
  "actions": [],
- "creation": "2021-04-27 17:48:08.795103",
+ "creation": "2021-04-26 17:30:36.067985",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "file_path",
-  "status"
+  "signature"
  ],
  "fields": [
   {
    "fieldname": "file_path",
    "fieldtype": "Data",
-   "label": "File Path"
+   "label": "File path"
   },
   {
-   "default": "Active",
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Active\nIn-Active"
+   "fieldname": "signature",
+   "fieldtype": "Signature",
+   "label": "Signature"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-03 14:27:00.807047",
+ "modified": "2021-09-03 14:37:17.839377",
  "modified_by": "Administrator",
- "module": "Version2 App",
- "name": "Promotions",
+ "module": "Sign Ezy",
+ "name": "Paidout Receipts",
  "owner": "Administrator",
  "permissions": [
   {
