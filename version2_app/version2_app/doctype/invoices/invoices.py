@@ -181,6 +181,7 @@ def generateIrn(data):
         }
         taxpayer_details = get_tax_payer_details(GspData)
         #gst data
+        print(taxpayer_details["data"].__dict__,"-----------------------------")
         if company_details['data'].mode == 'Testing':
             if len(invoice.invoice_number) > 13:
                 testing_invoice_number = invoice.invoice_number
@@ -1109,7 +1110,7 @@ def insert_invoice(data):
         # qr_generated = "Pending"
         if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
             irn_generated = "Zero Invoice"
-            taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+            taxpayer= {"legal_name": "","email":data['taxpayer']['email'],"address_1": "","address_2": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
             data['taxpayer'] =taxpayer
             data['guest_data']['invoice_type'] = "B2C"
 
@@ -1123,6 +1124,7 @@ def insert_invoice(data):
             invoice_from = data['guest_data']['invoice_from']
         else:
             invoice_from = "Pms"	
+        print(data["taxpayer"],"+++++++++++++++++++++++++")
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -2724,6 +2726,7 @@ def get_tax_payer_details(data):
     get TaxPayerDetail from gsp   gstNumber, code, apidata
     '''
     try:
+        print(data,">>>>>>>>>>>>>>>>>>>>>>>.....")
         company = frappe.get_doc('company',data['code'])
         headers = {'Content-Type': 'application/json'}
         tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
@@ -2775,7 +2778,7 @@ def get_tax_payer_details(data):
                             details["AddrBno"] = details["AddrBno"] + "    "
                         tax_payer = frappe.new_doc('TaxPayerDetail')
                         tax_payer.gst_number = details['Gstin']
-                        tax_payer.email = " "
+                        tax_payer.email = data["email"]
                         tax_payer.phone_number = " "
                         tax_payer.legal_name = details['LegalName']
                         tax_payer.address_1 = details['AddrBnm']
@@ -2828,6 +2831,7 @@ def get_tax_payer_details(data):
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
                     data['apidata'], data['invoice'], data['code'])
                 if response['success']:
+                    print(response,"_____________________")
                     company = frappe.get_doc('company',data['code'])
                     details = response['result']
                     if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
@@ -2857,7 +2861,7 @@ def get_tax_payer_details(data):
                         details["AddrBno"] = details["AddrBno"] + "    "
                     tax_payer = frappe.new_doc('TaxPayerDetail')
                     tax_payer.gst_number = details['Gstin']
-                    tax_payer.email = " "
+                    tax_payer.email = data["email"]
                     tax_payer.phone_number = " "
                     tax_payer.legal_name = details['LegalName']
                     tax_payer.address_1 = details['AddrBnm']
