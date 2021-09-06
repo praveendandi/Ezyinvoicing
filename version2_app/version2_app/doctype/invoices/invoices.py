@@ -968,7 +968,10 @@ def insert_invoice(data):
                 if item['taxable'] == 'No' and item['item_type'] != "Discount":
                     other_charges += float(item['item_value_after_gst'])
                     other_charges_before_tax += float(item['item_value'])
-                    total_vat_amount += float(item['vat_amount'])
+                    if data['guest_data']['invoice_category'] != "Credit Invoice":
+                        total_vat_amount += float(item['vat_amount'])
+                    else:
+                        total_credit_vat_amount += float(item['vat_amount'])
                 elif item['taxable']=="No" and item['item_type']=="Discount":
                     discountAmount += item['item_value_after_gst'] 
                 elif item['sac_code'].isdigit():
