@@ -95,6 +95,7 @@ def CheckConnection(data):
 def resetworkstation_tablet(data):
     try:
         if frappe.db.exists("Tablet Config",data["name"]):
+            data["uuid"]=data["tablet"]
             doc = frappe.get_doc("Tablet Config",data["name"])
             doc.mode = "Sleep"
             doc.save(ignore_permissions=True,ignore_version=True)

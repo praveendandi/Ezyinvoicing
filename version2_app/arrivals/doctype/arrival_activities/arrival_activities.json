@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "creation": "2021-09-07 11:21:21.057899",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "file_name",
+  "source",
+  "file_path",
+  "processed_count",
+  "duplicate_count",
+  "already_checkin_count",
+  "total_count"
+ ],
+ "fields": [
+  {
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "label": "File Name"
+  },
+  {
+   "fieldname": "source",
+   "fieldtype": "Data",
+   "label": "Source"
+  },
+  {
+   "fieldname": "file_path",
+   "fieldtype": "Attach",
+   "label": "File Path"
+  },
+  {
+   "fieldname": "processed_count",
+   "fieldtype": "Data",
+   "label": "Processed Count"
+  },
+  {
+   "fieldname": "duplicate_count",
+   "fieldtype": "Data",
+   "label": "Duplicate Count"
+  },
+  {
+   "fieldname": "already_checkin_count",
+   "fieldtype": "Data",
+   "label": "Already Checkin Count"
+  },
+  {
+   "fieldname": "total_count",
+   "fieldtype": "Data",
+   "label": "Total Count"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-09-07 11:21:21.057899",
+ "modified_by": "Administrator",
+ "module": "Arrivals",
+ "name": "Arrival Activities",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
