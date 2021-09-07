@@ -1,0 +1,208 @@
+{
+ "actions": [],
+ "autoname": "field:confirmation_number",
+ "creation": "2021-09-07 17:14:34.146147",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "guest_title",
+  "guest_first_name",
+  "guest_last_name",
+  "guest_email_address",
+  "room_type",
+  "guest_phone_no",
+  "travel_agent_name",
+  "no_of_adults",
+  "no_of_children",
+  "no_of_nights",
+  "billing_instructions",
+  "no_of_rooms",
+  "confirmation_number",
+  "csr_id",
+  "print_rate",
+  "room_rate",
+  "reservation_clerk",
+  "membership_no",
+  "membership_type",
+  "total_visits",
+  "checkin_date",
+  "checkout_date",
+  "cc_number",
+  "cc_exp_date",
+  "company_name",
+  "booking_status",
+  "virtual_checkin_status",
+  "company"
+ ],
+ "fields": [
+  {
+   "fieldname": "guest_title",
+   "fieldtype": "Data",
+   "label": "Guest Title"
+  },
+  {
+   "fieldname": "guest_first_name",
+   "fieldtype": "Data",
+   "label": "Guest First Name"
+  },
+  {
+   "fieldname": "guest_last_name",
+   "fieldtype": "Data",
+   "label": "Guest Last Name"
+  },
+  {
+   "fieldname": "guest_email_address",
+   "fieldtype": "Data",
+   "label": "Guest Email Address"
+  },
+  {
+   "fieldname": "room_type",
+   "fieldtype": "Data",
+   "label": "Room Type"
+  },
+  {
+   "fieldname": "guest_phone_no",
+   "fieldtype": "Data",
+   "label": "Guest Phone No"
+  },
+  {
+   "fieldname": "travel_agent_name",
+   "fieldtype": "Data",
+   "label": "Travel Agent Name"
+  },
+  {
+   "fieldname": "no_of_adults",
+   "fieldtype": "Int",
+   "label": "No Of Adults"
+  },
+  {
+   "fieldname": "no_of_children",
+   "fieldtype": "Int",
+   "label": "No Of Children"
+  },
+  {
+   "fieldname": "no_of_nights",
+   "fieldtype": "Int",
+   "label": "No Of Nights"
+  },
+  {
+   "fieldname": "billing_instructions",
+   "fieldtype": "Data",
+   "label": "Billing Instructions"
+  },
+  {
+   "fieldname": "no_of_rooms",
+   "fieldtype": "Data",
+   "label": "No Of Rooms"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "csr_id",
+   "fieldtype": "Data",
+   "label": "CSR Id"
+  },
+  {
+   "fieldname": "print_rate",
+   "fieldtype": "Select",
+   "label": "Print Rate",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "room_rate",
+   "fieldtype": "Float",
+   "label": "Room Rate"
+  },
+  {
+   "fieldname": "reservation_clerk",
+   "fieldtype": "Data",
+   "label": "Reservation Clerk"
+  },
+  {
+   "fieldname": "membership_no",
+   "fieldtype": "Data",
+   "label": "Membership No"
+  },
+  {
+   "fieldname": "membership_type",
+   "fieldtype": "Data",
+   "label": "Membership Type"
+  },
+  {
+   "fieldname": "total_visits",
+   "fieldtype": "Data",
+   "label": "Total Visits"
+  },
+  {
+   "fieldname": "cc_number",
+   "fieldtype": "Data",
+   "label": "CC Number"
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "Company Name"
+  },
+  {
+   "fieldname": "booking_status",
+   "fieldtype": "Data",
+   "label": "Booking Status"
+  },
+  {
+   "fieldname": "virtual_checkin_status",
+   "fieldtype": "Data",
+   "label": "Virtual Checkin Status"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company"
+  },
+  {
+   "fieldname": "checkin_date",
+   "fieldtype": "Date",
+   "label": "Checkin Date"
+  },
+  {
+   "fieldname": "checkout_date",
+   "fieldtype": "Date",
+   "label": "Checkout Date"
+  },
+  {
+   "fieldname": "cc_exp_date",
+   "fieldtype": "Date",
+   "label": "CC Exp Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-09-07 18:19:48.177321",
+ "modified_by": "Administrator",
+ "module": "Arrivals",
+ "name": "Arrival Information",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
