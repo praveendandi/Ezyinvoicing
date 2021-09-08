@@ -127,7 +127,8 @@
   "sign_ezy_module",
   "enable_pos_extra_text",
   "create_taxinvoice_raisecredit",
-  "qr_page"
+  "qr_page",
+  "arrival_report"
  ],
  "fields": [
   {
@@ -821,11 +822,16 @@
    "fieldtype": "Select",
    "label": "QR Page",
    "options": "First\nLast"
+  },
+  {
+   "fieldname": "arrival_report",
+   "fieldtype": "Attach",
+   "label": "Arrival Report"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-20 15:15:25.157186",
+ "modified": "2021-09-08 15:31:03.345507",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

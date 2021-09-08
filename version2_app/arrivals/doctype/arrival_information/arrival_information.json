@@ -33,7 +33,10 @@
   "company_name",
   "booking_status",
   "virtual_checkin_status",
-  "company"
+  "company",
+  "arrival_date",
+  "departure_date",
+  "is_group_code"
  ],
  "fields": [
   {
@@ -155,8 +158,9 @@
   },
   {
    "fieldname": "virtual_checkin_status",
-   "fieldtype": "Data",
-   "label": "Virtual Checkin Status"
+   "fieldtype": "Select",
+   "label": "Virtual Checkin Status",
+   "options": "Yes\nNo"
   },
   {
    "fieldname": "company",
@@ -176,13 +180,30 @@
   },
   {
    "fieldname": "cc_exp_date",
-   "fieldtype": "Date",
+   "fieldtype": "Data",
    "label": "CC Exp Date"
+  },
+  {
+   "fieldname": "arrival_date",
+   "fieldtype": "Date",
+   "label": "Arrival Date"
+  },
+  {
+   "fieldname": "departure_date",
+   "fieldtype": "Date",
+   "label": "Departure Date"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_group_code",
+   "fieldtype": "Select",
+   "label": "Is Group Code",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-07 18:19:48.177321",
+ "modified": "2021-09-08 12:55:44.657112",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
@@ -197,6 +218,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
    "share": 1,
    "write": 1
   }

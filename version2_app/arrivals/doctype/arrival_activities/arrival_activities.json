@@ -11,7 +11,8 @@
   "processed_count",
   "duplicate_count",
   "already_checkin_count",
-  "total_count"
+  "total_count",
+  "status"
  ],
  "fields": [
   {
@@ -48,11 +49,16 @@
    "fieldname": "total_count",
    "fieldtype": "Data",
    "label": "Total Count"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-07 11:21:21.057899",
+ "modified": "2021-09-08 13:56:44.069411",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Activities",
@@ -67,6 +73,30 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
    "share": 1,
    "write": 1
   }
