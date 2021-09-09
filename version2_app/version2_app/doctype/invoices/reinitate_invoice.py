@@ -256,7 +256,7 @@ def Reinitiate_invoice(data):
 
         doc.irn_generated=irn_generated
         print(data['total_invoice_amount'],type(data['total_invoice_amount']))
-        invoice_round_off_amount =  float(data['total_invoice_amount']) - float(abs(pms_invoice_summary+other_charges))
+        invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
             if len(data['items_data'])==0:
                 doc.ready_to_generate_irn = "No"
