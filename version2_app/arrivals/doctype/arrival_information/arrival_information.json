@@ -36,7 +36,8 @@
   "company",
   "arrival_date",
   "departure_date",
-  "is_group_code"
+  "is_group_code",
+  "status"
  ],
  "fields": [
   {
@@ -199,11 +200,18 @@
    "fieldtype": "Select",
    "label": "Is Group Code",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending\nScanned"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-08 12:55:44.657112",
+ "modified": "2021-09-09 15:38:15.224586",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
