@@ -91,7 +91,7 @@ def manual_upload_data(data):
             if output['success'] ==False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
             return output
-        if companyData.bulk_excel_upload_type == "Hyatt Mumbai":
+        if companyData.bulk_excel_upload_type == "Hyatt Mumbai" or companyData.bulk_excel_upload_type == "Hyatt Hyderabad":
             print(">>>>>>>>>>>>>>>>>.////////")
             output = hyatt_mumbai(data)
             if output['success'] == False:

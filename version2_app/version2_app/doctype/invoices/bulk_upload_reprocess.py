@@ -10,6 +10,7 @@ import json
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.payment_types.payment_types import *
+from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
 
 
 
@@ -98,10 +99,14 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai":
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type == "Hyatt Hyderabad":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
+            # output = hyatt_mumbai(data)
+            # if output['success'] == False:
+            #     frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+            # return output
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
             items = []
             sort_order = 1

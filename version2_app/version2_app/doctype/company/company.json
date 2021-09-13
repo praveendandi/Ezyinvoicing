@@ -95,7 +95,6 @@
   "manual_tax_invoice",
   "manual_credit_invoice",
   "manual_debit_invoice",
-  "ipp_printer_file_path",
   "change_invoice_reconciliation_invoice_number",
   "disable_sez",
   "b2c_online_payments",
@@ -127,7 +126,8 @@
   "sign_ezy_module",
   "enable_pos_extra_text",
   "create_taxinvoice_raisecredit",
-  "qr_page"
+  "qr_page",
+  "ipp_printer_file_path"
  ],
  "fields": [
   {
@@ -476,7 +476,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai"
+   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
   },
   {
    "default": "0",
@@ -825,7 +825,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-20 15:15:25.157186",
+ "modified": "2021-09-13 14:38:57.517051",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

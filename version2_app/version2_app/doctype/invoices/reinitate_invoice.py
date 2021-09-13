@@ -97,7 +97,7 @@ def Reinitiate_invoice(data):
                         value_before_gst += float(item['item_value'])
                         value_after_gst += float(item['item_value_after_gst'])
                         total_vat_amount += float(item['vat_amount'])
-                        # print(value_before_gst,value_after_gst," ******")
+                        print(value_after_gst," ******")
                     else:
                         # cgst_amount+=item['cgst_amount']
                         # sgst_amount+=item['sgst_amount']
@@ -113,6 +113,12 @@ def Reinitiate_invoice(data):
                         credit_value_after_gst += float(abs(item['item_value_after_gst']))
                         total_credit_vat_amount += float(item['vat_amount'])
                 else:
+                    # print(item["sac_code"])
+                    # if item['sac_code']=="No Sac":
+                    #     print(value_after_gst+float(item['item_value_after_gst'])," ******")
+                    #     value_before_gst += float(item['item_value'])
+                    #     value_after_gst += float(item['item_value_after_gst'])
+                    #     print("++++++++++",value_after_gst)
                     pass
         if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
@@ -255,7 +261,6 @@ def Reinitiate_invoice(data):
         
 
         doc.irn_generated=irn_generated
-        print(data['total_invoice_amount'],type(data['total_invoice_amount']))
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
             if len(data['items_data'])==0:

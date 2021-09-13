@@ -482,7 +482,10 @@ def testsample(file_path,company):
         data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
         data1["invoiceamount"]=float(data1["invoiceamount"])
         data1["sgstamount"]=float(data1["sgstamount"])
-        data1["ngstamount"]=float(data1["ngstamount"])
+        if "ngstamount" not in data1:
+            data1["ngstamount"]=float(data1["igstamount"])
+        else:
+            data1["ngstamount"]=float(data1["ngstamount"])
         if "folioid" in data1:
             # global folioid
             folioid=data1["folioid"]

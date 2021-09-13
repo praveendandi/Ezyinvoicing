@@ -28,7 +28,10 @@ def hyatt_mumbai(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            gst_data[str(item["BILL_GENERATION_DATE"])]=item["TRX_CODE"]
+            if invoice_data["company"]=="Hyatt Mumbai":
+                gst_data[str(item["BILL_GENERATION_DATE"])]=item["TRX_CODE"]
+            else:
+                gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         input_data = []
