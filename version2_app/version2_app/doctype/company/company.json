@@ -127,7 +127,10 @@
   "enable_pos_extra_text",
   "create_taxinvoice_raisecredit",
   "qr_page",
-  "ipp_printer_file_path"
+  "ipp_printer_file_path",
+  "bulkupload_excel",
+  "bulkupload_csv",
+  "bulkupload_xml"
  ],
  "fields": [
   {
@@ -821,11 +824,29 @@
    "fieldtype": "Select",
    "label": "QR Page",
    "options": "First\nLast"
+  },
+  {
+   "default": "0",
+   "fieldname": "bulkupload_excel",
+   "fieldtype": "Check",
+   "label": "Bulkupload Excel"
+  },
+  {
+   "default": "0",
+   "fieldname": "bulkupload_csv",
+   "fieldtype": "Check",
+   "label": "Bulkupload Csv"
+  },
+  {
+   "default": "0",
+   "fieldname": "bulkupload_xml",
+   "fieldtype": "Check",
+   "label": "Bulkupload Xml"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-13 14:38:57.517051",
+ "modified": "2021-09-15 15:55:28.215480",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
