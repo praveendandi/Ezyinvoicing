@@ -3390,6 +3390,9 @@ def Error_Insert_invoice(data):
                 data['invoice_type'] ="B2B"
             if "gst_number" not in data or "gstNumber" not in data:
                 data['gst_number'] = ""
+            print(data["guest_name"],"======================")
+            if data["guest_name"]=="":
+                data["guest_name"]="NA"
             invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
