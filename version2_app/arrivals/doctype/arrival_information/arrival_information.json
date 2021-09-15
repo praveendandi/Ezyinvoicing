@@ -37,7 +37,8 @@
   "arrival_date",
   "departure_date",
   "is_group_code",
-  "status"
+  "status",
+  "number_of_guests"
  ],
  "fields": [
   {
@@ -207,11 +208,16 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Pending\nScanned"
+  },
+  {
+   "fieldname": "number_of_guests",
+   "fieldtype": "Data",
+   "label": "Number of Guests"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-09 15:38:15.224586",
+ "modified": "2021-09-14 17:20:51.545340",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
