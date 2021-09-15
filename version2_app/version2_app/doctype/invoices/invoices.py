@@ -181,6 +181,7 @@ def generateIrn(data):
         }
         taxpayer_details = get_tax_payer_details(GspData)
         #gst data
+        print("dataaaaaaaaaaaaaaaaaaaaa",data)
         print(taxpayer_details["data"].__dict__,"-----------------------------")
         if company_details['data'].mode == 'Testing':
             if len(invoice.invoice_number) > 13:
@@ -367,9 +368,11 @@ def generateIrn(data):
                 if response['success']:
                     # json.dumps(data['invoice_object_from_file']
                     IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
+                    
                     IRNObjectdoc.save()
                     # print(IRNObjectdoc.name,"/a/a/a/")
                     invoice = frappe.get_doc('Invoices', invoice_number)
+                    print(invoice.email,"|||||||||||||||||||||||||||||||||||")
                     invoice.ack_no = response['result']['AckNo']
                     invoice.irn_number = response['result']['Irn']
                     invoice.ack_date = response['result']['AckDt']
@@ -932,6 +935,7 @@ def insert_invoice(data):
     # insert invoice data     data, company_code, taxpayer,items_data
     # '''
     try:
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:
@@ -1111,6 +1115,8 @@ def insert_invoice(data):
                         
                         return{"success":False,"message":TotalMismatchErrorAPI['message']}
         # qr_generated = "Pending"
+        if "Arrival" in data["taxpayer"]["email"]:
+            data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
         if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
             irn_generated = "Zero Invoice"
             taxpayer= {"legal_name": "","email":data['taxpayer']['email'],"address_1": "","address_2": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
