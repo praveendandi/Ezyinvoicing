@@ -207,7 +207,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Pending\nScanned"
+   "options": "Pending\nScanned\nReserved"
   },
   {
    "fieldname": "number_of_guests",
@@ -217,7 +217,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-14 17:20:51.545340",
+ "modified": "2021-09-13 12:26:54.622286",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
