@@ -90,7 +90,6 @@
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
   "licensing_host",
-  "skip_ssl_verify",
   "b2b_to_credit",
   "manual_tax_invoice",
   "manual_credit_invoice",
@@ -127,10 +126,11 @@
   "enable_pos_extra_text",
   "create_taxinvoice_raisecredit",
   "qr_page",
-  "ipp_printer_file_path",
   "upload_gst_details",
   "bulkupload_inovice_file_type",
-  "bulkupload_gst_file_type"
+  "bulkupload_gst_file_type",
+  "skip_ssl_verify",
+  "ipp_printer_file_path"
  ],
  "fields": [
   {
@@ -479,7 +479,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
+   "options": "None\nGrand\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
   },
   {
    "default": "0",
@@ -846,7 +846,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-16 12:54:58.955545",
+ "modified": "2021-09-16 18:29:24.116227",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
