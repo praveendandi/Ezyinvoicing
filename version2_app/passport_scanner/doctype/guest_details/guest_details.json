@@ -60,7 +60,8 @@
   "frro_failure_count",
   "frro_checkout",
   "frro_checkout_message",
-  "frro_checkout_date"
+  "frro_checkout_date",
+  "next_destination_district"
  ],
  "fields": [
   {
@@ -354,11 +355,16 @@
    "fieldname": "frro_checkout_date",
    "fieldtype": "Data",
    "label": "Frro Checkout Date"
+  },
+  {
+   "fieldname": "next_destination_district",
+   "fieldtype": "Data",
+   "label": "Next Destination District"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-20 10:59:23.630301",
+ "modified": "2021-09-16 15:58:46.234735",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

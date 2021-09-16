@@ -107,6 +107,12 @@ doc_events = {
 		# "on_cancel": "method",
 		# "on_trash": "method"
 	},
+    "Arrival Information": {
+        "after_insert": "version2_app.events.arrival_information",
+    },
+    "Guest Details": {
+        "after_insert": "version2_app.events.guest_attachments",
+    },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",
         "on_trash": "version2_app.events.remove_mapping",
@@ -145,7 +151,6 @@ doc_events = {
     },
     "Information Folio": {
         "after_insert": "version2_app.events.information_folio_created",
-        "on_update": "version2_app.events.information_folio_created",
     },
 	"File":{
 		# 'after_save':"version2_app.events.fileCreated",

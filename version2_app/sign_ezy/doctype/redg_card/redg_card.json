@@ -238,13 +238,13 @@
   },
   {
    "fieldname": "redg_file",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "Redg File"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-03 14:37:55.350491",
+ "modified": "2021-09-15 16:08:45.481675",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Redg Card",
