@@ -128,9 +128,9 @@
   "create_taxinvoice_raisecredit",
   "qr_page",
   "ipp_printer_file_path",
-  "bulkupload_excel",
-  "bulkupload_csv",
-  "bulkupload_xml"
+  "upload_gst_details",
+  "bulkupload_inovice_file_type",
+  "bulkupload_gst_file_type"
  ],
  "fields": [
   {
@@ -827,26 +827,26 @@
   },
   {
    "default": "0",
-   "fieldname": "bulkupload_excel",
+   "fieldname": "upload_gst_details",
    "fieldtype": "Check",
-   "label": "Bulkupload Excel"
+   "label": "Upload Gst Details"
   },
   {
-   "default": "0",
-   "fieldname": "bulkupload_csv",
-   "fieldtype": "Check",
-   "label": "Bulkupload Csv"
+   "fieldname": "bulkupload_inovice_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload Inovice File Type",
+   "options": "csv\nxlsx\nxml"
   },
   {
-   "default": "0",
-   "fieldname": "bulkupload_xml",
-   "fieldtype": "Check",
-   "label": "Bulkupload Xml"
+   "fieldname": "bulkupload_gst_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload GST File Type",
+   "options": "\ncsv\nxlsx\nxml"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-15 15:55:28.215480",
+ "modified": "2021-09-16 12:54:58.955545",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

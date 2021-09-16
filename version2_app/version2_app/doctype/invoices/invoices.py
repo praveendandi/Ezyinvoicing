@@ -2865,7 +2865,8 @@ def get_tax_payer_details(data):
                             details['LegalName'] = details['TradeName']
                     if (details['AddrLoc'] == "") or (details['AddrLoc'] == None):
                         details['AddrLoc'] = "      "
-
+                    if "email" not in data:
+                        data["email"]=""
                     if len(details["AddrBnm"]) < 3:
                         details["AddrBnm"] = details["AddrBnm"] + "    "
                     if len(details["AddrBno"]) < 3:
@@ -3367,6 +3368,10 @@ def Error_Insert_invoice(data):
                 sez = invoice_doc.sez
             else:
                 sez = 0
+        if "gst_number" in data:
+            print(data["gst_number"],">>>>>>>>>>>>>>>")
+            if data["gst_number"]==None:
+                data["gst_number"]=""
         if len(data['gst_number'])<15 and len(data['gst_number'])>0:
             if 'items_data' not in list(data.keys()):
                 data['items_data'] = []

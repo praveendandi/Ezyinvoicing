@@ -29,7 +29,9 @@ def grand_newdelhi(data):
         to_dict_data=gst_df.to_dict(orient="records")
         print(to_dict_data,"-----------------------")
         for item in to_dict_data:
-                gst_data[str(item["invoice"])]=item["gst_number"]
+            if str(item["gst_number"])!="nan":
+                if str(item["gst_number"]).strip()!="0":
+                    gst_data[str(item["invoice"])]=str(item["gst_number"]).strip()
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         input_data = []
@@ -171,6 +173,7 @@ def grand_newdelhi(data):
             sez = 0
             # print(len(each_item['gstNumber']),"lennn",each_item['gstNumber'],each_item['invoice_type'])
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+            print(each_item,"++++++++++++++++++++++++++++++++++")
             if len(each_item['gstNumber']) < 15 and len(each_item['gstNumber'])>0:
                 error_data['error_message'] = "Invalid GstNumber " + each_item['gstNumber']
                 error_data['amened'] = 'No'
