@@ -77,7 +77,7 @@ def manual_upload_data(data):
         items_data_file = data['invoice_file']
         company = data['company']
         companyData = frappe.get_doc('company',data['company'])
-        if companyData.upload_gst_details==1:
+        if companyData.bulk_excel_upload_type=="Grand":
             output=grand_newdelhi(data)
             if output['success'] == False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
