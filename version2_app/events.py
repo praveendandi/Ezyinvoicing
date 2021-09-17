@@ -1,6 +1,7 @@
+# from typing_extensions import get_args
 from requests.exceptions import RetryError
 import frappe, requests, json
-
+from datetime import datetime
 from version2_app.parsers import *
 import json
 import shlex
@@ -245,7 +246,18 @@ def information_folio_created(doc, method=None):
         # if
         frappe.publish_realtime(
             "custom_socket", {'message': 'information Invoices Created', 'data': doc.__dict__})
-
+        get_data=frappe.db.get_list("Documents",doc.confirmation_number)
+        if len(get_data)==0:
+            user_name =  frappe.session.user
+            data={"doctype":"Documents","invoice_file":doc.invoice_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        user_name =  frappe.session.user
+        data={"doctype":"Documents","invoice_file":doc.invoice_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
+        get_doc=frappe.db.set_value(data)
+        # get_doc.insert()
+        frappe.db.commit()
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
     except Exception as e:
         print(e)
@@ -338,9 +350,28 @@ def update_tablet_status(doc, method=None):
 
 def create_redg_card(doc, method=None):
     try:
-        print(doc.name, "hello hiee")
         frappe.publish_realtime(
             "custom_socket", {'message': 'Redg Created', 'data': doc.__dict__})
+        get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
+        user_name =  frappe.session.user
+        get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
+        date_time = datetime.datetime.now() 
+        date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Redg card added successfully"}
+        event_doc=frappe.get_doc(activity_data)
+        event_doc.insert()
+        frappe.db.commit()
+        if len(get_data)==0:
+            user_name =  frappe.session.user
+            data={"doctype":"Documents","redg_file":doc.redg_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        user_name =  frappe.session.user
+        data={"redg_file":doc.redg_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
+        get_doc=frappe.db.set_value("Documents",get_data[0]["name"],data)
+        # get_doc.insert()
+        frappe.db.commit()
     except Exception as e:
         print(e)
         
@@ -355,9 +386,27 @@ def create_paidout_receipt(doc, method=None):
         
 def create_advance_deposits(doc, method=None):
     try:
-        print(doc.name, "hello hiee")
         frappe.publish_realtime(
             "custom_socket", {'message': 'Advance Deposits Created', 'data': doc.__dict__})
+        user_name =  frappe.session.user
+        get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.conformation_no})
+        date_time = datetime.datetime.now() 
+        date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.conformation_no,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Advance Deposits Created successfully"}
+        event_doc=frappe.get_doc(activity_data)
+        event_doc.insert()
+        frappe.db.commit()
+        if len(get_data)==0:
+            user_name =  frappe.session.user
+            data={"doctype":"Documents","advance_deposits_file":doc.file_path,"confirmation_number":doc.conformation_no,"module_name":"Sign Ezy","user":user_name}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        user_name =  frappe.session.user
+        data={"advance_deposits_file":doc.file_path,"confirmation_number":doc.conformation_no,"module_name":"Sign Ezy","user":user_name}
+        get_doc=frappe.db.set_value("Documents",get_data[0]["name"],data)
+        # get_doc.insert()
+        frappe.db.commit()
     except Exception as e:
         print(e)
         
@@ -605,4 +654,48 @@ def backup_file_perticulerdoctypes(data):
         return get_company.host+"files/{}".format(os.path.basename(filename))
     except Exception as e:
         frappe.log_error("backupfile:"+str(e))
-    
+
+@frappe.whitelist(allow_guest=True)
+def arrival_information(doc,method=None):
+    user_name =  frappe.session.user
+    date_time = datetime.datetime.now() 
+    date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+    data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Arrival Information added successfully"}
+    get_doc=frappe.get_doc(data)
+    get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
+    get_doc.insert()
+    frappe.db.commit()
+    data_get={"doctype":"Documents","number_of_guests":doc.number_of_guests,"confirmation_number":doc.confirmation_number}
+    if len(get_data)==0:
+        get_doc=frappe.get_doc(data_get)
+        get_doc.insert()
+        frappe.db.commit()
+    else:
+        frappe.db.set_value("Documents",get_data[0]["name"],{"number_of_guests":doc.number_of_guests})
+
+
+@frappe.whitelist(allow_guest=True)
+def guest_attachments(doc,method=None):
+    user_name =  frappe.session.user
+    date_time = datetime.datetime.now() 
+    date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+    activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully"}
+    event_doc=frappe.get_doc(activity_data)
+    event_doc.insert()
+    frappe.db.commit()
+    get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
+    if len(get_data)==0:
+        user_name =  frappe.session.user
+        data={"doctype":"Documents","guest_details":[{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image}],"confirmation_number":doc.confirmation_number,"module_name":"Scan Ezy","user":user_name}
+        get_doc=frappe.get_doc(data)
+        get_doc.insert()
+        frappe.db.commit()
+    else: 
+        user_name =  frappe.session.user
+        data={"confirmation_number":doc.confirmation_number,"module_name":"Scan Ezy","user":user_name}
+        get_doc=frappe.db.set_value("Documents",get_data[0]["name"],data)
+        frappe.db.commit()
+        update_doc=frappe.get_doc("Documents",get_data[0]["name"])
+        update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
+        update_doc.save()
+        frappe.db.commit()

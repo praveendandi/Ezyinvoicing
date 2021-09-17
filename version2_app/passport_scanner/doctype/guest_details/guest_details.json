@@ -60,7 +60,8 @@
   "frro_failure_count",
   "frro_checkout",
   "frro_checkout_message",
-  "frro_checkout_date"
+  "frro_checkout_date",
+  "next_destination_district"
  ],
  "fields": [
   {
@@ -354,6 +355,11 @@
    "fieldname": "frro_checkout_date",
    "fieldtype": "Data",
    "label": "Frro Checkout Date"
+  },
+  {
+   "fieldname": "next_destination_district",
+   "fieldtype": "Data",
+   "label": "Next Destination District"
   }
  ],
  "index_web_pages_for_search": 1,
