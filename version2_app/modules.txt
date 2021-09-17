@@ -4,3 +4,4 @@ Passport Scanner
 Sign Ezy
 Ezy Checkins
 Arrivals
+Generics
