@@ -128,7 +128,8 @@
   "enable_pos_extra_text",
   "create_taxinvoice_raisecredit",
   "qr_page",
-  "arrival_report"
+  "arrival_report",
+  "pre_arrival_html"
  ],
  "fields": [
   {
@@ -827,11 +828,16 @@
    "fieldname": "arrival_report",
    "fieldtype": "Attach",
    "label": "Arrival Report"
+  },
+  {
+   "fieldname": "pre_arrival_html",
+   "fieldtype": "HTML Editor",
+   "label": "Pre Arrival HTML"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-08 15:31:03.345507",
+ "modified": "2021-09-15 17:35:59.487923",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

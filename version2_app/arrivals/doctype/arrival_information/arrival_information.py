@@ -76,6 +76,7 @@ def arrivalActivity(company,file_url):
                     "booking_status":replace_new[column_indexs["BOOKING_STATUS"]],
                     "is_group_code": IS_GROUP_CODE,
                     "virtual_checkin_status":"No",
+                    "company":company,
                     "cc_exp_date":replace_new[column_indexs["CC_EXP_DATE"]]
                 }
                 arrival_date = datetime.datetime.strptime(replace_new[column_indexs["ARRIVAL_DATE"]], "%d-%b-%y").date()
