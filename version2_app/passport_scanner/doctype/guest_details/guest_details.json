@@ -61,7 +61,8 @@
   "frro_checkout",
   "frro_checkout_message",
   "frro_checkout_date",
-  "next_destination_district"
+  "next_destination_district",
+  "next_destination_state"
  ],
  "fields": [
   {
@@ -360,6 +361,11 @@
    "fieldname": "next_destination_district",
    "fieldtype": "Data",
    "label": "Next Destination District"
+  },
+  {
+   "fieldname": "next_destination_state",
+   "fieldtype": "Data",
+   "label": "Next Destination State"
   }
  ],
  "index_web_pages_for_search": 1,
