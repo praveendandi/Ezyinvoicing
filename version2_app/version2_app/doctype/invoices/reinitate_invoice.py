@@ -87,17 +87,18 @@ def Reinitiate_invoice(data):
                     total_vat_amount += float(item['vat_amount'])
                 elif item['taxable']=="No" and item['item_type']=="Discount":
                     discountAmount += item['item_value_after_gst'] 
-                elif item['sac_code'].isdigit():
+                elif item['sac_code']!= None:
                     if "-" not in str(item['item_value']):
-                        cgst_amount+=float(item['cgst_amount'])
-                        sgst_amount+=float(item['sgst_amount'])
-                        igst_amount+=float(item['igst_amount'])
-                        total_central_cess_amount+=float(item['cess_amount'])
-                        total_state_cess_amount +=float(item['state_cess_amount'])
-                        value_before_gst += float(item['item_value'])
-                        value_after_gst += float(item['item_value_after_gst'])
-                        total_vat_amount += float(item['vat_amount'])
-                        print(value_after_gst," ******")
+                        if item['sac_code'].isdigit():
+                            cgst_amount+=float(item['cgst_amount'])
+                            sgst_amount+=float(item['sgst_amount'])
+                            igst_amount+=float(item['igst_amount'])
+                            total_central_cess_amount+=float(item['cess_amount'])
+                            total_state_cess_amount +=float(item['state_cess_amount'])
+                            value_before_gst += float(item['item_value'])
+                            value_after_gst += float(item['item_value_after_gst'])
+                            total_vat_amount += float(item['vat_amount'])
+                            print(value_after_gst," ******")
                     else:
                         # cgst_amount+=item['cgst_amount']
                         # sgst_amount+=item['sgst_amount']
