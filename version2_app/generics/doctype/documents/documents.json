@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "autoname": "field:confirmation_number",
+ "creation": "2021-09-09 09:41:50.293608",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "confirmation_number",
+  "module_name",
+  "document_type",
+  "user",
+  "number_of_guests",
+  "redg_file",
+  "invoice_file",
+  "advance_deposits_file",
+  "encasement_file",
+  "guest_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "module_name",
+   "fieldtype": "Select",
+   "label": "Module Name",
+   "options": "Sign Ezy\nScan Ezy\nEzycheckins\nEzyinvoicing"
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Select",
+   "label": "Document Type",
+   "options": "ID card\nAadhaar Card\nPan Card\nLicense\nReg card"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Data",
+   "label": "User"
+  },
+  {
+   "fieldname": "number_of_guests",
+   "fieldtype": "Data",
+   "label": "Number Of Guests"
+  },
+  {
+   "fieldname": "redg_file",
+   "fieldtype": "Attach",
+   "label": "redg_file"
+  },
+  {
+   "fieldname": "invoice_file",
+   "fieldtype": "Attach",
+   "label": "invoice file"
+  },
+  {
+   "fieldname": "advance_deposits_file",
+   "fieldtype": "Attach",
+   "label": "Advance Deposits File"
+  },
+  {
+   "fieldname": "encasement_file",
+   "fieldtype": "Attach",
+   "label": "Enhancement File"
+  },
+  {
+   "fieldname": "guest_details",
+   "fieldtype": "Table",
+   "label": "Guest details",
+   "options": "Guest Attachments"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-09-17 10:28:45.461843",
+ "modified_by": "Administrator",
+ "module": "Generics",
+ "name": "Documents",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
