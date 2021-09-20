@@ -99,7 +99,7 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type == "Hyatt Hyderabad":
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.upload_gst_details==1:
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
@@ -113,11 +113,13 @@ def BulkUploadReprocess(data):
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             if invoice_data.change_gst_number=="No" and invoice_data.converted_from_b2c=="No":
-                if line_items['data'][0]['taxid'] == "empty":
+                if line_items['data']['gstNumber'] == "" or line_items['data']['gstNumber'].strip() == "0" :
+                    print("----===================")
                     gstNumber == ""
                     invoiceType = "B2C"
                 else:
-                    gstNumber = line_items['data'][0]['taxid']
+                    print("||||||||||||||||||||||||||||||||||||||")
+                    gstNumber = line_items['data']['gstNumber']
                     invoiceType = "B2B"
                     error_data['gst_number'] = gstNumber
                     error_data['invoice_type'] = "B2B"
@@ -127,7 +129,10 @@ def BulkUploadReprocess(data):
                     if  "CGST" in each["name"] or "SGST" in each["name"]  or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
                     item_dict = {}
-                    date_time_obj = datetime.datetime.strptime(each['date'],'%d.%m.%y').strftime(company.invoice_item_date_format)
+                    if company.name=="TGND-01":
+                        date_time_obj = datetime.datetime.strptime(each['date'],'%d-%m-%y').strftime(company.invoice_item_date_format)
+                    else:
+                        date_time_obj = datetime.datetime.strptime(each['date'],'%d.%m.%y').strftime(company.invoice_item_date_format)
                     item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
                     if "item_value" not in each:
                         item_dict["item_value"]=each["FT_CREDIT"]
@@ -195,8 +200,9 @@ def BulkUploadReprocess(data):
         calculate_data['sez'] = invoice_data.sez	
         # calculate_items_data = calulate_items(calculate_data)
         # print(calculate_items_data)
+        print(invoiceType,"//////////////////////////////////////////////////")
         if invoiceType=="B2B":
-
+            print("'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''",gstNumber)
             gspApiDataResponse = gsp_api_data({"code":company.name,"mode":company.mode,"provider":company.provider})
             if gspApiDataResponse['success']==True:
                 checkTokenIsValidResponse = check_token_is_valid({"code":company.name,"mode":company.mode})
@@ -210,7 +216,7 @@ def BulkUploadReprocess(data):
                         calculate_items_data = calulate_items(calculate_data)
                         if calculate_items_data['success']==True:
 
-                            guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoice_data.invoice_type,
+                            guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoiceType,
                                             "gstNumber":invoice_data.gst_number,"room_number":invoice_data.room_number,"company_code":company.name,"confirmation_number":invoice_data.confirmation_number,"start_time":str(datetime.datetime.now()),"print_by":invoice_data.print_by,"invoice_category":invoice_data.invoice_category,"invoice_file":invoice_data.invoice_file}
                             reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_total_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
                             taxpayer_details = {"gst_number":invoice_data.gst_number,"legal_name":invoice_data.legal_name,"email":invoice_data.email,"address_1":invoice_data.address_1,"address_2":invoice_data.address_1,"trade_name":invoice_data.trade_name,"location":invoice_data.location,"pincode":invoice_data.pincode,"phone_number":invoice_data.phone_number,"state_code":invoice_data.state_code}
@@ -242,15 +248,13 @@ def BulkUploadReprocess(data):
         else:
             calculate_items_data = calulate_items(calculate_data)	
             if calculate_items_data['success']==True:
-
-                guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoice_data.invoice_type,
+                guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoiceType,
                                 "gstNumber":invoice_data.gst_number,"room_number":invoice_data.room_number,"company_code":company.name,"confirmation_number":invoice_data.confirmation_number,"start_time":str(datetime.datetime.now()),"print_by":invoice_data.print_by,"invoice_category":invoice_data.invoice_category,"invoice_file":invoice_data.invoice_file}
                 reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_total_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
                 taxpayer_details = {"gst_number":invoice_data.gst_number,"legal_name":invoice_data.legal_name,"email":invoice_data.email,"address_1":invoice_data.address_1,"address_2":invoice_data.address_1,"trade_name":invoice_data.trade_name,"location":invoice_data.location,"pincode":invoice_data.pincode,"phone_number":invoice_data.phone_number,"state_code":invoice_data.state_code}
                 reinitiate_data['taxpayer']= taxpayer_details
                 reinitiate_data['guest_data'] = guest_data
                 reinitiate_data['invoice_object_from_file'] = json.loads(invoice_data.invoice_object_from_file)
-                
                 invoicereinitiate = Reinitiate_invoice(reinitiate_data)
                 return invoicereinitiate
             else:

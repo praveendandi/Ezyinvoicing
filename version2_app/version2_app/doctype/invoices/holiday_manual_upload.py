@@ -572,7 +572,7 @@ def holidayinnerrorbulkreprocess(file_path,company):
 
 @frappe.whitelist(allow_guest=True)
 def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
-    try:
+    # try:
         companyData = frappe.get_doc('company',company)
         site_folder_path = companyData.site_name
         folder_path = frappe.utils.get_bench_path()
@@ -624,7 +624,7 @@ def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
                 data=payload_new).json()
             url = upload_report['message']['file_url']
             return url
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}   
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+    #     return {"success":False,"message":str(e)}   
