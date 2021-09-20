@@ -17,8 +17,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Printer IP",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fieldname": "last_used",
@@ -45,7 +44,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-26 15:03:32.391339",
+ "modified": "2021-09-20 10:57:20.729451",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Printers",
