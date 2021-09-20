@@ -2785,11 +2785,11 @@ def get_tax_payer_details(data):
                             details["AddrBnm"] = details["AddrBnm"] + "    "
                         if len(details["AddrBno"]) < 3:
                             details["AddrBno"] = details["AddrBno"] + "    "
-                        if "email" not in data:
-                            data["email"]=" "
+                        # if "email" not in data:
+                        #     data["email"]=" "
                         tax_payer = frappe.new_doc('TaxPayerDetail')
                         tax_payer.gst_number = details['Gstin']
-                        tax_payer.email = data["email"]
+                        tax_payer.email = data["email"] if "email" in data else ""
                         tax_payer.phone_number = " "
                         tax_payer.legal_name = details['LegalName']
                         tax_payer.address_1 = details['AddrBnm']
