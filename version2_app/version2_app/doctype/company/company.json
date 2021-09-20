@@ -129,7 +129,8 @@
   "create_taxinvoice_raisecredit",
   "qr_page",
   "arrival_report",
-  "pre_arrival_html"
+  "pre_arrival_html",
+  "html_text"
  ],
  "fields": [
   {
@@ -831,13 +832,18 @@
   },
   {
    "fieldname": "pre_arrival_html",
-   "fieldtype": "HTML Editor",
+   "fieldtype": "Attach",
    "label": "Pre Arrival HTML"
+  },
+  {
+   "fieldname": "html_text",
+   "fieldtype": "HTML Editor",
+   "label": "html text"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-15 17:35:59.487923",
+ "modified": "2021-09-17 11:24:12.940299",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

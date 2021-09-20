@@ -12,7 +12,7 @@ import os,glob
 import sys
 import datetime
 import importlib.util
-from frappe.utils import cstr
+from frappe.utils import cstr,get_site_name
 import traceback
 import requests
 from datetime import date, timedelta
@@ -699,3 +699,24 @@ def guest_attachments(doc,method=None):
         update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
         update_doc.save()
         frappe.db.commit()
+
+@frappe.whitelist(allow_guest=True)
+def send_email(confirmation_number, company):
+    company_doc = frappe.get_doc("company",company)
+    folder_path = frappe.utils.get_bench_path()
+    site_folder_path = company_doc.site_name
+    file_path = folder_path+'/sites/'+site_folder_path+company_doc.pre_arrival_html
+    arrival_doc = frappe.get_doc('Arrival Information',confirmation_number)
+    today_time = datetime.datetime.now()
+    f = open(file_path, "r")
+    data=f.read()
+    data = data.replace('{{name}}',arrival_doc.guest_first_name)
+    data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+    data = data.replace('{{Hotel Radison}}',company_doc.company_name)
+    print(data)
+    f.close
+    mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
+    subject = "Pre Arrivals",
+    message= data,now = True)
+
+
