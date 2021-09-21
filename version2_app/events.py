@@ -627,12 +627,16 @@ def deletePromotionsSocket(doc,method=None):
 @frappe.whitelist(allow_guest=True)
 def block_irn():
     try: 
+        print("============================================================")
         company = frappe.get_last_doc("company")
         url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
         json_property = url_property.json()
         if url_property.status_code == 200:
             company.block_irn = json_property["data"]["block_irn"]
             company.block_print = json_property["data"]["block_print"]
+            company.sign_ezy_module = 1 if json_property["data"]["sign_ezy"] == "True" else 0
+            company.scan_ezy_module = 1 if json_property["data"]["scan_ezy"] == "True" else 0
+            company.ezy_checkins_module = 1 if json_property["data"]["ezy_checkins"] == "True" else 0
             company.save(ignore_permissions=True)
             frappe.db.commit()
     except Exception as e:
