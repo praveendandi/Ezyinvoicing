@@ -142,7 +142,7 @@ def holidayinManualupload(data):
                     list_data['guest_name'] = each['guestname']
                     # amount = #+each['sgstamount']+each['sgstamount']+each['ngstamount']
                     list_data['total_invoice_amount'] = totalitemAmount
-                    list_data['gstNumber'] = each['taxid']
+                    list_data['gstNumber'] = each['taxid'].strip()
                     item_list = {'date':item_date,'item_value':each['invoiceamount'],'item_name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc']),"doctype":"Items","item_type":"SAC" if len(each['taxcode_dsc']) == 6 else "HSN","cgst": gst_percentage if each['sgstamount'] else 0,"sgst": gst_percentage if each['sgstamount'] else 0,
                         "igst": gst_percentage if each['ngstamount'] else 0,"item_taxable_value":csi,"gst_rate":gst_percentage*2,"item_value_after_gst":total_invoice_amount,"cess":0,"cess_amount":0,"state_cess":0,"state_cess_amount":0,"cgst_amount":each['sgstamount'],"sgst_amount":each['sgstamount'],"igst_amount":each["ngstamount"],"parent":each["taxinvnum"],
                         "parentfield":"items","parenttype":"invoices","sac_code_found":"Yes","other_charges":0,"vat_amount":0,"vat":0.0,"unit_of_measurement":"OTH","quantity":1,"unit_of_measurement_description":"OTHERS",
@@ -178,7 +178,7 @@ def holidayinManualupload(data):
                         list_data['guest_name'] = each['guestname']
                         # amount = each['invoiceamount']#+each['sgstamount']+each['sgstamount']+each['ngstamount']
                         list_data['total_invoice_amount'] = totalitemAmount
-                        list_data['gstNumber'] = each['taxid']
+                        list_data['gstNumber'] = each['taxid'].strip()
                         # list_data['total_invoice_amount'] = each['SUMFT_DEBITPERtaxinvnum']
                         item_list = {'date':item_date,'item_value':each['invoiceamount'],'item_name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc']),"doctype":"Items","item_type":"SAC" if len(each['taxcode_dsc']) == 6 else "HSN","cgst": gst_percentage if each['sgstamount'] else 0,"sgst": gst_percentage if each['sgstamount'] else 0,
                         "igst": gst_percentage if each['ngstamount'] else 0,"item_taxable_value":csi,"gst_rate":gst_percentage*2,"item_value_after_gst":total_invoice_amount,"cess":0,"cess_amount":0,"state_cess":0,"state_cess_amount":0,"cgst_amount":each['sgstamount'],"sgst_amount":each['sgstamount'],"igst_amount":each["ngstamount"],"parent":each["taxinvnum"],
