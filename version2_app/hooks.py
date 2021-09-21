@@ -112,6 +112,7 @@ doc_events = {
     },
     "Guest Details": {
         "after_insert": "version2_app.events.guest_attachments",
+        "on_update": "version2_app.events.guest_update_attachment_logs"
     },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",

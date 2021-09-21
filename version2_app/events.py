@@ -627,7 +627,6 @@ def deletePromotionsSocket(doc,method=None):
 @frappe.whitelist(allow_guest=True)
 def block_irn():
     try: 
-        print("============================================================")
         company = frappe.get_last_doc("company")
         url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
         json_property = url_property.json()
@@ -683,7 +682,7 @@ def guest_attachments(doc,method=None):
     user_name =  frappe.session.user
     date_time = datetime.datetime.now() 
     date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-    activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully"}
+    activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully","status":"Scanned"}
     event_doc=frappe.get_doc(activity_data)
     event_doc.insert()
     frappe.db.commit()
@@ -703,6 +702,15 @@ def guest_attachments(doc,method=None):
         update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
         update_doc.save()
         frappe.db.commit()
+
+@frappe.whitelist(allow_guest=True)
+def guest_update_attachment_logs(doc,method=None):
+    try:
+        print(doc.__dict__,"==============================================")
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing guest update attachment logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def send_email(confirmation_number, company):
