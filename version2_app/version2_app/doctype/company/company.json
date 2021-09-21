@@ -49,10 +49,12 @@
   "irn_details_page",
   "invoice_item_date_format",
   "font_file_path",
+  "proxy_settings_section",
   "proxy",
   "proxy_url",
   "proxy_username",
   "proxy_password",
+  "section_break_140",
   "allowance_type",
   "invoice_cancelled_mails",
   "host",
@@ -128,7 +130,24 @@
   "enable_pos_extra_text",
   "create_taxinvoice_raisecredit",
   "qr_page",
-  "arrival_report"
+  "arrival_report",
+  "pre_checkin_templates_section",
+  "email_banner",
+  "pre_checkin_mail",
+  "pre_checkin_mail_content",
+  "cancellation_email",
+  "cancellation_email_mail_content",
+  "column_break_142",
+  "thank_you_email",
+  "thank_you_email_mail_content",
+  "terms_and_conditions",
+  "pre_checkins_section",
+  "e_signature",
+  "group_checkins",
+  "covid_list",
+  "column_break_141",
+  "mail_schedule",
+  "no_of_days"
  ],
  "fields": [
   {
@@ -827,11 +846,109 @@
    "fieldname": "arrival_report",
    "fieldtype": "Attach",
    "label": "Arrival Report"
+  },
+  {
+   "fieldname": "email_banner",
+   "fieldtype": "Attach",
+   "label": "Email Banner"
+  },
+  {
+   "fieldname": "pre_checkin_templates_section",
+   "fieldtype": "Section Break",
+   "label": "Pre Checkin Templates"
+  },
+  {
+   "fieldname": "pre_checkin_mail",
+   "fieldtype": "Data",
+   "label": "Pre Checkin Mail"
+  },
+  {
+   "fieldname": "pre_checkin_mail_content",
+   "fieldtype": "Data",
+   "label": "Pre Checkin Mail Content"
+  },
+  {
+   "fieldname": "cancellation_email",
+   "fieldtype": "Select",
+   "label": "Cancellation Email",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "cancellation_email_mail_content",
+   "fieldtype": "Data",
+   "label": "Cancellation Email Mail Content"
+  },
+  {
+   "fieldname": "thank_you_email",
+   "fieldtype": "Select",
+   "label": "Thank you Email",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "thank_you_email_mail_content",
+   "fieldtype": "Data",
+   "label": "Thank you Email Mail Content"
+  },
+  {
+   "fieldname": "terms_and_conditions",
+   "fieldtype": "Data",
+   "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "pre_checkins_section",
+   "fieldtype": "Section Break",
+   "label": "Pre Checkins"
+  },
+  {
+   "fieldname": "e_signature",
+   "fieldtype": "Select",
+   "label": "E signature",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "group_checkins",
+   "fieldtype": "Select",
+   "label": "Group Checkins",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "covid_list",
+   "fieldtype": "Select",
+   "label": "Covid List",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "mail_schedule",
+   "fieldtype": "Select",
+   "label": "Mail Schedule",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "no_of_days",
+   "fieldtype": "Data",
+   "label": "No of Days"
+  },
+  {
+   "fieldname": "proxy_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Proxy Settings"
+  },
+  {
+   "fieldname": "section_break_140",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_141",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_142",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-08 15:31:03.345507",
+ "modified": "2021-09-20 16:22:12.574108",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
