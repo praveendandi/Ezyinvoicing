@@ -725,7 +725,7 @@ def send_email(confirmation_number, company):
 
 @frappe.whitelist(allow_guest=True)
 def pre_mail():
-    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "RESERVED"]},fields=["arrival_date","name","guest_email_address"])
+    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "RESERVED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
     for x in get_arrival_data:
         dt_convert = str(x['arrival_date'])
         name = str(x['name'])
@@ -734,7 +734,28 @@ def pre_mail():
         convert_days = int(company.no_of_days)
         thetime = arrival_date-timedelta(days=convert_days)
         now = datetime.date.today()
-        if now == thetime:
+        if x['mail_sent']=="No":
+            if now == thetime:
+                mail_send = frappe.sendmail(recipients="kiran@caratred.com",
+                subject = "Pre Arrivals",
+                message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
+                frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
+                frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
+            else:
+                return {"success":False, "message":"Email Sent Already"}
+
+@frappe.whitelist(allow_guest=True)
+def cancel_mail():
+    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "CANCELLED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
+    for x in get_arrival_data:
+        dt_convert = str(x['arrival_date'])
+        name = str(x['name'])
+        arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
+        if x['mail_sent']=="No":
             mail_send = frappe.sendmail(recipients="kiran@caratred.com",
             subject = "Pre Arrivals",
             message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
+            frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
+            frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
+        else:
+            frappe.db.set_value('Arrival Information',x['name'],'mail_via','Manual')

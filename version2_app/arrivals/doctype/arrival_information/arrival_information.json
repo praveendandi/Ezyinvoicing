@@ -38,7 +38,9 @@
   "departure_date",
   "is_group_code",
   "status",
-  "number_of_guests"
+  "number_of_guests",
+  "mail_sent",
+  "mail_via"
  ],
  "fields": [
   {
@@ -213,11 +215,25 @@
    "fieldname": "number_of_guests",
    "fieldtype": "Data",
    "label": "Number of Guests"
+  },
+  {
+   "default": "No",
+   "fieldname": "mail_sent",
+   "fieldtype": "Select",
+   "label": "Mail Sent",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "None",
+   "fieldname": "mail_via",
+   "fieldtype": "Select",
+   "label": "Mail via",
+   "options": "Automatic\nManual\nNone"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-13 12:26:54.622286",
+ "modified": "2021-09-23 14:51:09.322995",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
