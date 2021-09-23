@@ -25,6 +25,7 @@ from version2_app.version2_app.doctype.invoices.opera_manula_bulkupload import o
 from version2_app.version2_app.doctype.invoices.hyatt_manual_upload import hyattbulkupload
 from frappe.utils.background_jobs import enqueue
 from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
+from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newdelhi
 
 
 
@@ -76,6 +77,11 @@ def manual_upload_data(data):
         items_data_file = data['invoice_file']
         company = data['company']
         companyData = frappe.get_doc('company',data['company'])
+        if companyData.bulk_excel_upload_type=="Grand" or companyData.bulk_excel_upload_type=="Novotel Vijayawada":
+            output=grand_newdelhi(data)
+            if output['success'] == False:
+                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+            return output
         if companyData.bulk_excel_upload_type == "HolidayIn":
             output = holidayinManualupload(data)
             if output['success'] == False:
@@ -91,15 +97,13 @@ def manual_upload_data(data):
             if output['success'] ==False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
             return output
-        if companyData.bulk_excel_upload_type == "Hyatt Mumbai":
-            print(">>>>>>>>>>>>>>>>>.////////")
+        if companyData.bulk_excel_upload_type == "Hyatt Mumbai" or companyData.bulk_excel_upload_type == "Hyatt Hyderabad":
             output = hyatt_mumbai(data)
             if output['success'] == False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
             return output
         site_folder_path = companyData.site_name
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-        print("-----------------------------------------------")
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         input_data = []
@@ -221,7 +225,6 @@ def manual_upload_data(data):
                 each['invoice_type'] = "B2C"
                 each['gstNumber'] = ""
 
-            print(countIn,"////////")
             # print(each['invoice_number'],"ionvvvvvvvvvnum")
             check_invoice = check_invoice_exists(str(each['invoice_number']))
             if check_invoice['success']==True:

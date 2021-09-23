@@ -22,7 +22,8 @@
   "cin_no",
   "service_tax_no",
   "website",
-  "print_count"
+  "print_count",
+  "invoice_number_format"
  ],
  "fields": [
   {
@@ -119,11 +120,16 @@
    "fieldname": "print_count",
    "fieldtype": "Int",
    "label": "Print Count"
+  },
+  {
+   "fieldname": "invoice_number_format",
+   "fieldtype": "Data",
+   "label": "Invoice Number Format"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-08-20 11:09:28.400121",
+ "modified": "2021-09-23 14:41:05.681433",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",

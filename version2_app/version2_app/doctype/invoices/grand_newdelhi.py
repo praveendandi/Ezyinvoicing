@@ -8,7 +8,7 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 
 # @frappe.whitelist(allow_guest=True)
-def hyatt_mumbai(data):
+def grand_newdelhi(data):
     try:
         invoice_data=data
         company =invoice_data['company']
@@ -23,15 +23,15 @@ def hyatt_mumbai(data):
             items_dataframe = xmltodict.parse(xml_file.read())
         # print(items_dataframe)
         gst_data={}
-        gst_df=pd.read_excel(folder_path+'/sites/'+site_folder_path+invoice_data["gst_file"])
-        # data_to_dict=gst_df
-        # gst_df=gst_df.iloc[0]
+        gst_df=pd.read_csv(folder_path+'/sites/'+site_folder_path+invoice_data["gst_file"],delimiter="|")
+        gst_df=gst_df.iloc[:,0:2]
+        gst_df.columns=["gst_number", "invoice"]
         to_dict_data=gst_df.to_dict(orient="records")
+        print(to_dict_data,"-----------------------")
         for item in to_dict_data:
-            if invoice_data["company"]=="Hyatt Mumbai":
-                gst_data[str(item["BILL_GENERATION_DATE"])]=item["TRX_CODE"]
-            else:
-                gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
+            if str(item["gst_number"])!="nan":
+                if str(item["gst_number"]).strip()!="0":
+                    gst_data[str(item["invoice"])]=str(item["gst_number"]).strip()
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         input_data = []
@@ -173,6 +173,7 @@ def hyatt_mumbai(data):
             sez = 0
             # print(len(each_item['gstNumber']),"lennn",each_item['gstNumber'],each_item['invoice_type'])
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+            print(each_item,"++++++++++++++++++++++++++++++++++")
             if len(each_item['gstNumber']) < 15 and len(each_item['gstNumber'])>0:
                 error_data['error_message'] = "Invalid GstNumber " + each_item['gstNumber']
                 error_data['amened'] = 'No'

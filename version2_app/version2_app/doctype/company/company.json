@@ -15,6 +15,7 @@
   "provider",
   "column_break_6",
   "gst_number",
+  "fssai_number",
   "email",
   "phone_number",
   "status",
@@ -92,12 +93,10 @@
   "custom_e_tax_invoice_footer",
   "custom_e_tax_invoice_footer_image",
   "licensing_host",
-  "skip_ssl_verify",
   "b2b_to_credit",
   "manual_tax_invoice",
   "manual_credit_invoice",
   "manual_debit_invoice",
-  "ipp_printer_file_path",
   "change_invoice_reconciliation_invoice_number",
   "disable_sez",
   "b2c_online_payments",
@@ -127,7 +126,12 @@
   "payment_reconciliation",
   "disable_sac_edit",
   "enable_pos_extra_text",
+  "upload_gst_details",
+  "bulkupload_inovice_file_type",
+  "ipp_printer_file_path",
+  "skip_ssl_verify",
   "create_taxinvoice_raisecredit",
+  "bulkupload_gst_file_type",
   "qr_page",
   "arrival_report",
   "pre_checkin_templates_section",
@@ -499,7 +503,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai"
+   "options": "None\nGrand\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
   },
   {
    "default": "0",
@@ -964,11 +968,34 @@
    "fieldname": "ezy_checkins_module",
    "fieldtype": "Check",
    "label": "Ezy Checkins Module"
+  },
+  {
+   "default": "0",
+   "fieldname": "upload_gst_details",
+   "fieldtype": "Check",
+   "label": "Upload Gst Details"
+  },
+  {
+   "fieldname": "bulkupload_inovice_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload Inovice File Type",
+   "options": "csv\nxlsx\nxml"
+  },
+  {
+   "fieldname": "bulkupload_gst_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload GST File Type",
+   "options": "\ncsv\nxlsx\nxml"
+  },
+  {
+   "fieldname": "fssai_number",
+   "fieldtype": "Data",
+   "label": "FSSAI Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-21 15:23:02.502147",
+ "modified": "2021-09-23 14:54:29.519403",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
