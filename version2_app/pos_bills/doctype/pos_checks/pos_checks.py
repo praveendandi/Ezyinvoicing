@@ -121,16 +121,18 @@ def extract_data(payload,company_doc):
 				if re.match(company_doc.normal_check_total_amt_regex,line.strip()):
 					total_amount_regex = re.findall("\d+\.\d+",line.replace(" ",""))
 					total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
-			if company_doc.check_number_reference in line:
+			if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
 				check_regex = re.findall(company_doc.check_number_regex, line.strip())
 				check_string = check_regex[0] if len(check_regex)>0 else ""
 				check_no_regex = re.findall("\d.+",check_string)
 				data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
-			if company_doc.table_number_reference in line:
+			if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
 				table_regex = re.findall(company_doc.table_number_regex, line.strip())
 				table_string = table_regex[0] if len(table_regex)>0 else ""
 				table_no_regex = table_string.split(" ")
 				data["table_number"] = table_no_regex[-1] if len(table_no_regex) > 1 else ""
+				if data["table_number"] == "" and len(table_no_regex) == 1:
+					data["table_number"] = table_no_regex[0] if "/" in table_no_regex[0] else ""
 			if company_doc.guest_number_reference in line and "%" not in line and "GST No." not in line:
 				guestno_regex = re.findall(company_doc.guest_number_regex, line.strip())
 				print(guestno_regex)
@@ -214,7 +216,7 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
 		address = company_doc.address_2+", "+company_doc.location+"-"+str(company_doc.pincode)+", INDIA"
 		mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
 		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{} CIN NO:{}\nPlace Of Supply:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,company_doc.place_of_supply)
-		invoice_number = "Invoice No "+x.strftime("%y")+x.strftime("%m")+check_no + "\n"
+		invoice_number = "Invoice No "+outlet_doc.invoice_number_format+check_no + "\n"
 		return {"success":True,"string":company_name+address+mobile+gst_details,"invoice_number":invoice_number}
 	except Exception as e:
 		print(str(e))
