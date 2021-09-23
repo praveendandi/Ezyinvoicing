@@ -121,19 +121,20 @@ def extract_data(payload,company_doc):
 				if re.match(company_doc.normal_check_total_amt_regex,line.strip()):
 					total_amount_regex = re.findall("\d+\.\d+",line.replace(" ",""))
 					total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
-			if company_doc.check_number_reference in line:
+			if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
 				check_regex = re.findall(company_doc.check_number_regex, line.strip())
 				check_string = check_regex[0] if len(check_regex)>0 else ""
 				check_no_regex = re.findall("\d.+",check_string)
 				data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
-			if company_doc.table_number_reference in line:
+			if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
 				table_regex = re.findall(company_doc.table_number_regex, line.strip())
 				table_string = table_regex[0] if len(table_regex)>0 else ""
 				table_no_regex = table_string.split(" ")
 				data["table_number"] = table_no_regex[-1] if len(table_no_regex) > 1 else ""
+				if data["table_number"] == "" and len(table_no_regex) == 1:
+					data["table_number"] = table_no_regex[0] if "/" in table_no_regex[0] else ""
 			if company_doc.guest_number_reference in line and "%" not in line and "GST No." not in line:
 				guestno_regex = re.findall(company_doc.guest_number_regex, line.strip())
-				print(guestno_regex)
 				guest_string = guestno_regex[0] if len(guestno_regex)>0 else ""
 				guest_no_regex = re.findall("\d+",guest_string)
 				data["no_of_guests"] = guest_no_regex[0] if len(guest_no_regex) > 0 else ""

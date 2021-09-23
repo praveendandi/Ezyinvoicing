@@ -712,23 +712,46 @@ def guest_update_attachment_logs(doc,method=None):
         frappe.log_error("Ezy-invoicing guest update attachment logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+# @frappe.whitelist(allow_guest=True)
+# def send_email(confirmation_number, company):
+#     company_doc = frappe.get_doc("company",company)
+#     folder_path = frappe.utils.get_bench_path()
+#     site_folder_path = company_doc.site_name
+#     file_path = folder_path+'/sites/'+site_folder_path+company_doc.pre_arrival_html
+#     arrival_doc = frappe.get_doc('Arrival Information',confirmation_number)
+#     today_time = datetime.datetime.now()
+#     f = open(file_path, "r")
+#     data=f.read()
+#     data = data.replace('{{name}}',arrival_doc.guest_first_name)
+#     data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+#     data = data.replace('{{Hotel Radison}}',company_doc.company_name)
+#     print(data)
+#     f.close
+#     mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
+#     subject = "Pre Arrivals",
+#     message= data,now = True)
+
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+
 @frappe.whitelist(allow_guest=True)
-def send_email(confirmation_number, company):
-    company_doc = frappe.get_doc("company",company)
-    folder_path = frappe.utils.get_bench_path()
-    site_folder_path = company_doc.site_name
-    file_path = folder_path+'/sites/'+site_folder_path+company_doc.pre_arrival_html
-    arrival_doc = frappe.get_doc('Arrival Information',confirmation_number)
-    today_time = datetime.datetime.now()
-    f = open(file_path, "r")
-    data=f.read()
-    data = data.replace('{{name}}',arrival_doc.guest_first_name)
-    data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-    data = data.replace('{{Hotel Radison}}',company_doc.company_name)
-    print(data)
-    f.close
-    mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
-    subject = "Pre Arrivals",
-    message= data,now = True)
-
-
+def send_email():
+    msg = MIMEMultipart('related')
+    
+    html = """\<html>
+    <head></head>
+    <body>
+      <img src="cid:image1" alt="Logo" style="width:250px;height:50px;"><br>
+       <p><h4 style="font-size:15px;">Some Text.</h4></p>           
+    </body>
+    </html>"""
+    part2 = MIMEText(html, 'html')
+    msg.attach(part2)
+    img_data = open("/home/caratred/Downloads/qr_logo.png", 'rb').read()
+    msgImage = MIMEImage(img_data, name=os.path.basename("/home/caratred/Downloads/qr_logo.png"))
+    msgImage.add_header('Content-ID', '<image1>')
+    msg.attach(msgImage)
+    mail_send = frappe.sendmail(recipients="prasanth@caratred.com",subject = "Pre Arrivals",message= msg,now = True)
+    
