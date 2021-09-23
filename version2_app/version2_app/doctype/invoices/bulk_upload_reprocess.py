@@ -24,9 +24,9 @@ def BulkUploadReprocess(data):
         line_items = json.loads(invoice_data.invoice_object_from_file)
         invoice_total_amount = invoice_data.total_invoice_amount
         print(invoice_total_amount)
-        # print(invoice_total_amount,"=-=-=-=-=-=-")
+        print(invoice_data.gst_number,"=-=-=-=-=-=-")
         company = frappe.get_doc('company',invoice_data.company)
-        gstNumber = invoice_data.gst_number 
+        gstNumber = (invoice_data.gst_number).strip() 
         invoiceType = invoice_data.invoice_type
         error_data ={}
         error_data['room_number'] = invoice_data.room_number
@@ -99,7 +99,7 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.upload_gst_details==1:
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
@@ -118,13 +118,12 @@ def BulkUploadReprocess(data):
                     gstNumber == ""
                     invoiceType = "B2C"
                 else:
-                    print("||||||||||||||||||||||||||||||||||||||")
+                    print("||||||||||||||||||||||||||||||||||||||",line_items['data']['gstNumber'])
                     gstNumber = line_items['data']['gstNumber']
                     invoiceType = "B2B"
                     error_data['gst_number'] = gstNumber
                     error_data['invoice_type'] = "B2B"
             for each in line_items['data']['items']:
-                print(each,">>>>>>>>>>>>>>>>>")
                 if each['name'] not in payment_Types:
                     if  "CGST" in each["name"] or "SGST" in each["name"]  or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
@@ -132,7 +131,7 @@ def BulkUploadReprocess(data):
                     if company.name=="TGND-01":
                         date_time_obj = datetime.datetime.strptime(each['date'],'%d-%m-%y').strftime(company.invoice_item_date_format)
                     else:
-                        date_time_obj = datetime.datetime.strptime(each['date'],'%d.%m.%y').strftime(company.invoice_item_date_format)
+                        date_time_obj = datetime.datetime.strptime(each['date'],company.invoice_item_date_format).strftime(company.invoice_item_date_format)
                     item_dict['date'] = date_time_obj#each['BILL_GENERATION_DATE_CHAR']
                     if "item_value" not in each:
                         item_dict["item_value"]=each["FT_CREDIT"]
@@ -200,7 +199,7 @@ def BulkUploadReprocess(data):
         calculate_data['sez'] = invoice_data.sez	
         # calculate_items_data = calulate_items(calculate_data)
         # print(calculate_items_data)
-        print(invoiceType,"//////////////////////////////////////////////////")
+        print(items,"//////////////////////////////////////////////////")
         if invoiceType=="B2B":
             print("'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''",gstNumber)
             gspApiDataResponse = gsp_api_data({"code":company.name,"mode":company.mode,"provider":company.provider})
@@ -214,8 +213,8 @@ def BulkUploadReprocess(data):
                         taxpayer=getTaxPayerDetailsResponse['data'].__dict__
                     
                         calculate_items_data = calulate_items(calculate_data)
+                        print(calculate_items_data,"////////>>>>>>>>>>>>>>>>>>>>>>")
                         if calculate_items_data['success']==True:
-
                             guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoiceType,
                                             "gstNumber":invoice_data.gst_number,"room_number":invoice_data.room_number,"company_code":company.name,"confirmation_number":invoice_data.confirmation_number,"start_time":str(datetime.datetime.now()),"print_by":invoice_data.print_by,"invoice_category":invoice_data.invoice_category,"invoice_file":invoice_data.invoice_file}
                             reinitiate_data = {"company_code":company.name,"items_data":calculate_items_data['data'],"total_invoice_amount":invoice_total_amount,"invoice_number":invoice_data.name,"amened":"No","sez":invoice_data.sez}
@@ -232,6 +231,7 @@ def BulkUploadReprocess(data):
                             return errorInvoice
                     else:
                         calculate_items_data = calulate_items(calculate_data)
+                        # print(calculate_items_data,">>>>>>>>>>>>>>>>>>>>>>")
                         if calculate_items_data['success'] == True:
                             error_data['items_data'] = calculate_items_data['data']
                         error_data['error_message'] = getTaxPayerDetailsResponse['message']
@@ -245,8 +245,8 @@ def BulkUploadReprocess(data):
                 error_data['error_message'] = checkTokenIsValidResponse['message']
                 errorInvoice = Error_Insert_invoice(error_data)	
                 return errorInvoice
-        else:
-            calculate_items_data = calulate_items(calculate_data)	
+        else:	
+            calculate_items_data = calulate_items(calculate_data)
             if calculate_items_data['success']==True:
                 guest_data = {'items':calculate_items_data['data'],'name':invoice_data.guest_name,"invoice_number":invoice_data.name,"membership":"","invoice_date":invdate,"invoice_type":invoiceType,
                                 "gstNumber":invoice_data.gst_number,"room_number":invoice_data.room_number,"company_code":company.name,"confirmation_number":invoice_data.confirmation_number,"start_time":str(datetime.datetime.now()),"print_by":invoice_data.print_by,"invoice_category":invoice_data.invoice_category,"invoice_file":invoice_data.invoice_file}

@@ -479,7 +479,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nGrand\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
+   "options": "None\nNovotel Vijayawada\nGrand\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
   },
   {
    "default": "0",
@@ -846,7 +846,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-16 18:29:24.116227",
+ "modified": "2021-09-21 11:45:08.417672",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
