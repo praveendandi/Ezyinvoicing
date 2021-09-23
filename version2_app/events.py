@@ -627,7 +627,6 @@ def deletePromotionsSocket(doc,method=None):
 @frappe.whitelist(allow_guest=True)
 def block_irn():
     try: 
-        print("============================================================")
         company = frappe.get_last_doc("company")
         url_property = requests.get(company.licensing_host+"/api/resource/Properties/"+company.company_code)
         json_property = url_property.json()
@@ -724,3 +723,18 @@ def send_email(confirmation_number, company):
     message= data,now = True)
 
 
+@frappe.whitelist(allow_guest=True)
+def pre_mail():
+    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "RESERVED"]},fields=["arrival_date","name","guest_email_address"])
+    for x in get_arrival_data:
+        dt_convert = str(x['arrival_date'])
+        name = str(x['name'])
+        arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
+        company = frappe.get_last_doc("company")
+        convert_days = int(company.no_of_days)
+        thetime = arrival_date-timedelta(days=convert_days)
+        now = datetime.date.today()
+        if now == thetime:
+            mail_send = frappe.sendmail(recipients="kiran@caratred.com",
+            subject = "Pre Arrivals",
+            message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
