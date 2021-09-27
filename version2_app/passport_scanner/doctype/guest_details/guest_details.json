@@ -8,6 +8,7 @@
   "confirmation_number",
   "frro_id",
   "room_number",
+  "guest_full_name",
   "surname",
   "given_name",
   "gender",
@@ -39,6 +40,8 @@
   "next_destination",
   "next_destination_country",
   "next_destination_city",
+  "next_destination_state",
+  "next_destination_district",
   "next_destination_place",
   "contact_phone_no",
   "contact_mobile_no",
@@ -60,9 +63,7 @@
   "frro_failure_count",
   "frro_checkout",
   "frro_checkout_message",
-  "frro_checkout_date",
-  "next_destination_district",
-  "next_destination_state"
+  "frro_checkout_date"
  ],
  "fields": [
   {
@@ -358,19 +359,24 @@
    "label": "Frro Checkout Date"
   },
   {
+   "fieldname": "next_destination_state",
+   "fieldtype": "Data",
+   "label": "Next Destination State"
+  },
+  {
    "fieldname": "next_destination_district",
    "fieldtype": "Data",
    "label": "Next Destination District"
   },
   {
-   "fieldname": "next_destination_state",
+   "fieldname": "guest_full_name",
    "fieldtype": "Data",
-   "label": "Next Destination State"
+   "label": "Guest Full Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-16 18:36:06.348464",
+ "modified": "2021-09-23 18:54:05.030019",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

@@ -679,34 +679,63 @@ def arrival_information(doc,method=None):
 
 @frappe.whitelist(allow_guest=True)
 def guest_attachments(doc,method=None):
-    user_name =  frappe.session.user
-    date_time = datetime.datetime.now() 
-    date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-    activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully","status":"Scanned"}
-    event_doc=frappe.get_doc(activity_data)
-    event_doc.insert()
-    frappe.db.commit()
-    get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
-    if len(get_data)==0:
+    try:
         user_name =  frappe.session.user
-        data={"doctype":"Documents","guest_details":[{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image}],"confirmation_number":doc.confirmation_number,"module_name":"Scan Ezy","user":user_name}
-        get_doc=frappe.get_doc(data)
-        get_doc.insert()
+        date_time = datetime.datetime.now() 
+        date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully","status":doc.status}
+        event_doc=frappe.get_doc(activity_data)
+        event_doc.insert()
         frappe.db.commit()
-    else: 
-        user_name =  frappe.session.user
-        data={"confirmation_number":doc.confirmation_number,"module_name":"Scan Ezy","user":user_name}
-        get_doc=frappe.db.set_value("Documents",get_data[0]["name"],data)
+        get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
+        if len(get_data)==0:
+            user_name =  frappe.session.user
+            data={"doctype":"Documents","guest_details":[{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image}],"confirmation_number":doc.confirmation_number,"module_name":"Scan Ezy","user":user_name}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        else: 
+            user_name =  frappe.session.user
+            data={"confirmation_number":doc.confirmation_number,"module_name":"Scan Ezy","user":user_name}
+            get_doc=frappe.db.set_value("Documents",get_data[0]["name"],data)
+            frappe.db.commit()
+            update_doc=frappe.get_doc("Documents",get_data[0]["name"])
+            update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
+            update_doc.save()
+            frappe.db.commit()
+        arrival_doc = frappe.get_doc('Arrival Information',doc.confirmation_number)
+        guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
+        added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
+        if guest_count != 0:
+            if added_guest_count > guest_count:
+                arrival_doc.no_of_adults = guest_count + 1
+        else:
+            arrival_doc.no_of_adults = guest_count + 1
+        arrival_doc.save()
         frappe.db.commit()
-        update_doc=frappe.get_doc("Documents",get_data[0]["name"])
-        update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
-        update_doc.save()
+        given_name = doc.given_name if doc.given_name else ""
+        surname = doc.surname if doc.surname else ""
+        frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
         frappe.db.commit()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing Guest Attachments","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def guest_update_attachment_logs(doc,method=None):
     try:
-        print(doc.__dict__,"==============================================")
+        given_name = doc.given_name if doc.given_name else ""
+        surname = doc.surname if doc.surname else ""
+        frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname})
+        frappe.db.commit()
+        user_name =  frappe.session.user
+        date_time = datetime.datetime.now() 
+        date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details changed successfully","status":doc.status}
+        event_doc=frappe.get_doc(activity_data)
+        event_doc.insert()
+        frappe.db.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing guest update attachment logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
