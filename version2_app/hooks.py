@@ -182,18 +182,18 @@ doc_events = {
 
 # Scheduled Tasks/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/emailTemplat.py
 # ---------------
-scheduler_events = {
+# scheduler_events = {
 	
 
-	# "daily":[
-	# 	"version2_app.events.deleteemailfilesdaily"
-	# ],
-	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
-			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
-			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
-			"0 12 * * *":["version2_app.events.block_irn"],
-            "* * * * *":["version2_app.events.pre_mail"]}	
-}	
+# 	# "daily":[
+# 	# 	"version2_app.events.deleteemailfilesdaily"
+# 	# ],
+# 	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+# 			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+# 			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
+# 			"0 12 * * *":["version2_app.events.block_irn"],
+#             "* * * * *":["version2_app.events.pre_mail"]}	
+# }	
 
 
 scheduler_events = {
@@ -201,12 +201,13 @@ scheduler_events = {
         "version2_app.version2_app.doctype.emailTemplat.sampleFun"
     ],
     "cron": {
-        "1-59 * * * *": [
-            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
-        ],
-        "09 11 * * * *": [
-            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
-        ]},
+        "1-59 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
+        "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+        "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+        "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
+        "0 12 * * *":["version2_app.events.block_irn"],
+        # "* * * * *":["version2_app.events.pre_mail"],
+        "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"]},
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
         "version2_app.events.deleteemailfilesdaily"

@@ -771,8 +771,9 @@ def pre_mail():
     company = frappe.get_last_doc("company")
     now = datetime.datetime.now()
     current_time = now.strftime("%H:%M:%S")
-    print(current_time,"::::::::")
-    if company.mail_schedule_time == current_time:
+    time_company=str(company.mail_schedule_time)
+    str_date=str(company.mail_schedule_time+timedelta(minutes=1))
+    if current_time > time_company and current_time<str_date:
         if company.mail_frequency == "Once": 
             for x in get_arrival_data:
                 dt_convert = str(x['arrival_date'])
@@ -786,8 +787,7 @@ def pre_mail():
                     if now == thetime:
                         mail_send = frappe.sendmail(recipients="kiran@caratred.com",
                         subject = "Pre Arrivals",
-                        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,
-                        content = "<div><img src=\"\/home/caratred/Pictures/Screenshot from 2020-12-14 10-18-54.png\"><\/div>",now = True)
+                        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
                         frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
                         frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
                     else:
@@ -805,8 +805,7 @@ def pre_mail():
                     if arrival_date > thetime and now <= arrival_date:
                         mail_send = frappe.sendmail(recipients="kiran@caratred.com",
                         subject = "Pre Arrivals",
-                        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,
-                        content = "<div><img src=\"\/home/caratred/Pictures/Screenshot from 2020-12-14 10-18-54.png\"><\/div>",now = True)
+                        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
                         frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
                     else:
                         return {"success":False, "message":"Email Sent Already"}
