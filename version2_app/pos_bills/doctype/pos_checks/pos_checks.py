@@ -214,6 +214,7 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
 		format = outlet_doc.invoice_number_format
 		monformat = ""
 		yearformat = ""
+		dayformat = ""
 		x = datetime.datetime.now()
 		if format:
 			countofy = format.count("Y")
@@ -222,11 +223,15 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
 			countofm = format.count("M")
 			if countofm!=0:
 				monformat = x.strftime("%m") if countofy == 2 else x.strftime("%m")
+			countofd = format.count("D")
+			if countofd!=0:
+				dayformat = x.strftime("%d")
 		company_name = '{}'.format(company_doc.company_name)+"\n"+company_doc.address_1+"\n"
 		address = company_doc.address_2+", "+company_doc.location+"-"+str(company_doc.pincode)+", INDIA"
 		mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
 		gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{} CIN NO:{}\nPlace Of Supply:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,company_doc.place_of_supply)
-		invoice_number = "Invoice No "+yearformat+monformat+check_no + "\n"
+		invoice_number = "Invoice No "+yearformat+monformat+dayformat+check_no + "\n"
+		print(invoice_number,"-----------------------------------------")
 		return {"success":True,"string":company_name+address+mobile+gst_details,"invoice_number":invoice_number}
 	except Exception as e:
 		print(str(e))
