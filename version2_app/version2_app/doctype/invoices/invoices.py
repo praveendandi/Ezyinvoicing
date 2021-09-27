@@ -370,6 +370,7 @@ def generateIrn(data):
                     IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
                     
                     IRNObjectdoc.save()
+                    print(response['result'],"00000000000000000000000000000000000000000000000")
                     # print(IRNObjectdoc.name,"/a/a/a/")
                     invoice = frappe.get_doc('Invoices', invoice_number)
                     print(invoice.email,"|||||||||||||||||||||||||||||||||||")
@@ -383,7 +384,7 @@ def generateIrn(data):
                     invoice.qr_code = response['result']['SignedQRCode']
                     invoice.qr_code_generated = 'Success'
                     invoice.irn_cancelled = 'No'
-                    invoice.irn_generated_time = datetime.datetime.utcnow()
+                    invoice.irn_generated_time = datetime.datetime.now()
                     invoice.irn_generated_type = generation_type
                     invoice.irn_process_time = datetime.datetime.utcnow(
                     ) - start_time
