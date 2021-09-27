@@ -142,7 +142,7 @@ def holidayinManualupload(data):
                     list_data['guest_name'] = each['guestname']
                     # amount = #+each['sgstamount']+each['sgstamount']+each['ngstamount']
                     list_data['total_invoice_amount'] = totalitemAmount
-                    list_data['gstNumber'] = each['taxid']
+                    list_data['gstNumber'] = each['taxid'].strip()
                     item_list = {'date':item_date,'item_value':each['invoiceamount'],'item_name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc']),"doctype":"Items","item_type":"SAC" if len(each['taxcode_dsc']) == 6 else "HSN","cgst": gst_percentage if each['sgstamount'] else 0,"sgst": gst_percentage if each['sgstamount'] else 0,
                         "igst": gst_percentage if each['ngstamount'] else 0,"item_taxable_value":csi,"gst_rate":gst_percentage*2,"item_value_after_gst":total_invoice_amount,"cess":0,"cess_amount":0,"state_cess":0,"state_cess_amount":0,"cgst_amount":each['sgstamount'],"sgst_amount":each['sgstamount'],"igst_amount":each["ngstamount"],"parent":each["taxinvnum"],
                         "parentfield":"items","parenttype":"invoices","sac_code_found":"Yes","other_charges":0,"vat_amount":0,"vat":0.0,"unit_of_measurement":"OTH","quantity":1,"unit_of_measurement_description":"OTHERS",
@@ -178,7 +178,7 @@ def holidayinManualupload(data):
                         list_data['guest_name'] = each['guestname']
                         # amount = each['invoiceamount']#+each['sgstamount']+each['sgstamount']+each['ngstamount']
                         list_data['total_invoice_amount'] = totalitemAmount
-                        list_data['gstNumber'] = each['taxid']
+                        list_data['gstNumber'] = each['taxid'].strip()
                         # list_data['total_invoice_amount'] = each['SUMFT_DEBITPERtaxinvnum']
                         item_list = {'date':item_date,'item_value':each['invoiceamount'],'item_name':each['goods_desc'],'sort_order':1,"sac_code":str(each['taxcode_dsc']),"doctype":"Items","item_type":"SAC" if len(each['taxcode_dsc']) == 6 else "HSN","cgst": gst_percentage if each['sgstamount'] else 0,"sgst": gst_percentage if each['sgstamount'] else 0,
                         "igst": gst_percentage if each['ngstamount'] else 0,"item_taxable_value":csi,"gst_rate":gst_percentage*2,"item_value_after_gst":total_invoice_amount,"cess":0,"cess_amount":0,"state_cess":0,"state_cess_amount":0,"cgst_amount":each['sgstamount'],"sgst_amount":each['sgstamount'],"igst_amount":each["ngstamount"],"parent":each["taxinvnum"],
@@ -482,7 +482,10 @@ def testsample(file_path,company):
         data1=dict((each["@name"],each["#text"]) if "#text" in  each else (each["@name"],"") for each in item["column"])
         data1["invoiceamount"]=float(data1["invoiceamount"])
         data1["sgstamount"]=float(data1["sgstamount"])
-        data1["ngstamount"]=float(data1["ngstamount"])
+        if "ngstamount" not in data1:
+            data1["ngstamount"]=float(data1["igstamount"])
+        else:
+            data1["ngstamount"]=float(data1["ngstamount"])
         if "folioid" in data1:
             # global folioid
             folioid=data1["folioid"]
@@ -569,7 +572,7 @@ def holidayinnerrorbulkreprocess(file_path,company):
 
 @frappe.whitelist(allow_guest=True)
 def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
-    try:
+    # try:
         companyData = frappe.get_doc('company',company)
         site_folder_path = companyData.site_name
         folder_path = frappe.utils.get_bench_path()
@@ -621,7 +624,7 @@ def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
                 data=payload_new).json()
             url = upload_report['message']['file_url']
             return url
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}   
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+    #     return {"success":False,"message":str(e)}   

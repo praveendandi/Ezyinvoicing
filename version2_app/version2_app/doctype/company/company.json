@@ -150,7 +150,9 @@
   "covid_list",
   "column_break_141",
   "mail_schedule",
-  "no_of_days"
+  "no_of_days",
+  "mail_frequency",
+  "mail_schedule_time"
  ],
  "fields": [
   {
@@ -964,11 +966,23 @@
    "fieldname": "ezy_checkins_module",
    "fieldtype": "Check",
    "label": "Ezy Checkins Module"
+  },
+  {
+   "fieldname": "mail_frequency",
+   "fieldtype": "Select",
+   "label": "Mail Frequency",
+   "options": "Once\nDaily"
+  },
+  {
+   "default": "09:00",
+   "fieldname": "mail_schedule_time",
+   "fieldtype": "Time",
+   "label": "Mail Schedule Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-23 14:42:46.397801",
+ "modified": "2021-09-27 10:34:59.161381",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -112,6 +112,7 @@ doc_events = {
     },
     "Guest Details": {
         "after_insert": "version2_app.events.guest_attachments",
+        "on_update": "version2_app.events.guest_update_attachment_logs"
     },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",
@@ -190,7 +191,8 @@ scheduler_events = {
 	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
 			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
 			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
-			"0 12 * * *":["version2_app.events.block_irn"]}	
+			"0 12 * * *":["version2_app.events.block_irn"],
+            "* * * * *":["version2_app.events.pre_mail"]}	
 }	
 
 

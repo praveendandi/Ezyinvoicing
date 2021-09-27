@@ -682,7 +682,7 @@ def guest_attachments(doc,method=None):
     user_name =  frappe.session.user
     date_time = datetime.datetime.now() 
     date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-    activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully"}
+    activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Passport Scanner","event":"PreArrivals","user":user_name,"activity":"guest details added successfully","status":"Scanned"}
     event_doc=frappe.get_doc(activity_data)
     event_doc.insert()
     frappe.db.commit()
@@ -704,38 +704,97 @@ def guest_attachments(doc,method=None):
         frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
-def send_email(confirmation_number, company):
-    company_doc = frappe.get_doc("company",company)
-    folder_path = frappe.utils.get_bench_path()
-    site_folder_path = company_doc.site_name
-    file_path = folder_path+'/sites/'+site_folder_path+company_doc.pre_arrival_html
-    arrival_doc = frappe.get_doc('Arrival Information',confirmation_number)
-    today_time = datetime.datetime.now()
-    f = open(file_path, "r")
-    data=f.read()
-    data = data.replace('{{name}}',arrival_doc.guest_first_name)
-    data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-    data = data.replace('{{Hotel Radison}}',company_doc.company_name)
-    print(data)
-    f.close
-    mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
-    subject = "Pre Arrivals",
-    message= data,now = True)
+def guest_update_attachment_logs(doc,method=None):
+    try:
+        print(doc.__dict__,"==============================================")
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing guest update attachment logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
+# @frappe.whitelist(allow_guest=True)
+# def send_email(confirmation_number, company):
+#     company_doc = frappe.get_doc("company",company)
+#     folder_path = frappe.utils.get_bench_path()
+#     site_folder_path = company_doc.site_name
+#     file_path = folder_path+'/sites/'+site_folder_path+company_doc.pre_arrival_html
+#     arrival_doc = frappe.get_doc('Arrival Information',confirmation_number)
+#     today_time = datetime.datetime.now()
+#     f = open(file_path, "r")
+#     data=f.read()
+#     data = data.replace('{{name}}',arrival_doc.guest_first_name)
+#     data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+#     data = data.replace('{{Hotel Radison}}',company_doc.company_name)
+#     print(data)
+#     f.close
+#     mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
+#     subject = "Pre Arrivals",
+#     message= data,now = True)
+
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 
 @frappe.whitelist(allow_guest=True)
 def pre_mail():
     get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "RESERVED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
-    for x in get_arrival_data:
-        dt_convert = str(x['arrival_date'])
-        name = str(x['name'])
-        arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
-        company = frappe.get_last_doc("company")
-        convert_days = int(company.no_of_days)
-        thetime = arrival_date-timedelta(days=convert_days)
-        now = datetime.date.today()
-        if x['mail_sent']=="No":
-            if now == thetime:
+    company = frappe.get_last_doc("company")
+    now = datetime.datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print(current_time,"::::::::")
+    if company.mail_schedule_time == current_time:
+        if company.mail_frequency == "Once": 
+            for x in get_arrival_data:
+                dt_convert = str(x['arrival_date'])
+                name = str(x['name'])
+                arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
+                company = frappe.get_last_doc("company")
+                convert_days = int(company.no_of_days)
+                thetime = arrival_date-timedelta(days=convert_days)
+                now = datetime.date.today()
+                if x['mail_sent']=="No":
+                    if now == thetime:
+                        mail_send = frappe.sendmail(recipients="kiran@caratred.com",
+                        subject = "Pre Arrivals",
+                        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,
+                        content = "<div><img src=\"\/home/caratred/Pictures/Screenshot from 2020-12-14 10-18-54.png\"><\/div>",now = True)
+                        frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
+                        frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
+                    else:
+                        return {"success":False, "message":"Email Sent Already"}
+        elif company.mail_frequency == "Daily":
+            for x in get_arrival_data:
+                dt_convert = str(x['arrival_date'])
+                name = str(x['name'])
+                arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
+                company = frappe.get_last_doc("company")
+                convert_days = int(company.no_of_days)
+                thetime = arrival_date-timedelta(days=convert_days)
+                now = datetime.date.today()
+                if x['mail_sent']=="No":
+                    if arrival_date > thetime and now <= arrival_date:
+                        mail_send = frappe.sendmail(recipients="kiran@caratred.com",
+                        subject = "Pre Arrivals",
+                        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,
+                        content = "<div><img src=\"\/home/caratred/Pictures/Screenshot from 2020-12-14 10-18-54.png\"><\/div>",now = True)
+                        frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
+                    else:
+                        return {"success":False, "message":"Email Sent Already"}
+        
+
+
+
+@frappe.whitelist(allow_guest=True)
+def cancel_mail():
+    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "CANCELLED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
+    company = frappe.get_last_doc("company")
+    if company.cancellation_email == "Yes":
+        for x in get_arrival_data:
+            dt_convert = str(x['arrival_date'])
+            name = str(x['name'])
+            arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
+            if x['mail_sent']=="No":
                 mail_send = frappe.sendmail(recipients="kiran@caratred.com",
                 subject = "Pre Arrivals",
                 message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
@@ -745,7 +804,7 @@ def pre_mail():
                 return {"success":False, "message":"Email Sent Already"}
 
 @frappe.whitelist(allow_guest=True)
-def cancel_mail():
+def manual_mail():
     get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "CANCELLED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
     for x in get_arrival_data:
         dt_convert = str(x['arrival_date'])
@@ -756,6 +815,6 @@ def cancel_mail():
             subject = "Pre Arrivals",
             message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
             frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
-            frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
-        else:
             frappe.db.set_value('Arrival Information',x['name'],'mail_via','Manual')
+        else:
+            return {"success":False, "message":"Email Sent Already"}
