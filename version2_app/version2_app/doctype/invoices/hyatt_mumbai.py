@@ -41,12 +41,12 @@ def hyatt_mumbai(data):
             if each['SUMFT_DEBITPERBILL_NO']==None:
                 each['SUMFT_DEBITPERBILL_NO']=0
             if each['BILL_NO'] in gst_data.keys():
-                data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':"GHM"+(each['BILL_NO']),'invoice_date':each['BILL_GENERATION_DATE'],
+                data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':gst_data[each["BILL_NO"]],'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2B"}
             else:
-                data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':"GHM"+(each['BILL_NO']),'invoice_date':each['BILL_GENERATION_DATE'],
+                data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':"",'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2C"}
