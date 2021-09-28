@@ -132,14 +132,13 @@
   "arrival_report",
   "pre_checkin_templates_section",
   "email_banner",
-  "pre_checkin_mail",
   "pre_checkin_mail_content",
   "cancellation_email",
-  "cancellation_email_mail_content",
   "column_break_142",
   "thank_you_email",
   "thank_you_email_mail_content",
   "terms_and_conditions",
+  "cancellation_email_mail_content",
   "modules_section",
   "scan_ezy_module",
   "sign_ezy_module",
@@ -152,7 +151,8 @@
   "mail_schedule",
   "no_of_days",
   "mail_frequency",
-  "mail_schedule_time"
+  "mail_schedule_time",
+  "pre_checkin_mail_subject"
  ],
  "fields": [
   {
@@ -863,13 +863,8 @@
    "label": "Pre Checkin Templates"
   },
   {
-   "fieldname": "pre_checkin_mail",
-   "fieldtype": "Data",
-   "label": "Pre Checkin Mail"
-  },
-  {
    "fieldname": "pre_checkin_mail_content",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "Pre Checkin Mail Content"
   },
   {
@@ -931,7 +926,7 @@
   {
    "fieldname": "no_of_days",
    "fieldtype": "Data",
-   "label": "No of Days"
+   "label": "Mail Schedule Days"
   },
   {
    "fieldname": "proxy_settings_section",
@@ -978,11 +973,16 @@
    "fieldname": "mail_schedule_time",
    "fieldtype": "Time",
    "label": "Mail Schedule Time"
+  },
+  {
+   "fieldname": "pre_checkin_mail_subject",
+   "fieldtype": "Data",
+   "label": "Pre Checkin Mail Subject"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-27 10:34:59.161381",
+ "modified": "2021-09-28 14:29:57.341036",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
