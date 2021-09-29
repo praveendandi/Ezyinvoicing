@@ -116,6 +116,7 @@
   "table_number_regex",
   "guest_number_reference",
   "guest_number_regex",
+  "bill_amount_regex",
   "print_check_type",
   "referrence_separator_type",
   "block_irn",
@@ -848,11 +849,16 @@
    "fieldname": "fssai_number",
    "fieldtype": "Data",
    "label": "FSSAI Number"
+  },
+  {
+   "fieldname": "bill_amount_regex",
+   "fieldtype": "Data",
+   "label": "Bill Amount Regex"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-23 14:45:28.195436",
+ "modified": "2021-09-29 12:33:51.808324",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
