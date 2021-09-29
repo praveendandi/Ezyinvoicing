@@ -132,7 +132,8 @@
   "bulkupload_inovice_file_type",
   "bulkupload_gst_file_type",
   "skip_ssl_verify",
-  "ipp_printer_file_path"
+  "ipp_printer_file_path",
+  "only_b2c"
  ],
  "fields": [
   {
@@ -854,11 +855,18 @@
    "fieldname": "bill_amount_regex",
    "fieldtype": "Data",
    "label": "Bill Amount Regex"
+  },
+  {
+   "default": "No",
+   "fieldname": "only_b2c",
+   "fieldtype": "Select",
+   "label": "Only B2C",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-29 12:33:51.808324",
+ "modified": "2021-09-29 17:18:27.830877",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
