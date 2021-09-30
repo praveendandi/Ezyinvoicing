@@ -152,7 +152,9 @@
   "no_of_days",
   "mail_frequency",
   "mail_schedule_time",
-  "pre_checkin_mail_subject"
+  "pre_checkin_mail_subject",
+  "cancellation_email_subject",
+  "thank_you_mail_subject"
  ],
  "fields": [
   {
@@ -868,6 +870,7 @@
    "label": "Pre Checkin Mail Content"
   },
   {
+   "default": "No",
    "fieldname": "cancellation_email",
    "fieldtype": "Select",
    "label": "Cancellation Email",
@@ -875,10 +878,11 @@
   },
   {
    "fieldname": "cancellation_email_mail_content",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "Cancellation Email Mail Content"
   },
   {
+   "default": "No",
    "fieldname": "thank_you_email",
    "fieldtype": "Select",
    "label": "Thank you Email",
@@ -886,7 +890,7 @@
   },
   {
    "fieldname": "thank_you_email_mail_content",
-   "fieldtype": "Data",
+   "fieldtype": "Attach",
    "label": "Thank you Email Mail Content"
   },
   {
@@ -900,28 +904,32 @@
    "label": "Pre Checkins"
   },
   {
+   "default": "No",
    "fieldname": "e_signature",
    "fieldtype": "Select",
    "label": "E signature",
    "options": "Yes\nNo"
   },
   {
+   "default": "No",
    "fieldname": "group_checkins",
    "fieldtype": "Select",
    "label": "Group Checkins",
    "options": "Yes\nNo"
   },
   {
+   "default": "No",
    "fieldname": "covid_list",
    "fieldtype": "Select",
    "label": "Covid List",
    "options": "Yes\nNo"
   },
   {
+   "default": "False",
    "fieldname": "mail_schedule",
    "fieldtype": "Select",
    "label": "Mail Schedule",
-   "options": "Yes\nNo"
+   "options": "True\nFalse"
   },
   {
    "fieldname": "no_of_days",
@@ -963,6 +971,7 @@
    "label": "Ezy Checkins Module"
   },
   {
+   "default": "Once",
    "fieldname": "mail_frequency",
    "fieldtype": "Select",
    "label": "Mail Frequency",
@@ -978,11 +987,21 @@
    "fieldname": "pre_checkin_mail_subject",
    "fieldtype": "Data",
    "label": "Pre Checkin Mail Subject"
+  },
+  {
+   "fieldname": "cancellation_email_subject",
+   "fieldtype": "Data",
+   "label": "Cancellation Email Subject"
+  },
+  {
+   "fieldname": "thank_you_mail_subject",
+   "fieldtype": "Data",
+   "label": "Thank You Mail Subject"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-28 14:29:57.341036",
+ "modified": "2021-09-30 10:33:36.975148",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

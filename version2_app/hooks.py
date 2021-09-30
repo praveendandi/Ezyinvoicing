@@ -206,7 +206,7 @@ scheduler_events = {
         "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
         "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
         "0 12 * * *":["version2_app.events.block_irn"],
-        # "* * * * *":["version2_app.events.pre_mail"],
+        "* * * * *":["version2_app.events.pre_mail"],
         "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"]},
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",

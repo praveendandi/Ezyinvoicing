@@ -75,6 +75,7 @@ def arrivalActivity(company,file_url):
                     "company_name":replace_new[column_indexs["COMPANY_NAME"]],
                     "booking_status":replace_new[column_indexs["BOOKING_STATUS"]],
                     "is_group_code": IS_GROUP_CODE,
+                    "number_of_guests": str(int(replace_new[column_indexs["NO_OF_ADULTS"]])+int(replace_new[column_indexs["NO_OF_CHILDREN"]])),
                     "virtual_checkin_status":"No",
                     "company":company,
                     "cc_exp_date":replace_new[column_indexs["CC_EXP_DATE"]]

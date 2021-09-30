@@ -209,7 +209,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Pending\nScanned\nReserved"
+   "options": "Pending\nScanned\nReserved\nPartial Scanned"
   },
   {
    "fieldname": "number_of_guests",
@@ -233,7 +233,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-24 12:19:38.561821",
+ "modified": "2021-09-28 16:47:53.993091",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
@@ -272,6 +272,18 @@
    "read": 1,
    "report": 1,
    "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
    "share": 1,
    "write": 1
   }
