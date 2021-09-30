@@ -133,6 +133,7 @@
   "pre_checkin_templates_section",
   "email_banner",
   "pre_checkin_mail_content",
+  "pre_checkin_text_content",
   "cancellation_email",
   "column_break_142",
   "thank_you_email",
@@ -997,11 +998,16 @@
    "fieldname": "thank_you_mail_subject",
    "fieldtype": "Data",
    "label": "Thank You Mail Subject"
+  },
+  {
+   "fieldname": "pre_checkin_text_content",
+   "fieldtype": "HTML Editor",
+   "label": "Pre Checkin Text Content"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-30 10:33:36.975148",
+ "modified": "2021-09-30 15:48:32.680919",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

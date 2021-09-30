@@ -3,8 +3,9 @@ from requests.exceptions import RetryError
 import frappe, requests, json
 from datetime import datetime
 from version2_app.parsers import *
+import base64
 import json
-import shlex
+import shlex,traceback
 import time
 import re
 from subprocess import Popen, PIPE, STDOUT
@@ -12,8 +13,7 @@ import os,glob
 import sys
 import datetime
 import importlib.util
-from frappe.utils import cstr,get_site_name
-import traceback
+from frappe.utils import cstr,get_site_name,random_string
 import requests
 from datetime import date, timedelta
 
@@ -754,14 +754,36 @@ def send_email(confirmation_number, company):
     today_time = datetime.datetime.now()
     f = open(file_path, "r")
     data=f.read()
+    f.close
     data = data.replace('{{name}}',arrival_doc.guest_first_name)
     data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
     data = data.replace('{{Hotel Radison}}',company_doc.company_name)
-    print(data)
-    f.close
-    mail_send = frappe.sendmail(recipients="kiran@caratred.com",
+    logopath = folder_path+'/sites/'+site_folder_path+company_doc.company_logo
+    logofilename, logofile_extension = os.path.splitext(logopath)
+    baneer_image = folder_path+'/sites/'+site_folder_path+company_doc.email_banner
+    bannerfilename, bannerfile_extension = os.path.splitext(baneer_image)
+    with open(baneer_image, 'rb') as f:
+        filecontent = f.read()
+    final_banner_string = "cid:{}".format(filecontent)
+    with open(logopath, 'rb') as f:
+        logofilecontent = f.read()
+    final_logo_string = "cid:{}".format(logofilecontent,"utf-8")
+    
+    # with open(logopath, "rb") as img_file:
+    #     logo_base64 = bytes.decode(base64.b64encode(img_file.read()))
+    #     final_logo_string = "data:image/{};base64,{}".format(logofile_extension.replace(".",""),logo_base64)
+    # with open(baneer_image, "rb") as img_file:
+    #     baneer_image_base64 = bytes.decode(base64.b64encode(img_file.read()))
+    #     final_banner_string = "data:image/{};base64,{}".format(bannerfile_extension.replace(".",""),baneer_image_base64)
+    # print(final_banner_string)
+    data = data.replace("headerBG",final_banner_string)
+    data = data.replace("logoImg",final_logo_string)
+    url = "https://so.ezycheckins.com/v2/?hotelId={}&confirmation={}&source=email".format(company_doc.name, confirmation_number)
+    data = data.replace('{{url}}',url)
+    mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
     subject = company_doc.pre_checkin_mail_subject,
     message= data,now = True)
+    # print(data)
 
 
 from email.mime.multipart import MIMEMultipart
@@ -797,7 +819,9 @@ def pre_mail():
                 data = data.replace('{{name}}',guest_first_name)
                 data = data.replace('{{lastName}}',guest_last_name)
                 data = data.replace('{{Hotel Radison}}',company.company_name)
-                data = data.replace('{{confirmation_number}}',conf_number)
+                # data = data.replace('{{confirmation_number}}',conf_number)
+                url = "https://so.ezycheckins.com/v2/?hotelId={}&confirmation={}&source=email".format(company.name, conf_number)
+                data = data.replace('{{url}}',url)
                 if x['mail_sent']=="No":
                     if now == thetime:
                         mail_send = frappe.sendmail(recipients="kiran@caratred.com",
