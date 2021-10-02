@@ -576,6 +576,14 @@ def send_invoicedata_to_gcb(invoice_number):
                 "company": company.name,
                 "showpaybutton": company.b2c_online_payments
             }
+            if company.pms_property_url:
+                b2c_data["file_url"] = company.pms_property_url
+            if company.pms_information_invoice_for_payment_qr == "Yes":
+                payment_list = frappe.db.get_list("Invoice Payments",filters={"invoice_number":doc.invoice_number},fields=["item_value","date","payment","payment_reference"])
+                if len(payment_list)>0:
+                    for each in payment_list:
+                        each["date"] = str(each["date"])
+                    b2c_data["payments"] = payment_list
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
                     json_response = requests.post(

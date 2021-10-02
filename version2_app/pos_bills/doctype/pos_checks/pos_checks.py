@@ -251,7 +251,6 @@ def print_pos_bill(data):
 			text = add_extra_text_while_print(check_doc.check_no,check_doc.outlet,company_doc)
 			if text["success"] == False:
 				return text
-			print(text["string"],"==================================")
 			added_text = (text["string"]).encode('utf-8')
 			invoice_number = (text["invoice_number"]).encode('utf-8')
 		outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
@@ -309,6 +308,8 @@ def print_pos_bill(data):
 def send_pos_bills_gcb(company,b2c_data):
 	try:
 		# b2c_data = json.dumps(data)
+		if company.pms_property_url:
+			b2c_data["file_url"]= company.pms_property_url
 		b2c_data["invoice_number"] = b2c_data["check_no"]
 		b2c_data["pos"] = True
 		if company.proxy == 1:
