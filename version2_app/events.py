@@ -137,7 +137,7 @@ def update_documentbin(filepath, error_log):
 
 
 def fileCreated(doc, method=None):
-    # try:
+    try:
         if 'job-' in doc.file_name:
             if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
                 update_documentbin(doc.file_url,"")
@@ -166,15 +166,15 @@ def fileCreated(doc, method=None):
 
             print('Normal File')
         logger.error(f"fileCreated,   {traceback.print_exc()}")
-    # except Exception as e:
-    #     # frappe.log_error(traceback.print_exc())
-    #     logger.error(f"fileCreated,   {traceback.print_exc()}")
-    #     print(str(e), "fileCreated")
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     update_documentbin(doc.file_url,str(e))
-    #     print(traceback.print_exc())
-    #     return {"success":False,"message":str(e)}
+    except Exception as e:
+        # frappe.log_error(traceback.print_exc())
+        logger.error(f"fileCreated,   {traceback.print_exc()}")
+        print(str(e), "fileCreated")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        update_documentbin(doc.file_url,str(e))
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):
     try:
@@ -707,15 +707,18 @@ def guest_attachments(doc,method=None):
         guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
         added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
         if guest_count != 0:
-            print("================================",added_guest_count, guest_count)
+            print("================================",added_guest_count, guest_count,arrival_doc.number_of_guests)
             if added_guest_count > guest_count:
                 arrival_doc.no_of_adults = guest_count + 1
-                arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
+                # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
         else:
+            print("-------------------")
             arrival_doc.no_of_adults = guest_count + 1
-            arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
-        arrival_doc.save()
-        frappe.db.commit()
+            # if arrival_doc.number_of_guests:
+            #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
+            # else:
+            #     arrival_doc.number_of_guests = str(0 + 1)
+        arrival_doc.save(ignore_permissions=True, ignore_version=True)
         given_name = doc.given_name if doc.given_name else ""
         surname = doc.surname if doc.surname else ""
         frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
