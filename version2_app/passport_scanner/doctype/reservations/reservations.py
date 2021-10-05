@@ -823,6 +823,11 @@ def voter_detect_text(image_file, doc_type):
                 for y in gender_list:
                     if y in x:
                         sex = y
+            if sex == '':
+                for x in block:
+                    if "sex:" in x and "/" in x:
+                        print(x.split("/"))
+                        sex = x.split("/")[-1]
             noun = re.compile(
                 '([a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+)')
             name = noun.findall(text)
@@ -846,7 +851,10 @@ def voter_detect_text(image_file, doc_type):
             date_of_birth = ''
             if len(date) >= 1:
                 date_of_birth = date[0]
-
+            else:
+                if len(data)==1:
+                    if "Date of Birth" in text and data[0] in text:
+                        date_of_birth = data[0]
             for x in likes:
                 r = re.compile(x)
                 if list(filter(r.match, name)):

@@ -17,7 +17,7 @@ class ArrivalInformation(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def arrivalActivity(company,file_url):
+def arrivalActivity(company,file_url,source):
     try:
         company_doc = frappe.get_doc("company",company)
         folder_path = frappe.utils.get_bench_path()
@@ -126,7 +126,7 @@ def arrivalActivity(company,file_url):
         if total_count > 0:
             arrival_activity = {
                 "file_name":os.path.basename(file_url),
-                "source":"",
+                "source":source,
                 "file_path":file_url,
                 "processed_count":processedCount,
                 "duplicate_count":duplicateCount,
