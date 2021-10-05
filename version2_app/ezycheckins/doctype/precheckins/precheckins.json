@@ -1,0 +1,346 @@
+{
+ "actions": [],
+ "creation": "2021-10-02 12:34:18.944210",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "guest_first_name",
+  "guest_last_name",
+  "guest_email_address",
+  "no_of_adults",
+  "no_of_children",
+  "confirmation_number",
+  "address1",
+  "address2",
+  "zip_code",
+  "guest_city",
+  "guest_state",
+  "guest_country",
+  "guest_dob",
+  "guest_age",
+  "guest_nationality",
+  "guest_id_type",
+  "signature",
+  "gender",
+  "pms_checkin",
+  "arrival_date",
+  "coming_from",
+  "eta",
+  "departure_date",
+  "going_to",
+  "etd",
+  "payment_mode",
+  "payment_type",
+  "payment_mobile_number",
+  "check_in_source",
+  "mode_of_transportation",
+  "travel_history",
+  "purpose_of_visit",
+  "health_symptoms",
+  "gst_no",
+  "extra_bed",
+  "guest_company_name",
+  "crs_id",
+  "billing_address",
+  "smoking_preferences",
+  "other_preferences",
+  "business_card",
+  "image_1",
+  "image_2",
+  "epoch",
+  "company"
+ ],
+ "fields": [
+  {
+   "fieldname": "guest_first_name",
+   "fieldtype": "Data",
+   "label": "Guest First Name"
+  },
+  {
+   "fieldname": "guest_last_name",
+   "fieldtype": "Data",
+   "label": "Guest Last Name"
+  },
+  {
+   "fieldname": "guest_email_address",
+   "fieldtype": "Data",
+   "label": "Guest Email Address"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number"
+  },
+  {
+   "fieldname": "address1",
+   "fieldtype": "Data",
+   "label": "Address1"
+  },
+  {
+   "fieldname": "address2",
+   "fieldtype": "Data",
+   "label": "Address2"
+  },
+  {
+   "fieldname": "zip_code",
+   "fieldtype": "Int",
+   "label": "Zip Code"
+  },
+  {
+   "fieldname": "guest_city",
+   "fieldtype": "Data",
+   "label": "Guest City"
+  },
+  {
+   "fieldname": "guest_state",
+   "fieldtype": "Data",
+   "label": "Guest State"
+  },
+  {
+   "fieldname": "guest_country",
+   "fieldtype": "Data",
+   "label": "Guest Country"
+  },
+  {
+   "fieldname": "guest_dob",
+   "fieldtype": "Data",
+   "label": "Guest Dob"
+  },
+  {
+   "fieldname": "guest_age",
+   "fieldtype": "Data",
+   "label": "Guest Age"
+  },
+  {
+   "fieldname": "guest_nationality",
+   "fieldtype": "Data",
+   "label": "Guest Nationality"
+  },
+  {
+   "fieldname": "guest_id_type",
+   "fieldtype": "Data",
+   "label": "Guest Id Type"
+  },
+  {
+   "fieldname": "signature",
+   "fieldtype": "Attach",
+   "label": "Signature"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Data",
+   "label": "Gender"
+  },
+  {
+   "fieldname": "pms_checkin",
+   "fieldtype": "Data",
+   "label": "PMS Checkin"
+  },
+  {
+   "fieldname": "arrival_date",
+   "fieldtype": "Date",
+   "label": "Arrival Date"
+  },
+  {
+   "fieldname": "coming_from",
+   "fieldtype": "Data",
+   "label": "Coming From"
+  },
+  {
+   "fieldname": "eta",
+   "fieldtype": "Data",
+   "label": "ETA"
+  },
+  {
+   "fieldname": "departure_date",
+   "fieldtype": "Date",
+   "label": "Departure Date"
+  },
+  {
+   "fieldname": "going_to",
+   "fieldtype": "Data",
+   "label": "Going To"
+  },
+  {
+   "fieldname": "etd",
+   "fieldtype": "Data",
+   "label": "ETD"
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Payment Mode"
+  },
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Payment Type"
+  },
+  {
+   "fieldname": "payment_mobile_number",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Payment Mobile Number"
+  },
+  {
+   "fieldname": "check_in_source",
+   "fieldtype": "Data",
+   "label": "Check In Source"
+  },
+  {
+   "fieldname": "mode_of_transportation",
+   "fieldtype": "Data",
+   "label": "Mode Of Transportation"
+  },
+  {
+   "fieldname": "travel_history",
+   "fieldtype": "Data",
+   "label": "Travel History"
+  },
+  {
+   "fieldname": "purpose_of_visit",
+   "fieldtype": "Data",
+   "label": "Purpose Of Visit"
+  },
+  {
+   "fieldname": "health_symptoms",
+   "fieldtype": "Data",
+   "label": "Health Symptoms"
+  },
+  {
+   "fieldname": "gst_no",
+   "fieldtype": "Data",
+   "label": "GST No"
+  },
+  {
+   "default": "No",
+   "fieldname": "extra_bed",
+   "fieldtype": "Select",
+   "label": "Extra Bed",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "crs_id",
+   "fieldtype": "Data",
+   "label": "CRS ID"
+  },
+  {
+   "fieldname": "billing_address",
+   "fieldtype": "Data",
+   "label": "Billing Address"
+  },
+  {
+   "fieldname": "smoking_preferences",
+   "fieldtype": "Data",
+   "label": "Smoking Preferences"
+  },
+  {
+   "fieldname": "other_preferences",
+   "fieldtype": "Data",
+   "label": "Other Preferences"
+  },
+  {
+   "fieldname": "business_card",
+   "fieldtype": "Data",
+   "label": "Business Card"
+  },
+  {
+   "fieldname": "image_1",
+   "fieldtype": "Attach",
+   "label": "Image 1"
+  },
+  {
+   "fieldname": "image_2",
+   "fieldtype": "Attach",
+   "label": "Image 2"
+  },
+  {
+   "fieldname": "guest_company_name",
+   "fieldtype": "Data",
+   "label": "Guest Company Name"
+  },
+  {
+   "fieldname": "epoch",
+   "fieldtype": "Data",
+   "label": "epoch"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "no_of_adults",
+   "fieldtype": "Int",
+   "label": "Number of Adults"
+  },
+  {
+   "fieldname": "no_of_children",
+   "fieldtype": "Int",
+   "label": "Number of Children"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-10-05 09:56:53.599638",
+ "modified_by": "Administrator",
+ "module": "EzyCheckins",
+ "name": "Precheckins",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

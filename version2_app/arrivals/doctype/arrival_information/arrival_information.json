@@ -40,7 +40,8 @@
   "status",
   "number_of_guests",
   "mail_sent",
-  "mail_via"
+  "mail_via",
+  "mail_count"
  ],
  "fields": [
   {
@@ -190,12 +191,16 @@
   {
    "fieldname": "arrival_date",
    "fieldtype": "Date",
-   "label": "Arrival Date"
+   "in_list_view": 1,
+   "label": "Arrival Date",
+   "reqd": 1
   },
   {
    "fieldname": "departure_date",
    "fieldtype": "Date",
-   "label": "Departure Date"
+   "in_list_view": 1,
+   "label": "Departure Date",
+   "reqd": 1
   },
   {
    "default": "No",
@@ -229,11 +234,16 @@
    "fieldtype": "Select",
    "label": "Mail Sent Through",
    "options": "Automatic\nManual\nNone"
+  },
+  {
+   "fieldname": "mail_count",
+   "fieldtype": "Int",
+   "label": "Mail Count"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-28 16:47:53.993091",
+ "modified": "2021-10-05 11:35:55.679783",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",

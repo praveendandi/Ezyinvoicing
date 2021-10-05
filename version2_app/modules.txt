@@ -5,3 +5,4 @@ Sign Ezy
 Ezy Checkins
 Arrivals
 Generics
+EzyCheckins

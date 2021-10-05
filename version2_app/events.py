@@ -1,5 +1,7 @@
 # from typing_extensions import get_args
+from email.mime import image
 from requests.exceptions import RetryError
+# from requests.sessions import _Data
 import frappe, requests, json
 from datetime import datetime
 from version2_app.parsers import *
@@ -16,13 +18,16 @@ import importlib.util
 from frappe.utils import cstr,get_site_name,random_string
 import requests
 from datetime import date, timedelta
-
-import shutil
+import base64
+from frappe.utils import cstr
+import shutil,PIL
+from PIL import Image
+from io import BytesIO
 from frappe.utils import logger
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
 
-
+user_name =  frappe.session.user
 def invoice_created(doc, method=None):
     try:
         print("Invoice Created",doc.name)
@@ -746,6 +751,7 @@ def guest_update_attachment_logs(doc,method=None):
 
 @frappe.whitelist(allow_guest=True)
 def send_email(confirmation_number, company):
+    user_name =  frappe.session.user
     company_doc = frappe.get_doc("company",company)
     folder_path = frappe.utils.get_bench_path()
     site_folder_path = company_doc.site_name
@@ -754,10 +760,12 @@ def send_email(confirmation_number, company):
     today_time = datetime.datetime.now()
     f = open(file_path, "r")
     data=f.read()
+    company_doc.save()
+    frappe.db.commit()
     f.close
     data = data.replace('{{name}}',arrival_doc.guest_first_name)
     data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-    data = data.replace('{{Hotel Radison}}',company_doc.company_name)
+    data = data.replace('{{hotelName}}',company_doc.company_name)
     logopath = folder_path+'/sites/'+site_folder_path+company_doc.company_logo
     logofilename, logofile_extension = os.path.splitext(logopath)
     baneer_image = folder_path+'/sites/'+site_folder_path+company_doc.email_banner
@@ -767,24 +775,19 @@ def send_email(confirmation_number, company):
     final_banner_string = "cid:{}".format(filecontent)
     with open(logopath, 'rb') as f:
         logofilecontent = f.read()
-    final_logo_string = "cid:{}".format(logofilecontent,"utf-8")
-    
-    # with open(logopath, "rb") as img_file:
-    #     logo_base64 = bytes.decode(base64.b64encode(img_file.read()))
-    #     final_logo_string = "data:image/{};base64,{}".format(logofile_extension.replace(".",""),logo_base64)
-    # with open(baneer_image, "rb") as img_file:
-    #     baneer_image_base64 = bytes.decode(base64.b64encode(img_file.read()))
-    #     final_banner_string = "data:image/{};base64,{}".format(bannerfile_extension.replace(".",""),baneer_image_base64)
-    # print(final_banner_string)
-    data = data.replace("headerBG",final_banner_string)
-    data = data.replace("logoImg",final_logo_string)
+    # data = data.replace('headerBG',final_banner_string)
+    # data = data.replace('logoImg',final_logo_string)
+    data = data.replace('{{email}}',company_doc.email)
+    data = data.replace('{{phone}}',company_doc.phone_number)
     url = "https://so.ezycheckins.com/v2/?hotelId={}&confirmation={}&source=email".format(company_doc.name, confirmation_number)
     data = data.replace('{{url}}',url)
-    mail_send = frappe.sendmail(recipients="prasanth@caratred.com",
+    mail_send = frappe.sendmail(recipients="kiran@caratred.com",
     subject = company_doc.pre_checkin_mail_subject,
     message= data,now = True)
-    # print(data)
-
+    activity_data = {"doctype":"Activity Logs","datetime":today_time,"confirmation_number":arrival_doc.confirmation_number,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Email Sent successfully"}
+    event_doc=frappe.get_doc(activity_data)
+    event_doc.insert()
+    frappe.db.commit()
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -819,6 +822,7 @@ def pre_mail():
                 data = data.replace('{{name}}',guest_first_name)
                 data = data.replace('{{lastName}}',guest_last_name)
                 data = data.replace('{{Hotel Radison}}',company.company_name)
+               
                 # data = data.replace('{{confirmation_number}}',conf_number)
                 url = "https://so.ezycheckins.com/v2/?hotelId={}&confirmation={}&source=email".format(company.name, conf_number)
                 data = data.replace('{{url}}',url)
@@ -829,6 +833,10 @@ def pre_mail():
                         message= data,now = True)
                         frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
                         frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
+                        activity_data = {"doctype":"Activity Logs","datetime":now,"confirmation_number":conf_number,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Email Sent successfully"}
+                        event_doc=frappe.get_doc(activity_data)
+                        event_doc.insert()
+                        frappe.db.commit()
                     else:
                         return {"success":False, "message":"Invitation Sent"}
         elif company.mail_frequency == "Daily":
@@ -877,16 +885,82 @@ def cancel_mail():
 
 @frappe.whitelist(allow_guest=True)
 def manual_mail():
-    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "RESERVED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
+    get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "RESERVED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via","mail_count"])
     for x in get_arrival_data:
         dt_convert = str(x['arrival_date'])
         name = str(x['name'])
+        count = x['mail_count']
         arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
-        if x['mail_sent']=="No":
-            mail_send = frappe.sendmail(recipients="kiran@caratred.com",
-            subject = "Pre Arrivals",
-            message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
-            frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
-            frappe.db.set_value('Arrival Information',x['name'],'mail_via','Manual')
+        # if x['mail_sent']=="No":
+        mail_send = frappe.sendmail(recipients="kiran@caratred.com",
+        subject = "Pre Arrivals",
+        message= "<style>p{color:#000;}</style> <p>Dear Team,</p><p>pre arrivals<b>"+" "+name,now = True)
+        frappe.db.set_value('Arrival Information',x['name'],'mail_via','Manual')
+        count = count+1
+        frappe.db.set_value('Arrival Information',x['name'],'mail_count',count)
+        frappe.db.commit()
+    
+
+
+@frappe.whitelist(allow_guest=True)
+def check_hotelId(data):
+    confirmation_number=data["confirmation_number"]
+    company=data["company"]
+    company_doc = frappe.db.get_value("company",company,["name","company_name","trade_name","gst_number","b2c_qr_url","company_logo","terms_and_conditions","ezycheckin_signature","welcome_message"],as_dict=True)
+    arrival_doc = frappe.db.get_value('Arrival Information',confirmation_number,["guest_title","guest_last_name","guest_first_name","room_type","guest_email_address","guest_phone_no","travel_agent_name","no_of_adults","no_of_children","no_of_nights","billing_instructions","no_of_rooms","confirmation_number","reservation_clerk","room_rate","print_rate","csr_id","membership_no","membership_type","checkin_date","total_visits","checkout_date","cc_number","booking_status","company_name","cc_exp_date","company","virtual_checkin_status","arrival_date","is_group_code","departure_date","number_of_guests","mail_sent","mail_via","confirmation_number"],as_dict=True)
+    if company ==company_doc["name"]:
+        if confirmation_number == arrival_doc["confirmation_number"]:
+            if arrival_doc["virtual_checkin_status"]=="No":
+                arrival_doc["company_settings"]=company_doc
+                return {"success":True, "data":arrival_doc}
+            else:
+                return {"success":True, "message":"You Already Checked-In","data":arrival_doc}
         else:
-            return {"success":False, "message":"Invitation Sent"}
+             {"success":False, "message":"confirmation Number not found"}
+    else:
+        {"success":False, "message":"Company Code not found"}
+    
+@frappe.whitelist(allow_guest=True)
+def check_hotelCode(data):
+    company=data["company"]
+    company_doc = frappe.db.get_value("company",company,["name","company_name","trade_name","gst_number","b2c_qr_url","company_logo","terms_and_conditions","welcome_message","ezycheckin_signature"],as_dict=True)
+    if company ==company_doc["name"]:
+        return {"success":True, "data":company_doc}
+    else:
+        return {"success":False, "message":"Company Code not found"}
+
+
+@frappe.whitelist(allow_guest=True)
+def precheckins():
+    data=json.loads(frappe.request.data)
+    company=frappe.get_last_doc("company")
+    now = datetime.date.today()
+    for i in data["data"]:
+        cwd = os.getcwd()
+        site_name = cstr(frappe.local.site)
+        signature_binary = base64.b64decode(i["signature"]) 
+        try:
+            image1_binary=base64.b64decode(i["image_1"])
+            image2_binary=base64.b64decode(i["image_2"])
+            im1 = Image.open(BytesIO(image1_binary))
+            im1.save(cwd+"/"+site_name+"/public/files/image1"+i["confirmation_number"]+".png", 'PNG')
+            im2 = Image.open(BytesIO(image2_binary))
+            im2.save(cwd+"/"+site_name+"/public/files/image2"+i["confirmation_number"]+".png", 'PNG')
+            im = Image.open(BytesIO(signature_binary))
+            im.save(cwd+"/"+site_name+"/public/files/signature"+i["confirmation_number"]+".png", 'PNG')
+        except PIL.UnidentifiedImageError:
+             pass
+        if company.ezycheckin_signature=="0":
+            i["signature"]="/files/signature"+i["confirmation_number"]+".png"
+        i["image_1"]="/files/image1"+i["confirmation_number"]+".png"
+        i["image_2"]="/files/image2"+i["confirmation_number"]+".png"
+        i.update({"doctype":'Precheckins'})
+        precheckins_doc = frappe.get_doc(i)
+        frappe.db.set_value('Arrival Information',i["confirmation_number"],'virtual_checkin_status','Yes')
+        activity_data = {"doctype":"Activity Logs","datetime":now,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Precheckin Done successfully"}
+        event_doc=frappe.get_doc(activity_data)
+        event_doc.insert()
+        frappe.db.commit()
+        precheckins_doc.insert()
+        frappe.db.commit()
+    return {"success":True}

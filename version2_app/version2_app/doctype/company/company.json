@@ -155,7 +155,11 @@
   "mail_schedule_time",
   "pre_checkin_mail_subject",
   "cancellation_email_subject",
-  "thank_you_mail_subject"
+  "thank_you_mail_subject",
+  "cancellation_text_content",
+  "thank_you_text_content",
+  "welcome_message",
+  "ezycheckin_signature"
  ],
  "fields": [
   {
@@ -1003,11 +1007,32 @@
    "fieldname": "pre_checkin_text_content",
    "fieldtype": "HTML Editor",
    "label": "Pre Checkin Text Content"
+  },
+  {
+   "fieldname": "cancellation_text_content",
+   "fieldtype": "HTML Editor",
+   "label": "Cancellation Text Content"
+  },
+  {
+   "fieldname": "thank_you_text_content",
+   "fieldtype": "HTML Editor",
+   "label": "Thank You Text content"
+  },
+  {
+   "fieldname": "welcome_message",
+   "fieldtype": "Data",
+   "label": "Welcome Message"
+  },
+  {
+   "default": "0",
+   "fieldname": "ezycheckin_signature",
+   "fieldtype": "Check",
+   "label": "Ezycheckin Signature"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-30 15:48:32.680919",
+ "modified": "2021-10-05 11:55:24.457089",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
