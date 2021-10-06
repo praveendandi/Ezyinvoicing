@@ -2,7 +2,6 @@ Version2 App
 POS Bills
 Passport Scanner
 Sign Ezy
-Ezy Checkins
 Arrivals
 Generics
 EzyCheckins

@@ -144,6 +144,7 @@
   "scan_ezy_module",
   "sign_ezy_module",
   "ezy_checkins_module",
+  "opera_scan",
   "pre_checkins_section",
   "e_signature",
   "group_checkins",
@@ -1028,11 +1029,17 @@
    "fieldname": "ezycheckin_signature",
    "fieldtype": "Check",
    "label": "Ezycheckin Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "opera_scan",
+   "fieldtype": "Check",
+   "label": "Opera Scan"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-05 11:55:24.457089",
+ "modified": "2021-10-05 12:21:00.385912",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

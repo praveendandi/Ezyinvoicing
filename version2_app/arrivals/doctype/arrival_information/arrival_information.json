@@ -192,15 +192,13 @@
    "fieldname": "arrival_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Arrival Date",
-   "reqd": 1
+   "label": "Arrival Date"
   },
   {
    "fieldname": "departure_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Departure Date",
-   "reqd": 1
+   "label": "Departure Date"
   },
   {
    "default": "No",
@@ -243,7 +241,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-05 11:35:55.679783",
+ "modified": "2021-10-05 12:37:38.790263",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
