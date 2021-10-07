@@ -134,9 +134,7 @@
   "email_banner",
   "pre_checkin_mail_content",
   "pre_checkin_text_content",
-  "cancellation_email",
   "column_break_142",
-  "thank_you_email",
   "thank_you_email_mail_content",
   "terms_and_conditions",
   "cancellation_email_mail_content",
@@ -159,7 +157,10 @@
   "cancellation_text_content",
   "thank_you_text_content",
   "welcome_message",
-  "ezycheckin_signature"
+  "ezycheckin_signature",
+  "cancellation_email",
+  "thank_you_email",
+  "ezycheckins_socket_host"
  ],
  "fields": [
   {
@@ -875,23 +876,15 @@
    "label": "Pre Checkin Mail Content"
   },
   {
-   "default": "No",
+   "default": "0",
    "fieldname": "cancellation_email",
-   "fieldtype": "Select",
-   "label": "Cancellation Email",
-   "options": "Yes\nNo"
+   "fieldtype": "Check",
+   "label": "Cancellation Mail"
   },
   {
    "fieldname": "cancellation_email_mail_content",
    "fieldtype": "Attach",
    "label": "Cancellation Email Mail Content"
-  },
-  {
-   "default": "No",
-   "fieldname": "thank_you_email",
-   "fieldtype": "Select",
-   "label": "Thank you Email",
-   "options": "Yes\nNo"
   },
   {
    "fieldname": "thank_you_email_mail_content",
@@ -1028,11 +1021,22 @@
    "fieldname": "ezycheckin_signature",
    "fieldtype": "Check",
    "label": "Ezycheckin Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "thank_you_email",
+   "fieldtype": "Check",
+   "label": "thank_you_email"
+  },
+  {
+   "fieldname": "ezycheckins_socket_host",
+   "fieldtype": "Data",
+   "label": "Ezycheckins Socket Host"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-05 11:55:24.457089",
+ "modified": "2021-10-06 14:30:20.927914",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

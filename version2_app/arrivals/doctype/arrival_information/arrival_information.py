@@ -138,7 +138,14 @@ def arrivalActivity(company,file_url,source):
             arrival_act = frappe.get_doc(arrival_activity)
             arrival_act.insert(ignore_permissions=True, ignore_links=True)
             frappe.db.commit()
+            date_time = datetime.datetime.now()
+            user_name =  frappe.session.user 
+            activity_data = {"doctype":"Activity Logs","datetime":date_time,"module":"Scanezy","event":"PreArrivals","user":user_name,"activity":"Arrivals added successfully"}
+            event_doc=frappe.get_doc(activity_data)
+            event_doc.insert()
+            frappe.db.commit()
         return {"success": True,"message":"Arrivals added successfully"}
+        
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Arrivals arrivalActivity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
