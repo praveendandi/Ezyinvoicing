@@ -43,7 +43,7 @@ def guest_details_opera(confirmation_number):
         if company_doc.opera_scan == 1:
             if company_doc.ezy_checkins_module == 1:
                 if frappe.db.exists({"doctype":"Precheckins",'confirmation_number': confirmation_number}):
-                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': confirmation_number},fields=["*"])
+                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': confirmation_number},fields=["name","confirmation_number","guest_first_name","guest_last_name"])
                     type = "ezy-checkins"
                     if company_doc.scan_ezy_module == 0 and company_doc.vision_api == 0:
                         for each in guest_details:
@@ -139,7 +139,14 @@ def update_guest_details(name):
                 if file_path1:
                     aadhar_front = helper_utility({"api":"scan_aadhar", "aadhar_image":convert1["data"], "scanView":"front"})
                     if aadhar_front["data"]["message"]["success"] == False:
-                        return aadhar_front["data"]["message"]
+                        aadhar_details["image_1"] = pre_checkins.image_1
+                        aadhar_details["image_2"] = pre_checkins.image_2
+                        aadhar_details.update(aadhar_front["data"]["message"])
+                        del aadhar_details["success"]
+                        del aadhar_details["aadhar_details"]
+                        aadhar_details["id_type"] = "aadhaar"
+                        return {"success": False,"data":aadhar_details}
+                        # return aadhar_front["data"]["message"]
                     if aadhar_front["data"]["message"]["aadhar_details"]["face"]:
                         base_image = convert_base64_to_image(aadhar_front["data"]["message"]["aadhar_details"]["face"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -157,7 +164,7 @@ def update_guest_details(name):
                         del aadhar_details["success"]
                         del aadhar_details["aadhar_details"]
                         aadhar_details["id_type"] = "aadhaar"
-                        return {"success": True,"data":aadhar_details}
+                        return {"success": False,"data":aadhar_details}
                     # aadhar_back["data"]["message"]["aadhar_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     aadhar_back["data"]["message"]["aadhar_details"]["image_2"] = pre_checkins.image_2
@@ -169,7 +176,14 @@ def update_guest_details(name):
                 if file_path1:
                     driving_license = helper_utility({"api":"scan_driving_license", "driving_image":convert1["data"]})
                     if driving_license["data"]["message"]["success"] == False:
-                        return driving_license["data"]["message"]
+                        driving_license_details["image_1"] = pre_checkins.image_1
+                        driving_license_details["image_2"] = pre_checkins.image_2
+                        driving_license_details.update(driving_license["data"]["message"])
+                        del driving_license_details["success"]
+                        del driving_license_details["driving_details"]
+                        driving_license_details["id_type"] = "driving"
+                        return {"success": False,"data":driving_license_details}
+                        # return driving_license["data"]["message"]
                     if driving_license["data"]["message"]["driving_details"]["face"]:
                         base_image = convert_base64_to_image(driving_license["data"]["message"]["driving_details"]["face"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -185,9 +199,16 @@ def update_guest_details(name):
                 voter_details = {}
                 if file_path1:
                     voter_front = helper_utility({"api":"scan_votercard", "voter_image":convert1["data"], "scanView":"front"})
-                    if "success" in voter_front["data"]["message"]:
+                    if "success" in voter_front["data"]["message"].keys():
                         if voter_front["data"]["message"]["success"] == False:
-                            return voter_front["data"]["message"]["voter_details"]
+                            voter_details["image_1"] = pre_checkins.image_1
+                            voter_details["image_2"] = pre_checkins.image_2
+                            voter_details.update(voter_front["data"]["message"])
+                            del voter_details["success"]
+                            del voter_details["voter_details"]
+                            voter_details["id_type"] = "voterId"
+                            return {"success": False,"data":voter_details}
+                            # return voter_front["data"]["message"]["voter_details"]
                     if "face" in voter_front["data"]["message"]["voter_details"]:
                         base_image = convert_base64_to_image(voter_front["data"]["message"]["voter_details"]["face"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -206,8 +227,8 @@ def update_guest_details(name):
                             del voter_details["success"]
                             del voter_details["voter_details"]
                             voter_details["id_type"] = "voterId"
-                            return {"success": True,"data":voter_details}
-                            return voter_back["data"]["message"]["voter_details"]
+                            return {"success": False,"data":voter_details}
+                            # return voter_back["data"]["message"]["voter_details"]
                     # aadhar_back["data"]["message"]["voter_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del voter_back["data"]["message"]["voter_details"]["base64_string"]
                     voter_details["image_2"] = pre_checkins.image_2
@@ -219,7 +240,13 @@ def update_guest_details(name):
                 if file_path1:
                     passport = helper_utility({"api":"passportvisadetails", "Passport_Image":convert1["data"], "scan_type":"web"})
                     if passport["data"]["message"]["success"] == False:
-                        return passport["data"]["message"]
+                        passport_details["image_1"] = pre_checkins.image_1
+                        passport_details["image_2"] = pre_checkins.image_2
+                        passport_details.update(passport["data"]["message"])
+                        del passport_details["success"]
+                        passport_details["id_type"] = "Foreign" if pre_checkins.guest_id_type == "passport" else pre_checkins.guest_id_type
+                        return {"success": False,"data":passport_details}
+                        # return passport["data"]["message"]
                     if "face" in passport["data"]["message"]["details"]:
                         base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -264,7 +291,7 @@ def update_guest_details(name):
                             passport_details.update(visa_details["data"]["message"])
                             del passport_details["success"]
                             passport_details["id_type"] = "Foreign"
-                            return {"success": True,"data":passport_details}
+                            return {"success": False,"data":passport_details}
                         passport_details.update(visa_details["data"]["message"]["details"]["data"])
                     else:
                         visa_details = helper_utility({"api":"passport_address", "Passport_Image":convert2["data"]})
@@ -273,7 +300,7 @@ def update_guest_details(name):
                             passport_details.update(visa_details["data"]["message"])
                             del passport_details["success"]
                             passport_details["id_type"] = pre_checkins.guest_id_type
-                            return {"success": True,"data":passport_details}
+                            return {"success": False,"data":passport_details}
                         passport_details.update(visa_details["data"]["message"]["data"])
                     # aadhar_back["data"]["message"]["details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     # del visa_details["data"]["message"]["details"]["data"]["base64_string"]
@@ -287,7 +314,13 @@ def update_guest_details(name):
                 if file_path1:
                     driving_license = helper_utility({"api":"other_images", "image":convert1["data"]})
                     if driving_license["data"]["message"]["success"] == False:
-                        return driving_license["data"]["message"]
+                        other_details["image_1"] = pre_checkins.image_1
+                        other_details["image_2"] = pre_checkins.image_2
+                        other_details.update(driving_license["data"]["message"])
+                        del other_details["success"]
+                        other_details["id_type"] = "other"
+                        return {"success": False,"data":other_details}
+                        # return driving_license["data"]["message"]
                     if driving_license["data"]["message"]["otherimage_details"]["base64_string"]:
                         base_image = convert_base64_to_image(driving_license["data"]["message"]["otherimage_details"]["base64_string"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -296,6 +329,11 @@ def update_guest_details(name):
                 if file_path2:
                     back2 = helper_utility({"api":"other_images", "image":convert2["data"]})
                     if back2["data"]["message"]["success"] == False:
+                        other_details["image_2"] = pre_checkins.image_2
+                        other_details.update(driving_license["data"]["message"])
+                        del other_details["success"]
+                        other_details["id_type"] = "other"
+                        return {"success": False,"data":other_details}
                         return back2["data"]["message"]
                     if back2["data"]["message"]["otherimage_details"]["base64_string"]:
                         base_image = convert_base64_to_image(back2["data"]["message"]["otherimage_details"]["base64_string"],name,site_folder_path,company_doc)
@@ -308,7 +346,7 @@ def update_guest_details(name):
             if company_doc.ezy_checkins_module == 1:
                 if frappe.db.exists({"doctype":"Precheckins",'name': name}):
                     guest_details = frappe.db.get_value("Precheckins",name,["guest_first_name","guest_last_name","guest_last_name","no_of_adults","no_of_children","confirmation_number","address1","address2","zip_code","guest_city","guest_state","guest_country","guest_dob","guest_age","guest_nationality","gender","arrival_date","coming_from","departure_date","company","guest_id_type","image_1","image_2","going_to"], as_dict=1)
-                    guest_details["id_type"] = guest_details.guest_id_type
+                    guest_details["id_type"] = guest_details.guest_id_type if guest_details.guest_id_type != "passport" else "Foreign" 
                     guest_details["reference"] = "No-Vision"
                     return {"success":True, "data":guest_details}
                 else:

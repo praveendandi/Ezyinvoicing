@@ -233,9 +233,11 @@
    "label": "Billing Address"
   },
   {
+   "default": "No",
    "fieldname": "smoking_preferences",
-   "fieldtype": "Data",
-   "label": "Smoking Preferences"
+   "fieldtype": "Select",
+   "label": "Smoking Preferences",
+   "options": "Yes\nNo"
   },
   {
    "fieldname": "other_preferences",
@@ -285,7 +287,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-05 09:56:53.599638",
+ "modified": "2021-10-05 17:44:14.443295",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",

@@ -158,10 +158,12 @@
   },
   {
    "fieldname": "booking_status",
-   "fieldtype": "Data",
-   "label": "Booking Status"
+   "fieldtype": "Select",
+   "label": "Booking Status",
+   "options": "RESERVED\nCANCELLED\nCHECKED-IN\nCHECKED-OUT"
   },
   {
+   "default": "No",
    "fieldname": "virtual_checkin_status",
    "fieldtype": "Select",
    "label": "Virtual Checkin Status",
