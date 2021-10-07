@@ -145,6 +145,7 @@
   "sign_ezy_module",
   "ezy_checkins_module",
   "opera_scan",
+  "vision_api",
   "pre_checkins_section",
   "e_signature",
   "group_checkins",
@@ -1035,11 +1036,17 @@
    "fieldname": "opera_scan",
    "fieldtype": "Check",
    "label": "Opera Scan"
+  },
+  {
+   "default": "0",
+   "fieldname": "vision_api",
+   "fieldtype": "Check",
+   "label": "Vision Api"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-05 12:21:00.385912",
+ "modified": "2021-10-06 18:02:00.566744",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
