@@ -22,7 +22,16 @@ def funForTilda(raw_data):
     PaymentsData = []
     itemsort = 0
     for ind, i in enumerate(raw_data):
-        pattern = re.compile("^([0-9]{2}\-[0-9]{2}\-[0-9]{2})+")
+        company_doc = frappe.get_last_doc("company")
+        dateformat = company_doc.invoice_item_date_format
+        dt = ""
+        if "-" in dateformat:
+            dt = "-"
+        elif "." in dateformat:
+            dt = "."
+        elif "/" in dateformat:
+            dt = "/"
+        pattern = re.compile("^([0-9]{2}\%s[0-9]{2}\%s[0-9]{2})+"%(dt,dt))
         check_date = re.findall(pattern, i)
         if len(check_date) > 0:
             item = dict()
@@ -85,7 +94,16 @@ def funForHash(raw_data):
     for i in raw_data:
         # print(i,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         i = i.strip()
-        pattern = re.compile("^([0-9]{4}\-[0-9]{2}\-[0-9]{2})+")
+        company_doc = frappe.get_last_doc("company")
+        dateformat = company_doc.invoice_item_date_format
+        dt = ""
+        if "-" in dateformat:
+            dt = "-"
+        elif "." in dateformat:
+            dt = "."
+        elif "/" in dateformat:
+            dt = "/"
+        pattern = re.compile("^([0-9]{2}\%s[0-9]{2}\%s[0-9]{2})+"%(dt,dt))
         check_date = re.findall(pattern, i)
         if len(check_date) > 0 and "CGST" not in i and "SGST" not in i and "CESS" not in i and "VAT" not in i and "Cess" not in i and "Vat" not in i and "IGST" not in i and "Service Charge" not in i:
             item = dict()

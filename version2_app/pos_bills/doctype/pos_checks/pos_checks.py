@@ -23,6 +23,7 @@ class POSChecks(Document):
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(data):
     try:
+        now = datetime.datetime.now()
         raw_data = data["payload"].split("\n")
         if len(raw_data) > 5:
             company_doc = frappe.get_doc("company",data["company"])
@@ -263,109 +264,110 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
 
 @frappe.whitelist(allow_guest=True)
 def print_pos_bill(data):
-    try:
-        check_doc = frappe.get_doc("POS Checks",data["name"])
-        company_doc = frappe.get_doc("company",check_doc.company)
-        if company_doc.enable_pos_extra_text == 1:
-            text = add_extra_text_while_print(check_doc.check_no,check_doc.outlet,company_doc)
-            if text["success"] == False:
-                return text
-            print(text["string"],"==================================")
-            added_text = (text["string"]).encode('utf-8')
-            invoice_number = (text["invoice_number"]).encode('utf-8')
-        outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
-        printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
-        printer_doc = frappe.get_doc("POS Printers",printer_settings)
-        folder_path = frappe.utils.get_bench_path()
-        path = folder_path + '/sites/' + company_doc.site_name +"/public"
-        logopath = path+outlet_values[0]["outlet_logo"]
-        qr_path = path+outlet_values[0]["static_payment_qr_code"]
-        b = (check_doc.payload).encode('utf-8')
-        # b = (company_name+address+mobile+gst_details+check_doc.payload+"\n").encode('utf-8')
-        kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
-        # kitchen = Network(printer_doc.printer_ip)
-        kitchen.set("CENTER", "A", "B")
-        kitchen.image(img_source=logopath)
-        kitchen.hw('INIT')
-        if company_doc.enable_pos_extra_text == 1:
-            kitchen.set("CENTER", "A")
-            kitchen.text('\n')
-            kitchen._raw(added_text)
-            kitchen.set("CENTER", "A","B")
-            kitchen._raw(invoice_number)
-            kitchen.set("CENTER", "A")
-        else:
-            kitchen.set("CENTER", "A","B")
-            kitchen.text('\n')
-        kitchen._raw(b)
-        kitchen.hw('INIT')
-        kitchen.set("CENTER", "A", "B")
-        if check_doc.check_type == "Normal Check":
-            if outlet_values[0]["payment_mode"]=="Dynamic":
-                razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
-                if razor_pay["success"] == False:
-                    return razor_pay["message"]
-                kitchen.qr(razor_pay['short_url'],size=7)
-                kitchen.hw('INIT')
-            else:
-                kitchen.image(qr_path)
-                kitchen.hw('INIT')
-        elif check_doc.check_type == "Check Closed":
-            qrurl = company_doc.b2c_qr_url + check_doc.gcp_file_url
-            kitchen.qr(qrurl,size=7)
-            kitchen.hw('INIT')
-        else:
-            pass
-        kitchen.cut()
-        kitchen.hw('INIT')
-        return {"success":True,"message":"Printed Successfully"}
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing give print","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
-    
+	try:
+		check_doc = frappe.get_doc("POS Checks",data["name"])
+		company_doc = frappe.get_doc("company",check_doc.company)
+		if company_doc.enable_pos_extra_text == 1:
+			text = add_extra_text_while_print(check_doc.check_no,check_doc.outlet,company_doc)
+			if text["success"] == False:
+				return text
+			added_text = (text["string"]).encode('utf-8')
+			invoice_number = (text["invoice_number"]).encode('utf-8')
+		outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
+		printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
+		printer_doc = frappe.get_doc("POS Printers",printer_settings)
+		folder_path = frappe.utils.get_bench_path()
+		path = folder_path + '/sites/' + company_doc.site_name +"/public"
+		logopath = path+outlet_values[0]["outlet_logo"]
+		qr_path = path+outlet_values[0]["static_payment_qr_code"]
+		b = (check_doc.payload).encode('utf-8')
+		# b = (company_name+address+mobile+gst_details+check_doc.payload+"\n").encode('utf-8')
+		kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
+		# kitchen = Network(printer_doc.printer_ip)
+		kitchen.set("CENTER", "A", "B")
+		kitchen.image(img_source=logopath)
+		kitchen.hw('INIT')
+		if company_doc.enable_pos_extra_text == 1:
+			kitchen.set("CENTER", "A")
+			kitchen.text('\n')
+			kitchen._raw(added_text)
+			kitchen.set("CENTER", "A","B")
+			kitchen._raw(invoice_number)
+			kitchen.set("CENTER", "A")
+		else:
+			kitchen.set("CENTER", "A","B")
+			kitchen.text('\n')
+		kitchen._raw(b)
+		kitchen.hw('INIT')
+		kitchen.set("CENTER", "A", "B")
+		if check_doc.check_type == "Normal Check":
+			if outlet_values[0]["payment_mode"]=="Dynamic":
+				razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
+				if razor_pay["success"] == False:
+					return razor_pay["message"]
+				kitchen.qr(razor_pay['short_url'],size=7)
+				kitchen.hw('INIT')
+			else:
+				kitchen.image(qr_path)
+				kitchen.hw('INIT')
+		elif check_doc.check_type == "Check Closed":
+			qrurl = company_doc.b2c_qr_url + check_doc.gcp_file_url
+			kitchen.qr(qrurl,size=7)
+			kitchen.hw('INIT')
+		else:
+			pass
+		kitchen.cut()
+		kitchen.hw('INIT')
+		return {"success":True,"message":"Printed Successfully"}
+	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing give print","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+		return {"success":False,"message":str(e)}
+	
 
 def send_pos_bills_gcb(company,b2c_data):
-    try:
-        # b2c_data = json.dumps(data)
-        b2c_data["invoice_number"] = b2c_data["check_no"]
-        b2c_data["pos"] = True
-        if company.proxy == 1:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://","@")
-            proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
-        headers = {'Content-Type': 'application/json'}
-        if company.proxy == 0:
-            if company.skip_ssl_verify == 0:
-                json_response = requests.post(
-                    "https://gst.caratred.in/ezy/api/addJsonToGcb",
-                    headers=headers,
-                    json=b2c_data,verify=False)
-            else:
-                json_response = requests.post(
-                    "https://gst.caratred.in/ezy/api/addJsonToGcb",
-                    headers=headers,
-                    json=b2c_data,verify=False)
-            response = json_response.json()
-            if response["success"] == False:
-                return {
-                    "success": False,
-                    "message": response["message"]
-                }
-        else:
-            json_response = requests.post(
-                "https://gst.caratred.in/ezy/api/addJsonToGcb",
-                headers=headers,
-                json=b2c_data,
-                proxies=proxies,verify=False)
-            response = json_response.json()
-            if response["success"] == False:
-                return {
-                    "success": False,
-                    "message": response["message"]
-                }
-        return {"success":True, "data": response['data']}
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing send pos bills gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+	try:
+		# b2c_data = json.dumps(data)
+		if company.pms_property_url:
+			b2c_data["file_url"]= company.pms_property_url
+		b2c_data["invoice_number"] = b2c_data["check_no"]
+		b2c_data["pos"] = True
+		if company.proxy == 1:
+			proxyhost = company.proxy_url
+			proxyhost = proxyhost.replace("http://","@")
+			proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+		headers = {'Content-Type': 'application/json'}
+		if company.proxy == 0:
+			if company.skip_ssl_verify == 0:
+				json_response = requests.post(
+					"https://gst.caratred.in/ezy/api/addJsonToGcb",
+					headers=headers,
+					json=b2c_data,verify=False)
+			else:
+				json_response = requests.post(
+					"https://gst.caratred.in/ezy/api/addJsonToGcb",
+					headers=headers,
+					json=b2c_data,verify=False)
+			response = json_response.json()
+			if response["success"] == False:
+				return {
+					"success": False,
+					"message": response["message"]
+				}
+		else:
+			json_response = requests.post(
+				"https://gst.caratred.in/ezy/api/addJsonToGcb",
+				headers=headers,
+				json=b2c_data,
+				proxies=proxies,verify=False)
+			response = json_response.json()
+			if response["success"] == False:
+				return {
+					"success": False,
+					"message": response["message"]
+				}
+		return {"success":True, "data": response['data']}
+	except Exception as e:
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing send pos bills gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+		return {"success":False,"message":str(e)}

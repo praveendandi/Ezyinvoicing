@@ -52,6 +52,14 @@ def company_created(doc,method=None):
         insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
         headers = {'content-type': 'application/json'}
         r = requests.post(api,headers=headers,json=insert_dict,verify=False)
+        folder_path = frappe.utils.get_bench_path()
+        if doc.pms_property_logo != "":
+            file_path = folder_path+'/sites/'+doc.site_name+doc.pms_property_logo
+            status = upload_propery_logo_pms({"file_path":file_path,"company":doc.name})
+            if status["success"] == False:
+                return status 
+            frappe.db.set_value('company', doc.name, {"pms_property_url":status["data"]})
+            frappe.db.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing company_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))   
@@ -605,4 +613,61 @@ def backup_file_perticulerdoctypes(data):
         return get_company.host+"files/{}".format(os.path.basename(filename))
     except Exception as e:
         frappe.log_error("backupfile:"+str(e))
-    
+
+
+def upload_propery_logo_pms(data):
+    try:
+        # headers = {'Content-Type': 'application/json'}
+        company = frappe.get_doc('company',data["company"])
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+        files = {'file': open(data["file_path"],'rb')}
+        file_name, file_extension = os.path.splitext(data["file_path"])
+        if company.proxy == 0:
+            if company.skip_ssl_verify == 0:
+                json_response = requests.post(
+                    "http://0.0.0.0:3000/api/addCompanyLogo",
+                    data={"company":company.name,"file_extension":file_extension},files = files,verify=False)
+            else:
+                json_response = requests.post(
+                    "http://0.0.0.0:3000/api/addCompanyLogo",
+                    data={"company":company.name,"file_extension":file_extension},files = files,verify=False)
+            response = json_response.json()
+            if response["success"] == False:
+                return {
+                    "success": False,
+                    "message": response["message"]
+                }
+            return response
+        else:
+            print(proxies, "     proxy console")
+            json_response = requests.post(
+                "http://0.0.0.0:3000/api/addCompanyLogo",
+                data={"company":company.name,"file_extension":file_extension},files = files,
+                proxies=proxies,verify=False)
+            response = json_response.json()
+            if response["success"] == False:
+                return {
+                    "success": False,
+                    "message": response["message"]
+                }
+            return response
+    except Exception as e:
+        frappe.log_error("upload_propery_logo_pms:"+str(e))
+        return {"success":False,"message":str(e)}
+
+def update_company(doc,method=None):
+    try:
+        folder_path = frappe.utils.get_bench_path()
+        if doc.pms_property_logo != "":
+            file_path = folder_path+'/sites/'+doc.site_name+doc.pms_property_logo
+            status = upload_propery_logo_pms({"file_path":file_path,"company":doc.name})
+            if status["success"] == False:
+                return status 
+            frappe.db.set_value('company', doc.name, {"pms_property_url":status["data"]})
+            frappe.db.commit()
+    except Exception as e:
+        frappe.log_error("update_company:"+str(e))
+        return {"success":False,"message":str(e)}
