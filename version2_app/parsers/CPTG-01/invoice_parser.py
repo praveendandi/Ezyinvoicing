@@ -67,7 +67,7 @@ def file_parsing(filepath):
 			if "Confirmation No." in i:
 				confirmation_number = i.split(":")
 				conf_number = confirmation_number[-1].replace(" ", "")
-			if "Total" in i:
+			if "Total          INR" in i:
 				total_invoice = i.split(" ")
 				total_invoice_amount = float(total_invoice[-2].replace(",", ""))
 			if "Original Bill  :" in i:
