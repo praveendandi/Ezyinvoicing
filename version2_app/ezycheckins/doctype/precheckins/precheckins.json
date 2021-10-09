@@ -43,13 +43,13 @@
   "guest_company_name",
   "crs_id",
   "billing_address",
-  "smoking_preferences",
   "other_preferences",
   "business_card",
   "image_1",
   "image_2",
   "epoch",
-  "company"
+  "company",
+  "smoking_preferences"
  ],
  "fields": [
   {
@@ -104,7 +104,7 @@
   },
   {
    "fieldname": "guest_dob",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Guest Dob"
   },
   {
@@ -216,11 +216,10 @@
    "label": "GST No"
   },
   {
-   "default": "No",
+   "default": "0",
    "fieldname": "extra_bed",
-   "fieldtype": "Select",
-   "label": "Extra Bed",
-   "options": "Yes\nNo"
+   "fieldtype": "Check",
+   "label": "Extra Bed"
   },
   {
    "fieldname": "crs_id",
@@ -233,11 +232,10 @@
    "label": "Billing Address"
   },
   {
-   "default": "No",
+   "default": "0",
    "fieldname": "smoking_preferences",
-   "fieldtype": "Select",
-   "label": "Smoking Preferences",
-   "options": "Yes\nNo"
+   "fieldtype": "Check",
+   "label": "Smoking Preferences"
   },
   {
    "fieldname": "other_preferences",
@@ -287,7 +285,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-05 17:44:14.443295",
+ "modified": "2021-10-08 18:31:37.730011",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",

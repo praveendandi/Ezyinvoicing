@@ -26,8 +26,10 @@ from io import BytesIO
 from frappe.utils import logger
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
+import pyshorteners as ps
 
 user_name =  frappe.session.user
+print(user_name,"????????????????????????????????????????????????//")
 def invoice_created(doc, method=None):
     try:
         print("Invoice Created",doc.name)
@@ -907,6 +909,8 @@ def pre_mail():
                 frappe.db.commit()
             else:
                 return {"success":False, "message":"Invitation Sent"}
+    
+    
 
     # if company.thank_you_email== "1":
     #     get_arrival_data = frappe.db.get_list("Arrival Information",filters={"docstatus":0},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
@@ -944,6 +948,7 @@ def pre_mail():
 def manual_mail(data):
     date_time = datetime.datetime.now() 
     conf_number = data["confirmation_number"] 
+    email_address = data["guest_email_address"]
     arrival_doc = frappe.get_doc('Arrival Information',conf_number)
     count = arrival_doc.mail_count
     company = frappe.get_last_doc("company")
@@ -954,20 +959,22 @@ def manual_mail(data):
         f = open(file_path, "r")
         data=f.read()
         data = data.replace('{{name}}',arrival_doc.guest_first_name)
-        # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+        data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
         data = data.replace('{{hotelName}}',company.company_name)
         data = data.replace('{{email}}',company.email)
         data = data.replace('{{phone}}',company.phone_number)
         url = "{}?hotelId={}&confirmation={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
-        data = data.replace('{{url}}',url)
-        mail_send = frappe.sendmail(recipients=arrival_doc.guest_email_address,
+        u = ps.Shortener().tinyurl.short(url)
+        data = data.replace('{{url}}',u)
+        mail_send = frappe.sendmail(recipients=email_address,
                         subject = company.pre_checkin_mail_subject,
                         message= data,now = True)
+        frappe.db.set_value('Arrival Information',conf_number,'guest_email_address',email_address)
         frappe.db.set_value('Arrival Information',conf_number,'mail_via','Manual')
         frappe.db.set_value('Arrival Information',conf_number,'mail_sent','Yes')
         count = count+1
         frappe.db.set_value('Arrival Information',conf_number,'mail_count',count)
-        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":conf_number,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Mail Sent successfully"}
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":conf_number,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Mail Sentout"}
         event_doc=frappe.get_doc(activity_data)
         event_doc.insert()
         frappe.db.commit()
@@ -993,6 +1000,8 @@ def manual_mail(data):
         event_doc.insert()
         frappe.db.commit()
         return {"success":True}
+    else:
+        {"success":False, "message":"Email Failure"}
   
 
 
@@ -1050,12 +1059,50 @@ def precheckins():
         i["image_1"]="/files/image1"+i["confirmation_number"]+".png"
         i["image_2"]="/files/image2"+i["confirmation_number"]+".png"
         i.update({"doctype":'Precheckins'})
+        get_arrival_data = frappe.db.count("Precheckins",filters={"confirmation_number":i["confirmation_number"]})
+        if get_arrival_data != 0:
+            if get_arrival_data == 1:
+                nam=((i["confirmation_number"]+"-")+str(get_arrival_data))
+            else:
+                nam=((i["confirmation_number"]+"-")+str(get_arrival_data-1))
+            i["confirmation_number"] = nam
         precheckins_doc = frappe.get_doc(i)
         frappe.db.set_value('Arrival Information',i["confirmation_number"],'virtual_checkin_status','Yes')
         activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Precheckedin Successfully"}
         event_doc=frappe.get_doc(activity_data)
         event_doc.insert()
+        precheckins_doc.insert() 
         frappe.db.commit()
-        precheckins_doc.insert()
-        frappe.db.commit()
+        if company.thank_you_email == "1":
+            cancel_email_address = i["guest_email_address"]
+            folder_path = frappe.utils.get_bench_path()
+            site_folder_path = company.site_name
+            file_path = folder_path+'/sites/'+site_folder_path+company.thank_you_email_mail_content
+            if i['mail_sent']=="No":
+                f = open(file_path, "r")
+                data=f.read()
+                data = data.replace('{{name}}',i["guest_first_name"])
+                # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+                data = data.replace('{{hotelName}}',company.company_name)
+                data = data.replace('{{email}}',company.email)
+                data = data.replace('{{phone}}',company.phone_number)
+                mail_send = frappe.sendmail(recipients=cancel_email_address,
+                        subject = company.cancellation_email_mail_content,
+                        message= data,now = True)
+                frappe.db.set_value('Arrival Information',i['name'],'mail_sent','Yes')
+                frappe.db.set_value('Arrival Information',i['name'],'mail_via','Automatic')
+                activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
+                event_doc=frappe.get_doc(activity_data)
+                event_doc.insert()
+                frappe.db.commit()
+            else:
+                return {"success":False, "message":"Invitation Sent"}
     return {"success":True}
+
+
+@frappe.whitelist(allow_guest=True)
+def checkins():
+    id = 10
+    url = "https://so.ezycheckins.com/v2/?hotelId=H9306GMM&confirmation=9735241&source=email"
+    u = ps.Shortener().tinyurl.short(url)
+    print(u)
