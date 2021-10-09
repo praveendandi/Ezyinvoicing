@@ -370,6 +370,7 @@ def generateIrn(data):
                     IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
                     
                     IRNObjectdoc.save()
+                    print(response['result'],"00000000000000000000000000000000000000000000000")
                     # print(IRNObjectdoc.name,"/a/a/a/")
                     invoice = frappe.get_doc('Invoices', invoice_number)
                     print(invoice.email,"|||||||||||||||||||||||||||||||||||")
@@ -383,7 +384,7 @@ def generateIrn(data):
                     invoice.qr_code = response['result']['SignedQRCode']
                     invoice.qr_code_generated = 'Success'
                     invoice.irn_cancelled = 'No'
-                    invoice.irn_generated_time = datetime.datetime.utcnow()
+                    invoice.irn_generated_time = datetime.datetime.now()
                     invoice.irn_generated_type = generation_type
                     invoice.irn_process_time = datetime.datetime.utcnow(
                     ) - start_time
@@ -575,6 +576,14 @@ def send_invoicedata_to_gcb(invoice_number):
                 "company": company.name,
                 "showpaybutton": company.b2c_online_payments
             }
+            if company.pms_property_url:
+                b2c_data["file_url"] = company.pms_property_url
+            if company.pms_information_invoice_for_payment_qr == "Yes":
+                payment_list = frappe.db.get_list("Invoice Payments",filters={"invoice_number":doc.invoice_number},fields=["item_value","date","payment","payment_reference"])
+                if len(payment_list)>0:
+                    for each in payment_list:
+                        each["date"] = str(each["date"])
+                    b2c_data["payments"] = payment_list
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
                     json_response = requests.post(
@@ -1083,8 +1092,17 @@ def insert_invoice(data):
         
         else:
             if len(data['items_data'])>0 and data['total_invoice_amount'] != 0:
-                roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
-                data['invoice_round_off_amount'] = roundoff_amount
+                if company.only_b2c == "No":
+                    roundoff_amount = float(data['total_invoice_amount']) - float(pms_invoice_summary+other_charges)
+                    data['invoice_round_off_amount'] = roundoff_amount
+                else:
+                    roundoff_amount = 0
+                    data['invoice_round_off_amount'] = 0
+                    pms_invoice_summary = data['total_invoice_amount']
+                    other_charges = data['total_invoice_amount']
+                    other_charges_before_tax = data["total_invoice_amount"]
+                    sales_amount_before_tax = data["total_invoice_amount"]
+                    sales_amount_after_tax = data['total_invoice_amount']
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
                 if abs(roundoff_amount)>6:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):

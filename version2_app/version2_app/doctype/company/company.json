@@ -119,6 +119,8 @@
   "table_number_regex",
   "guest_number_reference",
   "guest_number_regex",
+  "bill_amount_regex",
+  "fssai_number",
   "print_check_type",
   "referrence_separator_type",
   "block_irn",
@@ -162,7 +164,17 @@
   "ezycheckin_signature",
   "cancellation_email",
   "ezycheckins_socket_host",
-  "thank_you_email"
+  "thank_you_email",
+  "upload_gst_details",
+  "bulkupload_inovice_file_type",
+  "bulkupload_gst_file_type",
+  "skip_ssl_verify",
+  "ipp_printer_file_path",
+  "only_b2c",
+  "pms_payment_qr",
+  "pms_information_invoice_for_payment_qr",
+  "pms_property_logo",
+  "pms_property_url"
  ],
  "fields": [
   {
@@ -1046,11 +1058,50 @@
    "fieldname": "thank_you_email",
    "fieldtype": "Check",
    "label": "Thank you Email"
+  },
+  {
+   "fieldname": "fssai_number",
+   "fieldtype": "Data",
+   "label": "FSSAI Number"
+  },
+  {
+   "fieldname": "bill_amount_regex",
+   "fieldtype": "Data",
+   "label": "Bill Amount Regex"
+  },
+  {
+   "default": "No",
+   "fieldname": "only_b2c",
+   "fieldtype": "Select",
+   "label": "Only B2C",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "pms_payment_qr",
+   "fieldtype": "Attach",
+   "label": "PMS Payment QR"
+  },
+  {
+   "default": "No",
+   "fieldname": "pms_information_invoice_for_payment_qr",
+   "fieldtype": "Select",
+   "label": "PMS Information Invoice For Payment QR",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "pms_property_logo",
+   "fieldtype": "Attach",
+   "label": "PMS Property Logo"
+  },
+  {
+   "fieldname": "pms_property_url",
+   "fieldtype": "Data",
+   "label": "PMS Property URL"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-07 11:19:54.210694",
+ "modified": "2021-10-02 11:13:03.453670",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

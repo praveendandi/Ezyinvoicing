@@ -28,7 +28,7 @@ def hyatt_mumbai(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            if invoice_data["company"]=="Hyatt Mumbai":
+            if invoice_data["company"]=="GHM-01":
                 gst_data[str(item["BILL_GENERATION_DATE"])]=item["TRX_CODE"]
             else:
                 gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
@@ -43,13 +43,15 @@ def hyatt_mumbai(data):
             if each['BILL_NO'] in gst_data.keys():
                 data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
-                            'gstNumber':gst_data[each["BILL_NO"]],'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
+                            'gstNumber':gst_data[each["BILL_NO"]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2B"}
+                data["invoice_number"] = "GHM"+data["invoice_number"]
             else:
                 data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':"",'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2C"}
+                data["invoice_number"] = "GHM"+data["invoice_number"]
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
             items = []
             items_pdf = []
@@ -99,7 +101,7 @@ def hyatt_mumbai(data):
                     items.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
                     items_pdf.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"taxcode_dsc":"No Sac",'sort_order':1,"sac_code":'No Sac'})
 
-
+            each["BILL_NO"] = "GHM"+each["BILL_NO"]
             data['items'] = items
             refobj = data.copy()
             del refobj['items']

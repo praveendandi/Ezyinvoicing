@@ -611,8 +611,8 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
             invoice.credit_qr_code = response['result']['SignedQRCode']
             invoice.credit_qr_code_generated = 'Success'
             invoice.credit_irn_cancelled = 'No'
-            invoice.credit_irn_generated_time = datetime.datetime.utcnow()
-            invoice.irn_generated_time = datetime.datetime.utcnow()
+            invoice.credit_irn_generated_time = datetime.datetime.now()
+            invoice.irn_generated_time = datetime.datetime.now()
             invoice.save(ignore_permissions=True,ignore_version=True)
             create_credit_qr_image(invoice_number, GSP_details['data'])
             # print(credit_items)
