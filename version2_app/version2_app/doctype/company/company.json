@@ -1047,36 +1047,15 @@
    "label": "Ezycheckins Socket Host"
   },
   {
-<<<<<<< HEAD
-   "fieldname": "billing_address",
-   "fieldtype": "HTML Editor",
-   "label": "Billing Address "
-  },
-  {
-   "default": "0",
-   "fieldname": "check_billing_address",
-   "fieldtype": "Check",
-   "label": "Check Billing Address"
-  },
-  {
-   "fieldname": "guest_gst_number",
-   "fieldtype": "Data",
-   "label": "Guest GST Number"
-=======
    "default": "0",
    "fieldname": "thank_you_email",
    "fieldtype": "Check",
    "label": "Thank you Email"
->>>>>>> e6278868ceae999935b441b2d57996e22397a95b
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2021-10-08 10:37:39.455016",
-=======
  "modified": "2021-10-07 11:19:54.210694",
->>>>>>> e6278868ceae999935b441b2d57996e22397a95b
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

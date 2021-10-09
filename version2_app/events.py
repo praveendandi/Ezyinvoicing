@@ -1099,10 +1099,3 @@ def precheckins():
                 return {"success":False, "message":"Invitation Sent"}
     return {"success":True}
 
-
-@frappe.whitelist(allow_guest=True)
-def checkins():
-    id = 10
-    url = "https://so.ezycheckins.com/v2/?hotelId=H9306GMM&confirmation=9735241&source=email"
-    u = ps.Shortener().tinyurl.short(url)
-    print(u)
