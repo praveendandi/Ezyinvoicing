@@ -14,7 +14,7 @@ import razorpay
 from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api")
 
 class POSChecks(Document):
     pass
