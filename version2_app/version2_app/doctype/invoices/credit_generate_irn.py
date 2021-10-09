@@ -14,7 +14,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", file_count=50)
+logger = frappe.logger("api")
 
 
 def check_company_exist_for_Irn(code):
