@@ -628,11 +628,11 @@ def upload_propery_logo_pms(data):
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
                 json_response = requests.post(
-                    "http://0.0.0.0:3000/api/addCompanyLogo",
+                    "https://gst.caratred.in/ezy/api/addCompanyLogo",
                     data={"company":company.name,"file_extension":file_extension},files = files,verify=False)
             else:
                 json_response = requests.post(
-                    "http://0.0.0.0:3000/api/addCompanyLogo",
+                    "https://gst.caratred.in/ezy/api/addCompanyLogo",
                     data={"company":company.name,"file_extension":file_extension},files = files,verify=False)
             response = json_response.json()
             if response["success"] == False:
@@ -644,7 +644,7 @@ def upload_propery_logo_pms(data):
         else:
             print(proxies, "     proxy console")
             json_response = requests.post(
-                "http://0.0.0.0:3000/api/addCompanyLogo",
+                "https://gst.caratred.in/ezy/api/addCompanyLogo",
                 data={"company":company.name,"file_extension":file_extension},files = files,
                 proxies=proxies,verify=False)
             response = json_response.json()
