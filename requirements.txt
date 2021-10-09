@@ -19,4 +19,5 @@ pytesseract
 pdf2image
 opencv-python
 email-to
+pyshorteners
 tensorflow

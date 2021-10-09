@@ -163,6 +163,11 @@
   "welcome_message",
   "ezycheckin_signature",
   "cancellation_email",
+  "thank_you_email",
+  "ezycheckins_socket_host",
+  "check_billing_address",
+  "billing_address",
+  "guest_gst_number",
   "ezycheckins_socket_host",
   "thank_you_email",
   "upload_gst_details",
@@ -907,7 +912,7 @@
   },
   {
    "fieldname": "terms_and_conditions",
-   "fieldtype": "Data",
+   "fieldtype": "HTML Editor",
    "label": "Terms and Conditions"
   },
   {
@@ -1027,7 +1032,7 @@
   },
   {
    "fieldname": "welcome_message",
-   "fieldtype": "Data",
+   "fieldtype": "HTML Editor",
    "label": "Welcome Message"
   },
   {
@@ -1052,6 +1057,22 @@
    "fieldname": "ezycheckins_socket_host",
    "fieldtype": "Data",
    "label": "Ezycheckins Socket Host"
+  },
+  {
+   "fieldname": "billing_address",
+   "fieldtype": "HTML Editor",
+   "label": "Billing Address "
+  },
+  {
+   "default": "0",
+   "fieldname": "check_billing_address",
+   "fieldtype": "Check",
+   "label": "Check Billing Address"
+  },
+  {
+   "fieldname": "guest_gst_number",
+   "fieldtype": "Data",
+   "label": "Guest GST Number"
   },
   {
    "default": "0",
