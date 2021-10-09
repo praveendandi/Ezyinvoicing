@@ -21,3 +21,4 @@ opencv-python
 email-to
 pyshorteners
 tensorflow
+razorpay
