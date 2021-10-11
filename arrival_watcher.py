@@ -30,13 +30,12 @@ def getprearrivals_file():
                 proxyhost = proxyhost.replace("http://","@")
                 proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost,
                                 'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost}
-                file_response = requests.get(config_json["host"]+"api/method/upload_file",headers=headers,proxies=proxies,verify=False)
-                print("File Uploaded to Host")
+                file_response = requests.post(config_json["host"]+"api/method/upload_file",headers=headers,proxies=proxies,verify=False)
             else:
                 if config_json["skip_ssl_verify"] == 1:
-                    file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
+                    file_response_post = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
                 else:
-                    file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
+                    file_response_post = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
             if file_response.status_code==200:
                 file_data = file_response.json()
                 print(file_response,"File response")
@@ -45,7 +44,7 @@ def getprearrivals_file():
                     proxyhost = proxyhost.replace("http://","@")
                     proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost,
                                     'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost}
-                    file_response_arr = requests.get(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":file_data["message"]["attached_to_name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
+                    file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":file_data["message"]["attached_to_name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
                 else:
                     if config_json["skip_ssl_verify"] == 1:
                         file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":file_data["message"]["attached_to_name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
