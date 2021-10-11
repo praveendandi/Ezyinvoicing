@@ -8,6 +8,7 @@
   "guest_first_name",
   "guest_last_name",
   "guest_email_address",
+  "guest_phone_number",
   "no_of_adults",
   "no_of_children",
   "confirmation_number",
@@ -35,10 +36,12 @@
   "payment_mobile_number",
   "check_in_source",
   "mode_of_transportation",
+  "travel_other_states",
   "travel_history",
   "purpose_of_visit",
+  "covid_symptoms",
   "health_symptoms",
-  "gst_no",
+  "guest_gst_number",
   "extra_bed",
   "guest_company_name",
   "crs_id",
@@ -49,7 +52,12 @@
   "image_2",
   "epoch",
   "company",
-  "smoking_preferences"
+  "smoking_preferences",
+  "check_out_time",
+  "resident_of_india",
+  "temperature",
+  "terms_and_conditions",
+  "loyalty_membership"
  ],
  "fields": [
   {
@@ -74,7 +82,7 @@
   },
   {
    "fieldname": "address1",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address1"
   },
   {
@@ -211,11 +219,6 @@
    "label": "Health Symptoms"
   },
   {
-   "fieldname": "gst_no",
-   "fieldtype": "Data",
-   "label": "GST No"
-  },
-  {
    "default": "0",
    "fieldname": "extra_bed",
    "fieldtype": "Check",
@@ -281,11 +284,64 @@
    "fieldname": "no_of_children",
    "fieldtype": "Int",
    "label": "Number of Children"
+  },
+  {
+   "fieldname": "guest_phone_number",
+   "fieldtype": "Data",
+   "label": "Guest Phone Number"
+  },
+  {
+   "fieldname": "check_out_time",
+   "fieldtype": "Data",
+   "label": "Check Out time"
+  },
+  {
+   "default": "Yes",
+   "fieldname": "resident_of_india",
+   "fieldtype": "Select",
+   "label": "Resident Of India",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "temperature",
+   "fieldtype": "Data",
+   "label": "Temperature"
+  },
+  {
+   "default": "No",
+   "fieldname": "travel_other_states",
+   "fieldtype": "Select",
+   "label": "Travel Other States",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "No",
+   "fieldname": "covid_symptoms",
+   "fieldtype": "Select",
+   "label": "Covid Symptoms",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "Terms and Conditions"
+  },
+  {
+   "default": "No",
+   "fieldname": "loyalty_membership",
+   "fieldtype": "Select",
+   "label": "Loyalty Membership",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "guest_gst_number",
+   "fieldtype": "Data",
+   "label": "Guest GST No"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-08 18:31:37.730011",
+ "modified": "2021-10-11 12:27:30.378504",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",
