@@ -10,8 +10,7 @@ config_json_path="/home/caratred/Desktop/config/config.json"
 headers = {'Content-Type': 'application/json'}
 with open(config_json_path) as f:
    config_json = json.load(f)
-def getprearrivals_file():
-    
+def getprearrivals_file():   
     try:
         print("Waiting for File")
         time.sleep(5)
