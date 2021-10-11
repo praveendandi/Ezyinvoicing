@@ -57,7 +57,8 @@
   "resident_of_india",
   "temperature",
   "terms_and_conditions",
-  "loyalty_membership"
+  "loyalty_membership",
+  "opera_scanned_status"
  ],
  "fields": [
   {
@@ -337,11 +338,18 @@
    "fieldname": "guest_gst_number",
    "fieldtype": "Data",
    "label": "Guest GST No"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "opera_scanned_status",
+   "fieldtype": "Select",
+   "label": "Opera Scanned Status",
+   "options": "Pending\nScanned"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-11 12:27:30.378504",
+ "modified": "2021-10-11 16:26:16.930674",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",
