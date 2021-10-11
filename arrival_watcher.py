@@ -15,7 +15,6 @@ def getprearrivals_file():
         print("Waiting for File")
         time.sleep(5)
         files = glob.glob(config_json["file_path"])
-        print("File Read Succesfully")
         for file_path in files:
             invoicefile = {'file': open(file_path, 'rb')}
             payload = {
@@ -33,9 +32,9 @@ def getprearrivals_file():
                 file_response = requests.post(config_json["host"]+"api/method/upload_file",headers=headers,proxies=proxies,verify=False)
             else:
                 if config_json["skip_ssl_verify"] == 1:
-                    file_response_post = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
+                    file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
                 else:
-                    file_response_post = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
+                    file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
             if file_response.status_code==200:
                 file_data = file_response.json()
                 print(file_response,"File response")
