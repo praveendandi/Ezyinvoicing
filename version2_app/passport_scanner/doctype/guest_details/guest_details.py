@@ -170,6 +170,10 @@ def update_guest_details(name):
                     aadhar_back["data"]["message"]["aadhar_details"]["image_2"] = pre_checkins.image_2
                     aadhar_details.update(aadhar_back["data"]["message"]["aadhar_details"])
                 aadhar_details["id_type"] = "aadhaar"    
+                if company_doc.scan_ezy_module == 1:
+                    aadhar_details["scan_ezy"] = True
+                else:
+                    aadhar_details["scan_ezy"] = False
                 return {"success": True,"data":aadhar_details}
             if pre_checkins.guest_id_type == "driving":
                 driving_license_details= {}
@@ -194,6 +198,10 @@ def update_guest_details(name):
                     driving_license["data"]["message"]["driving_details"]["image_1"] = pre_checkins.image_1
                     driving_license_details.update(driving_license["data"]["message"]["driving_details"])
                 driving_license_details["id_type"] = "driving"
+                if company_doc.scan_ezy_module == 1:
+                    driving_license_details["scan_ezy"] = True
+                else:
+                    driving_license_details["scan_ezy"] = False
                 return {"success":True, "data":driving_license_details}
             if pre_checkins.guest_id_type == "voterId":
                 voter_details = {}
@@ -234,6 +242,10 @@ def update_guest_details(name):
                     voter_details["image_2"] = pre_checkins.image_2
                     voter_details.update(voter_back["data"]["message"]["voter_details"]["data"])
                 voter_details["id_type"] = "voterId"    
+                if company_doc.scan_ezy_module == 1:
+                    voter_details["scan_ezy"] = True
+                else:
+                    voter_details["scan_ezy"] = False
                 return {"success": True,"data":voter_details}
             if pre_checkins.guest_id_type == "indianPassport" or pre_checkins.guest_id_type == "passport":
                 passport_details = {}
@@ -306,6 +318,10 @@ def update_guest_details(name):
                     # del visa_details["data"]["message"]["details"]["data"]["base64_string"]
                     passport_details["image_2"] = pre_checkins.image_2  
                 passport_details["id_type"] = pre_checkins.guest_id_type if pre_checkins.guest_id_type == "indianPassport" else "Foreign"
+                if company_doc.scan_ezy_module == 1:
+                    passport_details["scan_ezy"] = True
+                else:
+                    passport_details["scan_ezy"] = False
                 return {"success": True,"data":passport_details}
             if pre_checkins.guest_id_type == "OCI":
                 pass
@@ -341,6 +357,10 @@ def update_guest_details(name):
                             other_details["image_2"] = base_image["message"]["file_url"]
                             del back2["data"]["message"]["otherimage_details"]["base64_string"]
                 other_details["id_type"] = "other"
+                if company_doc.scan_ezy_module == 1:
+                    other_details["scan_ezy"] = True
+                else:
+                    other_details["scan_ezy"] = False
                 return {"success":True, "data":other_details}
         else:
             if company_doc.ezy_checkins_module == 1:
@@ -358,7 +378,7 @@ def update_guest_details(name):
 
 @frappe.whitelist(allow_guest=True)
 def add_guest_details(data):
-    # try:
+    try:
         company_doc = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path+'/sites/'+company_doc.site_name
@@ -401,7 +421,7 @@ def add_guest_details(data):
         doc = frappe.get_doc(data)
         doc.insert(ignore_permissions=True, ignore_links=True)
         return {"success":True, "message":"Guest added successfully"}
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return {"success":False,"message":str(e)}   
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}   
