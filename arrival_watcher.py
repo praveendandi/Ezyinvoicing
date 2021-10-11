@@ -30,6 +30,7 @@ def getprearrivals_file():
                 proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost,
                                 'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost}
                 file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload,verify=False)
+                print(file_response_arr.text,"File uploaded succesfully with proxy")
             else:
                 if config_json["skip_ssl_verify"] == 1:
                     file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
