@@ -40,8 +40,7 @@ def add_pre_checkins():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
-        print(data)
-        company = frappe.get_last_doc("company")
+        company = frappe.get_doc("company",data["company"])
         no_of_adults = data["no_of_adults"]
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path+'/sites/'+company.site_name

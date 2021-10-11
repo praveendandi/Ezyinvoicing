@@ -43,19 +43,14 @@ def guest_details_opera(confirmation_number):
         if company_doc.opera_scan == 1:
             if company_doc.ezy_checkins_module == 1:
                 if frappe.db.exists({"doctype":"Precheckins",'confirmation_number': confirmation_number}):
-                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': ["like", confirmation_number+"%"]},fields=["name","confirmation_number","guest_first_name","guest_last_name"],order_by="creation")
+                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': ["like", confirmation_number+"%"]},fields=["name","confirmation_number","guest_first_name","guest_last_name","opera_scanned_status"],order_by="creation")
                     type = "ezy-checkins"
-                    if company_doc.scan_ezy_module == 1:
-                        for each in guest_details:
-                            each["Scan Ezy"] = True
                 else:
                     return {"success":False,"message":"Confirmation Number not found"}
             elif company_doc.scan_ezy_module == 1 and company_doc.ezy_checkins_module == 0:
                 if frappe.db.exists("Arrival Information", confirmation_number):
                     guest_details = frappe.db.get_list("Arrival Information",filters={'name': confirmation_number},fields=["*"])
                     type = "scan-ezy"
-                    for each in guest_details:
-                        each["Hidden_Buttons"] = False
                 else:
                     return {"success":False,"message":"Confirmation Number not found"}
             else:
@@ -382,7 +377,10 @@ def add_guest_details(data):
         company_doc = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path+'/sites/'+company_doc.site_name
-        pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
+        if company_doc.ezy_checkins_module == 1:
+            pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
+        if company_doc.ezy_checkins_module == 1 and company_doc.scan_ezy_module == 1:
+            pre_checkins_count = frappe.db.get_value('Arrival Information',{"confirmation_number":data["confirmation_number"]},"no_of_adults")
         if "-" in data["confirmation_number"]:
             data["confirmation_number"] = data["confirmation_number"].split("-")[0]
         scan_guest_details = frappe.db.count('Guest Details', {'confirmation_number': data["confirmation_number"]})
@@ -396,14 +394,14 @@ def add_guest_details(data):
                     arrival_doc.booking_status = "CHECKED IN"
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
         name = data["given_name"]+data["confirmation_number"]+data["id_type"]
-        if data["id_image1"] != "":
+        if data["id_image1"]:
             if "private" not in data["id_image1"]:
                 image_1 = convert_base64_to_image(data["id_image1"],name,site_folder_path,company_doc)
                 if "file_url" not in  image_1["message"].keys():
                     return image_1
                 data["id_image1"] = image_1["message"]["file_url"]
                 del data["id_image1"]
-        if data["id_image2"] != "":
+        if data["id_image2"]:
             if "private" not in data["id_image2"]:
                 image_2 = convert_base64_to_image(data["id_image2"],name,site_folder_path,company_doc)
                 if "file_url" not in  image_2["message"].keys():
@@ -418,6 +416,11 @@ def add_guest_details(data):
                 data["face_image"] = face["message"]["file_url"]
                 del data["face_image"]
         data["doctype"] = "Guest Details"
+        if company_doc.ezy_checkins_module == 1:
+            pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
+            pre_doc.opera_scanned_status = "Scanned"
+            pre_doc.save(ignore_permissions=True,ignore_version=True)
+            del data["guest_id"]
         doc = frappe.get_doc(data)
         doc.insert(ignore_permissions=True, ignore_links=True)
         return {"success":True, "message":"Guest added successfully"}
