@@ -358,7 +358,7 @@ def update_guest_details(name):
 
 @frappe.whitelist(allow_guest=True)
 def add_guest_details(data):
-    # try:
+    try:
         company_doc = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path+'/sites/'+company_doc.site_name
@@ -401,7 +401,7 @@ def add_guest_details(data):
         doc = frappe.get_doc(data)
         doc.insert(ignore_permissions=True, ignore_links=True)
         return {"success":True, "message":"Guest added successfully"}
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return {"success":False,"message":str(e)}   
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}   
