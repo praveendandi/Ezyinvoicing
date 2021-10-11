@@ -31,6 +31,7 @@
   "address",
   "city",
   "country",
+  "postal_code",
   "arrival_from_country",
   "arrival_from_city",
   "arrival_place",
@@ -372,11 +373,16 @@
    "fieldname": "guest_full_name",
    "fieldtype": "Data",
    "label": "Guest Full Name"
+  },
+  {
+   "fieldname": "postal_code",
+   "fieldtype": "Data",
+   "label": "Postal Code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-23 18:54:05.030019",
+ "modified": "2021-10-10 17:20:16.088068",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
