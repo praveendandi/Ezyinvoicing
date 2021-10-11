@@ -25,7 +25,7 @@ from PIL import Image
 from io import BytesIO
 from frappe.utils import logger
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api")
 import pyshorteners as ps
 
 user_name =  frappe.session.user
@@ -1055,11 +1055,11 @@ def precheckins():
             image1_binary=base64.b64decode(i["image_1"])
             image2_binary=base64.b64decode(i["image_2"])
             im1 = Image.open(BytesIO(image1_binary))
-            im1.save(cwd+"/"+site_name+"/public/files/image1"+i["confirmation_number"]+".png", 'PNG')
+            im1.save(cwd+"/"+site_name+"/private/files/image1"+i["confirmation_number"]+".png", 'PNG')
             im2 = Image.open(BytesIO(image2_binary))
-            im2.save(cwd+"/"+site_name+"/public/files/image2"+i["confirmation_number"]+".png", 'PNG')
+            im2.save(cwd+"/"+site_name+"/private/files/image2"+i["confirmation_number"]+".png", 'PNG')
             im = Image.open(BytesIO(signature_binary))
-            im.save(cwd+"/"+site_name+"/public/files/signature"+i["confirmation_number"]+".png", 'PNG')
+            im.save(cwd+"/"+site_name+"/private/files/signature"+i["confirmation_number"]+".png", 'PNG')
         except PIL.UnidentifiedImageError:
              pass
         if company.ezycheckin_signature=="0":
@@ -1165,10 +1165,3 @@ def update_company(doc,method=None):
         return {"success":False,"message":str(e)}
         
 
-
-@frappe.whitelist(allow_guest=True)
-def checkins():
-    id = 10
-    url = "https://so.ezycheckins.com/v2/?hotelId=H9306GMM&confirmation=9735241&source=email"
-    u = ps.Shortener().tinyurl.short(url)
-    print(u)
