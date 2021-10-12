@@ -19,18 +19,15 @@ def getprearrivals_file():
             invoicefile = {'file': open(file_path, 'rb')}
             payload = {
                 'is_private': 1,
-                'folder': 'Home',
-                'doctype': 'invoices',
-                'docname': config_json["name"],
-                'fieldname': 'invoice'}
+                'folder': 'Home'}
             if config_json["proxy"] == 1:
                 print("Proxy is Active")
                 proxyhost = config_json["proxy_url"]
-                proxyhost = proxyhost.replace("http://","@")
-                proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost,
-                                'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost}
-                file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload,verify=False)
-                print(file_response_arr.text,"File uploaded succesfully with proxy")
+                proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+"@"+proxyhost,
+                                'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+"@"+proxyhost}
+                print(proxies)
+                file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile,proxies=proxies,data=payload,verify=False)
+                print(file_response.text)
             else:
                 if config_json["skip_ssl_verify"] == 1:
                     file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
@@ -42,22 +39,24 @@ def getprearrivals_file():
                 if config_json["proxy"] == 1:
                     proxyhost = config_json["proxy_url"]
                     proxyhost = proxyhost.replace("http://","@")
-                    proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost,
-                                    'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+proxyhost}
-                    file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":file_data["message"]["attached_to_name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
+                    proxies = {'http':'http://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+"@"+proxyhost,
+                                'https':'https://'+config_json["proxy_username"]+":"+config_json["proxy_password"]+"@"+proxyhost}
+                    file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",proxies=proxies,params={"company":config_json["name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
                     print(file_response_arr.text,"File uploaded succesfully with proxy Enabled")
                 else:
                     if config_json["skip_ssl_verify"] == 1:
-                        file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":file_data["message"]["attached_to_name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
+
+                        file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":config_json["name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
                         print(file_response_arr.text,"File uploaded succesfully with skip_ssl enabled")
                     else:
-                        file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":file_data["message"]["attached_to_name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
+                        file_response_arr = requests.post(config_json["host"]+"api/method/version2_app.arrivals.doctype.arrival_information.arrival_information.arrivalActivity",params={"company":config_json["name"],"file_url":file_data["message"]["file_url"],"source":"Manual"})
                         print(file_response_arr.text,"File uploaded succesfully with skip_ssl 0")
             invoicefile['file'].close()
             print("file removed")
             if path.exists(file_path):
                 os.remove(file_path)
     except Exception as e:
-        print(e,"am from exception")
+       print(e,"am from exception")
     getprearrivals_file()
 getprearrivals_file()
+
