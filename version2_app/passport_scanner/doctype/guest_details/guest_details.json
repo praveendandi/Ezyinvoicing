@@ -288,8 +288,9 @@
   },
   {
    "fieldname": "confirmation_number",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Confirmation Number",
+   "options": "Arrival Information",
    "reqd": 1
   },
   {
@@ -382,7 +383,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-10 17:20:16.088068",
+ "modified": "2021-10-12 12:37:54.139643",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
