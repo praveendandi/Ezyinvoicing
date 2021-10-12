@@ -160,7 +160,7 @@
    "fieldname": "booking_status",
    "fieldtype": "Select",
    "label": "Booking Status",
-   "options": "RESERVED\nCANCELLED\nCHECKED IN\nCHECKED OUT\nDUE IN"
+   "options": "RESERVED\nCANCELLED\nCHECKED IN\nCHECKED OUT\nDUE IN\nDUE OUT"
   },
   {
    "default": "No",
@@ -243,7 +243,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-11 11:41:18.472541",
+ "modified": "2021-10-12 17:23:02.532605",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",

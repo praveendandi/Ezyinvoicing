@@ -41,7 +41,8 @@ def arrivalActivity(company,file_url,source):
             if len(replace_new)>4:
                 confirmation_number = ""
                 IS_GROUP_CODE = ""
-                if len(replace_new) >= column_indexs["GROUP_CODE"]:
+                print(len(replace_new), column_indexs["GROUP_CODE"])
+                if column_indexs["GROUP_CODE"] <= len(replace_new):
                     if replace_new[column_indexs["GROUP_CODE"]] != "":
                         confirmation_number = replace_new[column_indexs["GROUP_CODE"]]
                         IS_GROUP_CODE = "Yes"
