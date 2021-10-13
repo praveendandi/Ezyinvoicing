@@ -56,7 +56,6 @@
   "check_out_time",
   "resident_of_india",
   "temperature",
-  "terms_and_conditions",
   "loyalty_membership",
   "opera_scanned_status"
  ],
@@ -323,11 +322,6 @@
    "options": "Yes\nNo"
   },
   {
-   "fieldname": "terms_and_conditions",
-   "fieldtype": "Text",
-   "label": "Terms and Conditions"
-  },
-  {
    "default": "No",
    "fieldname": "loyalty_membership",
    "fieldtype": "Select",
@@ -349,7 +343,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-11 16:26:16.930674",
+ "modified": "2021-10-13 16:07:06.615629",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",

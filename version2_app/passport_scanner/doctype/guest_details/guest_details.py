@@ -136,6 +136,10 @@ def update_guest_details(name):
             if pre_checkins.guest_id_type == "aadhaar":
                 aadhar_details = {}
                 if file_path1:
+                    aadhar_details["pre_city"] = pre_checkins.guest_city
+                    aadhar_details["pre_country"] = pre_checkins.guest_country
+                    aadhar_details["pre_state"] = pre_checkins.guest_state
+                    aadhar_details["pre_Nationality"] = pre_checkins.guest_nationality
                     aadhar_front = helper_utility({"api":"scan_aadhar", "aadhar_image":convert1["data"], "scanView":"front"})
                     if aadhar_front["data"]["message"]["success"] == False:
                         aadhar_details["image_1"] = pre_checkins.image_1
@@ -177,6 +181,10 @@ def update_guest_details(name):
             if pre_checkins.guest_id_type == "driving":
                 driving_license_details= {}
                 if file_path1:
+                    driving_license_details["pre_city"] = pre_checkins.guest_city
+                    driving_license_details["pre_country"] = pre_checkins.guest_country
+                    driving_license_details["pre_state"] = pre_checkins.guest_state
+                    driving_license_details["pre_Nationality"] = pre_checkins.guest_nationality
                     driving_license = helper_utility({"api":"scan_driving_license", "driving_image":convert1["data"]})
                     if driving_license["data"]["message"]["success"] == False:
                         driving_license_details["image_1"] = pre_checkins.image_1
@@ -205,6 +213,10 @@ def update_guest_details(name):
             if pre_checkins.guest_id_type == "voterId":
                 voter_details = {}
                 if file_path1:
+                    voter_details["pre_city"] = pre_checkins.guest_city
+                    voter_details["pre_country"] = pre_checkins.guest_country
+                    voter_details["pre_state"] = pre_checkins.guest_state
+                    voter_details["pre_Nationality"] = pre_checkins.guest_nationality
                     voter_front = helper_utility({"api":"scan_votercard", "voter_image":convert1["data"], "scanView":"front"})
                     if "success" in voter_front["data"]["message"].keys():
                         if voter_front["data"]["message"]["success"] == False:
@@ -249,6 +261,10 @@ def update_guest_details(name):
             if pre_checkins.guest_id_type == "indianPassport" or pre_checkins.guest_id_type == "passport":
                 passport_details = {}
                 if file_path1:
+                    passport_details["pre_city"] = pre_checkins.guest_city
+                    passport_details["pre_country"] = pre_checkins.guest_country
+                    passport_details["pre_state"] = pre_checkins.guest_state
+                    passport_details["pre_Nationality"] = pre_checkins.guest_nationality
                     passport = helper_utility({"api":"passportvisadetails", "Passport_Image":convert1["data"], "scan_type":"web"})
                     if passport["data"]["message"]["success"] == False:
                         passport_details["image_1"] = pre_checkins.image_1
