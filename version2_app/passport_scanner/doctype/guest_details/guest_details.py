@@ -340,7 +340,7 @@ def update_guest_details(name):
                 return {"success": True,"data":passport_details}
             if pre_checkins.guest_id_type == "OCI":
                 pass
-            if pre_checkins.guest_id_type == "other":
+            if pre_checkins.guest_id_type == "other" or pre_checkins.guest_id_type == "others":
                 other_details = {}
                 if file_path1:
                     driving_license = helper_utility({"api":"other_images", "image":convert1["data"]})

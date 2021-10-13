@@ -83,6 +83,9 @@ def add_pre_checkins():
             if data["resident_of_india"] == "Yes":
                 pre_checkins["guest_country"] = "IND"
             pre_checkins["doctype"] = "Precheckins"
+            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
+                arrival_doc = frappe.get_doc('Arrival Information', data["confirmation_number"])
+                pre_checkins["arrival_date"] = arrival_doc.arrival_date
             precheckins_doc = frappe.get_doc(pre_checkins)
             precheckins_doc.insert(ignore_permissions=True, ignore_links=True)
             count+=1
