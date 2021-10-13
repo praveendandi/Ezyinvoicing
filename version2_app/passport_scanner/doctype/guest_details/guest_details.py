@@ -376,8 +376,10 @@ def update_guest_details(name):
         return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def add_guest_details(data):
+def add_guest_details():
     try:
+        data=json.loads(frappe.request.data)
+        data = data["data"]
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1:
             folder_path = frappe.utils.get_bench_path()
@@ -393,10 +395,10 @@ def add_guest_details(data):
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
                 arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
                 if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
-                    if scan_guest_details == pre_checkins_count:
+                    if (scan_guest_details+1) == pre_checkins_count:
                         arrival_doc.status = "Scanned"
                     else:
-                        if scan_guest_details<pre_checkins_count:
+                        if (scan_guest_details+1) < pre_checkins_count:
                             arrival_doc.status = "Partial Scanned"
                             arrival_doc.booking_status = "CHECKED IN"
                 arrival_doc.save(ignore_permissions=True, ignore_version=True)
@@ -430,6 +432,7 @@ def add_guest_details(data):
                     pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
                     pre_doc.opera_scanned_status = "Scanned"
                     pre_doc.guest_first_name = data["given_name"]
+                    pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
                     pre_doc.save(ignore_permissions=True,ignore_version=True)
                     del data["guest_id"]
             doc = frappe.get_doc(data)
