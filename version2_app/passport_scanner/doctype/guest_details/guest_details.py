@@ -431,6 +431,7 @@ def add_guest_details():
                 if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and data["guest_id"]:
                     pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
                     pre_doc.opera_scanned_status = "Scanned"
+                    arrival_doc.booking_status = "CHECKED IN"
                     pre_doc.guest_first_name = data["given_name"]
                     pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
                     pre_doc.save(ignore_permissions=True,ignore_version=True)
