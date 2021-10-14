@@ -126,6 +126,7 @@
   "disable_sac_edit",
   "sign_ezy_module",
   "enable_pos_extra_text",
+  "pos_text",
   "create_taxinvoice_raisecredit",
   "qr_page",
   "upload_gst_details",
@@ -888,11 +889,16 @@
    "fieldname": "pms_property_url",
    "fieldtype": "Data",
    "label": "PMS Property URL"
+  },
+  {
+   "fieldname": "pos_text",
+   "fieldtype": "Small Text",
+   "label": "POS Text"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-02 11:13:03.453670",
+ "modified": "2021-10-14 09:54:18.378711",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
