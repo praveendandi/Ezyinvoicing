@@ -1211,7 +1211,8 @@ def pass_detect_text(image_file):
                     date_of_birth = full+remain
 
             sex = second[20]
-
+            if "М" in sex:
+                sex = "Male"
             expiry_date = second[21:27]
             expiry_joindate = '/'.join([expiry_date[:2],
                                         expiry_date[2:4], expiry_date[4:]])
