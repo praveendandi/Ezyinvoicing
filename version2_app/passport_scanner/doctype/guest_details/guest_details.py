@@ -150,11 +150,12 @@ def update_guest_details(name):
                         aadhar_details["id_type"] = "aadhaar"
                         return {"success": False,"data":aadhar_details}
                         # return aadhar_front["data"]["message"]
-                    if aadhar_front["data"]["message"]["aadhar_details"]["face"]:
-                        base_image = convert_base64_to_image(aadhar_front["data"]["message"]["aadhar_details"]["face"],name,site_folder_path,company_doc)
-                        if "file_url" in  base_image["message"].keys():
-                            aadhar_details["face_url"] = base_image["message"]["file_url"]
-                            del aadhar_front["data"]["message"]["aadhar_details"]["face"]
+                    if "face" in if aadhar_front["data"]["message"]["aadhar_details"].keys():
+                        if aadhar_front["data"]["message"]["aadhar_details"]["face"]:
+                            base_image = convert_base64_to_image(aadhar_front["data"]["message"]["aadhar_details"]["face"],name,site_folder_path,company_doc)
+                            if "file_url" in  base_image["message"].keys():
+                                aadhar_details["face_url"] = base_image["message"]["file_url"]
+                                del aadhar_front["data"]["message"]["aadhar_details"]["face"]
                     # aadhar_front["data"]["message"]["aadhar_details"]["front_image"] = aadhar_front["data"]["message"]["aadhar_details"]["base64_string"]
                     del aadhar_front["data"]["message"]["aadhar_details"]["base64_string"]
                     aadhar_front["data"]["message"]["aadhar_details"]["image_1"] = pre_checkins.image_1
