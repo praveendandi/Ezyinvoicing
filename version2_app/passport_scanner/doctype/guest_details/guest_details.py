@@ -452,6 +452,13 @@ def add_guest_details():
                     pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
                     pre_doc.save(ignore_permissions=True,ignore_version=True)
                     del data["guest_id"]
+            if data["address"] != "":
+                if re.search("\d{6}",data["address"]):
+                    postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address"]).groupdict()['zipcode']
+                    data["postal_code"] = postal_code if len(postal_code) == 6 else ''
+                split_address = data["address"].split(",")
+                data["address"] = ' '.join(split_address[:len(split_address)//2])
+                data["address2"] = ' '.join(split_address[len(split_address)//2:])
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             return {"success":True, "message":"Guest added successfully"}

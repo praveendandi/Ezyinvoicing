@@ -196,7 +196,7 @@ def aadhar_detect_text(image_file, doc_type):
                 if 'Address' in x:
                     abc = block.index(x)
             address = block[abc:]
-            regex = re.compile('([^a-zA-Z0-9-/ ]|Address|govin|ligovin|help|No|www|o  |uidai)')
+            regex = re.compile('([^a-zA-Z0-9-,./ ]|Address|govin|ligovin|help|No|www|o  |uidai)')
             cannot = ([regex.sub('', i) for i in address])
             cannot = [x for x in cannot if x not in unlike]
             unique_list = list(OrderedDict((element, None)
@@ -447,7 +447,7 @@ def license_detect_text(image_file):
                     final_address = address[:ind+1]
                     person_address = ' '.join(x for x in final_address)
                     person_address = re.sub(
-                        '[^A-Za-z0-9-/ ]', '', person_address)
+                        '[^A-Za-z0-9-,/ ]', '', person_address)
 
                     break
         if person_address != '':
@@ -473,7 +473,7 @@ def license_detect_text(image_file):
                         final_address = address[:ind+1]
                         person_address = ' '.join(x for x in final_address)
                         person_address = re.sub(
-                            '[^A-Za-z0-9-/ ]|[0-9]{2}\/[0-9]{2}\/[0-9]{4}|[0-9]{2}\-[0-9]{2}\-[0-9]{4}', '', person_address)
+                            '[^A-Za-z0-9-,/ ]|[0-9]{2}\/[0-9]{2}\/[0-9]{4}|[0-9]{2}\-[0-9]{2}\-[0-9]{4}', '', person_address)
 
                         break
 
@@ -538,7 +538,7 @@ def license_detect_text(image_file):
 
         if person_address != '':
             person_address = re.sub(
-                'Issued on|Issued|Date of First Issue|ssued|DoB|[0-9]{2}\/[0-9]{2}\/[0-9]{4}', '', person_address)
+                'Issued on|Issued|Date of First Issue|ssued|DoB|[0-9]{2}\/[0-9]{2}\/[0-9]{4}|Addressress|Address|ADDRESS|address', '', person_address)
         postal_code = ''
         state = ''
         details = {"uid": uid, "Date_of_birth": Date_of_birth,

@@ -29,6 +29,7 @@
   "visa_type",
   "visa_sub_type",
   "address",
+  "address2",
   "city",
   "country",
   "postal_code",
@@ -379,11 +380,16 @@
    "fieldname": "postal_code",
    "fieldtype": "Data",
    "label": "Postal Code"
+  },
+  {
+   "fieldname": "address2",
+   "fieldtype": "Small Text",
+   "label": "Address2"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-12 12:37:54.139643",
+ "modified": "2021-10-18 18:06:25.478227",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
