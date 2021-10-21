@@ -163,7 +163,7 @@ def update_guest_details(name):
                     aadhar_details.update(aadhar_front["data"]["message"]["aadhar_details"])
                 if file_path2:
                     aadhar_back = helper_utility({"api":"scan_aadhar", "aadhar_image":convert2["data"], "scanView":"back"})
-                    if "success" in aadhar_back["data"]["message"].keys():
+                    if "message" in aadhar_back["data"].keys():
                         if aadhar_back["data"]["message"]["success"] == False:
                             aadhar_details["image_2"] = pre_checkins.image_2
                             aadhar_details.update(aadhar_back["data"]["message"])
@@ -171,6 +171,10 @@ def update_guest_details(name):
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
                             return {"success": False,"data":aadhar_details}
+                    else:
+                        aadhar_details["image_2"] = pre_checkins.image_2
+                        aadhar_details["id_type"] = "aadhaar"
+                        return {"success": False,"data":aadhar_details}
                     # aadhar_back["data"]["message"]["aadhar_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     aadhar_back["data"]["message"]["aadhar_details"]["image_2"] = pre_checkins.image_2
