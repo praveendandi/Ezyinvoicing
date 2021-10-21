@@ -449,16 +449,20 @@ def add_guest_details():
                     pre_doc.opera_scanned_status = "Scanned"
                     arrival_doc.booking_status = "CHECKED IN"
                     pre_doc.guest_first_name = data["given_name"]
-                    pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
+                    if "sur_name" in data.keys():
+                        pre_doc.guest_last_name = data["sur_name"] if data["sur_name"] else ""
+                    else:
+                        pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
                     pre_doc.save(ignore_permissions=True,ignore_version=True)
                     del data["guest_id"]
-            if data["address"] != "":
-                if re.search("\d{6}",data["address"]):
-                    postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address"]).groupdict()['zipcode']
-                    data["postal_code"] = postal_code if len(postal_code) == 6 else ''
-                split_address = data["address"].split(",")
-                data["address"] = ' '.join(split_address[:len(split_address)//2])
-                data["address2"] = ' '.join(split_address[len(split_address)//2:])
+            if "address1" in data.keys():
+                data["address"] = data["address1"]
+                del data["address1"]
+            if "address2" in data.keys():
+                if data["address2"] != "":
+                    if re.search("\d{6}",data["address2"]):
+                        postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address2"]).groupdict()['zipcode']
+                        data["postal_code"] = postal_code if len(postal_code) == 6 else ''
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             return {"success":True, "message":"Guest added successfully"}

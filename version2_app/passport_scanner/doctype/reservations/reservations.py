@@ -219,8 +219,30 @@ def aadhar_detect_text(image_file, doc_type):
             person_address = ' '.join(x for x in final_address)
             pin_get = re.findall('[0-9]{6}', person_address)
             postal_code = ''
-            state = ''   
-            return {"success": True,"data": {'person_address': person_address, "postal_code": postal_code, "state": state}}
+            state = ''
+            address1 = ""  
+            address2 = ""
+            person_address = person_address.replace("W|O","").replace("W/O","").replace("w/o","").replace("w|o","").replace("D/O","").replace("d/o","").replace("d|o","").replace("D|O","").replace("d/o","").replace("s/o","").replace("s/o","").replace("S/O","").replace("s/o","").replace("S|O","").replace("s/o","").replace("s|o","")
+            split_address = person_address.split(" ")
+            if len(split_address) > 2:
+                if split_address[0] == "DIO" or split_address[0] == "WIO" or split_address[0] == "AND" or split_address[0] == "SIO":
+                    split_address.pop(0)
+                if split_address[1] == "DIO" or split_address[1] == "WIO" or split_address[1] == "AND" or split_address[1] == "SIO" or split_address[1] == "WIO" or split_address[1] == "BO":
+                    split_address.pop(1)
+                person_address = " ".join(split_address)
+            if person_address != "":
+                if re.search("\d{6}",person_address):
+                    postal_code_data = re.match('^.*(?P<zipcode>\d{6}).*$', person_address).groupdict()['zipcode']
+                    postal_code = postal_code_data if len(postal_code_data) == 6 else ''
+                if "," in person_address:
+                    split_address = person_address.split(",")
+                    address1 = ','.join(split_address[:len(split_address)//2])
+                    address2 = ','.join(split_address[len(split_address)//2:])
+                else:
+                    split_address = person_address.split(" ")
+                    address1 = ' '.join(split_address[:len(split_address)//2])
+                    address2 = ' '.join(split_address[len(split_address)//2:])
+            return {"success": True,"data": {'person_address': person_address, "postal_code": postal_code, "state": state, "address1":address1, "address2":address2}}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy aadhar_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -535,14 +557,26 @@ def license_detect_text(image_file):
                         final_address = final_address[:no_pin]
                 final_address.append(pin_get[0])
                 person_address = ' '.join(x for x in final_address)
-
+        address1 = ""
+        address2 = ""
+        postal_code = ''
+        state = ''
         if person_address != '':
             person_address = re.sub(
                 'Issued on|Issued|Date of First Issue|ssued|DoB|[0-9]{2}\/[0-9]{2}\/[0-9]{4}|Addressress|Address|ADDRESS|address', '', person_address)
-        postal_code = ''
-        state = ''
+            if re.search("\d{6}",person_address):
+                postal_code_data = re.match('^.*(?P<zipcode>\d{6}).*$', person_address).groupdict()['zipcode']
+                postal_code = postal_code_data if len(postal_code_data) == 6 else ''
+            if "," in person_address:
+                split_address = person_address.split(",")
+                address1 = ','.join(split_address[:len(split_address)//2])
+                address2 = ','.join(split_address[len(split_address)//2:])
+            else:
+                split_address = person_address.split(" ")
+                address1 = ' '.join(split_address[:len(split_address)//2])
+                address2 = ' '.join(split_address[len(split_address)//2:])
         details = {"uid": uid, "Date_of_birth": Date_of_birth,
-                   "name": name, "person_address": person_address, "state": state, "postal_code": postal_code}
+                   "name": name, "person_address": person_address, "state": state, "postal_code": postal_code,"address1":address1,"address2":address2}
         # logger.info(f"time elapsed for parse text is{time.time()-req_time}")
         return {"success":True,"data":details}
     except Exception as e:
@@ -972,8 +1006,22 @@ def voter_detect_text(image_file, doc_type):
                 pin_get = re.findall('[0-9]{6}', person_address)
                 postal_code = ''
                 state = ''
+            address1 = "test"
+            address2 = "test"
+            if person_address != "":
+                if re.search("\d{6}",person_address):
+                    postal_code_data = re.match('^.*(?P<zipcode>\d{6}).*$', person_address).groupdict()['zipcode']
+                    postal_code = postal_code_data if len(postal_code_data) == 6 else ''
+                if "," in person_address:
+                    split_address = person_address.split(",")
+                    address1 = ','.join(split_address[:len(split_address)//2])
+                    address2 = ','.join(split_address[len(split_address)//2:])
+                else:
+                    split_address = person_address.split(" ")
+                    address1 = ' '.join(split_address[:len(split_address)//2])
+                    address2 = ' '.join(split_address[len(split_address)//2:])
             # logger.info(f"time elapsed for parse text is {time.time()-req_time}")
-            return {"success":True,"data":{"person_address": person_address, "Date_of_birth": date_of_birth, "postal_code": postal_code, "state": state}}
+            return {"success":True,"data":{"person_address": person_address, "Date_of_birth": date_of_birth, "postal_code": postal_code, "state": state,"address1":address1,"address2":address2}}
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy voter_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -1461,6 +1509,7 @@ def passportvisadetails():
         details['face'] = image_string
         details['fullimage_size'] = fullimage_size
         details['faceimage_size'] = faceimage_size
+        details["base64_string"] = base
         # logger.info(
         #     f"time elapsed for api request is{time.time()-api_time}")
         return ({"success": True, "details": details})
@@ -1524,8 +1573,22 @@ def passport_address_detect_text(image_file):
                     person_address = ','.join(addr)
                 break
         # logger.info(f"time elapsed for parse text is {time.time()-req_time}")
-
-        return {"success":True,"data":{"personaddress": re.sub("[^a-zA-Z0-9:\s,-]|", "", person_address)}}
+        address1 = ""
+        address2 = ""
+        person_address = re.sub("[^a-zA-Z0-9:\s,-]|", "", person_address)
+        if person_address != "":
+            if re.search("\d{6}",person_address):
+                postal_code_data = re.match('^.*(?P<zipcode>\d{6}).*$', person_address).groupdict()['zipcode']
+                postal_code = postal_code_data if len(postal_code_data) == 6 else ''
+            if "," in person_address:
+                split_address = person_address.split(",")
+                address1 = ','.join(split_address[:len(split_address)//2])
+                address2 = ','.join(split_address[len(split_address)//2:])
+            else:
+                split_address = person_address.split(" ")
+                address1 = ' '.join(split_address[:len(split_address)//2])
+                address2 = ' '.join(split_address[len(split_address)//2:])
+        return {"success":True,"data":{"personaddress": person_address,"address1":address1,"address2":address2}}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy passport_address_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -1543,6 +1606,7 @@ def passport_address():
         if add_details["success"] == False:
             return add_details
         details = add_details["data"]
+        details["base64_string"] = base
         # logger.info(f"extracted address is {details}")
         # logger.info(
         #     f"time elapsed for api request is {time.time()-api_time}")

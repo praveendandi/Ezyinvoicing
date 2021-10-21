@@ -1163,5 +1163,18 @@ def update_company(doc,method=None):
     except Exception as e:
         frappe.log_error("update_company:"+str(e))
         return {"success":False,"message":str(e)}
-        
 
+def delete_arrival_activity():
+    try:
+        last_week = datetime.datetime.now() - datetime.timedelta(days=6)
+        arrival_activity = frappe.db.get_all("Arrival Activities",filters={'creation':["<",last_week]},fields=["name","file_path"])
+        data = frappe.db.sql("""DELETE FROM `tabArrival Activities` WHERE creation < %s""",last_week)
+        frappe.db.commit()
+        for each in arrival_activity:
+            files = frappe.db.delete("File",{"file_url":each["file_path"]})
+            frappe.db.commit()
+        return {"success":True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-Delete Arrival Activity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
