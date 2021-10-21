@@ -141,14 +141,15 @@ def update_guest_details(name):
                     aadhar_details["pre_state"] = pre_checkins.guest_state
                     aadhar_details["pre_Nationality"] = pre_checkins.guest_nationality
                     aadhar_front = helper_utility({"api":"scan_aadhar", "aadhar_image":convert1["data"], "scanView":"front"})
-                    if aadhar_front["data"]["message"]["success"] == False:
-                        aadhar_details["image_1"] = pre_checkins.image_1
-                        aadhar_details["image_2"] = pre_checkins.image_2
-                        aadhar_details.update(aadhar_front["data"]["message"])
-                        del aadhar_details["success"]
-                        del aadhar_details["aadhar_details"]
-                        aadhar_details["id_type"] = "aadhaar"
-                        return {"success": False,"data":aadhar_details}
+                    if "success" in aadhar_front["data"["message"]].keys():
+                        if aadhar_front["data"]["message"]["success"] == False:
+                            aadhar_details["image_1"] = pre_checkins.image_1
+                            aadhar_details["image_2"] = pre_checkins.image_2
+                            aadhar_details.update(aadhar_front["data"]["message"])
+                            del aadhar_details["success"]
+                            del aadhar_details["aadhar_details"]
+                            aadhar_details["id_type"] = "aadhaar"
+                            return {"success": False,"data":aadhar_details}
                         # return aadhar_front["data"]["message"]
                     if aadhar_front["data"]["message"]["aadhar_details"]["face"]:
                         base_image = convert_base64_to_image(aadhar_front["data"]["message"]["aadhar_details"]["face"],name,site_folder_path,company_doc)
@@ -161,13 +162,14 @@ def update_guest_details(name):
                     aadhar_details.update(aadhar_front["data"]["message"]["aadhar_details"])
                 if file_path2:
                     aadhar_back = helper_utility({"api":"scan_aadhar", "aadhar_image":convert2["data"], "scanView":"back"})
-                    if aadhar_back["data"]["message"]["success"] == False:
-                        aadhar_details["image_2"] = pre_checkins.image_2
-                        aadhar_details.update(aadhar_back["data"]["message"])
-                        del aadhar_details["success"]
-                        del aadhar_details["aadhar_details"]
-                        aadhar_details["id_type"] = "aadhaar"
-                        return {"success": False,"data":aadhar_details}
+                    if "success" in aadhar_back["data"]["message"].keys():
+                        if aadhar_back["data"]["message"]["success"] == False:
+                            aadhar_details["image_2"] = pre_checkins.image_2
+                            aadhar_details.update(aadhar_back["data"]["message"])
+                            del aadhar_details["success"]
+                            del aadhar_details["aadhar_details"]
+                            aadhar_details["id_type"] = "aadhaar"
+                            return {"success": False,"data":aadhar_details}
                     # aadhar_back["data"]["message"]["aadhar_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     aadhar_back["data"]["message"]["aadhar_details"]["image_2"] = pre_checkins.image_2
