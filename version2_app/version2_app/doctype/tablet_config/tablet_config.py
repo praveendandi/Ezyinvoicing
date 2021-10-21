@@ -127,7 +127,6 @@ def removeAllDevices():
         'docstatus': 0
     })
     frappe.db.commit()
-    print("**********************************")
     return True
 
 

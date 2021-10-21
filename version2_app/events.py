@@ -283,6 +283,9 @@ def tablet_mapping(doc, method=None):
         print(doc.name, "hello hiee","$$$$$$$$$$$$$$$$")
         workstation = frappe.get_doc("Active Work Stations",doc.work_station)
         workstation.username = doc.username
+        workstation.save(ignore_permissions=True, ignore_version=True)
+        tablet_doc = frappe.get_doc("Active Tablets",doc.tablet)
+        doc.device_name = tablet_doc.device_name
         workstation.save(ignore_permissions=True,ignore_version=True)
         frappe.publish_realtime("custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
