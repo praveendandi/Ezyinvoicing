@@ -171,10 +171,10 @@ def update_guest_details(name):
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
                             return {"success": False,"data":aadhar_details}
-                    else:
-                        aadhar_details["image_2"] = pre_checkins.image_2
-                        aadhar_details["id_type"] = "aadhaar"
-                        return {"success": False,"data":aadhar_details}
+                    # else:
+                    #     aadhar_details["image_2"] = pre_checkins.image_2
+                    #     aadhar_details["id_type"] = "aadhaar"
+                    #     return {"success": False,"data":aadhar_details}
                     # aadhar_back["data"]["message"]["aadhar_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     aadhar_back["data"]["message"]["aadhar_details"]["image_2"] = pre_checkins.image_2
