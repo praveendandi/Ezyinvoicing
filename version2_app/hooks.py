@@ -176,12 +176,7 @@ doc_events = {
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
-    },
-    "Precheckins":{
-        'after_insert':"version2_app.events.insertprecheckindocuments"
     }
-	
-
 }
 
 # Scheduled Tasks/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/emailTemplat.py

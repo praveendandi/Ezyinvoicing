@@ -56,6 +56,7 @@ def add_pre_checkins():
                 pre_checkins["signature"] = signature["message"]["file_url"]
                 del data["signature"]
         count = 1
+        guest_images= []
         for each in images:
             if each["img_1"] != "":
                 name = data["confirmation_number"]+each["id_type"]+"front"
@@ -89,6 +90,7 @@ def add_pre_checkins():
                 pre_checkins["arrival_date"] = arrival_doc.arrival_date
             precheckins_doc = frappe.get_doc(pre_checkins)
             precheckins_doc.insert(ignore_permissions=True, ignore_links=True)
+            guest_images.append({"image1":pre_checkins["image_1"],"image2":pre_checkins["image_1"]})
             count+=1
         user_name =  frappe.session.user
         date_time = datetime.datetime.now()
@@ -97,6 +99,10 @@ def add_pre_checkins():
         frappe.db.commit()
         event_doc=frappe.get_doc(activity_data)
         event_doc.insert(ignore_permissions=True, ignore_links=True)
+        if company.ezy_checkins_module == 1 and company.scan_ezy_module == 0:
+            guest_attachments={"doctype":"Documents","guest_details":guest_images,"confirmation_number":data["confirmation_number"],"module_name":"Ezycheckins","user":user_name,"number_of_guests":no_of_adults}
+            guestatt_doc=frappe.get_doc(guest_attachments)
+            guestatt_doc.insert(ignore_permissions=True, ignore_links=True)
         if company.thank_you_email == "1":
             cancel_email_address = pre_checkins["guest_email_address"]
             folder_path = frappe.utils.get_bench_path()
