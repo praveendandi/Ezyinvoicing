@@ -103,7 +103,7 @@ def resetworkstation_tablet(data):
             work_doc.status = "In Active"
             work_doc.mode = "Not Connected"
             work_doc.save(ignore_permissions=True,ignore_version=True)
-            frappe.publish_realtime("custom_socket", {'message':'Reset Workstation Tablet','type':"document_bin_insert","data":data})
+            frappe.publish_realtime("custom_socket", {'message':'Reset Workstation Tablet','type':"document_bin_insert","data":doc.__dict__})
             return {"success":True}
         else:
             return {"success":False}

@@ -54,6 +54,7 @@ def add_pre_checkins():
                     if signature["success"] == False:
                         return signature
                 pre_checkins["signature"] = signature["message"]["file_url"]
+                del data["signature"]
         count = 1
         for each in images:
             if each["img_1"] != "":

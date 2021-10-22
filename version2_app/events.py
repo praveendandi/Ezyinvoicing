@@ -1181,3 +1181,13 @@ def delete_arrival_activity():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-Delete Arrival Activity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+
+def insertprecheckindocuments(doc,method=None):
+    try:
+        print(doc.__dict__,"================================")
+        
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-Insert Pre-Checkins Documnets","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
