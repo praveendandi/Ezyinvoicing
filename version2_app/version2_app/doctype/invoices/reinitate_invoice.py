@@ -1042,6 +1042,7 @@ def auto_adjustment(data):
                     sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
                 if sac_code_based_gst_rates.net == "Yes":
                     item_each["item_value"] = item_each["item_value_after_gst"]
+                item_each["service_charge"] = "Yes" if sac_code_based_gst_rates.service_charge == "Yes" else "No"
             negative_data = [items for items in item_data if items["item_value"]<0]
             positive_data = [items for items in item_data if items["item_value"]>0]
             # df = pd.DataFrame.from_records(negative_data)
@@ -1050,7 +1051,7 @@ def auto_adjustment(data):
             value = 0
             for each in negative_data:
                 for item in positive_data:
-                    if each["sac_code"] == item["sac_code"] and each["gst_rate"] == item["gst_rate"] and each["type"] == item["type"] and each["taxable"] == item["taxable"] and item["item_value"] == abs(each["item_value"]):
+                    if each["sac_code"] == item["sac_code"] and each["gst_rate"] == item["gst_rate"] and each["type"] == item["type"] and each["taxable"] == item["taxable"] and item["item_value"] == abs(each["item_value"]) and item["service_charge"] == each["service_charge"]:
                         value = item['item_value'] - abs(each["item_value"])
                         positive_data.remove(item)
                         each["item_value"] = value
@@ -1059,7 +1060,7 @@ def auto_adjustment(data):
             if (negative_total != [] and positive_data != []):
                 for each_item in negative_data:
                     for items in positive_data:
-                        if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0:
+                        if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0 and each_item["service_charge"] == items["service_charge"]:
                             value = items["item_value"] - abs(each_item["item_value"])
                             if value == 0:
                                 positive_data.remove(items)
