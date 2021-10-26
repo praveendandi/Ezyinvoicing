@@ -661,7 +661,7 @@ def upload_propery_logo_pms(data):
 def update_company(doc,method=None):
     try:
         folder_path = frappe.utils.get_bench_path()
-        if doc.pms_property_logo != "":
+        if doc.pms_property_logo:
             file_path = folder_path+'/sites/'+doc.site_name+doc.pms_property_logo
             status = upload_propery_logo_pms({"file_path":file_path,"company":doc.name})
             if status["success"] == False:
