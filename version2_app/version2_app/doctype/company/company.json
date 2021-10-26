@@ -174,6 +174,9 @@
   "only_b2c",
   "pms_payment_qr",
   "pms_information_invoice_for_payment_qr",
+  "bulkupload_inovice_file_type",
+  "bulkupload_gst_file_type",
+  "upload_gst_details",
   "pms_property_logo",
   "pms_property_url",
   "cform_credential_section",
@@ -1154,11 +1157,29 @@
    "fieldname": "cform_session",
    "fieldtype": "Check",
    "label": "CForm Session"
-  }
+  },
+  {
+    "fieldname": "bulkupload_gst_file_type",
+    "fieldtype": "Select",
+    "label": "Bulkupload GST File Type",
+    "options": "\ncsv\nxlsx\nxml"
+   },
+   {
+    "fieldname": "bulkupload_inovice_file_type",
+    "fieldtype": "Select",
+    "label": "Bulkupload Inovice File Type",
+    "options": "csv\nxlsx\nxml"
+   },
+   {
+    "default": "0",
+    "fieldname": "upload_gst_details",
+    "fieldtype": "Check",
+    "label": "Upload Gst Details"
+   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-26 09:24:40.994524",
+ "modified": "2021-10-26 20:33:02.408795",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
