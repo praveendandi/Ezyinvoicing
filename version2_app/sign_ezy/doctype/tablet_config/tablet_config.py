@@ -96,10 +96,12 @@ def createTabConfig():
         data=json.loads(frappe.request.data)
         data = data["data"]
         if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"]}):
-            tablet_config = frappe.db.get_value("Tablet Config",{"work_station":data["work_station"]},"tablet")
-            tab_doc = frappe.get_doc("Active Tablets",tablet_config)
+            tablet_config = frappe.db.get_value("Tablet Config",{"work_station":data["work_station"]},["name","tablet","work_station","work_station_socket_id","tablet_socket_id"], as_dict=1)
+            tab_doc = frappe.get_doc("Active Tablets",tablet_config["tablet"])
             tab_doc.status = "Not Connected"
             tab_doc.save(ignore_permissions=True,ignore_version=True)
+            tablet_config["uuid"] = tablet_config["tablet"]
+            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config})
             frappe.db.delete("Tablet Config", {"work_station": data["work_station"]})
             frappe.db.commit()
         tablet = frappe.get_doc("Active Tablets",data["tablet"])
@@ -130,13 +132,15 @@ def deleteTabConfig():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
-        print(data,"-------------------------")
         if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"tablet":data["tablet"]}):
-            frappe.db.delete("Tablet Config", {"work_station": data["work_station"],"tablet":data["tablet"]})
-            frappe.db.commit()
+            # frappe.db.delete("Tablet Config", {"work_station": data["work_station"],"tablet":data["tablet"]})
+            # frappe.db.commit()
+            table_config_data = frappe.db.get_value("Tablet Config", {"work_station": data["work_station"],"tablet":data["tablet"]},["name","tablet","work_station","work_station_socket_id","tablet_socket_id"], as_dict=1)
             tab_doc = frappe.get_doc("Active Tablets",data["tablet"])
             tab_doc.status = "Not Connected"
             tab_doc.save(ignore_permissions=True,ignore_version=True)
+            table_config_data.uuid = data["tablet"]
+            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': table_config_data})
             return {"success":True,"message":"Tablet mapped removed successfully"}
         else:
             return {"success":False,"message":"No records found"}

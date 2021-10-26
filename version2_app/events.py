@@ -285,6 +285,7 @@ def tablet_mapping(doc, method=None):
         tablet_doc = frappe.get_doc("Active Tablets",doc.tablet)
         doc.device_name = tablet_doc.device_name
         doc.uuid = doc.tablet
+        doc.workstation_status = workstation.status
         workstation.save(ignore_permissions=True,ignore_version=True)
         frappe.publish_realtime("custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
