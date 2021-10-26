@@ -3,7 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe
+import frappe,sys,traceback,json
 from frappe.model.document import Document
 
 class TabletConfig(Document):
@@ -89,6 +89,61 @@ class TabletConfig(Document):
 #             return {'success': False, 'message': "No Redg Card Found"}
 #     else:
 #         return {'success': False, 'message': "No Configuration Found"}
+
+@frappe.whitelist(allow_guest=True)
+def createTabConfig():
+    try:
+        data=json.loads(frappe.request.data)
+        data = data["data"]
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"]}):
+            tablet_config = frappe.db.get_value("Tablet Config",{"work_station":data["work_station"]},"tablet")
+            tab_doc = frappe.get_doc("Active Tablets",tablet_config)
+            tab_doc.status = "Not Connected"
+            tab_doc.save(ignore_permissions=True,ignore_version=True)
+            frappe.db.delete("Tablet Config", {"work_station": data["work_station"]})
+            frappe.db.commit()
+        tablet = frappe.get_doc("Active Tablets",data["tablet"])
+        work_station = frappe.get_doc("Active Work Stations",data["work_station"])
+        if not frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"mode":"Active"}):
+            if not frappe.db.exists({"doctype":"Tablet Config","tablet":data["tablet"],"mode":"Active"}):
+                data["work_station_socket_id"] = work_station.socket_id
+                data["tablet_ip_address"] = tablet.ip_address
+                data["tablet_socket_id"] = tablet.socket_id
+                data["mode"] = "Active"
+                data["doctype"] = "Tablet Config"
+                insert_tabconfig = frappe.get_doc(data)
+                insert_tabconfig.insert(ignore_permissions=True, ignore_links=True)
+                tablet.status = "Connected"
+                tablet.save(ignore_permissions=True,ignore_version=True)
+                return {"success":True, "message":"Tablet connected"}
+            else:
+                return {"success":False,"message":"Already tablet connected to other work station"}
+        else:
+            return {"success":False,"message":"Already work station connected to other tablet"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing Create Tab Config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
+
+@frappe.whitelist(allow_guest=True)
+def deleteTabConfig():
+    try:
+        data=json.loads(frappe.request.data)
+        data = data["data"]
+        print(data,"-------------------------")
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"tablet":data["tablet"]}):
+            frappe.db.delete("Tablet Config", {"work_station": data["work_station"],"tablet":data["tablet"]})
+            frappe.db.commit()
+            tab_doc = frappe.get_doc("Active Tablets",data["tablet"])
+            tab_doc.status = "Not Connected"
+            tab_doc.save(ignore_permissions=True,ignore_version=True)
+            return {"success":True,"message":"Tablet mapped removed successfully"}
+        else:
+            return {"success":False,"message":"No records found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing Delete Tab Config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
 
 @frappe.whitelist(allow_guest=True)
 def pushToTab(name=None, doc_name=None,doc_type=None):

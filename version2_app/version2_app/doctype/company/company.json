@@ -17,6 +17,7 @@
   "gst_number",
   "email",
   "phone_number",
+  "land_line_number",
   "status",
   "address_details_section",
   "address_1",
@@ -29,6 +30,8 @@
   "column_break_15",
   "location",
   "pincode",
+  "state",
+  "city",
   "font_file",
   "b2c_qr_type",
   "merchant_virtual_payment_address",
@@ -168,18 +171,15 @@
   "check_billing_address",
   "billing_address",
   "guest_gst_number",
-  "ezycheckins_socket_host",
-  "thank_you_email",
-  "upload_gst_details",
-  "bulkupload_inovice_file_type",
-  "bulkupload_gst_file_type",
-  "skip_ssl_verify",
-  "ipp_printer_file_path",
   "only_b2c",
   "pms_payment_qr",
   "pms_information_invoice_for_payment_qr",
   "pms_property_logo",
-  "pms_property_url"
+  "pms_property_url",
+  "cform_credential_section",
+  "cform_user_name",
+  "cform_password",
+  "cform_session"
  ],
  "fields": [
   {
@@ -1118,11 +1118,47 @@
    "fieldname": "pms_property_url",
    "fieldtype": "Data",
    "label": "PMS Property URL"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "land_line_number",
+   "fieldtype": "Data",
+   "label": "Land Line Number"
+  },
+  {
+   "fieldname": "cform_credential_section",
+   "fieldtype": "Section Break",
+   "label": "CForm Details"
+  },
+  {
+   "fieldname": "cform_user_name",
+   "fieldtype": "Data",
+   "label": "CForm User Name"
+  },
+  {
+   "fieldname": "cform_password",
+   "fieldtype": "Data",
+   "label": "CForm Password"
+  },
+  {
+   "default": "0",
+   "fieldname": "cform_session",
+   "fieldtype": "Check",
+   "label": "CForm Session"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-02 11:13:03.453670",
+ "modified": "2021-10-26 09:24:40.994524",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

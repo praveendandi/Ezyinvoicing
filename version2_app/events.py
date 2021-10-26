@@ -29,7 +29,6 @@ logger = frappe.logger("api")
 import pyshorteners as ps
 
 user_name =  frappe.session.user
-print(user_name,"????????????????????????????????????????????????//")
 def invoice_created(doc, method=None):
     try:
         print("Invoice Created",doc.name)
@@ -280,12 +279,12 @@ def information_folio_created(doc, method=None):
 
 def tablet_mapping(doc, method=None):
     try:
-        print(doc.name, "hello hiee","$$$$$$$$$$$$$$$$")
         workstation = frappe.get_doc("Active Work Stations",doc.work_station)
         workstation.username = doc.username
         workstation.save(ignore_permissions=True, ignore_version=True)
         tablet_doc = frappe.get_doc("Active Tablets",doc.tablet)
         doc.device_name = tablet_doc.device_name
+        doc.uuid = doc.tablet
         workstation.save(ignore_permissions=True,ignore_version=True)
         frappe.publish_realtime("custom_socket", {'message': 'Tablet Mapped', 'data': doc.__dict__})
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
@@ -349,19 +348,29 @@ def workstation_disconnected(doc, method=None):
 
 def update_tablet_status(doc, method=None):
     try:
-        table_config = frappe.db.get_value("Tablet Config",{"tablet":doc.name},["work_station","username","tablet"])
-        tablet = frappe.get_doc("Active Tablets",table_config[2])
-        table_config_doc = frappe.get_doc("Tablet Config",table_config.name)
-        table_config_doc.tablet_socket_id = tablet.socket_id
-        table_config_doc.save(ignore_permissions=True,ignore_version=True)
-        workstation = frappe.get_doc("Active Work Stations",table_config[0])
-        workstation.username = table_config[1]
-        workstation.save(ignore_permissions=True,ignore_version=True)
-        data = doc.__dict__
-        data["workstation"] = workstation.work_station
-        data["workstation_status"] = workstation.status
-        frappe.publish_realtime(
-            "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
+        table_config = frappe.db.get_value("Tablet Config",{"tablet":doc.name},["name"])
+        if table_config:
+            table_config_doc = frappe.get_doc("Tablet Config",table_config)
+            table_config_doc.tablet_socket_id = doc.socket_id
+            table_config_doc.save(ignore_permissions=True,ignore_version=True)
+            # workstation = frappe.get_doc("Active Work Stations",table_config[0])
+            # workstation.username = table_config[1]
+            # workstation.save(ignore_permissions=True,ignore_version=True)
+            # data = doc.__dict__
+            # data["workstation"] = workstation.work_station
+            # data["workstation_status"] = workstation.status
+            frappe.publish_realtime(
+                "custom_socket", {'message': 'Tablet Status Updated', 'data': doc.__dict__})
+    except Exception as e:
+        print(e)
+
+def update_workstations_status(doc,method=None):
+    try:
+        table_config = frappe.db.get_value("Tablet Config",{"work_station":doc.name},["name"])
+        if table_config:
+            table_config_doc = frappe.get_doc("Tablet Config",table_config)
+            table_config_doc.work_station_socket_id = doc.socket_id
+            table_config_doc.save(ignore_permissions=True,ignore_version=True)
     except Exception as e:
         print(e)
 
@@ -1156,7 +1165,7 @@ def upload_propery_logo_pms(data):
 def update_company(doc,method=None):
     try:
         folder_path = frappe.utils.get_bench_path()
-        if doc.pms_property_logo != "":
+        if doc.pms_property_logo:
             file_path = folder_path+'/sites/'+doc.site_name+doc.pms_property_logo
             status = upload_propery_logo_pms({"file_path":file_path,"company":doc.name})
             if status["success"] == False:

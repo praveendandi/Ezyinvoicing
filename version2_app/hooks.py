@@ -149,6 +149,7 @@ doc_events = {
     },
     "Active Work Stations": {
         "on_trash": "version2_app.events.workstation_disconnected",
+        "on_update": "version2_app.events.update_workstations_status",
     },
     "Information Folio": {
         "after_insert": "version2_app.events.information_folio_created",

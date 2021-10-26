@@ -65,7 +65,9 @@
   "frro_failure_count",
   "frro_checkout",
   "frro_checkout_message",
-  "frro_checkout_date"
+  "frro_checkout_date",
+  "remarks",
+  "select_category"
  ],
  "fields": [
   {
@@ -385,11 +387,21 @@
    "fieldname": "address2",
    "fieldtype": "Small Text",
    "label": "Address2"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "select_category",
+   "fieldtype": "Data",
+   "label": "Select Category"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-18 18:06:25.478227",
+ "modified": "2021-10-25 17:41:56.622788",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
@@ -416,6 +428,54 @@
    "read": 1,
    "report": 1,
    "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Inbox",
    "share": 1,
    "write": 1
   }

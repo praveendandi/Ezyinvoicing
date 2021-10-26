@@ -3,11 +3,13 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import datetime
 import frappe
 import sys,traceback
 import base64
 from frappe.model.document import Document
 from version2_app.passport_scanner.doctype.reservations.reservations import *
+from version2_app.passport_scanner.doctype.guest_details.cform import *
 
 class GuestDetails(Document):
     pass
@@ -471,4 +473,54 @@ def add_guest_details():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}   
+        return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def process_cform():
+    try:
+        data=json.loads(frappe.request.data)
+        data = data["data"]
+        company = frappe.get_last_doc('company')
+        if company.cform_session == 1:
+            return {"success":False}
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 1
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        for each in data:
+            each_data = frappe.db.get_value("Guest Details",each,["surname","given_name","gender","date_of_birth","select_category",
+            "nationality","address","city","country","passport_number","passport_place_of_issued_city",
+            "passport_place_of_issued_country","passport_date_of_issue","passport_valid_till","visa_number","visa_place_of_issued_city","visa_place_of_issued_country",
+            "visa_date_of_issue","visa_valid_till","visa_type","visa_sub_type","arrival_from_country","arrival_from_city","arrival_place",
+            "date_of_arrival_in_india","checkin_date","checkin_time","no_of_nights","whether_employed_in_india","purpose_of_visit","next_destination","next_destination_place",
+            "next_destination_state","next_destination_city","next_destination_country","contact_phone_no","contact_mobile_no","permanent_phone_no","permanent_mobile_no","remarks","face_image"], as_dict=1)
+            each_data["hotelAddress"] = company.address_1+" ,"+company.address_2
+            each_data["hote_state"] = company.state
+            each_data["hotel_city"] = company.city
+            each_data["hotel_pincode"] = company.pincode
+            if each_data["date_of_birth"]:
+                each_data["date_of_birth"] = each_data["date_of_birth"].strftime("%d/%m/%Y")
+            if each_data["passport_date_of_issue"]:
+                each_data["passport_date_of_issue"] = each_data["passport_date_of_issue"].strftime("%d%m%Y")
+            if each_data["passport_valid_till"]:
+                each_data["passport_valid_till"] = each_data["passport_valid_till"].strftime("%d%m%Y")
+            if each_data["visa_date_of_issue"]:
+                each_data["visa_date_of_issue"] = datetime.datetime.strptime(each_data["visa_date_of_issue"], '%Y-%m-%d').strftime("%d%m%Y")
+            if each_data["visa_valid_till"]:
+                each_data["visa_valid_till"] = datetime.datetime.strptime(each_data["visa_valid_till"], '%Y-%m-%d').strftime("%d%m%Y")
+            if each_data["date_of_arrival_in_india"]:
+                each_data["date_of_arrival_in_india"] = each_data["date_of_arrival_in_india"].strftime("%d/%m/%Y")
+            if each_data["checkin_date"]:
+                each_data["checkin_date"] = each_data["checkin_date"].strftime("%d/%m/%Y")
+            each_data = {k: "" if not v else v for k, v in each_data.items()}
+            intiate(each_data)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+    except Exception as e:
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Scan-Process Cform","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+

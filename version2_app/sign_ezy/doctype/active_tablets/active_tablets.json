@@ -37,9 +37,11 @@
    "label": "Connected On"
   },
   {
+   "default": "Not Connected",
    "fieldname": "status",
-   "fieldtype": "Data",
-   "label": "Status"
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Connected\nNot Connected"
   },
   {
    "fieldname": "uuid",
@@ -50,12 +52,15 @@
   {
    "fieldname": "device_name",
    "fieldtype": "Data",
-   "label": "Device Name"
+   "in_list_view": 1,
+   "label": "Device Name",
+   "reqd": 1,
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-06 10:59:53.273736",
+ "modified": "2021-10-26 14:15:15.939546",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Active Tablets",
