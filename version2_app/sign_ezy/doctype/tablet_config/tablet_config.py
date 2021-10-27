@@ -137,7 +137,7 @@ def deleteTabConfig():
             # frappe.db.commit()
             table_config_data = frappe.db.get_value("Tablet Config", {"work_station": data["work_station"],"tablet":data["tablet"]},["name","tablet","work_station","work_station_socket_id","tablet_socket_id"], as_dict=1)
             tablet_config = frappe.get_doc("Tablet Config",table_config_data["name"])
-            tablet_config.status = "In Active"
+            tablet_config.mode = "In Active"
             tablet_config.save(ignore_permissions=True,ignore_version=True)
             tab_doc = frappe.get_doc("Active Tablets",data["tablet"])
             tab_doc.status = "Not Connected"
