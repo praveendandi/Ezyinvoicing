@@ -156,7 +156,7 @@ doc_events = {
     },
 	"File":{
 		# 'after_save':"version2_app.events.fileCreated",
-		'after_insert':"version2_app.events.fileCreated"
+		# 'after_insert':"version2_app.events.fileCreated"
 	},
 	"Update Logs":{
 		'before_insert':"version2_app.events.Updateemitsocket"
