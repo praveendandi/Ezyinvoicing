@@ -165,7 +165,7 @@ doc_events = {
 		'on_update':"version2_app.events.DocumentBinSocket"
 	},
 	"company":{
-		"after_insert":"version2_app.events.company_created",
+		# "after_insert":"version2_app.events.company_created",
         'on_update':"version2_app.events.update_company"
 	},
 	"Gsp Metering":{
