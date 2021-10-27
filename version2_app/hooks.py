@@ -154,10 +154,10 @@ doc_events = {
     "Information Folio": {
         "after_insert": "version2_app.events.information_folio_created",
     },
-	"File":{
-		# 'after_save':"version2_app.events.fileCreated",
-		# 'after_insert':"version2_app.events.fileCreated"
-	},
+	# "File":{
+	# 	# 'after_save':"version2_app.events.fileCreated",
+	# 	# 'after_insert':"version2_app.events.fileCreated"
+	# },
 	"Update Logs":{
 		'before_insert':"version2_app.events.Updateemitsocket"
 	},
