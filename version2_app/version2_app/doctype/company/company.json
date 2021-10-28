@@ -182,7 +182,15 @@
   "cform_credential_section",
   "cform_user_name",
   "cform_password",
-  "cform_session"
+  "cform_session",
+  "pre_checkin_form_section",
+  "covid_declaration",
+  "standard_checkin_time",
+  "member_ship_url",
+  "column_break_181",
+  "precheckins_signature",
+  "membership_link",
+  "only_pre_checkins"
  ],
  "fields": [
   {
@@ -1159,27 +1167,71 @@
    "label": "CForm Session"
   },
   {
-    "fieldname": "bulkupload_gst_file_type",
-    "fieldtype": "Select",
-    "label": "Bulkupload GST File Type",
-    "options": "\ncsv\nxlsx\nxml"
-   },
-   {
-    "fieldname": "bulkupload_inovice_file_type",
-    "fieldtype": "Select",
-    "label": "Bulkupload Inovice File Type",
-    "options": "csv\nxlsx\nxml"
-   },
-   {
-    "default": "0",
-    "fieldname": "upload_gst_details",
-    "fieldtype": "Check",
-    "label": "Upload Gst Details"
-   }
+   "fieldname": "bulkupload_gst_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload GST File Type",
+   "options": "\ncsv\nxlsx\nxml"
+  },
+  {
+   "fieldname": "bulkupload_inovice_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload Inovice File Type",
+   "options": "csv\nxlsx\nxml"
+  },
+  {
+   "default": "0",
+   "fieldname": "upload_gst_details",
+   "fieldtype": "Check",
+   "label": "Upload Gst Details"
+  },
+  {
+   "fieldname": "pre_checkin_form_section",
+   "fieldtype": "Section Break",
+   "label": "Pre Checkin Form"
+  },
+  {
+   "default": "0",
+   "fieldname": "covid_declaration",
+   "fieldtype": "Check",
+   "label": "Covid Declaration"
+  },
+  {
+   "default": "0",
+   "fieldname": "standard_checkin_time",
+   "fieldtype": "Check",
+   "label": "Standard Checkin Time"
+  },
+  {
+   "default": "0",
+   "fieldname": "precheckins_signature",
+   "fieldtype": "Check",
+   "label": "Precheckins Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "membership_link",
+   "fieldtype": "Check",
+   "label": "Membership Link"
+  },
+  {
+   "fieldname": "column_break_181",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "member_ship_url",
+   "fieldtype": "Data",
+   "label": "Member Ship URL"
+  },
+  {
+   "default": "0",
+   "fieldname": "only_pre_checkins",
+   "fieldtype": "Check",
+   "label": "Only Pre Checkins"
+  }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-26 20:33:02.408795",
+ "modified": "2021-10-28 18:53:31.336799",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
