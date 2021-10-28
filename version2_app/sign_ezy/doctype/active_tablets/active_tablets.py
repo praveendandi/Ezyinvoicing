@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 import frappe
+import json
 from frappe.model.document import Document
 import requests,os,sys,traceback
 
@@ -111,4 +112,45 @@ def resetworkstation_tablet(data):
         print(str(e), "      CheckInternet")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("restetablet","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return False
+
+
+@frappe.whitelist(allow_guest=True)
+def updatetablet():
+    try:
+        data=json.loads(frappe.request.data)
+        data = data["data"]
+        if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"device_name":data["device_name"],"status":"Connected"}):
+            active_doc = frappe.get_doc("Active Tablets",data["uuid"])
+            active_doc.socket_id = data["socket_id"]
+            active_doc.save(ignore_permissions=True,ignore_version=True)
+            return {"success":True, "message":"Tablet updated Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
+        else:
+            if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"device_name":data["device_name"],"status":"Not Connected"}):
+                frappe.db.delete("Active Tablets", {"name": data["uuid"]})
+                frappe.db.commit()
+                data["doctype"] = "Active Tablets"
+                doc = frappe.get_doc(data)
+                doc.insert(ignore_permissions=True, ignore_links=True)
+                return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
+            if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Connected"}) or frappe.db.exists({"doctype":"Active Tablets","tablet":data["uuid"],"device_name":data["device_name"],"Status":"Connected"}):
+                return {"success":False,"message":"Tablet or Device Name must be unique"}
+            else:
+                if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Not Connected"}) or frappe.db.exists({"doctype":"Active Tablets","tablet":data["uuid"],"device_name":data["device_name"],"Status":"Not Connected"}):
+                    frappe.db.delete("Active Tablets", {"name": data["uuid"]})
+                    frappe.db.commit()
+                    frappe.db.delete("Active Tablets", {"device_name": data["device_name"]})
+                    frappe.db.commit()
+                    data["doctype"] = "Active Tablets"
+                    doc = frappe.get_doc(data)
+                    doc.insert(ignore_permissions=True, ignore_links=True)
+                    return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
+                else:
+                    data["doctype"] = "Active Tablets"
+                    doc = frappe.get_doc(data)
+                    doc.insert(ignore_permissions=True, ignore_links=True)
+                    return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("updatetablet","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return False
