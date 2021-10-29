@@ -145,7 +145,7 @@ doc_events = {
     "Active Tablets": {
         "after_insert": "version2_app.events.tablet_connected",
         "on_trash": "version2_app.events.tablet_disconnected",
-        # "on_update": "version2_app.events.update_tablet_status",
+        "on_update": "version2_app.events.update_tablet_status",
     },
     "Active Work Stations": {
         "on_trash": "version2_app.events.workstation_disconnected",
