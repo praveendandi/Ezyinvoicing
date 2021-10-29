@@ -216,6 +216,8 @@ def update_guest_details(name):
                             driving_license["data"]["message"]["driving_details"]["image_1"] = pre_checkins.image_1
                             driving_license_details.update(driving_license["data"]["message"]["driving_details"])
                 driving_license_details["id_type"] = "driving"
+                driving_license_details["image_1"] = pre_checkins.image_1
+                driving_license_details["image_2"] = pre_checkins.image_2
                 if company_doc.scan_ezy_module == 1:
                     driving_license_details["scan_ezy"] = True
                 else:
