@@ -120,6 +120,7 @@ def updatetablet():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
+        print(data)
         if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"device_name":data["device_name"],"status":"Connected"}):
             active_doc = frappe.get_doc("Active Tablets",data["uuid"])
             active_doc.socket_id = data["socket_id"]
