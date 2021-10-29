@@ -204,15 +204,17 @@ def update_guest_details(name):
                         driving_license_details["id_type"] = "driving"
                         return {"success": False,"data":driving_license_details}
                         # return driving_license["data"]["message"]
-                    if driving_license["data"]["message"]["driving_details"]["face"]:
-                        base_image = convert_base64_to_image(driving_license["data"]["message"]["driving_details"]["face"],name,site_folder_path,company_doc)
-                        if "file_url" in  base_image["message"].keys():
-                            driving_license_details["face_url"] = base_image["message"]["file_url"]
-                            del driving_license["data"]["message"]["driving_details"]["face"]
-                    # aadhar_front["data"]["message"]["driving_details"]["front_image"] = aadhar_front["data"]["message"]["driving_details"]["base64_string"]
-                    del driving_license["data"]["message"]["driving_details"]["base64_string"]
-                    driving_license["data"]["message"]["driving_details"]["image_1"] = pre_checkins.image_1
-                    driving_license_details.update(driving_license["data"]["message"]["driving_details"])
+                    if "driving_details" in driving_license["data"]["message"].keys():
+                        if "face" in driving_license["data"]["message"]["driving_details"].keys():
+                            if driving_license["data"]["message"]["driving_details"]["face"]:
+                                base_image = convert_base64_to_image(driving_license["data"]["message"]["driving_details"]["face"],name,site_folder_path,company_doc)
+                                if "file_url" in  base_image["message"].keys():
+                                    driving_license_details["face_url"] = base_image["message"]["file_url"]
+                                    del driving_license["data"]["message"]["driving_details"]["face"]
+                            # aadhar_front["data"]["message"]["driving_details"]["front_image"] = aadhar_front["data"]["message"]["driving_details"]["base64_string"]
+                            del driving_license["data"]["message"]["driving_details"]["base64_string"]
+                            driving_license["data"]["message"]["driving_details"]["image_1"] = pre_checkins.image_1
+                            driving_license_details.update(driving_license["data"]["message"]["driving_details"])
                 driving_license_details["id_type"] = "driving"
                 if company_doc.scan_ezy_module == 1:
                     driving_license_details["scan_ezy"] = True
