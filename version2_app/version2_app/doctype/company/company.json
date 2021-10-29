@@ -187,10 +187,13 @@
   "covid_declaration",
   "standard_checkin_time",
   "member_ship_url",
+  "adults_limit",
   "column_break_181",
   "precheckins_signature",
   "membership_link",
   "only_pre_checkins",
+  "children_limit",
+  "data_188",
   "sign_ezy_details_section",
   "allow_regcard",
   "allow_regcard_agree_check",
@@ -1406,11 +1409,27 @@
    "fieldname": "allow_pos_bills_signature",
    "fieldtype": "Check",
    "label": "Allow POS Bills Signature"
+  },
+  {
+   "default": "1",
+   "fieldname": "adults_limit",
+   "fieldtype": "Int",
+   "label": "Adults Limit"
+  },
+  {
+   "default": "1",
+   "fieldname": "children_limit",
+   "fieldtype": "Int",
+   "label": "Children Limit "
+  },
+  {
+   "fieldname": "data_188",
+   "fieldtype": "Data"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-29 11:55:51.798866",
+ "modified": "2021-10-29 15:50:52.336902",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
