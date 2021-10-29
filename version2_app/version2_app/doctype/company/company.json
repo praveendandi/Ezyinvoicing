@@ -190,7 +190,33 @@
   "column_break_181",
   "precheckins_signature",
   "membership_link",
-  "only_pre_checkins"
+  "only_pre_checkins",
+  "sign_ezy_details_section",
+  "allow_regcard",
+  "allow_regcard_agree_check",
+  "allow_invoice_signature",
+  "allow_information_invoices",
+  "allow_information_invoices_agree_check",
+  "allow_paid_out_receipts_signature",
+  "allow_payment_receipts",
+  "allow_payment_receipts_agree_check",
+  "allow_advance_deposites_signature",
+  "allow_ecertificates",
+  "allow_ecertificates_agree_check",
+  "allow_pos_bills_signature",
+  "column_break_189",
+  "allow_regcard_signature",
+  "allow_invoice",
+  "allow_invoice_agree_check",
+  "allow_information_invoices_signatrue",
+  "allow_paid_out_receipts",
+  "allow_paid_out_receipt_agree_check",
+  "allow_payment_receipts_signature",
+  "allow_advance_deposits",
+  "allow_advance_deposits_agree_check",
+  "allow_ecertificates_signature",
+  "allow_pos_bills",
+  "allow_pos_bills_agree_check"
  ],
  "fields": [
   {
@@ -1227,11 +1253,164 @@
    "fieldname": "only_pre_checkins",
    "fieldtype": "Check",
    "label": "Only Pre Checkins"
+  },
+  {
+   "fieldname": "sign_ezy_details_section",
+   "fieldtype": "Section Break",
+   "label": "Sign Ezy Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_regcard",
+   "fieldtype": "Check",
+   "label": "Allow Regcard"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_regcard_signature",
+   "fieldtype": "Check",
+   "label": "Allow Regcard Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_regcard_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Regcard Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_invoice",
+   "fieldtype": "Check",
+   "label": "Allow Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_invoice_signature",
+   "fieldtype": "Check",
+   "label": "Allow Invoice Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_invoice_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Invoice Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_information_invoices",
+   "fieldtype": "Check",
+   "label": "Allow Information Invoices"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_information_invoices_signatrue",
+   "fieldtype": "Check",
+   "label": "Allow Information Invoices Signatrue"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_information_invoices_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Information Invoices Agree Check"
+  },
+  {
+   "fieldname": "column_break_189",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_paid_out_receipts",
+   "fieldtype": "Check",
+   "label": "Allow Paid out Receipts"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_paid_out_receipts_signature",
+   "fieldtype": "Check",
+   "label": "Allow Paid out Receipts Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_paid_out_receipt_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Paid out Receipt Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_payment_receipts",
+   "fieldtype": "Check",
+   "label": "Allow Payment Receipts"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_payment_receipts_signature",
+   "fieldtype": "Check",
+   "label": "Allow Payment Receipts Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_payment_receipts_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Payment Receipts Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_advance_deposits",
+   "fieldtype": "Check",
+   "label": "Allow Advance Deposits"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_advance_deposites_signature",
+   "fieldtype": "Check",
+   "label": "Allow Advance Deposites Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_advance_deposits_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Advance Deposits Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_ecertificates",
+   "fieldtype": "Check",
+   "label": "Allow ECertificates"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_ecertificates_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow ECertificates Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_ecertificates_signature",
+   "fieldtype": "Check",
+   "label": "Allow ECertificates Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_pos_bills",
+   "fieldtype": "Check",
+   "label": "Allow POS Bills"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_pos_bills_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow POS Bills Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_pos_bills_signature",
+   "fieldtype": "Check",
+   "label": "Allow POS Bills Signature"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-28 18:53:31.336799",
+ "modified": "2021-10-29 11:55:51.798866",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
