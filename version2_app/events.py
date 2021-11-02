@@ -1180,7 +1180,7 @@ def update_company(doc,method=None):
 
 def delete_arrival_activity():
     try:
-        last_week = datetime.datetime.now() - datetime.timedelta(days=6)
+        last_week = datetime.datetime.now() - datetime.timedelta(days=2)
         arrival_activity = frappe.db.get_all("Arrival Activities",filters={'creation':["<",last_week]},fields=["name","file_path"])
         data = frappe.db.sql("""DELETE FROM `tabArrival Activities` WHERE creation < %s""",last_week)
         frappe.db.commit()
