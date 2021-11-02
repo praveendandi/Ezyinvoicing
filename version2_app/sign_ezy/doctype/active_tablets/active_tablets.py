@@ -137,7 +137,7 @@ def updatetablet():
             if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Connected"}) or frappe.db.exists({"doctype":"Active Tablets","tablet":data["uuid"],"device_name":data["device_name"],"Status":"Connected"}):
                 return {"success":False,"message":"Tablet or Device Name must be unique"}
             else:
-                if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Not Connected"}) or frappe.db.exists({"doctype":"Active Tablets","tablet":data["uuid"],"device_name":data["device_name"],"Status":"Not Connected"}):
+                if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Not Connected"}) or frappe.db.exists({"doctype":"Active Tablets","device_name":data["device_name"],"Status":"Not Connected"}):
                     frappe.db.delete("Active Tablets", {"name": data["uuid"]})
                     frappe.db.commit()
                     frappe.db.delete("Active Tablets", {"device_name": data["device_name"]})

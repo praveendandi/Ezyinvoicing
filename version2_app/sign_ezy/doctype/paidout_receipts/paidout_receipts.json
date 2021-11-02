@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "file_path",
-  "signature"
+  "signature",
+  "agree"
  ],
  "fields": [
   {
@@ -18,11 +19,17 @@
    "fieldname": "signature",
    "fieldtype": "Signature",
    "label": "Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "agree",
+   "fieldtype": "Check",
+   "label": "Agree"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-03 14:37:17.839377",
+ "modified": "2021-11-01 18:22:21.511571",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Paidout Receipts",

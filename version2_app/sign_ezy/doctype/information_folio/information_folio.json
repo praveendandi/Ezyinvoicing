@@ -39,7 +39,8 @@
   "amended_from",
   "items",
   "signature_details_section",
-  "signature"
+  "signature",
+  "agree"
  ],
  "fields": [
   {
@@ -240,12 +241,18 @@
    "fieldtype": "Signature",
    "ignore_user_permissions": 1,
    "label": "signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "agree",
+   "fieldtype": "Check",
+   "label": "Agree"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-09-03 14:38:07.068457",
+ "modified": "2021-11-01 18:23:00.284448",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Information Folio",

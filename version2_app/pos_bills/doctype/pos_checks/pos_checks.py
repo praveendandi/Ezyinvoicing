@@ -128,7 +128,7 @@ def extract_data(payload,company_doc):
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
             if company_doc.name == "JP-2025":
-                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]|[0-9]+/+[0-9]+\s+[0-9]+"
+                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
                 if re.match(pattern, line):
                     if "GST" not in line:
                         split_line = line.split(" ")
@@ -143,7 +143,7 @@ def extract_data(payload,company_doc):
                         if len(final_list)>3:
                             data["check_no"] = final_list[1]
                             data["table_number"] = final_list[0]
-                            data["no_of_guests"] = final_list[-1]
+                            data["no_of_guests"] = final_list[-1].replace("GST","")
             else:
                 if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())

@@ -108,15 +108,16 @@ def insert_information_folio(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def update_signature(name=None, signature=None, work_station=None, tab=None, doctype=None):
+def update_signature(name=None, signature=None, agree=0, work_station=None, tab=None, doctype=None):
     doc = frappe.db.set_value(doctype, name,
-                              'signature', signature, update_modified=False)
+                              {'signature':signature,"agree":agree}, update_modified=False)
 
     frappe.db.commit()
     data = {
         'name': name,
         'signature': signature,
         'work_station': work_station,
+        'agree': agree,
         'tab': tab
     }
     frappe.publish_realtime(

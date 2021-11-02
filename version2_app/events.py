@@ -661,9 +661,10 @@ def block_irn():
         if url_property.status_code == 200:
             company.block_irn = json_property["data"]["block_irn"]
             company.block_print = json_property["data"]["block_print"]
-            company.sign_ezy_module = 1 if json_property["data"]["sign_ezy"] == "True" else 0
-            company.scan_ezy_module = 1 if json_property["data"]["scan_ezy"] == "True" else 0
-            company.ezy_checkins_module = 1 if json_property["data"]["ezy_checkins"] == "True" else 0
+            company.sign_ezy_module = json_property["data"]["signezy"]
+            company.scan_ezy_module = json_property["data"]["scanezy"]
+            company.ezy_checkins_module = json_property["data"]["ezycheckins"]
+            company.pos_bills_module = "Enable" if json_property["data"]["POS Bills Module"] == 1 else "Disable"
             company.save(ignore_permissions=True)
             frappe.db.commit()
     except Exception as e:

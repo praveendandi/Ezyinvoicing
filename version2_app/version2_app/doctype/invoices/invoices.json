@@ -139,7 +139,8 @@
   "note",
   "credit_note_raised",
   "suptyp",
-  "signature"
+  "signature",
+  "agree"
  ],
  "fields": [
   {
@@ -909,12 +910,18 @@
    "fieldname": "folioid",
    "fieldtype": "Data",
    "label": "Folioid"
+  },
+  {
+   "default": "0",
+   "fieldname": "agree",
+   "fieldtype": "Check",
+   "label": "Agree"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-08-19 12:21:42.349094",
+ "modified": "2021-11-01 19:10:41.954984",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

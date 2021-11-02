@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "file_path",
-  "signature"
+  "signature",
+  "agree"
  ],
  "fields": [
   {
@@ -18,11 +19,16 @@
    "fieldname": "signature",
    "fieldtype": "Signature",
    "label": "Signature"
+  },
+  {
+   "fieldname": "agree",
+   "fieldtype": "Data",
+   "label": "Agree"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-03 14:36:52.564716",
+ "modified": "2021-11-01 18:23:30.508349",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Payment Receipts",
