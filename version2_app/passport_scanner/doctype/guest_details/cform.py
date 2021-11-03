@@ -8,6 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from urllib.request import urlretrieve
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.chrome.options import Options
 # from version2_app.passport_scanner.doctype.guest_details.guest_details import *
 
 import time,json
@@ -80,8 +81,11 @@ def intiate():
     try:
         # print(data)
         global driver
+        company = frappe.get_last_doc('company')
+        options = Options()
+        options.headless = True if company.cform_chrome_headless == 1 else False
         driver = webdriver.Chrome(
-            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
+            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver',options=options)
         driver.get("https://indianfrro.gov.in/frro/FormC")
         myElem = WebDriverWait(driver, global_delay).until(
             EC.presence_of_element_located((By.ID, 'capt')))
@@ -563,7 +567,7 @@ def save_temp_success():
         cform_id_html = driver.find_elements_by_tag_name("h1")[0]
         cform_id = cform_id_html.get_attribute('innerHTML')
         guest_doc = frappe.get_doc("Guest Details",data["name"])
-        guest_doc.frro_id = cform_id
+        guest_doc.frro_id = cform_id.strip()
         guest_doc.uploaded_to_frro = 1
         guest_doc.status = "In House"
         guest_doc.frro_failure_count = 0

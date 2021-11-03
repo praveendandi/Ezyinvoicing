@@ -181,8 +181,10 @@
   "pms_property_url",
   "cform_credential_section",
   "cform_user_name",
-  "cform_password",
   "cform_session",
+  "column_break_177",
+  "cform_password",
+  "cform_chrome_headless",
   "pre_checkin_form_section",
   "covid_declaration",
   "standard_checkin_time",
@@ -1425,11 +1427,21 @@
   {
    "fieldname": "data_188",
    "fieldtype": "Data"
+  },
+  {
+   "fieldname": "column_break_177",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "cform_chrome_headless",
+   "fieldtype": "Check",
+   "label": "CForm Chrome Headless"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-29 15:50:52.336902",
+ "modified": "2021-11-03 17:20:16.703806",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
