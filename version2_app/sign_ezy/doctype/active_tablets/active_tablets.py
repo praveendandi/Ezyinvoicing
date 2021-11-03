@@ -134,8 +134,8 @@ def updatetablet():
                 doc = frappe.get_doc(data)
                 doc.insert(ignore_permissions=True, ignore_links=True)
                 return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
-            if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Connected"}) or frappe.db.exists({"doctype":"Active Tablets","tablet":data["uuid"],"device_name":data["device_name"],"Status":"Connected"}):
-                return {"success":False,"message":"Tablet or Device Name must be unique"}
+            if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Connected"}) or frappe.db.exists({"doctype":"Active Tablets","device_name":data["device_name"],"Status":"Connected"}):
+                return {"success":False,"message":"Tablet or work station already connected"}
             else:
                 if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Not Connected"}) or frappe.db.exists({"doctype":"Active Tablets","device_name":data["device_name"],"Status":"Not Connected"}):
                     frappe.db.delete("Active Tablets", {"name": data["uuid"]})

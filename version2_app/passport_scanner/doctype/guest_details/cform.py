@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import Select
 # from version2_app.passport_scanner.doctype.guest_details.guest_details import *
 
 import time,json
+import datetime
 import frappe
 import sys,traceback
 import base64
@@ -74,19 +75,16 @@ data = {
 }
 
 folder_path = frappe.utils.get_bench_path()
-def intiate(obj):
+def intiate():
     try:
         # print(data)
         global driver
-        global data
         driver = webdriver.Chrome(
             folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
         driver.get("https://indianfrro.gov.in/frro/FormC")
         myElem = WebDriverWait(driver, global_delay).until(
             EC.presence_of_element_located((By.ID, 'capt')))
         print(driver.title)
-        
-        data = obj
         download_captcha()
     except TimeoutException:
         print("time exceed")
@@ -142,35 +140,73 @@ enter userid password and captcha image
 @frappe.whitelist(allow_guest=True)
 def login_cform():
     try:
-        # global data
-        print(data,"**********************************")
+        global data
         cform_data=json.loads(frappe.request.data)
         login_details = cform_data["data"]
-        user_id = login_details["user_id"]
-        password = login_details["password"]
-        captcha = login_details["captcha"]
-        print(data,"===============")
-        username = driver.find_element_by_name('uid')
-        username.clear()
-        username.send_keys(user_id)
+        company = frappe.get_last_doc('company')
+        if len(login_details["data"])>0:
+            company_doc = frappe.get_doc('company',company.name)
+            company_doc.cform_session = 1
+            company_doc.save(ignore_permissions=True,ignore_version=True)
+            for index, each in enumerate(login_details["data"]):
+                each_data = frappe.db.get_value("Guest Details",each,["surname","given_name","gender","date_of_birth","select_category",
+                "nationality","address","city","country","passport_number","passport_place_of_issued_city",
+                "passport_place_of_issued_country","passport_date_of_issue","passport_valid_till","visa_number","visa_place_of_issued_city","visa_place_of_issued_country",
+                "visa_date_of_issue","visa_valid_till","visa_type","visa_sub_type","arrival_from_country","arrival_from_city","arrival_place",
+                "date_of_arrival_in_india","checkin_date","checkin_time","no_of_nights","whether_employed_in_india","purpose_of_visit","next_destination","next_destination_place",
+                "next_destination_state","next_destination_city","next_destination_country","contact_phone_no","contact_mobile_no","permanent_phone_no","permanent_mobile_no","remarks","face_image","name"], as_dict=1)
+                each_data["hotelAddress"] = company.address_1+" ,"+company.address_2
+                each_data["hote_state"] = company.state
+                each_data["hotel_city"] = company.city
+                each_data["hotel_pincode"] = company.pincode
+                if each_data["date_of_birth"]:
+                    each_data["date_of_birth"] = each_data["date_of_birth"].strftime("%d/%m/%Y")
+                if each_data["passport_date_of_issue"]:
+                    each_data["passport_date_of_issue"] = each_data["passport_date_of_issue"].strftime("%d%m%Y")
+                if each_data["passport_valid_till"]:
+                    each_data["passport_valid_till"] = each_data["passport_valid_till"].strftime("%d%m%Y")
+                if each_data["visa_date_of_issue"]:
+                    each_data["visa_date_of_issue"] = datetime.datetime.strptime(each_data["visa_date_of_issue"], '%Y-%m-%d').strftime("%d%m%Y")
+                if each_data["visa_valid_till"]:
+                    each_data["visa_valid_till"] = datetime.datetime.strptime(each_data["visa_valid_till"], '%Y-%m-%d').strftime("%d%m%Y")
+                if each_data["date_of_arrival_in_india"]:
+                    each_data["date_of_arrival_in_india"] = each_data["date_of_arrival_in_india"].strftime("%d/%m/%Y")
+                if each_data["checkin_date"]:
+                    each_data["checkin_date"] = each_data["checkin_date"].strftime("%d/%m/%Y")
+                if each_data["checkin_time"]:
+                    each_data["checkin_time"] = str(each_data["checkin_time"])
+                each_data = {k: "" if not v else v for k, v in each_data.items()}
+                data = each_data
+                if index == 0:
+                    user_id = login_details["user_id"]
+                    password = login_details["password"]
+                    captcha = login_details["captcha"]
+                    print(data,"===============")
+                    username = driver.find_element_by_name('uid')
+                    username.clear()
+                    username.send_keys(user_id)
 
-        passcode = driver.find_element_by_name('pwd')
-        passcode.clear()
-        passcode.send_keys(password)
+                    passcode = driver.find_element_by_name('pwd')
+                    passcode.clear()
+                    passcode.send_keys(password)
 
-        captcha_text = driver.find_element_by_name('captchaval')
-        captcha_text.clear()
-        captcha_text.send_keys(captcha)
+                    captcha_text = driver.find_element_by_name('captchaval')
+                    captcha_text.clear()
+                    captcha_text.send_keys(captcha)
 
-        login = driver.find_elements_by_class_name("loginButton")
-        if len(login) > 0:
-            login[0].click()
+                    login = driver.find_elements_by_class_name("loginButton")
+                    if len(login) > 0:
+                        login[0].click()
 
-        WebDriverWait(driver, 3).until(EC.alert_is_present())
-        alert = driver.switch_to.alert
-        alert.accept()
-        login_success()
-
+                    WebDriverWait(driver, 3).until(EC.alert_is_present())
+                    alert = driver.switch_to.alert
+                    alert.accept()
+                    login_success()
+                elif index > 0:
+                    mulcform = multiple_cforms(each_data)
+            company_doc.cform_session = 0
+            company_doc.save(ignore_permissions=True,ignore_version=True)
+            return {"success":True,"message":"Guest uploaded to cform"}
     except TimeoutException:
         print("no alert")
         login_success()
@@ -241,7 +277,6 @@ def checkin_cform():
             EC.presence_of_element_located((By.ID, 'Filerfno')))
         '''uplaod face image'''
         company = frappe.get_last_doc("company")
-        print(data,"=================================")
         if "private" in data["face_image"]:
             driver.find_element_by_id("file1").send_keys(folder_path+"/sites/"+company.site_name+data["face_image"])
         else:
@@ -299,7 +334,8 @@ def checkin_cform():
 
         applicant_refstatedistr = Select(
             driver.find_element_by_id('applicant_refstatedistr'))
-        applicant_refstatedistr.select_by_visible_text(data['hotel_city'].upper())
+        applicant_refstatedistr.select_by_visible_text(
+            data['hotel_city'].upper())
 
         applicant_refpincode = driver.find_element_by_id(
             'applicant_refpincode')
@@ -368,9 +404,10 @@ def checkin_cform():
         applicant_arrivedfromplace.send_keys(data['arrival_place'])
 
         driver.execute_script(
-            'document.getElementById("applicant_doarrivalindia").value ='+data['date_of_arrival_in_india'])
+            'document.getElementById("applicant_doarrivalindia").value ="'+data['date_of_arrival_in_india']+'"')
+
         driver.execute_script(
-            'document.getElementById("applicant_doarrivalhotel").value ='+data['checkin_date'])
+            'document.getElementById("applicant_doarrivalhotel").value ="'+data['checkin_date']+'"')
 
         applicant_timeoarrivalhotel = driver.find_element_by_id(
             'applicant_timeoarrivalhotel')
@@ -383,20 +420,20 @@ def checkin_cform():
         # # employed
         applicant_purpovisit = Select(driver.find_element_by_id(
             'applicant_purpovisit'))
-        applicant_purpovisit.select_by_visible_text(data['purpose_of_visit'])
+        applicant_purpovisit.select_by_value(data['purpose_of_visit'])
 
         if(data['next_destination'] == 'I'):
             driver.find_element_by_css_selector('input[value="I"').click()
 
             applicant_next_destination_state_IN = Select(
                 driver.find_element_by_id('applicant_next_destination_state_IN'))
-            applicant_next_destination_state_IN.select_by_visible_text(
+            applicant_next_destination_state_IN.select_by_value(
                 data['next_destination_state'])
             time.sleep(1)
 
             applicant_next_destination_city_district_IN = Select(
                 driver.find_element_by_id('applicant_next_destination_city_district_IN'))
-            applicant_next_destination_city_district_IN.select_by_visible_text(
+            applicant_next_destination_city_district_IN.select_by_value(
                 data['next_destination_city'])
 
             applicant_next_destination_place_IN = driver.find_element_by_id(
@@ -449,7 +486,8 @@ def checkin_cform():
 
         tmpsbmt = driver.find_element_by_id(
             'tmpsbmt')
-        # tmpsbmt.click()
+        tmpsbmt.click()
+        save_temp_success()
 
     except TimeoutException:
         print("error in checkin")
@@ -457,3 +495,41 @@ def checkin_cform():
         print(e)
 
 
+multiple = False
+
+def save_temp_success():
+    try:
+        '''wait until page settle'''
+        myElem = WebDriverWait(driver, global_delay).until(
+            EC.presence_of_element_located((By.ID, 'GetFileno')))
+        '''extract cform number'''
+        cform_id_html = driver.find_elements_by_tag_name("h1")[0]
+        cform_id = cform_id_html.get_attribute('innerHTML')
+        guest_doc = frappe.get_doc("Guest Details",data["name"])
+        guest_doc.frro_id = cform_id
+        guest_doc.uploaded_to_frro = 1
+        guest_doc.status = "In House"
+        guest_doc.frro_failure_count = 0
+        guest_doc.save(ignore_permissions=True, ignore_version=True)
+        frappe.publish_realtime("custom_socket", {'message': 'Cform Success', 'data': data["name"]})
+        print(cform_id,"======================")
+        '''only devmode else comment'''
+        if multiple:
+            multiple_cforms()
+
+    except TimeoutException:
+        print("error in temp success")
+    except Exception as e:
+        print(e)
+
+
+def multiple_cforms(checkin_deatils):
+    # checkin_cform()
+    try:
+        global data
+        data = checkin_deatils
+        menu_header = driver.find_elements_by_tag_name("a")
+        menu_header[0].click()
+        intiate_checkin_process()
+    except Exception as e:
+        print(e)
