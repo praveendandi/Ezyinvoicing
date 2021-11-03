@@ -116,15 +116,19 @@ def resetworkstation_tablet(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def updatetablet():
+def updatetablet(uuid = "",device_name = "",tablet="",socket_id="",status=""):
     try:
-        data=json.loads(frappe.request.data)
-        data = data["data"]
-        print(data)
+        data = {}
+        data["uuid"] = uuid
+        data["device_name"] = device_name
+        data["tablet"] = tablet
+        data["socket_id"] = socket_id
+        data["status"] = status
         if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"device_name":data["device_name"],"status":"Connected"}):
             active_doc = frappe.get_doc("Active Tablets",data["uuid"])
             active_doc.socket_id = data["socket_id"]
             active_doc.save(ignore_permissions=True,ignore_version=True)
+            frappe.db.commit()
             return {"success":True, "message":"Tablet updated Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
         else:
             if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"device_name":data["device_name"],"status":"Not Connected"}):
@@ -133,6 +137,7 @@ def updatetablet():
                 data["doctype"] = "Active Tablets"
                 doc = frappe.get_doc(data)
                 doc.insert(ignore_permissions=True, ignore_links=True)
+                frappe.db.commit()
                 return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
             if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Connected"}) or frappe.db.exists({"doctype":"Active Tablets","device_name":data["device_name"],"Status":"Connected"}):
                 return {"success":False,"message":"Tablet or work station already connected"}
@@ -145,11 +150,13 @@ def updatetablet():
                     data["doctype"] = "Active Tablets"
                     doc = frappe.get_doc(data)
                     doc.insert(ignore_permissions=True, ignore_links=True)
+                    frappe.db.commit()
                     return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
                 else:
                     data["doctype"] = "Active Tablets"
                     doc = frappe.get_doc(data)
                     doc.insert(ignore_permissions=True, ignore_links=True)
+                    frappe.db.commit()
                     return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
