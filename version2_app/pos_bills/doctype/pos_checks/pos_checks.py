@@ -8,7 +8,6 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
 import traceback, sys
-from datetime import datetime
 import requests, json
 import datetime
 import os,re
