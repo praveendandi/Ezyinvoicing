@@ -1,3 +1,4 @@
+from os import initgroups
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -85,10 +86,15 @@ def intiate():
         myElem = WebDriverWait(driver, global_delay).until(
             EC.presence_of_element_located((By.ID, 'capt')))
         print(driver.title)
-        download_captcha()
+        download = download_captcha()
+        if download["success"] == False:
+            return download
+        return {"success": True,"message": "CForm initiated successfully"}
     except TimeoutException:
         print("time exceed")
-
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("intiate","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":"timeout"}
 
 '''download captcha image form screen'''
 
@@ -101,7 +107,7 @@ def convert_image_to_base64(image):
         return {"success":True, "data":encoded_str}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("CForm-convert image to base64","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
 def download_captcha():
@@ -112,12 +118,16 @@ def download_captcha():
         if convert_base["success"] == False:
             return convert_base
         frappe.publish_realtime("custom_socket", {'message': 'Captcha Image', 'data': convert_base["data"]})
+        return {"success": True}
         # username = company.cform_user_name
         # password = company.cform_password
         # captcha_text = input('Enter captcha: ')
         # login_cform(username, password, captcha_text)
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("CForm-download captcha","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
 
 
 '''refresh captcha'''
@@ -128,7 +138,10 @@ def refresh_captcha():
         refresh_butoon = driver.find_element_by_xpath(
             '//*[@title="Refresh Image"]')
         refresh_butoon.click()
-        download_captcha()
+        download = download_captcha()
+        if download["success"] == False:
+            return download
+        return {"success": True,"message": "CForm initiated successfully"}
     except Exception as e:
         print(e)
 
@@ -201,20 +214,33 @@ def login_cform():
                     WebDriverWait(driver, 3).until(EC.alert_is_present())
                     alert = driver.switch_to.alert
                     alert.accept()
-                    login_success()
+                    login = login_success()
+                    if login["success"] == False:
+                        return login
                 elif index > 0:
                     mulcform = multiple_cforms(each_data)
+                    if mulcform["success"]==False:
+                        return mulcform
             company_doc.cform_session = 0
             company_doc.save(ignore_permissions=True,ignore_version=True)
             return {"success":True,"message":"Guest uploaded to cform"}
     except TimeoutException:
         print("no alert")
-        login_success()
+        login = login_success()
+        if login["success"] == False:
+            return login
 
         # driver.find_element_by_name("Loginform").submit()
 
     except Exception as e:
         print(e)
+        company = frappe.get_last_doc('company')
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("login cform","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 ''' check login is success or not'''
@@ -223,13 +249,23 @@ def login_cform():
 def login_success():
     try:
         element = driver.find_element_by_partial_link_text("Logout")
-        intiate_checkin_process()
+        checkin = intiate_checkin_process()
+        if checkin["success"] == False:
+            return checkin
+        return {"success": True}
     except NoSuchElementException:
         print("login unsuccess")
         # intiate_checkin_process()
         check_invalid_details()
     except Exception as e:
         print(e)
+        company = frappe.get_last_doc('company')
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("login success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 def check_invalid_details():
@@ -247,6 +283,9 @@ def check_invalid_details():
         print("not invalid captcha issue")
     except Exception as e:
         print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("check invalid details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 '''route to checkin page'''
@@ -261,10 +300,20 @@ def intiate_checkin_process():
             if 'formc.jsp' in lnk.get_attribute('href'):
                 # driver.find_element_by_partial_link_text(lnk.get_attribute('href')).click()
                 lnk.click()
-                checkin_cform()
+                check = checkin_cform()
+                if check["success"] == False:
+                    return check
+                return {"success":True}
         pass
     except Exception as e:
         print(e)
+        company = frappe.get_last_doc('company')
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("intiate checkin process","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 '''start checkin'''
@@ -487,12 +536,20 @@ def checkin_cform():
         tmpsbmt = driver.find_element_by_id(
             'tmpsbmt')
         tmpsbmt.click()
-        save_temp_success()
-
+        save = save_temp_success()
+        if save["success"] == False:
+            return save
+        return {"success": True}
     except TimeoutException:
         print("error in checkin")
     except Exception as e:
-        print(e)
+        company = frappe.get_last_doc('company')
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("save temp success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 multiple = False
@@ -512,15 +569,20 @@ def save_temp_success():
         guest_doc.frro_failure_count = 0
         guest_doc.save(ignore_permissions=True, ignore_version=True)
         frappe.publish_realtime("custom_socket", {'message': 'Cform Success', 'data': data["name"]})
-        print(cform_id,"======================")
         '''only devmode else comment'''
         if multiple:
             multiple_cforms()
-
+        return {"success":True}
     except TimeoutException:
         print("error in temp success")
     except Exception as e:
-        print(e)
+        company = frappe.get_last_doc('company')
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("save temp success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 def multiple_cforms(checkin_deatils):
@@ -530,6 +592,16 @@ def multiple_cforms(checkin_deatils):
         data = checkin_deatils
         menu_header = driver.find_elements_by_tag_name("a")
         menu_header[0].click()
-        intiate_checkin_process()
+        intiate = intiate_checkin_process()
+        if intiate == False:
+            return intiate
+        return {"success":True}
     except Exception as e:
         print(e)
+        company = frappe.get_last_doc('company')
+        company_doc = frappe.get_doc('company',company.name)
+        company_doc.cform_session = 0
+        company_doc.save(ignore_permissions=True,ignore_version=True)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("multiple cforms","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
