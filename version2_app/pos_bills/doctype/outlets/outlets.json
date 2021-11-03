@@ -24,7 +24,8 @@
   "website",
   "print_count",
   "invoice_number_format",
-  "last_updated"
+  "last_updated",
+  "payment_gateway"
  ],
  "fields": [
   {
@@ -131,11 +132,17 @@
    "fieldname": "last_updated",
    "fieldtype": "Datetime",
    "label": "Last Updated"
+  },
+  {
+   "fieldname": "payment_gateway",
+   "fieldtype": "Select",
+   "label": "Payment gateway",
+   "options": "Razorpay\nPaytm"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-14 12:07:49.713887",
+ "modified": "2021-11-02 19:04:54.460755",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",
