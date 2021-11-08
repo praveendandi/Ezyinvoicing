@@ -1418,7 +1418,9 @@ def pass_detect_text(image_file):
             return {"success":True, "data":details}
             # else:
             #     details={"type":"partial data","message":"image not scaned properly"}
-            #     return details
+            #     return 
+        else:
+            return {"success":False, "data":"unable to scan image"}
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))

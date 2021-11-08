@@ -286,47 +286,48 @@ def update_guest_details(name):
                         passport_details.update(passport["data"]["message"])
                         del passport_details["success"]
                         passport_details["id_type"] = "Foreign" if pre_checkins.guest_id_type == "passport" else pre_checkins.guest_id_type
-                        return {"success": True,"data":passport_details}
+                        # return {"success": True,"data":passport_details}
                         # return passport["data"]["message"]
-                    if "details" in ["data"]["message"].keys():
-                        if "face" in passport["data"]["message"]["details"].keys():
-                            base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
-                            if "file_url" in  base_image["message"].keys():
-                                passport_details["face_url"] = base_image["message"]["file_url"]
-                                del passport["data"]["message"]["details"]["face"]
-                    if "details" in ["data"]["message"].keys():
-                        if "data" in ["data"]["message"]["details"].keys():
-                            if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Date_of_birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
-                                del passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
-                            if "country_code" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_country_code"] = passport["data"]["message"]["details"]["data"]["country_code"]
-                                del passport["data"]["message"]["details"]["data"]["country_code"]
-                            if "FamilyName" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_FamilyName"] = passport["data"]["message"]["details"]["data"]["FamilyName"]
-                                del passport["data"]["message"]["details"]["data"]["FamilyName"]
-                            if "Given_Name" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Given_Name"] = passport["data"]["message"]["details"]["data"]["Given_Name"]
-                                del passport["data"]["message"]["details"]["data"]["Given_Name"]
-                            if "Date_of_Issue" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Date_of_Issue"] = passport["data"]["message"]["details"]["data"]["Date_of_Issue"]
-                                del passport["data"]["message"]["details"]["data"]["Date_of_Issue"]
-                            if "Nationality" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Nationality"] = passport["data"]["message"]["details"]["data"]["Nationality"]
-                                del passport["data"]["message"]["details"]["data"]["Nationality"]
-                            if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Date_of_Birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
-                                del passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
-                            if "Gender" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Gender"] = passport["data"]["message"]["details"]["data"]["Gender"]
-                                del passport["data"]["message"]["details"]["data"]["Gender"]
-                            if "Date_of_Expiry" in passport["data"]["message"]["details"]["data"].keys():
-                                passport_details["pass_Date_of_Expiry"] = passport["data"]["message"]["details"]["data"]["Date_of_Expiry"]
-                                del passport["data"]["message"]["details"]["data"]["Date_of_Expiry"]
-                            # aadhar_front["data"]["message"]["details"]["front_image"] = aadhar_front["data"]["message"]["aadhar_details"]["base64_string"]
-                            # del passport["data"]["message"]["details"]["base64_string"]
-                            passport_details.update(passport["data"]["message"]["details"]["data"])
-                    passport_details["image_1"] = pre_checkins.image_1
+                    if passport["data"]["message"]["success"] == True:
+                        if "details" in ["data"]["message"].keys():
+                            if "face" in passport["data"]["message"]["details"].keys():
+                                base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
+                                if "file_url" in  base_image["message"].keys():
+                                    passport_details["face_url"] = base_image["message"]["file_url"]
+                                    del passport["data"]["message"]["details"]["face"]
+                        if "details" in ["data"]["message"].keys():
+                            if "data" in ["data"]["message"]["details"].keys():
+                                if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Date_of_birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
+                                    del passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
+                                if "country_code" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_country_code"] = passport["data"]["message"]["details"]["data"]["country_code"]
+                                    del passport["data"]["message"]["details"]["data"]["country_code"]
+                                if "FamilyName" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_FamilyName"] = passport["data"]["message"]["details"]["data"]["FamilyName"]
+                                    del passport["data"]["message"]["details"]["data"]["FamilyName"]
+                                if "Given_Name" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Given_Name"] = passport["data"]["message"]["details"]["data"]["Given_Name"]
+                                    del passport["data"]["message"]["details"]["data"]["Given_Name"]
+                                if "Date_of_Issue" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Date_of_Issue"] = passport["data"]["message"]["details"]["data"]["Date_of_Issue"]
+                                    del passport["data"]["message"]["details"]["data"]["Date_of_Issue"]
+                                if "Nationality" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Nationality"] = passport["data"]["message"]["details"]["data"]["Nationality"]
+                                    del passport["data"]["message"]["details"]["data"]["Nationality"]
+                                if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Date_of_Birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
+                                    del passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
+                                if "Gender" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Gender"] = passport["data"]["message"]["details"]["data"]["Gender"]
+                                    del passport["data"]["message"]["details"]["data"]["Gender"]
+                                if "Date_of_Expiry" in passport["data"]["message"]["details"]["data"].keys():
+                                    passport_details["pass_Date_of_Expiry"] = passport["data"]["message"]["details"]["data"]["Date_of_Expiry"]
+                                    del passport["data"]["message"]["details"]["data"]["Date_of_Expiry"]
+                                # aadhar_front["data"]["message"]["details"]["front_image"] = aadhar_front["data"]["message"]["aadhar_details"]["base64_string"]
+                                # del passport["data"]["message"]["details"]["base64_string"]
+                                passport_details.update(passport["data"]["message"]["details"]["data"])
+                        passport_details["image_1"] = pre_checkins.image_1
                     
                 if file_path2:
                     if pre_checkins.guest_id_type == "passport":
