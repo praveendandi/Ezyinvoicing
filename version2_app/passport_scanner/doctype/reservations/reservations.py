@@ -1460,7 +1460,6 @@ def passportvisadetails():
         pass_details = pass_detect_text(base)
         if not pass_details:
             return {"success":False,"message":"unable to scan your ID"}
-        print(pass_details,"===============================")
         if pass_details["success"] == False:
             return pass_details
         details = pass_details["data"]
