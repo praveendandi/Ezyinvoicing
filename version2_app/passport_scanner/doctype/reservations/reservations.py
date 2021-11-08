@@ -733,7 +733,7 @@ def pan_detect_text(image_file):
         return {"success":True, "data": details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("SignEzy pan_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("SignEzy pan_dete981492ct_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success":False,"message": str(e)})   
 
 # API to scan pan card images
@@ -1458,6 +1458,9 @@ def passportvisadetails():
         imgdata = base64.b64decode(base)
         header = frappe.local.form_dict.get("scan_type")
         pass_details = pass_detect_text(base)
+        if not pass_details:
+            return {"success":False,"message":"unable to scan your ID"}
+        print(pass_details,"===============================")
         if pass_details["success"] == False:
             return pass_details
         details = pass_details["data"]
