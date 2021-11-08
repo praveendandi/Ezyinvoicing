@@ -1460,7 +1460,7 @@ def passportvisadetails():
         imgdata = base64.b64decode(base)
         header = frappe.local.form_dict.get("scan_type")
         pass_details = pass_detect_text(base)
-        if not pass_details:
+        if pass_details is None:
             return {"success":False,"message":"unable to scan your ID"}
         if pass_details["success"] == False:
             return pass_details
