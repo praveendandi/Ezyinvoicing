@@ -287,8 +287,8 @@ def update_guest_details(name):
                         passport_details["id_type"] = "Foreign" if pre_checkins.guest_id_type == "passport" else pre_checkins.guest_id_type
                         return {"success": False,"data":passport_details}
                         # return passport["data"]["message"]
-                    if "details" in ["data"]["message"]:
-                        if "face" in passport["data"]["message"]["details"]:
+                    if "details" in ["data"]["message"].keys():
+                        if "face" in passport["data"]["message"]["details"].keys():
                             base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
                             if "file_url" in  base_image["message"].keys():
                                 passport_details["face_url"] = base_image["message"]["file_url"]
