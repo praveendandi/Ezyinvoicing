@@ -287,11 +287,12 @@ def update_guest_details(name):
                         passport_details["id_type"] = "Foreign" if pre_checkins.guest_id_type == "passport" else pre_checkins.guest_id_type
                         return {"success": False,"data":passport_details}
                         # return passport["data"]["message"]
-                    if "face" in passport["data"]["message"]["details"]:
-                        base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
-                        if "file_url" in  base_image["message"].keys():
-                            passport_details["face_url"] = base_image["message"]["file_url"]
-                            del passport["data"]["message"]["details"]["face"]
+                    if "details" in ["data"]["message"]:
+                        if "face" in passport["data"]["message"]["details"]:
+                            base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
+                            if "file_url" in  base_image["message"].keys():
+                                passport_details["face_url"] = base_image["message"]["file_url"]
+                                del passport["data"]["message"]["details"]["face"]
                     if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
                         passport_details["pass_Date_of_birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
                         del passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
