@@ -127,6 +127,7 @@
   "sign_ezy_module",
   "enable_pos_extra_text",
   "pos_text",
+  "pos_footer",
   "create_taxinvoice_raisecredit",
   "qr_page",
   "upload_gst_details",
@@ -894,11 +895,16 @@
    "fieldname": "pos_text",
    "fieldtype": "Small Text",
    "label": "POS Text"
+  },
+  {
+   "fieldname": "pos_footer",
+   "fieldtype": "Small Text",
+   "label": "POS Footer"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-14 09:54:18.378711",
+ "modified": "2021-11-09 09:26:33.352510",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

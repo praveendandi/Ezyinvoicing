@@ -1693,7 +1693,7 @@ def calulate_items(data):
                                 scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
                                 gst_value = scharge_value- scharge_value_base
                                 scharge_value = scharge_value_base
-                            if vat_rate_percentage>0:
+                            if vat_rate_percentage>0 and sac_code_based_gst_rates.disable_vat_for_sc == 0:
                                 vatamount = (vat_rate_percentage * scharge_value) / 100.0
                                 service_dict['vat_amount'] = vatamount
                                 service_dict['vat'] = vat_rate_percentage
@@ -1837,7 +1837,7 @@ def calulate_items(data):
                         gst_value = scharge_value- scharge_value_base
                         scharge_value = scharge_value_base
                         
-                    if vat_rate_percentage>0:
+                    if vat_rate_percentage>0 and sac_code_based_gst_rates.disable_vat_for_sc == 0:
                         vatamount = (vat_rate_percentage * scharge_value) / 100.0
                         service_dict['vat_amount'] = vatamount
                         service_dict['vat'] = vat_rate_percentage

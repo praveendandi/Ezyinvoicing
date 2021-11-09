@@ -71,7 +71,6 @@ def create_pos_bills(data):
                                 added_text1 = "Guest Copy\n\n".encode("utf-8")
                             elif count == 1:
                                 added_text1 = "Merchant Copy\n".encode("utf-8")
-                        
                             added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                         give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number)
                     data["printed"] = 1
@@ -88,6 +87,8 @@ def create_pos_bills(data):
                         elif count == 1:
                             added_text1 = "Merchant Copy\n".encode("utf-8")
                         added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                    if company_doc.pos_footer:
+                        data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
                     give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
                 data["gcp_file_url"] = pos_bills['data']
                 data["printed"] = 1

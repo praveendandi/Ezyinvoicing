@@ -34,7 +34,8 @@
   "sac_index",
   "ignore_non_taxable_items",
   "bulk_upload_service_charge",
-  "disable_cess_for_sc"
+  "disable_cess_for_sc",
+  "disable_vat_for_sc"
  ],
  "fields": [
   {
@@ -216,11 +217,17 @@
    "fieldname": "disable_cess_for_sc",
    "fieldtype": "Check",
    "label": "Disable Cess For SC"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_vat_for_sc",
+   "fieldtype": "Check",
+   "label": "Disable Vat For SC"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-20 14:37:03.279780",
+ "modified": "2021-11-09 10:26:39.366497",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
