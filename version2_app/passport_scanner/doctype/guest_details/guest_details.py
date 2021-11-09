@@ -401,6 +401,7 @@ def update_guest_details(name):
                     other_details["scan_ezy"] = True
                 else:
                     other_details["scan_ezy"] = False
+                print("===========================")
                 return {"success":True, "data":other_details}
         else:
             if company_doc.ezy_checkins_module == 1:
