@@ -140,7 +140,7 @@ def updatetablet(uuid = "",device_name = "",tablet="",socket_id="",status=""):
                 frappe.db.commit()
                 return {"success":True, "message":"Tablet created Successfully", "data":{"socket_id":data["socket_id"], "uuid":data["uuid"], "device_name": data["device_name"]}}
             if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Connected"}) or frappe.db.exists({"doctype":"Active Tablets","device_name":data["device_name"],"Status":"Connected"}):
-                return {"success":False,"message":"Tablet or work station already connected"}
+                return {"success":False,"message":"Tablet already connected to other workstation"}
             else:
                 if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"Status":"Not Connected"}) or frappe.db.exists({"doctype":"Active Tablets","device_name":data["device_name"],"Status":"Not Connected"}):
                     frappe.db.delete("Active Tablets", {"name": data["uuid"]})
