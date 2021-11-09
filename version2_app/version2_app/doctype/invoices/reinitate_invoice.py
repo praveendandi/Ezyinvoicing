@@ -98,7 +98,6 @@ def Reinitiate_invoice(data):
                             value_before_gst += float(item['item_value'])
                             value_after_gst += float(item['item_value_after_gst'])
                             total_vat_amount += float(item['vat_amount'])
-                            print(value_after_gst," ******")
                     else:
                         # cgst_amount+=item['cgst_amount']
                         # sgst_amount+=item['sgst_amount']
@@ -147,7 +146,7 @@ def Reinitiate_invoice(data):
 
                 has_credit_items = "Yes"
             else:
-                has_credit_items = "No"			
+                has_credit_items = "No"	
         cgst_amount = cgst_amount - credit_cgst_amount
         sgst_amount = sgst_amount - credit_sgst_amount
         igst_amount	= igst_amount - credit_igst_amount	
@@ -168,13 +167,16 @@ def Reinitiate_invoice(data):
         # 	total_invoice_amount = sales_amount_after_tax
         # 	data['total_invoice_amount'] = sales_amount_after_tax
 
-        
         if data['total_invoice_amount'] == 0:
             total = (value_after_gst + other_charges) - credit_value_after_gst
             if (total>0 and total<1) or (total>-1 and total<1):
                 data['total_invoice_amount'] = 0
             else:
                 data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
+        else:
+            total = (value_after_gst + other_charges) - credit_value_after_gst
+            if (total>0 and total<1) or (total>-1 and total<1):
+                data['total_invoice_amount'] = 0
         if "address_1" not in data['taxpayer']:
             data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
         if '-' in str(sales_amount_after_tax):
@@ -265,6 +267,7 @@ def Reinitiate_invoice(data):
 
         doc.irn_generated=irn_generated
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
+        print(data['total_invoice_amount'],pms_invoice_summary, other_charges,"==================")
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
             if len(data['items_data'])==0:
                 doc.ready_to_generate_irn = "No"

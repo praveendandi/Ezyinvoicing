@@ -8,11 +8,13 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
 import traceback, sys
-import requests, json, datetime
+import requests, json
+import datetime
 import os,re
 import razorpay
 from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
+from version2_app.version2_app.doctype.paytm_integrate import *
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
 
@@ -53,7 +55,10 @@ def create_pos_bills(data):
             if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
                 port = int(printer_doc.port) if printer_doc.port != "" else 9100
                 if outlet_doc.payment_mode == "Dynamic":
-                    short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
+                    if outlet_doc.payment_gateway == "Razorpay":
+                        short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
+                    if outlet_doc.payment_gateway == "Paytm":
+                        short_url = paytmIntegrate(data["total_amount"],data["check_no"],data["outlet"],company_doc)
                     if short_url["success"]:
                         for count in range(0,outlet_doc.print_count):
                             if outlet_doc.print_count > 1:
@@ -129,7 +134,7 @@ def extract_data(payload,company_doc):
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
             if company_doc.name == "JP-2025":
-                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]|[0-9]+/+[0-9]+\s+[0-9]+"
+                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
                 if re.match(pattern, line):
                     if "GST" not in line:
                         split_line = line.split(" ")
@@ -144,7 +149,7 @@ def extract_data(payload,company_doc):
                         if len(final_list)>3:
                             data["check_no"] = final_list[1]
                             data["table_number"] = final_list[0]
-                            data["no_of_guests"] = final_list[-1]
+                            data["no_of_guests"] = final_list[-1].replace("GST","")
             else:
                 if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
@@ -276,7 +281,7 @@ def print_pos_bill(data):
                 return text
             added_text = (text["string"]).encode('utf-8')
             invoice_number = (text["invoice_number"]).encode('utf-8')
-        outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
+        outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name","payment_gateway"],as_dict=1)
         printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
         printer_doc = frappe.get_doc("POS Printers",printer_settings)
         folder_path = frappe.utils.get_bench_path()
@@ -312,11 +317,14 @@ def print_pos_bill(data):
         kitchen.set("CENTER", "A", "B")
         if check_doc.check_type == "Normal Check":
             if outlet_values[0]["payment_mode"]=="Dynamic":
-                razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
-                if razor_pay["success"] == False:
-                    return razor_pay["message"]
-                kitchen.qr(razor_pay['short_url'],size=7)
-                kitchen.hw('INIT')
+                if outlet_values[0]["payment_gateway"] == "Razorpay":
+                    razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
+                if outlet_values[0]["payment_gateway"] == "Paytm":
+                    razor_pay = paytmIntegrate(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)               
+                    if razor_pay["success"] == False:
+                        return razor_pay["message"]
+                    kitchen.qr(razor_pay['short_url'],size=7)
+                    kitchen.hw('INIT')         
             else:
                 kitchen.image(qr_path)
                 kitchen.hw('INIT')
