@@ -123,7 +123,7 @@ def updatetablet(uuid = "",device_name = "",tablet="",socket_id="",status=""):
         data["device_name"] = device_name
         data["tablet"] = tablet
         data["socket_id"] = socket_id
-        data["status"] = status
+        data["status"] = "Not Connected"
         if frappe.db.exists({"doctype":"Active Tablets","uuid":data["uuid"],"device_name":data["device_name"],"status":"Connected"}):
             active_doc = frappe.get_doc("Active Tablets",data["uuid"])
             active_doc.socket_id = data["socket_id"]

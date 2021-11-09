@@ -153,6 +153,7 @@
   "e_signature",
   "group_checkins",
   "covid_list",
+  "allow_membership",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -195,7 +196,6 @@
   "membership_link",
   "only_pre_checkins",
   "children_limit",
-  "data_188",
   "sign_ezy_details_section",
   "allow_regcard",
   "allow_regcard_agree_check",
@@ -295,6 +295,11 @@
    "reqd": 1
   },
   {
+   "fieldname": "land_line_number",
+   "fieldtype": "Data",
+   "label": "Land Line Number"
+  },
+  {
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -320,10 +325,31 @@
    "reqd": 1
   },
   {
+   "fieldname": "place_of_supply",
+   "fieldtype": "Data",
+   "label": "Place of supply"
+  },
+  {
    "fieldname": "state_code",
    "fieldtype": "Data",
    "label": "State Code",
    "reqd": 1
+  },
+  {
+   "fieldname": "calculation_by",
+   "fieldtype": "Select",
+   "label": "Calculation By",
+   "options": "Description\nSAC"
+  },
+  {
+   "fieldname": "merchant_name",
+   "fieldtype": "Data",
+   "label": "Merchant Name"
+  },
+  {
+   "fieldname": "b2c_qr_url",
+   "fieldtype": "Data",
+   "label": "B2C QR URL"
   },
   {
    "fieldname": "column_break_15",
@@ -342,15 +368,34 @@
    "reqd": 1
   },
   {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
    "fieldname": "font_file",
    "fieldtype": "Attach",
    "label": "Font File"
   },
   {
-   "fieldname": "calculation_by",
+   "fieldname": "b2c_qr_type",
    "fieldtype": "Select",
-   "label": "Calculation By",
-   "options": "Description\nSAC"
+   "label": "B2C QR Type",
+   "options": "Virtual Payment\nInvoice Details"
+  },
+  {
+   "fieldname": "merchant_virtual_payment_address",
+   "fieldtype": "Data",
+   "label": "Merchant Virtual Payment Address"
+  },
+  {
+   "fieldname": "section_break_22",
+   "fieldtype": "Section Break"
   },
   {
    "bold": 1,
@@ -377,6 +422,10 @@
    "label": "Qr Rect Y1"
   },
   {
+   "fieldname": "column_break_26",
+   "fieldtype": "Column Break"
+  },
+  {
    "bold": 1,
    "fieldname": "irn_text_point1",
    "fieldtype": "Int",
@@ -389,16 +438,13 @@
    "label": "IRN Text Point2"
   },
   {
-   "fieldname": "column_break_26",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_22",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "section_break_30",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "invoice_reinitiate_parsing_file",
+   "fieldtype": "Attach",
+   "label": "Invoice Reinitiate Parsing File"
   },
   {
    "fieldname": "reinitiate_file_path",
@@ -411,9 +457,9 @@
    "label": "Invoice Parser File "
   },
   {
-   "fieldname": "invoice_reinitiate_parsing_file",
-   "fieldtype": "Attach",
-   "label": "Invoice Reinitiate Parsing File"
+   "fieldname": "invoice_parser_file_path",
+   "fieldtype": "Data",
+   "label": "Invoice Parser File Path"
   },
   {
    "fieldname": "site_name",
@@ -427,40 +473,19 @@
    "options": "First\nLast"
   },
   {
-   "fieldname": "b2c_qr_type",
-   "fieldtype": "Select",
-   "label": "B2C QR Type",
-   "options": "Virtual Payment\nInvoice Details"
-  },
-  {
-   "fieldname": "merchant_name",
-   "fieldtype": "Data",
-   "label": "Merchant Name"
-  },
-  {
-   "fieldname": "merchant_virtual_payment_address",
-   "fieldtype": "Data",
-   "label": "Merchant Virtual Payment Address"
-  },
-  {
-   "fieldname": "b2c_qr_url",
-   "fieldtype": "Data",
-   "label": "B2C QR URL"
-  },
-  {
    "fieldname": "invoice_item_date_format",
    "fieldtype": "Data",
    "label": "Invoice Item Date Format"
   },
   {
-   "fieldname": "invoice_parser_file_path",
-   "fieldtype": "Data",
-   "label": "Invoice Parser File Path"
-  },
-  {
    "fieldname": "font_file_path",
    "fieldtype": "Data",
    "label": "Font File Path"
+  },
+  {
+   "fieldname": "proxy_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Proxy Settings"
   },
   {
    "default": "0",
@@ -482,6 +507,10 @@
    "fieldname": "proxy_password",
    "fieldtype": "Data",
    "label": "Proxy Password"
+  },
+  {
+   "fieldname": "section_break_140",
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "allowance_type",
@@ -523,6 +552,12 @@
    "label": "Number In Description"
   },
   {
+   "default": "0",
+   "fieldname": "allow_auto_irn",
+   "fieldtype": "Check",
+   "label": "Allow Auto Irn"
+  },
+  {
    "fieldname": "sc_name",
    "fieldtype": "Data",
    "label": "SC Name"
@@ -536,12 +571,6 @@
    "fieldname": "adjustment_service_charge_list",
    "fieldtype": "Data",
    "label": "Adjustment Service Charge List"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_auto_irn",
-   "fieldtype": "Check",
-   "label": "Allow Auto Irn"
   },
   {
    "default": "0",
@@ -599,11 +628,6 @@
    "label": "Backend Git Branch"
   },
   {
-   "fieldname": "sc_sac_code",
-   "fieldtype": "Data",
-   "label": "SC SAC Code"
-  },
-  {
    "fieldname": "slab_12_starting_range",
    "fieldtype": "Int",
    "label": "Slab 12% Starting Range"
@@ -631,22 +655,14 @@
    "options": "Small\nLarge"
   },
   {
+   "fieldname": "sc_sac_code",
+   "fieldtype": "Data",
+   "label": "SC SAC Code"
+  },
+  {
    "fieldname": "system_storage_path",
    "fieldtype": "Data",
    "label": "System Storage Path"
-  },
-  {
-   "default": "No",
-   "fieldname": "b2c_online_payments",
-   "fieldtype": "Select",
-   "label": "B2C Online Payments",
-   "options": "Yes\nNo"
-  },
-  {
-   "default": "0",
-   "fieldname": "skip_ssl_verify",
-   "fieldtype": "Check",
-   "label": "Skip SSL Verify"
   },
   {
    "fieldname": "reconciliation_format",
@@ -707,11 +723,6 @@
    "label": "Skip SSL Verify"
   },
   {
-   "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
-   "label": "Ipp Printer File Path"
-  },
-  {
    "default": "0",
    "fieldname": "b2b_to_credit",
    "fieldtype": "Check",
@@ -751,6 +762,13 @@
    "fieldname": "disable_sez",
    "fieldtype": "Check",
    "label": "Disable Sez"
+  },
+  {
+   "default": "No",
+   "fieldname": "b2c_online_payments",
+   "fieldtype": "Select",
+   "label": "B2C Online Payments",
+   "options": "Yes\nNo"
   },
   {
    "default": "Disable",
@@ -806,6 +824,11 @@
    "label": "Closed Check Reference"
   },
   {
+   "fieldname": "closed_check_total_amt_regex",
+   "fieldtype": "Data",
+   "label": "Closed Check Total Amt Regex"
+  },
+  {
    "fieldname": "normal_check_total_amt_regex",
    "fieldtype": "Data",
    "label": "Normal Check Total Amt Regex"
@@ -841,20 +864,19 @@
    "label": "Guest Number Regex"
   },
   {
-   "fieldname": "closed_check_total_amt_regex",
+   "fieldname": "bill_amount_regex",
    "fieldtype": "Data",
-   "label": "Closed Check Total Amt Regex"
+   "label": "Bill Amount Regex"
+  },
+  {
+   "fieldname": "fssai_number",
+   "fieldtype": "Data",
+   "label": "FSSAI Number"
   },
   {
    "fieldname": "print_check_type",
    "fieldtype": "Data",
    "label": "Print Check Type"
-  },
-  {
-   "default": "0",
-   "fieldname": "payment_reconciliation",
-   "fieldtype": "Check",
-   "label": "Payment Reconciliation"
   },
   {
    "fieldname": "referrence_separator_type",
@@ -881,14 +903,9 @@
   },
   {
    "default": "0",
-   "fieldname": "enable_pos_extra_text",
+   "fieldname": "payment_reconciliation",
    "fieldtype": "Check",
-   "label": "Enable POS Extra Text"
-  },
-  {
-   "fieldname": "place_of_supply",
-   "fieldtype": "Data",
-   "label": "Place of supply"
+   "label": "Payment Reconciliation"
   },
   {
    "default": "0",
@@ -898,9 +915,9 @@
   },
   {
    "default": "0",
-   "fieldname": "sign_ezy_module",
+   "fieldname": "enable_pos_extra_text",
    "fieldtype": "Check",
-   "label": "Sign Ezy Module"
+   "label": "Enable POS Extra Text"
   },
   {
    "default": "No",
@@ -922,14 +939,14 @@
    "label": "Arrival Report"
   },
   {
-   "fieldname": "email_banner",
-   "fieldtype": "Attach",
-   "label": "Email Banner"
-  },
-  {
    "fieldname": "pre_checkin_templates_section",
    "fieldtype": "Section Break",
    "label": "Pre Checkin Templates"
+  },
+  {
+   "fieldname": "email_banner",
+   "fieldtype": "Attach",
+   "label": "Email Banner"
   },
   {
    "fieldname": "pre_checkin_mail_content",
@@ -937,15 +954,13 @@
    "label": "Pre Checkin Mail Content"
   },
   {
-   "default": "0",
-   "fieldname": "cancellation_email",
-   "fieldtype": "Check",
-   "label": "Cancellation Email"
+   "fieldname": "pre_checkin_text_content",
+   "fieldtype": "HTML Editor",
+   "label": "Pre Checkin Text Content"
   },
   {
-   "fieldname": "cancellation_email_mail_content",
-   "fieldtype": "Attach",
-   "label": "Cancellation Email Mail Content"
+   "fieldname": "column_break_142",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "thank_you_email_mail_content",
@@ -956,6 +971,46 @@
    "fieldname": "terms_and_conditions",
    "fieldtype": "HTML Editor",
    "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "cancellation_email_mail_content",
+   "fieldtype": "Attach",
+   "label": "Cancellation Email Mail Content"
+  },
+  {
+   "fieldname": "modules_section",
+   "fieldtype": "Section Break",
+   "label": "Modules"
+  },
+  {
+   "default": "0",
+   "fieldname": "scan_ezy_module",
+   "fieldtype": "Check",
+   "label": "Scan Ezy Module"
+  },
+  {
+   "default": "0",
+   "fieldname": "sign_ezy_module",
+   "fieldtype": "Check",
+   "label": "Sign Ezy Module"
+  },
+  {
+   "default": "0",
+   "fieldname": "ezy_checkins_module",
+   "fieldtype": "Check",
+   "label": "Ezy Checkins Module"
+  },
+  {
+   "default": "0",
+   "fieldname": "opera_scan",
+   "fieldtype": "Check",
+   "label": "Opera Scan"
+  },
+  {
+   "default": "0",
+   "fieldname": "vision_api",
+   "fieldtype": "Check",
+   "label": "Vision Api"
   },
   {
    "fieldname": "pre_checkins_section",
@@ -984,6 +1039,16 @@
    "options": "Yes\nNo"
   },
   {
+   "default": "0",
+   "fieldname": "allow_membership",
+   "fieldtype": "Check",
+   "label": "Allow Membership"
+  },
+  {
+   "fieldname": "column_break_141",
+   "fieldtype": "Column Break"
+  },
+  {
    "default": "False",
    "fieldname": "mail_schedule",
    "fieldtype": "Select",
@@ -994,40 +1059,6 @@
    "fieldname": "no_of_days",
    "fieldtype": "Data",
    "label": "Mail Schedule Days"
-  },
-  {
-   "fieldname": "proxy_settings_section",
-   "fieldtype": "Section Break",
-   "label": "Proxy Settings"
-  },
-  {
-   "fieldname": "section_break_140",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_141",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_142",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "modules_section",
-   "fieldtype": "Section Break",
-   "label": "Modules"
-  },
-  {
-   "default": "0",
-   "fieldname": "scan_ezy_module",
-   "fieldtype": "Check",
-   "label": "Scan Ezy Module"
-  },
-  {
-   "default": "0",
-   "fieldname": "ezy_checkins_module",
-   "fieldtype": "Check",
-   "label": "Ezy Checkins Module"
   },
   {
    "default": "Once",
@@ -1058,11 +1089,6 @@
    "label": "Thank You Mail Subject"
   },
   {
-   "fieldname": "pre_checkin_text_content",
-   "fieldtype": "HTML Editor",
-   "label": "Pre Checkin Text Content"
-  },
-  {
    "fieldname": "cancellation_text_content",
    "fieldtype": "HTML Editor",
    "label": "Cancellation Text Content"
@@ -1085,36 +1111,9 @@
   },
   {
    "default": "0",
-   "fieldname": "opera_scan",
+   "fieldname": "cancellation_email",
    "fieldtype": "Check",
-   "label": "Opera Scan"
-  },
-  {
-   "default": "0",
-   "fieldname": "vision_api",
-   "fieldtype": "Check",
-   "label": "Vision Api"
-  },
-  {
-   "fieldname": "ezycheckins_socket_host",
-   "fieldtype": "Data",
-   "label": "Ezycheckins Socket Host"
-  },
-  {
-   "fieldname": "billing_address",
-   "fieldtype": "HTML Editor",
-   "label": "Billing Address "
-  },
-  {
-   "default": "0",
-   "fieldname": "check_billing_address",
-   "fieldtype": "Check",
-   "label": "Check Billing Address"
-  },
-  {
-   "fieldname": "guest_gst_number",
-   "fieldtype": "Data",
-   "label": "Guest GST Number"
+   "label": "Cancellation Email"
   },
   {
    "default": "0",
@@ -1123,14 +1122,25 @@
    "label": "Thank you Email"
   },
   {
-   "fieldname": "fssai_number",
+   "fieldname": "ezycheckins_socket_host",
    "fieldtype": "Data",
-   "label": "FSSAI Number"
+   "label": "Ezycheckins Socket Host"
   },
   {
-   "fieldname": "bill_amount_regex",
+   "default": "0",
+   "fieldname": "check_billing_address",
+   "fieldtype": "Check",
+   "label": "Check Billing Address"
+  },
+  {
+   "fieldname": "billing_address",
+   "fieldtype": "HTML Editor",
+   "label": "Billing Address "
+  },
+  {
+   "fieldname": "guest_gst_number",
    "fieldtype": "Data",
-   "label": "Bill Amount Regex"
+   "label": "Guest GST Number"
   },
   {
    "default": "No",
@@ -1152,6 +1162,24 @@
    "options": "Yes\nNo"
   },
   {
+   "fieldname": "bulkupload_inovice_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload Inovice File Type",
+   "options": "csv\nxlsx\nxml"
+  },
+  {
+   "fieldname": "bulkupload_gst_file_type",
+   "fieldtype": "Select",
+   "label": "Bulkupload GST File Type",
+   "options": "\ncsv\nxlsx\nxml"
+  },
+  {
+   "default": "0",
+   "fieldname": "upload_gst_details",
+   "fieldtype": "Check",
+   "label": "Upload Gst Details"
+  },
+  {
    "fieldname": "pms_property_logo",
    "fieldtype": "Attach",
    "label": "PMS Property Logo"
@@ -1160,21 +1188,6 @@
    "fieldname": "pms_property_url",
    "fieldtype": "Data",
    "label": "PMS Property URL"
-  },
-  {
-   "fieldname": "state",
-   "fieldtype": "Data",
-   "label": "State"
-  },
-  {
-   "fieldname": "city",
-   "fieldtype": "Data",
-   "label": "City"
-  },
-  {
-   "fieldname": "land_line_number",
-   "fieldtype": "Data",
-   "label": "Land Line Number"
   },
   {
    "fieldname": "cform_credential_section",
@@ -1187,33 +1200,25 @@
    "label": "CForm User Name"
   },
   {
-   "fieldname": "cform_password",
-   "fieldtype": "Data",
-   "label": "CForm Password"
-  },
-  {
    "default": "0",
    "fieldname": "cform_session",
    "fieldtype": "Check",
    "label": "CForm Session"
   },
   {
-   "fieldname": "bulkupload_gst_file_type",
-   "fieldtype": "Select",
-   "label": "Bulkupload GST File Type",
-   "options": "\ncsv\nxlsx\nxml"
+   "fieldname": "column_break_177",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "bulkupload_inovice_file_type",
-   "fieldtype": "Select",
-   "label": "Bulkupload Inovice File Type",
-   "options": "csv\nxlsx\nxml"
+   "fieldname": "cform_password",
+   "fieldtype": "Data",
+   "label": "CForm Password"
   },
   {
-   "default": "0",
-   "fieldname": "upload_gst_details",
+   "default": "1",
+   "fieldname": "cform_chrome_headless",
    "fieldtype": "Check",
-   "label": "Upload Gst Details"
+   "label": "CForm Chrome Headless"
   },
   {
    "fieldname": "pre_checkin_form_section",
@@ -1233,6 +1238,21 @@
    "label": "Standard Checkin Time"
   },
   {
+   "fieldname": "member_ship_url",
+   "fieldtype": "Data",
+   "label": "Member Ship URL"
+  },
+  {
+   "default": "1",
+   "fieldname": "adults_limit",
+   "fieldtype": "Int",
+   "label": "Adults Limit"
+  },
+  {
+   "fieldname": "column_break_181",
+   "fieldtype": "Column Break"
+  },
+  {
    "default": "0",
    "fieldname": "precheckins_signature",
    "fieldtype": "Check",
@@ -1245,19 +1265,16 @@
    "label": "Membership Link"
   },
   {
-   "fieldname": "column_break_181",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "member_ship_url",
-   "fieldtype": "Data",
-   "label": "Member Ship URL"
-  },
-  {
    "default": "0",
    "fieldname": "only_pre_checkins",
    "fieldtype": "Check",
    "label": "Only Pre Checkins"
+  },
+  {
+   "default": "1",
+   "fieldname": "children_limit",
+   "fieldtype": "Int",
+   "label": "Children Limit "
   },
   {
    "fieldname": "sign_ezy_details_section",
@@ -1272,21 +1289,9 @@
   },
   {
    "default": "0",
-   "fieldname": "allow_regcard_signature",
-   "fieldtype": "Check",
-   "label": "Allow Regcard Signature"
-  },
-  {
-   "default": "0",
    "fieldname": "allow_regcard_agree_check",
    "fieldtype": "Check",
    "label": "Allow Regcard Agree Check"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_invoice",
-   "fieldtype": "Check",
-   "label": "Allow Invoice"
   },
   {
    "default": "0",
@@ -1296,37 +1301,15 @@
   },
   {
    "default": "0",
-   "fieldname": "allow_invoice_agree_check",
-   "fieldtype": "Check",
-   "label": "Allow Invoice Agree Check"
-  },
-  {
-   "default": "0",
    "fieldname": "allow_information_invoices",
    "fieldtype": "Check",
    "label": "Allow Information Invoices"
   },
   {
    "default": "0",
-   "fieldname": "allow_information_invoices_signatrue",
-   "fieldtype": "Check",
-   "label": "Allow Information Invoices Signatrue"
-  },
-  {
-   "default": "0",
    "fieldname": "allow_information_invoices_agree_check",
    "fieldtype": "Check",
    "label": "Allow Information Invoices Agree Check"
-  },
-  {
-   "fieldname": "column_break_189",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_paid_out_receipts",
-   "fieldtype": "Check",
-   "label": "Allow Paid out Receipts"
   },
   {
    "default": "0",
@@ -1336,21 +1319,9 @@
   },
   {
    "default": "0",
-   "fieldname": "allow_paid_out_receipt_agree_check",
-   "fieldtype": "Check",
-   "label": "Allow Paid out Receipt Agree Check"
-  },
-  {
-   "default": "0",
    "fieldname": "allow_payment_receipts",
    "fieldtype": "Check",
    "label": "Allow Payment Receipts"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_payment_receipts_signature",
-   "fieldtype": "Check",
-   "label": "Allow Payment Receipts Signature"
   },
   {
    "default": "0",
@@ -1360,21 +1331,9 @@
   },
   {
    "default": "0",
-   "fieldname": "allow_advance_deposits",
-   "fieldtype": "Check",
-   "label": "Allow Advance Deposits"
-  },
-  {
-   "default": "0",
    "fieldname": "allow_advance_deposites_signature",
    "fieldtype": "Check",
    "label": "Allow Advance Deposites Signature"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_advance_deposits_agree_check",
-   "fieldtype": "Check",
-   "label": "Allow Advance Deposits Agree Check"
   },
   {
    "default": "0",
@@ -1387,6 +1346,70 @@
    "fieldname": "allow_ecertificates_agree_check",
    "fieldtype": "Check",
    "label": "Allow ECertificates Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_pos_bills_signature",
+   "fieldtype": "Check",
+   "label": "Allow POS Bills Signature"
+  },
+  {
+   "fieldname": "column_break_189",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_regcard_signature",
+   "fieldtype": "Check",
+   "label": "Allow Regcard Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_invoice",
+   "fieldtype": "Check",
+   "label": "Allow Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_invoice_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Invoice Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_information_invoices_signatrue",
+   "fieldtype": "Check",
+   "label": "Allow Information Invoices Signatrue"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_paid_out_receipts",
+   "fieldtype": "Check",
+   "label": "Allow Paid out Receipts"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_paid_out_receipt_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Paid out Receipt Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_payment_receipts_signature",
+   "fieldtype": "Check",
+   "label": "Allow Payment Receipts Signature"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_advance_deposits",
+   "fieldtype": "Check",
+   "label": "Allow Advance Deposits"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_advance_deposits_agree_check",
+   "fieldtype": "Check",
+   "label": "Allow Advance Deposits Agree Check"
   },
   {
    "default": "0",
@@ -1405,43 +1428,11 @@
    "fieldname": "allow_pos_bills_agree_check",
    "fieldtype": "Check",
    "label": "Allow POS Bills Agree Check"
-  },
-  {
-   "default": "0",
-   "fieldname": "allow_pos_bills_signature",
-   "fieldtype": "Check",
-   "label": "Allow POS Bills Signature"
-  },
-  {
-   "default": "1",
-   "fieldname": "adults_limit",
-   "fieldtype": "Int",
-   "label": "Adults Limit"
-  },
-  {
-   "default": "1",
-   "fieldname": "children_limit",
-   "fieldtype": "Int",
-   "label": "Children Limit "
-  },
-  {
-   "fieldname": "data_188",
-   "fieldtype": "Data"
-  },
-  {
-   "fieldname": "column_break_177",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "1",
-   "fieldname": "cform_chrome_headless",
-   "fieldtype": "Check",
-   "label": "CForm Chrome Headless"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-03 17:20:16.703806",
+ "modified": "2021-11-09 14:42:28.255941",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

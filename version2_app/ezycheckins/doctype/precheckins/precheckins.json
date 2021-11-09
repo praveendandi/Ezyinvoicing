@@ -57,7 +57,8 @@
   "resident_of_india",
   "temperature",
   "loyalty_membership",
-  "opera_scanned_status"
+  "opera_scanned_status",
+  "membership_number"
  ],
  "fields": [
   {
@@ -339,11 +340,16 @@
    "fieldtype": "Select",
    "label": "Opera Scanned Status",
    "options": "Pending\nScanned"
+  },
+  {
+   "fieldname": "membership_number",
+   "fieldtype": "Data",
+   "label": "Membership Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-13 16:07:06.615629",
+ "modified": "2021-11-09 14:43:19.950071",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",

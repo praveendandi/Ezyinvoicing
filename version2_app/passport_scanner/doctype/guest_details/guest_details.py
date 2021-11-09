@@ -138,6 +138,10 @@ def update_guest_details(name):
                     return convert2
             if pre_checkins.guest_id_type == "aadhaar":
                 aadhar_details = {}
+                if company_doc.scan_ezy_module == 1:
+                    aadhar_details["scan_ezy"] = True
+                else:
+                    aadhar_details["scan_ezy"] = False
                 if file_path1:
                     aadhar_details["pre_city"] = pre_checkins.guest_city
                     aadhar_details["pre_country"] = pre_checkins.guest_country
@@ -190,6 +194,10 @@ def update_guest_details(name):
                 return {"success": True,"data":aadhar_details}
             if pre_checkins.guest_id_type == "driving":
                 driving_license_details= {}
+                if company_doc.scan_ezy_module == 1:
+                    driving_license_details["scan_ezy"] = True
+                else:
+                    driving_license_details["scan_ezy"] = False
                 if file_path1:
                     driving_license_details["pre_city"] = pre_checkins.guest_city
                     driving_license_details["pre_country"] = pre_checkins.guest_country
@@ -226,6 +234,10 @@ def update_guest_details(name):
                 return {"success":True, "data":driving_license_details}
             if pre_checkins.guest_id_type == "voterId":
                 voter_details = {}
+                if company_doc.scan_ezy_module == 1:
+                    voter_details["scan_ezy"] = True
+                else:
+                    voter_details["scan_ezy"] = False
                 if file_path1:
                     voter_details["pre_city"] = pre_checkins.guest_city
                     voter_details["pre_country"] = pre_checkins.guest_country
@@ -266,14 +278,14 @@ def update_guest_details(name):
                     del voter_back["data"]["message"]["voter_details"]["base64_string"]
                     voter_details["image_2"] = pre_checkins.image_2
                     voter_details.update(voter_back["data"]["message"]["voter_details"]["data"])
-                voter_details["id_type"] = "voterId"    
-                if company_doc.scan_ezy_module == 1:
-                    voter_details["scan_ezy"] = True
-                else:
-                    voter_details["scan_ezy"] = False
+                voter_details["id_type"] = "voterId"
                 return {"success": True,"data":voter_details}
             if pre_checkins.guest_id_type == "indianPassport" or pre_checkins.guest_id_type == "passport":
                 passport_details = {}
+                if company_doc.scan_ezy_module == 1:
+                    passport_details["scan_ezy"] = True
+                else:
+                    passport_details["scan_ezy"] = False
                 if file_path1:
                     passport_details["pre_city"] = pre_checkins.guest_city
                     passport_details["pre_country"] = pre_checkins.guest_country
@@ -350,10 +362,6 @@ def update_guest_details(name):
                     # del visa_details["data"]["message"]["details"]["data"]["base64_string"]
                     passport_details["image_2"] = pre_checkins.image_2  
                 passport_details["id_type"] = pre_checkins.guest_id_type if pre_checkins.guest_id_type == "indianPassport" else "Foreign"
-                if company_doc.scan_ezy_module == 1:
-                    passport_details["scan_ezy"] = True
-                else:
-                    passport_details["scan_ezy"] = False
                 return {"success": True,"data":passport_details}
             if pre_checkins.guest_id_type == "OCI":
                 pass
