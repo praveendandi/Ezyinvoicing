@@ -549,6 +549,7 @@ def checkin_cform():
     except TimeoutException:
         print("error in checkin")
     except Exception as e:
+        print(str(e),"====================")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -582,6 +583,7 @@ def save_temp_success():
     except TimeoutException:
         print("error in temp success")
     except Exception as e:
+        print(str(e),"====================")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
