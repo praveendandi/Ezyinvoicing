@@ -9,7 +9,8 @@ from frappe.model.document import Document
 from frappe.utils import logger
 import traceback, sys
 import requests, json
-import datetime
+# import datetime
+from datetime import datetime
 import os,re
 import razorpay
 from escpos.printer import Network
@@ -25,7 +26,7 @@ class POSChecks(Document):
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(data):
     try:
-        now = datetime.datetime.now()
+        now = datetime.now()
         raw_data = data["payload"].split("\n")
         if len(raw_data) > 5:
             company_doc = frappe.get_doc("company",data["company"])
@@ -246,7 +247,7 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
         monformat = ""
         yearformat = ""
         dayformat = ""
-        x = datetime.datetime.now()
+        x = datetime.now()
         if format:
             countofy = format.count("Y")
             if countofy!=0:
@@ -275,12 +276,28 @@ def print_pos_bill(data):
     try:
         check_doc = frappe.get_doc("POS Checks",data["name"])
         company_doc = frappe.get_doc("company",check_doc.company)
+        outlet_doc = frappe.get_doc("Outlets",check_doc.outlet)
         if company_doc.enable_pos_extra_text == 1:
             text = add_extra_text_while_print(check_doc.check_no,check_doc.outlet,company_doc)
             if text["success"] == False:
                 return text
             added_text = (text["string"]).encode('utf-8')
-            invoice_number = (text["invoice_number"]).encode('utf-8')
+            x = check_doc.creation
+            format = outlet_doc.invoice_number_format
+            monformat = ""
+            yearformat = ""
+            dayformat = ""
+            if format:
+                countofy = format.count("Y")
+                if countofy!=0:
+                    yearformat = x.strftime("%y") if countofy == 2 else x.strftime("%Y")
+                countofm = format.count("M")
+                if countofm!=0:
+                    monformat = x.strftime("%m") if countofy == 2 else x.strftime("%m")
+                countofd = format.count("D")
+                if countofd!=0:
+                    dayformat = x.strftime("%d")
+            invoice_number = ("\nInvoice No "+yearformat+monformat+dayformat+check_doc.check_no + "\n").encode('utf-8')
         outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name","payment_gateway"],as_dict=1)
         printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
         printer_doc = frappe.get_doc("POS Printers",printer_settings)
