@@ -545,6 +545,7 @@ def process_cform():
             # company_doc.cform_session = 0
             # company_doc.save(ignore_permissions=True,ignore_version=True)
     except Exception as e:
+        print(str(e),"====================")
         # company_doc = frappe.get_doc('company',company.name)
         # company_doc.cform_session = 0
         # company_doc.save(ignore_permissions=True,ignore_version=True)

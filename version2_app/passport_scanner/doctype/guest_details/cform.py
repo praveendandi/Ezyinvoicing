@@ -110,6 +110,7 @@ def convert_image_to_base64(image):
         # print(encoded_str)
         return {"success":True, "data":encoded_str}
     except Exception as e:
+        print(str(e),"====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("CForm-convert image to base64","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
@@ -128,6 +129,7 @@ def download_captcha():
         # captcha_text = input('Enter captcha: ')
         # login_cform(username, password, captcha_text)
     except Exception as e:
+        print(str(e),"====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("CForm-download captcha","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
