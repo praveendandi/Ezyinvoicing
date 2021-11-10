@@ -244,7 +244,7 @@ def login_cform():
         company_doc.cform_session = 0
         company_doc.save(ignore_permissions=True,ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb)
+        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
         frappe.log_error("login cform","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
@@ -269,7 +269,7 @@ def login_success():
         company_doc.cform_session = 0
         company_doc.save(ignore_permissions=True,ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb)
+        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
         frappe.log_error("login success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
@@ -289,7 +289,7 @@ def check_invalid_details():
         print("not invalid captcha issue")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb)
+        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
         frappe.log_error("check invalid details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
@@ -317,7 +317,7 @@ def intiate_checkin_process():
         company_doc.cform_session = 0
         company_doc.save(ignore_permissions=True,ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb)
+        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
         frappe.log_error("intiate checkin process","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
