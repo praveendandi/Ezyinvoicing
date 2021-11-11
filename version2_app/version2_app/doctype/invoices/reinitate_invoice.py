@@ -98,7 +98,6 @@ def Reinitiate_invoice(data):
                             value_before_gst += float(item['item_value'])
                             value_after_gst += float(item['item_value_after_gst'])
                             total_vat_amount += float(item['vat_amount'])
-                            print(value_after_gst," ******")
                     else:
                         # cgst_amount+=item['cgst_amount']
                         # sgst_amount+=item['sgst_amount']
@@ -147,7 +146,7 @@ def Reinitiate_invoice(data):
 
                 has_credit_items = "Yes"
             else:
-                has_credit_items = "No"			
+                has_credit_items = "No"	
         cgst_amount = cgst_amount - credit_cgst_amount
         sgst_amount = sgst_amount - credit_sgst_amount
         igst_amount	= igst_amount - credit_igst_amount	
@@ -168,13 +167,16 @@ def Reinitiate_invoice(data):
         # 	total_invoice_amount = sales_amount_after_tax
         # 	data['total_invoice_amount'] = sales_amount_after_tax
 
-        
         if data['total_invoice_amount'] == 0:
             total = (value_after_gst + other_charges) - credit_value_after_gst
             if (total>0 and total<1) or (total>-1 and total<1):
                 data['total_invoice_amount'] = 0
             else:
                 data['total_invoice_amount'] = value_after_gst + other_charges + credit_value_after_gst
+        else:
+            total = (value_after_gst + other_charges) - credit_value_after_gst
+            if (total>0 and total<1) or (total>-1 and total<1):
+                data['total_invoice_amount'] = 0
         if "address_1" not in data['taxpayer']:
             data['taxpayer']['address_1'] = data['taxpayer']['address_2']	
         if '-' in str(sales_amount_after_tax):
@@ -265,6 +267,7 @@ def Reinitiate_invoice(data):
 
         doc.irn_generated=irn_generated
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
+        print(data['total_invoice_amount'],pms_invoice_summary, other_charges,"==================")
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
             if len(data['items_data'])==0:
                 doc.ready_to_generate_irn = "No"
@@ -272,12 +275,13 @@ def Reinitiate_invoice(data):
                 doc.invoice_type = "B2C"
                 generateb2cQr = False
             else:
-                if abs(invoice_round_off_amount)>6:
-                    if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-                        generateb2cQr = False
-                        doc.error_message = " Invoice Total Mismatch"
-                        doc.irn_generated = "Error"
-                        doc.ready_to_generate_irn = "No"
+                if company.only_b2c == "No":
+                    if abs(invoice_round_off_amount)>6:
+                        if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+                            generateb2cQr = False
+                            doc.error_message = " Invoice Total Mismatch"
+                            doc.irn_generated = "Error"
+                            doc.ready_to_generate_irn = "No"
                 # else:
                 # 	doc.irn_generated ="Pending"
                 # 	doc.ready_to_generate_irn = "Yes"		
@@ -714,7 +718,7 @@ def reprocess_calulate_items(data):
                         scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
                         gst_value = scharge_value- scharge_value_base
                         scharge_value = scharge_value_base
-                    if vat_rate_percentage>0:
+                    if vat_rate_percentage>0 and sac_code_based_gst_rates.disable_vat_for_sc == 0:
                         vatamount = (vat_rate_percentage * scharge_value) / 100.0
                         service_dict['vat_amount'] = vatamount
                         service_dict['vat'] = vat_rate_percentage
@@ -1042,6 +1046,7 @@ def auto_adjustment(data):
                     sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
                 if sac_code_based_gst_rates.net == "Yes":
                     item_each["item_value"] = item_each["item_value_after_gst"]
+                item_each["service_charge"] = "Yes" if sac_code_based_gst_rates.service_charge == "Yes" else "No"
             negative_data = [items for items in item_data if items["item_value"]<0]
             positive_data = [items for items in item_data if items["item_value"]>0]
             # df = pd.DataFrame.from_records(negative_data)
@@ -1050,7 +1055,7 @@ def auto_adjustment(data):
             value = 0
             for each in negative_data:
                 for item in positive_data:
-                    if each["sac_code"] == item["sac_code"] and each["gst_rate"] == item["gst_rate"] and each["type"] == item["type"] and each["taxable"] == item["taxable"] and item["item_value"] == abs(each["item_value"]):
+                    if each["sac_code"] == item["sac_code"] and each["gst_rate"] == item["gst_rate"] and each["type"] == item["type"] and each["taxable"] == item["taxable"] and item["item_value"] == abs(each["item_value"]) and item["service_charge"] == each["service_charge"]:
                         value = item['item_value'] - abs(each["item_value"])
                         positive_data.remove(item)
                         each["item_value"] = value
@@ -1059,7 +1064,7 @@ def auto_adjustment(data):
             if (negative_total != [] and positive_data != []):
                 for each_item in negative_data:
                     for items in positive_data:
-                        if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0:
+                        if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0 and each_item["service_charge"] == items["service_charge"]:
                             value = items["item_value"] - abs(each_item["item_value"])
                             if value == 0:
                                 positive_data.remove(items)
