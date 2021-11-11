@@ -12,6 +12,7 @@
   "user",
   "number_of_guests",
   "redg_file",
+  "tax_invoice_file",
   "invoice_file",
   "advance_deposits_file",
   "encasement_file",
@@ -71,11 +72,16 @@
    "fieldtype": "Table",
    "label": "Guest details",
    "options": "Guest Attachments"
+  },
+  {
+   "fieldname": "tax_invoice_file",
+   "fieldtype": "Attach",
+   "label": "Tax Invoice File"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-17 10:28:45.461843",
+ "modified": "2021-11-11 15:32:20.598728",
  "modified_by": "Administrator",
  "module": "Generics",
  "name": "Documents",

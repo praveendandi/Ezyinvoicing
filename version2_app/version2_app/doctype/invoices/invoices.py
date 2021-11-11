@@ -3492,7 +3492,8 @@ def Error_Insert_invoice(data):
                 "sez":sez,
                 "invoice_from":invoice_from,
                 "folioid":data["folioid"] if "folioid" in data else "",
-                "invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+                "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
+                "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else ""
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
