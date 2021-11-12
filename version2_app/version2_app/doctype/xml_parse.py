@@ -43,6 +43,8 @@ def extract_xml(file_list):
                     check_val=each["BILL_NO"].startswith("2018")
                     if check_val is True:
                         each['BILL_NO']=each["BILL_NO"][4::]
+                if company_doc.name == "FMORB-01":
+                    each["BILL_NO"] = "222"+each["BILL_NO"]
                 if company_doc.change_invoice_reconciliation_invoice_number == 1:
                     each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
                 if "-" in each["BILL_GENERATION_DATE"]:
@@ -83,6 +85,8 @@ def extract_xml(file_list):
 
             each = data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]
             each['BILL_NO'] = each["BILL_NO"].strip()
+            if company_doc.name == "FMORB-01":
+                each["BILL_NO"] = "222"+each["BILL_NO"]
             if company_doc.change_invoice_reconciliation_invoice_number == 1:
                 each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
             print(each['BILL_NO'])
