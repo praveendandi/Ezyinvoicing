@@ -46,6 +46,13 @@ def invoice_created(doc, method=None):
                 # bin_doc.error_log = error_log
                 bin_doc.document_printed = "Yes"
                 bin_doc.save(ignore_permissions=True,ignore_version=True)
+        if not frappe.db.exists('Documents', doc.confirmation_number):
+            data={"doctype":"Documents","tax_invoice_file":doc.invoice_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":doc.owner}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        get_doc=frappe.db.set_value("Documents",doc.confirmation_number,{"tax_invoice_file":doc.invoice_file})
+        frappe.db.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing invoice_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))            
@@ -257,24 +264,20 @@ def information_folio_created(doc, method=None):
     try:
         print(doc.invoice_file, "heeloo hiee")
         print(doc.name, "hello hiee")
-        # if
+        print(doc.__dict__)
+        user_name =  frappe.session.user
         frappe.publish_realtime(
             "custom_socket", {'message': 'information Invoices Created', 'data': doc.__dict__})
-        get_data=frappe.db.get_list("Documents",doc.confirmation_number)
-        if len(get_data)==0:
-            user_name =  frappe.session.user
+        if not frappe.db.exists('Documents', doc.confirmation_number):
             data={"doctype":"Documents","invoice_file":doc.invoice_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
             get_doc=frappe.get_doc(data)
             get_doc.insert()
             frappe.db.commit()
-        user_name =  frappe.session.user
-        data={"doctype":"Documents","invoice_file":doc.invoice_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
-        get_doc=frappe.db.set_value(data)
-        # get_doc.insert()
+        get_doc=frappe.db.set_value("Documents",doc.confirmation_number,{"invoice_file":doc.invoice_file})
         frappe.db.commit()
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
     except Exception as e:
-        print(e)
+        return {"success":False,"message":str(e)}
 
 
 def tablet_mapping(doc, method=None):
@@ -389,19 +392,19 @@ def create_redg_card(doc, method=None):
         event_doc=frappe.get_doc(activity_data)
         event_doc.insert()
         frappe.db.commit()
-        if len(get_data)==0:
+        if not frappe.db.exists('Documents', doc.confirmation_number):
             user_name =  frappe.session.user
-            data={"doctype":"Documents","redg_file":doc.redg_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
+            data={"doctype":"Documents","redg_file":doc.redg_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":doc.owner}
             get_doc=frappe.get_doc(data)
             get_doc.insert()
             frappe.db.commit()
         user_name =  frappe.session.user
-        data={"redg_file":doc.redg_file,"confirmation_number":doc.confirmation_number,"module_name":"Sign Ezy","user":user_name}
-        get_doc=frappe.db.set_value("Documents",get_data[0]["name"],data)
+        data={"redg_file":doc.redg_file}
+        get_doc=frappe.db.set_value("Documents",doc.confirmation_number,data)
         # get_doc.insert()
         frappe.db.commit()
     except Exception as e:
-        print(e)
+        print(e,"=================================================")
         
         
 def create_paidout_receipt(doc, method=None):
