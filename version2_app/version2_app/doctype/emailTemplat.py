@@ -88,22 +88,32 @@ def emailTemplate():
         return ({"success": False, "message":str(e)})
 
 @frappe.whitelist(allow_guest=True)
-def send_email():
+def send_email(data):
     """send email with payment link"""
     try:
         # send_mail = frappe.sendmail(recipients=["ganesh@caratred.com"], subject="Invoice Reg.",
         #     message="sample", attachments=[frappe.attach_print(doctype="File",name="ab5aba0184")])
         # print(send_mail,"//////////")
-        pdffilename = frappe.get_doc("File","ab5aba0184")
-        
+        folder_path = frappe.utils.get_bench_path()
+        companyCheckResponse = frappe.get_last_doc('company')
+        site_folder_path = companyCheckResponse.site_name
+        if "private" in data["attachments"]:
+            file_path = folder_path+'/sites/'+site_folder_path+data["attachments"]
+        else:
+            file_path = folder_path+'/sites/'+site_folder_path+"/public"+data["attachments"]
+        get_file = frappe.db.get_value("File",{"file_name":data["attachments"].replace("/private/files/","").replace("/files/","")})
+        pdffilename = frappe.get_doc("File",get_file)
+        with open(file_path, 'r') as f:
+	        content = f.read()
         frappe.sendmail(
-            recipients = "info@caratred.com",
+            recipients = data["recipients"],
             cc = '',
-            subject = 'Sample',
-            content = 'Message',
-            reference_doctype = 'File',
-            reference_name = 'ab5aba0184',
-            attachments=[frappe.attach_print(doctype="File",name="ab5aba0184",file_name=pdffilename.file_name,print_letterhead=True)],
+            subject = data["subject"],
+            content = data["content"],
+            reference_doctype = 'Redg Card',
+            read_receipt = data["read_receipt"],
+            reference_name = data["name"],
+            attachments=[{'fname': data["attachments"].replace("/private/files/","").replace("/files/",""),'fcontent': content}],
             now = True
         )
     except Exception as e:
