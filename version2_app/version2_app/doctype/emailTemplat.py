@@ -88,36 +88,58 @@ def emailTemplate():
         return ({"success": False, "message":str(e)})
 
 @frappe.whitelist(allow_guest=True)
-def send_email(data):
+def send_email():
     """send email with payment link"""
     try:
         # send_mail = frappe.sendmail(recipients=["ganesh@caratred.com"], subject="Invoice Reg.",
         #     message="sample", attachments=[frappe.attach_print(doctype="File",name="ab5aba0184")])
         # print(send_mail,"//////////")
-        folder_path = frappe.utils.get_bench_path()
-        companyCheckResponse = frappe.get_last_doc('company')
-        site_folder_path = companyCheckResponse.site_name
-        if "private" in data["attachments"]:
-            file_path = folder_path+'/sites/'+site_folder_path+data["attachments"]
-        else:
-            file_path = folder_path+'/sites/'+site_folder_path+"/public"+data["attachments"]
-        get_file = frappe.db.get_value("File",{"file_name":data["attachments"].replace("/private/files/","").replace("/files/","")})
-        pdffilename = frappe.get_doc("File",get_file)
-        with open(file_path, 'r') as f:
-	        content = f.read()
+        pdffilename = frappe.get_doc("File","ab5aba0184")
+        
         frappe.sendmail(
-            recipients = data["recipients"],
+            recipients = "info@caratred.com",
             cc = '',
-            subject = data["subject"],
-            content = data["content"],
-            reference_doctype = 'Redg Card',
-            read_receipt = data["read_receipt"],
-            reference_name = data["name"],
-            attachments=[{'fname': data["attachments"].replace("/private/files/","").replace("/files/",""),'fcontent': content}],
+            subject = 'Sample',
+            content = 'Message',
+            reference_doctype = 'File',
+            reference_name = 'ab5aba0184',
+            attachments=[frappe.attach_print(doctype="File",name="ab5aba0184",file_name=pdffilename.file_name,print_letterhead=True)],
             now = True
         )
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing send_email","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def send_mail_files(data):
+    try:
+        obj = {"email":""}
+        get_doc = frappe.get_doc(data["doctype"],data["name"])
+        if data["doctype"] == "Invoices":
+            if get_doc.confirmation_number != "":
+                obj["email"] = frappe.db.get_value("Arrival Information",get_doc.confirmation_number,["guest_email_address"])
+        b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
+        obj["val"] = b2csuccess
+        files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
+        obj["attachments"] = [d['name'] for d in files]
+        return {"success": True, "obj":obj}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing send_email_files","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)    
+def email_logs():
+    try:
+        data = frappe.db.get_all("Email Queue",fields=["sender","status","name","creation"])
+        for each in data:
+            each["recipient"]=frappe.db.get_value("Email Queue Recipient",{"parent":each["name"]},"recipient")
+        return {"success": True, "data":data}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))
         return{"success":False,"message":str(e)}
