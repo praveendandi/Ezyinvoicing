@@ -83,9 +83,10 @@ def intiate():
         global driver
         company = frappe.get_last_doc('company')
         options = Options()
-        options.headless = True if company.cform_chrome_headless == 1 else False
+        options.add_argument("--headless")
+        # options.headless = True if company.cform_chrome_headless == 1 else False
         driver = webdriver.Chrome(
-            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver',options=options)
+            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver',chrome_options=options)
         driver.get("https://indianfrro.gov.in/frro/FormC")
         myElem = WebDriverWait(driver, global_delay).until(
             EC.presence_of_element_located((By.ID, 'capt')))
