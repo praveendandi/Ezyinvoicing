@@ -113,6 +113,7 @@ def createTabConfig():
                 data["tablet_socket_id"] = tablet.socket_id
                 data["mode"] = "Active"
                 data["doctype"] = "Tablet Config"
+                data["device_name"] = tablet.device_name
                 insert_tabconfig = frappe.get_doc(data)
                 insert_tabconfig.insert(ignore_permissions=True, ignore_links=True)
                 tablet.status = "Connected"

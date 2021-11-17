@@ -155,6 +155,7 @@
   "covid_list",
   "allow_membership",
   "allow_push_to_tab_in_precheckins_form",
+  "tablet_back_ground_image",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1435,11 +1436,16 @@
    "fieldname": "allow_push_to_tab_in_precheckins_form",
    "fieldtype": "Check",
    "label": "Allow Push to Tab in Precheckins Form"
+  },
+  {
+   "fieldname": "tablet_back_ground_image",
+   "fieldtype": "Attach",
+   "label": "Tablet Back Ground Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-17 10:01:11.565830",
+ "modified": "2021-11-17 10:53:48.193938",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
