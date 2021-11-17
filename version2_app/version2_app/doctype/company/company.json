@@ -154,6 +154,7 @@
   "group_checkins",
   "covid_list",
   "allow_membership",
+  "allow_push_to_tab_in_precheckins_form",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1428,11 +1429,17 @@
    "fieldname": "allow_pos_bills_agree_check",
    "fieldtype": "Check",
    "label": "Allow POS Bills Agree Check"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_push_to_tab_in_precheckins_form",
+   "fieldtype": "Check",
+   "label": "Allow Push to Tab in Precheckins Form"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-09 14:42:28.255941",
+ "modified": "2021-11-17 10:01:11.565830",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
