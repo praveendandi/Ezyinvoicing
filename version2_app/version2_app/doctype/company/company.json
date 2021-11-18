@@ -211,6 +211,7 @@
   "allow_ecertificates",
   "allow_ecertificates_agree_check",
   "allow_pos_bills_signature",
+  "direct_print_without_push_to_tab",
   "column_break_189",
   "allow_regcard_signature",
   "allow_invoice",
@@ -1441,11 +1442,17 @@
    "fieldname": "tablet_back_ground_image",
    "fieldtype": "Attach",
    "label": "Tablet Back Ground Image"
+  },
+  {
+   "default": "0",
+   "fieldname": "direct_print_without_push_to_tab",
+   "fieldtype": "Check",
+   "label": "Direct Print Without Push to Tab"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-17 14:00:30.518927",
+ "modified": "2021-11-18 09:33:16.639559",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
