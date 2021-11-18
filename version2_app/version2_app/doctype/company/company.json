@@ -126,20 +126,19 @@
   "disable_sac_edit",
   "sign_ezy_module",
   "enable_pos_extra_text",
-  "pos_text",
-  "pos_footer",
   "create_taxinvoice_raisecredit",
   "qr_page",
   "upload_gst_details",
   "bulkupload_inovice_file_type",
   "bulkupload_gst_file_type",
   "skip_ssl_verify",
-  "ipp_printer_file_path",
   "only_b2c",
   "pms_payment_qr",
   "pms_information_invoice_for_payment_qr",
   "pms_property_logo",
-  "pms_property_url"
+  "pms_property_url",
+  "ipp_printer_file_path",
+  "bulkupload_json"
  ],
  "fields": [
   {
@@ -488,7 +487,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nGrand\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
+   "options": "None\nGrand\nHyatt Bulkupload\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
   },
   {
    "default": "0",
@@ -892,19 +891,14 @@
    "label": "PMS Property URL"
   },
   {
-   "fieldname": "pos_text",
-   "fieldtype": "Small Text",
-   "label": "POS Text"
-  },
-  {
-   "fieldname": "pos_footer",
-   "fieldtype": "Small Text",
-   "label": "POS Footer"
+   "fieldname": "bulkupload_json",
+   "fieldtype": "Attach",
+   "label": "BulkUpload Json"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-09 09:26:33.352510",
+ "modified": "2021-11-18 12:07:01.463406",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
