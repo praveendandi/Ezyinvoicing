@@ -53,6 +53,23 @@ def invoice_created(doc, method=None):
             frappe.db.commit()
         get_doc=frappe.db.set_value("Documents",doc.confirmation_number,{"tax_invoice_file":doc.invoice_file})
         frappe.db.commit()
+        company = frappe.get_doc("company",doc.company)
+        if company.direct_print_without_push_to_tab == 1:
+            if doc.invoice_file.count("-") == 2:
+                get_values = {}
+                if doc.confirmation_number != "":
+                    if frappe.db.exists("Arrival Information",doc.confirmation_number):
+                        get_values = frappe.db.get_value("Arrival Information",doc.confirmation_number,["guest_email_address","guest_phone_no"],as_dict=1)
+                workstation = re.search('-(.*)-', doc.invoice_file)
+                workstation = workstation.group(1)
+                if frappe.db.exists({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"}):
+                    # tabletconfig = frappe.get_doc({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"})
+                    tabletconfig = frappe.db.get_value("Tablet Config",{"work_station":workstation,"mode":"Active"},["work_station","tablet","username","work_station_socket_id","tablet_socket_id","mode","device_name"], as_dict=1)
+                    data = {'tablet_config': tabletconfig,'doc_data': doc.__dict__,'uuid':tabletconfig.tablet,"guest_details":get_values}
+                    data['uuid'] = tabletconfig.tablet
+                    frappe.publish_realtime(
+                        "custom_socket", {'message': 'Push To Tab', 'data': data})
+                    return {"success":True, "data":data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing invoice_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))            
@@ -138,11 +155,11 @@ def update_documentbin(filepath, error_log):
         if len(bin_data)>0:
             pass
         else:
-            if '@' in filepath:
-                systemName = re.search('@(.*)@', filepath)
-                systemName = systemName.group(1)
-            else:
-                systemName = "NA"    
+            systemName = "NA"
+            if filepath.count("@") == 2:
+                if '@' in filepath:
+                    systemName = re.search('@(.*)@', filepath)
+                    systemName = systemName.group(1)     
             bin_doc = frappe.new_doc("Document Bin")
             bin_doc.system_name = systemName
             bin_doc.invoice_file = filepath
@@ -261,7 +278,7 @@ def safe_decode(string, encoding='utf-8'):
 
 
 def information_folio_created(doc, method=None):
-    try:
+    # try:
         print(doc.invoice_file, "heeloo hiee")
         print(doc.name, "hello hiee")
         print(doc.__dict__)
@@ -275,9 +292,26 @@ def information_folio_created(doc, method=None):
             frappe.db.commit()
         get_doc=frappe.db.set_value("Documents",doc.confirmation_number,{"invoice_file":doc.invoice_file})
         frappe.db.commit()
+        company = frappe.get_doc("company",doc.company)
+        if company.direct_print_without_push_to_tab == 1:
+            if doc.invoice_file.count("-") == 2:
+                get_values = {}
+                if doc.confirmation_number != "":
+                    if frappe.db.exists("Arrival Information",doc.confirmation_number):
+                        get_values = frappe.db.get_value("Arrival Information",doc.confirmation_number,["guest_email_address","guest_phone_no"],as_dict=1)
+                workstation = re.search('-(.*)-', doc.invoice_file)
+                workstation = workstation.group(1)
+                if frappe.db.exists({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"}):
+                    # tabletconfig = frappe.get_doc({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"})
+                    tabletconfig = frappe.db.get_value("Tablet Config",{"work_station":workstation,"mode":"Active"},["work_station","tablet","username","work_station_socket_id","tablet_socket_id","mode","device_name"], as_dict=1)
+                    data = {'tablet_config': tabletconfig,'doc_data': doc.__dict__,'uuid':tabletconfig.tablet,"guest_details":get_values}
+                    data['uuid'] = tabletconfig.tablet
+                    frappe.publish_realtime(
+                        "custom_socket", {'message': 'Push To Tab', 'data': data})
+                    return {"success":True, "data":data}
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
-    except Exception as e:
-        return {"success":False,"message":str(e)}
+    # except Exception as e:
+    #     return {"success":False,"message":str(e)}
 
 
 def tablet_mapping(doc, method=None):
