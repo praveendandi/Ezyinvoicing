@@ -1112,73 +1112,37 @@ def b2b_success_to_credit_note(data):
         invoice_data = frappe.db.get_all('Invoices', filters={"name":data["invoice_number"]},fields=["*"])
         total_data = {}
         # print(invoice_data)
-        if len(invoice_data) > 0:
-            invoice_number = data["invoice_number"]+"CN"
-            if "holiday" in data and data["holiday"] == "Yes":
-                invoice_date = "31-aug-21 00:00:00"
-            else:
-                invoice_date = datetime.datetime.strptime(str(datetime.datetime.today().date()),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
-            item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
-            for item_each in item_data:
-                sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
-                if not sac_code_based_gst:
-                    sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['like', '%' + item_each["description"] + '%']})
-                if len(sac_code_based_gst)>0:
-                    sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
-                if sac_code_based_gst_rates.net == "Yes":
-                    if sac_code_based_gst_rates.code == '996311':
-                        item_each["item_value"] = item_each["item_taxable_value"]
-                    else:	
-                        item_each["item_value"] = item_each["item_value_after_gst"]
+        invoice_number = data["invoice_number"]+"CN"
+        if "holiday" in data and data["holiday"] == "Yes":
+            invoice_date = "31-aug-21 00:00:00"
+        else:
+            invoice_date = datetime.datetime.strptime(str(datetime.datetime.today().date()),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+        if company.name == "CPGN-01" and data["invoice_number"] == "1136548":
+            calulate_items_data = frappe.db.get_list('Items',{"parent":data["invoice_number"]},["date","item_value","item_name","sort_order","sac_code","item_type",
+                        "cgst","sgst","igst","item_taxable_value","gst_rate","item_value_after_gst","cess","cess_amount","state_cess","state_cess_amount","cgst_amount","sgst_amount","igst_amount","parent",
+                        "parentfield","parenttype","sac_code_found","vat_amount","vat","unit_of_measurement","quantity","unit_of_measurement_description",
+                        "is_service_charge_item","sac_index","line_edit_net","item_reference","taxable","item_mode","item_type","description","type"])
             total_items = []
-            if invoice_doc.has_credit_items == "Yes":
-                negative_data = [items for items in item_data if items["item_value"]<0]
-                positive_data = [items for items in item_data if items["item_value"]>0]
-                # df = pd.DataFrame.from_records(negative_data)
-                # group = df.groupby(["sac_code","gst_rate","type","taxable"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first","parentfield":"first","parenttype":"first","taxable":"first","sort_order":"first","sac_code_found":"first","gst_rate":"first"})
-                # group_data = group.to_dict('records')
-                value = 0
-                for each in negative_data:
-                    for item in positive_data:
-                        if each["sac_code"] == item["sac_code"] and each["gst_rate"] == item["gst_rate"] and each["type"] == item["type"] and each["taxable"] == item["taxable"] and item["item_value"] == abs(each["item_value"]):
-                            value = item['item_value'] - abs(each["item_value"])
-                            positive_data.remove(item)
-                            each["item_value"] = value
-
-                negative_total = [items for items in negative_data if items["item_value"] != 0]
-                if (negative_total != [] and positive_data != []):
-                    for each_item in negative_data:
-                        for items in positive_data:
-                            if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0:
-                                value = items["item_value"] - abs(each_item["item_value"])
-                                if value == 0:
-                                    positive_data.remove(items)
-                                    each_item["item_value"] = 0
-                                elif value < 0:
-                                    each_item["item_value"] = value
-                                    items["item_value"] = 0
-                                else:
-                                    each_item["item_value"] = 0
-                                    items["item_value"] = value
-                item_data = [items for items in negative_data if items["item_value"] != 0]
-                if len(item_data) > 0:
-                    return {"success": False, "message": "Please adjust the items manually before converting to credit."}
-                item_data.extend([items for items in positive_data if abs(items["item_value"]) != 0])
-            for items in item_data:
-                item_date = datetime.datetime.strptime(str(items["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
-                total_items.append({"date":item_date, "item_value":-abs(items["item_value"]),"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"],"sgst":items["sgst"],"cgst":items["sgst"],"igst":items["igst"]})
-            calulate_items_data = {"items":total_items,"invoice_number":invoice_number,"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}
-            calulate_response = calulate_items(calulate_items_data)
-            if calulate_response["success"] == False:
-                return {"success": False, "message": calulate_response["message"]}
-            guest_data = {"name":invoice_data[0]["guest_name"],"items":calulate_items_data,"invoice_date":invoice_date,"invoice_number":invoice_number,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":"Credit Invoice","invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"invoice_from":"Web"}
+            for each in calulate_items_data:
+                each["doctype"] = "Items"
+                each["parent"] = invoice_number
+                each["item_value"] = -abs(each["item_value"])
+                each["item_mode"] = "Credit"
+                each["item_taxable_value"] = -abs(each["item_taxable_value"])
+                each["cgst_amount"] = -abs(each["cgst_amount"])
+                each["sgst_amount"] = -abs(each["sgst_amount"])
+                each["item_value_after_gst"] = -abs(each["item_value_after_gst"])
+                each["date"] = datetime.datetime.strptime(str(each["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
+                total_items.append({"date":each["date"], "item_value":each["item_value"],"sac_code":each["sac_code"],"sort_order":int(each["sort_order"]),"name":each["description"],"sgst":each["sgst"],"cgst":each["sgst"],"igst":each["igst"]})
+            calulateitems = {"items":total_items,"invoice_number":invoice_number,"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}
+            guest_data = {"name":invoice_data[0]["guest_name"],"items":calulateitems,"invoice_date":invoice_date,"invoice_number":invoice_number,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":"Credit Invoice","invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"invoice_from":"Web"}
             if invoice_data[0]["gst_number"] != "":
                 taxpayer = frappe.get_doc("TaxPayerDetail",invoice_data[0]["gst_number"])
                 tax_payer = taxpayer.__dict__
             else:
                 taxpayer = {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
                 tax_payer = taxpayer
-            reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes","tax_invoice_referrence_number":invoice_doc.name,"tax_invoice_referrence_date":data['invoice_date'] if "invoice_date" in data else "","raise_credit":"Yes"})
+            reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_items_data,"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes","tax_invoice_referrence_number":invoice_doc.name,"tax_invoice_referrence_date":data['invoice_date'] if "invoice_date" in data else "","raise_credit":"Yes"})
             if reinitate["success"] == False:
                 return {"success": False, "message": reinitate["message"]}
             doc_invoice = frappe.get_doc("Invoices",data["invoice_number"])
@@ -1187,13 +1151,84 @@ def b2b_success_to_credit_note(data):
             doc_invoice.save(ignore_permissions=True,ignore_version=True)
             if data['taxinvoice'] == "Yes":
                 raise_credit_taxinvoice(data['invoice_number'],data['invoice_date'],data['taxinvoice_number'])
+        else:
+            if len(invoice_data) > 0:
+                item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
+                for item_each in item_data:
+                    sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['=',item_each["description"]]})
+                    if not sac_code_based_gst:
+                        sac_code_based_gst = frappe.db.get_list('SAC HSN CODES',filters={'name': ['like', '%' + item_each["description"] + '%']})
+                    if len(sac_code_based_gst)>0:
+                        sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
+                    if sac_code_based_gst_rates.net == "Yes":
+                        if sac_code_based_gst_rates.code == '996311':
+                            item_each["item_value"] = item_each["item_taxable_value"]
+                        else:	
+                            item_each["item_value"] = item_each["item_value_after_gst"]
+                total_items = []
+                if invoice_doc.has_credit_items == "Yes":
+                    negative_data = [items for items in item_data if items["item_value"]<0]
+                    positive_data = [items for items in item_data if items["item_value"]>0]
+                    # df = pd.DataFrame.from_records(negative_data)
+                    # group = df.groupby(["sac_code","gst_rate","type","taxable"]).agg({'cgst_amount': 'sum','sgst_amount':'sum','igst_amount':'sum','item_value':'sum','item_taxable_value':'sum','item_value_after_gst':'sum',"cess_amount":'sum',"state_cess_amount":'sum',"vat_amount":'sum','discount_value':'sum','sac_code':"first","item_name":'first',"item_type":"first","cgst":"first","sgst":"first","igst":"first","cess":"first","state_cess":"first","description":"first","date":"first","type":"first","unit_of_measurement":"first","unit_of_measurement_description":"first","sac_index":"first","quantity":"first","is_service_charge_item":"first","parentfield":"first","parenttype":"first","taxable":"first","sort_order":"first","sac_code_found":"first","gst_rate":"first"})
+                    # group_data = group.to_dict('records')
+                    value = 0
+                    for each in negative_data:
+                        for item in positive_data:
+                            if each["sac_code"] == item["sac_code"] and each["gst_rate"] == item["gst_rate"] and each["type"] == item["type"] and each["taxable"] == item["taxable"] and item["item_value"] == abs(each["item_value"]):
+                                value = item['item_value'] - abs(each["item_value"])
+                                positive_data.remove(item)
+                                each["item_value"] = value
+
+                    negative_total = [items for items in negative_data if items["item_value"] != 0]
+                    if (negative_total != [] and positive_data != []):
+                        for each_item in negative_data:
+                            for items in positive_data:
+                                if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0:
+                                    value = items["item_value"] - abs(each_item["item_value"])
+                                    if value == 0:
+                                        positive_data.remove(items)
+                                        each_item["item_value"] = 0
+                                    elif value < 0:
+                                        each_item["item_value"] = value
+                                        items["item_value"] = 0
+                                    else:
+                                        each_item["item_value"] = 0
+                                        items["item_value"] = value
+                    item_data = [items for items in negative_data if items["item_value"] != 0]
+                    if len(item_data) > 0:
+                        return {"success": False, "message": "Please adjust the items manually before converting to credit."}
+                    item_data.extend([items for items in positive_data if abs(items["item_value"]) != 0])
+                for items in item_data:
+                    item_date = datetime.datetime.strptime(str(items["date"]),'%Y-%m-%d').strftime(company.invoice_item_date_format)
+                    total_items.append({"date":item_date, "item_value":-abs(items["item_value"]),"sac_code":items["sac_code"],"sort_order":int(items["sort_order"]),"name":items["description"],"sgst":items["sgst"],"cgst":items["sgst"],"igst":items["igst"]})
+                calulate_items_data = {"items":total_items,"invoice_number":invoice_number,"company_code":company.name,"invoice_item_date_format":company.invoice_item_date_format,"sez":invoice_doc.sez}
+                calulate_response = calulate_items(calulate_items_data)
+                if calulate_response["success"] == False:
+                    return {"success": False, "message": calulate_response["message"]}
+                guest_data = {"name":invoice_data[0]["guest_name"],"items":calulate_items_data,"invoice_date":invoice_date,"invoice_number":invoice_number,"membership":"","invoice_type":invoice_data[0]["invoice_type"],"gstNumber":invoice_data[0]["gst_number"],"room_number":invoice_data[0]["room_number"],"company_code":invoice_data[0]["company"],"confirmation_number":invoice_data[0]["confirmation_number"],"print_by":invoice_data[0]["print_by"],"invoice_category":"Credit Invoice","invoice_file":invoice_data[0]["invoice_file"],"start_time":str(datetime.datetime.utcnow()),"invoice_from":"Web"}
+                if invoice_data[0]["gst_number"] != "":
+                    taxpayer = frappe.get_doc("TaxPayerDetail",invoice_data[0]["gst_number"])
+                    tax_payer = taxpayer.__dict__
+                else:
+                    taxpayer = {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+                    tax_payer = taxpayer
+                reinitate = insert_invoice({"guest_data":guest_data,"items_data":calulate_response["data"],"sez":invoice_doc.sez,"total_invoice_amount":-abs(invoice_doc.total_invoice_amount),"taxpayer":tax_payer,"invoice_number":invoice_number,"company_code":company.name,"amened":"No","converted_tax_to_credit":"Yes","tax_invoice_referrence_number":invoice_doc.name,"tax_invoice_referrence_date":data['invoice_date'] if "invoice_date" in data else "","raise_credit":"Yes"})
+                if reinitate["success"] == False:
+                    return {"success": False, "message": reinitate["message"]}
+                doc_invoice = frappe.get_doc("Invoices",data["invoice_number"])
+                doc_invoice.invoice_object_from_file = invoice_doc.invoice_object_from_file
+                doc_invoice.credit_note_raised = "Yes"
+                doc_invoice.save(ignore_permissions=True,ignore_version=True)
+                if data['taxinvoice'] == "Yes":
+                    raise_credit_taxinvoice(data['invoice_number'],data['invoice_date'],data['taxinvoice_number'])
             # subject1 = 'Credit Note Created and Invoice Number is {}'.format(invoice_number)
             # parent_activity = frappe.get_doc({'doctype': 'Version','data': '<!DOCTYPE html><html><body><p>{}</p></body></html>'.format(subject1),"ref_doctype":"Invoices","docname":data["invoice_number"]})
             # parent_activity.insertS(ignore_permissions=True,ignore_version=True)
             # frappe.db.commit()
             # if data['tax_invoice'] == "Yes":
 
-            return {"success": True, "message": "Credit Note Raised Successfully"}
+        return {"success": True, "message": "Credit Note Raised Successfully"}
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
