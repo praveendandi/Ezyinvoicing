@@ -156,6 +156,7 @@
   "allow_membership",
   "allow_push_to_tab_in_precheckins_form",
   "tablet_back_ground_image",
+  "card_type_detect_api",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1448,11 +1449,17 @@
    "fieldname": "direct_print_without_push_to_tab",
    "fieldtype": "Check",
    "label": "Direct Print Without Push to Tab"
+  },
+  {
+   "default": "0",
+   "fieldname": "card_type_detect_api",
+   "fieldtype": "Check",
+   "label": "Card Type Detect API"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-18 09:33:16.639559",
+ "modified": "2021-11-23 11:34:58.697457",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

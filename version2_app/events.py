@@ -55,7 +55,7 @@ def invoice_created(doc, method=None):
         frappe.db.commit()
         company = frappe.get_doc("company",doc.company)
         if company.direct_print_without_push_to_tab == 1:
-            if doc.invoice_file.count("-") == 2:
+            if doc.invoice_file.count("-") >= 2:
                 get_values = {}
                 if doc.confirmation_number != "":
                     if frappe.db.exists("Arrival Information",doc.confirmation_number):
@@ -278,7 +278,7 @@ def safe_decode(string, encoding='utf-8'):
 
 
 def information_folio_created(doc, method=None):
-    # try:
+    try:
         print(doc.invoice_file, "heeloo hiee")
         print(doc.name, "hello hiee")
         print(doc.__dict__)
@@ -294,7 +294,7 @@ def information_folio_created(doc, method=None):
         frappe.db.commit()
         company = frappe.get_doc("company",doc.company)
         if company.direct_print_without_push_to_tab == 1:
-            if doc.invoice_file.count("-") == 2:
+            if doc.invoice_file.count("-") >= 2:
                 get_values = {}
                 if doc.confirmation_number != "":
                     if frappe.db.exists("Arrival Information",doc.confirmation_number):
@@ -310,8 +310,8 @@ def information_folio_created(doc, method=None):
                         "custom_socket", {'message': 'Push To Tab', 'data': data})
                     return {"success":True, "data":data}
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
-    # except Exception as e:
-    #     return {"success":False,"message":str(e)}
+    except Exception as e:
+        return {"success":False,"message":str(e)}
 
 
 def tablet_mapping(doc, method=None):

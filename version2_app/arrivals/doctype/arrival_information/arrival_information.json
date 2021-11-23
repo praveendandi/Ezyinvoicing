@@ -41,7 +41,8 @@
   "number_of_guests",
   "mail_sent",
   "mail_via",
-  "mail_count"
+  "mail_count",
+  "voucher"
  ],
  "fields": [
   {
@@ -239,11 +240,16 @@
    "fieldname": "mail_count",
    "fieldtype": "Int",
    "label": "Mail Count"
+  },
+  {
+   "fieldname": "voucher",
+   "fieldtype": "Attach",
+   "label": "Voucher"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-26 15:30:26.183169",
+ "modified": "2021-11-23 09:58:36.266709",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
