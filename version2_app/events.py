@@ -55,12 +55,12 @@ def invoice_created(doc, method=None):
         frappe.db.commit()
         company = frappe.get_doc("company",doc.company)
         if company.direct_print_without_push_to_tab == 1:
-            if doc.invoice_file.count("^") == 2:
+            if doc.invoice_file.count("@-") == 2:
                 get_values = {}
                 if doc.confirmation_number != "":
                     if frappe.db.exists("Arrival Information",doc.confirmation_number):
                         get_values = frappe.db.get_value("Arrival Information",doc.confirmation_number,["guest_email_address","guest_phone_no"],as_dict=1)
-                workstation = re.search('^(.*)^', doc.invoice_file)
+                workstation = re.search('@-(.*)@-', doc.invoice_file)
                 workstation = workstation.group(1)
                 if frappe.db.exists({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"}):
                     # tabletconfig = frappe.get_doc({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"})
@@ -294,12 +294,12 @@ def information_folio_created(doc, method=None):
         frappe.db.commit()
         company = frappe.get_doc("company",doc.company)
         if company.direct_print_without_push_to_tab == 1:
-            if doc.invoice_file.count("^") >= 2:
+            if doc.invoice_file.count("@-") >= 2:
                 get_values = {}
                 if doc.confirmation_number != "":
                     if frappe.db.exists("Arrival Information",doc.confirmation_number):
                         get_values = frappe.db.get_value("Arrival Information",doc.confirmation_number,["guest_email_address","guest_phone_no"],as_dict=1)
-                workstation = re.search('^(.*)^', doc.invoice_file)
+                workstation = re.search('@-(.*)@-', doc.invoice_file)
                 workstation = workstation.group(1)
                 if frappe.db.exists({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"}):
                     # tabletconfig = frappe.get_doc({"doctype":"Tablet Config","work_station":workstation,"mode":"Active"})
