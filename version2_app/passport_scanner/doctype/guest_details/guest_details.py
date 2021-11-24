@@ -136,9 +136,9 @@ def update_guest_details(name):
                     return convert1
             if pre_checkins.image_2:
                 if "private" in pre_checkins.image_2:
-                    file_path1 = folder_path+'/sites/'+company_doc.site_name+pre_checkins.image_2
+                    file_path2 = folder_path+'/sites/'+company_doc.site_name+pre_checkins.image_2
                 else:
-                    file_path1 = folder_path+'/sites/'+company_doc.site_name+"/public"+pre_checkins.image_2
+                    file_path2 = folder_path+'/sites/'+company_doc.site_name+"/public"+pre_checkins.image_2
                 # file_path2 = folder_path+'/sites/'+company_doc.site_name+pre_checkins.image_2
                 convert2= convert_image_to_base64(file_path2)
                 if convert2["success"] == False:
