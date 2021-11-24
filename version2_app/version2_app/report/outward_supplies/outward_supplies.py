@@ -14,7 +14,7 @@ def execute(filters=None):
 		pd.set_option("display.max_rows", None, "display.max_columns", None)
 		columns = ["Invoice Number","Document Type","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value"]
 		
-		fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez']
+		fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax']
 		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
 		if len(doc) == 0:
 			data = []
@@ -69,10 +69,14 @@ def execute(filters=None):
 		# mergedDf["Quantity"] = " "
 
 		mergedDf['place_of_supply'] = mergedDf['place_of_supply'].fillna(company.state_code)
+		mergedDf['sales_amount_after_tax'] = mergedDf['sales_amount_after_tax'].tolist() 
 		mergedDf.loc[(mergedDf.invoice_type=="B2C"),'Gst Check'] = ' '
 		mergedDf.loc[(mergedDf.sez==0),'sez'] = 'REG'
 		mergedDf.loc[(mergedDf.sez==1),'sez'] = 'SEZ'
-		mergedDf.rename(columns={'invoice_number': 'Invoice Number',"unit_of_measurement_description":"HSN UOM","sez":"Document Type",'invoice_date': 'Invoice Date','gst_number':'Gst Number','invoice_type':'Invoice Type','trade_name':'Registered Name','place_of_supply':'Place of Supply (POS)','sac_code':'SAC / HSN CODE','gst_rate':'Gst Number','gst_rate':'Total GST RATE %','item_value':'Taxable Value','item_value_after_gst':'Original Invoice Value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','quantity':"HSN Quantity"}, inplace=True)
+		if company.name != "RBHND-01":
+			mergedDf.rename(columns={'invoice_number': 'Invoice Number',"unit_of_measurement_description":"HSN UOM","sez":"Document Type",'invoice_date': 'Invoice Date','gst_number':'Gst Number','invoice_type':'Invoice Type','trade_name':'Registered Name','place_of_supply':'Place of Supply (POS)','sac_code':'SAC / HSN CODE','gst_rate':'Gst Number','gst_rate':'Total GST RATE %','item_value':'Taxable Value','item_value_after_gst':'Original Invoice Value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','quantity':"HSN Quantity"}, inplace=True)
+		else:
+			mergedDf.rename(columns={'invoice_number': 'Invoice Number',"unit_of_measurement_description":"HSN UOM","sez":"Document Type",'invoice_date': 'Invoice Date','gst_number':'Gst Number','invoice_type':'Invoice Type','trade_name':'Registered Name','place_of_supply':'Place of Supply (POS)','sac_code':'SAC / HSN CODE','gst_rate':'Gst Number','gst_rate':'Total GST RATE %','item_value':'Taxable Value','sales_amount_after_tax':'Original Invoice Value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','quantity':"HSN Quantity"}, inplace=True)
 		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
 		mergedDf = mergedDf[columns]
 		data = mergedDf.values.tolist()
