@@ -20,7 +20,7 @@ def convert_base64_to_image(base,name,site_folder_path,company):
             fh.write(base64.b64decode(base))
         files = {"file": open(file, 'rb')}
         payload = {
-            "is_private": 1,
+            "is_private": 0,
             "folder": "Home"
         }
         site = company.host
