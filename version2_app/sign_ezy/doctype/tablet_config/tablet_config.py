@@ -201,3 +201,27 @@ def removeAllDevices():
     return True
 
 
+@frappe.whitelist(allow_guest=True)
+def disconnectTablet(name):
+    try:
+        tablet_config = frappe.get_doc("Tablet Config",name)
+        if frappe.db.exists("Active Tablets",tablet_config.tablet):
+            tablet_doc = frappe.get_doc("Active Tablets",tablet_config.tablet)
+            tablet_doc.status = "Not Connected"
+            tablet_doc.save(ignore_permissions=True, ignore_version=True)
+            if frappe.db.exists("Active Work Stations",tablet_config.work_station):
+                ws_doc = frappe.get_doc("Active Work Stations",tablet_config.work_station)
+                ws_doc.status = "In Active"
+                ws_doc.save(ignore_permissions=True, ignore_version=True)
+            tablet_config = frappe.get_doc("Tablet Config",name)
+            tablet_config.mode = "Sleep"
+            tablet_config.save(ignore_permissions=True,ignore_version=True)
+            tablet_config.uuid = tablet_config.tablet
+            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config.__dict__})
+            return {"success":True,"message":"Tablet mapped removed successfully"}
+        else:
+            pass
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-disconnectTablet","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
