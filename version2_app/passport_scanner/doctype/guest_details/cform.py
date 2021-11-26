@@ -150,7 +150,7 @@ def refresh_captcha():
             return download
         return {"success": True,"message": "CForm initiated successfully"}
     except Exception as e:
-        print(e)
+        return {"success": False,"message": str(e)}
 
 
 '''
@@ -263,7 +263,10 @@ def login_success():
     except NoSuchElementException:
         print("login unsuccess")
         # intiate_checkin_process()
-        check_invalid_details()
+        check_invalid = check_invalid_details()
+        if check_invalid["success"] == False:
+            return check_invalid
+        return {"success": True}
     except Exception as e:
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
@@ -283,11 +286,16 @@ def check_invalid_details():
         print(error_message.text)
         if error_message.text == 'Wrong Userid Or Password':
             print("invalid username")
+            return {"success":False,"message":"Wrong Userid Or Password"}
         else:
             print("invalid captcha")
-            refresh_captcha()
+            refresh_cap = refresh_captcha()
+            if refresh_cap["success"] == False:
+                return refresh_captcha
+            return {"success":True}
     except NoSuchElementException:
         print("not invalid captcha issue")
+        return {"success": False, "message": "not invalid captcha"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)

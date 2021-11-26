@@ -222,8 +222,23 @@ def disconnectTablet(name):
             frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config.__dict__})
             return {"success":True,"message":"Tablet mapped removed successfully"}
         else:
-            pass
+            return {"success":False,"message":"Tablets not found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-disconnectTablet","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
+
+@frappe.whitelist(allow_guest=True)
+def get_tablet_config(ws):
+    try:
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":ws,"mode":"Active"}):
+            get_tablet_config = frappe.db.get_list('Tablet Config',filters={"work_station":ws,"mode":"Active"},fields=["work_station","tablet","device_name","mode"],order_by='creation desc')
+            print(get_tablet_config)
+            return {"success": True,"data":get_tablet_config[0]}
+        else:
+            return {'success': True,"data":""}
+
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get_tablet_config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach qr code")
