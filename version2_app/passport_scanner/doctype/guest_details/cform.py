@@ -223,14 +223,14 @@ def login_cform():
                     login = login_success()
                     if login["success"] == False:
                         get_count = frappe.get_doc("Guest Details",each)
-                        get_count.frro_failure_count = int(get_count.frro_failure_count)+1
+                        get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
                         get_count.save(ignore_permissions=True, ignore_version=True)
                         return login
                 elif index > 0:
                     mulcform = multiple_cforms(each_data)
                     if mulcform["success"]==False:
                         get_count = frappe.get_doc("Guest Details",each)
-                        get_count.frro_failure_count = int(get_count.frro_failure_count)+1
+                        get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
                         get_count.save(ignore_permissions=True, ignore_version=True)
                         return mulcform
             company_doc.cform_session = 0
