@@ -216,10 +216,12 @@ def disconnectTablet(name):
                 ws_doc.status = "In Active"
                 ws_doc.mode = "Not Connected"
                 ws_doc.save(ignore_permissions=True, ignore_version=True)
+                frappe.db.commit()
             tablet_config = frappe.get_doc("Tablet Config",name)
             tablet_config.mode = "Sleep"
             tablet_config.save(ignore_permissions=True,ignore_version=True)
             tablet_config.uuid = tablet_config.tablet
+            frappe.db.commit()
             frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config.__dict__})
             return {"success":True,"message":"Tablet mapped removed successfully"}
         else:
