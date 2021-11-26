@@ -201,7 +201,6 @@ def login_cform():
                     user_id = login_details["user_id"]
                     password = login_details["password"]
                     captcha = login_details["captcha"]
-                    print(data,"===============")
                     username = driver.find_element_by_name('uid')
                     username.clear()
                     username.send_keys(user_id)
@@ -223,10 +222,16 @@ def login_cform():
                     alert.accept()
                     login = login_success()
                     if login["success"] == False:
+                        get_count = frappe.get_doc("Guest Details",each)
+                        get_count.frro_failure_count = int(get_count.frro_failure_count)+1
+                        get_count.save(ignore_permissions=True, ignore_version=True)
                         return login
                 elif index > 0:
                     mulcform = multiple_cforms(each_data)
                     if mulcform["success"]==False:
+                        get_count = frappe.get_doc("Guest Details",each)
+                        get_count.frro_failure_count = int(get_count.frro_failure_count)+1
+                        get_count.save(ignore_permissions=True, ignore_version=True)
                         return mulcform
             company_doc.cform_session = 0
             company_doc.save(ignore_permissions=True,ignore_version=True)
