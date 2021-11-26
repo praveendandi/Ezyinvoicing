@@ -212,6 +212,7 @@ def disconnectTablet(name):
             if frappe.db.exists("Active Work Stations",tablet_config.work_station):
                 ws_doc = frappe.get_doc("Active Work Stations",tablet_config.work_station)
                 ws_doc.status = "In Active"
+                ws_doc.mode = "Not Connected"
                 ws_doc.save(ignore_permissions=True, ignore_version=True)
             tablet_config = frappe.get_doc("Tablet Config",name)
             tablet_config.mode = "Sleep"
