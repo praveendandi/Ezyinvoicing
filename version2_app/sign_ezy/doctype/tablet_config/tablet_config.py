@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from re import T
 import frappe,sys,traceback,json
 from frappe.model.document import Document
 
@@ -238,6 +239,23 @@ def get_tablet_config(ws):
         else:
             return {'success': True,"data":""}
 
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get_tablet_config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
+
+@frappe.whitelist(allow_guest=True)
+def disconnectWorkStation(ws):
+    try:
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":ws,"mode":"Active"}):
+            get_tablet_config = frappe.db.get_list('Tablet Config',filters={"work_station":ws,"mode":"Active"},fields=["name","work_station","tablet","device_name","mode"],order_by='creation desc')
+            tablet_disconnected = disconnectTablet(get_tablet_config[0]["name"])
+            if tablet_disconnected["success"] == False:
+                return tablet_disconnected
+            return {"success":True,"message":"Tablet mapped removed successfully"}
+
+        else:
+            return {"success":False,"message":"Tablet Configuration not found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-get_tablet_config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
