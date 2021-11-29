@@ -3,6 +3,8 @@ import datetime,os,sys,traceback
 import json
 import requests
 import frappe
+from frappe.core.doctype.communication.email import make
+
 @frappe.whitelist(allow_guest=True)
 def emailTemplate():
     try:
@@ -138,6 +140,29 @@ def email_logs():
         for each in data:
             each["recipient"]=frappe.db.get_value("Email Queue Recipient",{"parent":each["name"]},"recipient")
         return {"success": True, "data":data}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)    
+def email_push_tab(data):
+    try:
+        get_doc = frappe.get_doc(data["doctype"],data["name"])
+        b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
+        files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
+        attachments = [d['name'] for d in files]
+        response = make(recipients = data["email"],
+            # cc = '',
+            subject = b2csuccess.subject,
+            content = b2csuccess.response,
+            doctype = data["doctype"],
+            name = data["name"],
+            attachments = attachments,
+            send_email=1
+        )
+        return {"success":True,"message":"Mail sent successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
