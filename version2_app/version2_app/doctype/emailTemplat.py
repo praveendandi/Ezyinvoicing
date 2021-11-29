@@ -151,6 +151,7 @@ def email_push_tab():
     try:
         data = json.loads(frappe.request.data)
         data = data["data"]
+        print(data,"===========================================")
         get_doc = frappe.get_doc(data["doctype"],data["name"])
         b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
         files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
