@@ -148,7 +148,7 @@ def email_logs():
 
 @frappe.whitelist(allow_guest=True)    
 def email_push_tab():
-    try:
+    # try:
         data = json.loads(frappe.request.data)
         data = data["data"]
         print(data,"===========================================")
@@ -166,8 +166,8 @@ def email_push_tab():
             send_email=1
         )
         return {"success":True,"message":"Mail sent successfully"}
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        print(str(e))
-        return{"success":False,"message":str(e)}
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+    #     print(str(e))
+    #     return{"success":False,"message":str(e)}
