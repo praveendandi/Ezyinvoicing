@@ -221,17 +221,26 @@ def login_cform():
                     alert = driver.switch_to.alert
                     alert.accept()
                     login = login_success()
-                    if login["success"] == False:
-                        # get_count = frappe.get_doc("Guest Details",each)
-                        # get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
-                        # get_count.save(ignore_permissions=True, ignore_version=True)
+                    if login["success"] == False: 
+                        get_count = frappe.get_doc("Guest Details",each)
+                        if get_count.frro_failure_count:
+                            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                        else:
+                            get_count.frro_failure_count = str(0+1)
+                        get_count.save(ignore_permissions=True, ignore_version=True)
+                        frappe.db.commit()
                         return login
                 elif index > 0:
                     mulcform = multiple_cforms(each_data)
                     if mulcform["success"]==False:
-                        # get_count = frappe.get_doc("Guest Details",each)
-                        # get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
-                        # get_count.save(ignore_permissions=True, ignore_version=True)
+                        get_count = frappe.get_doc("Guest Details",each)
+                        if get_count.frro_failure_count:
+                            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                        else:
+                            get_count.frro_failure_count = str(0+1)
+                        get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                        get_count.save(ignore_permissions=True, ignore_version=True)
+                        frappe.db.commit()
                         return mulcform
             company_doc.cform_session = 0
             company_doc.save(ignore_permissions=True,ignore_version=True)
