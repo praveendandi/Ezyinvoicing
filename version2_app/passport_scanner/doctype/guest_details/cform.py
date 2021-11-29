@@ -238,7 +238,6 @@ def login_cform():
                             get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
                         else:
                             get_count.frro_failure_count = str(0+1)
-                        get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
                         get_count.save(ignore_permissions=True, ignore_version=True)
                         frappe.db.commit()
                         return mulcform
