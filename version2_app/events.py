@@ -114,6 +114,36 @@ def invoice_deleted(doc,method=None):
         frappe.log_error("Ezy-invoicing invoice_deleted Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+def  precheckinsdocuments(doc,method=None):
+    try:
+        user_name =  frappe.session.user
+        date_time = datetime.datetime.now()
+        confirmation_number = doc.confirmation_number
+        if "-" in confirmation_number:
+            confirmation_number = confirmation_number.split("-")[0]
+            
+        date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":confirmation_number,"module":"ezycheckins","event":"PreCheckins","user":user_name,"activity":"Precheckin done","status":""}
+        event_doc=frappe.get_doc(activity_data)
+        event_doc.insert()
+        frappe.db.commit()
+        if not frappe.db.exists('Documents', confirmation_number):
+            user_name =  frappe.session.user
+            data={"doctype":"Documents","guest_details":[{"image1":doc.image_1,"image2":doc.image_2}],"confirmation_number":confirmation_number,"module_name":"Ezycheckins","user":user_name}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        else:
+            update_doc=frappe.get_doc("Documents",confirmation_number)
+            update_doc.append("guest_details",{"image1":doc.image_1,"image2":doc.image_2})
+            update_doc.save()
+            frappe.db.commit()
+    except Exception as e:
+        print(str(e), "Process Checkin event")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-precheckins","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 def invoiceCreated(doc):
     try:
@@ -775,12 +805,10 @@ def guest_attachments(doc,method=None):
         guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
         added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
         if guest_count != 0:
-            print("================================",added_guest_count, guest_count,arrival_doc.number_of_guests)
             if added_guest_count > guest_count:
                 arrival_doc.no_of_adults = guest_count + 1
                 # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
         else:
-            print("-------------------")
             arrival_doc.no_of_adults = guest_count + 1
             # if arrival_doc.number_of_guests:
             #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)

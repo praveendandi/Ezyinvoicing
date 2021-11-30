@@ -457,19 +457,19 @@ def add_guest_details():
                 arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
             name = data["given_name"]+data["confirmation_number"]+data["id_type"]
             if data["id_image1"]:
-                if "private" not in data["id_image1"]:
+                if "private" not in data["id_image1"] or "files/" not in data["id_image1"]:
                     image_1 = convert_base64_to_image(data["id_image1"],name,site_folder_path,company_doc)
                     if image_1["message"] == False:
                         return image_1
                     data["id_image1"] = image_1["message"]["file_url"]
             if data["id_image2"]:
-                if "private" not in data["id_image2"]:
+                if "private" not in data["id_image2"] or "files/" not in data["id_image2"]:
                     image_2 = convert_base64_to_image(data["id_image2"],name,site_folder_path,company_doc)
                     if image_2["message"] == False:
                         return image_2
                     data["id_image2"] = image_2["message"]["file_url"]
             if data["face_image"] != "":
-                if "private" not in data["face_image"]:
+                if "private" not in data["face_image"] or "files/" not in data["face_image"]:
                     face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
                     if face["message"] == False:
                         return face
