@@ -123,11 +123,11 @@ def  precheckinsdocuments(doc,method=None):
             confirmation_number = confirmation_number.split("-")[0]
             
         date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":confirmation_number,"module":"ezycheckins","event":"PreCheckins","user":user_name,"activity":"Precheckin done","status":""}
-        event_doc=frappe.get_doc(activity_data)
-        event_doc.insert()
-        frappe.db.commit()
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":confirmation_number,"module":"ezycheckins","event":"PreCheckins","user":user_name,"activity":"Precheckin done by "+doc.guest_first_name,"status":""}
         if not frappe.db.exists('Documents', confirmation_number):
+            event_doc=frappe.get_doc(activity_data)
+            event_doc.insert()
+            frappe.db.commit()
             user_name =  frappe.session.user
             data={"doctype":"Documents","guest_details":[{"image1":doc.image_1,"image2":doc.image_2}],"confirmation_number":confirmation_number,"module_name":"Ezycheckins","user":user_name}
             get_doc=frappe.get_doc(data)
