@@ -426,7 +426,7 @@ def update_guest_details(name):
 
 @frappe.whitelist(allow_guest=True)
 def add_guest_details():
-    # try:
+    try:
         data=json.loads(frappe.request.data)
         data = data["data"]
         company_doc = frappe.get_last_doc("company")
@@ -501,10 +501,10 @@ def add_guest_details():
             return {"success":True, "message":"Guest added successfully"}
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return {"success":False,"message":str(e)}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
