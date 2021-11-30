@@ -459,6 +459,7 @@ def add_guest_details():
                                 arrival_doc.status = "Partial Scanned"
                                 arrival_doc.booking_status = "CHECKED IN"
                 arrival_doc.save(ignore_permissions=True, ignore_version=True)
+                frappe.db.commit()
             else:
                 arrival_date = datetime.datetime.now().date()
                 arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
