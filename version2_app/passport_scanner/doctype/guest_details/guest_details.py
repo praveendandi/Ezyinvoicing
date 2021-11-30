@@ -429,12 +429,14 @@ def add_guest_details():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
+        pre_checkins_count = 0
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1:
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = folder_path+'/sites/'+company_doc.site_name
             if company_doc.ezy_checkins_module == 1:
-                pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
+                if frappe.db.exists({"doctype":'Precheckins', "confirmation_number":data["confirmation_number"]}):
+                    pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
             # if company_doc.ezy_checkins_module == 0 and company_doc.scan_ezy_module == 1:
             #     pre_checkins_count = frappe.db.get_value('Arrival Information',{"confirmation_number":data["confirmation_number"]},"no_of_adults")
             pre_arrival_confi = data["confirmation_number"]
@@ -443,13 +445,19 @@ def add_guest_details():
             scan_guest_details = frappe.db.count('Guest Details', {'confirmation_number': data["confirmation_number"]})
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
                 arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
+                if arrival_doc.no_of_adults:
+                    pre_checkins_count = arrival_doc.no_of_adults
                 if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
-                    if (scan_guest_details+1) == pre_checkins_count:
+                    if pre_checkins_count == 0:
                         arrival_doc.status = "Scanned"
+                        arrival_doc.booking_status = "CHECKED IN"
                     else:
-                        if (scan_guest_details+1) < pre_checkins_count:
-                            arrival_doc.status = "Partial Scanned"
-                            arrival_doc.booking_status = "CHECKED IN"
+                        if (scan_guest_details+1) == pre_checkins_count:
+                            arrival_doc.status = "Scanned"
+                        else:
+                            if (scan_guest_details+1) < pre_checkins_count:
+                                arrival_doc.status = "Partial Scanned"
+                                arrival_doc.booking_status = "CHECKED IN"
                 arrival_doc.save(ignore_permissions=True, ignore_version=True)
             else:
                 arrival_date = datetime.datetime.now().date()
