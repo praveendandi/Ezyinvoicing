@@ -445,9 +445,17 @@ def add_guest_details():
             scan_guest_details = frappe.db.count('Guest Details', {'confirmation_number': data["confirmation_number"]})
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
                 arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
-                if arrival_doc.no_of_adults:
-                    pre_checkins_count = arrival_doc.no_of_adults
                 if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+                    if (scan_guest_details+1) == pre_checkins_count:
+                        arrival_doc.status = "Scanned"
+                        arrival_doc.booking_status = "CHECKED IN"
+                    else:
+                        if (scan_guest_details+1) < pre_checkins_count:
+                            arrival_doc.status = "Partial Scanned"
+                            arrival_doc.booking_status = "CHECKED IN"
+                else:
+                    if arrival_doc.no_of_adults:
+                        pre_checkins_count = arrival_doc.no_of_adults
                     if pre_checkins_count == 0:
                         arrival_doc.status = "Scanned"
                         arrival_doc.booking_status = "CHECKED IN"
