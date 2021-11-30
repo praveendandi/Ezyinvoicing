@@ -510,6 +510,7 @@ def add_guest_details():
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
     except Exception as e:
+        print(str(e),"====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
