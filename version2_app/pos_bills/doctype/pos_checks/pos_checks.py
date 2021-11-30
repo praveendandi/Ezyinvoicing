@@ -135,7 +135,7 @@ def extract_data(payload,company_doc):
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
             if company_doc.name == "JP-2025":
-                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
+                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+[GST]+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
                 if re.match(pattern, line):
                     if "GST" not in line:
                         split_line = line.split(" ")
