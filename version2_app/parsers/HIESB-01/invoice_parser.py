@@ -27,6 +27,7 @@ def file_parsing(filepath):
     try:
         start_time = datetime.datetime.utcnow()
         companyCheckResponse = check_company_exist("HIESB-01")
+        print(companyCheckResponse,">>>>>>>>>.")
         site_folder_path = companyCheckResponse['data'].site_name
         file_path = folder_path+'/sites/'+site_folder_path+filepath
         today = date.today()

@@ -1031,8 +1031,7 @@ def insert_invoice(data):
 
                 has_discount_items = "Yes"
             else:
-                has_discount_items = "No"
-                
+                has_discount_items = "No"      
         else:
             pms_invoice_summary = value_after_gst - credit_value_after_gst
             pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
@@ -1084,7 +1083,6 @@ def insert_invoice(data):
 
         if "raise_credit" in data:
             data['total_invoice_amount'] = float(pms_invoice_summary+other_charges)#value_after_gst + other_charges + credit_value_after_gst
-            print("----------------",data['total_invoice_amount'])
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
 
@@ -1151,7 +1149,6 @@ def insert_invoice(data):
             invoice_from = data['guest_data']['invoice_from']
         else:
             invoice_from = "Pms"	
-        print(data["taxpayer"],"+++++++++++++++++++++++++")
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',

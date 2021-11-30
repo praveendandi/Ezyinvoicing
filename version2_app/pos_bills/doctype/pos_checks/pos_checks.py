@@ -155,7 +155,7 @@ def extract_data(payload,company_doc):
                 if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
-                    check_no_regex = re.findall("\d.+",check_string)
+                    check_no_regex = re.findall("\d+",check_string)
                     data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     table_regex = re.findall(company_doc.table_number_regex, line.strip())
