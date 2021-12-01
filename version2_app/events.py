@@ -1259,3 +1259,16 @@ def delete_arrival_activity():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-Delete Arrival Activity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def get_apikey(email):
+    try:
+        if frappe.db.exists("User",email):
+            user_api = frappe.db.get_value("User",email,['api_key'])
+            return {"success": True, "data":user_api}
+        else:
+            return {"success": False, "message":"No user found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get_apikey","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
