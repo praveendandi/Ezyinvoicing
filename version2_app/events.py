@@ -16,7 +16,6 @@ import sys
 import datetime
 import importlib.util
 from frappe.utils import cstr,get_site_name,random_string
-from frappe.core.doctype.user.user import generate_keys
 import requests
 from datetime import date, timedelta
 import base64
@@ -1265,9 +1264,12 @@ def delete_arrival_activity():
 def get_apikey(user):
     try:
         if frappe.db.exists("User",user):
-            user_api = frappe.db.get_value("User",user,['api_key'])
-            generate = generate_keys(user)
-            return {"success": True, "api_key":user_api,"api_secret":generate["api_secret"]}
+            company = frappe.get_last_doc("company")
+            user_api = frappe.get_doc("User",user)
+            secret = user_api.get_password(fieldname='api_secret',raise_exception=True)
+            api_key = user_api.api_key
+            # generate = generate_keys(user)
+            return {"success": True, "api_key":api_key,"api_secret":secret}
         else:
             return {"success": False, "message":"No user found"}
     except Exception as e:
