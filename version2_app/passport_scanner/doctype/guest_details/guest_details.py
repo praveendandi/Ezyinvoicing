@@ -494,7 +494,7 @@ def add_guest_details():
             data["doctype"] = "Guest Details"
             data["id_type"] = "Foreigner" if data["id_type"] == "Foreign" else data["id_type"]
             if company_doc.ezy_checkins_module == 1:
-                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and data["guest_id"]:
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and "guest_id" in data.keys():
                     pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
                     pre_doc.opera_scanned_status = "Scanned"
                     arrival_doc.booking_status = "CHECKED IN"
