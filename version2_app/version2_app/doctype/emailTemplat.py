@@ -165,9 +165,9 @@ def email_push_tab():
             attachments = attachments,
             send_email=1
         )
-        return {"success":True,"message":"Mail sent successfully"}
+        return {"success":True,"message":"Mail Send"}
     except Exception as e:
+        print(str(e),"====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        print(str(e))
         return{"success":False,"message":str(e)}
