@@ -146,12 +146,11 @@ def email_logs():
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)    
+@frappe.whitelist()    
 def email_push_tab():
     try:
         data = json.loads(frappe.request.data)
         data = data["data"]
-        print(data,"===========================================")
         get_doc = frappe.get_doc(data["doctype"],data["name"])
         b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
         files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
@@ -167,7 +166,6 @@ def email_push_tab():
         )
         return {"success":True,"message":"Mail Send"}
     except Exception as e:
-        print(str(e),"====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return{"success":False,"message":str(e)}
