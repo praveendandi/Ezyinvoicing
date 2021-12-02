@@ -775,32 +775,33 @@ def arrival_information(doc,method=None):
     else:
         frappe.db.set_value("Documents",get_data[0]["name"],{"number_of_guests":doc.number_of_guests})
 
-# def send_invoice_mail(doc,method=None):
-#     try:
-#         if doc.guest_eamil2 != "":
-#             if doc.invoice_send_mail_count == 0:
-#                 if frappe.db.exists({"doctype":"Invoices","confirmation_number":doc.name}):
-#                     get_doc = frappe.db.get_value("Invoices",{"confirmation_number":doc.name},["invoice_file","name"],as_dict=True)
-#                     b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
-#                     files=frappe.db.get_list('File',filters={'file_url': ['=',get_doc["invoice_file"]]},fields=['name'])
-#                     attachments = [file["name"] for file in files]
-#                     print(attachments)
-#                     response = make(recipients = doc.guest_eamil2,
-#                         # cc = '',
-#                         subject = b2csuccess.subject,
-#                         content = b2csuccess.response,
-#                         doctype = "Invoices",
-#                         name = get_doc["name"],
-#                         attachments = attachments,
-#                         send_email=1
-#                     )
-#                     print(response)
-#                     doc.invoice_send_mail_count = 1
-#                     return {"success":True,"message":"Mail Send"}
-#     except Exception as e:
-#         exc_type, exc_obj, exc_tb = sys.exc_info()
-#         frappe.log_error("Ezy-send_invoice_mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-#         return {"success":False,"message":str(e)}
+def send_invoice_mail(doc,method=None):
+    try:
+        get_arrivals = frappe.get_doc("Arrival Information", doc.name)
+        if get_arrivals.guest_eamil2:
+            if get_arrivals.invoice_send_mail_count == 0:
+                if frappe.db.exists({"doctype":"Invoices","confirmation_number":doc.name}):
+                    get_doc = frappe.db.get_value("Invoices",{"confirmation_number":doc.name},["invoice_file","name"],as_dict=True)
+                    b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
+                    files=frappe.db.get_list('File',filters={'file_url': ['=',get_doc["invoice_file"]]},fields=['name'])
+                    attachments = [files[0]["name"]]
+                    print(attachments, get_arrivals.guest_eamil2, get_doc["name"])
+                    response = make(recipients = get_arrivals.guest_eamil2,
+                        # cc = '',
+                        subject = b2csuccess.subject,
+                        content = b2csuccess.response,
+                        doctype = "Invoices",
+                        name = get_doc["name"],
+                        attachments = attachments,
+                        send_email=1
+                    )
+                    print(response)
+                    doc.invoice_send_mail_count = 1
+                    return {"success":True,"message":"Mail Send"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-send_invoice_mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def guest_attachments(doc,method=None):

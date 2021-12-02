@@ -109,7 +109,7 @@ doc_events = {
 	},
     "Arrival Information": {
         "after_insert": "version2_app.events.arrival_information",
-        # "on_update": "version2_app.events.send_invoice_mail"
+        "on_update": "version2_app.events.send_invoice_mail"
     },
     "Guest Details": {
         "after_insert": "version2_app.events.guest_attachments",
