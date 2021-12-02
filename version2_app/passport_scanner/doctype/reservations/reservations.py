@@ -16,6 +16,7 @@ import os
 import re
 import xmltodict
 import traceback
+import datetime
 import numpy as np
 from scipy import ndimage
 from PIL import Image
@@ -1272,10 +1273,14 @@ def pass_detect_text(image_file):
                 date_of_expiry = str((parsed_expiry).date())
             if Date_of_issue == date_of_expiry or Date_of_issue == date_of_birth:
                 Date_of_issue = ' '
-
             data = {"Document_Type": type, "country_code": country_code, "FamilyName": surname, "Given_Name": givenname, "Date_of_Issue": Date_of_issue,
                     "Passport_Document_No": passport_no, "Nationality": nationality, "Date_of_Birth": date_of_birth, "Gender": sex, "Date_of_Expiry": date_of_expiry}
             details = {"type": "PASSPORT", "data": data}
+            if date_of_expiry != ' ':
+                expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
+                today_date = datetime.datetime.now().date()
+                if expiry<=today_date:
+                    return {"success":False, "type":details,"message":"Passport is expired"}
             # logger.info(
             #     f"time elapsed for text parse is{time.time()-req_time}")
             return {"success":True, "data":details}
@@ -1412,6 +1417,11 @@ def pass_detect_text(image_file):
             optional_data = second[28:]
             data = {"Document_Type": type, "visa_Type": type_of_visa, "Issued_country": issuingcountry, "Visa_No_Of_Enteries": entry, "FamilyName": surname, "Visa_Issue_Date": Date_of_issue,
                     "Given_Name": givenname, "Visa_Number": visa_number, "Nationality": nationality, "Date_of_Birth": date_of_birth, "Gender": sex, "Visa_Expiry_Date": date_of_expiry}
+            if date_of_expiry != ' ':
+                expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
+                today_date = datetime.datetime.now().date()
+                if expiry<=today_date:
+                    return {"success":False, "type":data,"message":"Visa is expired"}
             details = {"type": "VISA", "data": data}
             # logger.info(
             #     f"time elapsed for text parse is{time.time()-req_time}")

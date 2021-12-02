@@ -9,7 +9,6 @@ from urllib.request import urlretrieve
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
-# from version2_app.passport_scanner.doctype.guest_details.guest_details import *
 
 import time,json
 import datetime
