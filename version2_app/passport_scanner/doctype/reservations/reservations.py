@@ -1280,10 +1280,10 @@ def pass_detect_text(image_file):
                 expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
                 today_date = datetime.datetime.now().date()
                 if expiry<=today_date:
-                    return {"success":False, "type":details,"message":"Passport is expired"}
+                    return {"success":False, "details":details,"message":"Passport is expired","expired":True}
             # logger.info(
             #     f"time elapsed for text parse is{time.time()-req_time}")
-            return {"success":True, "data":details}
+            return {"success":True, "data":details,"expired":False}
         elif(first[0] == 'V'):
             visa_type = ('\n'.join(tuple(loss)))
 
@@ -1417,15 +1417,15 @@ def pass_detect_text(image_file):
             optional_data = second[28:]
             data = {"Document_Type": type, "visa_Type": type_of_visa, "Issued_country": issuingcountry, "Visa_No_Of_Enteries": entry, "FamilyName": surname, "Visa_Issue_Date": Date_of_issue,
                     "Given_Name": givenname, "Visa_Number": visa_number, "Nationality": nationality, "Date_of_Birth": date_of_birth, "Gender": sex, "Visa_Expiry_Date": date_of_expiry}
+            details = {"type": "VISA", "data": data}
             if date_of_expiry != ' ':
                 expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
                 today_date = datetime.datetime.now().date()
                 if expiry<=today_date:
-                    return {"success":False, "type":data,"message":"Visa is expired"}
-            details = {"type": "VISA", "data": data}
+                    return {"success":False, "details":details,"message":"Visa is expired","expired":True}
             # logger.info(
             #     f"time elapsed for text parse is{time.time()-req_time}")
-            return {"success":True, "data":details}
+            return {"success":True, "data":details, "expired":False}
             # else:
             #     details={"type":"partial data","message":"image not scaned properly"}
             #     return 
@@ -1434,15 +1434,15 @@ def pass_detect_text(image_file):
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False, "type":"partial data","message":str(e)})
+        return ({"success":False, "type":"partial data","message":str(e),"expired":False})
     except NoneType as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False, "type":"partial data","message":str(e)})
+        return ({"success":False, "type":"partial data","message":str(e),"expired":False})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False, "type":"partial data","message":str(e)})
+        return ({"success":False, "type":"partial data","message":str(e),"expired":False})
 
 def rotate(imagepath,number):
     img = cv2.imread(imagepath)

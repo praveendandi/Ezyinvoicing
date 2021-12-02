@@ -300,19 +300,25 @@ def update_guest_details(name):
                     passport_details["pre_Nationality"] = pre_checkins.guest_nationality
                     passport = helper_utility({"api":"passportvisadetails", "Passport_Image":convert1["data"], "scan_type":"web"})
                     if passport["data"]["message"]["success"] == False:
+                        if "expired" in passport["data"]["message"].keys():
+                            passport_details["pass_expired"] = passport["data"]["message"]["expired"]
+                        else:
+                            passport_details["visa_expired"] = False
                         passport_details["image_1"] = pre_checkins.image_1
                         passport_details["image_2"] = pre_checkins.image_2
-                        passport_details.update(passport["data"]["message"])
-                        del passport_details["success"]
+                        passport_details["passport_message"] = passport["data"]["message"]["message"]
                         passport_details["id_type"] = "Foreign" if pre_checkins.guest_id_type == "passport" else pre_checkins.guest_id_type
                         # return {"success": True,"data":passport_details}
                         # return passport["data"]["message"]
                     if passport["data"]["message"]["success"] == True:
+                        passport_details["pass_expired"] = False
                         if "face" in passport["data"]["message"]["details"].keys():
                             base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
                             if "file_url" in  base_image["message"].keys():
                                 passport_details["face_url"] = base_image["message"]["file_url"]
                                 del passport["data"]["message"]["details"]["face"]
+                        passport_details["image_1"] = pre_checkins.image_1
+                    if "details" in passport["data"]["message"].keys():
                         if "data" in passport["data"]["message"]["details"].keys():
                             if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
                                 passport_details["pass_Date_of_birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
@@ -344,17 +350,26 @@ def update_guest_details(name):
                             # aadhar_front["data"]["message"]["details"]["front_image"] = aadhar_front["data"]["message"]["aadhar_details"]["base64_string"]
                             # del passport["data"]["message"]["details"]["base64_string"]
                             passport_details.update(passport["data"]["message"]["details"]["data"])
-                        passport_details["image_1"] = pre_checkins.image_1
                     
                 if file_path2:
                     if pre_checkins.guest_id_type == "passport":
                         visa_details = helper_utility({"api":"passportvisadetails", "Passport_Image":convert2["data"], "scan_type":"web"})
                         if visa_details["data"]["message"]["success"] == False:
+                            if "expired" in visa_details["data"]["message"].keys():
+                                passport_details["visa_expired"] = visa_details["data"]["message"]["expired"]
+                            else:
+                                passport_details["visa_expired"] = False
                             passport_details["image_2"] = pre_checkins.image_2
-                            passport_details.update(visa_details["data"]["message"])
-                            del passport_details["success"]
+                            error_message = visa_details["data"]["message"]["message"]
+                            del visa_details["data"]["message"]["message"]
+                            if "details" in visa_details["data"]["message"].keys():
+                                if "data" in visa_details["data"]["message"]["details"].keys():
+                                    passport_details.update(visa_details["data"]["message"]["details"]["data"])
+                            passport_details["visa_message"] = error_message
                             passport_details["id_type"] = "Foreign"
                             return {"success": True,"data":passport_details}
+                        
+                        passport_details["visa_expired"] = False
                         passport_details.update(visa_details["data"]["message"]["details"]["data"])
                     else:
                         visa_details = helper_utility({"api":"passport_address", "Passport_Image":convert2["data"]})

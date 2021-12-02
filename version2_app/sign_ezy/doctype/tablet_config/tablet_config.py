@@ -96,17 +96,17 @@ def createTabConfig():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
-        if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"]}):
+        work_station = frappe.get_doc("Active Work Stations",data["work_station"])
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"mode":"Active"}):
             tablet_config = frappe.db.get_value("Tablet Config",{"work_station":data["work_station"]},["name","tablet","work_station","work_station_socket_id","tablet_socket_id"], as_dict=1)
             tab_doc = frappe.get_doc("Active Tablets",tablet_config["tablet"])
             tab_doc.status = "Not Connected"
             tab_doc.save(ignore_permissions=True,ignore_version=True)
             tablet_config["uuid"] = tablet_config["tablet"]
-            # frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config})
+            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config})
             frappe.db.delete("Tablet Config", {"work_station": data["work_station"]})
             frappe.db.commit()
         tablet = frappe.get_doc("Active Tablets",data["tablet"])
-        work_station = frappe.get_doc("Active Work Stations",data["work_station"])
         if not frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"mode":"Active"}):
             if not frappe.db.exists({"doctype":"Tablet Config","tablet":data["tablet"],"mode":"Active"}):
                 data["work_station_socket_id"] = work_station.socket_id
@@ -115,6 +115,7 @@ def createTabConfig():
                 data["mode"] = "Active"
                 data["doctype"] = "Tablet Config"
                 data["device_name"] = tablet.device_name
+                data["work_station_discription"] = work_station.work_station_discription
                 insert_tabconfig = frappe.get_doc(data)
                 insert_tabconfig.insert(ignore_permissions=True, ignore_links=True)
                 tablet.status = "Connected"
