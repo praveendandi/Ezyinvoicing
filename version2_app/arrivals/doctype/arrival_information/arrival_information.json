@@ -42,7 +42,10 @@
   "mail_sent",
   "mail_via",
   "mail_count",
-  "voucher"
+  "voucher",
+  "guest_eamil2",
+  "guest_mobile_no2",
+  "invoice_send_mail_count"
  ],
  "fields": [
   {
@@ -245,11 +248,26 @@
    "fieldname": "voucher",
    "fieldtype": "Attach",
    "label": "Voucher"
+  },
+  {
+   "fieldname": "guest_eamil2",
+   "fieldtype": "Data",
+   "label": "Guest Eamil2"
+  },
+  {
+   "fieldname": "guest_mobile_no2",
+   "fieldtype": "Data",
+   "label": "Guest Mobile No2"
+  },
+  {
+   "fieldname": "invoice_send_mail_count",
+   "fieldtype": "Int",
+   "label": "Invoice Send Mail Count"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-23 09:58:36.266709",
+ "modified": "2021-12-02 18:22:17.271271",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
