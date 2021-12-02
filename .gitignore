@@ -11,3 +11,4 @@ version2_app/parsers_invoice/invoice_parsers
 apps/version2_app/version2_app/parsers_invoice/invoice_parsers
 version2_app/invoice_parsers/
 version2_app/arrival_report.json
+node_modules
