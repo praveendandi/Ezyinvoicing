@@ -447,97 +447,93 @@ def add_guest_details():
         pre_checkins_count = 0
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1:
-            try:
-                if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned"}):
-                    return {"success":False, "message":"Guest already scanned on this confirmation number"}
-            except:
-                pass
-            finally:
-                folder_path = frappe.utils.get_bench_path()
-                site_folder_path = folder_path+'/sites/'+company_doc.site_name
-                if company_doc.ezy_checkins_module == 1:
-                    if frappe.db.exists({"doctype":'Precheckins', "confirmation_number":data["confirmation_number"]}):
-                        pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
-                # if company_doc.ezy_checkins_module == 0 and company_doc.scan_ezy_module == 1:
-                #     pre_checkins_count = frappe.db.get_value('Arrival Information',{"confirmation_number":data["confirmation_number"]},"no_of_adults")
-                pre_arrival_confi = data["confirmation_number"]
-                if "-" in data["confirmation_number"]:
-                    data["confirmation_number"] = data["confirmation_number"].split("-")[0]
-                scan_guest_details = frappe.db.count('Guest Details', {'confirmation_number': data["confirmation_number"]})
-                name = data["given_name"]+data["confirmation_number"]+data["id_type"]
-                if data["id_image1"]:
-                    if "private" not in data["id_image1"] and "/files/" not in data["id_image1"]:
-                        image_1 = convert_base64_to_image(data["id_image1"],name,site_folder_path,company_doc)
-                        if image_1["message"] == False:
-                            return image_1
-                        data["id_image1"] = image_1["message"]["file_url"]
-                if data["id_image2"]:
-                    if "private" not in data["id_image2"] and "/files/" not in data["id_image2"]:
-                        image_2 = convert_base64_to_image(data["id_image2"],name,site_folder_path,company_doc)
-                        if image_2["message"] == False:
-                            return image_2
-                        data["id_image2"] = image_2["message"]["file_url"]
-                if "face_image" in data.keys():
-                    if data["face_image"] != "":
-                        if "private" not in data["face_image"] and "/files/" not in data["face_image"]:
-                            face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
-                            if face["message"] == False:
-                                return face
-                            data["face_image"] = face["message"]["file_url"]
-                data["doctype"] = "Guest Details"
-                data["id_type"] = "Foreigner" if data["id_type"] == "Foreign" else data["id_type"]
-                if company_doc.ezy_checkins_module == 1:
-                    if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and "guest_id" in data.keys():
-                        pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
-                        pre_doc.opera_scanned_status = "Scanned"
-                        # arrival_doc.booking_status = "CHECKED IN"
-                        pre_doc.guest_first_name = data["given_name"]
-                        if "sur_name" in data.keys():
-                            pre_doc.guest_last_name = data["sur_name"] if data["sur_name"] else ""
-                        else:
-                            pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
-                        pre_doc.save(ignore_permissions=True,ignore_version=True)
-                        del data["guest_id"]
-                if "address1" in data.keys():
-                    data["address"] = data["address1"]
-                    del data["address1"]
-                if "address2" in data.keys():
-                    if data["address2"] != "":
-                        if re.search("\d{6}",data["address2"]):
-                            postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address2"]).groupdict()['zipcode']
-                            data["postal_code"] = postal_code if len(postal_code) == 6 else ''
-                doc = frappe.get_doc(data)
-                doc.insert(ignore_permissions=True, ignore_links=True)
-                if frappe.db.exists('Arrival Information', data["confirmation_number"]):
-                    arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
-                    if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+            if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned"}):
+                return {"success":False, "message":"Guest already scanned on this confirmation number"}
+            folder_path = frappe.utils.get_bench_path()
+            site_folder_path = folder_path+'/sites/'+company_doc.site_name
+            if company_doc.ezy_checkins_module == 1:
+                if frappe.db.exists({"doctype":'Precheckins', "confirmation_number":data["confirmation_number"]}):
+                    pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
+            # if company_doc.ezy_checkins_module == 0 and company_doc.scan_ezy_module == 1:
+            #     pre_checkins_count = frappe.db.get_value('Arrival Information',{"confirmation_number":data["confirmation_number"]},"no_of_adults")
+            pre_arrival_confi = data["confirmation_number"]
+            if "-" in data["confirmation_number"]:
+                data["confirmation_number"] = data["confirmation_number"].split("-")[0]
+            scan_guest_details = frappe.db.count('Guest Details', {'confirmation_number': data["confirmation_number"]})
+            name = data["given_name"]+data["confirmation_number"]+data["id_type"]
+            if data["id_image1"]:
+                if "private" not in data["id_image1"] and "/files/" not in data["id_image1"]:
+                    image_1 = convert_base64_to_image(data["id_image1"],name,site_folder_path,company_doc)
+                    if image_1["message"] == False:
+                        return image_1
+                    data["id_image1"] = image_1["message"]["file_url"]
+            if data["id_image2"]:
+                if "private" not in data["id_image2"] and "/files/" not in data["id_image2"]:
+                    image_2 = convert_base64_to_image(data["id_image2"],name,site_folder_path,company_doc)
+                    if image_2["message"] == False:
+                        return image_2
+                    data["id_image2"] = image_2["message"]["file_url"]
+            if "face_image" in data.keys():
+                if data["face_image"] != "":
+                    if "private" not in data["face_image"] and "/files/" not in data["face_image"]:
+                        face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
+                        if face["message"] == False:
+                            return face
+                        data["face_image"] = face["message"]["file_url"]
+            data["doctype"] = "Guest Details"
+            data["id_type"] = "Foreigner" if data["id_type"] == "Foreign" else data["id_type"]
+            if company_doc.ezy_checkins_module == 1:
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and "guest_id" in data.keys():
+                    pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
+                    pre_doc.opera_scanned_status = "Scanned"
+                    # arrival_doc.booking_status = "CHECKED IN"
+                    pre_doc.guest_first_name = data["given_name"]
+                    if "sur_name" in data.keys():
+                        pre_doc.guest_last_name = data["sur_name"] if data["sur_name"] else ""
+                    else:
+                        pre_doc.guest_last_name = data["surname"] if data["surname"] else ""
+                    pre_doc.save(ignore_permissions=True,ignore_version=True)
+                    del data["guest_id"]
+            if "address1" in data.keys():
+                data["address"] = data["address1"]
+                del data["address1"]
+            if "address2" in data.keys():
+                if data["address2"] != "":
+                    if re.search("\d{6}",data["address2"]):
+                        postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address2"]).groupdict()['zipcode']
+                        data["postal_code"] = postal_code if len(postal_code) == 6 else ''
+            doc = frappe.get_doc(data)
+            doc.insert(ignore_permissions=True, ignore_links=True)
+            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
+                arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+                    if (scan_guest_details+1) == pre_checkins_count:
+                        arrival_doc.status = "Scanned"
+                        arrival_doc.booking_status = "CHECKED IN"
+                    else:
+                        if (scan_guest_details+1) < pre_checkins_count:
+                            arrival_doc.status = "Partial Scanned"
+                            arrival_doc.booking_status = "CHECKED IN"
+                else:
+                    if arrival_doc.no_of_adults:
+                        pre_checkins_count = arrival_doc.no_of_adults
+                    if pre_checkins_count == 0:
+                        arrival_doc.status = "Scanned"
+                        arrival_doc.booking_status = "CHECKED IN"
+                    else:
                         if (scan_guest_details+1) == pre_checkins_count:
                             arrival_doc.status = "Scanned"
-                            arrival_doc.booking_status = "CHECKED IN"
                         else:
                             if (scan_guest_details+1) < pre_checkins_count:
                                 arrival_doc.status = "Partial Scanned"
                                 arrival_doc.booking_status = "CHECKED IN"
-                    else:
-                        if arrival_doc.no_of_adults:
-                            pre_checkins_count = arrival_doc.no_of_adults
-                        if pre_checkins_count == 0:
-                            arrival_doc.status = "Scanned"
-                            arrival_doc.booking_status = "CHECKED IN"
-                        else:
-                            if (scan_guest_details+1) == pre_checkins_count:
-                                arrival_doc.status = "Scanned"
-                            else:
-                                if (scan_guest_details+1) < pre_checkins_count:
-                                    arrival_doc.status = "Partial Scanned"
-                                    arrival_doc.booking_status = "CHECKED IN"
-                    arrival_doc.save(ignore_permissions=True, ignore_version=True)
-                    frappe.db.commit()
-                else:
-                    arrival_date = datetime.datetime.now().date()
-                    arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
-                    arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
-                return {"success":True, "message":"Guest added successfully"}
+                arrival_doc.save(ignore_permissions=True, ignore_version=True)
+                frappe.db.commit()
+            else:
+                arrival_date = datetime.datetime.now().date()
+                arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
+                arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
+            return {"success":True, "message":"Guest added successfully"}
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
     except Exception as e:

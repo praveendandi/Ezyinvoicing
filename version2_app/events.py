@@ -829,20 +829,21 @@ def guest_attachments(doc,method=None):
             update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
             update_doc.save()
             frappe.db.commit()
-        arrival_doc = frappe.get_doc('Arrival Information',doc.confirmation_number)
-        guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
-        added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
-        if guest_count != 0:
-            if added_guest_count > guest_count:
+        if frappe.db.exists('Arrival Information',doc.confirmation_number):
+            arrival_doc = frappe.get_doc('Arrival Information',doc.confirmation_number)
+            guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
+            added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
+            if guest_count != 0:
+                if added_guest_count > guest_count:
+                    arrival_doc.no_of_adults = guest_count + 1
+                    # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
+            else:
                 arrival_doc.no_of_adults = guest_count + 1
-                # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
-        else:
-            arrival_doc.no_of_adults = guest_count + 1
-            # if arrival_doc.number_of_guests:
-            #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
-            # else:
-            #     arrival_doc.number_of_guests = str(0 + 1)
-        arrival_doc.save(ignore_permissions=True, ignore_version=True)
+                # if arrival_doc.number_of_guests:
+                #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
+                # else:
+                #     arrival_doc.number_of_guests = str(0 + 1)
+            arrival_doc.save(ignore_permissions=True, ignore_version=True)
         given_name = doc.given_name if doc.given_name else ""
         surname = doc.surname if doc.surname else ""
         frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
