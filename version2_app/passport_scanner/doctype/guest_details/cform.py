@@ -581,8 +581,7 @@ def checkin_cform():
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
         company_doc.save(ignore_permissions=True,ignore_version=True)
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("save temp success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("save temp success",str(e))
         return {"success":False,"message":str(e)}
 
 
