@@ -473,12 +473,13 @@ def add_guest_details():
                     if image_2["message"] == False:
                         return image_2
                     data["id_image2"] = image_2["message"]["file_url"]
-            if data["face_image"] != "":
-                if "private" not in data["face_image"] and "/files/" not in data["face_image"]:
-                    face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
-                    if face["message"] == False:
-                        return face
-                    data["face_image"] = face["message"]["file_url"]
+            if "face_image" in data.keys():
+                if data["face_image"] != "":
+                    if "private" not in data["face_image"] and "/files/" not in data["face_image"]:
+                        face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
+                        if face["message"] == False:
+                            return face
+                        data["face_image"] = face["message"]["file_url"]
             data["doctype"] = "Guest Details"
             data["id_type"] = "Foreigner" if data["id_type"] == "Foreign" else data["id_type"]
             if company_doc.ezy_checkins_module == 1:
