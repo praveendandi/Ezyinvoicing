@@ -103,7 +103,7 @@ def createTabConfig():
             tab_doc.status = "Not Connected"
             tab_doc.save(ignore_permissions=True,ignore_version=True)
             tablet_config["uuid"] = tablet_config["tablet"]
-            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config})
+            frappe.publish_realtime("custom_socket", {'message': 'Change Tablet', 'data': tablet_config})
             frappe.db.delete("Tablet Config", {"work_station": data["work_station"]})
             frappe.db.commit()
         tablet = frappe.get_doc("Active Tablets",data["tablet"])
