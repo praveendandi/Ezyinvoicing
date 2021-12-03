@@ -45,7 +45,8 @@
   "voucher",
   "guest_eamil2",
   "guest_mobile_no2",
-  "invoice_send_mail_count"
+  "invoice_send_mail_send",
+  "send_invoice_mail"
  ],
  "fields": [
   {
@@ -260,14 +261,21 @@
    "label": "Guest Mobile No2"
   },
   {
-   "fieldname": "invoice_send_mail_count",
-   "fieldtype": "Int",
-   "label": "Invoice Send Mail Count"
+   "default": "0",
+   "fieldname": "invoice_send_mail_send",
+   "fieldtype": "Check",
+   "label": "Invoice Send Mail Send"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_invoice_mail",
+   "fieldtype": "Check",
+   "label": "Send Invoice Mail"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-02 18:22:17.271271",
+ "modified": "2021-12-03 12:29:55.339072",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
