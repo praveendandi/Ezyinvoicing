@@ -140,7 +140,7 @@ def download_captcha():
 
 @frappe.whitelist(allow_guest=True)
 def refresh_captcha():
-    # try:
+    try:
         refresh_butoon = driver.find_element_by_xpath(
             '//*[@title="Refresh Image"]')
         refresh_butoon.click()
@@ -148,9 +148,9 @@ def refresh_captcha():
         if download["success"] == False:
             return download
         return {"success": True,"message": "CForm initiated successfully"}
-    # except Exception as e:
-    #     print(str(e),"===================================")
-    #     return {"success": False,"message": str(e)}
+    except Exception as e:
+        print(str(e),"===================================")
+        return {"success": False,"message": str(e)}
 
 
 '''
