@@ -846,8 +846,11 @@ def guest_attachments(doc,method=None):
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
         given_name = doc.given_name if doc.given_name else ""
         surname = doc.surname if doc.surname else ""
-        frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
-        frappe.db.commit()
+        # frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
+        # frappe.db.commit()
+        doc.guest_full_name = given_name+" "+surname
+        doc.checkout_date = arrival_doc.departure_date if arrival_doc.departure_date else ''
+        doc.checkin_date = arrival_doc.arrival_date if arrival_doc.arrival_date else ''
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing Guest Attachments","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
