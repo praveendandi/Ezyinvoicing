@@ -161,6 +161,7 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
     # print(tablet_config_exist, "test")
     if tablet_config_exist is not None:
         get_values = {}
+        confirmation_number = ""
         tablet_config = frappe.get_doc('Tablet Config', name)
         doc_exist = frappe.db.exists(
             doc_type, doc_name)
@@ -169,6 +170,7 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
                 doc_type, doc_name)
             if doc_type == "Invoices":
                 if doc_data.confirmation_number != "":
+                    confirmation_number = doc_data.confirmation_number
                     if frappe.db.exists("Arrival Information",doc_data.confirmation_number):
                         get_values = frappe.db.get_value("Arrival Information",doc_data.confirmation_number,["guest_email_address","guest_phone_no"],as_dict=1)
             doc_data = frappe.get_doc(
@@ -177,7 +179,8 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
                 'tablet_config': tablet_config.__dict__,
                 'doc_data': doc_data.__dict__,
                 'uuid':tablet_config.tablet,
-                "guest_details":get_values
+                "guest_details":get_values,
+                "confirmation_number":confirmation_number
             }
             frappe.publish_realtime(
                 "custom_socket", {'message': 'Push To Tab', 'data': data})
