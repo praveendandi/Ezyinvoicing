@@ -154,13 +154,14 @@ def arrivalActivity(company,file_url,source):
 
 
 @frappe.whitelist(allow_guest=True)
-def updateEmail(confirmation=None,mobile=None,email=None):
+def updateEmail(confirmation='',mobile='',email=''):
     try:
         if frappe.db.exists("Arrival Information",confirmation):
             arrival_doc = frappe.get_doc("Arrival Information",confirmation)
             arrival_doc.guest_eamil2 = email
             arrival_doc.guest_mobile_no2 = mobile
-            arrival_doc.send_invoice_mail = 1
+            if email != '':
+                arrival_doc.send_invoice_mail = 1
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
             frappe.db.commit()
             return {"success":True, "message":"email updated"}

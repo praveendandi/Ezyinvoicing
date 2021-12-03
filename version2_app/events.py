@@ -775,17 +775,17 @@ def arrival_information(doc,method=None):
     else:
         frappe.db.set_value("Documents",get_data[0]["name"],{"number_of_guests":doc.number_of_guests})
 
-def send_invoice_mail(doc,method=None):
+def send_invoice_mail():
     try:
-        get_arrivals = frappe.get_doc("Arrival Information", doc.name)
-        if get_arrivals.guest_eamil2:
-            if get_arrivals.invoice_send_mail_count == 0:
-                if frappe.db.exists({"doctype":"Invoices","confirmation_number":doc.name}):
-                    get_doc = frappe.db.get_value("Invoices",{"confirmation_number":doc.name},["invoice_file","name"],as_dict=True)
+        get_arrivals = frappe.db.get_list("Arrival Information",filters={'guest_eamil2': ['!=', ""],'send_invoice_mail':['=',1],'invoice_send_mail_send':['=',0]})
+        if len(get_arrivals)>0:
+            for each in get_arrivals:
+                get_arrivals = frappe.get_doc("Arrival Information", each["name"])
+                if frappe.db.exists({"doctype":"Invoices","confirmation_number":each["name"]}):
+                    get_doc = frappe.db.get_value("Invoices",{"confirmation_number":each["name"]},["invoice_file","name"],as_dict=True)
                     b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
                     files=frappe.db.get_list('File',filters={'file_url': ['=',get_doc["invoice_file"]]},fields=['name'])
                     attachments = [files[0]["name"]]
-                    print(attachments, get_arrivals.guest_eamil2, get_doc["name"])
                     response = make(recipients = get_arrivals.guest_eamil2,
                         # cc = '',
                         subject = b2csuccess.subject,
@@ -796,7 +796,9 @@ def send_invoice_mail(doc,method=None):
                         send_email=1
                     )
                     print(response)
-                    doc.invoice_send_mail_count = 1
+                    get_arrivals.invoice_send_mail_send = 1
+                    get_arrivals.save(ignore_permissions=True, ignore_version=True)
+                    frappe.db.commit()
                     return {"success":True,"message":"Mail Send"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
