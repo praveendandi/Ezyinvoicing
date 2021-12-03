@@ -151,3 +151,20 @@ def arrivalActivity(company,file_url,source):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Arrivals arrivalActivity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def updateEmail(confirmation=None,mobile=None,email=None):
+    try:
+        if frappe.db.exists("Arrival Information",confirmation):
+            arrival_doc = frappe.get_doc("Arrival Information",confirmation)
+            arrival_doc.guest_eamil2 = email
+            arrival_doc.guest_mobile_no2 = mobile
+            arrival_doc.save(ignore_permissions=True, ignore_version=True)
+            frappe.db.commit()
+            return {"success":True, "message":"email updated"}
+        return {"success":False, "message":"Reservation not found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("updateEmail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success": False, "message": str(e)}
