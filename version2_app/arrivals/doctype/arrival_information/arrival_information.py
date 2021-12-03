@@ -165,6 +165,7 @@ def updateEmail(confirmation=None,mobile=None,email=None):
             return {"success":True, "message":"email updated"}
         return {"success":False, "message":"Reservation not found"}
     except Exception as e:
+        print(str(e),"//////////////")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("updateEmail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
