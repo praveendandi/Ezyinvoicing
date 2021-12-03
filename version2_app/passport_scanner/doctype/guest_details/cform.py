@@ -149,6 +149,7 @@ def refresh_captcha():
             return download
         return {"success": True,"message": "CForm initiated successfully"}
     except Exception as e:
+        print(str(e),"===================================")
         return {"success": False,"message": str(e)}
 
 
@@ -252,6 +253,7 @@ def login_cform():
         # driver.find_element_by_name("Loginform").submit()
 
     except Exception as e:
+        print(str(e),"-----------------------")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -280,6 +282,7 @@ def login_success():
             return check_invalid
         return {"success": True}
     except Exception as e:
+        print(str(e),"+++++++++++++++++")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -309,6 +312,7 @@ def check_invalid_details():
         print("not invalid captcha issue")
         return {"success": False, "message": "not invalid captcha"}
     except Exception as e:
+        print(str(e),"/////////////////////////")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
         frappe.log_error("check invalid details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -333,6 +337,7 @@ def intiate_checkin_process():
                 return {"success":True}
         pass
     except Exception as e:
+        print(str(e),"..........................")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -568,6 +573,7 @@ def checkin_cform():
             return save
         return {"success": True}
     except TimeoutException:
+        print(",.,.,.,.,")
         print("error in checkin")
     except Exception as e:
         print(str(e),"====================")
@@ -604,7 +610,7 @@ def save_temp_success():
     except TimeoutException:
         print("error in temp success")
     except Exception as e:
-        print(str(e),"====================")
+        print(str(e),"*****************")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -626,7 +632,7 @@ def multiple_cforms(checkin_deatils):
             return intiate
         return {"success":True}
     except Exception as e:
-        print(e)
+        print(str(e),"@@@@@@@@")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
