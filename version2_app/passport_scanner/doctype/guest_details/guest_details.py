@@ -447,8 +447,11 @@ def add_guest_details():
         pre_checkins_count = 0
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1:
-            if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned"}):
-                return {"success":False, "message":"Guest already scanned on this confirmation number"}
+            try:
+                if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned"}):
+                    return {"success":False, "message":"Guest already scanned on this confirmation number"}
+            except:
+                pass
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = folder_path+'/sites/'+company_doc.site_name
             if company_doc.ezy_checkins_module == 1:
