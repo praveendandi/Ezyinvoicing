@@ -581,6 +581,13 @@ def checkin_cform():
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
         company_doc.save(ignore_permissions=True,ignore_version=True)
+        get_count = frappe.get_doc("Guest Details",data["name"])
+        if get_count.frro_failure_count:
+            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+        else:
+            get_count.frro_failure_count = str(0+1)
+        get_count.save(ignore_permissions=True, ignore_version=True)
+        frappe.db.commit()
         frappe.log_error("save temp success",str(e))
         return {"success":False,"message":str(e)}
 
