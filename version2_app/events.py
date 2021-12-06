@@ -795,7 +795,6 @@ def send_invoice_mail():
                         attachments = attachments,
                         send_email=1
                     )
-                    print(response)
                     get_arrivals.invoice_send_mail_send = 1
                     get_arrivals.save(ignore_permissions=True, ignore_version=True)
                     frappe.db.commit()
