@@ -157,6 +157,7 @@
   "allow_push_to_tab_in_precheckins_form",
   "tablet_back_ground_image",
   "card_type_detect_api",
+  "dynamic_colour_for_tab",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1455,11 +1456,16 @@
    "fieldtype": "Select",
    "label": "Mail Schedule",
    "options": "True\nFalse"
+  },
+  {
+   "fieldname": "dynamic_colour_for_tab",
+   "fieldtype": "Data",
+   "label": "Dynamic Colour for Tab"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-06 11:37:06.301305",
+ "modified": "2021-12-06 12:38:37.505409",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
