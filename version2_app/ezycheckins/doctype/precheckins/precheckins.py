@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import datetime
 import frappe, json
 import base64, requests
 import sys, traceback, datetime
@@ -40,6 +41,10 @@ def add_pre_checkins():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
+        if "etd" in data.keys():
+            if "+" in data["etd"]:
+                date_time = data["etd"].split("+")[0]
+                data["etd"] = datetime.datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%S.%f').strftime("%H:%M")
         company = frappe.get_doc("company",data["company"])
         no_of_adults = data["no_of_adults"]
         folder_path = frappe.utils.get_bench_path()
