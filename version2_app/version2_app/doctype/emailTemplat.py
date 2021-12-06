@@ -155,7 +155,7 @@ def signezy_email_logs():
         return {"success": True, "data":data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-signezy_email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))
         return{"success":False,"message":str(e)}
 
