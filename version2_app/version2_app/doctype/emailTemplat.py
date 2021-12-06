@@ -146,6 +146,19 @@ def email_logs():
         print(str(e))
         return{"success":False,"message":str(e)}
 
+@frappe.whitelist(allow_guest=True)    
+def signezy_email_logs():
+    try:
+        data = frappe.db.get_all("Email Queue",filters={"reference_doctype":"Invoices"},fields=["sender","status","name","creation"])
+        for each in data:
+            each["recipient"]=frappe.db.get_value("Email Queue Recipient",{"parent":each["name"]},"recipient")
+        return {"success": True, "data":data}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
 @frappe.whitelist()    
 def email_push_tab():
     try:
