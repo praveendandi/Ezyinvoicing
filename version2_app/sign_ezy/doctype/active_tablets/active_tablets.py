@@ -168,9 +168,9 @@ def updatetablet(uuid = "",device_name = "",tablet="",socket_id="",status=""):
 @frappe.whitelist(allow_guest=True)
 def resetTablet(uuid):
     try:
-        if frappe.db.exists({'doctype': 'Tablet Config','Tablet': uuid,'mode': 'Active'}):
+        if frappe.db.exists({'doctype': 'Tablet Config','tablet': uuid,'mode': 'Active'}):
             if frappe.db.exists('Active Tablets', uuid):
-                tab_name = frappe.get_value('Tablet Config', {'Tablet': uuid,'mode': 'Active'})
+                tab_name = frappe.get_value('Tablet Config', {'tablet': uuid,'mode': 'Active'})
                 tab_doc = frappe.get_doc("Tablet Config",tab_name)
                 tab_doc.mode = 'Sleep'
                 tab_doc.save(ignore_permissions=True, ignore_version=True)
@@ -180,7 +180,7 @@ def resetTablet(uuid):
                 tablet_doc.save(ignore_permissions=True, ignore_version=True)
                 frappe.db.commit()
                 tab_doc.uuid = uuid
-                frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation', 'data': tab_doc.__dict__})
+                frappe.publish_realtime("custom_socket", {'message': 'Reset Tablet', 'data': tab_doc.__dict__})
                 return {"success":True,"message":"Tablet mapped removed successfully"}
             else:
                 return {"success":False,"message":"No work station found"}
