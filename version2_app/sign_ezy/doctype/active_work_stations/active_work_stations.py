@@ -49,6 +49,8 @@ def resetWorkStations(name, doctype):
             frappe.db.commit()
             tab_doc.uuid = tab_doc.tablet
             frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation' if type == 'work_station' else 'Reset Tablet', 'data': tab_doc.__dict__})
+            if type == "tablet":
+                frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tab_doc.__dict__})
             return {"success":True,"message":"Tablet mapped removed successfully"}
         else:
             return {"success":False,"message":"Work station not connected to any device" if type == 'work_station' else "Device not connected to any work station"}

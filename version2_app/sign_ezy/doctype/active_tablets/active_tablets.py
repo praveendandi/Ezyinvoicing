@@ -163,28 +163,3 @@ def updatetablet(uuid = "",device_name = "",tablet="",socket_id="",status=""):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("updatetablet","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return False
-
-
-@frappe.whitelist(allow_guest=True)
-def resetTablet(uuid):
-    try:
-        if frappe.db.exists({'doctype': 'Tablet Config','tablet': uuid,'mode': 'Active'}):
-            if frappe.db.exists('Active Tablets', uuid):
-                tab_name = frappe.get_value('Tablet Config', {'tablet': uuid,'mode': 'Active'})
-                tab_doc = frappe.get_doc("Tablet Config",tab_name)
-                tab_doc.mode = 'Sleep'
-                tab_doc.save(ignore_permissions=True, ignore_version=True)
-                frappe.db.commit()
-                tablet_doc = frappe.get_doc("Active Tablets", uuid)
-                tablet_doc.status = "Not Connected"
-                tablet_doc.save(ignore_permissions=True, ignore_version=True)
-                frappe.db.commit()
-                tab_doc.uuid = uuid
-                frappe.publish_realtime("custom_socket", {'message': 'Reset Tablet', 'data': tab_doc.__dict__})
-                return {"success":True,"message":"Tablet mapped removed successfully"}
-            else:
-                return {"success":False,"message":"No work station found"}
-        else:
-            return {"success":False,"message":"Work station not connected to any device"}
-    except Exception as e:
-        return {"success":False,"message":str(e)}
