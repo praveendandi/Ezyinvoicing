@@ -124,11 +124,11 @@ def  precheckinsdocuments(doc,method=None):
             confirmation_number = confirmation_number.split("-")[0]
             
         date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":confirmation_number,"module":"ezycheckins","event":"PreCheckins","user":user_name,"activity":"Precheckin done by "+doc.guest_first_name,"status":""}
+        # activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":confirmation_number,"module":"ezycheckins","event":"PreCheckins","user":user_name,"activity":"Precheckin done by "+doc.guest_first_name,"status":""}
         if not frappe.db.exists('Documents', confirmation_number):
-            event_doc=frappe.get_doc(activity_data)
-            event_doc.insert()
-            frappe.db.commit()
+            # event_doc=frappe.get_doc(activity_data)
+            # event_doc.insert()
+            # frappe.db.commit()
             user_name =  frappe.session.user
             data={"doctype":"Documents","guest_details":[{"image1":doc.image_1,"image2":doc.image_2}],"confirmation_number":confirmation_number,"module_name":"Ezycheckins","user":user_name}
             get_doc=frappe.get_doc(data)
@@ -762,7 +762,7 @@ def arrival_information(doc,method=None):
     user_name =  frappe.session.user
     date_time = datetime.datetime.now() 
     date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-    data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Arrival Information added successfully"}
+    data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Reservation Created"}
     get_doc=frappe.get_doc(data)
     get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
     get_doc.insert()
@@ -1190,7 +1190,7 @@ def precheckins():
             i["confirmation_number"] = nam
         precheckins_doc = frappe.get_doc(i)
         frappe.db.set_value('Arrival Information',i["confirmation_number"],'virtual_checkin_status','Yes')
-        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Precheckedin Successfully"}
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Precheckin Done"}
         event_doc=frappe.get_doc(activity_data)
         event_doc.insert()
         precheckins_doc.insert() 
