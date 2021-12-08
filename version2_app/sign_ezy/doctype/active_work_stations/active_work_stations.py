@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from version2_app.sign_ezy.doctype.tablet_config.tablet_config import disconnectTablet
 
 class ActiveWorkStations(Document):
 	pass
@@ -31,26 +32,11 @@ def resetWorkStations(name, doctype):
         if frappe.db.exists({'doctype': 'Tablet Config',type: name,'mode': 'Active'}):
             tab_name = frappe.get_value('Tablet Config', {type: name,'mode': 'Active'})
             tab_doc = frappe.get_doc("Tablet Config",tab_name)
-            if not frappe.db.exists('Active Tablets',tab_doc.tablet):
-                return {"success":False, "message": "Device not found"}
-            if not frappe.db.exists('Active Work Stations',tab_doc.work_station):
-                return {"success":False, "message": "Work station not found"}
-            tab_doc.mode = 'Sleep'
-            tab_doc.save(ignore_permissions=True, ignore_version=True)
-            frappe.db.commit()
-            active_tablet = frappe.get_doc('Active Tablets',tab_doc.tablet)
-            active_tablet.status = "Not Connected"
-            active_tablet.save(ignore_permissions=True, ignore_version=True)
-            frappe.db.commit()
-            ws_doc = frappe.get_doc("Active Work Stations", tab_doc.work_station)
-            ws_doc.status = "In Active"
-            ws_doc.mode = "Not Connected"
-            ws_doc.save(ignore_permissions=True, ignore_version=True)
-            frappe.db.commit()
+            tablet_disconnected = disconnectTablet(tab_name)
+            if tablet_disconnected["success"] == False:
+                return tablet_disconnected
             tab_doc.uuid = tab_doc.tablet
             frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation' if type == 'work_station' else 'Reset Tablet', 'data': tab_doc.__dict__})
-            # if type == "tablet":
-            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tab_doc.__dict__})
             return {"success":True,"message":"Tablet mapped removed successfully"}
         else:
             return {"success":False,"message":"Work station not connected to any device" if type == 'work_station' else "Device not connected to any work station"}
