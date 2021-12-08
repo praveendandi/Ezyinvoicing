@@ -229,7 +229,8 @@ def fileCreated(doc, method=None):
                 frappe.log_error(traceback.print_exc())
                 logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
-            if "company" not in doc.file_name or "GSP_API" not in doc.file_name:
+            if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
+                # pass
                 company = frappe.get_last_doc("company")
                 if company.block_print == "True":
                     return {"success":False,"message":"Print has been Blocked"}
