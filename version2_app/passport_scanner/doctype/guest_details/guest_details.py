@@ -40,7 +40,7 @@ def empty_guest_details(name):
 
 @frappe.whitelist(allow_guest=True)
 def guest_details_opera(confirmation_number):
-    try:
+    # try:
         type = ""
         company_doc = frappe.get_last_doc("company")
         if company_doc.opera_scan == 1:
@@ -65,10 +65,10 @@ def guest_details_opera(confirmation_number):
             
         else:
             return {"success":False,"message":"You dont have rights"}
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+    #     return {"success":False,"message":str(e)}
 
 def helper_utility(data):
     try:
