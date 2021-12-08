@@ -177,6 +177,9 @@ doc_events = {
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
+    },
+    "Precheckins":{
+         "after_insert": "version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details",
     }
 }
 
