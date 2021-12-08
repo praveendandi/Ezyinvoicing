@@ -79,6 +79,7 @@ def invoice_created(doc, method=None):
 def company_created(doc,method=None):
     try:
         if frappe.db.exists('company',doc.name):
+            pass
             # doc = frappe.db.get_list('company',filters={"docstatus":0},fields=["name","company_name","company_code","phone_number","gst_number","provider","ip_address","port"])
             # api="http://"+doc[0]["ip_address"]+":"+doc[0]["port"]+"/api/resource/Properties"
             # adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
