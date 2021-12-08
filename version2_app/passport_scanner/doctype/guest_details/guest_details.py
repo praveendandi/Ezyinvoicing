@@ -9,7 +9,7 @@ import frappe
 import sys,traceback
 import base64
 from frappe.model.document import Document
-from version2_app.passport_scanner.doctype.reservations.reservations import *
+# from version2_app.passport_scanner.doctype.reservations.reservations import *
 from version2_app.passport_scanner.doctype.guest_details.cform import *
 
 class GuestDetails(Document):
