@@ -14,7 +14,8 @@
   "work_station_socket_id",
   "tablet_socket_id",
   "mode",
-  "device_name"
+  "device_name",
+  "work_station_discription"
  ],
  "fields": [
   {
@@ -73,11 +74,16 @@
    "fieldname": "device_name",
    "fieldtype": "Data",
    "label": "Device Name"
+  },
+  {
+   "fieldname": "work_station_discription",
+   "fieldtype": "Small Text",
+   "label": "Work Station Discription"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-17 10:29:31.273591",
+ "modified": "2021-12-02 16:06:05.081636",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Tablet Config",

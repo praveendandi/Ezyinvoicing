@@ -300,19 +300,25 @@ def update_guest_details(name):
                     passport_details["pre_Nationality"] = pre_checkins.guest_nationality
                     passport = helper_utility({"api":"passportvisadetails", "Passport_Image":convert1["data"], "scan_type":"web"})
                     if passport["data"]["message"]["success"] == False:
+                        if "expired" in passport["data"]["message"].keys():
+                            passport_details["pass_expired"] = passport["data"]["message"]["expired"]
+                        else:
+                            passport_details["visa_expired"] = False
                         passport_details["image_1"] = pre_checkins.image_1
                         passport_details["image_2"] = pre_checkins.image_2
-                        passport_details.update(passport["data"]["message"])
-                        del passport_details["success"]
+                        passport_details["passport_message"] = passport["data"]["message"]["message"]
                         passport_details["id_type"] = "Foreign" if pre_checkins.guest_id_type == "passport" else pre_checkins.guest_id_type
                         # return {"success": True,"data":passport_details}
                         # return passport["data"]["message"]
                     if passport["data"]["message"]["success"] == True:
+                        passport_details["pass_expired"] = False
                         if "face" in passport["data"]["message"]["details"].keys():
                             base_image = convert_base64_to_image(passport["data"]["message"]["details"]["face"],name,site_folder_path,company_doc)
                             if "file_url" in  base_image["message"].keys():
                                 passport_details["face_url"] = base_image["message"]["file_url"]
                                 del passport["data"]["message"]["details"]["face"]
+                        passport_details["image_1"] = pre_checkins.image_1
+                    if "details" in passport["data"]["message"].keys():
                         if "data" in passport["data"]["message"]["details"].keys():
                             if "Date_of_Birth" in passport["data"]["message"]["details"]["data"].keys():
                                 passport_details["pass_Date_of_birth"] = passport["data"]["message"]["details"]["data"]["Date_of_Birth"]
@@ -344,17 +350,26 @@ def update_guest_details(name):
                             # aadhar_front["data"]["message"]["details"]["front_image"] = aadhar_front["data"]["message"]["aadhar_details"]["base64_string"]
                             # del passport["data"]["message"]["details"]["base64_string"]
                             passport_details.update(passport["data"]["message"]["details"]["data"])
-                        passport_details["image_1"] = pre_checkins.image_1
                     
                 if file_path2:
                     if pre_checkins.guest_id_type == "passport":
                         visa_details = helper_utility({"api":"passportvisadetails", "Passport_Image":convert2["data"], "scan_type":"web"})
                         if visa_details["data"]["message"]["success"] == False:
+                            if "expired" in visa_details["data"]["message"].keys():
+                                passport_details["visa_expired"] = visa_details["data"]["message"]["expired"]
+                            else:
+                                passport_details["visa_expired"] = False
                             passport_details["image_2"] = pre_checkins.image_2
-                            passport_details.update(visa_details["data"]["message"])
-                            del passport_details["success"]
+                            error_message = visa_details["data"]["message"]["message"]
+                            del visa_details["data"]["message"]["message"]
+                            if "details" in visa_details["data"]["message"].keys():
+                                if "data" in visa_details["data"]["message"]["details"].keys():
+                                    passport_details.update(visa_details["data"]["message"]["details"]["data"])
+                            passport_details["visa_message"] = error_message
                             passport_details["id_type"] = "Foreign"
                             return {"success": True,"data":passport_details}
+                        
+                        passport_details["visa_expired"] = False
                         passport_details.update(visa_details["data"]["message"]["details"]["data"])
                     else:
                         visa_details = helper_utility({"api":"passport_address", "Passport_Image":convert2["data"]})
@@ -429,58 +444,49 @@ def add_guest_details():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
+        pre_checkins_count = 0
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1:
+            if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned"}):
+                return {"success":False, "message":"Guest already scanned on this confirmation number"}
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = folder_path+'/sites/'+company_doc.site_name
             if company_doc.ezy_checkins_module == 1:
-                pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
+                if frappe.db.exists({"doctype":'Precheckins', "confirmation_number":data["confirmation_number"]}):
+                    pre_checkins_count = frappe.db.get_value('Precheckins', {"confirmation_number":data["confirmation_number"]}, "no_of_adults")
             # if company_doc.ezy_checkins_module == 0 and company_doc.scan_ezy_module == 1:
             #     pre_checkins_count = frappe.db.get_value('Arrival Information',{"confirmation_number":data["confirmation_number"]},"no_of_adults")
             pre_arrival_confi = data["confirmation_number"]
             if "-" in data["confirmation_number"]:
                 data["confirmation_number"] = data["confirmation_number"].split("-")[0]
             scan_guest_details = frappe.db.count('Guest Details', {'confirmation_number': data["confirmation_number"]})
-            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
-                arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
-                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
-                    if (scan_guest_details+1) == pre_checkins_count:
-                        arrival_doc.status = "Scanned"
-                    else:
-                        if (scan_guest_details+1) < pre_checkins_count:
-                            arrival_doc.status = "Partial Scanned"
-                            arrival_doc.booking_status = "CHECKED IN"
-                arrival_doc.save(ignore_permissions=True, ignore_version=True)
-            else:
-                arrival_date = datetime.datetime.now().date()
-                arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
-                arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
             name = data["given_name"]+data["confirmation_number"]+data["id_type"]
             if data["id_image1"]:
-                if "private" not in data["id_image1"]:
+                if "private" not in data["id_image1"] and "/files/" not in data["id_image1"]:
                     image_1 = convert_base64_to_image(data["id_image1"],name,site_folder_path,company_doc)
                     if image_1["message"] == False:
                         return image_1
                     data["id_image1"] = image_1["message"]["file_url"]
             if data["id_image2"]:
-                if "private" not in data["id_image2"]:
+                if "private" not in data["id_image2"] and "/files/" not in data["id_image2"]:
                     image_2 = convert_base64_to_image(data["id_image2"],name,site_folder_path,company_doc)
                     if image_2["message"] == False:
                         return image_2
                     data["id_image2"] = image_2["message"]["file_url"]
-            if data["face_image"] != "":
-                if "private" not in data["face_image"]:
-                    face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
-                    if face["message"] == False:
-                        return face
-                    data["face_image"] = face["message"]["file_url"]
+            if "face_image" in data.keys():
+                if data["face_image"] != "":
+                    if "private" not in data["face_image"] and "/files/" not in data["face_image"]:
+                        face = convert_base64_to_image(data["face_image"],name,site_folder_path,company_doc)
+                        if face["message"] == False:
+                            return face
+                        data["face_image"] = face["message"]["file_url"]
             data["doctype"] = "Guest Details"
             data["id_type"] = "Foreigner" if data["id_type"] == "Foreign" else data["id_type"]
             if company_doc.ezy_checkins_module == 1:
-                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and data["guest_id"]:
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}) and "guest_id" in data.keys():
                     pre_doc = frappe.get_doc("Precheckins",data["guest_id"])
                     pre_doc.opera_scanned_status = "Scanned"
-                    arrival_doc.booking_status = "CHECKED IN"
+                    # arrival_doc.booking_status = "CHECKED IN"
                     pre_doc.guest_first_name = data["given_name"]
                     if "sur_name" in data.keys():
                         pre_doc.guest_last_name = data["sur_name"] if data["sur_name"] else ""
@@ -498,10 +504,40 @@ def add_guest_details():
                         data["postal_code"] = postal_code if len(postal_code) == 6 else ''
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
+            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
+                arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+                    if (scan_guest_details+1) == pre_checkins_count:
+                        arrival_doc.status = "Scanned"
+                        arrival_doc.booking_status = "CHECKED IN"
+                    else:
+                        if (scan_guest_details+1) < pre_checkins_count:
+                            arrival_doc.status = "Partial Scanned"
+                            arrival_doc.booking_status = "CHECKED IN"
+                else:
+                    if arrival_doc.no_of_adults:
+                        pre_checkins_count = arrival_doc.no_of_adults
+                    if pre_checkins_count == 0:
+                        arrival_doc.status = "Scanned"
+                        arrival_doc.booking_status = "CHECKED IN"
+                    else:
+                        if (scan_guest_details+1) == pre_checkins_count:
+                            arrival_doc.status = "Scanned"
+                        else:
+                            if (scan_guest_details+1) < pre_checkins_count:
+                                arrival_doc.status = "Partial Scanned"
+                                arrival_doc.booking_status = "CHECKED IN"
+                arrival_doc.save(ignore_permissions=True, ignore_version=True)
+                frappe.db.commit()
+            else:
+                arrival_date = datetime.datetime.now().date()
+                arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
+                arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
             return {"success":True, "message":"Guest added successfully"}
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
     except Exception as e:
+        print(str(e),"====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Scan-Add Guest Details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}

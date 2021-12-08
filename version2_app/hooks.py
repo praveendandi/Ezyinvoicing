@@ -109,6 +109,7 @@ doc_events = {
 	},
     "Arrival Information": {
         "after_insert": "version2_app.events.arrival_information",
+        # "on_update": "version2_app.events.send_invoice_mail"
     },
     "Guest Details": {
         "after_insert": "version2_app.events.guest_attachments",
@@ -178,8 +179,9 @@ doc_events = {
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
     },
-    "Precheckins":{
-         "after_insert": "version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details",
+    'Precheckins':{
+        'after_insert':"version2_app.events.precheckinsdocuments",
+        'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
     }
 }
 
@@ -211,7 +213,8 @@ scheduler_events = {
         "0 12 * * *":["version2_app.events.block_irn"],
         "0 2 * * *":["version2_app.events.delete_arrival_activity"],
         # "* * * * *":["version2_app.events.pre_mail"],
-        "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"]},
+        "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
+        "*/5 * * * *":["version2_app.events.send_invoice_mail"]},
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
         "version2_app.events.deleteemailfilesdaily"

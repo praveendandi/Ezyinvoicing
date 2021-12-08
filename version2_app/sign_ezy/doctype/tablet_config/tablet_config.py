@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from re import T
 import frappe,sys,traceback,json
 from frappe.model.document import Document
 
@@ -95,17 +96,17 @@ def createTabConfig():
     try:
         data=json.loads(frappe.request.data)
         data = data["data"]
-        if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"]}):
+        work_station = frappe.get_doc("Active Work Stations",data["work_station"])
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"mode":"Active"}):
             tablet_config = frappe.db.get_value("Tablet Config",{"work_station":data["work_station"]},["name","tablet","work_station","work_station_socket_id","tablet_socket_id"], as_dict=1)
             tab_doc = frappe.get_doc("Active Tablets",tablet_config["tablet"])
             tab_doc.status = "Not Connected"
             tab_doc.save(ignore_permissions=True,ignore_version=True)
             tablet_config["uuid"] = tablet_config["tablet"]
-            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config})
+            frappe.publish_realtime("custom_socket", {'message': 'Change Tablet', 'data': tablet_config})
             frappe.db.delete("Tablet Config", {"work_station": data["work_station"]})
             frappe.db.commit()
         tablet = frappe.get_doc("Active Tablets",data["tablet"])
-        work_station = frappe.get_doc("Active Work Stations",data["work_station"])
         if not frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"mode":"Active"}):
             if not frappe.db.exists({"doctype":"Tablet Config","tablet":data["tablet"],"mode":"Active"}):
                 data["work_station_socket_id"] = work_station.socket_id
@@ -114,6 +115,7 @@ def createTabConfig():
                 data["mode"] = "Active"
                 data["doctype"] = "Tablet Config"
                 data["device_name"] = tablet.device_name
+                data["work_station_discription"] = work_station.work_station_discription
                 insert_tabconfig = frappe.get_doc(data)
                 insert_tabconfig.insert(ignore_permissions=True, ignore_links=True)
                 tablet.status = "Connected"
@@ -159,6 +161,7 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
     # print(tablet_config_exist, "test")
     if tablet_config_exist is not None:
         get_values = {}
+        confirmation_number = ""
         tablet_config = frappe.get_doc('Tablet Config', name)
         doc_exist = frappe.db.exists(
             doc_type, doc_name)
@@ -167,6 +170,7 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
                 doc_type, doc_name)
             if doc_type == "Invoices":
                 if doc_data.confirmation_number != "":
+                    confirmation_number = doc_data.confirmation_number
                     if frappe.db.exists("Arrival Information",doc_data.confirmation_number):
                         get_values = frappe.db.get_value("Arrival Information",doc_data.confirmation_number,["guest_email_address","guest_phone_no"],as_dict=1)
             doc_data = frappe.get_doc(
@@ -175,7 +179,8 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
                 'tablet_config': tablet_config.__dict__,
                 'doc_data': doc_data.__dict__,
                 'uuid':tablet_config.tablet,
-                "guest_details":get_values
+                "guest_details":get_values,
+                "confirmation_number":confirmation_number
             }
             frappe.publish_realtime(
                 "custom_socket", {'message': 'Push To Tab', 'data': data})
@@ -209,19 +214,55 @@ def disconnectTablet(name):
             tablet_doc = frappe.get_doc("Active Tablets",tablet_config.tablet)
             tablet_doc.status = "Not Connected"
             tablet_doc.save(ignore_permissions=True, ignore_version=True)
+            frappe.db.commit()
             if frappe.db.exists("Active Work Stations",tablet_config.work_station):
                 ws_doc = frappe.get_doc("Active Work Stations",tablet_config.work_station)
                 ws_doc.status = "In Active"
+                ws_doc.mode = "Not Connected"
                 ws_doc.save(ignore_permissions=True, ignore_version=True)
+                frappe.db.commit()
             tablet_config = frappe.get_doc("Tablet Config",name)
             tablet_config.mode = "Sleep"
             tablet_config.save(ignore_permissions=True,ignore_version=True)
             tablet_config.uuid = tablet_config.tablet
+            frappe.db.commit()
             frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config.__dict__})
             return {"success":True,"message":"Tablet mapped removed successfully"}
         else:
-            pass
+            return {"success":False,"message":"Tablets not found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-disconnectTablet","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
+
+@frappe.whitelist(allow_guest=True)
+def get_tablet_config(ws):
+    try:
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":ws,"mode":"Active"}):
+            get_tablet_config = frappe.db.get_list('Tablet Config',filters={"work_station":ws,"mode":"Active"},fields=["work_station","tablet","device_name","mode"],order_by='creation desc')
+            print(get_tablet_config)
+            return {"success": True,"data":get_tablet_config[0]}
+        else:
+            return {'success': True,"data":""}
+
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get_tablet_config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(e, "attach qr code")
+
+@frappe.whitelist(allow_guest=True)
+def disconnectWorkStation(ws):
+    try:
+        if frappe.db.exists({"doctype":"Tablet Config","work_station":ws,"mode":"Active"}):
+            get_tablet_config = frappe.db.get_list('Tablet Config',filters={"work_station":ws,"mode":"Active"},fields=["name","work_station","tablet","device_name","mode"],order_by='creation desc')
+            tablet_disconnected = disconnectTablet(get_tablet_config[0]["name"])
+            if tablet_disconnected["success"] == False:
+                return tablet_disconnected
+            return {"success":True,"message":"Tablet mapped removed successfully"}
+
+        else:
+            return {"success":False,"message":"Tablet Configuration not found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get_tablet_config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach qr code")

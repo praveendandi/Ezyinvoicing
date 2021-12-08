@@ -12,7 +12,8 @@
   "socket_id",
   "status",
   "username",
-  "mode"
+  "mode",
+  "work_station_discription"
  ],
  "fields": [
   {
@@ -54,11 +55,16 @@
    "fieldname": "mode",
    "fieldtype": "Data",
    "label": "Mode"
+  },
+  {
+   "fieldname": "work_station_discription",
+   "fieldtype": "Small Text",
+   "label": "Work Station Discription"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-09-06 11:00:21.378020",
+ "modified": "2021-12-01 09:43:27.738987",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Active Work Stations",

@@ -9,7 +9,6 @@ from urllib.request import urlretrieve
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
-# from version2_app.passport_scanner.doctype.guest_details.guest_details import *
 
 import time,json
 import datetime
@@ -139,7 +138,7 @@ def download_captcha():
 
 '''refresh captcha'''
 
-
+@frappe.whitelist(allow_guest=True)
 def refresh_captcha():
     try:
         refresh_butoon = driver.find_element_by_xpath(
@@ -150,7 +149,8 @@ def refresh_captcha():
             return download
         return {"success": True,"message": "CForm initiated successfully"}
     except Exception as e:
-        print(e)
+        print(str(e),"===================================")
+        return {"success": False,"message": str(e)}
 
 
 '''
@@ -201,7 +201,6 @@ def login_cform():
                     user_id = login_details["user_id"]
                     password = login_details["password"]
                     captcha = login_details["captcha"]
-                    print(data,"===============")
                     username = driver.find_element_by_name('uid')
                     username.clear()
                     username.send_keys(user_id)
@@ -222,11 +221,25 @@ def login_cform():
                     alert = driver.switch_to.alert
                     alert.accept()
                     login = login_success()
-                    if login["success"] == False:
+                    if login["success"] == False: 
+                        get_count = frappe.get_doc("Guest Details",each)
+                        if get_count.frro_failure_count:
+                            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                        else:
+                            get_count.frro_failure_count = str(0+1)
+                        get_count.save(ignore_permissions=True, ignore_version=True)
+                        frappe.db.commit()
                         return login
                 elif index > 0:
                     mulcform = multiple_cforms(each_data)
                     if mulcform["success"]==False:
+                        get_count = frappe.get_doc("Guest Details",each)
+                        if get_count.frro_failure_count:
+                            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                        else:
+                            get_count.frro_failure_count = str(0+1)
+                        get_count.save(ignore_permissions=True, ignore_version=True)
+                        frappe.db.commit()
                         return mulcform
             company_doc.cform_session = 0
             company_doc.save(ignore_permissions=True,ignore_version=True)
@@ -240,6 +253,7 @@ def login_cform():
         # driver.find_element_by_name("Loginform").submit()
 
     except Exception as e:
+        print(str(e),"-----------------------")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -263,8 +277,12 @@ def login_success():
     except NoSuchElementException:
         print("login unsuccess")
         # intiate_checkin_process()
-        check_invalid_details()
+        check_invalid = check_invalid_details()
+        if check_invalid["success"] == False:
+            return check_invalid
+        return {"success": True}
     except Exception as e:
+        print(str(e),"+++++++++++++++++")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -283,12 +301,18 @@ def check_invalid_details():
         print(error_message.text)
         if error_message.text == 'Wrong Userid Or Password':
             print("invalid username")
+            return {"success":False,"message":"Wrong Userid Or Password"}
         else:
             print("invalid captcha")
-            refresh_captcha()
+            refresh_cap = refresh_captcha()
+            if refresh_cap["success"] == False:
+                return refresh_captcha
+            return {"success":True}
     except NoSuchElementException:
         print("not invalid captcha issue")
+        return {"success": False, "message": "not invalid captcha"}
     except Exception as e:
+        print(str(e),"/////////////////////////")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
         frappe.log_error("check invalid details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -313,6 +337,7 @@ def intiate_checkin_process():
                 return {"success":True}
         pass
     except Exception as e:
+        print(str(e),"..........................")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -548,6 +573,7 @@ def checkin_cform():
             return save
         return {"success": True}
     except TimeoutException:
+        print(",.,.,.,.,")
         print("error in checkin")
     except Exception as e:
         print(str(e),"====================")
@@ -555,8 +581,14 @@ def checkin_cform():
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
         company_doc.save(ignore_permissions=True,ignore_version=True)
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("save temp success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        get_count = frappe.get_doc("Guest Details",data["name"])
+        if get_count.frro_failure_count:
+            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+        else:
+            get_count.frro_failure_count = str(0+1)
+        get_count.save(ignore_permissions=True, ignore_version=True)
+        frappe.db.commit()
+        frappe.log_error("save temp success",str(e))
         return {"success":False,"message":str(e)}
 
 
@@ -584,7 +616,7 @@ def save_temp_success():
     except TimeoutException:
         print("error in temp success")
     except Exception as e:
-        print(str(e),"====================")
+        print(str(e),"*****************")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0
@@ -606,7 +638,7 @@ def multiple_cforms(checkin_deatils):
             return intiate
         return {"success":True}
     except Exception as e:
-        print(e)
+        print(str(e),"@@@@@@@@")
         company = frappe.get_last_doc('company')
         company_doc = frappe.get_doc('company',company.name)
         company_doc.cform_session = 0

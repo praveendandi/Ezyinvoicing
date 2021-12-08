@@ -27,6 +27,7 @@ from frappe.utils import logger
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 import pyshorteners as ps
+from frappe.core.doctype.communication.email import make
 
 user_name =  frappe.session.user
 def invoice_created(doc, method=None):
@@ -77,20 +78,22 @@ def invoice_created(doc, method=None):
 
 def company_created(doc,method=None):
     try:
-        doc = frappe.db.get_list('company',filters={"docstatus":0},fields=["name","company_name","company_code","phone_number","gst_number","provider","ip_address","port"])
-        api="http://"+doc[0]["ip_address"]+":"+doc[0]["port"]+"/api/resource/Properties"
-        adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
-        insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
-        headers = {'content-type': 'application/json'}
-        r = requests.post(api,headers=headers,json=insert_dict,verify=False)
-        folder_path = frappe.utils.get_bench_path()
-        if doc.pms_property_logo != "":
-            file_path = folder_path+'/sites/'+doc.site_name+doc.pms_property_logo
-            status = upload_propery_logo_pms({"file_path":file_path,"company":doc.name})
-            if status["success"] == False:
-                return status 
-            frappe.db.set_value('company', doc.name, {"pms_property_url":status["data"]})
-            frappe.db.commit()
+        if frappe.db.exists('company',doc.name):
+            pass
+            doc = frappe.db.get_list('company',filters={"docstatus":0},fields=["name","company_name","company_code","phone_number","gst_number","provider","licensing_host"])
+            api= doc[0]["licensing_host"]+"/api/resource/Properties"
+            adequare_doc=frappe.get_doc("GSP APIS",doc[0]["provider"])
+            insert_dict={"doctype":"Properties","property_name":doc[0]["company_name"],"property_code":doc[0]["company_code"],"contact_number":doc[0]["phone_number"],"gst_number":doc[0]["gst_number"],"gsp_provider":doc[0]["provider"],"api_key":adequare_doc.gsp_prod_app_secret,"api_secret":adequare_doc.gsp_prod_app_id,"gsp_test_app_id":adequare_doc.gsp_test_app_id,"gsp_test_app_secret":adequare_doc.gsp_test_app_secret}
+            headers = {'content-type': 'application/json'}
+            r = requests.post(api,headers=headers,json=insert_dict,verify=False)
+            folder_path = frappe.utils.get_bench_path()
+            # if doc.pms_property_logo != "":
+            #     file_path = folder_path+'/sites/'+doc.site_name+doc.pms_property_logo
+            #     status = upload_propery_logo_pms({"file_path":file_path,"company":doc.name})
+            #     if status["success"] == False:
+            #         return status 
+            #     frappe.db.set_value('company', doc.name, {"pms_property_url":status["data"]})
+            #     frappe.db.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing company_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))   
@@ -114,6 +117,36 @@ def invoice_deleted(doc,method=None):
         frappe.log_error("Ezy-invoicing invoice_deleted Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+def  precheckinsdocuments(doc,method=None):
+    try:
+        user_name =  frappe.session.user
+        date_time = datetime.datetime.now()
+        confirmation_number = doc.confirmation_number
+        if "-" in confirmation_number:
+            confirmation_number = confirmation_number.split("-")[0]
+            
+        date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
+        # activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":confirmation_number,"module":"ezycheckins","event":"PreCheckins","user":user_name,"activity":"Precheckin done by "+doc.guest_first_name,"status":""}
+        if not frappe.db.exists('Documents', confirmation_number):
+            # event_doc=frappe.get_doc(activity_data)
+            # event_doc.insert()
+            # frappe.db.commit()
+            user_name =  frappe.session.user
+            data={"doctype":"Documents","guest_details":[{"image1":doc.image_1,"image2":doc.image_2}],"confirmation_number":confirmation_number,"module_name":"Ezycheckins","user":user_name}
+            get_doc=frappe.get_doc(data)
+            get_doc.insert()
+            frappe.db.commit()
+        else:
+            update_doc=frappe.get_doc("Documents",confirmation_number)
+            update_doc.append("guest_details",{"image1":doc.image_1,"image2":doc.image_2})
+            update_doc.save()
+            frappe.db.commit()
+    except Exception as e:
+        print(str(e), "Process Checkin event")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-precheckins","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(traceback.print_exc())
+        return {"success":False,"message":str(e)}
 
 def invoiceCreated(doc):
     try:
@@ -196,13 +229,15 @@ def fileCreated(doc, method=None):
                 frappe.log_error(traceback.print_exc())
                 logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
-            company = frappe.get_last_doc("company")
-            if company.block_print == "True":
-                return {"success":False,"message":"Print has been Blocked"}
-            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
-                update_documentbin(doc.file_url,"")
+            if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
+                # pass
+                company = frappe.get_last_doc("company")
+                if company.block_print == "True":
+                    return {"success":False,"message":"Print has been Blocked"}
+                if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
+                    update_documentbin(doc.file_url,"")
 
-            print('Normal File')
+                print('Normal File')
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
         # frappe.log_error(traceback.print_exc())
@@ -731,7 +766,7 @@ def arrival_information(doc,method=None):
     user_name =  frappe.session.user
     date_time = datetime.datetime.now() 
     date_time=date_time.strftime("%Y-%m-%d %H:%M:%S")
-    data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Arrival Information added successfully"}
+    data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":doc.confirmation_number,"module":"Sign Ezy","event":"PreArrivals","user":user_name,"activity":"Reservation Created"}
     get_doc=frappe.get_doc(data)
     get_data=frappe.db.get_list(doctype="Documents",filters={"confirmation_number":doc.confirmation_number})
     get_doc.insert()
@@ -744,6 +779,34 @@ def arrival_information(doc,method=None):
     else:
         frappe.db.set_value("Documents",get_data[0]["name"],{"number_of_guests":doc.number_of_guests})
 
+def send_invoice_mail():
+    try:
+        get_arrivals = frappe.db.get_list("Arrival Information",filters={'guest_eamil2': ['!=', ""],'send_invoice_mail':['=',1],'invoice_send_mail_send':['=',0]})
+        if len(get_arrivals)>0:
+            for each in get_arrivals:
+                get_arrivals = frappe.get_doc("Arrival Information", each["name"])
+                if frappe.db.exists({"doctype":"Invoices","confirmation_number":each["name"]}):
+                    get_doc = frappe.db.get_value("Invoices",{"confirmation_number":each["name"]},["invoice_file","name"],as_dict=True)
+                    b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
+                    files=frappe.db.get_list('File',filters={'file_url': ['=',get_doc["invoice_file"]]},fields=['name'])
+                    attachments = [files[0]["name"]]
+                    response = make(recipients = get_arrivals.guest_eamil2,
+                        # cc = '',
+                        subject = b2csuccess.subject,
+                        content = b2csuccess.response,
+                        doctype = "Invoices",
+                        name = get_doc["name"],
+                        attachments = attachments,
+                        send_email=1
+                    )
+                    get_arrivals.invoice_send_mail_send = 1
+                    get_arrivals.save(ignore_permissions=True, ignore_version=True)
+                    frappe.db.commit()
+                    return {"success":True,"message":"Mail Send"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-send_invoice_mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def guest_attachments(doc,method=None):
@@ -771,26 +834,28 @@ def guest_attachments(doc,method=None):
             update_doc.append("guest_details",{"image1":doc.id_image1,"image2":doc.id_image2,"image3":doc.id_image3,"face_image":doc.face_image})
             update_doc.save()
             frappe.db.commit()
-        arrival_doc = frappe.get_doc('Arrival Information',doc.confirmation_number)
-        guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
-        added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
-        if guest_count != 0:
-            print("================================",added_guest_count, guest_count,arrival_doc.number_of_guests)
-            if added_guest_count > guest_count:
+        if frappe.db.exists('Arrival Information',doc.confirmation_number):
+            arrival_doc = frappe.get_doc('Arrival Information',doc.confirmation_number)
+            guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
+            added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
+            if guest_count != 0:
+                if added_guest_count > guest_count:
+                    arrival_doc.no_of_adults = guest_count + 1
+                    # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
+            else:
                 arrival_doc.no_of_adults = guest_count + 1
-                # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
-        else:
-            print("-------------------")
-            arrival_doc.no_of_adults = guest_count + 1
-            # if arrival_doc.number_of_guests:
-            #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
-            # else:
-            #     arrival_doc.number_of_guests = str(0 + 1)
-        arrival_doc.save(ignore_permissions=True, ignore_version=True)
+                # if arrival_doc.number_of_guests:
+                #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
+                # else:
+                #     arrival_doc.number_of_guests = str(0 + 1)
+            arrival_doc.save(ignore_permissions=True, ignore_version=True)
+            doc.checkout_date = arrival_doc.departure_date if arrival_doc.departure_date else ''
+            doc.checkin_date = arrival_doc.arrival_date if arrival_doc.arrival_date else ''
         given_name = doc.given_name if doc.given_name else ""
         surname = doc.surname if doc.surname else ""
-        frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
-        frappe.db.commit()
+        # frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
+        # frappe.db.commit()
+        doc.guest_full_name = given_name+" "+surname
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing Guest Attachments","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -1129,7 +1194,7 @@ def precheckins():
             i["confirmation_number"] = nam
         precheckins_doc = frappe.get_doc(i)
         frappe.db.set_value('Arrival Information',i["confirmation_number"],'virtual_checkin_status','Yes')
-        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Precheckedin Successfully"}
+        activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Precheckin Done"}
         event_doc=frappe.get_doc(activity_data)
         event_doc.insert()
         precheckins_doc.insert() 
@@ -1230,4 +1295,21 @@ def delete_arrival_activity():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-Delete Arrival Activity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def get_apikey(user):
+    try:
+        if frappe.db.exists("User",user):
+            company = frappe.get_last_doc("company")
+            user_api = frappe.get_doc("User",user)
+            secret = user_api.get_password(fieldname='api_secret',raise_exception=True)
+            api_key = user_api.api_key
+            # generate = generate_keys(user)
+            return {"success": True, "api_key":api_key,"api_secret":secret}
+        else:
+            return {"success": False, "message":"No user found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get_apikey","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}

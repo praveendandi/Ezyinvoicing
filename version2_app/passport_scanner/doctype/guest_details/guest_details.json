@@ -343,6 +343,7 @@
    "label": "Uploaded to Frro"
   },
   {
+   "default": "0",
    "fieldname": "frro_failure_count",
    "fieldtype": "Data",
    "label": "Frro Failure Count"
@@ -401,7 +402,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-25 17:41:56.622788",
+ "modified": "2021-12-08 14:42:06.320864",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
