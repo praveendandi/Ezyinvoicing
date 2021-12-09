@@ -502,6 +502,15 @@ def add_guest_details():
                     if re.search("\d{6}",data["address2"]):
                         postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address2"]).groupdict()['zipcode']
                         data["postal_code"] = postal_code if len(postal_code) == 6 else ''
+            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
+                now = datetime.datetime.now()
+                arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
+                data["no_of_nights"] = arrival_doc.no_of_nights
+                data["checkin_date"] = arrival_doc.arrival_date
+                data["checkin_time"] = now.strftime("%H:%M:%S")
+            if data["id_type"] == "Foreigner":
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+                    pre_checkins = frappe.get_doc("Precheckins",data["confirmation_number"])
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
