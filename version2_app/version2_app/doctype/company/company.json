@@ -158,6 +158,7 @@
   "tablet_back_ground_image",
   "card_type_detect_api",
   "dynamic_colour_for_tab",
+  "work_station_pass_code",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1461,11 +1462,16 @@
    "fieldname": "dynamic_colour_for_tab",
    "fieldtype": "Data",
    "label": "Dynamic Colour for Tab"
+  },
+  {
+   "fieldname": "work_station_pass_code",
+   "fieldtype": "Data",
+   "label": "Work Station Pass Code"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-06 12:38:37.505409",
+ "modified": "2021-12-10 16:36:44.455045",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
