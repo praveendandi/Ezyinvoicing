@@ -510,7 +510,10 @@ def add_guest_details():
                 data["checkin_time"] = now.strftime("%H:%M:%S")
             if data["id_type"] == "Foreigner":
                 if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
-                    pre_checkins = frappe.get_doc("Precheckins",data["confirmation_number"])
+                    pre_checkins = frappe.db.get_value('Precheckins',{'confirmation_number': data["confirmation_number"]},["address1","guest_city","guest_country"], as_dict=1)
+                    data["address"] = pre_checkins["address1"]
+                    data["city"] = pre_checkins["guest_city"]
+                    data["country"] =  pre_checkins["guest_country"]
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
