@@ -448,7 +448,7 @@ def update_workstations_status():
         del data["workstation"]
         update_workstation = frappe.db.set_value('Active Work Stations', workstation, data)
         frappe.db.commit()
-        table_config = frappe.db.get_value("Tablet Config",{"work_station":workstation, "mode":"Active"},["name"])
+        table_config = frappe.db.get_value("Tablet Config",{"work_station":workstation},["name"])
         if table_config:
             table_config_doc = frappe.get_doc("Tablet Config",table_config)
             table_config_doc.work_station_socket_id = data["socket_id"]
