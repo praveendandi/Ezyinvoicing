@@ -439,14 +439,18 @@ def update_tablet_status(doc, method=None):
     except Exception as e:
         print(e)
 
-def update_workstations_status(doc,method=None):
+@frappe.whitelist(allow_guest=True)
+def update_workstations_status():
     try:
-        # doc.save(ignore_permissions=True,ignore_version=True)
-        # frappe.db.commit()
-        table_config = frappe.db.get_value("Tablet Config",{"work_station":doc.name},["name"])
+        data=json.loads(frappe.request.data)
+        data = data["data"]
+        workstation = data['workstation']
+        del data["workstation"]
+        update_workstation = frappe.db.set_value('Active Work Stations', workstation, data)
+        table_config = frappe.db.get_value("Tablet Config",{"work_station":workstation, "Mode":"Active"},["name"])
         if table_config:
             table_config_doc = frappe.get_doc("Tablet Config",table_config)
-            table_config_doc.work_station_socket_id = doc.socket_id
+            table_config_doc.work_station_socket_id = data["socket_id"]
             table_config_doc.save(ignore_permissions=True,ignore_version=True)
     except Exception as e:
         print(e)
