@@ -441,6 +441,9 @@ def update_tablet_status(doc, method=None):
 
 def update_workstations_status(doc,method=None):
     try:
+        doc.update_modified=False
+        doc.save(ignore_permissions=True,ignore_version=True)
+        frappe.db.commit()
         table_config = frappe.db.get_value("Tablet Config",{"work_station":doc.name},["name"])
         if table_config:
             table_config_doc = frappe.get_doc("Tablet Config",table_config)
