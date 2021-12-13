@@ -447,6 +447,7 @@ def update_workstations_status():
         workstation = data['workstation']
         del data["workstation"]
         update_workstation = frappe.db.set_value('Active Work Stations', workstation, data)
+        frappe.db.commit()
         table_config = frappe.db.get_value("Tablet Config",{"work_station":workstation, "Mode":"Active"},["name"])
         if table_config:
             table_config_doc = frappe.get_doc("Tablet Config",table_config)
