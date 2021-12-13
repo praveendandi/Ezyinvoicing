@@ -38,7 +38,7 @@ def resetWorkStations(name, doctype):
             uuid = tab_doc.tablet
             tab_doc.uuid = uuid
             frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation' if type == 'work_station' else 'Reset Tablet', 'data': tab_doc.__dict__})
-            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tab_doc.__dict__})
+            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet' if type == 'work_station' else 'Disconnect Workstation', 'data': tab_doc.__dict__})
             if type == "tablet":
                 tab_doc = frappe.get_doc("Tablet Config",tab_name)
                 tab_doc.delete()

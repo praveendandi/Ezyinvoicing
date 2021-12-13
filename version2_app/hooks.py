@@ -117,7 +117,7 @@ doc_events = {
     },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",
-        "on_trash": "version2_app.events.remove_mapping",
+        # "on_trash": "version2_app.events.remove_mapping",
     },
     "Redg Card": {
         "after_insert": "version2_app.events.create_redg_card",
