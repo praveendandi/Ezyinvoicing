@@ -38,6 +38,7 @@ def resetWorkStations(name, doctype):
             uuid = tab_doc.tablet
             tab_doc.uuid = uuid
             if type == "tablet":
+                tab_doc = frappe.get_doc("Tablet Config",tab_name)
                 tab_doc.delete()
                 frappe.db.commit()
                 tablet_doc = frappe.get_doc("Active Tablets",tab_doc.tablet)
