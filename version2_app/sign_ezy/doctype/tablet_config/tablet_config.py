@@ -207,7 +207,7 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
 
 
 @frappe.whitelist(allow_guest=True)
-def disconnectTablet(name):
+def disconnectTablet(name,check=False):
     try:
         tablet_config = frappe.get_doc("Tablet Config",name)
         if not frappe.db.exists("Active Tablets",tablet_config.tablet):
@@ -228,7 +228,8 @@ def disconnectTablet(name):
         tablet_config.save(ignore_permissions=True,ignore_version=True)
         tablet_config.uuid = tablet_config.tablet
         frappe.db.commit()
-        frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config.__dict__})
+        if check == False:
+            frappe.publish_realtime("custom_socket", {'message': 'Disconnect Tablet', 'data': tablet_config.__dict__})
         return {"success":True,"message":"Tablet mapped removed successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
