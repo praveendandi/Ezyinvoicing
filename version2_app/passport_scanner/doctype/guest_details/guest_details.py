@@ -219,7 +219,7 @@ def update_guest_details(name):
                         del driving_license_details["success"]
                         del driving_license_details["driving_details"]
                         driving_license_details["id_type"] = "driving"
-                        return {"success": False,"data":driving_license_details}
+                        return {"success": True,"data":driving_license_details}
                         # return driving_license["data"]["message"]
                     if "driving_details" in driving_license["data"]["message"].keys():
                         if "face" in driving_license["data"]["message"]["driving_details"].keys():
@@ -235,10 +235,6 @@ def update_guest_details(name):
                 driving_license_details["id_type"] = "driving"
                 driving_license_details["image_1"] = pre_checkins.image_1
                 driving_license_details["image_2"] = pre_checkins.image_2
-                if company_doc.scan_ezy_module == 1:
-                    driving_license_details["scan_ezy"] = True
-                else:
-                    driving_license_details["scan_ezy"] = False
                 return {"success":True, "data":driving_license_details}
             if pre_checkins.guest_id_type == "voterId":
                 voter_details = {}
@@ -256,11 +252,10 @@ def update_guest_details(name):
                         if voter_front["data"]["message"]["success"] == False:
                             voter_details["image_1"] = pre_checkins.image_1
                             voter_details["image_2"] = pre_checkins.image_2
-                            voter_details.update(voter_front["data"]["message"])
-                            del voter_details["success"]
-                            del voter_details["voter_details"]
+                            voter_details["error"] = voter_front["data"]["message"]["message"]
+                            voter_details["message"] = "Unable to scan voter card"
                             voter_details["id_type"] = "voterId"
-                            return {"success": False,"data":voter_details}
+                            return {"success": True,"data":voter_details}
                             # return voter_front["data"]["message"]["voter_details"]
                     if "face" in voter_front["data"]["message"]["voter_details"]:
                         base_image = convert_base64_to_image(voter_front["data"]["message"]["voter_details"]["face"],name,site_folder_path,company_doc)
@@ -273,14 +268,13 @@ def update_guest_details(name):
                     voter_details.update(voter_front["data"]["message"]["voter_details"]["data"])
                 if file_path2:
                     voter_back = helper_utility({"api":"scan_votercard", "voter_image":convert2["data"], "scanView":"back"})
-                    if "success" in voter_back["data"]["message"].keys():
+                    if "voter_details" in voter_back["data"]["message"].keys():
                         if voter_back["data"]["message"]["success"] == False:
                             voter_details["image_2"] = pre_checkins.image_2
-                            voter_details.update(voter_back["data"]["message"])
-                            del voter_details["success"]
-                            del voter_details["voter_details"]
+                            voter_details["error"] = voter_back["data"]["message"]["message"]
                             voter_details["id_type"] = "voterId"
-                            return {"success": False,"data":voter_details}
+                            voter_details["message"] = "Unable to fetch complete details"
+                            return {"success": True,"data":voter_details}
                             # return voter_back["data"]["message"]["voter_details"]
                     # aadhar_back["data"]["message"]["voter_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del voter_back["data"]["message"]["voter_details"]["base64_string"]
@@ -398,7 +392,7 @@ def update_guest_details(name):
                         other_details.update(driving_license["data"]["message"])
                         del other_details["success"]
                         other_details["id_type"] = "other"
-                        return {"success": False,"data":other_details}
+                        return {"success": True,"data":other_details}
                         # return driving_license["data"]["message"]
                     if driving_license["data"]["message"]["otherimage_details"]["base64_string"]:
                         base_image = convert_base64_to_image(driving_license["data"]["message"]["otherimage_details"]["base64_string"],name,site_folder_path,company_doc)
@@ -412,8 +406,7 @@ def update_guest_details(name):
                         other_details.update(driving_license["data"]["message"])
                         del other_details["success"]
                         other_details["id_type"] = "other"
-                        return {"success": False,"data":other_details}
-                        return back2["data"]["message"]
+                        return {"success": True,"data":other_details}
                     if back2["data"]["message"]["otherimage_details"]["base64_string"]:
                         base_image = convert_base64_to_image(back2["data"]["message"]["otherimage_details"]["base64_string"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -424,7 +417,6 @@ def update_guest_details(name):
                     other_details["scan_ezy"] = True
                 else:
                     other_details["scan_ezy"] = False
-                print("===========================")
                 return {"success":True, "data":other_details}
         else:
             if company_doc.ezy_checkins_module == 1:

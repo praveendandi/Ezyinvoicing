@@ -1007,8 +1007,8 @@ def voter_detect_text(image_file, doc_type):
                 pin_get = re.findall('[0-9]{6}', person_address)
                 postal_code = ''
                 state = ''
-            address1 = "test"
-            address2 = "test"
+            address1 = ""
+            address2 = ""
             if person_address != "":
                 if re.search("\d{6}",person_address):
                     postal_code_data = re.match('^.*(?P<zipcode>\d{6}).*$', person_address).groupdict()['zipcode']
@@ -1087,7 +1087,7 @@ def scan_votercard():
                     # logger.info(
                     #     f"time elapsed for api request is {time.time()-api_time}")
 
-                    return ({"success": True, "voter_details": details})
+                    return details
             elif 'error' not in details.keys():
                 face_ex = {key: value for key,
                             value in details.items() if key != 'face'}
