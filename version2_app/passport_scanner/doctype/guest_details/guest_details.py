@@ -507,6 +507,10 @@ def add_guest_details():
                     data["address"] = pre_checkins["address1"]
                     data["city"] = pre_checkins["guest_city"]
                     data["country"] =  pre_checkins["guest_country"]
+            if data["date_of_birth"] != "":
+                today = datetime.datetime.today()
+                birthDate = datetime.datetime.strptime(data["date_of_birth"], '%Y-%m-%d')
+                data["age"] = today.year - birthDate.year - ((today.month, today.day) <(birthDate.month, birthDate.day))
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
