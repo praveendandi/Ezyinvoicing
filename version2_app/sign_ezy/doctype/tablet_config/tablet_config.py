@@ -100,6 +100,9 @@ def createTabConfig():
         tablet = frappe.get_doc("Active Tablets",data["tablet"])
         if frappe.db.exists({"doctype":"Tablet Config","work_station":data["work_station"],"tablet":data["tablet"],"mode":"Active"}):
             tablet_config = frappe.db.get_value("Tablet Config",{"work_station":data["work_station"],"tablet":data["tablet"],"mode":"Active"},["name","tablet","work_station","work_station_socket_id","tablet_socket_id","device_name"], as_dict=1)
+            config_update = frappe.db.set_value('Tablet Config', tablet_config["name"], {'work_station_socket_id': work_station.socket_id,'tablet_socket_id': tablet.socket_id})
+            frappe.db.commit()
+            tablet_config["work_station_socket_id"] = work_station.socket_id
             tablet_config["uuid"] = tablet_config["tablet"]
             tablet_config["workstation_status"] = work_station.status
             frappe.publish_realtime("custom_socket", {'message': 'Tablet Mapped', 'data': tablet_config})
