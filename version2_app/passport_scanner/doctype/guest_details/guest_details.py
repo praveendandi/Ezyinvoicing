@@ -163,7 +163,7 @@ def update_guest_details(name):
                             del aadhar_details["success"]
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
-                            return {"success": False,"data":aadhar_details}
+                            return {"success": True,"data":aadhar_details}
                         # return aadhar_front["data"]["message"]
                     if "face" in aadhar_front["data"]["message"]["aadhar_details"].keys():
                         if aadhar_front["data"]["message"]["aadhar_details"]["face"]:
@@ -184,7 +184,8 @@ def update_guest_details(name):
                             del aadhar_details["success"]
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
-                            return {"success": False,"data":aadhar_details}
+                            aadhar_details["message"] = "Unable to fetch complete details"
+                            return {"success": True,"data":aadhar_details}
                     else:
                         aadhar_details["image_2"] = pre_checkins.image_2
                         aadhar_details["id_type"] = "aadhaar"
