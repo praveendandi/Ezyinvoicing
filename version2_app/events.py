@@ -6,20 +6,16 @@ import frappe, requests, json
 from datetime import datetime
 from version2_app.parsers import *
 import base64
-import json
 import shlex,traceback
 import time
-import re
+import re, pdfplumber
 from subprocess import Popen, PIPE, STDOUT
 import os,glob
 import sys
 import datetime
 import importlib.util
 from frappe.utils import cstr,get_site_name,random_string
-import requests
 from datetime import date, timedelta
-import base64
-from frappe.utils import cstr
 import shutil,PIL
 from PIL import Image
 from io import BytesIO
@@ -206,6 +202,29 @@ def update_documentbin(filepath, error_log):
         frappe.log_error("Ezy-invoicing update_documentbin Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+def insert_folios(company, file_path):
+    try:
+        site_folder_path = company.site_name
+        folder_path = frappe.utils.get_bench_path()
+        if "private" in file_path:
+            file_path = folder_path+'/sites/'+site_folder_path+file_path
+        else:
+            file_path = folder_path+'/sites/'+site_folder_path+"/public"+file_path
+        content = []
+        with pdfplumber.open(file_path) as pdf:
+            count = len(pdf.pages)
+            for index in range(count):
+                first_page = pdf.pages[index]
+                content.append(first_page.extract_text())
+        raw_data = []
+        for i in content:
+            for j in i.splitlines():
+                raw_data.append(j)
+        # document_names = {"REGISTRATION CARD":"Redg Card","Paidout Receipts":""}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-Insert Folios","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 def fileCreated(doc, method=None):
     try:
@@ -217,6 +236,9 @@ def fileCreated(doc, method=None):
                 new_parsers = company_doc.new_parsers
                 if company_doc.block_print == "True":
                     return {"success":False,"message":"Print has been Blocked"}
+                insertfolios = insert_folios(company_doc,doc.file_name)
+                if insertfolios["success"] == False:
+                    return insertfolios
                 if new_parsers == 0:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 else:
