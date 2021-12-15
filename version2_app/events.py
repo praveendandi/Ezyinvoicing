@@ -224,13 +224,19 @@ def insert_folios(company, file_path):
         document_type = []
         document_names = {"reg_card_identification_text":"Redg Card","paid_out_receipts":"Paidout Receipts","advance_deposits_identification":"Advance Deposits","payment_receipts_identification":"Payment Receipts","encashment_certificates_identification":"Encashment Certificates"}
         get_values = frappe.db.get_value("company",company.name,["reg_card_identification_text","paid_out_receipts","advance_deposits_identification","payment_receipts_identification","encashment_certificates_identification"],as_dict=1)
-        # for key,value in get_values.items():
-        #     for i in raw_data:
-        #         if value:
-        #             if value in i:
-        #                 document_type.append(key)
+        for key,value in get_values.items():
+            for i in raw_data:
+                if value:
+                    if value in i:
+                        document_type.append(key)
+        print("-------------",document_type)
         for i in raw_data:
-            print(i)
+            print("=========================")
+            if "advance_deposits_identification" in raw_data:
+                print("========================")
+                pattern = re.compile(company.advance_deposits_confirmation_no_regex)
+                check_confirmation = re.findall(pattern, i)
+                print(check_confirmation)
         return {"success":True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

@@ -233,7 +233,7 @@
   "section_break_226",
   "reg_card_confirmation_no_regex",
   "paid_out_confirmation_no_regex",
-  "advance_deposits",
+  "advance_deposits_confirmation_no_regex",
   "payment_receipts_confirmation_no_regex"
  ],
  "fields": [
@@ -1490,11 +1490,6 @@
    "label": "Advance Deposits Identification"
   },
   {
-   "fieldname": "advance_deposits",
-   "fieldtype": "Small Text",
-   "label": "Advance Deposits Confirmation no Regex"
-  },
-  {
    "fieldname": "payment_receipts_identification",
    "fieldtype": "Small Text",
    "label": "Payment Receipts Identification"
@@ -1508,11 +1503,16 @@
    "fieldname": "encashment_certificates_identification",
    "fieldtype": "Small Text",
    "label": "Encashment Certificates Identification"
+  },
+  {
+   "fieldname": "advance_deposits_confirmation_no_regex",
+   "fieldtype": "Small Text",
+   "label": "Advance Deposits Confirmation no Regex"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-14 18:14:53.880784",
+ "modified": "2021-12-15 18:30:26.517112",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
