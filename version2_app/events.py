@@ -124,11 +124,11 @@ def update_documentbin(filepath, error_log):
         if len(bin_data)>0:
             pass
         else:
-            if '@' in filepath:
-                systemName = re.search('@(.*)@', filepath)
-                systemName = systemName.group(1)
-            else:
-                systemName = "NA"    
+            systemName = "NA"
+            if filepath.count("@") == 2:
+                if '@' in filepath:
+                    systemName = re.search('@(.*)@', filepath)
+                    systemName = systemName.group(1)
             bin_doc = frappe.new_doc("Document Bin")
             bin_doc.system_name = systemName
             bin_doc.invoice_file = filepath
