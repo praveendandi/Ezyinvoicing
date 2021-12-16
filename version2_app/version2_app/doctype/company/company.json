@@ -155,6 +155,7 @@
   "card_type_detect_api",
   "dynamic_colour_for_tab",
   "work_station_pass_code",
+  "device_font_style_document",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1508,11 +1509,16 @@
    "fieldname": "advance_deposits_confirmation_no_regex",
    "fieldtype": "Small Text",
    "label": "Advance Deposits Confirmation no Regex"
+  },
+  {
+   "fieldname": "device_font_style_document",
+   "fieldtype": "Attach",
+   "label": "Device Font Style Document"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-15 18:30:26.517112",
+ "modified": "2021-12-16 11:27:12.607263",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

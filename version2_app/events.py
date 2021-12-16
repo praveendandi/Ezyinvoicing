@@ -7,7 +7,7 @@ from datetime import datetime
 from version2_app.parsers import *
 import base64
 import shlex,traceback
-import time
+import time, itertools
 import re, pdfplumber
 from subprocess import Popen, PIPE, STDOUT
 import os,glob
@@ -229,14 +229,13 @@ def insert_folios(company, file_path):
                 if value:
                     if value in i:
                         document_type.append(key)
-        print("-------------",document_type)
         for i in raw_data:
-            print("=========================")
-            if "advance_deposits_identification" in raw_data:
-                print("========================")
+            if "advance_deposits_identification" in document_type:
                 pattern = re.compile(company.advance_deposits_confirmation_no_regex)
                 check_confirmation = re.findall(pattern, i)
-                print(check_confirmation)
+                if len(check_confirmation)>0:
+                    confirmation = list(itertools.chain(*tuple))
+                    print(confirmation)
         return {"success":True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -253,12 +252,12 @@ def fileCreated(doc, method=None):
                 new_parsers = company_doc.new_parsers
                 if company_doc.block_print == "True":
                     return {"success":False,"message":"Print has been Blocked"}
-                if company_doc.ezy_checkins_module == 1:
-                    insertfolios = insert_folios(company_doc,doc.file_url)
-                    if insertfolios["success"] == False:
-                        return insertfolios
-                    else:
-                        return True
+                # if company_doc.ezy_checkins_module == 1:
+                #     insertfolios = insert_folios(company_doc,doc.file_url)
+                #     if insertfolios["success"] == False:
+                #         return insertfolios
+                #     else:
+                #         return True
                 if new_parsers == 0:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 else:
