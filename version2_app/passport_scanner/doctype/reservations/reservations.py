@@ -616,7 +616,7 @@ def scan_driving_license():
             return {"success": False,"message": face_detect["message"],"driving_details": details}
         face = face_detect["data"]
         os.remove(filename)
-        if type == "back":
+        if file_type == "back":
             details = {k: v for k, v in details.items() if v}
         if os.path.isfile(face) is True:
             with open(face, 'rb') as image:
