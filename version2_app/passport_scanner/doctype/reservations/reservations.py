@@ -591,6 +591,7 @@ def scan_driving_license():
     try:
         company = frappe.get_last_doc('company')
         api_time = time.time()
+        file_type = frappe.local.form_dict.get("scanView")
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
@@ -615,7 +616,8 @@ def scan_driving_license():
             return {"success": False,"message": face_detect["message"],"driving_details": details}
         face = face_detect["data"]
         os.remove(filename)
-
+        if type == "back":
+            details = {k: v for k, v in details.items() if v}
         if os.path.isfile(face) is True:
             with open(face, 'rb') as image:
                 image_string = base64.b64encode(image.read()).decode()
