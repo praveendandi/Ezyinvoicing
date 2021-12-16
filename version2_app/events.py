@@ -6,20 +6,16 @@ import frappe, requests, json
 from datetime import datetime
 from version2_app.parsers import *
 import base64
-import json
 import shlex,traceback
-import time
-import re
+import time, itertools
+import re, pdfplumber
 from subprocess import Popen, PIPE, STDOUT
 import os,glob
 import sys
 import datetime
 import importlib.util
 from frappe.utils import cstr,get_site_name,random_string
-import requests
 from datetime import date, timedelta
-import base64
-from frappe.utils import cstr
 import shutil,PIL
 from PIL import Image
 from io import BytesIO
@@ -206,6 +202,45 @@ def update_documentbin(filepath, error_log):
         frappe.log_error("Ezy-invoicing update_documentbin Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+def insert_folios(company, file_path):
+    try:
+        print(file_path)
+        site_folder_path = company.site_name
+        folder_path = frappe.utils.get_bench_path()
+        if "private" in file_path:
+            file_path = folder_path+'/sites/'+site_folder_path+file_path
+        else:
+            file_path = folder_path+'/sites/'+site_folder_path+"/public"+file_path
+        content = []
+        with pdfplumber.open(file_path) as pdf:
+            count = len(pdf.pages)
+            for index in range(count):
+                first_page = pdf.pages[index]
+                content.append(first_page.extract_text())
+        raw_data = []
+        for i in content:
+            for j in i.splitlines():
+                raw_data.append(j)
+        document_type = []
+        document_names = {"reg_card_identification_text":"Redg Card","paid_out_receipts":"Paidout Receipts","advance_deposits_identification":"Advance Deposits","payment_receipts_identification":"Payment Receipts","encashment_certificates_identification":"Encashment Certificates"}
+        get_values = frappe.db.get_value("company",company.name,["reg_card_identification_text","paid_out_receipts","advance_deposits_identification","payment_receipts_identification","encashment_certificates_identification"],as_dict=1)
+        for key,value in get_values.items():
+            for i in raw_data:
+                if value:
+                    if value in i:
+                        document_type.append(key)
+        for i in raw_data:
+            if "advance_deposits_identification" in document_type:
+                pattern = re.compile(company.advance_deposits_confirmation_no_regex)
+                check_confirmation = re.findall(pattern, i)
+                if len(check_confirmation)>0:
+                    confirmation = list(itertools.chain(*tuple))
+                    print(confirmation)
+        return {"success":True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-Insert Folios","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
 def fileCreated(doc, method=None):
     try:
@@ -217,6 +252,12 @@ def fileCreated(doc, method=None):
                 new_parsers = company_doc.new_parsers
                 if company_doc.block_print == "True":
                     return {"success":False,"message":"Print has been Blocked"}
+                # if company_doc.ezy_checkins_module == 1:
+                #     insertfolios = insert_folios(company_doc,doc.file_url)
+                #     if insertfolios["success"] == False:
+                #         return insertfolios
+                #     else:
+                #         return True
                 if new_parsers == 0:
                     file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
                 else:

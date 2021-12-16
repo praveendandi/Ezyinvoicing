@@ -261,7 +261,7 @@ def get_tablet_config(ws):
         print(e, "attach qr code")
 
 @frappe.whitelist(allow_guest=True)
-def disconnectWorkStation(ws = "",tablet = "",extension=False):
+def disconnectWorkStation(ws = "",tablet = "",extension="False"):
     try:
         if ws != "" and tablet != "":
             if not frappe.db.exists({"doctype":"Tablet Config","work_station":ws,"tablet":tablet,"mode":"Active"}):
@@ -269,11 +269,16 @@ def disconnectWorkStation(ws = "",tablet = "",extension=False):
             get_tablet_config = frappe.db.get_list('Tablet Config',filters={"work_station":ws,"tablet":tablet,"mode":"Active"},fields=["name"],order_by='creation desc')
         elif ws != "":
             if not frappe.db.exists({"doctype":"Tablet Config","work_station":ws,"mode":"Active"}):
-                if extension == True:
+                if extension == "True":
                     ws_doc = frappe.get_doc("Active Work Stations",ws)
+                    ws_doc.status = "In Active"
+                    ws_doc.mode = "Not Connected"
+                    ws_doc.save(ignore_permissions=True, ignore_version=True)
+                    frappe.db.commit()
                     frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation', 'data': ws_doc.__dict__})
                     return {"success": True, "message": "Workstation disconnected"}
-                return {"success":False,"message":"Mapping not found"}
+                else:
+                    return {"success":False,"message":"Mapping not found"}
             get_tablet_config = frappe.db.get_list('Tablet Config',filters={"work_station":ws,"mode":"Active"},fields=["name"],order_by='creation desc')
         else:
             return {"success":False,"message":"Mapping not found"}
