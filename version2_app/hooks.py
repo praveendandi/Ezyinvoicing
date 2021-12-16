@@ -117,7 +117,7 @@ doc_events = {
     },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",
-        "on_trash": "version2_app.events.remove_mapping",
+        # "on_trash": "version2_app.events.remove_mapping",
     },
     "Redg Card": {
         "after_insert": "version2_app.events.create_redg_card",
@@ -145,7 +145,7 @@ doc_events = {
     },
     "Active Tablets": {
         "after_insert": "version2_app.events.tablet_connected",
-        "on_trash": "version2_app.events.tablet_disconnected",
+        # "on_trash": "version2_app.events.tablet_disconnected",
         "on_update": "version2_app.events.update_tablet_status",
     },
     "Active Work Stations": {
