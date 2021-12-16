@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "creation": "2021-02-17 18:03:34.397136",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "guest_name",
+  "invoice_type",
+  "room_number",
+  "confirmation_number",
+  "invoice_category",
+  "print_by",
+  "viewed",
+  "record_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  },
+  {
+   "fieldname": "guest_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest Name"
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "label": "Invoice Type",
+   "options": "B2B\nB2C"
+  },
+  {
+   "fieldname": "room_number",
+   "fieldtype": "Int",
+   "label": "Room Number"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "label": "Invoice Category",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+  },
+  {
+   "fieldname": "print_by",
+   "fieldtype": "Data",
+   "label": "Print By"
+  },
+  {
+   "default": "0",
+   "fieldname": "viewed",
+   "fieldtype": "Check",
+   "label": "Viewed"
+  },
+  {
+   "fieldname": "record_type",
+   "fieldtype": "Data",
+   "label": "Record Type"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-03-03 18:46:08.447101",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Socket Notification",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -5,6 +5,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "item_value",
+  "item_value_after_gst",
   "item_name",
   "sac_code",
   "date",
@@ -17,18 +19,29 @@
   "igst_amount",
   "description",
   "gst_rate",
-  "item_value",
   "item_taxable_value",
-  "item_value_after_gst",
   "sac_code_found",
   "is_credit_item",
   "taxable",
   "item_type",
-  "quantity",
   "sort_order",
   "cess",
   "cess_amount",
-  "type"
+  "type",
+  "item_mode",
+  "state_cess",
+  "state_cess_amount",
+  "vat",
+  "vat_amount",
+  "unit_of_measurement",
+  "unit_of_measurement_description",
+  "quantity",
+  "sac_index",
+  "is_service_charge_item",
+  "is_manual_edit",
+  "discount_value",
+  "line_edit_net",
+  "item_reference"
  ],
  "fields": [
   {
@@ -53,7 +66,7 @@
   },
   {
    "fieldname": "cgst",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "CGST %",
    "reqd": 1
@@ -67,7 +80,7 @@
   },
   {
    "fieldname": "sgst",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "in_list_view": 1,
    "label": "SGST %",
    "reqd": 1
@@ -81,7 +94,7 @@
   },
   {
    "fieldname": "igst",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "IGST %",
    "reqd": 1
   },
@@ -103,7 +116,7 @@
   },
   {
    "fieldname": "gst_rate",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "GST Rate"
   },
   {
@@ -113,11 +126,13 @@
    "label": "Item Value"
   },
   {
+   "columns": 3,
    "fieldname": "item_taxable_value",
    "fieldtype": "Float",
    "label": "Item Taxable value"
   },
   {
+   "columns": 3,
    "fieldname": "item_value_after_gst",
    "fieldtype": "Float",
    "label": "Item Value After GST"
@@ -145,40 +160,112 @@
    "fieldname": "item_type",
    "fieldtype": "Select",
    "label": "Item Type",
-   "options": "SAC\nHSN"
-  },
-  {
-   "fieldname": "quantity",
-   "fieldtype": "Select",
-   "label": "Quantity",
-   "options": "Units\nOthers"
+   "options": "SAC\nHSN\nDiscount"
   },
   {
    "fieldname": "sort_order",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "label": "Sort Order"
   },
   {
    "fieldname": "cess_amount",
    "fieldtype": "Float",
-   "label": "CESS Amount"
+   "label": "Central CESS Amount"
   },
   {
    "fieldname": "cess",
-   "fieldtype": "Int",
-   "label": "CESS %"
+   "fieldtype": "Float",
+   "label": "Central CESS %"
   },
   {
    "fieldname": "type",
    "fieldtype": "Select",
    "label": "Type",
    "options": "Included\nExcempted\nNon-Gst"
+  },
+  {
+   "fieldname": "item_mode",
+   "fieldtype": "Select",
+   "label": "Item Mode",
+   "options": "Credit\nDiscount\nDebit"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Float",
+   "label": "VAT Amount"
+  },
+  {
+   "fieldname": "vat",
+   "fieldtype": "Float",
+   "label": "VAT %"
+  },
+  {
+   "fieldname": "state_cess",
+   "fieldtype": "Float",
+   "label": "State CESS %"
+  },
+  {
+   "fieldname": "state_cess_amount",
+   "fieldtype": "Float",
+   "label": "State Cess Amount"
+  },
+  {
+   "fieldname": "unit_of_measurement",
+   "fieldtype": "Select",
+   "label": "Unit Of Measurement",
+   "options": "BAG\nBAL\nBDL\nBKL\nBOU\nBOX\nBTL\nBUN\nCAN\nCBM\nCCM\nCMS\nCTN\nDOZ\nDRM\nGGK\nGMS\nGRS\nGYD\nKGS\nKLR\nKME\nMLT\nMTR\nMTS\nNOS\nPAC\nPCS\nPRS\nQTL\nROL\nSET\nSQF\nSQM\nSQY\nTBS\nTGM\nTHD\nTON\nTUB\nUGS\nUNT\nYDS\nOTH"
+  },
+  {
+   "fieldname": "unit_of_measurement_description",
+   "fieldtype": "Select",
+   "label": "Unit Of Measurement Description",
+   "options": "BAGS\nBALE\nBUNDLES\nBUCKLES\nBILLION OF UNITS\nBOX\nBOTTLES\nBUNCHES\nCANS\nCUBIC METERS\nCUBIC CENTIMETERS\nCENTIMETERS\nCARTONS\nDOZENS\nDRUMS\nGREAT GROSS\nGRAMMES\nGROSS\nGROSS YARDS\nKILOGRAMS\nKILOLITRE\nKILOMETRE\nMILILITRE\nMETERS\nMETRIC TON\nNUMBERS\nPACKS\nPIECES\nPAIRS\nQUINTAL\nROLLS\nSETS\nSQUARE FEET\nSQUARE METERS\nSQUARE YARDS\nTABLETS\nTEN GROSS\nTHOUSANDS\nTONNES\nTUBES\nUS GALLONS\nUNITS\nYARDS\nOTHERS"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Data",
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "sac_index",
+   "fieldtype": "Data",
+   "label": "SAC Index"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_service_charge_item",
+   "fieldtype": "Select",
+   "label": "Is Service Charge Item",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_manual_edit",
+   "fieldtype": "Select",
+   "label": "Is Manual Edit",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "discount_value",
+   "fieldtype": "Float",
+   "label": "Discount Value"
+  },
+  {
+   "fieldname": "line_edit_net",
+   "fieldtype": "Select",
+   "label": "Line Edit Net",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "item_reference",
+   "fieldtype": "Data",
+   "label": "Item Reference"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-12-07 14:30:31.030206",
+ "modified": "2021-07-08 16:51:29.719164",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",

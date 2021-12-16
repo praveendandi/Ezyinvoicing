@@ -25,7 +25,8 @@
   "address_floor_number",
   "address_street",
   "block_status",
-  "status"
+  "status",
+  "disable_auto_irn"
  ],
  "fields": [
   {
@@ -132,11 +133,17 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Active\nIn-Active"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_auto_irn",
+   "fieldtype": "Check",
+   "label": "Disable Auto IRN"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2020-11-23 11:06:39.756636",
+ "modified": "2021-04-16 10:44:02.024180",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "TaxPayerDetail",
@@ -187,6 +194,54 @@
    "read": 1,
    "report": 1,
    "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Inbox",
    "share": 1,
    "write": 1
   }

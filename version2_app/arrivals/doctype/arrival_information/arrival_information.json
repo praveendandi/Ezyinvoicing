@@ -1,0 +1,337 @@
+{
+ "actions": [],
+ "autoname": "field:confirmation_number",
+ "creation": "2021-09-07 17:14:34.146147",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "guest_title",
+  "guest_first_name",
+  "guest_last_name",
+  "guest_email_address",
+  "room_type",
+  "guest_phone_no",
+  "travel_agent_name",
+  "no_of_adults",
+  "no_of_children",
+  "no_of_nights",
+  "billing_instructions",
+  "no_of_rooms",
+  "confirmation_number",
+  "csr_id",
+  "print_rate",
+  "room_rate",
+  "reservation_clerk",
+  "membership_no",
+  "membership_type",
+  "total_visits",
+  "checkin_date",
+  "checkout_date",
+  "cc_number",
+  "cc_exp_date",
+  "company_name",
+  "booking_status",
+  "virtual_checkin_status",
+  "company",
+  "arrival_date",
+  "departure_date",
+  "is_group_code",
+  "status",
+  "number_of_guests",
+  "mail_sent",
+  "mail_via",
+  "mail_count",
+  "voucher",
+  "guest_eamil2",
+  "guest_mobile_no2",
+  "invoice_send_mail_send",
+  "send_invoice_mail"
+ ],
+ "fields": [
+  {
+   "fieldname": "guest_title",
+   "fieldtype": "Data",
+   "label": "Guest Title"
+  },
+  {
+   "fieldname": "guest_first_name",
+   "fieldtype": "Data",
+   "label": "Guest First Name"
+  },
+  {
+   "fieldname": "guest_last_name",
+   "fieldtype": "Data",
+   "label": "Guest Last Name"
+  },
+  {
+   "fieldname": "guest_email_address",
+   "fieldtype": "Data",
+   "label": "Guest Email Address"
+  },
+  {
+   "fieldname": "room_type",
+   "fieldtype": "Data",
+   "label": "Room Type"
+  },
+  {
+   "fieldname": "guest_phone_no",
+   "fieldtype": "Data",
+   "label": "Guest Phone No"
+  },
+  {
+   "fieldname": "travel_agent_name",
+   "fieldtype": "Data",
+   "label": "Travel Agent Name"
+  },
+  {
+   "fieldname": "no_of_adults",
+   "fieldtype": "Int",
+   "label": "No Of Adults"
+  },
+  {
+   "fieldname": "no_of_children",
+   "fieldtype": "Int",
+   "label": "No Of Children"
+  },
+  {
+   "fieldname": "no_of_nights",
+   "fieldtype": "Int",
+   "label": "No Of Nights"
+  },
+  {
+   "fieldname": "billing_instructions",
+   "fieldtype": "Data",
+   "label": "Billing Instructions"
+  },
+  {
+   "fieldname": "no_of_rooms",
+   "fieldtype": "Data",
+   "label": "No Of Rooms"
+  },
+  {
+   "fieldname": "confirmation_number",
+   "fieldtype": "Data",
+   "label": "Confirmation Number",
+   "unique": 1
+  },
+  {
+   "fieldname": "csr_id",
+   "fieldtype": "Data",
+   "label": "CSR Id"
+  },
+  {
+   "fieldname": "print_rate",
+   "fieldtype": "Select",
+   "label": "Print Rate",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "room_rate",
+   "fieldtype": "Float",
+   "label": "Room Rate"
+  },
+  {
+   "fieldname": "reservation_clerk",
+   "fieldtype": "Data",
+   "label": "Reservation Clerk"
+  },
+  {
+   "fieldname": "membership_no",
+   "fieldtype": "Data",
+   "label": "Membership No"
+  },
+  {
+   "fieldname": "membership_type",
+   "fieldtype": "Data",
+   "label": "Membership Type"
+  },
+  {
+   "fieldname": "total_visits",
+   "fieldtype": "Data",
+   "label": "Total Visits"
+  },
+  {
+   "fieldname": "cc_number",
+   "fieldtype": "Data",
+   "label": "CC Number"
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "Company Name"
+  },
+  {
+   "fieldname": "booking_status",
+   "fieldtype": "Select",
+   "label": "Booking Status",
+   "options": "RESERVED\nCANCELLED\nCHECKED IN\nCHECKED OUT\nDUE IN\nDUE OUT"
+  },
+  {
+   "default": "No",
+   "fieldname": "virtual_checkin_status",
+   "fieldtype": "Select",
+   "label": "Virtual Checkin Status",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company"
+  },
+  {
+   "fieldname": "checkin_date",
+   "fieldtype": "Date",
+   "label": "Checkin Date"
+  },
+  {
+   "fieldname": "checkout_date",
+   "fieldtype": "Date",
+   "label": "Checkout Date"
+  },
+  {
+   "fieldname": "cc_exp_date",
+   "fieldtype": "Data",
+   "label": "CC Exp Date"
+  },
+  {
+   "fieldname": "arrival_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Arrival Date"
+  },
+  {
+   "fieldname": "departure_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Departure Date"
+  },
+  {
+   "default": "No",
+   "fieldname": "is_group_code",
+   "fieldtype": "Select",
+   "label": "Is Group Code",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending\nScanned\nReserved\nPartial Scanned"
+  },
+  {
+   "fieldname": "number_of_guests",
+   "fieldtype": "Data",
+   "label": "Number of Guests"
+  },
+  {
+   "default": "No",
+   "fieldname": "mail_sent",
+   "fieldtype": "Select",
+   "label": "Mail Sent",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "None",
+   "fieldname": "mail_via",
+   "fieldtype": "Select",
+   "label": "Mail Sent Through",
+   "options": "Automatic\nManual\nNone"
+  },
+  {
+   "fieldname": "mail_count",
+   "fieldtype": "Int",
+   "label": "Mail Count"
+  },
+  {
+   "fieldname": "voucher",
+   "fieldtype": "Attach",
+   "label": "Voucher"
+  },
+  {
+   "fieldname": "guest_eamil2",
+   "fieldtype": "Data",
+   "label": "Guest Eamil2"
+  },
+  {
+   "fieldname": "guest_mobile_no2",
+   "fieldtype": "Data",
+   "label": "Guest Mobile No2"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_send_mail_send",
+   "fieldtype": "Check",
+   "label": "Invoice Send Mail Send"
+  },
+  {
+   "default": "0",
+   "fieldname": "send_invoice_mail",
+   "fieldtype": "Check",
+   "label": "Send Invoice Mail"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-12-03 12:29:55.339072",
+ "modified_by": "Administrator",
+ "module": "Arrivals",
+ "name": "Arrival Information",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

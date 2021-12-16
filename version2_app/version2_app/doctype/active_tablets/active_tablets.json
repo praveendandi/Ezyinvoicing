@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "autoname": "field:uuid",
+ "creation": "2021-04-02 14:52:31.064383",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tablet",
+  "ip_address",
+  "socket_id",
+  "connected_on",
+  "status",
+  "uuid",
+  "device_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "tablet",
+   "fieldtype": "Data",
+   "label": "Tablet"
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "label": "Ip Address"
+  },
+  {
+   "fieldname": "socket_id",
+   "fieldtype": "Data",
+   "label": "socket Id",
+   "unique": 1
+  },
+  {
+   "fieldname": "connected_on",
+   "fieldtype": "Data",
+   "label": "Connected On"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "uuid",
+   "fieldtype": "Data",
+   "label": "UUID",
+   "unique": 1
+  },
+  {
+   "fieldname": "device_name",
+   "fieldtype": "Data",
+   "label": "Device Name"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-07-26 09:49:47.663052",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Active Tablets",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

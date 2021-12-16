@@ -4,3 +4,10 @@
 *.swp
 tags
 version2_app/docs/current
+apps/version2_app/version2_app/version2_app/doctype/invoices/invoice_parser.py
+apps/version2_app/version2_app/version2_app/doctype/invoices/reinitiate_parser.py
+parsers_invoices
+version2_app/parsers_invoice/invoice_parsers
+apps/version2_app/version2_app/parsers_invoice/invoice_parsers
+version2_app/invoice_parsers/
+version2_app/arrival_report.json

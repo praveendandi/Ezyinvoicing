@@ -1,0 +1,173 @@
+{
+ "actions": [],
+ "autoname": "field:outlet_name",
+ "creation": "2021-06-25 17:24:17.347033",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "outlet_name",
+  "static_payment_qr_code",
+  "outlet_logo",
+  "payment_mode",
+  "void",
+  "start",
+  "cancelled",
+  "closed",
+  "print",
+  "printer_mapped",
+  "gstin",
+  "fssai",
+  "tin_no",
+  "cin_no",
+  "service_tax_no",
+  "website",
+  "print_count",
+  "invoice_number_format",
+  "last_updated"
+ ],
+ "fields": [
+  {
+   "fieldname": "outlet_name",
+   "fieldtype": "Data",
+   "label": "Outlet Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "static_payment_qr_code",
+   "fieldtype": "Attach",
+   "label": "Static Payment QR Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "outlet_logo",
+   "fieldtype": "Attach",
+   "label": "Outlet Logo",
+   "reqd": 1
+  },
+  {
+   "default": "Static",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Payment Mode",
+   "options": "Static\nDynamic"
+  },
+  {
+   "fieldname": "void",
+   "fieldtype": "Data",
+   "label": "Void"
+  },
+  {
+   "fieldname": "start",
+   "fieldtype": "Data",
+   "label": "Start"
+  },
+  {
+   "fieldname": "cancelled",
+   "fieldtype": "Data",
+   "label": "Cancelled"
+  },
+  {
+   "fieldname": "closed",
+   "fieldtype": "Data",
+   "label": "Closed"
+  },
+  {
+   "default": "No",
+   "fieldname": "print",
+   "fieldtype": "Select",
+   "label": "Print",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "0",
+   "fieldname": "printer_mapped",
+   "fieldtype": "Check",
+   "label": "Printer Mapped"
+  },
+  {
+   "fieldname": "gstin",
+   "fieldtype": "Data",
+   "label": "GSTIN"
+  },
+  {
+   "fieldname": "fssai",
+   "fieldtype": "Data",
+   "label": "FSSAI"
+  },
+  {
+   "fieldname": "tin_no",
+   "fieldtype": "Data",
+   "label": "TIN NO"
+  },
+  {
+   "fieldname": "cin_no",
+   "fieldtype": "Data",
+   "label": "CIN NO"
+  },
+  {
+   "fieldname": "service_tax_no",
+   "fieldtype": "Data",
+   "label": "SERVICE TAX NO"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
+  },
+  {
+   "default": "1",
+   "fieldname": "print_count",
+   "fieldtype": "Int",
+   "label": "Print Count"
+  },
+  {
+   "fieldname": "invoice_number_format",
+   "fieldtype": "Data",
+   "label": "Invoice Number Format"
+  },
+  {
+   "fieldname": "last_updated",
+   "fieldtype": "Datetime",
+   "label": "Last Updated"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-10-14 12:07:49.713887",
+ "modified_by": "Administrator",
+ "module": "POS Bills",
+ "name": "Outlets",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
