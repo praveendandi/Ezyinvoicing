@@ -41,8 +41,8 @@ def invoice_update(doc,method=None):
             total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
-                # doc.save(ignore_permissions=True,ignore_version=True)
-        # frappe.db.commit()
+                doc.save(ignore_permissions=True,ignore_version=True)
+                # frappe.db.commit()
     except:
         frappe.log_error(frappe.get_traceback(),"invoice_update Error")
         
