@@ -39,7 +39,7 @@ def invoice_update(doc,method=None):
     try:
         doc.amount_in_word=num_to_words(doc.sales_amount_after_tax)
         doc.save(ignore_permissions=True,ignore_version=True)
-        frappe.db.commit()
+        # frappe.db.commit()
     except:
         frappe.log_error(frappe.get_traceback(),"invoice_update Error")
 def invoice_created(doc, method=None):
