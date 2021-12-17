@@ -42,7 +42,7 @@ def invoice_update(doc,method=None):
             total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
-                doc.save(ignore_permissions=True,ignore_version=True)
+                # doc.save(ignore_permissions=True,ignore_version=True)
         # frappe.db.commit()
     except:
         frappe.log_error(frappe.get_traceback(),"invoice_update Error")
@@ -52,9 +52,9 @@ def invoice_created(doc, method=None):
             total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
-                doc.save(ignore_permissions=True,ignore_version=True)
-                frappe.db.commit()
-        print(">>>>>>amount_in_word",)
+                # print(doc.amount_in_word,"===============")
+                # doc.save(ignore_permissions=True)
+                # frappe.db.commit()
         if frappe.db.exists('Invoice Reconciliations', doc.name):
             reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
             reconciliations_doc.invoice_found = "Yes"
