@@ -30,24 +30,30 @@ def num_to_words(num):
         num_in_word = money_in_words(given_num)
         print(num_in_word)
         text=str(num_in_word).strip("INR")
-        return text.strip()
+        return {"success":True, "data":text.strip()}
     except:
         frappe.log_error(frappe.get_traceback(),"num_to_words Error")
+        return {"success":False}
 
 
 def invoice_update(doc,method=None):
     try:
-        doc.amount_in_word=num_to_words(doc.sales_amount_after_tax)
-        doc.save(ignore_permissions=True,ignore_version=True)
+        if doc.sales_amount_after_tax:
+            total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
+            if total_amount_in_words["success"] == True:
+                doc.amount_in_word = total_amount_in_words["data"]
+                doc.save(ignore_permissions=True,ignore_version=True)
         # frappe.db.commit()
     except:
         frappe.log_error(frappe.get_traceback(),"invoice_update Error")
 def invoice_created(doc, method=None):
     try:
-        print("Invoice Created",doc.name)
-        doc.amount_in_word=num_to_words(doc.sales_amount_after_tax)
-        doc.save(ignore_permissions=True,ignore_version=True)
-        frappe.db.commit()
+        if doc.sales_amount_after_tax:
+            total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
+            if total_amount_in_words["success"] == True:
+                doc.amount_in_word = total_amount_in_words["data"]
+                doc.save(ignore_permissions=True,ignore_version=True)
+                frappe.db.commit()
         print(">>>>>>amount_in_word",)
         if frappe.db.exists('Invoice Reconciliations', doc.name):
             reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
