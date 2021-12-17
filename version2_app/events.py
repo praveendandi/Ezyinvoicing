@@ -28,7 +28,6 @@ def num_to_words(num):
     try:
         given_num = abs(float((num)))
         num_in_word = money_in_words(given_num)
-        print(num_in_word)
         text=str(num_in_word).strip("INR")
         return {"success":True, "data":text.strip()}
     except:
@@ -46,6 +45,8 @@ def invoice_update(doc,method=None):
         # frappe.db.commit()
     except:
         frappe.log_error(frappe.get_traceback(),"invoice_update Error")
+        
+
 def invoice_created(doc, method=None):
     try:
         if doc.sales_amount_after_tax:
