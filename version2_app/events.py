@@ -18,13 +18,36 @@ from datetime import date, timedelta
 
 import shutil
 from frappe.utils import logger
+from frappe.utils.data import money_in_words
+
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
 
+@frappe.whitelist(allow_guest=True)
+def num_to_words(num):
+    try:
+        given_num = abs(float((num)))
+        num_in_word = money_in_words(given_num)
+        print(num_in_word)
+        text=str(num_in_word).strip("INR")
+        return text.strip()
+    except:
+        frappe.log_error(frappe.get_traceback(),"num_to_words Error")
 
+
+def invoice_update(doc,method=None):
+    try:
+        doc.amount_in_word=num_to_words(doc.sales_amount_after_tax)
+        # doc.save(ignore_permissions=True,ignore_version=True)
+    except:
+        frappe.log_error(frappe.get_traceback(),"invoice_update Error")
 def invoice_created(doc, method=None):
     try:
         print("Invoice Created",doc.name)
+        doc.amount_in_word=num_to_words(doc.sales_amount_after_tax)
+        doc.save(ignore_permissions=True,ignore_version=True)
+        frappe.db.commit()
+        print(">>>>>>amount_in_word",)
         if frappe.db.exists('Invoice Reconciliations', doc.name):
             reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
             reconciliations_doc.invoice_found = "Yes"
