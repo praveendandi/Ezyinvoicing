@@ -542,7 +542,7 @@ def add_guest_details():
                 arrival_date = datetime.datetime.now().date()
                 arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
                 arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
-            return {"success":True, "message":"Guest added successfully"}
+            return {"success":True, "message":"Guest added"}
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
     except Exception as e:
