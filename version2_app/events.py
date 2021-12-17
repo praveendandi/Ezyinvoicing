@@ -893,25 +893,26 @@ def guest_attachments(doc,method=None):
             frappe.db.commit()
         if frappe.db.exists('Arrival Information',doc.confirmation_number):
             arrival_doc = frappe.get_doc('Arrival Information',doc.confirmation_number)
-            guest_count = arrival_doc.no_of_adults+arrival_doc.no_of_children
+            guest_count = arrival_doc.no_of_adults
             now = datetime.datetime.now()
             doc.no_of_nights = arrival_doc.no_of_nights
-            doc.checkin_date = arrival_doc.arrival_date
             doc.checkin_time = now.strftime("%H:%M:%S")
             added_guest_count = frappe.db.count('Guest Details', {'confirmation_number': doc.confirmation_number})
             if guest_count != 0:
+                arrival_doc.booking_status = "CHECKED IN"
                 if added_guest_count > guest_count:
                     arrival_doc.no_of_adults = guest_count + 1
                     # arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
             else:
                 arrival_doc.no_of_adults = guest_count + 1
+                arrival_doc.booking_status = "CHECKED IN"
                 # if arrival_doc.number_of_guests:
                 #     arrival_doc.number_of_guests = str(int(arrival_doc.number_of_guests) + 1)
                 # else:
                 #     arrival_doc.number_of_guests = str(0 + 1)
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
-            doc.checkout_date = arrival_doc.departure_date if arrival_doc.departure_date else ''
-            doc.checkin_date = arrival_doc.arrival_date if arrival_doc.arrival_date else ''
+            doc.checkout_date = datetime.datetime.strptime(str(arrival_doc.departure_date),'%Y-%m-%d') if arrival_doc.departure_date else None
+            doc.checkin_date = datetime.datetime.strptime(str(arrival_doc.arrival_date),'%Y-%m-%d') if arrival_doc.arrival_date else None
         given_name = doc.given_name if doc.given_name else ""
         surname = doc.surname if doc.surname else ""
         # frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
@@ -919,14 +920,15 @@ def guest_attachments(doc,method=None):
         if doc.id_type == "Foreigner":
             if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
                 pre_checkins = frappe.db.get_value('Precheckins',{'confirmation_number': data["confirmation_number"]},["address1","guest_city","guest_country"], as_dict=1)
-                data["address"] = pre_checkins["address1"]
-                data["city"] = pre_checkins["guest_city"]
-                data["country"] =  pre_checkins["guest_country"]
-        if doc.date_of_birth != "":
+                doc.address = pre_checkins["address1"]
+                doc.city = pre_checkins["guest_city"]
+                doc.country =  pre_checkins["guest_country"]
+        if doc.date_of_birth:
             today = datetime.datetime.today()
-            birthDate = datetime.datetime.strptime(data["date_of_birth"], '%Y-%m-%d')
-            data["age"] = today.year - birthDate.year - ((today.month, today.day) <(birthDate.month, birthDate.day))
+            birthDate = datetime.datetime.strptime(doc.date_of_birth, '%Y-%m-%d')
+            doc.age = today.year - birthDate.year - ((today.month, today.day) <(birthDate.month, birthDate.day))
         doc.guest_full_name = given_name+" "+surname
+        doc.save()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing Guest Attachments","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
