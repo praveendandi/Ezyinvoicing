@@ -68,7 +68,8 @@
   "frro_checkout_message",
   "frro_checkout_date",
   "remarks",
-  "select_category"
+  "select_category",
+  "aadhar_address"
  ],
  "fields": [
   {
@@ -114,7 +115,7 @@
   },
   {
    "fieldname": "date_of_birth",
-   "fieldtype": "Date",
+   "fieldtype": "Data",
    "label": "Date of Birth"
   },
   {
@@ -152,7 +153,7 @@
   },
   {
    "fieldname": "passport_date_of_issue",
-   "fieldtype": "Date",
+   "fieldtype": "Data",
    "label": "Passport Date of Issue"
   },
   {
@@ -398,11 +399,16 @@
    "fieldname": "select_category",
    "fieldtype": "Data",
    "label": "Select Category"
+  },
+  {
+   "fieldname": "aadhar_address",
+   "fieldtype": "Data",
+   "label": "Aadhar Address"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-02 09:13:56.518552",
+ "modified": "2021-12-18 12:16:19.856875",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Temp Doc Details",
