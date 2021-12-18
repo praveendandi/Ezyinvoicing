@@ -117,7 +117,7 @@ doc_events = {
     },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",
-        "on_trash": "version2_app.events.remove_mapping",
+        # "on_trash": "version2_app.events.remove_mapping",
     },
     "Redg Card": {
         "after_insert": "version2_app.events.create_redg_card",
@@ -145,12 +145,13 @@ doc_events = {
     },
     "Active Tablets": {
         "after_insert": "version2_app.events.tablet_connected",
-        "on_trash": "version2_app.events.tablet_disconnected",
+        # "on_trash": "version2_app.events.tablet_disconnected",
         "on_update": "version2_app.events.update_tablet_status",
     },
     "Active Work Stations": {
         "on_trash": "version2_app.events.workstation_disconnected",
-        "on_update": "version2_app.events.update_workstations_status",
+        "before_save": "version2_app.events.before_update_ws",
+        # "on_update": "version2_app.events.update_workstations_status",
     },
     "Information Folio": {
         "after_insert": "version2_app.events.information_folio_created",
@@ -212,7 +213,7 @@ scheduler_events = {
         "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
         "0 12 * * *":["version2_app.events.block_irn"],
         "0 2 * * *":["version2_app.events.delete_arrival_activity"],
-        # "* * * * *":["version2_app.events.pre_mail"],
+        "* * * * *":["version2_app.events.pre_mail"],
         "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
         "*/5 * * * *":["version2_app.events.send_invoice_mail"]},
     "daily": [

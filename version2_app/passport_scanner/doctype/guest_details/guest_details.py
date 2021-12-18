@@ -163,7 +163,7 @@ def update_guest_details(name):
                             del aadhar_details["success"]
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
-                            return {"success": False,"data":aadhar_details}
+                            return {"success": True,"data":aadhar_details}
                         # return aadhar_front["data"]["message"]
                     if "face" in aadhar_front["data"]["message"]["aadhar_details"].keys():
                         if aadhar_front["data"]["message"]["aadhar_details"]["face"]:
@@ -184,7 +184,8 @@ def update_guest_details(name):
                             del aadhar_details["success"]
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
-                            return {"success": False,"data":aadhar_details}
+                            aadhar_details["message"] = "Unable to fetch complete details"
+                            return {"success": True,"data":aadhar_details}
                     else:
                         aadhar_details["image_2"] = pre_checkins.image_2
                         aadhar_details["id_type"] = "aadhaar"
@@ -218,7 +219,7 @@ def update_guest_details(name):
                         del driving_license_details["success"]
                         del driving_license_details["driving_details"]
                         driving_license_details["id_type"] = "driving"
-                        return {"success": False,"data":driving_license_details}
+                        return {"success": True,"data":driving_license_details}
                         # return driving_license["data"]["message"]
                     if "driving_details" in driving_license["data"]["message"].keys():
                         if "face" in driving_license["data"]["message"]["driving_details"].keys():
@@ -234,10 +235,6 @@ def update_guest_details(name):
                 driving_license_details["id_type"] = "driving"
                 driving_license_details["image_1"] = pre_checkins.image_1
                 driving_license_details["image_2"] = pre_checkins.image_2
-                if company_doc.scan_ezy_module == 1:
-                    driving_license_details["scan_ezy"] = True
-                else:
-                    driving_license_details["scan_ezy"] = False
                 return {"success":True, "data":driving_license_details}
             if pre_checkins.guest_id_type == "voterId":
                 voter_details = {}
@@ -255,11 +252,10 @@ def update_guest_details(name):
                         if voter_front["data"]["message"]["success"] == False:
                             voter_details["image_1"] = pre_checkins.image_1
                             voter_details["image_2"] = pre_checkins.image_2
-                            voter_details.update(voter_front["data"]["message"])
-                            del voter_details["success"]
-                            del voter_details["voter_details"]
+                            voter_details["error"] = voter_front["data"]["message"]["message"]
+                            voter_details["message"] = "Unable to scan voter card"
                             voter_details["id_type"] = "voterId"
-                            return {"success": False,"data":voter_details}
+                            return {"success": True,"data":voter_details}
                             # return voter_front["data"]["message"]["voter_details"]
                     if "face" in voter_front["data"]["message"]["voter_details"]:
                         base_image = convert_base64_to_image(voter_front["data"]["message"]["voter_details"]["face"],name,site_folder_path,company_doc)
@@ -272,14 +268,13 @@ def update_guest_details(name):
                     voter_details.update(voter_front["data"]["message"]["voter_details"]["data"])
                 if file_path2:
                     voter_back = helper_utility({"api":"scan_votercard", "voter_image":convert2["data"], "scanView":"back"})
-                    if "success" in voter_back["data"]["message"].keys():
+                    if "voter_details" in voter_back["data"]["message"].keys():
                         if voter_back["data"]["message"]["success"] == False:
                             voter_details["image_2"] = pre_checkins.image_2
-                            voter_details.update(voter_back["data"]["message"])
-                            del voter_details["success"]
-                            del voter_details["voter_details"]
+                            voter_details["error"] = voter_back["data"]["message"]["message"]
                             voter_details["id_type"] = "voterId"
-                            return {"success": False,"data":voter_details}
+                            voter_details["message"] = "Unable to fetch complete details"
+                            return {"success": True,"data":voter_details}
                             # return voter_back["data"]["message"]["voter_details"]
                     # aadhar_back["data"]["message"]["voter_details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     del voter_back["data"]["message"]["voter_details"]["base64_string"]
@@ -397,7 +392,7 @@ def update_guest_details(name):
                         other_details.update(driving_license["data"]["message"])
                         del other_details["success"]
                         other_details["id_type"] = "other"
-                        return {"success": False,"data":other_details}
+                        return {"success": True,"data":other_details}
                         # return driving_license["data"]["message"]
                     if driving_license["data"]["message"]["otherimage_details"]["base64_string"]:
                         base_image = convert_base64_to_image(driving_license["data"]["message"]["otherimage_details"]["base64_string"],name,site_folder_path,company_doc)
@@ -411,8 +406,7 @@ def update_guest_details(name):
                         other_details.update(driving_license["data"]["message"])
                         del other_details["success"]
                         other_details["id_type"] = "other"
-                        return {"success": False,"data":other_details}
-                        return back2["data"]["message"]
+                        return {"success": True,"data":other_details}
                     if back2["data"]["message"]["otherimage_details"]["base64_string"]:
                         base_image = convert_base64_to_image(back2["data"]["message"]["otherimage_details"]["base64_string"],name,site_folder_path,company_doc)
                         if "file_url" in  base_image["message"].keys():
@@ -423,7 +417,6 @@ def update_guest_details(name):
                     other_details["scan_ezy"] = True
                 else:
                     other_details["scan_ezy"] = False
-                print("===========================")
                 return {"success":True, "data":other_details}
         else:
             if company_doc.ezy_checkins_module == 1:
@@ -502,6 +495,22 @@ def add_guest_details():
                     if re.search("\d{6}",data["address2"]):
                         postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address2"]).groupdict()['zipcode']
                         data["postal_code"] = postal_code if len(postal_code) == 6 else ''
+            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
+                now = datetime.datetime.now()
+                arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
+                data["no_of_nights"] = arrival_doc.no_of_nights
+                data["checkin_date"] = arrival_doc.arrival_date
+                data["checkin_time"] = now.strftime("%H:%M:%S")
+            if data["id_type"] == "Foreigner":
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+                    pre_checkins = frappe.db.get_value('Precheckins',{'confirmation_number': data["confirmation_number"]},["address1","guest_city","guest_country"], as_dict=1)
+                    data["address"] = pre_checkins["address1"]
+                    data["city"] = pre_checkins["guest_city"]
+                    data["country"] =  pre_checkins["guest_country"]
+            if data["date_of_birth"] != "":
+                today = datetime.datetime.today()
+                birthDate = datetime.datetime.strptime(data["date_of_birth"], '%Y-%m-%d')
+                data["age"] = today.year - birthDate.year - ((today.month, today.day) <(birthDate.month, birthDate.day))
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
@@ -533,7 +542,7 @@ def add_guest_details():
                 arrival_date = datetime.datetime.now().date()
                 arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
                 arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
-            return {"success":True, "message":"Guest added successfully"}
+            return {"success":True, "message":"Guest added"}
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
     except Exception as e:
