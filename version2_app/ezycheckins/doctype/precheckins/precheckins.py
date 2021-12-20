@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 import datetime
-import frappe, json
+import frappe, json, qrcode
 import base64, requests
 import sys, traceback, datetime
 from frappe.model.document import Document
@@ -137,4 +137,16 @@ def add_pre_checkins():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Precheckins-Add Pre Checkins","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+@frappe.whitelist(allow_guest=True)
+def get_pre_checkins_qr(company_code):
+    try:
+        company = frappe.get_doc("company", company_code)
+        url = "{}?hotelId={}".format(company.ezycheckins_socket_host,company.name)
+        img = qrcode.make(url)
+        img.save("some_file.png")
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Precheckins-Get Pre Checkins QR","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
