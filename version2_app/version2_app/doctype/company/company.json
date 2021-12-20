@@ -156,6 +156,7 @@
   "dynamic_colour_for_tab",
   "work_station_pass_code",
   "device_font_style_document",
+  "self_assisted",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -1514,11 +1515,17 @@
    "fieldname": "device_font_style_document",
    "fieldtype": "Attach",
    "label": "Device Font Style Document"
+  },
+  {
+   "default": "0",
+   "fieldname": "self_assisted",
+   "fieldtype": "Check",
+   "label": "Self Assisted"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-16 11:27:12.607263",
+ "modified": "2021-12-20 18:16:29.147414",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
