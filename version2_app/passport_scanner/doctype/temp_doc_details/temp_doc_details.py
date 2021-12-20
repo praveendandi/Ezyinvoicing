@@ -28,18 +28,18 @@ def update_document_details(doc,method=None):
             queue="default",
             timeout=800000,
             event="update_temp_doc_details",
-            now=False,
+            now=True,
             data = doc,
             is_async = True,
             )
 		return True
 	except Exception as e:
-		print(e)
+		frappe.log_error("error while update documnet detail:{}".format(str(e)))
+		print(e,"error while update documnet details")
 
 def create_passport_details(data):
 	try:
-		guest_details = {
-		}
+		guest_details = {}
 		img2_thresh = 0.3
 		if(data.resident_of_india == "No"):
 			img2_thresh = 0.2
@@ -109,17 +109,18 @@ def create_passport_details(data):
 		
 		guest_details['precheckin_data'] = {
 			"confirmation_number":doc.confirmation_number,
-			"postal_code":doc.zip_code,
-			"city":doc.guest_city,
-			"address":doc.address1,
-			"guest_phone_number":doc.guest_phone_number
+			# "postal_code":doc.zip_code,
+			# "city":doc.guest_city,
+			# "address":doc.address1,
+			# "guest_phone_number":doc.guest_phone_number
 		}
 		# print(guest_details)
 		parse_guest_details(guest_details)
 		
 		# print(rep.json())
 	except Exception as e:
-		print(e)
+		frappe.log_error("error while update documnet detail:{}".format(str(e)))
+		print(e,"error while update documnet details")
 
 
 
@@ -135,16 +136,16 @@ def parse_guest_details(data):
 		current_time = datetime.datetime.now().strftime('%H:%M:%S')
 		gender = ''
 		guest_precheckin_data = {
-            "address":data['precheckin_data']['address'],
+            # "address":data['precheckin_data']['address'],
 			"checkin_date":today,
 			"checkin_time":current_time,
-			"city":data['precheckin_data']['city'],
+			# "city":data['precheckin_data']['city'],
 			"confirmation_number":data['precheckin_data']['confirmation_number'],
-			"contact_phone_no":data['precheckin_data']['guest_phone_number'],
+			# "contact_phone_no":data['precheckin_data']['guest_phone_number'],
 			"no_of_nights":"",
-			"permanent_mobile_no":data['precheckin_data']['guest_phone_number'],
-			"permanent_phone_no":data['precheckin_data']['guest_phone_number'],
-			"postal_code":data['precheckin_data']['postal_code']
+			# "permanent_mobile_no":data['precheckin_data']['guest_phone_number'],
+			# "permanent_phone_no":data['precheckin_data']['guest_phone_number'],
+			# "postal_code":data['precheckin_data']['postal_code']
 		}
 		guest_details= {**guest_precheckin_data,**guest_details}
 		if 'passport_details' in data.keys():
@@ -207,7 +208,8 @@ def parse_guest_details(data):
 		return create_temp_precheckin_doc(guest_details)
 		
 	except Exception as e:
-		print(e)
+		frappe.log_error("error while update documnet detail:{}".format(str(e)))
+		print(e,"error while update documnet details")
 
 
 def create_temp_precheckin_doc(guest_details):
@@ -220,6 +222,8 @@ def create_temp_precheckin_doc(guest_details):
 		print(json.dumps(guest_details, indent = 3))
 		
 	except Exception as e:
+		frappe.log_error("error wihle create temp doc:{}".format(str(e)))
+
 		print("error wihle create temp doc",e)
 
 
@@ -252,6 +256,7 @@ def passport_mrz_post_processing(data):
 
 		return data
 	except Exception as e:
+		frappe.log_error("passport extraction:{}".format(str(e)))
 		print(e,"passport extraction")
 
 
@@ -268,4 +273,6 @@ def visa_mrz_post_processing(data):
 			
 		return data
 	except Exception as e:
+		frappe.log_error("visa extraction:{}".format(str(e)))
+
 		print(e,"visa extraction")
