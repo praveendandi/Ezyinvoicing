@@ -34,7 +34,8 @@ def update_document_details(doc,method=None):
             )
 		return True
 	except Exception as e:
-		print(e)
+		frappe.log_error("error while update documnet detail:{}".format(str(e)))
+		print(e,"error while update documnet details")
 
 def create_passport_details(data):
 	try:
@@ -118,7 +119,8 @@ def create_passport_details(data):
 		
 		# print(rep.json())
 	except Exception as e:
-		print(e)
+		frappe.log_error("error while update documnet detail:{}".format(str(e)))
+		print(e,"error while update documnet details")
 
 
 
@@ -206,7 +208,8 @@ def parse_guest_details(data):
 		return create_temp_precheckin_doc(guest_details)
 		
 	except Exception as e:
-		print(e)
+		frappe.log_error("error while update documnet detail:{}".format(str(e)))
+		print(e,"error while update documnet details")
 
 
 def create_temp_precheckin_doc(guest_details):
@@ -219,6 +222,8 @@ def create_temp_precheckin_doc(guest_details):
 		print(json.dumps(guest_details, indent = 3))
 		
 	except Exception as e:
+		frappe.log_error("error wihle create temp doc:{}".format(str(e)))
+
 		print("error wihle create temp doc",e)
 
 
@@ -251,6 +256,7 @@ def passport_mrz_post_processing(data):
 
 		return data
 	except Exception as e:
+		frappe.log_error("passport extraction:{}".format(str(e)))
 		print(e,"passport extraction")
 
 
@@ -267,4 +273,6 @@ def visa_mrz_post_processing(data):
 			
 		return data
 	except Exception as e:
+		frappe.log_error("visa extraction:{}".format(str(e)))
+
 		print(e,"visa extraction")
