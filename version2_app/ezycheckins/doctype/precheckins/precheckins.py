@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 import datetime
-import frappe, json
+import frappe, json, qrcode
 import base64, requests
 import sys, traceback, datetime
 from frappe.model.document import Document
@@ -137,4 +137,36 @@ def add_pre_checkins():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Precheckins-Add Pre Checkins","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+@frappe.whitelist(allow_guest=True)
+def get_pre_checkins_qr(company_code):
+    try:
+        company = frappe.get_doc("company", company_code)
+        if company.ezycheckins_socket_host:
+            url = "{}?hotelId={}".format(company.ezycheckins_socket_host,company.name)
+            img = qrcode.make(url)
+            folder_path = frappe.utils.get_bench_path()
+            site_folder_path = "/sites/"+company.site_name+"/private/files/precheckinqr.png"
+            file_path = folder_path+site_folder_path
+            img.save(file_path)
+            files = {"file": open(file_path, 'rb')}
+            payload = {
+                "is_private": 1,
+                "folder": "Home"
+            }
+            site = company.host
+            upload_qr_image = requests.post(site + "api/method/upload_file",
+                                            files=files,
+                                            data=payload)
+            response = upload_qr_image.json()
+            if 'message' in response:
+                return {"success": True, "url":response["message"]["file_url"]}
+            else:
+                return {"success": False, "message":"something went wrong"}
+        else:
+            return {"success": False, "message": "Please give the precheckins url in property settings"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Precheckins-Get Pre Checkins QR","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
