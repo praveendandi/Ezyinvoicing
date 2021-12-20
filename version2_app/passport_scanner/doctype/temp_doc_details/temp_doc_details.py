@@ -17,7 +17,7 @@ class TempDocDetails(Document):
 
 
 # detection_api = 'http://localhost:5000/detect'
-detection_api = 'https://api.caratred.com/detect'
+detection_api = 'https://api.caratred.in/detect'
 
 
 
@@ -52,8 +52,9 @@ def create_passport_details(data):
 		with open(image_1_file_path, "rb") as image_file:
 			encoded_string = base64.b64encode(image_file.read())
 		data = {"thresh":0.3,"base":encoded_string.decode("utf-8") }
-		rep = requests.post(detection_api,json=data)
-		# print(rep.text)
+
+		rep = requests.post(detection_api,json=data,verify=False)
+		print(rep.text)
 		# print(doc.resident_of_india,doc.guest_id_type)
 		if(doc.resident_of_india == "No" and doc.guest_id_type == 'passport'):
 			guest_details["passport_details"]={}
@@ -82,7 +83,7 @@ def create_passport_details(data):
 		with open(image_2_file_path, "rb") as image_file:
 			encoded_string = base64.b64encode(image_file.read())
 		data = {"thresh":img2_thresh,"base":encoded_string.decode("utf-8") }
-		rep = requests.post(detection_api,json=data)
+		rep = requests.post(detection_api,json=data,verify=False)
 		# print(rep.text)
 		if(doc.resident_of_india == "No" and doc.guest_id_type == 'passport'):
 			guest_details["visa_details"]={}
