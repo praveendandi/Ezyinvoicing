@@ -38,8 +38,7 @@ def update_document_details(doc,method=None):
 
 def create_passport_details(data):
 	try:
-		guest_details = {
-		}
+		guest_details = {}
 		img2_thresh = 0.3
 		if(data.resident_of_india == "No"):
 			img2_thresh = 0.2
@@ -109,10 +108,10 @@ def create_passport_details(data):
 		
 		guest_details['precheckin_data'] = {
 			"confirmation_number":doc.confirmation_number,
-			"postal_code":doc.zip_code,
-			"city":doc.guest_city,
-			"address":doc.address1,
-			"guest_phone_number":doc.guest_phone_number
+			# "postal_code":doc.zip_code,
+			# "city":doc.guest_city,
+			# "address":doc.address1,
+			# "guest_phone_number":doc.guest_phone_number
 		}
 		# print(guest_details)
 		parse_guest_details(guest_details)
@@ -135,16 +134,16 @@ def parse_guest_details(data):
 		current_time = datetime.datetime.now().strftime('%H:%M:%S')
 		gender = ''
 		guest_precheckin_data = {
-            "address":data['precheckin_data']['address'],
+            # "address":data['precheckin_data']['address'],
 			"checkin_date":today,
 			"checkin_time":current_time,
-			"city":data['precheckin_data']['city'],
+			# "city":data['precheckin_data']['city'],
 			"confirmation_number":data['precheckin_data']['confirmation_number'],
-			"contact_phone_no":data['precheckin_data']['guest_phone_number'],
+			# "contact_phone_no":data['precheckin_data']['guest_phone_number'],
 			"no_of_nights":"",
-			"permanent_mobile_no":data['precheckin_data']['guest_phone_number'],
-			"permanent_phone_no":data['precheckin_data']['guest_phone_number'],
-			"postal_code":data['precheckin_data']['postal_code']
+			# "permanent_mobile_no":data['precheckin_data']['guest_phone_number'],
+			# "permanent_phone_no":data['precheckin_data']['guest_phone_number'],
+			# "postal_code":data['precheckin_data']['postal_code']
 		}
 		guest_details= {**guest_precheckin_data,**guest_details}
 		if 'passport_details' in data.keys():
