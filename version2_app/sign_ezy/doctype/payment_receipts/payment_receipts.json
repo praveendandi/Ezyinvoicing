@@ -7,6 +7,7 @@
  "field_order": [
   "file_path",
   "signature",
+  "confirmation_number",
   "agree"
  ],
  "fields": [
@@ -21,14 +22,20 @@
    "label": "Signature"
   },
   {
-   "fieldname": "agree",
+   "fieldname": "confirmation_number",
    "fieldtype": "Data",
+   "label": "Confirmation Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "agree",
+   "fieldtype": "Check",
    "label": "Agree"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-01 18:23:30.508349",
+ "modified": "2021-12-20 10:17:36.648791",
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Payment Receipts",
