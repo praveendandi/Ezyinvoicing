@@ -1162,8 +1162,8 @@ def manual_mail(data):
     if arrival_doc.booking_status=="RESERVED":
         f = open(file_path, "r")
         data=f.read()
-        data = data.replace('{{name}}',arrival_doc.guest_first_name)
-        data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+        data = data.replace('{{name}}',arrival_doc.guest_first_name if arrival_doc.guest_first_name else "")
+        data = data.replace('{{lastName}}',arrival_doc.guest_last_name if arrival_doc.guest_last_name else "")
         data = data.replace('{{hotelName}}',company.company_name)
         data = data.replace('{{email}}',company.email)
         data = data.replace('{{phone}}',company.phone_number)
