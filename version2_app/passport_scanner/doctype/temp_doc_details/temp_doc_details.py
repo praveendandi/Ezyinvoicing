@@ -28,7 +28,7 @@ def update_document_details(doc,method=None):
             queue="default",
             timeout=800000,
             event="update_temp_doc_details",
-            now=False,
+            now=True,
             data = doc,
             is_async = True,
             )
