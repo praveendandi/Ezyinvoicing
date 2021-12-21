@@ -1002,6 +1002,7 @@ from email.mime.image import MIMEImage
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
+        print("=====================================")
         convert_days = int(company.no_of_days)
         date_time = datetime.datetime.now()
         future_date = date_time+timedelta(days=convert_days)
@@ -1016,6 +1017,7 @@ def pre_mail():
         site_folder_path = company.site_name
         file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
         if current_time > time_company and current_time<str_date:
+            print("----------------------------------")
             if company.mail_frequency == "Once": 
                 for x in get_arrival_data:
                     guest_first_name=str(x['guest_first_name'])
@@ -1042,6 +1044,7 @@ def pre_mail():
                         frappe.db.commit()
                 return {"success":False, "message":"Invitation Sent"}
             elif company.mail_frequency == "Daily":
+                print("-=-=-=----=--=-")
                 for x in get_arrival_data:
                     email_address = str(x["guest_email_address"])
                     guest_first_name=str(x['guest_first_name'])
