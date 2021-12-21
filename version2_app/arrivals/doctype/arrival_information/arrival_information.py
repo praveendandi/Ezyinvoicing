@@ -55,7 +55,7 @@ def arrivalActivity(company,file_url,source):
                 reservation = {"guest_title":replace_new[column_indexs["GUEST_TITLE"]],
                     "guest_first_name":replace_new[column_indexs["GUEST_FIRST_NAME"]],
                     "guest_last_name":replace_new[column_indexs["GUEST_LAST_NAME"]],
-                    "guest_email_address":replace_new[column_indexs["GUEST_EMAIL_ADDRESS"]],
+                    "guest_email_address":replace_new[column_indexs["GUEST_EMAIL_ADDRESS"]] if company != "GMM-01" else "susmitha@caratred.com",
                     "room_type": replace_new[column_indexs["ROOM_TYPE"]],
                     "guest_phone_no":replace_new[column_indexs["GUEST_PHONE_NO"]],
                     "travel_agent_name":replace_new[column_indexs["TRAVEL_AGENT_NAME"]],
