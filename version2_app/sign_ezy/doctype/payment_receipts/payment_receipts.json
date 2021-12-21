@@ -22,11 +22,14 @@
    "label": "Signature"
   },
   {
+<<<<<<< HEAD
    "fieldname": "confirmation_number",
    "fieldtype": "Data",
    "label": "Confirmation Number"
   },
   {
+=======
+>>>>>>> e0e4b898cc54380d3ebf2d26c67de21d51e70bc3
    "default": "0",
    "fieldname": "agree",
    "fieldtype": "Check",
@@ -35,7 +38,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
+<<<<<<< HEAD
  "modified": "2021-12-20 10:17:36.648791",
+=======
+ "modified": "2021-12-20 10:24:47.452036",
+>>>>>>> e0e4b898cc54380d3ebf2d26c67de21d51e70bc3
  "modified_by": "Administrator",
  "module": "Sign Ezy",
  "name": "Payment Receipts",
