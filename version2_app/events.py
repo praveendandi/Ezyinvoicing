@@ -1031,7 +1031,7 @@ def pre_mail():
                     data = data.replace('{{lastName}}',guest_last_name)
                     data = data.replace('{{Hotel Radison}}',company.company_name)               
                     # data = data.replace('{{confirmation_number}}',conf_number)
-                    url = "{}?hotelId={}&confirmation={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
+                    url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
                     data = data.replace('{{url}}',url)
                     if x['mail_sent']=="No":
                         if now == thetime:
@@ -1064,7 +1064,7 @@ def pre_mail():
                     data = data.replace('{{name}}',guest_first_name)
                     data = data.replace('{{lastName}}',guest_last_name)
                     data = data.replace('{{Hotel Radison}}',company.company_name)
-                    url = "{}?hotelId={}&confirmation={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
+                    url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
                     data = data.replace('{{url}}',url)
                     # if x['mail_sent']=="No":
                     if arrival_date > thetime and now <= arrival_date:
@@ -1167,7 +1167,7 @@ def manual_mail(data):
         data = data.replace('{{hotelName}}',company.company_name)
         data = data.replace('{{email}}',company.email)
         data = data.replace('{{phone}}',company.phone_number)
-        url = "{}?hotelId={}&confirmation={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
+        url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
         u = ps.Shortener().tinyurl.short(url)
         data = data.replace('{{url}}',u)
         mail_send = frappe.sendmail(recipients=email_address,
