@@ -495,6 +495,22 @@ def add_guest_details():
                     if re.search("\d{6}",data["address2"]):
                         postal_code = re.match('^.*(?P<zipcode>\d{6}).*$', data["address2"]).groupdict()['zipcode']
                         data["postal_code"] = postal_code if len(postal_code) == 6 else ''
+            if frappe.db.exists('Arrival Information', data["confirmation_number"]):
+                now = datetime.datetime.now()
+                arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
+                data["no_of_nights"] = arrival_doc.no_of_nights
+                data["checkin_date"] = arrival_doc.arrival_date
+                data["checkin_time"] = now.strftime("%H:%M:%S")
+            if data["id_type"] == "Foreigner":
+                if frappe.db.exists({'doctype': 'Precheckins','confirmation_number': data["confirmation_number"]}):
+                    pre_checkins = frappe.db.get_value('Precheckins',{'confirmation_number': data["confirmation_number"]},["address1","guest_city","guest_country"], as_dict=1)
+                    data["address"] = pre_checkins["address1"]
+                    data["city"] = pre_checkins["guest_city"]
+                    data["country"] =  pre_checkins["guest_country"]
+            if data["date_of_birth"] != "":
+                today = datetime.datetime.today()
+                birthDate = datetime.datetime.strptime(data["date_of_birth"], '%Y-%m-%d')
+                data["age"] = today.year - birthDate.year - ((today.month, today.day) <(birthDate.month, birthDate.day))
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
             if frappe.db.exists('Arrival Information', data["confirmation_number"]):
@@ -526,7 +542,7 @@ def add_guest_details():
                 arrival_date = datetime.datetime.now().date()
                 arrival_info_doc = frappe.get_doc({"doctype":"Arrival Information","confirmation_number":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED IN","arrival_date":arrival_date,"company":company_doc.name,"virtual_checkin_status":"Yes","guest_first_name":data["given_name"]})
                 arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
-            return {"success":True, "message":"Guest added successfully"}
+            return {"success":True, "message":"Guest added"}
         else:
             return {"success":False, "message":"Scan-Ezy module is not enabled"}
     except Exception as e:

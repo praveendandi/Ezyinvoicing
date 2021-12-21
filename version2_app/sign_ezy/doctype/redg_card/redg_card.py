@@ -18,7 +18,7 @@ def update_signature(name=None, signature=None, work_station=None, tab=None):
     #                        ignore_version=True  # do not create a version record
     #                        )
     doc = frappe.db.set_value('Redg Card', name,
-                              'signature', signature, update_modified=False)
+                              'signature', signature)
 
     frappe.db.commit()
     # data = {

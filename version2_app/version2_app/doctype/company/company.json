@@ -44,10 +44,6 @@
   "irn_text_point1",
   "irn_text_point2",
   "section_break_30",
-  "invoice_reinitiate_parsing_file",
-  "reinitiate_file_path",
-  "invoice_parser_file",
-  "invoice_parser_file_path",
   "site_name",
   "irn_details_page",
   "invoice_item_date_format",
@@ -158,6 +154,9 @@
   "tablet_back_ground_image",
   "card_type_detect_api",
   "dynamic_colour_for_tab",
+  "work_station_pass_code",
+  "device_font_style_document",
+  "self_assisted",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -226,7 +225,18 @@
   "allow_advance_deposits_agree_check",
   "allow_ecertificates_signature",
   "allow_pos_bills",
-  "allow_pos_bills_agree_check"
+  "allow_pos_bills_agree_check",
+  "regex_for_folios_column",
+  "reg_card_identification_text",
+  "paid_out_receipts",
+  "advance_deposits_identification",
+  "payment_receipts_identification",
+  "encashment_certificates_identification",
+  "section_break_226",
+  "reg_card_confirmation_no_regex",
+  "paid_out_confirmation_no_regex",
+  "advance_deposits_confirmation_no_regex",
+  "payment_receipts_confirmation_no_regex"
  ],
  "fields": [
   {
@@ -445,26 +455,6 @@
   {
    "fieldname": "section_break_30",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "invoice_reinitiate_parsing_file",
-   "fieldtype": "Attach",
-   "label": "Invoice Reinitiate Parsing File"
-  },
-  {
-   "fieldname": "reinitiate_file_path",
-   "fieldtype": "Data",
-   "label": "Reinitiate File Path"
-  },
-  {
-   "fieldname": "invoice_parser_file",
-   "fieldtype": "Attach",
-   "label": "Invoice Parser File "
-  },
-  {
-   "fieldname": "invoice_parser_file_path",
-   "fieldtype": "Data",
-   "label": "Invoice Parser File Path"
   },
   {
    "fieldname": "site_name",
@@ -1461,11 +1451,81 @@
    "fieldname": "dynamic_colour_for_tab",
    "fieldtype": "Data",
    "label": "Dynamic Colour for Tab"
+  },
+  {
+   "fieldname": "work_station_pass_code",
+   "fieldtype": "Data",
+   "label": "Work Station Pass Code"
+  },
+  {
+   "fieldname": "regex_for_folios_column",
+   "fieldtype": "Section Break",
+   "label": "Regex For Folios"
+  },
+  {
+   "fieldname": "reg_card_identification_text",
+   "fieldtype": "Data",
+   "label": "Reg Card Identification Text"
+  },
+  {
+   "fieldname": "paid_out_receipts",
+   "fieldtype": "Data",
+   "label": "Paid Out Receipts Identification"
+  },
+  {
+   "fieldname": "section_break_226",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reg_card_confirmation_no_regex",
+   "fieldtype": "Data",
+   "label": "Reg Card Confirmation no Regex"
+  },
+  {
+   "fieldname": "paid_out_confirmation_no_regex",
+   "fieldtype": "Data",
+   "label": "Paid Out Confirmation no Regex"
+  },
+  {
+   "fieldname": "advance_deposits_identification",
+   "fieldtype": "Data",
+   "label": "Advance Deposits Identification"
+  },
+  {
+   "fieldname": "payment_receipts_identification",
+   "fieldtype": "Small Text",
+   "label": "Payment Receipts Identification"
+  },
+  {
+   "fieldname": "payment_receipts_confirmation_no_regex",
+   "fieldtype": "Small Text",
+   "label": "Payment Receipts Confirmation no Regex"
+  },
+  {
+   "fieldname": "encashment_certificates_identification",
+   "fieldtype": "Small Text",
+   "label": "Encashment Certificates Identification"
+  },
+  {
+   "fieldname": "advance_deposits_confirmation_no_regex",
+   "fieldtype": "Small Text",
+   "label": "Advance Deposits Confirmation no Regex"
+  },
+  {
+   "fieldname": "device_font_style_document",
+   "fieldtype": "Attach",
+   "label": "Device Font Style Document"
+  },
+  {
+   "default": "0",
+   "fieldname": "self_assisted",
+   "fieldtype": "Check",
+   "label": "Self Assisted"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-06 12:38:37.505409",
+ "modified": "2021-12-20 18:16:29.147414",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
