@@ -287,7 +287,7 @@ def disconnectWorkStation(ws = "",tablet = "",extension="False"):
             return tablet_disconnected
         if ws != "" and tablet == "":
             config_doc = frappe.get_doc("Tablet Config",get_tablet_config[0]["name"])
-        frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation', 'data': config_doc.__dict__})
+            frappe.publish_realtime("custom_socket", {'message': 'Reset WorkStation', 'data': config_doc.__dict__})
         return {"success":True,"message":"Tablet mapped removed successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
