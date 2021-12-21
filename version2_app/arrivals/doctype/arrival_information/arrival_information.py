@@ -171,3 +171,18 @@ def updateEmail(confirmation='',mobile='',email=''):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("updateEmail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_arrival_info(confirmation,company):
+    try:
+        check_confirmation = frappe.db.sql("""SELECT * FROM `tabArrival Information` where (name = '{}' or csr_id = '{}') and booking_status in ('RESERVED','DUE IN') and status = 'Pending' and company = '{}'""".format(confirmation,confirmation,company), as_dict=1)
+        if len(check_confirmation) == 1:
+            return {"success":True, 'data':check_confirmation[0]}
+        return {"success":False, 'message':"Invalid confirmation number or csr id"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("get_arrival_info","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success": False, "message": str(e)}
+    
+    

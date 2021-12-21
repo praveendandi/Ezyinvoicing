@@ -144,7 +144,7 @@ def get_pre_checkins_qr(company_code):
     try:
         company = frappe.get_doc("company", company_code)
         if company.ezycheckins_socket_host:
-            url = "{}?hotelId={}".format(company.ezycheckins_socket_host,company.name)
+            url = "{}?company={}".format(company.ezycheckins_socket_host,company.name)
             img = qrcode.make(url)
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = "/sites/"+company.site_name+"/private/files/precheckinqr.png"
