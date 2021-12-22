@@ -1009,7 +1009,7 @@ def pre_mail():
         future_date = date_time+timedelta(days=convert_days)
         future_date = future_date.strftime("%Y-%m-%d")
         get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['in', ["RESERVED","DUE IN"]],"arrival_date":["=",future_date],"guest_email_address":["is","set"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via","guest_first_name","guest_last_name","confirmation_number"])
-        frappe.log_error("Ezy-pre_mail",get_arrival_data)
+        frappe.log_error("Ezy-pre_mail",str(get_arrival_data))
         company = frappe.get_last_doc("company")
         now = datetime.datetime.now()
         current_time = now.strftime("%H:%M:%S")
