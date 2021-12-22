@@ -1011,15 +1011,17 @@ def pre_mail():
         get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['in', ["RESERVED","DUE IN"]],"arrival_date":["=",future_date],"guest_email_address":["is","set"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via","guest_first_name","guest_last_name","confirmation_number"])
         company = frappe.get_last_doc("company")
         now = datetime.datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        time_company=str(company.mail_schedule_time)
-        str_date=str(company.mail_schedule_time+timedelta(minutes=1))
+        current_time = now.strftime("%H:%M")
+        time_company=company.mail_schedule_time
+        time_company = time_company.strftime("%H:%M")
+        str_date=company.mail_schedule_time+timedelta(minutes=1)
+        str_date = str_date.strftime("%H:%M")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = company.site_name
         file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
         frappe.log_error("Ezy-pre_mail","{},{},{},{}".format(current_time,time_company,current_time,str_date))
-        if current_time > time_company and current_time<str_date:
-            print("----------------------------------")
+        if current_time >= time_company and current_time<str_date:
+            time.sleep(60)
             if company.mail_frequency == "Once": 
                 for x in get_arrival_data:
                     guest_first_name=str(x['guest_first_name'])
