@@ -1003,6 +1003,7 @@ def pre_mail():
     try:
         company = frappe.get_last_doc("company")
         print("=====================================")
+        frappe.log_error("Ezy-pre_mail","test")
         convert_days = int(company.no_of_days)
         date_time = datetime.datetime.now()
         future_date = date_time+timedelta(days=convert_days)
