@@ -1012,10 +1012,8 @@ def pre_mail():
         company = frappe.get_last_doc("company")
         now = datetime.datetime.now()
         current_time = now.strftime("%H:%M")
-        time_company=str(company.mail_schedule_time)
-        time_company = time_company.strftime("%H:%M")
-        str_date=str(company.mail_schedule_time+timedelta(minutes=1))
-        str_date = str_date.strftime("%H:%M")
+        time_company=str(company.mail_schedule_time)[:-3:]
+        str_date=str(company.mail_schedule_time+timedelta(minutes=1))[:-3:]
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = company.site_name
         file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
