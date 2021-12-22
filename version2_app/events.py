@@ -1021,6 +1021,7 @@ def pre_mail():
         if current_time >= time_company and current_time<str_date:
             time.sleep(60)
             if company.mail_frequency == "Once": 
+                frappe.log_error("Ezy-pre_mail","once test")
                 for x in get_arrival_data:
                     guest_first_name=str(x['guest_first_name'])
                     email_address = str(x["guest_email_address"])
@@ -1046,7 +1047,7 @@ def pre_mail():
                         frappe.db.commit()
                 return {"success":False, "message":"Invitation Sent"}
             elif company.mail_frequency == "Daily":
-                frappe.log_error("Ezy-pre_mail","------------------")
+                frappe.log_error("Ezy-pre_mail","Daily Test")
                 print("-=-=-=----=--=-")
                 for x in get_arrival_data:
                     email_address = str(x["guest_email_address"])
