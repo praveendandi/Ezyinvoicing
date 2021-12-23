@@ -5,6 +5,11 @@
 from __future__ import unicode_literals
 # import frappe
 from frappe.model.document import Document
+import random, string
 
 class SACHSNCODES(Document):
-	pass
+
+	def before_insert(self):
+		# pass
+		match = ''.join(random.choice(string.digits) for _ in range(6))
+		self.sac_index = match

@@ -1,0 +1,159 @@
+{
+ "actions": [],
+ "creation": "2021-01-20 16:11:54.710531",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "irn_request_object",
+  "irn_response_object",
+  "invoice_category",
+  "allowance_irn_request_object",
+  "allowance_irn_response_object",
+  "irn_status",
+  "error_message",
+  "allowance_irn_status",
+  "allowance_error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  },
+  {
+   "fieldname": "irn_request_object",
+   "fieldtype": "Long Text",
+   "label": "Irn Request Object"
+  },
+  {
+   "fieldname": "irn_response_object",
+   "fieldtype": "Long Text",
+   "label": "Irn Response Object"
+  },
+  {
+   "fieldname": "allowance_irn_request_object",
+   "fieldtype": "Long Text",
+   "label": "Allowance Irn Request Object"
+  },
+  {
+   "fieldname": "allowance_irn_response_object",
+   "fieldtype": "Long Text",
+   "label": "Allowance Irn Response Object"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Long Text",
+   "label": "Error Message"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "label": "Invoice  Category",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+  },
+  {
+   "fieldname": "irn_status",
+   "fieldtype": "Select",
+   "label": "Irn Status",
+   "options": "Success\nFailed"
+  },
+  {
+   "fieldname": "allowance_irn_status",
+   "fieldtype": "Select",
+   "label": "Allowance Irn Status",
+   "options": "Success\nFailed"
+  },
+  {
+   "fieldname": "allowance_error_message",
+   "fieldtype": "Long Text",
+   "label": "Allowance Error Message"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-04-14 12:20:55.453426",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "IRN Objects",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -10,8 +10,13 @@
   "cgst",
   "sgst",
   "igst",
-  "total_amount",
-  "amended_from"
+  "amount_before_gst",
+  "amended_from",
+  "cess",
+  "amount_after_gst",
+  "state_cess",
+  "vat",
+  "type"
  ],
  "fields": [
   {
@@ -29,30 +34,24 @@
   },
   {
    "fieldname": "cgst",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "CGST",
    "reqd": 1
   },
   {
    "fieldname": "sgst",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "SGST",
    "reqd": 1
   },
   {
    "fieldname": "igst",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "IGST",
    "reqd": 1
-  },
-  {
-   "fieldname": "total_amount",
-   "fieldtype": "Float",
-   "in_list_view": 1,
-   "label": "Total Amount"
   },
   {
    "fieldname": "amended_from",
@@ -62,13 +61,45 @@
    "options": "SAC HSN Tax Summaries",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "cess",
+   "fieldtype": "Currency",
+   "label": "Central CESS"
+  },
+  {
+   "fieldname": "amount_before_gst",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount Before Gst"
+  },
+  {
+   "fieldname": "amount_after_gst",
+   "fieldtype": "Currency",
+   "label": "Amount After Gst"
+  },
+  {
+   "fieldname": "state_cess",
+   "fieldtype": "Currency",
+   "label": "State CESS"
+  },
+  {
+   "fieldname": "vat",
+   "fieldtype": "Currency",
+   "label": "VAT"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Invoice\nCredit\nDebit"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "istable": 1,
  "links": [],
- "modified": "2020-10-23 12:51:03.604984",
+ "modified": "2021-01-05 14:40:39.296388",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN Tax Summaries",

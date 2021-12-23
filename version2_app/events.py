@@ -1101,8 +1101,8 @@ def pre_mail():
                         frappe.db.commit()
                     else:
                         return {"success":False, "message":"Invitation Sent"}
-        else:
-             print("email schedular is false")
+            else:
+                print("schedular is false")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-pre_mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
