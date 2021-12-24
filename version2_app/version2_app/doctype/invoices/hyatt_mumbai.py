@@ -44,13 +44,13 @@ def hyatt_mumbai(data):
                 data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':gst_data[each["BILL_NO"]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
-                            'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2B"}
+                            'guest_data':{'invoice_category':each['FOLIO_TYPE'].lower().title()},'invoice_type':"B2B"}
                 data["invoice_number"] = "GHM"+data["invoice_number"]
             else:
                 data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':"",'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
-                            'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2C"}
+                            'guest_data':{'invoice_category':each['FOLIO_TYPE'].lower().title()},'invoice_type':"B2C"}
                 data["invoice_number"] = "GHM"+data["invoice_number"]
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
             items = []
