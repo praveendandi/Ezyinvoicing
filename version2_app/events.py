@@ -1005,13 +1005,11 @@ def pre_mail():
         company = frappe.get_last_doc("company")
         if company.mail_schedule == True:
             print("=====================================")
-            frappe.log_error("Ezy-pre_mail","test")
             convert_days = int(company.no_of_days)
             date_time = datetime.datetime.now()
             future_date = date_time+timedelta(days=convert_days)
             future_date = future_date.strftime("%Y-%m-%d")
             get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['in', ["RESERVED","DUE IN"]],"arrival_date":["=",future_date],"guest_email_address":["is","set"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via","guest_first_name","guest_last_name","confirmation_number"])
-            company = frappe.get_last_doc("company")
             now = datetime.datetime.now()
             current_time = now.strftime("%H:%M")
             time_company=str(company.mail_schedule_time)[:-3:]
@@ -1019,11 +1017,9 @@ def pre_mail():
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
             file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
-            frappe.log_error("Ezy-pre_mail","{},{},{},{}".format(current_time,time_company,current_time,str_date))
             if current_time >= time_company and current_time<str_date:
                 time.sleep(60)
-                if company.mail_frequency == "Once": 
-                    frappe.log_error("Ezy-pre_mail","once test")
+                if company.mail_frequency == "Once":
                     for x in get_arrival_data:
                         guest_first_name=str(x['guest_first_name'])
                         email_address = str(x["guest_email_address"])
@@ -1049,8 +1045,6 @@ def pre_mail():
                             frappe.db.commit()
                     return {"success":False, "message":"Invitation Sent"}
                 elif company.mail_frequency == "Daily":
-                    frappe.log_error("Ezy-pre_mail","Daily Test")
-                    print("-=-=-=----=--=-")
                     for x in get_arrival_data:
                         email_address = str(x["guest_email_address"])
                         guest_first_name=str(x['guest_first_name'])
@@ -1102,8 +1096,8 @@ def pre_mail():
                         frappe.db.commit()
                     else:
                         return {"success":False, "message":"Invitation Sent"}
-            else:
-                print("schedular is false")
+        else:
+            print("schedular is false")
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-pre_mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
