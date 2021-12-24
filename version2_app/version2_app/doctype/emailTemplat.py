@@ -122,10 +122,15 @@ def send_mail_files(data):
         if data["doctype"] == "Invoices":
             if get_doc.confirmation_number != "":
                 obj["email"] = frappe.db.get_value("Arrival Information",get_doc.confirmation_number,["guest_email_address"])
+        get_email_sender = frappe.db.get_list("Email Account",filters=[["default_outgoing","=",1]],fields=["email_id"])
+        if len(get_email_sender) == 0:
+            return{"success":False,"message":"Make one smtp as a defalut outgoing"}
+        get_email_sender = get_email_sender[0]
         b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
         obj["val"] = b2csuccess
+        obj["sender"] = get_email_sender["email_id"]
         files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
-        obj["attachments"] = [d['name'] for d in files]
+        obj["attachments"] = [files[0]["name"]]
         return {"success": True, "obj":obj}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
