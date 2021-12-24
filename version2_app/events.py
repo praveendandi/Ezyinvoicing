@@ -836,11 +836,13 @@ def arrival_information(doc,method=None):
     else:
         frappe.db.set_value("Documents",get_data[0]["name"],{"number_of_guests":doc.number_of_guests})
 
-def send_invoice_mail():
+@frappe.whitelist(allow_guest=True)
+def send_invoice_mail_scheduler():
     try:
+        frappe.log_error("Ezy-pre_mail","Send Invoice Email")
         get_arrivals = frappe.db.get_list("Arrival Information",filters={'guest_eamil2': ['!=', ""],'send_invoice_mail':['=',1],'invoice_send_mail_send':['=',0]})
+        frappe.log_error("Ezy-pre_mail","Send Invoice Email")
         if len(get_arrivals)>0:
-            frappe.log_error("Ezy-pre_mail","Send Invoice Email")
             for each in get_arrivals:
                 get_arrivals = frappe.get_doc("Arrival Information", each["name"])
                 if frappe.db.exists({"doctype":"Invoices","confirmation_number":each["name"]}):
@@ -1379,4 +1381,18 @@ def get_apikey(user):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-get_apikey","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def update_mail_send_confirmation(confirmation_number):
+    try:
+        if frappe.db.exists("Arrival Information",confirmation_number):
+            arrival_doc = frappe.get_doc("Arrival Information",confirmation_number)
+            arrival_doc.invoice_send_mail_send = 1
+            arrival_doc.save(ignore_permissions=True, ignore_version=True)
+            frappe.db.commit()
+            return {"success":True,"message":"Arrival updated"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-update_mail_send_confirmation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
