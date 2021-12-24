@@ -1008,6 +1008,8 @@ from email.mime.image import MIMEImage
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
+        if not company.site_domain:
+            return {"success":False,"message":"Please add site domain in property setting"}
         if company.mail_schedule == "True":
             print("=====================================")
             convert_days = int(company.no_of_days)
@@ -1034,7 +1036,13 @@ def pre_mail():
                         data=f.read()
                         data = data.replace('{{name}}',guest_first_name)
                         data = data.replace('{{lastName}}',guest_last_name)
-                        data = data.replace('{{Hotel Radison}}',company.company_name)               
+                        data = data.replace('{{hotelName}}',company.company_name)
+                        data = data.replace('{{email}}',company.email)
+                        data = data.replace('{{phone}}',company.phone_number)
+                        company_logo = (company.site_domain).rstrip('/')+company.company_logo
+                        data = data.replace('logoImg',company_logo)
+                        bg_logo = (company.site_domain).rstrip('/')+company.email_banner
+                        data = data.replace('headerBG',bg_logo)          
                         # data = data.replace('{{confirmation_number}}',conf_number)
                         url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
                         tiny_url = ps.Shortener().tinyurl.short(url)
@@ -1060,7 +1068,13 @@ def pre_mail():
                         data=f.read()
                         data = data.replace('{{name}}',guest_first_name)
                         data = data.replace('{{lastName}}',guest_last_name)
-                        data = data.replace('{{Hotel Radison}}',company.company_name)
+                        data = data.replace('{{hotelName}}',company.company_name)
+                        data = data.replace('{{email}}',company.email)
+                        data = data.replace('{{phone}}',company.phone_number)
+                        company_logo = (company.site_domain).rstrip('/')+company.company_logo
+                        data = data.replace('logoImg',company_logo)
+                        bg_logo = (company.site_domain).rstrip('/')+company.email_banner
+                        data = data.replace('headerBG',bg_logo)
                         url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
                         tiny_url = ps.Shortener().tinyurl.short(url)
                         data = data.replace('{{url}}',tiny_url)
@@ -1152,6 +1166,8 @@ def manual_mail(data):
     arrival_doc = frappe.get_doc('Arrival Information',conf_number)
     count = arrival_doc.mail_count
     company = frappe.get_last_doc("company")
+    if not company.site_domain:
+        return {"success":False,"message":"Please add site domain in property setting"}
     folder_path = frappe.utils.get_bench_path()
     site_folder_path = company.site_name
     file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
@@ -1163,6 +1179,10 @@ def manual_mail(data):
         data = data.replace('{{hotelName}}',company.company_name)
         data = data.replace('{{email}}',company.email)
         data = data.replace('{{phone}}',company.phone_number)
+        company_logo = (company.site_domain).rstrip('/')+company.company_logo
+        data = data.replace('logoImg',company_logo)
+        bg_logo = (company.site_domain).rstrip('/')+company.email_banner
+        data = data.replace('headerBG',bg_logo)
         url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
         u = ps.Shortener().tinyurl.short(url)
         data = data.replace('{{url}}',u)
