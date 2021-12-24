@@ -840,7 +840,6 @@ def arrival_information(doc,method=None):
 def send_invoice_mail_scheduler():
     try:
         get_arrivals = frappe.db.get_list("Arrival Information",filters={'guest_eamil2': ['!=', ""],'send_invoice_mail':['=',1],'invoice_send_mail_send':['=',0]})
-        frappe.log_error("Ezy-pre_mail","Send Invoice Email")
         if len(get_arrivals)>0:
             for each in get_arrivals:
                 get_arrivals = frappe.get_doc("Arrival Information", each["name"])
@@ -849,8 +848,13 @@ def send_invoice_mail_scheduler():
                     b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
                     files=frappe.db.get_list('File',filters={'file_url': ['=',get_doc["invoice_file"]]},fields=['name'])
                     attachments = [files[0]["name"]]
+                    get_email_sender = frappe.db.get_list("Email Account",filters=[["default_outgoing","=",1]],fields=["email_id"])
+                    if len(get_email_sender) == 0:
+                        return{"success":False,"message":"Make one smtp as a defalut outgoing"}
+                    get_email_sender = get_email_sender[0]
                     response = make(recipients = get_arrivals.guest_eamil2,
                         # cc = '',
+                        sender = get_email_sender["email_id"],
                         subject = b2csuccess.subject,
                         content = b2csuccess.response,
                         doctype = "Invoices",
