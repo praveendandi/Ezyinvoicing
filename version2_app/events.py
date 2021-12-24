@@ -1033,7 +1033,8 @@ def pre_mail():
                         data = data.replace('{{Hotel Radison}}',company.company_name)               
                         # data = data.replace('{{confirmation_number}}',conf_number)
                         url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
-                        data = data.replace('{{url}}',url)
+                        tiny_url = ps.Shortener().tinyurl.short(url)
+                        data = data.replace('{{url}}',tiny_url)
                         if x['mail_sent']=="No":
                             mail_send = frappe.sendmail(recipients=email_address,
                             subject = company.pre_checkin_mail_subject,
@@ -1057,7 +1058,8 @@ def pre_mail():
                         data = data.replace('{{lastName}}',guest_last_name)
                         data = data.replace('{{Hotel Radison}}',company.company_name)
                         url = "{}?company={}&confirmation_number={}&source=email".format(company.ezycheckins_socket_host,company.name, conf_number)
-                        data = data.replace('{{url}}',url)
+                        tiny_url = ps.Shortener().tinyurl.short(url)
+                        data = data.replace('{{url}}',tiny_url)
                         mail_send = frappe.sendmail(recipients=email_address,
                         subject = company.pre_checkin_mail_subject,
                         message= data,now = True)
