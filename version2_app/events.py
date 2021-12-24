@@ -1180,6 +1180,7 @@ def manual_mail(data):
         data = data.replace('{{email}}',company.email)
         data = data.replace('{{phone}}',company.phone_number)
         company_logo = (company.site_domain).rstrip('/')+company.company_logo
+        frappe.log_error("Ezy-Manual email",company_logo)
         data = data.replace('logoImg',company_logo)
         bg_logo = (company.site_domain).rstrip('/')+company.email_banner
         data = data.replace('headerBG',bg_logo)
