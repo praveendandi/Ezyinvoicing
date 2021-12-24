@@ -839,7 +839,6 @@ def arrival_information(doc,method=None):
 @frappe.whitelist(allow_guest=True)
 def send_invoice_mail_scheduler():
     try:
-        frappe.log_error("Ezy-pre_mail","Send Invoice Email")
         get_arrivals = frappe.db.get_list("Arrival Information",filters={'guest_eamil2': ['!=', ""],'send_invoice_mail':['=',1],'invoice_send_mail_send':['=',0]})
         frappe.log_error("Ezy-pre_mail","Send Invoice Email")
         if len(get_arrivals)>0:
