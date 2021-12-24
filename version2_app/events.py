@@ -1004,7 +1004,7 @@ from email.mime.image import MIMEImage
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
-        if company.mail_schedule == True:
+        if company.mail_schedule == "True":
             print("=====================================")
             convert_days = int(company.no_of_days)
             date_time = datetime.datetime.now()
