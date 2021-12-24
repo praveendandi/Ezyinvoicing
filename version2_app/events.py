@@ -840,6 +840,7 @@ def send_invoice_mail():
     try:
         get_arrivals = frappe.db.get_list("Arrival Information",filters={'guest_eamil2': ['!=', ""],'send_invoice_mail':['=',1],'invoice_send_mail_send':['=',0]})
         if len(get_arrivals)>0:
+            frappe.log_error("Ezy-pre_mail","Send Invoice Email")
             for each in get_arrivals:
                 get_arrivals = frappe.get_doc("Arrival Information", each["name"])
                 if frappe.db.exists({"doctype":"Invoices","confirmation_number":each["name"]}):
