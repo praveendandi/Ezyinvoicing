@@ -1422,3 +1422,26 @@ def update_mail_send_confirmation(confirmation_number):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-update_mail_send_confirmation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+# @frappe.whitelist(allow_guest=True)
+def delete_error_logs():
+    try:
+        frappe.log_error("Ezy-delete_error_logs","test")
+        days_before = (date.today()-timedelta(days=30)).isoformat()
+        frappe.db.delete("Error Log",{"creation":["<=",str(days_before)]})
+        frappe.db.commit()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-delete_error_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+# @frappe.whitelist(allow_guest=True)
+def delete_email_queue():
+    try:
+        days_before = (date.today()-timedelta(days=30)).isoformat()
+        frappe.db.delete("Email Queue",{"creation":["<=",str(days_before)]})
+        frappe.db.commit()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-delete_email_queue","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
