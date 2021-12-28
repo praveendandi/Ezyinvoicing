@@ -77,6 +77,8 @@ def add_pre_checkins():
                     if back["success"] == False:
                         return back
                 pre_checkins["image_2"] = back["message"]["file_url"]
+            else:
+                pre_checkins["image_2"] = ""
             pre_checkins["guest_id_type"] = each["id_type"]
             pre_checkins.update(data)
             if "ids" in pre_checkins.keys():
@@ -95,7 +97,7 @@ def add_pre_checkins():
                 pre_checkins["arrival_date"] = arrival_doc.arrival_date
             precheckins_doc = frappe.get_doc(pre_checkins)
             precheckins_doc.insert(ignore_permissions=True, ignore_links=True)
-            guest_images.append({"image1":pre_checkins["image_1"],"image2":pre_checkins["image_1"]})
+            guest_images.append({"image1":pre_checkins["image_1"],"image2":pre_checkins["image_2"]})
             count+=1
         user_name =  frappe.session.user
         date_time = datetime.datetime.now()
