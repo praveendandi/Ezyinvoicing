@@ -46,7 +46,7 @@ def guest_details_opera(confirmation_number):
         if company_doc.opera_scan == 1:
             if company_doc.ezy_checkins_module == 1:
                 if frappe.db.exists({"doctype":"Precheckins",'confirmation_number': confirmation_number}):
-                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': ["like", confirmation_number+"%"]},fields=["name","confirmation_number","guest_first_name","guest_last_name","opera_scanned_status"],order_by="creation")
+                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': ["like", confirmation_number+"%"]},fields=["name","confirmation_number","guest_first_name","guest_last_name","opera_scanned_status","guest_id_type"],order_by="creation")
                     type = "ezy-checkins"
                 else:
                     return {"success":False,"message":"Confirmation Number not found"}
