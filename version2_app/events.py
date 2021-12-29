@@ -1171,7 +1171,7 @@ def manual_mail(data):
     folder_path = frappe.utils.get_bench_path()
     site_folder_path = company.site_name
     file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
-    if arrival_doc.booking_status=="RESERVED":
+    if arrival_doc.booking_status=="RESERVED" or arrival_doc.booking_status=="DUE IN":
         f = open(file_path, "r")
         data=f.read()
         data = data.replace('{{name}}',arrival_doc.guest_first_name if arrival_doc.guest_first_name else "")
