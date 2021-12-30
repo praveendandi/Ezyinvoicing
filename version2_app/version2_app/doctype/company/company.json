@@ -138,7 +138,9 @@
   "pms_property_logo",
   "pms_property_url",
   "ipp_printer_file_path",
-  "bulkupload_json"
+  "bulkupload_json",
+  "pos_footer",
+  "pos_text"
  ],
  "fields": [
   {
@@ -894,11 +896,21 @@
    "fieldname": "bulkupload_json",
    "fieldtype": "Attach",
    "label": "BulkUpload Json"
+  },
+  {
+   "fieldname": "pos_footer",
+   "fieldtype": "Text",
+   "label": "POS Footer"
+  },
+  {
+   "fieldname": "pos_text",
+   "fieldtype": "Text",
+   "label": "POS Text"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-18 12:07:01.463406",
+ "modified": "2021-12-30 17:29:56.778018",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
