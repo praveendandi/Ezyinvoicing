@@ -1007,6 +1007,7 @@ from email.mime.image import MIMEImage
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
+        frappe.log_error("Ezy-pre_mail","====================================")
         if not company.site_domain:
             return {"success":False,"message":"Please add site domain in property setting"}
         if company.mail_schedule == "True":
@@ -1022,7 +1023,6 @@ def pre_mail():
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
             file_path = folder_path+'/sites/'+site_folder_path+company.pre_checkin_mail_content
-            frappe.log_error("Ezy-pre_mail","{}, {}, {}, {}".format(current_time, time_company, current_time, str_date))
             if current_time >= time_company and current_time<str_date:
                 time.sleep(60)
                 if company.mail_frequency == "Once":
