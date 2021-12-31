@@ -1293,7 +1293,7 @@ def precheckins():
         event_doc.insert()
         precheckins_doc.insert() 
         frappe.db.commit()
-        if company.thank_you_email == "1":
+        if company.thank_you_email == 1:
             cancel_email_address = i["guest_email_address"]
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
