@@ -1087,7 +1087,7 @@ def pre_mail():
                         event_doc.insert()
                         frappe.db.commit()
                     return {"success":True, "message":"Invitation Sent"}
-            if company.cancellation_email == "1":
+            if company.cancellation_email == 1:
                 get_arrival_data = frappe.db.get_list("Arrival Information",filters={"booking_status":['=', "CANCELLED"]},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
                 for x in get_arrival_data:
                     dt_convert = str(x['arrival_date'])
@@ -1293,30 +1293,30 @@ def precheckins():
         event_doc.insert()
         precheckins_doc.insert() 
         frappe.db.commit()
-        if company.thank_you_email == 1:
+        if company.thank_you_email == "1":
             cancel_email_address = i["guest_email_address"]
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
             file_path = folder_path+'/sites/'+site_folder_path+company.thank_you_email_mail_content
-            # if i['mail_sent']=="No":
-            f = open(file_path, "r")
-            data=f.read()
-            data = data.replace('{{name}}',i["guest_first_name"])
-            # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-            data = data.replace('{{hotelName}}',company.company_name)
-            data = data.replace('{{email}}',company.email)
-            data = data.replace('{{phone}}',company.phone_number)
-            mail_send = frappe.sendmail(recipients=cancel_email_address,
-                    subject = company.cancellation_email_mail_content,
-                    message= data,now = True)
-            # frappe.db.set_value('Arrival Information',i['name'],'mail_sent','Yes')
-            frappe.db.set_value('Arrival Information',i['name'],'mail_via','Automatic')
-            activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
-            event_doc=frappe.get_doc(activity_data)
-            event_doc.insert()
-            frappe.db.commit()
-            # else:
-            #     return {"success":False, "message":"Invitation Sent"}
+            if i['mail_sent']=="No":
+                f = open(file_path, "r")
+                data=f.read()
+                data = data.replace('{{name}}',i["guest_first_name"])
+                # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
+                data = data.replace('{{hotelName}}',company.company_name)
+                data = data.replace('{{email}}',company.email)
+                data = data.replace('{{phone}}',company.phone_number)
+                mail_send = frappe.sendmail(recipients=cancel_email_address,
+                        subject = company.cancellation_email_mail_content,
+                        message= data,now = True)
+                frappe.db.set_value('Arrival Information',i['name'],'mail_sent','Yes')
+                frappe.db.set_value('Arrival Information',i['name'],'mail_via','Automatic')
+                activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":i["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
+                event_doc=frappe.get_doc(activity_data)
+                event_doc.insert()
+                frappe.db.commit()
+            else:
+                return {"success":False, "message":"Invitation Sent"}
     return {"success":True}
 
 def upload_propery_logo_pms(data):
