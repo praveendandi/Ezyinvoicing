@@ -598,15 +598,14 @@ def deleteemailfilesdaily():
     try:
         company = frappe.get_last_doc('company')
         lastdate = date.today() - timedelta(days=1)
-        print(lastdate)
         emaildata = frappe.db.get_list('Email Queue',filters={'creation': ['>',lastdate],'status':"Sent"},fields=['name', 'attachments'])
-        print(emaildata)
         filelist = []
-        for each in emaildata:
-            value = json.loads(each.attachments)
-            filelist.append(value[0]['fid'])
-            delete = frappe.delete_doc("File",value[0]['fid'])
-            print(delete)
+        if len(emaildata) > 0:
+            for each in emaildata:
+                value = json.loads(each.attachments)
+                filelist.append(value[0]['fid'])
+                delete = frappe.delete_doc("File",value[0]['fid'])
+                print(delete)
         lastdate = date.today() - timedelta(days=6)
         data = frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""",lastdate)
         print(data)
