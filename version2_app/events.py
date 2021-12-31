@@ -1007,11 +1007,9 @@ from email.mime.image import MIMEImage
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
-        frappe.log_error("Ezy-pre_mail","===================")
         if not company.site_domain:
             return {"success":False,"message":"Please add site domain in property setting"}
         if company.mail_schedule == "True":
-            print("=====================================")
             convert_days = int(company.no_of_days)
             date_time = datetime.datetime.now()
             future_date = date_time+timedelta(days=convert_days)
