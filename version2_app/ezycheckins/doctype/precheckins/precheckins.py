@@ -110,7 +110,7 @@ def add_pre_checkins():
             guest_attachments={"doctype":"Documents","guest_details":guest_images,"confirmation_number":data["confirmation_number"],"module_name":"Ezycheckins","user":user_name,"number_of_guests":no_of_adults}
             guestatt_doc=frappe.get_doc(guest_attachments)
             guestatt_doc.insert(ignore_permissions=True, ignore_links=True)
-        if company.thank_you_email == 1:
+        if company.thank_you_email == 1 and company.self_assisted == 0:
             cancel_email_address = pre_checkins["guest_email_address"]
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
