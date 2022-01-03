@@ -127,7 +127,7 @@ def add_pre_checkins():
             mail_send = frappe.sendmail(recipients=cancel_email_address,
                     subject = company.thank_you_mail_subject,
                     message= data,now = True)
-            frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_via','Automatic')
+            # frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_via','Automatic')
             activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
             event_doc=frappe.get_doc(activity_data)
             event_doc.insert()
