@@ -128,10 +128,14 @@ def add_pre_checkins():
                     subject = company.thank_you_mail_subject,
                     message= data,now = True)
             # frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_via','Automatic')
-            activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
-            event_doc=frappe.get_doc(activity_data)
-            event_doc.insert()
-            frappe.db.commit()
+            if frappe.db.exists({"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"]}):
+                frappe.db.set_value("Activity Logs",data["confirmation_number"],{"datetime":date_time,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"})
+                frappe.db.commit()
+            else:
+                activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
+                event_doc=frappe.get_doc(activity_data)
+                event_doc.insert()
+                frappe.db.commit()
             # else:
             #     return {"success":False, "message":"Invitation Sent"}
         return {"success":True, "message":"Pre-checkin completed successfully"}
