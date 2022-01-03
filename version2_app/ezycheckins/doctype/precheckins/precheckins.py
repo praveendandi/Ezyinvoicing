@@ -119,15 +119,14 @@ def add_pre_checkins():
             # if arrival_doc.mail_sent=="No":
             f = open(file_path, "r")
             data=f.read()
-            data = data.replace('{{name}}',data["guest_first_name"])
+            data = data.replace('{{name}}',data["guest_first_name"]) if "{{name}}" in data else ""
             # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-            data = data.replace('{{hotelName}}',company.company_name)
-            data = data.replace('{{email}}',company.email)
-            data = data.replace('{{phone}}',company.phone_number)
+            data = data.replace('{{hotelName}}',company.company_name) if '{{hotelName}}' in data else ""
+            data = data.replace('{{email}}',company.email) if '{{email}}' in data else ""
+            data = data.replace('{{phone}}',company.phone_number) if '{{phone}}' in data else ""
             mail_send = frappe.sendmail(recipients=cancel_email_address,
-                    subject = company.cancellation_email_mail_content,
+                    subject = company.thank_you_mail_subject,
                     message= data,now = True)
-            frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_sent','Yes')
             frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_via','Automatic')
             activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
             event_doc=frappe.get_doc(activity_data)
