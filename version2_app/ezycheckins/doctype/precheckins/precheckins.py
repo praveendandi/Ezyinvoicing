@@ -128,7 +128,7 @@ def add_pre_checkins():
                     subject = company.thank_you_mail_subject,
                     message= data,now = True)
             # frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_via','Automatic')
-            if frappe.db.exists({"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"]}):
+            if frappe.db.exists({"doctype":"Activity Logs","confirmation_number":data["confirmation_number"]}):
                 frappe.db.set_value("Activity Logs",data["confirmation_number"],{"datetime":date_time,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"})
                 frappe.db.commit()
             else:
