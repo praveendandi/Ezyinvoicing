@@ -46,7 +46,7 @@ def guest_details_opera(confirmation_number):
         if company_doc.opera_scan == 1:
             if company_doc.ezy_checkins_module == 1:
                 if frappe.db.exists({"doctype":"Precheckins",'confirmation_number': confirmation_number}):
-                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': ["like", confirmation_number+"%"]},fields=["name","confirmation_number","guest_first_name","guest_last_name","opera_scanned_status"],order_by="creation")
+                    guest_details = frappe.db.get_list("Precheckins",filters={'confirmation_number': ["like", confirmation_number+"%"]},fields=["name","confirmation_number","guest_first_name","guest_last_name","opera_scanned_status","guest_id_type"],order_by="creation")
                     type = "ezy-checkins"
                 else:
                     return {"success":False,"message":"Confirmation Number not found"}
@@ -440,7 +440,7 @@ def add_guest_details():
         pre_checkins_count = 0
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1:
-            if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned"}):
+            if frappe.db.exists({"doctype":"Arrival Information","name":data["confirmation_number"],"status":"Scanned","booking_status":"CHECKED OUT"}):
                 return {"success":False, "message":"Guest already scanned on this confirmation number"}
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = folder_path+'/sites/'+company_doc.site_name

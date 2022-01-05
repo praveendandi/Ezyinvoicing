@@ -57,6 +57,7 @@
   "allowance_type",
   "invoice_cancelled_mails",
   "host",
+  "site_domain",
   "company_logo",
   "service_charge_percentage",
   "b2c_to_b2b",
@@ -1521,11 +1522,16 @@
    "fieldname": "self_assisted",
    "fieldtype": "Check",
    "label": "Self Assisted"
+  },
+  {
+   "fieldname": "site_domain",
+   "fieldtype": "Small Text",
+   "label": "Site Domain"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-20 18:16:29.147414",
+ "modified": "2021-12-24 17:30:22.907035",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
