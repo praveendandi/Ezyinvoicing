@@ -9,6 +9,9 @@ import base64, requests
 import sys, traceback, datetime
 from frappe.model.document import Document
 from frappe.utils import logger
+from frappe.utils.background_jobs import enqueue
+
+
 
 class Precheckins(Document):
     pass
@@ -111,39 +114,49 @@ def add_pre_checkins():
             guestatt_doc=frappe.get_doc(guest_attachments)
             guestatt_doc.insert(ignore_permissions=True, ignore_links=True)
         if company.thank_you_email == 1 and company.self_assisted == 0:
-            cancel_email_address = pre_checkins["guest_email_address"]
-            folder_path = frappe.utils.get_bench_path()
-            site_folder_path = company.site_name
-            file_path = folder_path+'/sites/'+site_folder_path+company.thank_you_email_mail_content
-            arrival_doc = frappe.get_doc("Arrival Information",data["confirmation_number"])
-            # if arrival_doc.mail_sent=="No":
-            f = open(file_path, "r")
-            data=f.read()
-            data = data.replace('{{name}}',data["guest_first_name"]) if "{{name}}" in data else ""
-            # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-            data = data.replace('{{hotelName}}',company.company_name) if '{{hotelName}}' in data else ""
-            data = data.replace('{{email}}',company.email) if '{{email}}' in data else ""
-            data = data.replace('{{phone}}',company.phone_number) if '{{phone}}' in data else ""
-            mail_send = frappe.sendmail(recipients=cancel_email_address,
-                    subject = company.thank_you_mail_subject,
-                    message= data,now = True)
-            # frappe.db.set_value('Arrival Information',data["confirmation_number"],'mail_via','Automatic')
-            # if frappe.db.exists({"doctype":"Activity Logs","confirmation_number":data["confirmation_number"]}):
-            #     frappe.db.set_value("Activity Logs",data["confirmation_number"],{"datetime":date_time,"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"})
-            #     frappe.db.commit()
-            # else:
-            #     activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":data["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"Thankyou Mail Sent-out"}
-            #     event_doc=frappe.get_doc(activity_data)
-            #     event_doc.insert()
-            #     frappe.db.commit()
-            # else:
-            #     return {"success":False, "message":"Invitation Sent"}
+            enqueue(
+            thankyouMail,
+            queue="default",
+            timeout=800000,
+            event="data_import",
+            now=False,
+            data = data,
+            is_async = True,
+            )
         return {"success":True, "message":"Pre-checkin completed successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Precheckins-Add Pre Checkins","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
-    
+
+def thankyouMail(data):
+    try:
+        company = frappe.get_doc("company",data["company"])
+        if not company.site_domain:
+            return {"success":False,"message":"Please add site domain in property setting"}
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = company.site_name
+        file_path = folder_path+'/sites/'+site_folder_path+company.thank_you_email_mail_content
+        f = open(file_path, "r")
+        mail_templet=f.read()
+        mail_templet = mail_templet.replace('{{name}}',data["guest_first_name"]) if "guest_first_name" in data.keys() else ""
+        mail_templet = mail_templet.replace('{{lastName}}',data["guest_last_name"]) if "guest_last_name" in data.keys() else ""
+        mail_templet = mail_templet.replace('{{hotelName}}',company.company_name)
+        mail_templet = mail_templet.replace('{{email}}',company.email)
+        mail_templet = mail_templet.replace('{{phone}}',company.phone_number)
+        company_logo = (company.site_domain).rstrip('/')+company.company_logo
+        mail_templet = mail_templet.replace('logoImg',company_logo)
+        bg_logo = (company.site_domain).rstrip('/')+company.email_banner
+        mail_templet = mail_templet.replace('headerBG',bg_logo)
+        mail_send = frappe.sendmail(recipients=data["guest_email_address"],
+                subject = company.thank_you_mail_subject,
+                message= mail_templet,now = True)
+        return {"success":True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Precheckins-Thankyou Mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+  
 @frappe.whitelist(allow_guest=True)
 def get_pre_checkins_qr(company_code):
     try:
