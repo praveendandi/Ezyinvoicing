@@ -37,8 +37,7 @@
   {
    "fieldname": "static_payment_qr_code",
    "fieldtype": "Attach",
-   "label": "Static Payment QR Code",
-   "reqd": 1
+   "label": "Static Payment QR Code"
   },
   {
    "fieldname": "outlet_logo",
@@ -138,12 +137,12 @@
    "fieldname": "payment_gateway",
    "fieldtype": "Select",
    "label": "Payment gateway",
-   "options": "Razorpay\nPaytm"
+   "options": "Razorpay\nPaytm\nCCAvenue"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-03 15:07:10.754069",
+ "modified": "2022-01-06 14:15:43.391280",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",
