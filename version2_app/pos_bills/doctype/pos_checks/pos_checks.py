@@ -147,7 +147,7 @@ def extract_data(payload,company_doc):
                     else:
                         split_line = line.split(" ")
                         final_list = [i for i in split_line if i]
-                        if len(final_list)>3:
+                        if len(final_list)>=3:
                             data["check_no"] = final_list[1]
                             data["table_number"] = final_list[0]
                             data["no_of_guests"] = final_list[-1].replace("GST","")

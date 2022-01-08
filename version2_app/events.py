@@ -18,13 +18,44 @@ from datetime import date, timedelta
 
 import shutil
 from frappe.utils import logger
+from frappe.utils.data import money_in_words
+
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api", allow_site=True, file_count=50)
 
+@frappe.whitelist(allow_guest=True)
+def num_to_words(num):
+    try:
+        given_num = abs(float((num)))
+        num_in_word = money_in_words(given_num)
+        text=str(num_in_word).strip("INR")
+        return {"success":True, "data":text.strip()}
+    except:
+        frappe.log_error(frappe.get_traceback(),"num_to_words Error")
+        return {"success":False}
+
+
+def invoice_update(doc,method=None):
+    try:
+        if doc.sales_amount_after_tax:
+            total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
+            if total_amount_in_words["success"] == True:
+                doc.amount_in_word = total_amount_in_words["data"]
+                # doc.save(ignore_permissions=True,ignore_version=True)
+        # frappe.db.commit()
+    except:
+        frappe.log_error(frappe.get_traceback(),"invoice_update Error")
+        
 
 def invoice_created(doc, method=None):
     try:
-        print("Invoice Created",doc.name)
+        if doc.sales_amount_after_tax:
+            total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
+            if total_amount_in_words["success"] == True:
+                doc.amount_in_word = total_amount_in_words["data"]
+                # print(doc.amount_in_word,"===============")
+                # doc.save(ignore_permissions=True)
+                # frappe.db.commit()
         if frappe.db.exists('Invoice Reconciliations', doc.name):
             reconciliations_doc = frappe.get_doc('Invoice Reconciliations', doc.name)
             reconciliations_doc.invoice_found = "Yes"
@@ -124,11 +155,11 @@ def update_documentbin(filepath, error_log):
         if len(bin_data)>0:
             pass
         else:
-            if '@' in filepath:
-                systemName = re.search('@(.*)@', filepath)
-                systemName = systemName.group(1)
-            else:
-                systemName = "NA"    
+            systemName = "NA"
+            if filepath.count("@") == 2:
+                if '@' in filepath:
+                    systemName = re.search('@(.*)@', filepath)
+                    systemName = systemName.group(1)
             bin_doc = frappe.new_doc("Document Bin")
             bin_doc.system_name = systemName
             bin_doc.invoice_file = filepath

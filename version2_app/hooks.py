@@ -102,6 +102,7 @@ app_license = "MIT"
 doc_events = {
 	"Invoices": {
         "after_insert":"version2_app.events.invoice_created",
+        "on_update":"version2_app.events.invoice_update",
 		"after_delete":"version2_app.events.invoice_deleted",
 		# "on_update": "version2_app.events.invoiceUpdate",
 		# "on_cancel": "method",
