@@ -140,7 +140,8 @@
   "ipp_printer_file_path",
   "bulkupload_json",
   "pos_footer",
-  "pos_text"
+  "pos_text",
+  "enable_pdf_upload"
  ],
  "fields": [
   {
@@ -906,11 +907,17 @@
    "fieldname": "pos_text",
    "fieldtype": "Text",
    "label": "POS Text"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_pdf_upload",
+   "fieldtype": "Check",
+   "label": "Enable PDF Upload"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-30 17:29:56.778018",
+ "modified": "2022-01-11 16:16:11.299351",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
