@@ -314,8 +314,9 @@ def manual_upload_data(data):
                                     if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
-                                        inv_data = {"invoice_number":each['invoice_number']}
-                                        auto_adjustment(inv_data)
+                                        if each['invoice_category'] == "Tax Invoice":
+                                            inv_data = {"invoice_number":each['invoice_number']}
+                                            auto_adjustment(inv_data)
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -339,8 +340,9 @@ def manual_upload_data(data):
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                                        inv_data = {"invoice_number":each['invoice_number']}
-                                        auto_adjustment(inv_data)
+                                        if each['invoice_category'] == "Tax Invoice":
+                                            inv_data = {"invoice_number":each['invoice_number']}
+                                            auto_adjustment(inv_data)
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 else:
