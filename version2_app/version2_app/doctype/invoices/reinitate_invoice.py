@@ -41,7 +41,7 @@ def Reinitiate_invoice(data):
                     place_of_supply = company.state_code
             else:
                 place_of_supply = company.state_code
-        if "invoice_object_from_file" not in data.keys():
+        if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
                 data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
         # if "raise_credit" in data['guest_data']:
@@ -309,7 +309,7 @@ def Reinitiate_invoice(data):
         doc.total_invoice_amount = data["total_invoice_amount"]
         doc.place_of_supply = place_of_supply
         doc.invoice_round_off_amount = invoice_round_off_amount
-        if "invoice_object_from_file" not in data.keys():
+        if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
                 doc.invoice_object_from_file = data['invoice_object_from_file']
         doc.save()
