@@ -30,7 +30,7 @@ def Reinitiate_invoice(data):
         total_invoice_amount = data['total_invoice_amount']
         # del data['total_invoice_amount']
         company = frappe.get_doc('company',data['company_code'])
-        if "place_of_supply" in data:
+        if "place_of_supply" in data.keys():
             place_of_supply = data['place_of_supply']
         else:
             doc = frappe.db.exists("Invoices",data['guest_data']['invoice_number'])

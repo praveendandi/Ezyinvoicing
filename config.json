@@ -7,5 +7,5 @@
     "host":"http://192.168.1.15:8000/",
     "skip_ssl_verify":0,
     "file_path":"/home/caratred/Desktop/files/*.txt",
-    "name":"RAH-01"
+    "name":"JPM-01"
 }
