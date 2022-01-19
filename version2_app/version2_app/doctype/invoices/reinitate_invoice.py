@@ -124,10 +124,11 @@ def Reinitiate_invoice(data):
                     pass
         if "Arrival" in data["taxpayer"]["email"]:
             data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
-        if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
-            taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-            data['taxpayer'] =taxpayer
-            data['guest_data']['invoice_type'] = "B2C"
+        if data["invoice_from"] != "Web":
+            if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
+                taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+                data['taxpayer'] =taxpayer
+                data['guest_data']['invoice_type'] = "B2C"
         if company.allowance_type=="Discount":
             discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
             discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
@@ -270,7 +271,7 @@ def Reinitiate_invoice(data):
         doc.irn_generated=irn_generated
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
         print(data['total_invoice_amount'],pms_invoice_summary, other_charges,"==================")
-        if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
+        if converted_from_tax_invoices_to_manual_tax_invoices == "No" and invoice_from != "Web": 
             if len(data['items_data'])==0:
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
