@@ -272,7 +272,7 @@ def Reinitiate_invoice(data):
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
         print(data['total_invoice_amount'],pms_invoice_summary, other_charges,"==================")
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" or invoice_from != "Web": 
-            if len(data['items_data'])==0:
+            if len(data['items_data'])==0 and data['guest_data']['invoice_type'] != "B2B":
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
                 doc.invoice_type = "B2C"
