@@ -43,7 +43,10 @@ def Reinitiate_invoice(data):
                 place_of_supply = company.state_code
         if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
-                data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
+                if "data" not in data['invoice_object_from_file'].keys():
+                    data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
+                else:
+                    data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
         # if "raise_credit" in data['guest_data']:
 
         sales_amount_before_tax = 0
