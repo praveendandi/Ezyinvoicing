@@ -79,7 +79,10 @@ def arrivalActivity(company,file_url,source):
                     "number_of_guests": str(int(replace_new[column_indexs["NO_OF_ADULTS"]])+int(replace_new[column_indexs["NO_OF_CHILDREN"]])),
                     "virtual_checkin_status":"No",
                     "company":company,
-                    "cc_exp_date":replace_new[column_indexs["CC_EXP_DATE"]]
+                    "cc_exp_date": replace_new[column_indexs["CC_EXP_DATE"]],
+                    "room_number": str(replace_new[column_indexs["room_number"]]),
+                    "checkin_time": replace_new[column_indexs["checkin_time"]] if replace_new[column_indexs["checkin_time"]] != "" else "00:00:00",
+                    "checkout_time": replace_new[column_indexs["checkout_time"]] if replace_new[column_indexs["checkout_time"]] != "" else "00:00:00"
                 }
                 arrival_date = datetime.datetime.strptime(replace_new[column_indexs["ARRIVAL_DATE"]], "%d-%b-%y").date()
                 today = date.today()

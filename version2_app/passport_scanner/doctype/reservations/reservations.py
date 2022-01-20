@@ -370,6 +370,7 @@ def scan_aadhar():
                 return ({"success": True, "aadhar_details": details})
 
     except IndexError as e:
+        company = frappe.get_last_doc('company')
         api_time =time.time()
         base = frappe.local.form_dict.get("aadhar_image")
         doc_type = frappe.local.form_dict.get("scanView")
@@ -385,6 +386,7 @@ def scan_aadhar():
         frappe.log_error("SignEzy scan_aadhar","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"error": str(e), "success": False, "aadhar_details": details,"message":"Unable to scan Aadhar"})
     except Exception as e:
+        company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("aadhar_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
@@ -644,6 +646,7 @@ def scan_driving_license():
             return ({"success": True, "driving_details": details})
 
     except IndexError as e:
+        company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
@@ -661,6 +664,7 @@ def scan_driving_license():
         frappe.log_error("SignEzy scan_driving","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"message": str(e), "success": False, "driving_details": details})
     except Exception as e:
+        company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
         rand_no = str(datetime.datetime.now())
@@ -1111,6 +1115,7 @@ def scan_votercard():
 
     except IndexError as e:
         print(str(e))
+        company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("voter_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
@@ -1130,6 +1135,7 @@ def scan_votercard():
         return ({"message": str(e), "success": False, "voter_details": details})
     except Exception as e:
         print(str(e))
+        company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("voter_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)

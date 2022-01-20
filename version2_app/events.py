@@ -916,6 +916,12 @@ def guest_attachments(doc,method=None):
                 # else:
                 #     arrival_doc.number_of_guests = str(0 + 1)
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
+            if arrival_doc.room_number:
+                doc.room_number = arrival_doc.room_number
+            if arrival_doc.checkin_time:
+                doc.checkin_time = arrival_doc.checkin_time
+            if arrival_doc.checkout_time:
+                doc.checkout_time = arrival_doc.checkout_time
             doc.checkout_date = datetime.datetime.strptime(str(arrival_doc.departure_date),'%Y-%m-%d') if arrival_doc.departure_date else None
             doc.checkin_date = datetime.datetime.strptime(str(arrival_doc.arrival_date),'%Y-%m-%d') if arrival_doc.arrival_date else None
         given_name = doc.given_name if doc.given_name else ""

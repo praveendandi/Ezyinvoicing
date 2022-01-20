@@ -60,6 +60,7 @@
   "checkin_date",
   "checkin_time",
   "checkout_date",
+  "checkout_time",
   "no_of_nights",
   "uploaded_to_frro",
   "frro_failure_count",
@@ -68,7 +69,8 @@
   "frro_checkout_date",
   "remarks",
   "select_category",
-  "main_guest"
+  "main_guest",
+  "pathik_image"
  ],
  "fields": [
   {
@@ -405,11 +407,21 @@
    "fieldname": "main_guest",
    "fieldtype": "Check",
    "label": "Main Guest"
+  },
+  {
+   "fieldname": "pathik_image",
+   "fieldtype": "Attach Image",
+   "label": "Pathik Image"
+  },
+  {
+   "fieldname": "checkout_time",
+   "fieldtype": "Time",
+   "label": "Checkout Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-11 14:11:12.654130",
+ "modified": "2022-01-20 15:42:47.592523",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

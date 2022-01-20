@@ -237,7 +237,8 @@
   "reg_card_confirmation_no_regex",
   "paid_out_confirmation_no_regex",
   "advance_deposits_confirmation_no_regex",
-  "payment_receipts_confirmation_no_regex"
+  "payment_receipts_confirmation_no_regex",
+  "pathik"
  ],
  "fields": [
   {
@@ -1527,11 +1528,17 @@
    "fieldname": "site_domain",
    "fieldtype": "Small Text",
    "label": "Site Domain"
+  },
+  {
+   "default": "0",
+   "fieldname": "pathik",
+   "fieldtype": "Check",
+   "label": "Pathik"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-24 17:30:22.907035",
+ "modified": "2022-01-20 12:54:29.068850",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
