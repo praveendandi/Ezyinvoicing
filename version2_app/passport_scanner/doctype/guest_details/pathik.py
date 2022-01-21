@@ -238,6 +238,7 @@ def intiate_pathik(obj,pathik_guest_details):
         global data
         global total_guest_details
         total_guest_details = pathik_guest_details
+        frappe.log_error("CForm-intiate_pathik",folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
         driver = webdriver.Chrome(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
         driver.get(pathik_url)
         myElem = WebDriverWait(driver, global_delay).until(
