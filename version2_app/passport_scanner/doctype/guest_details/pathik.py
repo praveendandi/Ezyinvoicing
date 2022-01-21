@@ -76,7 +76,7 @@ def add_guest(driver):
                 if data["doc_type"] == "Foreigner" or data["doc_type"] == "indianPassport" or data["doc_type"] == "other":
                     data["doc_type"] = "Others"
                 elif data["doc_type"] == "aadhaar":
-                    data["doc_type"] = "Aadhaar"
+                    data["doc_type"] = "Aadhar"
                 elif data["doc_type"] == "driving":
                     data["doc_type"] = "Driving Licence"
                 elif data["doc_type"] == "voterId":
