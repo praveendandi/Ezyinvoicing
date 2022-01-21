@@ -205,6 +205,7 @@ def add_guest(driver):
                 frappe.publish_realtime("custom_socket", {'message': 'Pathik Upload', 'data': each})
         return {"success":True,"message":"Data uploaded successfully"}
     except Exception as e:
+        frappe.log_error("CForm-intiate_pathik",str(e))
         return {"success":False,"message":str(e)}
 
 
@@ -225,6 +226,7 @@ def login(data, driver):
     except TimeoutException:
         return {"success":False,"message":"Unable to login"}
     except Exception as e:
+        frappe.log_error("CForm-intiate_pathik",str(e))
         return {"success":False,"message":str(e)}
 
 
@@ -246,6 +248,7 @@ def intiate_pathik(obj,pathik_guest_details):
     except TimeoutException:
         return {"success":False,"message":"Time exceed"}
     except Exception as e:
+        frappe.log_error("CForm-intiate_pathik",str(e))
         return {"success":False,"message":str(e)}
 
 
