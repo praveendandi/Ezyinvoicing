@@ -64,6 +64,8 @@ def add_guest(driver):
         for each in total_guest_details:
             if frappe.db.exists('Guest Details',each):
                 pass
+                # data = frappe.db.get_value("Guest Details",each,["given_name as first_name","middle_name","given_name as last_name",""], as_dict=1) 
+                # print(data)
         first_name = driver.find_elements_by_name("first_name")
         first_name[0].send_keys(data['first_name'])
 

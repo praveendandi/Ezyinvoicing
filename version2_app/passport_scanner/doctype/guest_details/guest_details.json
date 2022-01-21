@@ -81,7 +81,8 @@
   "vehicle_number",
   "pathik_status",
   "pending_pathik",
-  "pathik_locality"
+  "pathik_locality",
+  "guest_company_name"
  ],
  "fields": [
   {
@@ -486,11 +487,16 @@
    "fieldname": "middle_name",
    "fieldtype": "Data",
    "label": "Middle Name"
+  },
+  {
+   "fieldname": "guest_company_name",
+   "fieldtype": "Data",
+   "label": "Guest Company Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-21 14:37:56.351790",
+ "modified": "2022-01-21 15:47:31.547698",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
