@@ -155,6 +155,11 @@ def arrivalActivity(company,file_url,source):
         frappe.log_error("Arrivals arrivalActivity","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
+def update_guestdetails():
+    try:
+        pass
+    except Exception as e:
+        pass
 
 @frappe.whitelist(allow_guest=True)
 def updateEmail(confirmation='',mobile='',email=''):
