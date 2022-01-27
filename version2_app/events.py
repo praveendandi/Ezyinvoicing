@@ -4,7 +4,7 @@ from requests.exceptions import RetryError
 # from requests.sessions import _Data
 import frappe, requests, json
 from datetime import datetime
-from version2_app.parsers import *
+# from version2_app.parsers import *
 import base64
 import shlex,traceback
 import time, itertools
