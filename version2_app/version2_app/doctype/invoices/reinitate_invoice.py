@@ -124,11 +124,12 @@ def Reinitiate_invoice(data):
                     pass
         if "Arrival" in data["taxpayer"]["email"]:
             data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
-        if data["invoice_from"] != "Web":
-            if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
-                taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
-                data['taxpayer'] =taxpayer
-                data['guest_data']['invoice_type'] = "B2C"
+        if "invoice_from" in data.keys():
+            if data["invoice_from"] != "Web":
+                if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
+                    taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
+                    data['taxpayer'] =taxpayer
+                    data['guest_data']['invoice_type'] = "B2C"
         if company.allowance_type=="Discount":
             discountAfterAmount = abs(discountAmount)+abs(credit_value_after_gst)
             discountBeforeAmount = abs(discountAmount)+abs(credit_value_before_gst)
