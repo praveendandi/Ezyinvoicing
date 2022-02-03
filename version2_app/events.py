@@ -4,7 +4,7 @@ from requests.exceptions import RetryError
 # from requests.sessions import _Data
 import frappe, requests, json
 from datetime import datetime
-from version2_app.parsers import *
+# from version2_app.parsers import *
 import base64
 import shlex,traceback
 import time, itertools
@@ -1122,40 +1122,6 @@ def pre_mail():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-pre_mail","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
-    
-    
-
-    # if company.thank_you_email== "1":
-    #     get_arrival_data = frappe.db.get_list("Arrival Information",filters={"docstatus":0},fields=["arrival_date","name","guest_email_address","mail_sent","mail_via"])
-    #     for x in get_arrival_data:
-    #         dt_convert = str(x['arrival_date'])
-    #         name = str(x['name'])
-    #         thankyou_email_address = str(x["guest_email_address"])
-    #         arrival_date = datetime.datetime.strptime(dt_convert,'%Y-%m-%d').date()
-    #         if x['mail_sent']=="No":
-    #             if x["virtual_checkin_status"]=="Yes":
-    #                 folder_path = frappe.utils.get_bench_path()
-    #                 site_folder_path = company.site_name
-    #                 file_path = folder_path+'/sites/'+site_folder_path+company.cancellation_email_mail_content
-    #                 f = open(file_path, "r")
-    #                 data=f.read()
-    #                 data = data.replace('{{name}}',x["guest_first_name"])
-    #                 # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-    #                 data = data.replace('{{hotelName}}',company.company_name)
-    #                 data = data.replace('{{email}}',company.email)
-    #                 data = data.replace('{{phone}}',company.phone_number)
-    #                 mail_send = frappe.sendmail(recipients=thankyou_email_address,
-    #                         subject = company.thank_you_mail_subject,
-    #                         message= data,now = True)
-    #                 frappe.db.set_value('Arrival Information',x['name'],'mail_sent','Yes')
-    #                 frappe.db.set_value('Arrival Information',x['name'],'mail_via','Automatic')
-    #                 activity_data = {"doctype":"Activity Logs","datetime":date_time,"confirmation_number":x["confirmation_number"],"module":"Ezycheckins","event":"PreArrivals","user":user_name,"activity":"ThankYou Mail Sent successfully"}
-    #                 event_doc=frappe.get_doc(activity_data)
-    #                 event_doc.insert()
-    #                 frappe.db.commit()
-    #             else:
-    #                 return {"success":False, "message":"Invitation Sent"}
-
 
 @frappe.whitelist(allow_guest=True)
 def manual_mail(data):

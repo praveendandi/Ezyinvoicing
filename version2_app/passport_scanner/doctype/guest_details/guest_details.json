@@ -67,7 +67,8 @@
   "frro_checkout_message",
   "frro_checkout_date",
   "remarks",
-  "select_category"
+  "select_category",
+  "main_guest"
  ],
  "fields": [
   {
@@ -398,11 +399,17 @@
    "fieldname": "select_category",
    "fieldtype": "Data",
    "label": "Select Category"
+  },
+  {
+   "default": "0",
+   "fieldname": "main_guest",
+   "fieldtype": "Check",
+   "label": "Main Guest"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-08 14:42:06.320864",
+ "modified": "2022-01-11 14:11:12.654130",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
