@@ -67,7 +67,10 @@ def create_pos_bills(data):
                                     added_text1 = "Guest Copy\n\n".encode("utf-8")
                                 elif count == 1:
                                     added_text1 = "Merchant Copy\n".encode("utf-8")
-                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                if company_doc.enable_pos_extra_text == 1:
+                                    added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                else:
+                                    added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,short_url['short_url'])
                         data["printed"] = 1
                 else:
@@ -77,7 +80,10 @@ def create_pos_bills(data):
                                 added_text1 = "Guest Copy\n\n".encode("utf-8")
                             elif count == 1:
                                 added_text1 = "Merchant Copy\n".encode("utf-8")
-                            added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            if company_doc.enable_pos_extra_text == 1:
+                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            else:
+                                added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                         give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number)
                     data["printed"] = 1
             if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
@@ -92,7 +98,10 @@ def create_pos_bills(data):
                             added_text1 = "Guest Copy\n\n".encode("utf-8")
                         elif count == 1:
                             added_text1 = "Merchant Copy\n".encode("utf-8")
-                        added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                        if company_doc.enable_pos_extra_text == 1:
+                            added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                        else:
+                            added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                     if company_doc.pos_footer:
                         data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
                     give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
