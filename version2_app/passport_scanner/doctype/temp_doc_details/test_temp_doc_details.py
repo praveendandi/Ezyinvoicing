@@ -1,4 +1,4 @@
-# Copyright (c) 2021, caratred and Contributors
+# Copyright (c) 2022, caratred and Contributors
 # See license.txt
 
 # import frappe
