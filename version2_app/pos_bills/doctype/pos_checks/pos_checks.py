@@ -120,6 +120,7 @@ def extract_data(payload,company_doc):
                         total_amount_regex = re.findall(company_doc.bill_amount_regex,line.replace(" ",""))
                         total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                         total_amount = total_amount.replace("-","")
+                        total_amount = total_amount.lstrip(".")
                 else:
                     total_amount = "0.00"
             elif company_doc.void_check_reference in payload:
@@ -128,12 +129,14 @@ def extract_data(payload,company_doc):
                     total_amount_regex = re.findall(company_doc.bill_amount_regex,line.replace(" ",""))
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
+                    total_amount = total_amount.lstrip(".")
             else:
                 data["check_type"] = "Normal Check"
                 if re.match(company_doc.normal_check_total_amt_regex,line.strip()):
                     total_amount_regex = re.findall(company_doc.bill_amount_regex,line.replace(" ",""))
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
+                    total_amount = total_amount.lstrip(".")
             if company_doc.name == "JP-2025":
                 pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+[GST]+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
                 if re.match(pattern, line):
