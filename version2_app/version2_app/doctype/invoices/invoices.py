@@ -39,7 +39,7 @@ class Invoices(Document):
 
 
 
-
+    @frappe.whitelist()
     def cancelIrn(self, invoice_number, reason='wrong Entry'):
         try:
             # get invoice details
