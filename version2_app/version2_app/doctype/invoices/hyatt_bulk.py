@@ -108,8 +108,9 @@ def hyatt_bulkupload(data):
                     
                     items_pdf_dict = {'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac'}
                 else:
-                    items.append({'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],'sort_order':1,"sac_code":'No Sac'})
-                    items_pdf.append({'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"taxcode_dsc":"No Sac",'sort_order':1,"sac_code":'No Sac'})
+                    if x[bulk_meta_data["detail_folio"]["item_value"]]:
+                        items.append({'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],'sort_order':1,"sac_code":'No Sac'})
+                        items_pdf.append({'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"taxcode_dsc":"No Sac",'sort_order':1,"sac_code":'No Sac'})
 
             if bulk_meta_data['invoice_company_code']!="":
                 data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
