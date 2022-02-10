@@ -25,7 +25,7 @@ def execute(filters=None):
 		
 		items_fields = ['parent','sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount','unit_of_measurement_description','quantity']
 		items_columns = ['invoice_number','sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount','unit_of_measurement_description','quantity']
-		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
+		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names]},fields =items_fields ,as_list=True)
 		items_df = pd.DataFrame(items_doc,columns=items_columns)
 		items_df = items_df.round(2)
 		# df['DataFrame Column'] = df['DataFrame Column'].astype(int)
