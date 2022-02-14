@@ -1410,3 +1410,18 @@ def delete_email_queue():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-delete_email_queue","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def ezy_suite_dashboard(from_date, to_date):
+    try:
+        total_reservations = frappe.db.sql("""select count(name) as total_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}'""".format(from_date,to_date), as_dict=1)
+        pre_checkins_count = frappe.db.sql("""select count(name) as pre_checkins from tabPrecheckins where DATE(creation) between '{}' and '{}'""".format(from_date,to_date), as_dict=1)
+        reservations_scanned = frappe.db.sql("""select count(name) as scanned_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Scanned'""".format(from_date,to_date), as_dict=1)
+        reservations_pending = frappe.db.sql("""select count(name) as scanned_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Pending'""".format(from_date,to_date), as_dict=1)
+        pending_reviews = frappe.db.sql("""select count(name) as pending_reviews from `tabGuest Details` where uploaded_to_frro=0 and id_type='Foreigner' and DATE(creation) between '{}' and '{}'""".format(from_date,to_date), as_dict=1)
+        uploaded_cform_count = frappe.db.sql("""select count(name) as uploaded_cfrom_count from `tabGuest Details` where uploaded_to_frro=1 and id_type='Foreigner' and DATE(creation) between '{}' and '{}'""".format(from_date,to_date), as_dict=1)
+        pathik_pending = frappe.db.sql("""select count(name) as uploaded_cfrom_count from `tabGuest Details` where uploaded_to_frro=1 and id_type='Foreigner' and DATE(creation) between '{}' and '{}'""".format(from_date,to_date), as_dict=1)
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-suite dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
