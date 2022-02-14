@@ -916,8 +916,24 @@ def guest_attachments(doc,method=None):
                 # else:
                 #     arrival_doc.number_of_guests = str(0 + 1)
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
+            if arrival_doc.room_number:
+                doc.room_number = arrival_doc.room_number
+            if arrival_doc.checkin_time:
+                doc.checkin_time = arrival_doc.checkin_time
+            if arrival_doc.checkout_time:
+                doc.checkout_time = arrival_doc.checkout_time
             doc.checkout_date = datetime.datetime.strptime(str(arrival_doc.departure_date),'%Y-%m-%d') if arrival_doc.departure_date else None
             doc.checkin_date = datetime.datetime.strptime(str(arrival_doc.arrival_date),'%Y-%m-%d') if arrival_doc.arrival_date else None
+            if doc.main_guest == 1:
+                doc.no_of_adults = 1
+            else:
+                guest_det = frappe.db.get_value("Guest Details",{"confirmation_number":data["confirmation_number"],"main_guest":1})
+                guest_doc = frappe.get_doc("Guest Details",guest_det)
+                guest_doc.no_of_adults = arrival_doc.no_of_adults
+                guest_doc.save(ignore_permissions=True, ignore_version=True)
+                frappe.db.commit()
+            # frappe.db.get_value("Guest Details", {}doc.no_of_adults = arrival_doc.no_of_adults
+            doc.no_of_children = arrival_doc.no_of_children
         given_name = doc.given_name if doc.given_name else ""
         surname = doc.surname if doc.surname else ""
         # frappe.db.set_value('Guest Details',doc.name, {"guest_full_name":given_name+" "+surname,"checkout_date":arrival_doc.departure_date if arrival_doc.departure_date else None,"checkin_date":arrival_doc.arrival_date if arrival_doc.arrival_date else None})
