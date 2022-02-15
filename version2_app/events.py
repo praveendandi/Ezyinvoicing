@@ -146,7 +146,7 @@ def invoice_deleted(doc, method=None):
 def precheckinsdocuments(doc, method=None):
     try:
         user_name = frappe.session.user
-        date_time = datetime.datetime.now()
+        date_time = datetime.now()
         confirmation_number = doc.confirmation_number
         if "-" in confirmation_number:
             confirmation_number = confirmation_number.split("-")[0]
@@ -587,7 +587,7 @@ def create_redg_card(doc, method=None):
         user_name = frappe.session.user
         get_data = frappe.db.get_list(doctype="Documents", filters={
                                       "confirmation_number": doc.confirmation_number})
-        date_time = datetime.datetime.now()
+        date_time = datetime.now()
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         activity_data = {"doctype": "Activity Logs", "datetime": date_time, "confirmation_number": doc.confirmation_number,
                          "module": "Sign Ezy", "event": "PreArrivals", "user": user_name, "activity": "Redg card added successfully"}
@@ -627,7 +627,7 @@ def create_advance_deposits(doc, method=None):
         user_name = frappe.session.user
         get_data = frappe.db.get_list(doctype="Documents", filters={
                                       "confirmation_number": doc.conformation_no})
-        date_time = datetime.datetime.now()
+        date_time = datetime.now()
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         activity_data = {"doctype": "Activity Logs", "datetime": date_time, "confirmation_number": doc.conformation_no,
                          "module": "Sign Ezy", "event": "PreArrivals", "user": user_name, "activity": "Advance Deposits Created successfully"}
@@ -939,7 +939,7 @@ def backup_file_perticulerdoctypes(data):
 @frappe.whitelist(allow_guest=True)
 def arrival_information(doc, method=None):
     user_name = frappe.session.user
-    date_time = datetime.datetime.now()
+    date_time = datetime.now()
     date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
     data = {"doctype": "Activity Logs", "datetime": date_time, "confirmation_number": doc.confirmation_number,
             "module": "Sign Ezy", "event": "PreArrivals", "user": user_name, "activity": "Reservation Created"}
@@ -1006,7 +1006,7 @@ def send_invoice_mail_scheduler():
 def guest_attachments(doc, method=None):
     try:
         user_name = frappe.session.user
-        date_time = datetime.datetime.now()
+        date_time = datetime.now()
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         activity_data = {"doctype": "Activity Logs", "datetime": date_time, "confirmation_number": doc.confirmation_number,
                          "module": "Passport Scanner", "event": "PreArrivals", "user": user_name, "activity": "guest details added successfully", "status": doc.status}
@@ -1038,7 +1038,7 @@ def guest_attachments(doc, method=None):
             arrival_doc = frappe.get_doc(
                 'Arrival Information', doc.confirmation_number)
             guest_count = arrival_doc.no_of_adults
-            now = datetime.datetime.now()
+            now = datetime.now()
             doc.no_of_nights = arrival_doc.no_of_nights
             doc.checkin_time = now.strftime("%H:%M:%S")
             added_guest_count = frappe.db.count(
@@ -1112,7 +1112,7 @@ def guest_update_attachment_logs(doc, method=None):
                             "guest_full_name": given_name+" "+surname})
         frappe.db.commit()
         user_name = frappe.session.user
-        date_time = datetime.datetime.now()
+        date_time = datetime.now()
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         activity_data = {"doctype": "Activity Logs", "datetime": date_time, "confirmation_number": doc.confirmation_number, "module": "Passport Scanner",
                          "event": "PreArrivals", "user": user_name, "activity": "guest details changed successfully", "status": doc.status}
@@ -1135,8 +1135,8 @@ def send_email(confirmation_number, company):
     file_path = folder_path+'/sites/'+site_folder_path + \
         company_doc.pre_checkin_mail_content
     arrival_doc = frappe.get_doc('Arrival Information', confirmation_number)
-    today_time = datetime.datetime.now()
-    date_time = datetime.datetime.now()
+    today_time = datetime.now()
+    date_time = datetime.now()
     f = open(file_path, "r")
     data = f.read()
     company_doc.save()
@@ -1319,7 +1319,7 @@ def pre_mail():
 
 @frappe.whitelist(allow_guest=True)
 def manual_mail(data):
-    date_time = datetime.datetime.now()
+    date_time = datetime.now()
     conf_number = data["confirmation_number"]
     email_address = data["guest_email_address"]
     arrival_doc = frappe.get_doc('Arrival Information', conf_number)
@@ -1433,7 +1433,7 @@ def check_hotelCode(data):
 def precheckins():
     data = json.loads(frappe.request.data)
     company = frappe.get_last_doc("company")
-    date_time = datetime.datetime.now()
+    date_time = datetime.now()
     now = datetime.date.today()
     for i in data["data"]:
         cwd = os.getcwd()
@@ -1570,7 +1570,7 @@ def update_company(doc, method=None):
 
 def delete_arrival_activity():
     try:
-        last_week = datetime.datetime.now() - datetime.timedelta(days=2)
+        last_week = datetime.now() - datetime.timedelta(days=2)
         arrival_activity = frappe.db.get_all("Arrival Activities", filters={
                                              'creation': ["<", last_week]}, fields=["name", "file_path"])
         data = frappe.db.sql(
