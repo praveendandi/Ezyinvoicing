@@ -16,13 +16,12 @@ import os
 import re
 import xmltodict
 import traceback
-import datetime
 import numpy as np
 from scipy import ndimage
 from PIL import Image
 from collections import defaultdict, OrderedDict
 from difflib import get_close_matches
-from datetime import date
+from datetime import date, datetime
 from frappe.model.document import Document
 # from pyzbar.pyzbar import decode, ZBarSymbol
 from os.path import expanduser
@@ -322,7 +321,7 @@ def scan_aadhar():
         # base = data['aadhar_image']
         # doc_type = data['scanView']
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/aadhardoc.jpeg"
         with open(filename, 'wb') as f:
@@ -338,7 +337,7 @@ def scan_aadhar():
         details = aadhar_text["data"]
         details['base64_string'] = cropped_aadhar
         image_string = ' '
-        rand_int = str(datetime.datetime.now())
+        rand_int = str(datetime.now())
         face_detect = detect_faces(filename, rand_int)
         if face_detect["success"] == False:
             return {"success": False,"error": face_detect["message"],"aadhar_details":{"base64_string": cropped_aadhar},"message":"Unable to scan Aadhar"}
@@ -375,7 +374,7 @@ def scan_aadhar():
         base = frappe.local.form_dict.get("aadhar_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/aadhardoc.jpeg"
         with open(filename, 'wb') as f:
@@ -390,7 +389,7 @@ def scan_aadhar():
         base = frappe.local.form_dict.get("aadhar_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/aadhardoc.jpeg"
         with open(filename, 'wb') as f:
@@ -596,7 +595,7 @@ def scan_driving_license():
         file_type = frappe.local.form_dict.get("scanView")
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/driverdoc.jpeg"
         with open(filename, 'wb') as f:
@@ -612,7 +611,7 @@ def scan_driving_license():
         driving_cropped = drivingcropped["data"]
         details['base64_string'] = driving_cropped
         image_string = ' '
-        rand_int = str(datetime.datetime.now())
+        rand_int = str(datetime.now())
         face_detect = detect_faces(filename, rand_int)
         if face_detect["success"] == False:
             return {"success": False,"message": face_detect["message"],"driving_details": details}
@@ -649,7 +648,7 @@ def scan_driving_license():
         company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/driverdoc.jpeg"
         with open(filename, 'wb') as f:
@@ -667,7 +666,7 @@ def scan_driving_license():
         company = frappe.get_last_doc('company')
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/driverdoc.jpeg"
         with open(filename, 'wb') as f:
@@ -1048,7 +1047,7 @@ def scan_votercard():
         base = frappe.local.form_dict.get("voter_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/voterdoc.jpeg"
         with open(filename, 'wb') as f:
@@ -1062,7 +1061,7 @@ def scan_votercard():
         # logger.info(details)
         details['base64_string'] = voter_cropped
         image_string = ' '
-        rand_int = str(datetime.datetime.now())
+        rand_int = str(datetime.now())
         face_detect = detect_faces(filename, rand_int)
         if face_detect["success"] == False:
             return {"success": False,"message": face_detect["message"]}
@@ -1119,7 +1118,7 @@ def scan_votercard():
         base = frappe.local.form_dict.get("voter_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/voterdoc.jpeg"
         with open(filename, 'wb') as f:
@@ -1139,7 +1138,7 @@ def scan_votercard():
         base = frappe.local.form_dict.get("voter_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/voterdoc.jpeg"
         with open(filename, 'wb') as f:
@@ -1259,7 +1258,7 @@ def pass_detect_text(image_file):
                 date_of_birth = str((parsed_birth).date())
                 year = date_of_birth[0:4]
 
-                present_date = datetime.datetime.now()
+                present_date = datetime.now()
                 present_year = present_date.year
                 if str(present_year) < year:
                     two = date_of_birth[0:2]
@@ -1286,7 +1285,7 @@ def pass_detect_text(image_file):
             details = {"type": "PASSPORT", "data": data}
             if date_of_expiry != ' ':
                 expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
-                today_date = datetime.datetime.now().date()
+                today_date = datetime.now().date()
                 if expiry<=today_date:
                     return {"success":False, "details":details,"message":"Passport is expired","expired":True}
             # logger.info(
@@ -1403,7 +1402,7 @@ def pass_detect_text(image_file):
                 date_of_birth = str((parsed_birth).date())
                 year = date_of_birth[0:4]
 
-                present_date = datetime.datetime.now()
+                present_date = datetime.now()
                 present_year = present_date.year
                 if str(present_year) < year:
                     two = date_of_birth[0:2]
@@ -1428,7 +1427,7 @@ def pass_detect_text(image_file):
             details = {"type": "VISA", "data": data}
             if date_of_expiry != ' ':
                 expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
-                today_date = datetime.datetime.now().date()
+                today_date = datetime.now().date()
                 if expiry<=today_date:
                     return {"success":False, "details":details,"message":"Visa is expired","expired":True}
             # logger.info(
@@ -1484,7 +1483,7 @@ def passportvisadetails():
             return pass_details
         details = pass_details["data"]
         # startlog.info(details)
-        unique_no = str(datetime.datetime.now())
+        unique_no = str(datetime.now())
         if details['type'] == 'PASSPORT':
             no = details['data']['Passport_Document_No']
             unique_no = no[5:]
@@ -1742,7 +1741,7 @@ def qr_detect_text(image_file):
 #         base = data['evisaqr']
 #         doc_type = data['scanView']
 #         imgdata = base64.b64decode(base)
-#         unique_no = datetime.datetime.now()
+#         unique_no = datetime.now()
 #         filename = basedir + company.site_name + "/private/files/evisa.jpeg"
 #         with open(filename, 'wb') as f:
 #             f.write(imgdata)
@@ -1796,7 +1795,7 @@ def other_images():
         base = frappe.local.form_dict.get("image")
         # doc_type = file['scanView']
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.datetime.now())
+        rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/otherimage.jpeg"
         with open(filename, 'wb') as f:
