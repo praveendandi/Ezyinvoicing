@@ -51,8 +51,8 @@ def file_parsing():
             if len(remove_data) == 26 and remove_data[-1] == "RESERVED":
                 if not frappe.db.exists({'doctype': 'Reservations',"reservation_number":remove_data[16]}):
                     reservation_data = {"doctype":"Reservations","guest_first_name":remove_data[2],"guest_last_name":remove_data[1],"email":remove_data[3],"contact_phone_no":remove_data[5].replace("+",""),"no_of_nights":remove_data[9],"confirmation_number":remove_data[12],"reservation_number":remove_data[16],"status":"Pending","booking_status":"Pending","no_of_adults":remove_data[7],"no_of_children":remove_data[8]}
-                    reservation_data["checkin_date"]=datetime.datetime.strptime(remove_data[17],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
-                    reservation_data["checkout_date"]=datetime.datetime.strptime(remove_data[18],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
+                    reservation_data["checkin_date"]=datetime.strptime(remove_data[17],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
+                    reservation_data["checkout_date"]=datetime.strptime(remove_data[18],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
                     doc = frappe.get_doc(reservation_data)
                     doc.insert(ignore_permissions=True,ignore_links=True)
                     frappe.db.commit()
@@ -70,8 +70,8 @@ def file_parsing():
                             rev_doc.reservation_number = remove_data[16]
                             rev_doc.no_of_adults = remove_data[7]
                             rev_doc.no_of_children = remove_data[8]
-                            rev_doc.checkout_date = datetime.datetime.strptime(remove_data[18],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
-                            rev_doc.checkin_date = datetime.datetime.strptime(remove_data[17],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
+                            rev_doc.checkout_date = datetime.strptime(remove_data[18],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
+                            rev_doc.checkin_date = datetime.strptime(remove_data[17],"%d-%b-%y").strftime('%Y-%m-%d %H:%M:%S')
                             rev_doc.save(ignore_permissions=True,ignore_version=True)
                             frappe.db.commit()
         return {"success":True,"message":"Reservations successfully added"}
@@ -1284,7 +1284,7 @@ def pass_detect_text(image_file):
                     "Passport_Document_No": passport_no, "Nationality": nationality, "Date_of_Birth": date_of_birth, "Gender": sex, "Date_of_Expiry": date_of_expiry}
             details = {"type": "PASSPORT", "data": data}
             if date_of_expiry != ' ':
-                expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
+                expiry = datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
                 today_date = datetime.now().date()
                 if expiry<=today_date:
                     return {"success":False, "details":details,"message":"Passport is expired","expired":True}
@@ -1426,7 +1426,7 @@ def pass_detect_text(image_file):
                     "Given_Name": givenname, "Visa_Number": visa_number, "Nationality": nationality, "Date_of_Birth": date_of_birth, "Gender": sex, "Visa_Expiry_Date": date_of_expiry}
             details = {"type": "VISA", "data": data}
             if date_of_expiry != ' ':
-                expiry = datetime.datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
+                expiry = datetime.strptime(date_of_expiry, '%Y-%m-%d').date()
                 today_date = datetime.now().date()
                 if expiry<=today_date:
                     return {"success":False, "details":details,"message":"Visa is expired","expired":True}
