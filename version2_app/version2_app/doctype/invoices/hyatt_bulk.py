@@ -190,7 +190,7 @@ def hyatt_bulkupload(data):
             # print(len(each_item['gstNumber']),"lennn",each_item['gstNumber'],each_item['invoice_type'])
             taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
             if len(each_item['gstNumber']) < 15 and len(each_item['gstNumber'])>0:
-                error_data['error_message'] = "Invalid GstNumber " + each_item['gstNumber']
+                error_data['error_message'] = each_item['gstNumber']+" "+"Invalid GstNumber"
                 error_data['amened'] = 'No'
                 
                 errorcalulateItemsApiResponse = calulate_items(each_item)
@@ -269,7 +269,7 @@ def hyatt_bulkupload(data):
                             output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
                     else:
-                        error_data['error_message'] = "Invalid GstNumber " + each_item['gstNumber']
+                        error_data['error_message'] = each_item['gstNumber']+" "+"Invalid GstNumber"
                         error_data['amened'] = 'No'
                         
                         errorcalulateItemsApiResponse = calulate_items(each_item)
