@@ -1433,10 +1433,10 @@ def pass_detect_text(image_file):
             #     return 
         else:
             return {"success":False, "data":"unable to scan image"}
-    # except IndexError as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return ({"success":False, "type":"partial data","message":str(e),"expired":False})
+    except IndexError as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return ({"success":False, "type":"partial data","message":traceback.format_exc(),"expired":False})
     # except NoneType as e:
     #     exc_type, exc_obj, exc_tb = sys.exc_info()
     #     frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
