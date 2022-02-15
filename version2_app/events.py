@@ -1181,12 +1181,12 @@ def pre_mail():
             return {"success": False, "message": "Please add site domain in property setting"}
         if company.mail_schedule == "True":
             convert_days = int(company.no_of_days)
-            date_time = datetime.datetime.now()
+            date_time = datetime.now()
             future_date = date_time+timedelta(days=convert_days)
             future_date = future_date.strftime("%Y-%m-%d")
             get_arrival_data = frappe.db.get_list("Arrival Information", filters={"booking_status": ['in', ["RESERVED", "DUE IN"]], "arrival_date": ["=", future_date], "guest_email_address": [
                                                   "is", "set"]}, fields=["arrival_date", "name", "guest_email_address", "mail_sent", "mail_via", "guest_first_name", "guest_last_name", "confirmation_number"])
-            now = datetime.datetime.now()
+            now = datetime.now()
             current_time = now.strftime("%H:%M")
             time_company = str(company.mail_schedule_time)[:-3:]
             str_date = str(company.mail_schedule_time +
