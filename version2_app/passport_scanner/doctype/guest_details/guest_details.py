@@ -28,6 +28,7 @@ def empty_guest_details(name):
         column_dict["no_of_nights"] = 0
         column_dict["uploaded_to_frro"] = 0
         column_dict["frro_checkout"] = 0
+        column_dict["no_of_children"] = get_doc.no_of_children
         column_dict["main_guest"] = get_doc.main_guest
         column_dict["confirmation_number"] = get_doc.confirmation_number
         column_dict["given_name"] = get_doc.given_name
