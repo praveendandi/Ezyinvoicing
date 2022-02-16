@@ -79,7 +79,7 @@ def file_parsing():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy file_parsing","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        return {"success":False, "error":str(e), "message":"Unable to scan your id"}
 
 CASCADE = os.path.join(abs_path,"apps/version2_app/version2_app/passport_scanner/doctype/reservations/","Har_cascade.xml")
 FACE_CASCADE = cv2.CascadeClassifier(CASCADE)
@@ -104,7 +104,7 @@ def detect_faces(image_path, number):
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy detect_faces","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success": False, "message": str(e)}
+        return {"success": False, "error": str(e), "message":"Unable to scan your id"}
 
 def text_getter(image_file):
     try:
@@ -139,7 +139,7 @@ def text_getter(image_file):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy text_getter","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success": False, "message": str(e)}
+        return {"success": False, "error": str(e), "message":"Unable to scan your id"}
 
 def aadhar_detect_text(image_file, doc_type):
     try:
@@ -247,7 +247,7 @@ def aadhar_detect_text(image_file, doc_type):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy aadhar_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})
+        return ({"success":False, "error": str(e), "message":"Unable to scan your id"})
 
 def imgdeskew(image):
     try:
@@ -280,7 +280,7 @@ def imgdeskew(image):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy imgdeskewu","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})    
+        return ({"success":False, "error": str(e), "message":"Unable to scan your id"})    
 
 
 def image_processing(image):
@@ -583,7 +583,7 @@ def license_detect_text(image_file):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy license_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})
+        return ({"success":False, "error": str(e), "message":"Unable to scan your id"})
 
 # API to scan driving license images
 @frappe.whitelist(allow_guest=True)
@@ -659,7 +659,7 @@ def scan_driving_license():
         os.remove(filename)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy scan_driving","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": str(e), "success": False, "driving_details": details})
+        return ({"error": str(e), "message":"Unable to scan your id", "success": False, "driving_details": details})
     except Exception as e:
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
@@ -676,7 +676,7 @@ def scan_driving_license():
         os.remove(filename)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy scan_driving","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": str(e), "success": False, "driving_details": details})
+        return ({"error": str(e), "message":"Unable to scan your id", "success": False, "driving_details": details})
 
 
 def pan_detect_text(image_file):
@@ -737,7 +737,7 @@ def pan_detect_text(image_file):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pan_dete981492ct_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})   
+        return ({"success":False, "error": str(e), "message":"Unable to scan your id"})   
 
 # API to scan pan card images
 @frappe.whitelist(allow_guest=True)
@@ -760,11 +760,11 @@ def scan_pancard():
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy scan_pancard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": str(e), "success": False})
+        return ({"error": str(e), "success": False, "message":"Unable to scan your id"})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy scan_pancard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success": False, "message": str(e)})
+        return ({"success": False, "error": str(e), "message":"Unable to scan your id"})
 
 
 # def image_processing(image):
@@ -1028,11 +1028,11 @@ def voter_detect_text(image_file, doc_type):
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy voter_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})
+        return ({"success":False, "error": str(e), "message":"Unable to scan your id"})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy voter_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})
+        return ({"success":False, "error": str(e), "message":"Unable to scan your id"})
 
 # API to scan voter card images
 @frappe.whitelist(allow_guest=True)
@@ -1127,7 +1127,7 @@ def scan_votercard():
         os.remove(filename)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy scan_votercard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": str(e), "success": False, "voter_details": details})
+        return ({"error": str(e), "message":"Unable to scan your id", "success": False, "voter_details": details})
     except Exception as e:
         print(str(e))
         base = frappe.local.form_dict.get("voter_image")
@@ -1146,7 +1146,7 @@ def scan_votercard():
         os.remove(filename)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy scan_votercard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": str(e), "success": False, "voter_details": details})
+        return ({"error": str(e), "message":"Unable to scan your id", "success": False, "voter_details": details})
 
 class customException(Exception):
     pass
@@ -1436,7 +1436,7 @@ def pass_detect_text(image_file):
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False, "type":"partial data","message":traceback.format_exc(),"expired":False})
+        return ({"success":False, "type":"partial data","message":"Unable to scan your id","error":traceback.format_exc(),"expired":False})
     # except NoneType as e:
     #     exc_type, exc_obj, exc_tb = sys.exc_info()
     #     frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -1444,7 +1444,7 @@ def pass_detect_text(image_file):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False, "type":"partial data","message":str(e),"expired":False})
+        return ({"success":False, "type":"partial data","message":"Unable to scan your id","error":traceback.format_exc(),"expired":False})
 
 def rotate(imagepath,number):
     img = cv2.imread(imagepath)
@@ -1532,15 +1532,15 @@ def passportvisadetails():
     except OSError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy passportvisadetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"error": "Unable to scan your id, please try again", "success": False})
+        return ({"message": "Unable to scan your id, please try again", "error":str(e), "success": False})
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy passportvisadetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": "Unable to scan your id, please try again", "success": False})
+        return ({"message": "Unable to scan your id, please try again", "error":str(e), "success": False})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy passportvisadetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success": False, "message": "Unable to scan your id, please try again"})
+        return ({"success": False, "error":str(e), "message": "Unable to scan your id, please try again"})
 
 def passport_address_detect_text(image_file):
     try:
@@ -1608,7 +1608,7 @@ def passport_address_detect_text(image_file):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy passport_address_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})
+        return ({"success":False,"error": str(e), "message": "Unable to scan your id"})
 
 # API to passort address images
 @frappe.whitelist(allow_guest=True)
@@ -1631,7 +1631,7 @@ def passport_address():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy passport_address","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return({"success": False, "message": "Unable to scan your id, please try again"})
+        return({"success": False, "error":str(e), "message": "Unable to scan your id, please try again"})
 
 # def qr_scan(img_path):
 #     try:
@@ -1724,7 +1724,7 @@ def qr_detect_text(image_file):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy qr_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"success":False,"message": str(e)})
+        return ({"success":False,"error": str(e), "message":"Unable to scan your id"})
 
 # API to scan QR-Visa and E-Visa images
 # @frappe.whitelist(allow_guest=True)
@@ -1806,4 +1806,4 @@ def other_images():
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy other_images","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return ({"message": str(e), "success": False})
+        return ({"error": str(e), "message":"Unable to scan your id", "success": False})
