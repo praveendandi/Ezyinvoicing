@@ -339,7 +339,7 @@ def generateIrn(data):
             return creditIrn
         discount_before_value = abs(discount_before_value)	
         discount_after_value = abs(discount_after_value)
-        TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+        TotInnVal = round(invoice.amount_after_gst, 2)+round(invoice.other_charges,2) - round(discount_after_value,2)
         TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
         
         # print(TotInnVal,TotInvValFc)
@@ -351,11 +351,12 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": 0,
+            "OthChrg": round(invoice.other_charges,2),
             "RndOffAmt": 0,
             "TotInvVal": round(TotInnVal,2),
             "TotInvValFc": round(TotInvValFc, 2)
         }
+        print(gst_data)
         
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
