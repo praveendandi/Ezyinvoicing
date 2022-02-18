@@ -1663,7 +1663,7 @@ def ezy_suite_dashboard(from_date, to_date):
         reservations_scanned = frappe.db.sql(
             """select count(name) as scanned_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Scanned'""".format(from_date, to_date), as_dict=1)
         reservations_pending = frappe.db.sql(
-            """select count(name) as pending_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Pending'""".format(from_date, to_date), as_dict=1)
+            """select count(name) as pending_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Pending' and virtual_checkin_status='Yes'""".format(from_date, to_date), as_dict=1)
         pending_reviews = frappe.db.sql(
             """select count(name) as pending_reviews from `tabGuest Details` where uploaded_to_frro=0 and id_type='Foreigner' and DATE(creation) between '{}' and '{}'""".format(from_date, to_date), as_dict=1)
         uploaded_cform_count = frappe.db.sql(
