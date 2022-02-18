@@ -237,7 +237,13 @@
   "reg_card_confirmation_no_regex",
   "paid_out_confirmation_no_regex",
   "advance_deposits_confirmation_no_regex",
-  "payment_receipts_confirmation_no_regex"
+  "payment_receipts_confirmation_no_regex",
+  "pathik_details_section",
+  "pathik_username",
+  "pathik",
+  "column_break_235",
+  "pathik_password",
+  "pathik_session"
  ],
  "fields": [
   {
@@ -1527,11 +1533,42 @@
    "fieldname": "site_domain",
    "fieldtype": "Small Text",
    "label": "Site Domain"
+  },
+  {
+   "default": "0",
+   "fieldname": "pathik",
+   "fieldtype": "Check",
+   "label": "Pathik"
+  },
+  {
+   "default": "0",
+   "fieldname": "pathik_session",
+   "fieldtype": "Check",
+   "label": "Pathik Session"
+  },
+  {
+   "fieldname": "pathik_details_section",
+   "fieldtype": "Section Break",
+   "label": "Pathik Details"
+  },
+  {
+   "fieldname": "column_break_235",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "pathik_username",
+   "fieldtype": "Data",
+   "label": "Pathik Username"
+  },
+  {
+   "fieldname": "pathik_password",
+   "fieldtype": "Data",
+   "label": "Pathik Password"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-24 17:30:22.907035",
+ "modified": "2022-01-21 11:53:10.879496",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

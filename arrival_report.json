@@ -25,5 +25,8 @@
     "CC_EXP_DATE": 23,
     "COMPANY_NAME": 24,
     "BOOKING_STATUS": 25,
-    "GROUP_CODE": 84
+    "GROUP_CODE": 84,
+    "room_number":29,
+    "checkin_time":27,
+    "checkout_time":28
 }

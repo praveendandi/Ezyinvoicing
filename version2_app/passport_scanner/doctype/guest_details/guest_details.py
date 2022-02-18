@@ -11,6 +11,7 @@ import base64
 from frappe.model.document import Document
 from version2_app.passport_scanner.doctype.reservations.reservations import *
 from version2_app.passport_scanner.doctype.guest_details.cform import *
+from version2_app.passport_scanner.doctype.guest_details.pathik import *
 
 class GuestDetails(Document):
     pass
@@ -609,3 +610,43 @@ def process_cform():
         frappe.log_error("Scan-Process Cform","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def process_pathik(guest_details):
+    company = frappe.get_last_doc('company')
+    try:
+        guest_details = json.loads(guest_details)
+        if len(guest_details) == 0:
+            return {"success": False, "message": "Please select the guests"}
+        if company.pathik == 0:
+            return {"success": False, "message": "Pathik is in disable mode"}
+        if not (company.pathik_username and company.pathik_password):
+            return {"success": False, "message": "Username and password not found"}
+        if company.pathik_session == 1:
+            return {"success":False,"message":"Already Pathik inpogress"}
+        company_status = update_company(company.name, {"pathik_session":1})
+        if company_status["success"] == False:
+            return company_status
+        obj = {"userId":company.pathik_username,"password":company.pathik_password}
+        status = intiate_pathik(obj, guest_details)
+        update_company(company.name, {"pathik_session":0})
+        if company_status["success"] == False:
+            return company_status
+        return status
+    except Exception as e:
+        update_company(company.name, {"pathik_session":0})
+        if company_status["success"] == False:
+            return company_status
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Scan-Process Pathik","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+
+def update_company(company_code,obj):
+    try:
+        frappe.db.set_value('company', company_code, obj)
+        frappe.db.commit()
+        return {"success":True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Scan-update_company","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
