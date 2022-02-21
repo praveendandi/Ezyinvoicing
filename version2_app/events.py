@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from requests.exceptions import RetryError
 import frappe, requests, json
 
