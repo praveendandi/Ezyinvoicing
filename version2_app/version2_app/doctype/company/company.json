@@ -131,17 +131,17 @@
   "upload_gst_details",
   "bulkupload_inovice_file_type",
   "bulkupload_gst_file_type",
-  "skip_ssl_verify",
   "only_b2c",
   "pms_payment_qr",
   "pms_information_invoice_for_payment_qr",
   "pms_property_logo",
   "pms_property_url",
-  "ipp_printer_file_path",
   "bulkupload_json",
   "pos_footer",
   "pos_text",
-  "enable_pdf_upload"
+  "enable_pdf_upload",
+  "skip_ssl_verify",
+  "ipp_printer_file_path"
  ],
  "fields": [
   {
@@ -490,7 +490,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nGrand\nHyatt Bulkupload\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad"
+   "options": "None\nGrand\nHyatt Bulkupload\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad\nBulkupload With Headers\nBulkupload Without Headers"
   },
   {
    "default": "0",
@@ -917,7 +917,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-11 16:16:11.299351",
+ "modified": "2022-02-21 10:45:10.723752",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
