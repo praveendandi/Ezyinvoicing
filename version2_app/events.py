@@ -711,7 +711,7 @@ def fetch_invoice_details(filters=[]):
             company = frappe.get_last_doc("company")
             # if filters["company_code"] == company.name:
             filters.extend([["invoice_type","=","B2B"],["irn_generated","=","Success"]])
-            fetch_invoice = frappe.db.get_list('Invoices',filters=filters,fields=['igst_amount','sgst_amount','cgst_amount','total_gst_amount','invoice_number','invoice_date','guest_name','room_number','confirmation_number','total_invoice_amount','irn_number','qr_code_image','irn_generated_time','ack_no','invoice_file','gst_number'])
+            fetch_invoice = frappe.db.get_list('Invoices',filters=filters,fields=["*"])#['igst_amount','sgst_amount','cgst_amount','total_gst_amount','invoice_number','invoice_date','guest_name','room_number','confirmation_number','total_invoice_amount','irn_number','qr_code_image','irn_generated_time','ack_no','invoice_file','gst_number'])
             for x in fetch_invoice:
                 items_fields = ['parent','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount','date','item_type','sac_code','item_name']
                 items_doc = frappe.db.get_list('Items',filters={'parent':['in',x["invoice_number"]]},fields =items_fields)
