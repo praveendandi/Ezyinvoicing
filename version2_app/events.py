@@ -1071,7 +1071,7 @@ def guest_attachments(doc, method=None):
             else:
                 guest_det = frappe.db.get_value("Guest Details", {
                                                 "confirmation_number": data["confirmation_number"], "main_guest": 1})
-                guest_doc = frappe.get_doc("Guest Details", guest_det)
+                guest_doc = frappe.get_doc("Guest Details", doc.name)
                 guest_doc.no_of_adults = arrival_doc.no_of_adults
                 guest_doc.save(ignore_permissions=True, ignore_version=True)
                 frappe.db.commit()
