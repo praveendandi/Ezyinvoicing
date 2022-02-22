@@ -3,7 +3,7 @@ from email.mime import image
 from requests.exceptions import RetryError
 # from requests.sessions import _Data
 import frappe, requests, json
-from datetime import datetime
+# from datetime import datetime
 # from version2_app.parsers import *
 import base64
 import shlex,traceback
