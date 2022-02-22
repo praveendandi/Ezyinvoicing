@@ -1095,7 +1095,7 @@ def guest_attachments(doc, method=None):
             doc.age = today.year - birthDate.year - \
                 ((today.month, today.day) < (birthDate.month, birthDate.day))
         doc.guest_full_name = given_name+" "+surname
-        doc.save()
+        # doc.save()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing Guest Attachments",
