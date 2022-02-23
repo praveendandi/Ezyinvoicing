@@ -24,6 +24,7 @@ frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 import pyshorteners as ps
 from frappe.core.doctype.communication.email import make
+from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 
 user_name =  frappe.session.user
 def invoice_created(doc, method=None):
@@ -244,6 +245,7 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
+        # print(doc.__dict__)
         if 'job-' in doc.file_name:
             if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
                 update_documentbin(doc.file_url,"")
@@ -269,6 +271,11 @@ def fileCreated(doc, method=None):
                 module.file_parsing(doc.file_url)
                 frappe.log_error(traceback.print_exc())
                 logger.error(f"fileCreated,   {traceback.print_exc()}")
+                
+        elif doc.attached_to_doctype == 'Dropbox':
+
+            # print(doc.attached_to_doctype)
+            create_scanned_doc(doc.file_url)
         else:
             if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
                 # pass
@@ -283,11 +290,11 @@ def fileCreated(doc, method=None):
     except Exception as e:
         # frappe.log_error(traceback.print_exc())
         logger.error(f"fileCreated,   {traceback.print_exc()}")
-        print(str(e), "fileCreated")
+        # print(str(e), "fileCreated")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         update_documentbin(doc.file_url,str(e))
-        print(traceback.print_exc())
+        # print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
 def Updateemitsocket(doc,method=None):

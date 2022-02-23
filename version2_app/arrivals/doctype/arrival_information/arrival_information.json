@@ -46,7 +46,8 @@
   "guest_eamil2",
   "guest_mobile_no2",
   "invoice_send_mail_send",
-  "send_invoice_mail"
+  "send_invoice_mail",
+  "room_no"
  ],
  "fields": [
   {
@@ -271,14 +272,20 @@
    "fieldname": "send_invoice_mail",
    "fieldtype": "Check",
    "label": "Send Invoice Mail"
+  },
+  {
+   "fieldname": "room_no",
+   "fieldtype": "Data",
+   "label": "Room No"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-12-20 19:23:36.281763",
+ "modified": "2022-02-17 10:49:03.743516",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
