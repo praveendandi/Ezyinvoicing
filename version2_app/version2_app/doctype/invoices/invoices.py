@@ -524,7 +524,7 @@ def attach_qr_code(invoice_number, gsp, code):
 
 @frappe.whitelist()
 def send_invoicedata_to_gcb(invoice_number):
-    # try:
+    try:
         folder_path = frappe.utils.get_bench_path()
 
         doc = frappe.get_doc('Invoices', invoice_number)
@@ -722,11 +722,11 @@ def send_invoicedata_to_gcb(invoice_number):
                 "message": "QR-Code generated successfully",
                 "invoice":doc
             }
-    # except Exception as e:
-    #     print(e, "send invoicedata to gcb")
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Ezy-invoicing send_invoicedata_to_gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return {"success": False, "message": str(e)}
+    except Exception as e:
+        print(e, "send invoicedata to gcb")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing send_invoicedata_to_gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 def cancel_irn(irn_number, gsp, reason, company, invoice_number):
