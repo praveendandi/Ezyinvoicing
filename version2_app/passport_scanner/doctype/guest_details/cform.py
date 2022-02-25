@@ -1,21 +1,21 @@
-from os import initgroups
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
-from urllib.request import urlretrieve
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.chrome.options import Options
-
-import time,json
-import datetime
-import frappe
-import sys,traceback
 import base64
+import datetime
+import json
+import os
+import sys
+import time
+import traceback
+from os import initgroups
+from urllib.request import urlretrieve
 
+import frappe
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select, WebDriverWait
 
 driver = ''
 
@@ -76,6 +76,8 @@ data = {
 }
 
 folder_path = frappe.utils.get_bench_path()
+
+
 def intiate():
     try:
         # print(data)
@@ -85,7 +87,7 @@ def intiate():
         options.add_argument("--headless")
         # options.headless = True if company.cform_chrome_headless == 1 else False
         driver = webdriver.Chrome(
-            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver',chrome_options=options)
+            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver', chrome_options=options)
         driver.get("https://indianfrro.gov.in/frro/FormC")
         myElem = WebDriverWait(driver, global_delay).until(
             EC.presence_of_element_located((By.ID, 'capt')))
@@ -93,14 +95,17 @@ def intiate():
         download = download_captcha()
         if download["success"] == False:
             return download
-        return {"success": True,"message": "CForm initiated successfully"}
+        return {"success": True, "message": "CForm initiated successfully"}
     except TimeoutException:
         print("time exceed")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("intiate","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":"timeout"}
+        frappe.log_error("intiate", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": "timeout"}
+
 
 '''download captcha image form screen'''
+
 
 def convert_image_to_base64(image):
     try:
@@ -108,35 +113,43 @@ def convert_image_to_base64(image):
             encoded_string = base64.b64encode(image_file.read())
         encoded_str = encoded_string.decode("utf-8")
         # print(encoded_str)
-        return {"success":True, "data":encoded_str}
+        return {"success": True, "data": encoded_str}
     except Exception as e:
-        print(str(e),"====================")
+        print(str(e), "====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("CForm-convert image to base64","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        frappe.log_error("CForm-convert image to base64",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
+
 
 def download_captcha():
     try:
+        if not os.path.exists(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha'):
+            os.mkdir(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha')
         company = frappe.get_last_doc("company")
-        driver.find_element_by_id('capt').screenshot(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha/test.png')
-        convert_base = convert_image_to_base64(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha/test.png')
+        driver.find_element_by_id('capt').screenshot(
+            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha/test.png')
+        convert_base = convert_image_to_base64(
+            folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha/test.png')
         if convert_base["success"] == False:
             return convert_base
-        frappe.publish_realtime("custom_socket", {'message': 'Captcha Image', 'data': convert_base["data"]})
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Captcha Image', 'data': convert_base["data"]})
         return {"success": True}
         # username = company.cform_user_name
         # password = company.cform_password
         # captcha_text = input('Enter captcha: ')
         # login_cform(username, password, captcha_text)
     except Exception as e:
-        print(str(e),"====================")
+        print(str(e), "====================")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("CForm-download captcha","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
-
+        frappe.log_error("CForm-download captcha",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 '''refresh captcha'''
+
 
 @frappe.whitelist(allow_guest=True)
 def refresh_captcha():
@@ -147,55 +160,65 @@ def refresh_captcha():
         download = download_captcha()
         if download["success"] == False:
             return download
-        return {"success": True,"message": "CForm initiated successfully"}
+        return {"success": True, "message": "CForm initiated successfully"}
     except Exception as e:
-        print(str(e),"===================================")
-        return {"success": False,"message": str(e)}
+        print(str(e), "===================================")
+        return {"success": False, "message": str(e)}
 
 
 '''
 enter userid password and captcha image
 '''
 
+
 @frappe.whitelist(allow_guest=True)
 def login_cform():
     try:
         global data
-        cform_data=json.loads(frappe.request.data)
+        cform_data = json.loads(frappe.request.data)
         login_details = cform_data["data"]
         company = frappe.get_last_doc('company')
-        if len(login_details["data"])>0:
-            company_doc = frappe.get_doc('company',company.name)
+        if len(login_details["data"]) > 0:
+            company_doc = frappe.get_doc('company', company.name)
             company_doc.cform_session = 1
-            company_doc.save(ignore_permissions=True,ignore_version=True)
+            company_doc.save(ignore_permissions=True, ignore_version=True)
             for index, each in enumerate(login_details["data"]):
-                each_data = frappe.db.get_value("Guest Details",each,["surname","given_name","gender","date_of_birth","select_category",
-                "nationality","address","city","country","passport_number","passport_place_of_issued_city",
-                "passport_place_of_issued_country","passport_date_of_issue","passport_valid_till","visa_number","visa_place_of_issued_city","visa_place_of_issued_country",
-                "visa_date_of_issue","visa_valid_till","visa_type","visa_sub_type","arrival_from_country","arrival_from_city","arrival_place",
-                "date_of_arrival_in_india","checkin_date","checkin_time","no_of_nights","whether_employed_in_india","purpose_of_visit","next_destination","next_destination_place",
-                "next_destination_state","next_destination_city","next_destination_country","contact_phone_no","contact_mobile_no","permanent_phone_no","permanent_mobile_no","remarks","face_image","name"], as_dict=1)
-                each_data["hotelAddress"] = company.address_1+" ,"+company.address_2
+                each_data = frappe.db.get_value("Guest Details", each, ["surname", "given_name", "gender", "date_of_birth", "select_category",
+                                                                        "nationality", "address", "city", "country", "passport_number", "passport_place_of_issued_city",
+                                                                        "passport_place_of_issued_country", "passport_date_of_issue", "passport_valid_till", "visa_number", "visa_place_of_issued_city", "visa_place_of_issued_country",
+                                                                        "visa_date_of_issue", "visa_valid_till", "visa_type", "visa_sub_type", "arrival_from_country", "arrival_from_city", "arrival_place",
+                                                                        "date_of_arrival_in_india", "checkin_date", "checkin_time", "no_of_nights", "whether_employed_in_india", "purpose_of_visit", "next_destination", "next_destination_place",
+                                                                        "next_destination_state", "next_destination_city", "next_destination_country", "contact_phone_no", "contact_mobile_no", "permanent_phone_no", "permanent_mobile_no", "remarks", "face_image", "name"], as_dict=1)
+                each_data["hotelAddress"] = company.address_1 + \
+                    " ,"+company.address_2
                 each_data["hote_state"] = company.state
                 each_data["hotel_city"] = company.city
                 each_data["hotel_pincode"] = company.pincode
                 if each_data["date_of_birth"]:
-                    each_data["date_of_birth"] = each_data["date_of_birth"].strftime("%d/%m/%Y")
+                    each_data["date_of_birth"] = each_data["date_of_birth"].strftime(
+                        "%d/%m/%Y")
                 if each_data["passport_date_of_issue"]:
-                    each_data["passport_date_of_issue"] = each_data["passport_date_of_issue"].strftime("%d%m%Y")
+                    each_data["passport_date_of_issue"] = each_data["passport_date_of_issue"].strftime(
+                        "%d%m%Y")
                 if each_data["passport_valid_till"]:
-                    each_data["passport_valid_till"] = each_data["passport_valid_till"].strftime("%d%m%Y")
+                    each_data["passport_valid_till"] = each_data["passport_valid_till"].strftime(
+                        "%d%m%Y")
                 if each_data["visa_date_of_issue"]:
-                    each_data["visa_date_of_issue"] = datetime.datetime.strptime(each_data["visa_date_of_issue"], '%Y-%m-%d').strftime("%d%m%Y")
+                    each_data["visa_date_of_issue"] = datetime.datetime.strptime(
+                        each_data["visa_date_of_issue"], '%Y-%m-%d').strftime("%d%m%Y")
                 if each_data["visa_valid_till"]:
-                    each_data["visa_valid_till"] = datetime.datetime.strptime(each_data["visa_valid_till"], '%Y-%m-%d').strftime("%d%m%Y")
+                    each_data["visa_valid_till"] = datetime.datetime.strptime(
+                        each_data["visa_valid_till"], '%Y-%m-%d').strftime("%d%m%Y")
                 if each_data["date_of_arrival_in_india"]:
-                    each_data["date_of_arrival_in_india"] = each_data["date_of_arrival_in_india"].strftime("%d/%m/%Y")
+                    each_data["date_of_arrival_in_india"] = each_data["date_of_arrival_in_india"].strftime(
+                        "%d/%m/%Y")
                 if each_data["checkin_date"]:
-                    each_data["checkin_date"] = each_data["checkin_date"].strftime("%d/%m/%Y")
+                    each_data["checkin_date"] = each_data["checkin_date"].strftime(
+                        "%d/%m/%Y")
                 if each_data["checkin_time"]:
                     each_data["checkin_time"] = str(each_data["checkin_time"])
-                each_data = {k: "" if not v else v for k, v in each_data.items()}
+                each_data = {k: "" if not v else v for k,
+                             v in each_data.items()}
                 data = each_data
                 if index == 0:
                     user_id = login_details["user_id"]
@@ -221,29 +244,33 @@ def login_cform():
                     alert = driver.switch_to.alert
                     alert.accept()
                     login = login_success()
-                    if login["success"] == False: 
-                        get_count = frappe.get_doc("Guest Details",each)
+                    if login["success"] == False:
+                        get_count = frappe.get_doc("Guest Details", each)
                         if get_count.frro_failure_count:
-                            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                            get_count.frro_failure_count = str(
+                                int(get_count.frro_failure_count)+1)
                         else:
                             get_count.frro_failure_count = str(0+1)
-                        get_count.save(ignore_permissions=True, ignore_version=True)
+                        get_count.save(ignore_permissions=True,
+                                       ignore_version=True)
                         frappe.db.commit()
                         return login
                 elif index > 0:
                     mulcform = multiple_cforms(each_data)
-                    if mulcform["success"]==False:
-                        get_count = frappe.get_doc("Guest Details",each)
+                    if mulcform["success"] == False:
+                        get_count = frappe.get_doc("Guest Details", each)
                         if get_count.frro_failure_count:
-                            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+                            get_count.frro_failure_count = str(
+                                int(get_count.frro_failure_count)+1)
                         else:
                             get_count.frro_failure_count = str(0+1)
-                        get_count.save(ignore_permissions=True, ignore_version=True)
+                        get_count.save(ignore_permissions=True,
+                                       ignore_version=True)
                         frappe.db.commit()
                         return mulcform
             company_doc.cform_session = 0
-            company_doc.save(ignore_permissions=True,ignore_version=True)
-            return {"success":True,"message":"Guest uploaded to cform"}
+            company_doc.save(ignore_permissions=True, ignore_version=True)
+            return {"success": True, "message": "Guest uploaded to cform"}
     except TimeoutException:
         print("no alert")
         login = login_success()
@@ -253,15 +280,16 @@ def login_cform():
         # driver.find_element_by_name("Loginform").submit()
 
     except Exception as e:
-        print(str(e),"-----------------------")
+        print(str(e), "-----------------------")
         company = frappe.get_last_doc('company')
-        company_doc = frappe.get_doc('company',company.name)
+        company_doc = frappe.get_doc('company', company.name)
         company_doc.cform_session = 0
-        company_doc.save(ignore_permissions=True,ignore_version=True)
+        company_doc.save(ignore_permissions=True, ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
-        frappe.log_error("login cform","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        print(e, exc_type, exc_obj, exc_tb, exc_tb.tb_lineno)
+        frappe.log_error("login cform", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 ''' check login is success or not'''
@@ -282,15 +310,16 @@ def login_success():
             return check_invalid
         return {"success": True}
     except Exception as e:
-        print(str(e),"+++++++++++++++++")
+        print(str(e), "+++++++++++++++++")
         company = frappe.get_last_doc('company')
-        company_doc = frappe.get_doc('company',company.name)
+        company_doc = frappe.get_doc('company', company.name)
         company_doc.cform_session = 0
-        company_doc.save(ignore_permissions=True,ignore_version=True)
+        company_doc.save(ignore_permissions=True, ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
-        frappe.log_error("login success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        print(e, exc_type, exc_obj, exc_tb, exc_tb.tb_lineno)
+        frappe.log_error("login success", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 def check_invalid_details():
@@ -301,22 +330,23 @@ def check_invalid_details():
         print(error_message.text)
         if error_message.text == 'Wrong Userid Or Password':
             print("invalid username")
-            return {"success":False,"message":"Wrong Userid Or Password"}
+            return {"success": False, "message": "Wrong Userid Or Password"}
         else:
             print("invalid captcha")
             refresh_cap = refresh_captcha()
             if refresh_cap["success"] == False:
                 return refresh_captcha
-            return {"success":True}
+            return {"success": True}
     except NoSuchElementException:
         print("not invalid captcha issue")
         return {"success": False, "message": "not invalid captcha"}
     except Exception as e:
-        print(str(e),"/////////////////////////")
+        print(str(e), "/////////////////////////")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
-        frappe.log_error("check invalid details","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        print(e, exc_type, exc_obj, exc_tb, exc_tb.tb_lineno)
+        frappe.log_error("check invalid details", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 '''route to checkin page'''
@@ -334,18 +364,19 @@ def intiate_checkin_process():
                 check = checkin_cform()
                 if check["success"] == False:
                     return check
-                return {"success":True}
+                return {"success": True}
         pass
     except Exception as e:
-        print(str(e),"..........................")
+        print(str(e), "..........................")
         company = frappe.get_last_doc('company')
-        company_doc = frappe.get_doc('company',company.name)
+        company_doc = frappe.get_doc('company', company.name)
         company_doc.cform_session = 0
-        company_doc.save(ignore_permissions=True,ignore_version=True)
+        company_doc.save(ignore_permissions=True, ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print(e, exc_type, exc_obj, exc_tb,exc_tb.tb_lineno)
-        frappe.log_error("intiate checkin process","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        print(e, exc_type, exc_obj, exc_tb, exc_tb.tb_lineno)
+        frappe.log_error("intiate checkin process", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 '''start checkin'''
@@ -359,9 +390,11 @@ def checkin_cform():
         '''uplaod face image'''
         company = frappe.get_last_doc("company")
         if "private" in data["face_image"]:
-            driver.find_element_by_id("file1").send_keys(folder_path+"/sites/"+company.site_name+data["face_image"])
+            driver.find_element_by_id("file1").send_keys(
+                folder_path+"/sites/"+company.site_name+data["face_image"])
         else:
-            driver.find_element_by_id("file1").send_keys(folder_path+"/sites/"+company.site_name+"/public"+data["face_image"])
+            driver.find_element_by_id("file1").send_keys(
+                folder_path+"/sites/"+company.site_name+"/public"+data["face_image"])
         driver.find_element_by_xpath(
             "//input[@value='Upload File'][@type='button']").click()
         '''accept success alert'''
@@ -576,23 +609,25 @@ def checkin_cform():
         print(",.,.,.,.,")
         print("error in checkin")
     except Exception as e:
-        print(str(e),"====================")
+        print(str(e), "====================")
         company = frappe.get_last_doc('company')
-        company_doc = frappe.get_doc('company',company.name)
+        company_doc = frappe.get_doc('company', company.name)
         company_doc.cform_session = 0
-        company_doc.save(ignore_permissions=True,ignore_version=True)
-        get_count = frappe.get_doc("Guest Details",data["name"])
+        company_doc.save(ignore_permissions=True, ignore_version=True)
+        get_count = frappe.get_doc("Guest Details", data["name"])
         if get_count.frro_failure_count:
-            get_count.frro_failure_count = str(int(get_count.frro_failure_count)+1)
+            get_count.frro_failure_count = str(
+                int(get_count.frro_failure_count)+1)
         else:
             get_count.frro_failure_count = str(0+1)
         get_count.save(ignore_permissions=True, ignore_version=True)
         frappe.db.commit()
-        frappe.log_error("save temp success",str(e))
-        return {"success":False,"message":str(e)}
+        frappe.log_error("save temp success", str(e))
+        return {"success": False, "message": str(e)}
 
 
 multiple = False
+
 
 def save_temp_success():
     try:
@@ -602,28 +637,30 @@ def save_temp_success():
         '''extract cform number'''
         cform_id_html = driver.find_elements_by_tag_name("h1")[0]
         cform_id = cform_id_html.get_attribute('innerHTML')
-        guest_doc = frappe.get_doc("Guest Details",data["name"])
+        guest_doc = frappe.get_doc("Guest Details", data["name"])
         guest_doc.frro_id = cform_id.strip()
         guest_doc.uploaded_to_frro = 1
         guest_doc.status = "In House"
         guest_doc.frro_failure_count = 0
         guest_doc.save(ignore_permissions=True, ignore_version=True)
-        frappe.publish_realtime("custom_socket", {'message': 'Cform Success', 'data': data["name"]})
+        frappe.publish_realtime(
+            "custom_socket", {'message': 'Cform Success', 'data': data["name"]})
         '''only devmode else comment'''
         if multiple:
             multiple_cforms()
-        return {"success":True}
+        return {"success": True}
     except TimeoutException:
         print("error in temp success")
     except Exception as e:
-        print(str(e),"*****************")
+        print(str(e), "*****************")
         company = frappe.get_last_doc('company')
-        company_doc = frappe.get_doc('company',company.name)
+        company_doc = frappe.get_doc('company', company.name)
         company_doc.cform_session = 0
-        company_doc.save(ignore_permissions=True,ignore_version=True)
+        company_doc.save(ignore_permissions=True, ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("save temp success","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        frappe.log_error("save temp success", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 def multiple_cforms(checkin_deatils):
@@ -636,13 +673,14 @@ def multiple_cforms(checkin_deatils):
         intiate = intiate_checkin_process()
         if intiate == False:
             return intiate
-        return {"success":True}
+        return {"success": True}
     except Exception as e:
-        print(str(e),"@@@@@@@@")
+        print(str(e), "@@@@@@@@")
         company = frappe.get_last_doc('company')
-        company_doc = frappe.get_doc('company',company.name)
+        company_doc = frappe.get_doc('company', company.name)
         company_doc.cform_session = 0
-        company_doc.save(ignore_permissions=True,ignore_version=True)
+        company_doc.save(ignore_permissions=True, ignore_version=True)
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("multiple cforms","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        return {"success":False,"message":str(e)}
+        frappe.log_error("multiple cforms", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
