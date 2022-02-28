@@ -43,12 +43,12 @@ def get_summary(filters):
                 each["Date_string"] = str(
                     min(get_item_dates))+" to "+str(max(get_item_dates))
                 total_items.append(each)
-        df = pd.DataFrame.from_records(total_items)
-        data = df.groupby('service_type',as_index=False).agg({"Date_string":'first', "service_type": 'first', "invoice_category": 'first', "item_value_after_gst": 'sum'})
-        data.rename(columns={'Date_string': 'Date', 'service_type': 'Service Type','invoice_category':'Invoice Type','item_value_after_gst':'Amount'}, inplace=True)
-        data = data.values.tolist()
-        print(data)
-        columns = ["Date", "Service Type", "Invoice Type", "Amount"]
-        return {"success":True, "data":data, "columns":columns}
+            df = pd.DataFrame.from_records(total_items)
+            data = df.groupby('service_type',as_index=False).agg({"Date_string":'first', "service_type": 'first', "invoice_category": 'first', "item_value_after_gst": 'sum'})
+            data.rename(columns={'Date_string': 'Date', 'service_type': 'Service Type','invoice_category':'Invoice Type','item_value_after_gst':'Amount'}, inplace=True)
+            data = data.values.tolist()
+            columns = ["Date", "Service Type", "Invoice Type", "Amount"]
+            return {"success":True, "data":data, "columns":columns}
+        return {"success":False, "message":"no data found"}
     except Exception as e:
         return {"success":False, "message": str(e)}
