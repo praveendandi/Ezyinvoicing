@@ -722,4 +722,8 @@ def fetch_invoice_details(filters=[]):
             return {"success":False, "message":"filters not be empty"}
     except Exception as e:
         return {"Success":False,"message":str(e)}
-       
+
+@frappe.whitelist(allow_guest=True)
+def get_template():
+    summary_template = frappe.get_doc("Print Format", "summary")
+    return summary_template.html
