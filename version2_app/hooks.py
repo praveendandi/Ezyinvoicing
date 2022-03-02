@@ -171,6 +171,9 @@ doc_events = {
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
+    },
+    "Summaries": {
+        "after_insert":"version2_app.events.summaries_insert",
     }
 	
 

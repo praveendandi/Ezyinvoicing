@@ -4,10 +4,16 @@
 
 from __future__ import unicode_literals
 
-import frappe
+from datetime import timedelta
+
+import frappe,pdfkit,os
 import pandas as pd
 from frappe.model.document import Document
-from datetime import timedelta
+from weasyprint import HTML
+# import weasyprint as wp
+from pathlib import Path
+# from xhtml2pdf import pisa 
+
 
 
 class SummaryBreakups(Document):
@@ -15,7 +21,53 @@ class SummaryBreakups(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def create_summaries(filters=[], summary=None):
+def create_html_to_pdf(name):
+    try:
+        doc=frappe.db.get_value("Summaries",name,["name","tax_payer_details"],as_dict=1)
+        print(doc,"==========")
+        if doc:
+            templates=frappe.db.get_all("Print Format",filters={"name":["in",["Summary","Rooms","Food","Misc"]]},fields=["*"])
+            html=""
+            for each_template in templates:
+                html+=frappe.render_template(each_template["html"],doc)
+                html+='<div style="page-break-before: always;"></div>'
+            responce=html_to_pdf(html, "sample")
+            return responce
+    except Exception as e:
+        frappe.log_error("Error in create_html_to_pdf: ",frappe.get_traceback())
+        return {"Success":False,"message":str(e)}
+    
+
+def html_to_pdf(html_data,filename):
+    try:
+        cwd = os.getcwd() 
+        options = {
+                "enable-local-file-access": None
+                }
+
+        # with open(html_path,'r') as f:
+        # mycss = wp.CSS(string=(
+        #         "@page longpage {\n"
+        #         "    size: 210mm 10000mm;\n"
+        #         "}"
+        #         "body {\n"
+        #         "   page: longpage;\n"
+        #         "}\n"
+        #     ))
+        htmldoc = HTML(string=html_data, base_url="")#.render(stylesheets=[mycss])
+        file_path = cwd + "/" + filename + '.pdf'
+        # pisaStatus = pisa.CreatePDF(
+        #     src=html_data,            # the HTML to convert
+        #     dest=file_path)  
+        Path(file_path).write_bytes(htmldoc.write_pdf())
+        print(htmldoc.write_pdf(),"===========")
+        return {"Success":True,"message":"pdf created successfully"}
+    except Exception as e:
+        frappe.log_error("Error in html_to_pdf: ",frappe.get_traceback())
+        return {"Success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def create_summary_breakup(filters=[], summary=None):
     try:
         total_items = []
         get_company = frappe.get_last_doc("company")
@@ -53,17 +105,12 @@ def create_summaries(filters=[], summary=None):
                 doc = frappe.get_doc(summaries)
                 doc.insert()
                 frappe.db.commit()
-                if summaries["category"] == "Room":
-                    summary_breakup_details = df[df['service_type'] == "Room"]
-                elif summaries["category"] == "Food":
-                    summary_breakup_details = df[df['service_type'] == "Food"]
-                elif summaries["category"] == "Miscellaneous":
-                    summary_breakup_details = df[df['service_type'] == "Miscellaneous"]
-                else:
-                    pass
-                filter_food_columns = summary_breakup_details[["date","parent","sac_code","item_value_after_gst","item_taxable_value","cgst_amount","sgst_amount","igst_amount","gst_rate","service_type"]]
-                filter_food_columns.rename(columns={'parent': 'invoice_no', 'item_value_after_gst': 'amount', 'cgst_amount':'cgst',"sgst_amount":"sgst","igst_amount":"igst","gst_rate":"tax",
-                    'item_taxable_value': 'base_amount', 'service_type': 'category'}, inplace=True)
+                summary_breakup_details = df[df['service_type']
+                                             == summaries["category"]]
+                filter_food_columns = summary_breakup_details[["date", "parent", "sac_code", "item_value_after_gst",
+                                                               "item_taxable_value", "cgst_amount", "sgst_amount", "igst_amount", "gst_rate", "service_type", "description"]]
+                filter_food_columns.rename(columns={'parent': 'invoice_no', 'item_value_after_gst': 'amount', 'cgst_amount': 'cgst', "sgst_amount": "sgst", "igst_amount": "igst", "gst_rate": "tax",
+                                                    'item_taxable_value': 'base_amount', 'service_type': 'category', 'description': 'particulars'}, inplace=True)
                 filter_food_columns["parent"] = doc.name
                 filter_food_columns["parentfield"] = "summary_breakup_details"
                 filter_food_columns["parenttype"] = "Summary Breakups"
@@ -76,8 +123,41 @@ def create_summaries(filters=[], summary=None):
                     child_doc = frappe.get_doc(each)
                     child_doc.insert()
                     frappe.db.commit()
-            return {"success": True, "message":"data updated successfully"}    
+            return {"success": True, "message": "data updated successfully"}
         else:
             return {"success": False}
     except Exception as e:
+        frappe.log_error(str(e), "create_summary_breakup")
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def update_summary_breakup():
+    try:
+        pass
+    except Exception as e:
+        frappe.log_error(str(e), "update_summary_breakup")
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_summary_breakup(summary=None):
+    try:
+        if summary:
+            # "`tabSummary Breakups`.date", "`tabSummary Breakups`.category", "`tabSummary Breakups`.invoice_type", "`tabSummary Breakups`.amount", "`tabSummary Breakup Details`.date as breakup_date", "`tabSummary Breakup Details`.bill_no", "`tabSummary Breakup Details`.invoice_no", "`tabSummary Breakup Details`.particulars", "`tabSummary Breakup Details`.sac_code", "`tabSummary Breakup Details`.base_amount", 
+            #  "`tabSummary Breakup Details`.tax", "`tabSummary Breakup Details`.cgst", "`tabSummary Breakup Details`.sgst", "`tabSummary Breakup Details`.igst", "`tabSummary Breakup Details`.amount as total_amount", "`tabSummary Breakup Details`.checkin_date", "`tabSummary Breakup Details`.checkout_date", "`tabSummary Breakup Details`.no_of_nights", "`tabSummary Breakup Details`.no_of_guests", "`tabSummary Breakup Details`.room_rate", "`tabSummary Breakup Details`.category"
+            get_summary_breakups = frappe.db.get_list(
+                "Summary Breakups", filters=[["summaries", "=", summary]], fields=["*"])
+            if len(get_summary_breakups) > 0:
+                for each in get_summary_breakups:
+                    breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[
+                                                         ["parent", "=", each["name"]]], fields=["*"])
+                    each["summary_breakup_details"] = breakup_details
+                return {"success": True, "data": get_summary_breakups}
+            else:
+                return {"success": False, "message": "summary breakups not found"}
+        else:
+            return {"success": False, "message": "summary not found"}
+    except Exception as e:
+        frappe.log_error(str(e), "get_summary_breakup")
         return {"success": False, "message": str(e)}

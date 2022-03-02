@@ -9,7 +9,8 @@
   "from_date",
   "to_date",
   "event_type",
-  "tax_payer_details"
+  "tax_payer_details",
+  "between_dates"
  ],
  "fields": [
   {
@@ -41,11 +42,16 @@
    "fieldtype": "Link",
    "label": "Tax Payer Details",
    "options": "TaxPayerDetail"
+  },
+  {
+   "fieldname": "between_dates",
+   "fieldtype": "Data",
+   "label": "Between Dates"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-01 16:10:18.856235",
+ "modified": "2022-03-01 14:39:57.290812",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",

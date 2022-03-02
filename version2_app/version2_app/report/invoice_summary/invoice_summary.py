@@ -14,11 +14,9 @@ def execute(filters=None):
     if "gst_number" in filters.keys():
         data = get_summary(filters)
         if data["success"] == False:
-            print(data,"+++++++")
-            return [],[]
+            return [], []
         columns, data = data["columns"], data["data"]
         return columns, data
-    return [], []
 
 
 def get_summary(filters):
@@ -57,4 +55,5 @@ def get_summary(filters):
             return {"success": True, "data": data, "columns": columns}
         return {"success": False, "message": "no data found"}
     except Exception as e:
+        frappe.log_error(str(e),"get_summary")
         return {"success": False, "message": str(e)}
