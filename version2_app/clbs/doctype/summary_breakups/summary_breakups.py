@@ -21,6 +21,18 @@ def create_summary_breakup(filters=[], summary=None):
         total_items = []
         get_company = frappe.get_last_doc("company")
         if len(filters) > 0:
+            # if filters[0][0] != "parent":
+            #     return {"success":False, "message": "something went wrong"}
+            # list_of_invoices = filters[0][2]
+            # breakups = frappe.db.get_list("Summary Breakups", filters=[["summaries","=",summary]], pluck='name')
+            # if len(breakups) > 0:
+            #     breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[["parent","in",breakups]], pluck='invoice_no')
+            #     if len(breakup_details) > 0:
+            #         breakup_details = list(set(breakup_details))
+            #     check_new_invoices = list_of_invoices - breakup_details
+            #     if len(check_new_invoices) == 0:
+            #         return {'success': False, "message": "Summaries already generated for these invoices."}
+            #     filters = [["parent","in",check_new_invoices]]
             get_items = frappe.db.get_list(
                 "Items", filters=filters, fields=["*"])
             get_item_dates = frappe.db.get_list(
@@ -28,6 +40,7 @@ def create_summary_breakup(filters=[], summary=None):
             for each in get_items:
                 invoice_doc = frappe.get_doc("Invoices", each.parent)
                 each["invoice_category"] = invoice_doc.invoice_category
+                each["invoice_file"] = invoice_doc.invoice_file
                 sac_category = frappe.db.get_value(
                     "SAC HSN CODES", each.description, "category")
                 if sac_category:
@@ -50,17 +63,13 @@ def create_summary_breakup(filters=[], summary=None):
                         'invoice_category': 'invoice_type', 'item_value_after_gst': 'amount'}, inplace=True)
             data = data.to_dict('records')
             for summaries in data:
-                summaries["doctype"] = 'Summary Breakups'
-                doc = frappe.get_doc(summaries)
-                doc.insert()
-                frappe.db.commit()
                 summary_breakup_details = df[df['service_type']
-                                             == summaries["category"]]
+                                            == summaries["category"]]
                 filter_food_columns = summary_breakup_details[["date", "parent", "sac_code", "item_value_after_gst",
-                                                               "item_taxable_value", "cgst_amount", "sgst_amount", "igst_amount", "gst_rate", "service_type", "description"]]
+                                                            "item_taxable_value", "cgst_amount", "sgst_amount", "igst_amount", "gst_rate", "service_type", "description", "invoice_file"]]
                 filter_food_columns.rename(columns={'parent': 'invoice_no', 'item_value_after_gst': 'amount', 'cgst_amount': 'cgst', "sgst_amount": "sgst", "igst_amount": "igst", "gst_rate": "tax",
                                                     'item_taxable_value': 'base_amount', 'service_type': 'category', 'description': 'particulars'}, inplace=True)
-                filter_food_columns["parent"] = doc.name
+                # filter_food_columns["parent"] = doc.name
                 filter_food_columns["parentfield"] = "summary_breakup_details"
                 filter_food_columns["parenttype"] = "Summary Breakups"
                 filter_food_columns["doctype"] = "Summary Breakup Details"
@@ -68,10 +77,27 @@ def create_summary_breakup(filters=[], summary=None):
                     filter_food_columns["checkin_date"] = filter_food_columns["date"]
                     filter_food_columns["checkout_date"] = filter_food_columns["date"]+timedelta(1)
                 food_data = filter_food_columns.to_dict('records')
-                for each in food_data:
-                    child_doc = frappe.get_doc(each)
+                if len(food_data) == 0:
+                    return {"success": False}
+                summaries["doctype"] = 'Summary Breakups'
+                doc = frappe.get_doc(summaries)
+                doc.insert()
+                frappe.db.commit()
+                for child_items in food_data:
+                    child_items["parent"] = doc.name
+                    invoice_file = child_items["invoice_file"]
+                    del child_items["invoice_file"]
+                    child_doc = frappe.get_doc(child_items)
                     child_doc.insert()
                     frappe.db.commit()
+                    if frappe.db.exists({"doctype": "Invoices", "clbs_summary_generated": False, "invoice_number": child_items["invoice_no"], "company": get_company.name}):
+                        invoice_doc = frappe.get_doc("Invoices",child_items["invoice_no"])
+                        invoice_doc.clbs_summary_generated = 1
+                        invoice_doc.summary = summary
+                        invoice_doc.save(ignore_permissions=True, ignore_version=True)
+                        document_doc = frappe.get_doc({"doctype":"Summary Documents", "document_type":"Invoices", "summary":summary, "document": invoice_file, "company": get_company.name})
+                        document_doc.insert()
+                        frappe.db.commit()
             return {"success": True, "message": "data updated successfully"}
         else:
             return {"success": False}
