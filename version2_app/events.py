@@ -723,7 +723,10 @@ def fetch_invoice_details(filters=[]):
     except Exception as e:
         return {"Success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
-def get_template():
-    summary_template = frappe.get_doc("Print Format", "summary")
-    return summary_template.html
+
+def summaries_insert(doc, method=None):
+    try:
+        print(doc.from_date, doc.to_date)
+        doc.between_dates = doc.from_date+" to "+doc.to_date
+    except Exception as e:
+        return {"Success":False,"message":str(e)}
