@@ -1,34 +1,47 @@
 {
  "actions": [],
- "autoname": "field:event_name",
- "creation": "2022-03-01 15:49:44.714740",
+ "creation": "2022-03-02 10:02:56.076016",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "event_name",
+  "location",
+  "address",
+  "taxpayer_details",
   "company"
  ],
  "fields": [
   {
-   "fieldname": "event_name",
+   "fieldname": "location",
    "fieldtype": "Data",
-   "label": "Event Name",
-   "unique": 1
+   "in_list_view": 1,
+   "label": "Location"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "taxpayer_details",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Taxpayer Details",
+   "options": "TaxPayerDetail"
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "company",
+   "label": "Company",
    "options": "company"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-02 09:48:56.440101",
+ "modified": "2022-03-02 10:16:48.592872",
  "modified_by": "Administrator",
  "module": "CLBS",
- "name": "Events",
+ "name": "Taxpayer Locations",
  "owner": "Administrator",
  "permissions": [
   {
