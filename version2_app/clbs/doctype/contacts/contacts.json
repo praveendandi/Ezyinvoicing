@@ -10,7 +10,8 @@
   "phone_number",
   "contact_type",
   "taxpayer",
-  "company"
+  "company",
+  "location"
  ],
  "fields": [
   {
@@ -38,18 +39,24 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "company",
+   "label": "Company",
    "options": "company"
   },
   {
    "fieldname": "contact_name",
    "fieldtype": "Data",
    "label": "Contact Name"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Taxpayer Locations"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-01 14:16:16.283529",
+ "modified": "2022-03-02 11:12:04.695928",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Contacts",

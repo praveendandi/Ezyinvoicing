@@ -15,7 +15,7 @@ class SummaryBreakups(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def create_summaries(filters=[], summary=None):
+def create_summary_breakup(filters=[], summary=None):
     try:
         total_items = []
         get_company = frappe.get_last_doc("company")
@@ -53,17 +53,10 @@ def create_summaries(filters=[], summary=None):
                 doc = frappe.get_doc(summaries)
                 doc.insert()
                 frappe.db.commit()
-                if summaries["category"] == "Room":
-                    summary_breakup_details = df[df['service_type'] == "Room"]
-                elif summaries["category"] == "Food":
-                    summary_breakup_details = df[df['service_type'] == "Food"]
-                elif summaries["category"] == "Miscellaneous":
-                    summary_breakup_details = df[df['service_type'] == "Miscellaneous"]
-                else:
-                    pass
-                filter_food_columns = summary_breakup_details[["date","parent","sac_code","item_value_after_gst","item_taxable_value","cgst_amount","sgst_amount","igst_amount","gst_rate","service_type"]]
+                summary_breakup_details = df[df['service_type'] == summaries["category"]]
+                filter_food_columns = summary_breakup_details[["date","parent","sac_code","item_value_after_gst","item_taxable_value","cgst_amount","sgst_amount","igst_amount","gst_rate","service_type","description"]]
                 filter_food_columns.rename(columns={'parent': 'invoice_no', 'item_value_after_gst': 'amount', 'cgst_amount':'cgst',"sgst_amount":"sgst","igst_amount":"igst","gst_rate":"tax",
-                    'item_taxable_value': 'base_amount', 'service_type': 'category'}, inplace=True)
+                    'item_taxable_value': 'base_amount', 'service_type': 'category', 'description':'particulars'}, inplace=True)
                 filter_food_columns["parent"] = doc.name
                 filter_food_columns["parentfield"] = "summary_breakup_details"
                 filter_food_columns["parenttype"] = "Summary Breakups"
@@ -79,5 +72,12 @@ def create_summaries(filters=[], summary=None):
             return {"success": True, "message":"data updated successfully"}    
         else:
             return {"success": False}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+
+def update_summary_brakup():
+    try:
+        pass
     except Exception as e:
         return {"success": False, "message": str(e)}
