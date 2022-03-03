@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import timedelta
+from datetime import timedelta,datetime
 
 import frappe,pdfkit,os
 import pandas as pd
@@ -40,27 +40,21 @@ def create_html_to_pdf(name):
 
 def html_to_pdf(html_data,filename):
     try:
-        cwd = os.getcwd() 
-        options = {
-                "enable-local-file-access": None
-                }
-
-        # with open(html_path,'r') as f:
-        # mycss = wp.CSS(string=(
-        #         "@page longpage {\n"
-        #         "    size: 210mm 10000mm;\n"
-        #         "}"
-        #         "body {\n"
-        #         "   page: longpage;\n"
-        #         "}\n"
-        #     ))
+        # filename = datetime.now().strftime("%Y%m%d-%H%M%S")
+        # cwd = os.getcwd() 
+        # f= open(filename+".html","w")
+        # f.write(str(html_data)) 
+        # f.close()
+        # options = {
+        #         "enable-local-file-access": None
+        #         }
+        # with open(filename+'.html','r') as f:
+        #     file_pdf = pdfkit.from_file(f,filename + '.pdf',options=options)
+        #     file_path = cwd + "/" + filename + '.pdf'
         htmldoc = HTML(string=html_data, base_url="")#.render(stylesheets=[mycss])
-        file_path = cwd + "/" + filename + '.pdf'
-        # pisaStatus = pisa.CreatePDF(
-        #     src=html_data,            # the HTML to convert
-        #     dest=file_path)  
+        file_path = cwd + "/" + filename + '.pdf' 
         Path(file_path).write_bytes(htmldoc.write_pdf())
-        print(htmldoc.write_pdf(),"===========")
+        print("===========")
         return {"Success":True,"message":"pdf created successfully"}
     except Exception as e:
         frappe.log_error("Error in html_to_pdf: ",frappe.get_traceback())
