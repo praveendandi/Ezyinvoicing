@@ -563,8 +563,8 @@ def process_cform():
         # data=json.loads(frappe.request.data)
         # data = data["data"]
         company = frappe.get_last_doc('company')
-        if company.cform_session == 1:
-            return {"success":False,"message":"Already cform inpogress"}
+        # if company.cform_session == 1:
+        #     return {"success":False,"message":"Already cform inpogress"}
         # if len(data)>0:
         #     company_doc = frappe.get_doc('company',company.name)
         #     company_doc.cform_session = 1
