@@ -1,7 +1,7 @@
 // Copyright (c) 2022, caratred and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Temp Doc Details', {
+frappe.ui.form.on('Dropbox', {
 	// refresh: function(frm) {
 
 	// }

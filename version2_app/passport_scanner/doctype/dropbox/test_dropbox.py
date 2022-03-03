@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestTempDocDetails(unittest.TestCase):
+class TestDropbox(unittest.TestCase):
 	pass

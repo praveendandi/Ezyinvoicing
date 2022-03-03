@@ -243,7 +243,16 @@
   "pathik",
   "column_break_235",
   "pathik_password",
-  "pathik_session"
+  "pathik_session",
+  "scan_ezy_settings_section",
+  "classfiy_api",
+  "in_house_passport_ocr",
+  "in_house_visa_ocr",
+  "in_house_voter_ocr",
+  "column_break_246",
+  "detection_api",
+  "in_house_aadhar_ocr",
+  "in_house_driving_ocr"
  ],
  "fields": [
   {
@@ -1564,14 +1573,64 @@
    "fieldname": "pathik_password",
    "fieldtype": "Data",
    "label": "Pathik Password"
+  },
+  {
+   "fieldname": "scan_ezy_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Scan Ezy Settings"
+  },
+  {
+   "fieldname": "classfiy_api",
+   "fieldtype": "Data",
+   "label": "Classfiy Api"
+  },
+  {
+   "fieldname": "detection_api",
+   "fieldtype": "Data",
+   "label": "Detection Api"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_passport_ocr",
+   "fieldtype": "Check",
+   "label": "In House Passport Ocr"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_visa_ocr",
+   "fieldtype": "Check",
+   "label": "In House Visa Ocr"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_aadhar_ocr",
+   "fieldtype": "Check",
+   "label": "In House Aadhar Ocr"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_driving_ocr",
+   "fieldtype": "Check",
+   "label": "In House Driving Ocr"
+  },
+  {
+   "fieldname": "column_break_246",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_voter_ocr",
+   "fieldtype": "Check",
+   "label": "In House Voter Ocr"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-21 11:53:10.879496",
+ "modified": "2022-02-28 12:06:35.319723",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

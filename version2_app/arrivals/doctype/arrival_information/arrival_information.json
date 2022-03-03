@@ -297,6 +297,7 @@
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

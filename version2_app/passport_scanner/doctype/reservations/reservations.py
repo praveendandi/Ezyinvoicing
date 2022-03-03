@@ -142,7 +142,7 @@ def text_getter(image_file):
 
 def aadhar_detect_text(image_file, doc_type):
     try:
-        remove = ['GOVERNMENT OF INDIA', 'Government of India', 'Year of Birth',
+        remove = ['GOVERNMENT OF INDIA','Government of India','Government of India', 'Year of Birth',
                   '/ Male', 'GOVERNMENT OF IND', 'Nent of India', 'GOVERMENTER']
         unlike = ['UNIQUE IDENTIFICATION AUTHORITY', 'OF INDIA', 'Identification', 'Bengaluru-560001', '-500001', '500001', 'Bengaluru-580001', '560001', ' WWW', 'WWW', '-560001', '-560101', '560101', 'uidai', 'Aam Admi ka', 'VvV', 'he', 'uldai', 'uldal', 'govin', 'www', 'A Unique Identification', 'Www', 'in', 'gov', 'of India', 'uidai', 'INDIA', 'India', 'www', 'I', '1B 1ST', 'MERI PEHACHAN', '1E 1B', 'MERA AADHAAR',
                   'Unique Identification Authority', 'of India', 'UNQUE IDENTIFICATION AUTHORITY', '1800 180 1947', '1800180 1947', 'Admi ka Adhikar', 'w', 'ww', 'S', 's', '1800 180 17', 'WWW', 'dai', 'uidai', 'Address', '1809 180 1947', 'help', 'AADHAAR', '160 160 1947', 'Aadhaar', '180 18167', 'Aadhaar-Aam Admi ka Adhikar', 'gov in', '1947', 'MERA AADHAAR MERI PEHACHAN', '38059606 3964', '8587 1936 9174', 'Unique Identification Authority of India']
