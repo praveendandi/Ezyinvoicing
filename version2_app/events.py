@@ -1671,15 +1671,15 @@ def ezy_suite_dashboard(from_date, to_date):
         reservations_scanned = frappe.db.sql(
             """select count(name) as scanned_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Scanned'""".format(from_date, to_date), as_dict=1)
         reservations_pending = frappe.db.sql(
-            """select count(name) as pending_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Pending' and virtual_checkin_status='Yes'""".format(from_date, to_date), as_dict=1)
+            """select count(name) as pending_reservations from `tabArrival Information` where DATE(arrival_date) between '{}' and '{}' and status='Pending' and virtual_checkin_status='No'""".format(from_date, to_date), as_dict=1)
         pending_reviews = frappe.db.sql(
-            """select count(name) as pending_reviews from `tabGuest Details` where uploaded_to_frro=0 and id_type='Foreigner' and DATE(creation) between '{}' and '{}'""".format(from_date, to_date), as_dict=1)
+            """select count(name) as pending_reviews from `tabGuest Details` where uploaded_to_frro=0 and id_type='Foreigner'""", as_dict=1)
         uploaded_cform_count = frappe.db.sql(
-            """select count(name) as uploaded_cfrom_count from `tabGuest Details` where uploaded_to_frro=1 and id_type='Foreigner' and DATE(creation) between '{}' and '{}'""".format(from_date, to_date), as_dict=1)
+            """select count(name) as uploaded_cfrom_count from `tabGuest Details` where uploaded_to_frro=1 and id_type='Foreigner'""", as_dict=1)
         pathik_pending = frappe.db.sql(
-            """select count(name) as pending_pathik from `tabGuest Details` where pending_pathik=0 and id_type='Foreigner' and main_guest=1 and DATE(creation) between '{}' and '{}'""".format(from_date, to_date), as_dict=1)
+            """select count(name) as pending_pathik from `tabGuest Details` where pending_pathik=0 and id_type='Foreigner' and main_guest=1""", as_dict=1)
         uploaded_pathik = frappe.db.sql(
-            """select count(name) as uploaded_pathik from `tabGuest Details` where pending_pathik=1 and id_type='Foreigner' and main_guest=1 and DATE(creation) between '{}' and '{}'""".format(from_date, to_date), as_dict=1)
+            """select count(name) as uploaded_pathik from `tabGuest Details` where pending_pathik=1 and id_type='Foreigner' and main_guest=1""", as_dict=1)
         return {"success": True, "data": {"total_reservations": total_reservations[0]["total_reservations"], "pre_checkins_count": pre_checkins_count[0]["pre_checkins"], "reservations_scanned": reservations_scanned[0]["scanned_reservations"],
                                           "reservations_pending": reservations_pending[0]["pending_reservations"], "pending_reviews": pending_reviews[0]["pending_reviews"], "uploaded_cform_count": uploaded_cform_count[0]["uploaded_cfrom_count"],
                                           "total_foreign_ids": pending_reviews[0]["pending_reviews"]+uploaded_cform_count[0]["uploaded_cfrom_count"], "pathik_pending": pathik_pending[0]["pending_pathik"], "uploaded_pathik": uploaded_pathik[0]["uploaded_pathik"],
