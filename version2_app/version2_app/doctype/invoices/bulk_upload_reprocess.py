@@ -116,7 +116,7 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada":
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Bulkupload Without Headers":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
@@ -142,7 +142,7 @@ def BulkUploadReprocess(data):
                     error_data['invoice_type'] = "B2B"
             for each in line_items['data']['items']:
                 if each['name'] not in payment_Types:
-                    if  "CGST" in each["name"] or "SGST" in each["name"]  or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "Service Charge " in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
                     item_dict = {}
                     if company.name=="TGND-01":

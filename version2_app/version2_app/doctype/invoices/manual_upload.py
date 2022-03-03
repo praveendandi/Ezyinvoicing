@@ -26,6 +26,7 @@ from version2_app.version2_app.doctype.invoices.hyatt_manual_upload import hyatt
 from frappe.utils.background_jobs import enqueue
 from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
 from version2_app.version2_app.doctype.invoices.hyatt_bulk import hyatt_bulkupload
+from version2_app.version2_app.doctype.invoices.bulkupload import bulkupload
 from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newdelhi
 
 
@@ -78,7 +79,13 @@ def manual_upload_data(data):
         items_data_file = data['invoice_file']
         company = data['company']
         companyData = frappe.get_doc('company',data['company'])
-        if companyData.bulk_excel_upload_type=="Hyatt Bulkupload":
+        if companyData.bulk_excel_upload_type=="Bulkupload Without Headers":
+            print("++++++++++++++++++")
+            output=bulkupload(data)
+            if output['success'] == False:
+                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+            return output
+        if companyData.bulk_excel_upload_type=="Hyatt Bulkupload" or companyData.bulk_excel_upload_type=="Bulkupload With Headers":
             output=hyatt_bulkupload(data)
             if output['success'] == False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
