@@ -1,52 +1,34 @@
 {
  "actions": [],
- "creation": "2022-03-02 14:07:22.527354",
+ "autoname": "field:document_type",
+ "creation": "2022-03-03 17:00:36.142946",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "document_type",
-  "document",
-  "summary",
-  "company",
-  "invoice_number"
+  "company"
  ],
  "fields": [
   {
    "fieldname": "document_type",
-   "fieldtype": "Link",
-   "label": "document_type",
-   "options": "Document Types"
-  },
-  {
-   "fieldname": "document",
-   "fieldtype": "Attach",
-   "label": "Document"
-  },
-  {
-   "fieldname": "summary",
-   "fieldtype": "Link",
-   "label": "Summary",
-   "options": "Summaries"
+   "fieldtype": "Data",
+   "label": "Document Type",
+   "unique": 1
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
    "options": "company"
-  },
-  {
-   "fieldname": "invoice_number",
-   "fieldtype": "Data",
-   "label": "Invoice Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-03 17:05:20.958484",
+ "modified": "2022-03-03 17:00:36.142946",
  "modified_by": "Administrator",
  "module": "CLBS",
- "name": "Summary Documents",
+ "name": "Document Types",
  "owner": "Administrator",
  "permissions": [
   {

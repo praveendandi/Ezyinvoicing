@@ -128,10 +128,16 @@ def create_summary_breakup(filters=[], summary=None):
                     filter_food_columns["checkin_date"] = filter_food_columns["date"]
                     filter_food_columns["checkout_date"] = filter_food_columns["date"]+timedelta(1)
                 food_data = filter_food_columns.to_dict('records')
-                summaries["doctype"] = 'Summary Breakups'
-                doc = frappe.get_doc(summaries)
-                doc.insert()
-                frappe.db.commit()
+                get_existing_breakup = frappe.db.get_value("Summary Breakups", {"category":summaries["category"],"summaries":summary}, ["name", "amount"], as_dict=True)
+                if get_existing_breakup:
+                    doc = frappe.get_doc("Summary Breakups",get_existing_breakup["name"])
+                    doc.amount = get_existing_breakup["amount"] + summaries["amount"]
+                    doc.save(ignore_permissions=True, ignore_version=True)
+                else:
+                    summaries["doctype"] = 'Summary Breakups'
+                    doc = frappe.get_doc(summaries)
+                    doc.insert()
+                    frappe.db.commit()
                 for child_items in food_data:
                     child_items["parent"] = doc.name
                     invoice_file = child_items["invoice_file"]
@@ -144,7 +150,7 @@ def create_summary_breakup(filters=[], summary=None):
                         invoice_doc.clbs_summary_generated = 1
                         invoice_doc.summary = summary
                         invoice_doc.save(ignore_permissions=True, ignore_version=True)
-                        document_doc = frappe.get_doc({"doctype":"Summary Documents", "document_type":"Invoices", "summary":summary, "document": invoice_file, "company": get_company.name})
+                        document_doc = frappe.get_doc({"doctype":"Summary Documents", "document_type":"Invoices", "summary":summary, "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"]})
                         document_doc.insert()
                         frappe.db.commit()
             return {"success": True, "message": "data updated successfully"}

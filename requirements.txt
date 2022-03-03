@@ -18,4 +18,5 @@ scipy
 pytesseract
 pdf2image
 pytesseract
+weasyprint
 # opencv-python
