@@ -6,14 +6,65 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-import frappe
+import frappe,pdfkit,os
 import pandas as pd
 from frappe.model.document import Document
+from weasyprint import HTML
+# import weasyprint as wp
+from pathlib import Path
+# from xhtml2pdf import pisa 
+
 
 
 class SummaryBreakups(Document):
     pass
 
+
+@frappe.whitelist(allow_guest=True)
+def create_html_to_pdf(name):
+    try:
+        doc=frappe.db.get_value("Summaries",name,["name","tax_payer_details"],as_dict=1)
+        print(doc,"==========")
+        if doc:
+            templates=frappe.db.get_all("Print Format",filters={"name":["in",["Summary","Rooms","Food","Misc"]]},fields=["*"])
+            html=""
+            for each_template in templates:
+                html+=frappe.render_template(each_template["html"],doc)
+                html+='<div style="page-break-before: always;"></div>'
+            responce=html_to_pdf(html, "sample")
+            return responce
+    except Exception as e:
+        frappe.log_error("Error in create_html_to_pdf: ",frappe.get_traceback())
+        return {"Success":False,"message":str(e)}
+    
+
+def html_to_pdf(html_data,filename):
+    try:
+        cwd = os.getcwd() 
+        options = {
+                "enable-local-file-access": None
+                }
+
+        # with open(html_path,'r') as f:
+        # mycss = wp.CSS(string=(
+        #         "@page longpage {\n"
+        #         "    size: 210mm 10000mm;\n"
+        #         "}"
+        #         "body {\n"
+        #         "   page: longpage;\n"
+        #         "}\n"
+        #     ))
+        htmldoc = HTML(string=html_data, base_url="")#.render(stylesheets=[mycss])
+        file_path = cwd + "/" + filename + '.pdf'
+        # pisaStatus = pisa.CreatePDF(
+        #     src=html_data,            # the HTML to convert
+        #     dest=file_path)  
+        Path(file_path).write_bytes(htmldoc.write_pdf())
+        print(htmldoc.write_pdf(),"===========")
+        return {"Success":True,"message":"pdf created successfully"}
+    except Exception as e:
+        frappe.log_error("Error in html_to_pdf: ",frappe.get_traceback())
+        return {"Success":False,"message":str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def create_summary_breakup(filters=[], summary=None):

@@ -21,8 +21,8 @@ def execute(filters=None):
 
 def get_summary(filters):
     try:
-        get_invoices = frappe.db.get_list("Invoices", filters=[['invoice_date', 'between', [
-            filters["from_date"], filters["to_date"]]], ["gst_number", "=", filters["gst_number"]]], pluck='name')
+        get_invoices = frappe.db.get_all("Invoices", filters=[['invoice_date', 'between', 
+            [filters["from_date"], filters["to_date"]]], ["gst_number", "=", filters["gst_number"]]], pluck='name')
         total_items = []
         if len(get_invoices) > 0:
             get_items = frappe.db.get_list(
