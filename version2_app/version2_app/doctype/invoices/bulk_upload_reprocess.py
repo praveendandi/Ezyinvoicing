@@ -11,7 +11,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
-
+from version2_app.version2_app.doctype.invoices.hyatt_bulk import hyatt_bulkupload
 
 
  
@@ -22,6 +22,12 @@ def BulkUploadReprocess(data):
         invoice_number = data['invoice_number']
         invoice_data = frappe.get_doc('Invoices',invoice_number)
         line_items = json.loads(invoice_data.invoice_object_from_file)
+        if "data" not in line_items.keys():
+            line_items = {"data": line_items}
+            invoice_data.invoice_object_from_file = json.dumps(line_items)
+        if "data" in line_items["data"].keys():
+            line_items = line_items["data"]
+            invoice_data.invoice_object_from_file = json.dumps(line_items)
         invoice_total_amount = invoice_data.total_invoice_amount
         print(invoice_total_amount)
         print(invoice_data.gst_number,"=-=-=-=-=-=-")
@@ -35,6 +41,12 @@ def BulkUploadReprocess(data):
         error_data['gst_number'] = invoice_data.gst_number
         error_data['company_code'] = invoice_data.company
         each = {}
+        # if company.bulk_excel_upload_type=="Hyatt Bulkupload":
+        #     data.update(invoice_data.company)
+        #     output=hyatt_bulkupload(data)
+        #     if output['success'] == False:
+        #         frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+        #     return output
         if company.bulk_excel_upload_type == "HolidayIn":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             invdate =datetime.datetime.strptime(str(invoice_data.invoice_date),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
@@ -103,7 +115,7 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada":
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Bulkupload Without Headers":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
@@ -129,7 +141,7 @@ def BulkUploadReprocess(data):
                     error_data['invoice_type'] = "B2B"
             for each in line_items['data']['items']:
                 if each['name'] not in payment_Types:
-                    if  "CGST" in each["name"] or "SGST" in each["name"]  or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "Service Charge " in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
                     item_dict = {}
                     if company.name=="TGND-01":

@@ -89,7 +89,7 @@ def holidayinManualupload(data):
             each['invoiceamount'] = round(each['invoiceamount'],2)
             each['taxcode_dsc'] = str(each['taxcode_dsc'])
             # print(each['taxinvnum'],len(each['taxinvnum']))
-            del each['accountdate']# = str(each['accountdate'])
+            # del each['accountdate']# = str(each['accountdate'])
             del each['arrdate']# = str(each['arrdate'])
             del each['depdate']# = str(each['depdate'])
             del each['org_invoicedate']
@@ -104,6 +104,7 @@ def holidayinManualupload(data):
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             each['invoicedate'] = str(each['invoicedate'])
+            each['accountdate'] = str(each['accountdate'])
             csi = total_invoice_amount-each['sgstamount']-each['sgstamount']-each['ngstamount']
             if csi != 0:
                 gst_percentage = round((each['sgstamount']/csi)*100,1)
@@ -111,10 +112,10 @@ def holidayinManualupload(data):
                 gst_percentage = 0
             if each['goods_desc'] not in payment_Types:
                 # totalitemAmount = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
-                if "00:00:00" in each['invoicedate']:
-                    item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+                if "00:00:00" in each['accountdate']:
+                    item_date = datetime.datetime.strptime(each['accountdate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
                 else:
-                    item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
+                    item_date = datetime.datetime.strptime(each['accountdate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
                 # if frappe.db.exists('SAC HSN CODES', each['goods_desc']):
                 #     sac_doc = frappe.get_doc('SAC HSN CODES',each['goods_desc'])
                 #     list_data["sac_desc"] = each['goods_desc']
@@ -311,6 +312,9 @@ def holidayinManualupload(data):
                         #         list_data["sac_code"] = "NOT Found"
                         #         break
                         # if each["sac_code"] == "Found":
+                        if each["total_invoice_amount"] < 0:
+                            each['invoice_category'] = "Credit Invoice"
+
                         if reupload==False:
                             insertInvoiceApiResponse = insert_invoice({"folioid":each["folioid"],"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:

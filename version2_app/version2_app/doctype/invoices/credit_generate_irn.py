@@ -519,7 +519,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
         ass_value = 0
         for index, item in enumerate(invoice.items):
             # print(item.sac_code,"HsnCD")
-            if item.item_mode == "Credit" and item.type!="Non-Gst":
+            if item.item_mode == "Credit" and item.taxable == "Yes" and item.type!="Non-Gst":
                 credit_items.append(item.__dict__)
                 total_igst_value += abs(item.igst_amount)
                 total_sgst_value += abs(item.sgst_amount)
@@ -589,7 +589,10 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
             "TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
             "TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
         }
-        
+        if company.name == "FMBW-01":
+            if invoice.name == "BLRFK-23334":
+                gst_data["TranDtls"]["IgstOnIntra"] = "Y"
+                gst_data["TranDtls"]["RegRev"] = "Y"
         response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
         if response['success']==True:
             irnobj.allowance_irn_request_object = json.dumps({"data": gst_data})

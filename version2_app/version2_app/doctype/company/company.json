@@ -243,7 +243,11 @@
   "pathik",
   "column_break_235",
   "pathik_password",
-  "pathik_session"
+  "pathik_session",
+  "bulkupload_json",
+  "pos_footer",
+  "pos_text",
+  "enable_pdf_upload"
  ],
  "fields": [
   {
@@ -601,7 +605,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai"
+   "options": "None\nGrand\nHyatt Bulkupload\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad\nBulkupload With Headers\nBulkupload Without Headers"
   },
   {
    "default": "0",
@@ -1564,11 +1568,32 @@
    "fieldname": "pathik_password",
    "fieldtype": "Data",
    "label": "Pathik Password"
+  },
+  {
+   "fieldname": "bulkupload_json",
+   "fieldtype": "Attach",
+   "label": "BulkUpload Json"
+  },
+  {
+   "fieldname": "pos_footer",
+   "fieldtype": "Text",
+   "label": "POS Footer"
+  },
+  {
+   "fieldname": "pos_text",
+   "fieldtype": "Text",
+   "label": "POS Text"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_pdf_upload",
+   "fieldtype": "Check",
+   "label": "Enable PDF Upload"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-21 11:53:10.879496",
+ "modified": "2022-02-21 10:45:10.723752",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -140,7 +140,8 @@
   "credit_note_raised",
   "suptyp",
   "signature",
-  "agree"
+  "agree",
+  "amount_in_word"
  ],
  "fields": [
   {
@@ -916,12 +917,17 @@
    "fieldname": "agree",
    "fieldtype": "Check",
    "label": "Agree"
+  },
+  {
+   "fieldname": "amount_in_word",
+   "fieldtype": "Data",
+   "label": "Amount In Word"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-11-01 19:10:41.954984",
+ "modified": "2021-12-16 18:50:32.115022",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

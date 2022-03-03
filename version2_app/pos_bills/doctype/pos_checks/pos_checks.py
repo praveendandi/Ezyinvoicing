@@ -8,11 +8,14 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
 import traceback, sys
-import requests, json, datetime
+import requests, json
+# import datetime
+from datetime import datetime
 import os,re
 import razorpay
 from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
+from version2_app.version2_app.doctype.paytm_integrate import *
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 
@@ -23,7 +26,7 @@ class POSChecks(Document):
 @frappe.whitelist(allow_guest=True)
 def create_pos_bills(data):
     try:
-        now = datetime.datetime.now()
+        now = datetime.now()
         raw_data = data["payload"].split("\n")
         if len(raw_data) > 5:
             company_doc = frappe.get_doc("company",data["company"])
@@ -53,7 +56,10 @@ def create_pos_bills(data):
             if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
                 port = int(printer_doc.port) if printer_doc.port != "" else 9100
                 if outlet_doc.payment_mode == "Dynamic":
-                    short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
+                    if outlet_doc.payment_gateway == "Razorpay":
+                        short_url = razorPay(data["total_amount"],data["check_no"],data["outlet"],company_doc)
+                    if outlet_doc.payment_gateway == "Paytm":
+                        short_url = paytmIntegrate(data["total_amount"],data["check_no"],data["outlet"],company_doc)
                     if short_url["success"]:
                         for count in range(0,outlet_doc.print_count):
                             if outlet_doc.print_count > 1:
@@ -61,7 +67,10 @@ def create_pos_bills(data):
                                     added_text1 = "Guest Copy\n\n".encode("utf-8")
                                 elif count == 1:
                                     added_text1 = "Merchant Copy\n".encode("utf-8")
-                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                if company_doc.enable_pos_extra_text == 1:
+                                    added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                else:
+                                    added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,short_url['short_url'])
                         data["printed"] = 1
                 else:
@@ -71,8 +80,10 @@ def create_pos_bills(data):
                                 added_text1 = "Guest Copy\n\n".encode("utf-8")
                             elif count == 1:
                                 added_text1 = "Merchant Copy\n".encode("utf-8")
-                        
-                            added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            if company_doc.enable_pos_extra_text == 1:
+                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            else:
+                                added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                         give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number)
                     data["printed"] = 1
             if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
@@ -87,7 +98,12 @@ def create_pos_bills(data):
                             added_text1 = "Guest Copy\n\n".encode("utf-8")
                         elif count == 1:
                             added_text1 = "Merchant Copy\n".encode("utf-8")
-                        added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                        if company_doc.enable_pos_extra_text == 1:
+                            added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                        else:
+                            added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                    if company_doc.pos_footer:
+                        data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
                     give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
                 data["gcp_file_url"] = pos_bills['data']
                 data["printed"] = 1
@@ -113,6 +129,7 @@ def extract_data(payload,company_doc):
                         total_amount_regex = re.findall(company_doc.bill_amount_regex,line.replace(" ",""))
                         total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                         total_amount = total_amount.replace("-","")
+                        total_amount = total_amount.lstrip(".")
                 else:
                     total_amount = "0.00"
             elif company_doc.void_check_reference in payload:
@@ -121,14 +138,16 @@ def extract_data(payload,company_doc):
                     total_amount_regex = re.findall(company_doc.bill_amount_regex,line.replace(" ",""))
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
+                    total_amount = total_amount.lstrip(".")
             else:
                 data["check_type"] = "Normal Check"
                 if re.match(company_doc.normal_check_total_amt_regex,line.strip()):
                     total_amount_regex = re.findall(company_doc.bill_amount_regex,line.replace(" ",""))
                     total_amount = (total_amount_regex[0] if len(total_amount_regex) > 0 else "").replace(",","")
                     total_amount = total_amount.replace("-","")
+                    total_amount = total_amount.lstrip(".")
             if company_doc.name == "JP-2025":
-                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
+                pattern = "[0-9]+/+[0-9]+\s+[0-9]+\s+GST+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+[GST]+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+|[0-9]+/+[0-9]+\s+[0-9]+\s+GST+[0-9]+"
                 if re.match(pattern, line):
                     if "GST" not in line:
                         split_line = line.split(" ")
@@ -140,7 +159,7 @@ def extract_data(payload,company_doc):
                     else:
                         split_line = line.split(" ")
                         final_list = [i for i in split_line if i]
-                        if len(final_list)>3:
+                        if len(final_list)>=3:
                             data["check_no"] = final_list[1]
                             data["table_number"] = final_list[0]
                             data["no_of_guests"] = final_list[-1].replace("GST","")
@@ -240,7 +259,7 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
         monformat = ""
         yearformat = ""
         dayformat = ""
-        x = datetime.datetime.now()
+        x = datetime.now()
         if format:
             countofy = format.count("Y")
             if countofy!=0:
@@ -269,13 +288,29 @@ def print_pos_bill(data):
     try:
         check_doc = frappe.get_doc("POS Checks",data["name"])
         company_doc = frappe.get_doc("company",check_doc.company)
+        outlet_doc = frappe.get_doc("Outlets",check_doc.outlet)
         if company_doc.enable_pos_extra_text == 1:
             text = add_extra_text_while_print(check_doc.check_no,check_doc.outlet,company_doc)
             if text["success"] == False:
                 return text
             added_text = (text["string"]).encode('utf-8')
-            invoice_number = (text["invoice_number"]).encode('utf-8')
-        outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name"],as_dict=1)
+            x = check_doc.creation
+            format = outlet_doc.invoice_number_format
+            monformat = ""
+            yearformat = ""
+            dayformat = ""
+            if format:
+                countofy = format.count("Y")
+                if countofy!=0:
+                    yearformat = x.strftime("%y") if countofy == 2 else x.strftime("%Y")
+                countofm = format.count("M")
+                if countofm!=0:
+                    monformat = x.strftime("%m") if countofy == 2 else x.strftime("%m")
+                countofd = format.count("D")
+                if countofd!=0:
+                    dayformat = x.strftime("%d")
+            invoice_number = ("\nInvoice No "+yearformat+monformat+dayformat+check_doc.check_no + "\n").encode('utf-8')
+        outlet_values = frappe.db.get_values("Outlets",{"outlet_name":check_doc.outlet},["static_payment_qr_code","outlet_logo","payment_mode","name","payment_gateway"],as_dict=1)
         printer_settings = frappe.db.get_value("POS Print Settings",{"outlet":outlet_values[0]["name"]},["printer"])
         printer_doc = frappe.get_doc("POS Printers",printer_settings)
         folder_path = frappe.utils.get_bench_path()
@@ -311,11 +346,14 @@ def print_pos_bill(data):
         kitchen.set("CENTER", "A", "B")
         if check_doc.check_type == "Normal Check":
             if outlet_values[0]["payment_mode"]=="Dynamic":
-                razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
-                if razor_pay["success"] == False:
-                    return razor_pay["message"]
-                kitchen.qr(razor_pay['short_url'],size=7)
-                kitchen.hw('INIT')
+                if outlet_values[0]["payment_gateway"] == "Razorpay":
+                    razor_pay = razorPay(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)
+                if outlet_values[0]["payment_gateway"] == "Paytm":
+                    razor_pay = paytmIntegrate(check_doc.total_amount,check_doc.check_no,check_doc.outlet,company_doc)               
+                    if razor_pay["success"] == False:
+                        return razor_pay["message"]
+                    kitchen.qr(razor_pay['short_url'],size=7)
+                    kitchen.hw('INIT')         
             else:
                 kitchen.image(qr_path)
                 kitchen.hw('INIT')

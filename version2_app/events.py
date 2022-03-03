@@ -1,6 +1,7 @@
 # from typing_extensions import get_args
 # from version2_app.parsers import *
 import base64
+import datetime
 import glob
 import importlib.util
 import itertools
@@ -19,7 +20,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
 from subprocess import PIPE, STDOUT, Popen
-import datetime
 
 # from requests.sessions import _Data
 import frappe
@@ -29,6 +29,7 @@ import pyshorteners as ps
 import requests
 from frappe.core.doctype.communication.email import make
 from frappe.utils import cstr, get_site_name, logger, random_string
+from frappe.utils.data import money_in_words
 from PIL import Image
 from requests.exceptions import RetryError
 
@@ -38,9 +39,39 @@ logger = frappe.logger("api")
 user_name = frappe.session.user
 
 
+@frappe.whitelist(allow_guest=True)
+def num_to_words(num):
+    try:
+        given_num = abs(float((num)))
+        num_in_word = money_in_words(given_num)
+        text = str(num_in_word).strip("INR")
+        return {"success": True, "data": text.strip()}
+    except:
+        frappe.log_error(frappe.get_traceback(), "num_to_words Error")
+        return {"success": False}
+
+
+def invoice_update(doc, method=None):
+    try:
+        if doc.sales_amount_after_tax:
+            total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
+            if total_amount_in_words["success"] == True:
+                doc.amount_in_word = total_amount_in_words["data"]
+                # doc.save(ignore_permissions=True,ignore_version=True)
+        # frappe.db.commit()
+    except:
+        frappe.log_error(frappe.get_traceback(), "invoice_update Error")
+
+
 def invoice_created(doc, method=None):
     try:
-        print("Invoice Created", doc.name)
+        if doc.sales_amount_after_tax:
+            total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
+            if total_amount_in_words["success"] == True:
+                doc.amount_in_word = total_amount_in_words["data"]
+                # print(doc.amount_in_word,"===============")
+                # doc.save(ignore_permissions=True)
+                # frappe.db.commit()
         if frappe.db.exists('Invoice Reconciliations', doc.name):
             reconciliations_doc = frappe.get_doc(
                 'Invoice Reconciliations', doc.name)
@@ -1681,3 +1712,29 @@ def ezy_suite_dashboard(from_date, to_date):
         frappe.log_error("Ezy-suite dashboard",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def fetch_invoice_details(filters=[]):
+    try:
+        if len(filters) > 0:
+            filters = json.loads(filters)
+            company = frappe.get_last_doc("company")
+            # if filters["company_code"] == company.name:
+            filters.extend([["invoice_type", "=", "B2B"], [
+                           "irn_generated", "=", "Success"]])
+            # ['igst_amount','sgst_amount','cgst_amount','total_gst_amount','invoice_number','invoice_date','guest_name','room_number','confirmation_number','total_invoice_amount','irn_number','qr_code_image','irn_generated_time','ack_no','invoice_file','gst_number'])
+            fetch_invoice = frappe.db.get_list(
+                'Invoices', filters=filters, fields=["*"])
+            for x in fetch_invoice:
+                items_fields = ['parent', 'sac_code', 'item_value', 'item_value_after_gst', 'gst_rate', 'igst_amount',
+                                'cgst_amount', 'sgst_amount', 'state_cess_amount', 'cess_amount', 'date', 'item_type', 'sac_code', 'item_name']
+                items_doc = frappe.db.get_list(
+                    'Items', filters={'parent': ['in', x["invoice_number"]]}, fields=["*"])
+                x['items'] = items_doc
+                # print(x['items'])
+            return fetch_invoice
+        else:
+            return {"success": False, "message": "filters not be empty"}
+    except Exception as e:
+        return {"Success": False, "message": str(e)}

@@ -39,7 +39,7 @@ class Invoices(Document):
 
 
 
-
+    @frappe.whitelist()
     def cancelIrn(self, invoice_number, reason='wrong Entry'):
         try:
             # get invoice details
@@ -339,7 +339,7 @@ def generateIrn(data):
             return creditIrn
         discount_before_value = abs(discount_before_value)	
         discount_after_value = abs(discount_after_value)
-        TotInnVal = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
+        TotInnVal = round(invoice.amount_after_gst, 2)+round(invoice.other_charges,2) - round(discount_after_value,2)
         TotInvValFc = round(invoice.amount_after_gst, 2) - round(discount_after_value,2)
         
         # print(TotInnVal,TotInvValFc)
@@ -351,13 +351,16 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": 0,
+            "OthChrg": round(invoice.other_charges,2),
             "RndOffAmt": 0,
             "TotInvVal": round(TotInnVal,2),
             "TotInvValFc": round(TotInvValFc, 2)
         }
+        print(gst_data)
         
         # print(gst_data['ValDtls'])
+        if len(gst_data['ItemList']) == 0:
+            return {"success":False,"message":"Items cannot be Empty"}
         if ass_value > 0:
             try:
                 response = postIrn(gst_data, GSP_details['data'],
@@ -579,6 +582,7 @@ def send_invoicedata_to_gcb(invoice_number):
             if company.pms_property_url:
                 b2c_data["file_url"] = company.pms_property_url
             if company.pms_information_invoice_for_payment_qr == "Yes":
+                print("=====================")
                 payment_list = frappe.db.get_list("Invoice Payments",filters={"invoice_number":doc.invoice_number},fields=["item_value","date","payment","payment_reference"])
                 if len(payment_list)>0:
                     for each in payment_list:
@@ -595,11 +599,12 @@ def send_invoicedata_to_gcb(invoice_number):
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
                         headers=headers,
                         json=b2c_data,verify=False)
-                response = json_response.json()
-                if response["success"] == False:
+                if json_response.status_code==200:
+                    response = json_response.json()
+                if json_response.status_code!=200:
                     return {
                         "success": False,
-                        "message": response["message"]
+                        "message": "status code"+str(json_response.status_code)+"reason"+str(json_response.reason)
                     }
             else:
                 print(proxies, "     proxy console")
@@ -1031,8 +1036,7 @@ def insert_invoice(data):
 
                 has_discount_items = "Yes"
             else:
-                has_discount_items = "No"
-                
+                has_discount_items = "No"      
         else:
             pms_invoice_summary = value_after_gst - credit_value_after_gst
             pms_invoice_summary_without_gst = value_before_gst - credit_value_before_gst
@@ -1084,7 +1088,6 @@ def insert_invoice(data):
 
         if "raise_credit" in data:
             data['total_invoice_amount'] = float(pms_invoice_summary+other_charges)#value_after_gst + other_charges + credit_value_after_gst
-            print("----------------",data['total_invoice_amount'])
         if len(data['items_data'])==0:
             ready_to_generate_irn = "No"
 
@@ -1151,7 +1154,6 @@ def insert_invoice(data):
             invoice_from = data['guest_data']['invoice_from']
         else:
             invoice_from = "Pms"	
-        print(data["taxpayer"],"+++++++++++++++++++++++++")
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1693,7 +1695,7 @@ def calulate_items(data):
                                 scharge_value_base = round(scharge_value * (100 / ((gst_percentage+igst_percentage) + 100)),3)
                                 gst_value = scharge_value- scharge_value_base
                                 scharge_value = scharge_value_base
-                            if vat_rate_percentage>0:
+                            if vat_rate_percentage>0 and sac_code_based_gst_rates.disable_vat_for_sc == 0:
                                 vatamount = (vat_rate_percentage * scharge_value) / 100.0
                                 service_dict['vat_amount'] = vatamount
                                 service_dict['vat'] = vat_rate_percentage
@@ -1837,7 +1839,7 @@ def calulate_items(data):
                         gst_value = scharge_value- scharge_value_base
                         scharge_value = scharge_value_base
                         
-                    if vat_rate_percentage>0:
+                    if vat_rate_percentage>0 and sac_code_based_gst_rates.disable_vat_for_sc == 0:
                         vatamount = (vat_rate_percentage * scharge_value) / 100.0
                         service_dict['vat_amount'] = vatamount
                         service_dict['vat'] = vat_rate_percentage

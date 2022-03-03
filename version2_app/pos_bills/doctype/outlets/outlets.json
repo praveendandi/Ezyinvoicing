@@ -24,7 +24,8 @@
   "website",
   "print_count",
   "invoice_number_format",
-  "last_updated"
+  "last_updated",
+  "payment_gateway"
  ],
  "fields": [
   {
@@ -36,8 +37,7 @@
   {
    "fieldname": "static_payment_qr_code",
    "fieldtype": "Attach",
-   "label": "Static Payment QR Code",
-   "reqd": 1
+   "label": "Static Payment QR Code"
   },
   {
    "fieldname": "outlet_logo",
@@ -131,11 +131,18 @@
    "fieldname": "last_updated",
    "fieldtype": "Datetime",
    "label": "Last Updated"
+  },
+  {
+   "default": "Razorpay",
+   "fieldname": "payment_gateway",
+   "fieldtype": "Select",
+   "label": "Payment gateway",
+   "options": "Razorpay\nPaytm\nCCAvenue"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-14 12:07:49.713887",
+ "modified": "2022-01-06 14:15:43.391280",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",
