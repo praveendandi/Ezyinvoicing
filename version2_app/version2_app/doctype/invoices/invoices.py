@@ -599,11 +599,12 @@ def send_invoicedata_to_gcb(invoice_number):
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
                         headers=headers,
                         json=b2c_data,verify=False)
-                response = json_response.json()
-                if response["success"] == False:
+                if json_response.status_code==200:
+                    response = json_response.json()
+                if json_response.status_code!=200:
                     return {
                         "success": False,
-                        "message": response["message"]
+                        "message": "status code"+str(json_response.status_code)+"reason"+str(json_response.reason)
                     }
             else:
                 print(proxies, "     proxy console")
