@@ -1581,12 +1581,12 @@
   },
   {
    "fieldname": "classfiy_api",
-   "fieldtype": "Data",
+   "fieldtype": "Text",
    "label": "Classfiy Api"
   },
   {
    "fieldname": "detection_api",
-   "fieldtype": "Data",
+   "fieldtype": "Text",
    "label": "Detection Api"
   },
   {
@@ -1626,11 +1626,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-28 12:06:35.319723",
+ "modified": "2022-03-03 19:37:13.018909",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
