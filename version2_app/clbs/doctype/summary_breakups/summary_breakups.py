@@ -77,8 +77,6 @@ def create_summary_breakup(filters=[], summary=None):
                     filter_food_columns["checkin_date"] = filter_food_columns["date"]
                     filter_food_columns["checkout_date"] = filter_food_columns["date"]+timedelta(1)
                 food_data = filter_food_columns.to_dict('records')
-                if len(food_data) == 0:
-                    return {"success": False}
                 summaries["doctype"] = 'Summary Breakups'
                 doc = frappe.get_doc(summaries)
                 doc.insert()
