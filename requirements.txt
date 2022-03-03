@@ -22,3 +22,6 @@ pyshorteners
 tensorflow
 razorpay
 selenium
+pytesseract
+weasyprint
+# opencv-python

@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "creation": "2022-02-28 15:47:56.864345",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "bill_no",
+  "invoice_no",
+  "particulars",
+  "sac_code",
+  "base_amount",
+  "tax",
+  "cgst",
+  "sgst",
+  "igst",
+  "amount",
+  "room_no",
+  "checkin_date",
+  "checkout_date",
+  "no_of_nights",
+  "no_of_guests",
+  "room_rate",
+  "category"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bill_no",
+   "fieldtype": "Data",
+   "label": "Bill No."
+  },
+  {
+   "fieldname": "invoice_no",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Invoice No.",
+   "reqd": 1
+  },
+  {
+   "fieldname": "particulars",
+   "fieldtype": "Data",
+   "label": "Particulars"
+  },
+  {
+   "fieldname": "sac_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "SAC Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "base_amount",
+   "fieldtype": "Float",
+   "label": "Base Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cgst",
+   "fieldtype": "Float",
+   "label": "CGST"
+  },
+  {
+   "fieldname": "sgst",
+   "fieldtype": "Float",
+   "label": "SGST"
+  },
+  {
+   "fieldname": "igst",
+   "fieldtype": "Float",
+   "label": "IGST"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "label": "Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "room_no",
+   "fieldtype": "Int",
+   "label": "Room No"
+  },
+  {
+   "fieldname": "checkin_date",
+   "fieldtype": "Date",
+   "label": "Checkin Date"
+  },
+  {
+   "fieldname": "checkout_date",
+   "fieldtype": "Date",
+   "label": "Checkout Date"
+  },
+  {
+   "default": "1",
+   "fieldname": "no_of_nights",
+   "fieldtype": "Int",
+   "label": "No of Nights"
+  },
+  {
+   "default": "1",
+   "fieldname": "no_of_guests",
+   "fieldtype": "Int",
+   "label": "No of Guests"
+  },
+  {
+   "fieldname": "room_rate",
+   "fieldtype": "Float",
+   "label": "Room Rate"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "Food\nRoom\nMiscellaneous"
+  },
+  {
+   "fieldname": "tax",
+   "fieldtype": "Int",
+   "label": "Tax %"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-02-28 18:08:05.998238",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "Summary Breakup Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

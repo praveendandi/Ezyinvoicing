@@ -35,7 +35,8 @@
   "ignore_non_taxable_items",
   "bulk_upload_service_charge",
   "disable_cess_for_sc",
-  "disable_vat_for_sc"
+  "disable_vat_for_sc",
+  "category"
  ],
  "fields": [
   {
@@ -223,11 +224,17 @@
    "fieldname": "disable_vat_for_sc",
    "fieldtype": "Check",
    "label": "Disable Vat For SC"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "Food\nRoom\nMiscellaneous"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-09 10:26:39.366497",
+ "modified": "2022-02-26 15:52:16.137068",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

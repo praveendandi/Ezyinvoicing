@@ -1737,4 +1737,12 @@ def fetch_invoice_details(filters=[]):
         else:
             return {"success": False, "message": "filters not be empty"}
     except Exception as e:
-        return {"Success": False, "message": str(e)}
+        return {"Success":False,"message":str(e)}
+
+
+def summaries_insert(doc, method=None):
+    try:
+        print(doc.from_date, doc.to_date)
+        doc.between_dates = doc.from_date+" to "+doc.to_date
+    except Exception as e:
+        return {"Success":False,"message":str(e)}
