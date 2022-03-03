@@ -183,6 +183,7 @@ doc_events = {
     'Precheckins':{
         'after_insert':"version2_app.events.precheckinsdocuments",
         # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
+        # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
     }
 }
 

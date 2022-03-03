@@ -10,6 +10,7 @@
   "room_number",
   "guest_full_name",
   "surname",
+  "middle_name",
   "given_name",
   "gender",
   "date_of_birth",
@@ -60,6 +61,7 @@
   "checkin_date",
   "checkin_time",
   "checkout_date",
+  "checkout_time",
   "no_of_nights",
   "uploaded_to_frro",
   "frro_failure_count",
@@ -68,7 +70,19 @@
   "frro_checkout_date",
   "remarks",
   "select_category",
-  "main_guest"
+  "main_guest",
+  "pathik_image",
+  "no_of_children",
+  "no_of_adults",
+  "pathik_country",
+  "pathik_state",
+  "pathik_district",
+  "vehicle_type",
+  "vehicle_number",
+  "pathik_status",
+  "pending_pathik",
+  "pathik_locality",
+  "guest_company_name"
  ],
  "fields": [
   {
@@ -405,11 +419,84 @@
    "fieldname": "main_guest",
    "fieldtype": "Check",
    "label": "Main Guest"
+  },
+  {
+   "fieldname": "pathik_image",
+   "fieldtype": "Attach Image",
+   "label": "Pathik Image"
+  },
+  {
+   "fieldname": "checkout_time",
+   "fieldtype": "Time",
+   "label": "Checkout Time"
+  },
+  {
+   "fieldname": "no_of_children",
+   "fieldtype": "Int",
+   "label": "No of Children"
+  },
+  {
+   "fieldname": "no_of_adults",
+   "fieldtype": "Int",
+   "label": "No of Adults"
+  },
+  {
+   "fieldname": "pathik_state",
+   "fieldtype": "Data",
+   "label": "Pathik State"
+  },
+  {
+   "fieldname": "vehicle_type",
+   "fieldtype": "Data",
+   "label": "Vehicle Type"
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Data",
+   "label": "Vehicle Number"
+  },
+  {
+   "fieldname": "pathik_district",
+   "fieldtype": "Data",
+   "label": "Pathik District"
+  },
+  {
+   "default": "Pending Review",
+   "fieldname": "pathik_status",
+   "fieldtype": "Select",
+   "label": "Pathik Status",
+   "options": "Pending Review\nPending Pathik\nIn House"
+  },
+  {
+   "default": "0",
+   "fieldname": "pending_pathik",
+   "fieldtype": "Check",
+   "label": "Pending Pathik"
+  },
+  {
+   "fieldname": "pathik_locality",
+   "fieldtype": "Data",
+   "label": "Pathik Locality"
+  },
+  {
+   "fieldname": "pathik_country",
+   "fieldtype": "Data",
+   "label": "Pathik Country"
+  },
+  {
+   "fieldname": "middle_name",
+   "fieldtype": "Data",
+   "label": "Middle Name"
+  },
+  {
+   "fieldname": "guest_company_name",
+   "fieldtype": "Data",
+   "label": "Guest Company Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-11 14:11:12.654130",
+ "modified": "2022-01-21 15:47:31.547698",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
