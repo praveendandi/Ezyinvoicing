@@ -30,13 +30,16 @@ def create_html_to_pdf(name):
             "Summaries", name, ["name", "tax_payer_details"], as_dict=1)
         print(doc, "==========")
         if doc:
-            templates = frappe.db.get_all("Print Format", filters={
-                                          "name": ["in", ["Summary", "Rooms", "Food", "Misc"]]}, fields=["*"])
-            html = ""
+            # ["Summary","Rooms","Food","Misc"]
+            templates=frappe.db.get_all("Print Format",filters={"name":["in",["Summary","Rooms","Food","Misc"]]},fields=["*"])
+            # for each in templates:
+            #     if each["name"]=="Summary":
+                    
+            # html=""
             for each_template in templates:
-                html += frappe.render_template(each_template["html"], doc)
-                html += '<div style="page-break-before: always;"></div>'
-            responce = html_to_pdf(html, "sample")
+                html=frappe.render_template(each_template["html"],doc)
+                # html+='<div style="page-break-before: always;"></div>'
+                responce=html_to_pdf(html,each_template["name"])
             return responce
     except Exception as e:
         frappe.log_error("Error in create_html_to_pdf: ",
@@ -47,7 +50,7 @@ def create_html_to_pdf(name):
 def html_to_pdf(html_data, filename):
     try:
         # filename = datetime.now().strftime("%Y%m%d-%H%M%S")
-        # cwd = os.getcwd()
+        cwd = os.getcwd() 
         # f= open(filename+".html","w")
         # f.write(str(html_data))
         # f.close()
@@ -57,10 +60,9 @@ def html_to_pdf(html_data, filename):
         # with open(filename+'.html','r') as f:
         #     file_pdf = pdfkit.from_file(f,filename + '.pdf',options=options)
         #     file_path = cwd + "/" + filename + '.pdf'
-        # .render(stylesheets=[mycss])
-        htmldoc = HTML(string=html_data, base_url="")
-        file_path = cwd + "/" + filename + '.pdf'
-        Path(file_path).write_bytes(htmldoc.write_pdf())
+        htmldoc = HTML(string=html_data, base_url="")#.render(stylesheets=[mycss])
+        file_path = cwd + "/" + filename + '.pdf' 
+        htmldoc.write_pdf(file_path)
         print("===========")
         return {"Success": True, "message": "pdf created successfully"}
     except Exception as e:
