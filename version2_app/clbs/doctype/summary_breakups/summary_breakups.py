@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+import json
 import os
 from datetime import datetime, timedelta
 # import weasyprint as wp
@@ -211,6 +212,19 @@ def create_summary_breakup(filters=[], summary=None):
         frappe.log_error(str(e), "create_summary_breakup")
         return {"success": False, "message": str(e)}
 
+
+@frappe.whitelist(allow_guest=True)
+def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
+    try:
+        # frappe.db.delete("Summaries", {"summaries": summary})
+        # frappe.db.delete("Summary Documents", {"summary": summary})
+        # frappe.db.commit()
+        get_invoices_under_summary = frappe.db.get_list("Invoices", {"summary": summary}, pluck="name")
+        
+
+    except Exception as e:
+        frappe.log_error(str(e), "delete_invoice_summary_breakup")
+        return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def update_summary_breakup():
