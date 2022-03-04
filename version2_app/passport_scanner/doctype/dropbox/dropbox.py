@@ -23,18 +23,19 @@ class Dropbox(Document):
 
 @frappe.whitelist(allow_guest=True)
 def create_doc_using_base_files(reservation_number: str,image_1: str =None,image_2: str=None,image_3:str = None,guest_name:str='Guest'):
-    '''
-    create dropbox based on base64 file using fijtsu scanner
-    '''
-    try:
+    # '''
+    # create dropbox based on base64 file using fijtsu scanner
+    # '''
+    # try:
         company = frappe.get_last_doc("company")
+        print(company.classfiy_api)
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path+'/sites/'+company.site_name
         front = ''
         back = ''
         front_doc_type = ''
         if image_1:
-            image_1_response = requests.post(company.classfiy_api, json={"base": image_1})
+            image_1_response = requests.post(company.classfiy_api, json={"base": image_1},verify=False)
             try:
                 image_1_response = image_1_response.json()
                 front_doc_type = image_1_response['doc_type']
@@ -67,7 +68,7 @@ def create_doc_using_base_files(reservation_number: str,image_1: str =None,image
                 raise
 
         if image_3:
-            image_3_response = requests.post(company.classfiy_api, json={"base": image_3})
+            image_3_response = requests.post(company.classfiy_api, json={"base": image_3},verify=False)
             try:
                 image_3_response = image_3_response.json()
                 del image_3_response['base']
@@ -156,47 +157,47 @@ def create_doc_using_base_files(reservation_number: str,image_1: str =None,image
             new_dropbox.merged_on = datetime.datetime.now()
 
         new_dropbox.insert(ignore_permissions=True)
-        enqueue(
-            extract_text,
-            queue="default",
-            timeout=800000,
-            event="data_extraction",
-            now=False,
-            data = {"dropbox":new_dropbox,
-            "image_1":image_1,
-            "image_2":image_2
-            },
-            is_async = True,
-        )
-        if company.scan_ezy_module:
-            if new_dropbox.id_type == 'aadhaar':
-                enqueue(
-                    scan_aadhar,
-                    queue="default",
-                    timeout=800000,
-                    event="vision_api_extraction",
-                    now=True,
-                    data = {
-                    "front_base_image":front,
-                    "back_base_image":back,
-                    "dropbox":new_dropbox,
-                    "company":company
-                    },
-                    is_async = True,
-                )
+        # enqueue(
+        #     extract_text,
+        #     queue="default",
+        #     timeout=800000,
+        #     event="data_extraction",
+        #     now=False,
+        #     data = {"dropbox":new_dropbox,
+        #     "image_1":image_1,
+        #     "image_2":image_2
+        #     },
+        #     is_async = True,
+        # )
+        # if company.scan_ezy_module:
+        #     if new_dropbox.id_type == 'aadhaar':
+        #         enqueue(
+        #             scan_aadhar,
+        #             queue="default",
+        #             timeout=800000,
+        #             event="vision_api_extraction",
+        #             now=True,
+        #             data = {
+        #             "front_base_image":front,
+        #             "back_base_image":back,
+        #             "dropbox":new_dropbox,
+        #             "company":company
+        #             },
+        #             is_async = True,
+        #         )
         return {
             "success": True,
             "Message":"Dropbox created successfully"
         }
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error(
-            "create_doc_using_base_files", "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
-        print(e)
-        return {
-            "success": False,
-            "Message":"Error while Dropbox creating Please try again"
-        }
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error(
+    #         "create_doc_using_base_files", "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
+    #     print(e)
+    #     return {
+    #         "success": False,
+    #         "Message":"Error while Dropbox creating Please try again"
+    #     }
 
 def extract_text(data:dict):
     '''
