@@ -151,7 +151,7 @@ def create_doc_using_base_files(reservation_number: str,image_1: str =None,image
         new_precheckin.confirmation_number = reservation_number
         # print(reseravtions_data)
         if reseravtions_data:
-            new_precheckin.insert()
+            new_precheckin.insert(ignore_permissions=True)
             new_dropbox.merged = "Merged"
             new_dropbox.merged_to = reservation_number
             new_dropbox.merged_on = datetime.datetime.now()
