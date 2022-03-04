@@ -260,7 +260,7 @@ def Reinitiate_invoice(data):
         doc.qr_code_generated='Pending'
         doc.signed_invoice_generated='No'
         doc.company=data['company_code']
-        doc.print_by = data['guest_data']['print_by']
+        doc.print_by = data['guest_data']['print_by'] if "print_by" in data["guest_data"].keys() else ""
         doc.total_credit_central_cess_amount =  round(total_credit_central_cess_amount,2)
         doc.total_credit_state_cess_amount = round(total_credit_state_cess_amount,2)
         doc.total_credit_vat_amount = round(total_credit_vat_amount,2)

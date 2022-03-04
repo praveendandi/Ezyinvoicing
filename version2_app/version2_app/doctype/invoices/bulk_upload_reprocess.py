@@ -56,7 +56,7 @@ def BulkUploadReprocess(data):
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             if invoice_data.change_gst_number=="Yes" and invoice_data.converted_from_b2c=="No":
-                if line_items['data'][0]['taxid'] == "empty":
+                if line_items['data'][0]['taxid'] == "empty" or line_items['data'][0]['taxid'] == "":
                     gstNumber == ""
                     invoiceType = "B2C"
                 else:
