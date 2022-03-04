@@ -23,10 +23,10 @@ class Dropbox(Document):
 
 @frappe.whitelist(allow_guest=True)
 def create_doc_using_base_files(reservation_number: str,image_1: str =None,image_2: str=None,image_3:str = None,guest_name:str='Guest'):
-    # '''
-    # create dropbox based on base64 file using fijtsu scanner
-    # '''
-    # try:
+    '''
+    create dropbox based on base64 file using fijtsu scanner
+    '''
+    try:
         company = frappe.get_last_doc("company")
         print(company.classfiy_api)
         folder_path = frappe.utils.get_bench_path()
@@ -189,15 +189,15 @@ def create_doc_using_base_files(reservation_number: str,image_1: str =None,image
             "success": True,
             "Message":"Dropbox created successfully"
         }
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error(
-    #         "create_doc_using_base_files", "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
-    #     print(e)
-    #     return {
-    #         "success": False,
-    #         "Message":"Error while Dropbox creating Please try again"
-    #     }
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "create_doc_using_base_files", "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
+        print(e)
+        return {
+            "success": False,
+            "Message":"Error while Dropbox creating Please try again"
+        }
 
 def extract_text(data:dict):
     '''
@@ -252,7 +252,34 @@ def extract_text(data:dict):
             "extract_text", "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
         print(e)
 
-
+@frappe.whitelist(allow_guest=True)
+def check_drop_exist(reservation_number:str,guest_name:str):
+    '''
+    check dropbox exist or not
+    :param name: dropbox name
+    '''
+    try:
+        dropbox_exist = frappe.db.exists("Dropbox", {"reservation_no": reservation_number,"guest_name":guest_name})
+        if dropbox_exist:
+            return {
+                'success':True,
+                'found':True,
+                'message':"Dropbox already exist"
+                }
+        else:
+            return {
+                'success':True,
+                'found':False,
+                'message':"Dropbox not exist"
+            }
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "check_drop_exist", "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
+        return {
+                'success':False,
+                'message':"Error while checking Dropbox exist"
+            }
 
 
 def create_guest_details(dropbox):
@@ -421,7 +448,7 @@ def get_reservation_details(reseravtion: str):
     '''
     try:
         pre_arrival_details = frappe.db.get_value(
-            'Arrival Information', {'confirmation_number': reseravtion}, ['guest_first_name', 'no_of_adults', 'no_of_children', 'room_no'], as_dict=1)
+            'Arrival Information', {'confirmation_number': reseravtion}, ['guest_first_name', 'no_of_adults', 'no_of_children', 'room_number'], as_dict=1)
         # print(pre_arrival_details)
         if pre_arrival_details:
             return pre_arrival_details
