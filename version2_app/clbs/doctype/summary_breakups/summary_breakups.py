@@ -28,18 +28,18 @@ def create_html_to_pdf(name):
     try:
         doc = frappe.db.get_value(
             "Summaries", name, ["name", "tax_payer_details"], as_dict=1)
-        print(doc, "==========")
         if doc:
             # ["Summary","Rooms","Food","Misc"]
-            templates=frappe.db.get_all("Print Format",filters={"name":["in",["Summary","Rooms","Food","Misc"]]},fields=["*"])
+            templates = frappe.db.get_all("Print Format", filters={
+                                          "name": ["in", ["Summary", "Rooms", "Food", "Misc"]]}, fields=["*"])
             # for each in templates:
             #     if each["name"]=="Summary":
-                    
+
             # html=""
             for each_template in templates:
-                html=frappe.render_template(each_template["html"],doc)
+                html = frappe.render_template(each_template["html"], doc)
                 # html+='<div style="page-break-before: always;"></div>'
-                responce=html_to_pdf(html,each_template["name"])
+                responce = html_to_pdf(html, each_template["name"])
             return responce
     except Exception as e:
         frappe.log_error("Error in create_html_to_pdf: ",
@@ -50,7 +50,7 @@ def create_html_to_pdf(name):
 def html_to_pdf(html_data, filename):
     try:
         # filename = datetime.now().strftime("%Y%m%d-%H%M%S")
-        cwd = os.getcwd() 
+        cwd = os.getcwd()
         # f= open(filename+".html","w")
         # f.write(str(html_data))
         # f.close()
@@ -60,8 +60,9 @@ def html_to_pdf(html_data, filename):
         # with open(filename+'.html','r') as f:
         #     file_pdf = pdfkit.from_file(f,filename + '.pdf',options=options)
         #     file_path = cwd + "/" + filename + '.pdf'
-        htmldoc = HTML(string=html_data, base_url="")#.render(stylesheets=[mycss])
-        file_path = cwd + "/" + filename + '.pdf' 
+        # .render(stylesheets=[mycss])
+        htmldoc = HTML(string=html_data, base_url="")
+        file_path = cwd + "/" + filename + '.pdf'
         htmldoc.write_pdf(file_path)
         print("===========")
         return {"Success": True, "message": "pdf created successfully"}
@@ -215,18 +216,48 @@ def create_summary_breakup(filters=[], summary=None):
         return {"success": False, "message": str(e)}
 
 
+def update_invoices(invoices=[], data={}):
+    try:
+        for each in invoices:
+            frappe.db.set_value('Invoices', each, data)
+            frappe.db.commit()
+        return {"success": True}
+    except Exception as e:
+        frappe.log_error(str(e), "update_invoices")
+        return {"success": False, "message": str(e)}
+
+
 @frappe.whitelist(allow_guest=True)
 def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
     try:
-        # frappe.db.delete("Summaries", {"summaries": summary})
-        # frappe.db.delete("Summary Documents", {"summary": summary})
-        # frappe.db.commit()
-        get_invoices_under_summary = frappe.db.get_list("Invoices", {"summary": summary}, pluck="name")
-        
-
+        print(type(deleted_invoices))
+        if len(deleted_invoices) == 0:
+            return {"success": False, "message": "please select invoices for delete"}
+        deleted_invoices = json.loads(deleted_invoices)
+        get_invoices_under_summary = frappe.db.get_list(
+            "Invoices", {"summary": summary}, pluck="name")
+        if len(get_invoices_under_summary) > 0:
+            remaining_invoices = list(
+                set(get_invoices_under_summary)-set(deleted_invoices))
+            if len(remaining_invoices) > 0:
+                frappe.db.delete("Summary Breakups", {"summaries": summary})
+                frappe.db.delete("Summary Documents", {"summary": summary})
+                frappe.db.commit()
+                update_invoice = update_invoices(
+                    deleted_invoices, {"summary": None, "clbs_summary_generated": 0})
+                if update_invoice["success"] == False:
+                    return update_invoice
+                create_breakups = create_summary_breakup(
+                    [["parent", "in", remaining_invoices]], summary)
+                if create_breakups["success"] == False:
+                    return create_breakups
+                return {"success": True, "message": "Invoice is deleted from this summary"}
+        else:
+            return {"success": False, "message": "something went wrong"}
     except Exception as e:
         frappe.log_error(str(e), "delete_invoice_summary_breakup")
         return {"success": False, "message": str(e)}
+
 
 @frappe.whitelist(allow_guest=True)
 def update_summary_breakup():
