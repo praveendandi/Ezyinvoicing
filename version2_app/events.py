@@ -333,7 +333,7 @@ def fileCreated(doc, method=None):
                 if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                     update_documentbin(doc.file_url, "")
 
-                print('Normal File')
+                # print('Normal File')
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
         # frappe.log_error(traceback.print_exc())
