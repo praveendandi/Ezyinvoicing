@@ -13,7 +13,7 @@ from frappe.utils.background_jobs import enqueue
 from version2_app.passport_scanner.doctype.dropbox.ocr_details import scan_aadhar
 import datetime
 import re
-from frappe.utils.data import format_date
+# from frappe.utils.data import format_date
 import time
 
 
