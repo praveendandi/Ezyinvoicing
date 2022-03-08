@@ -127,6 +127,7 @@ def update_guest_details(name):
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1 or company_doc.vision_api == 1:
             pre_checkins = frappe.get_doc("Precheckins",name)
+            print(pre_checkins.image_1)
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = folder_path+'/sites/'+company_doc.site_name
             file_path1 = ""
@@ -137,6 +138,7 @@ def update_guest_details(name):
                 else:
                     file_path1 = folder_path+'/sites/'+company_doc.site_name+"/public"+pre_checkins.image_1
                 convert1= convert_image_to_base64(file_path1)
+                print(file_path1)
                 if convert1["success"] == False:
                     return convert1
             if pre_checkins.image_2:
@@ -241,7 +243,7 @@ def update_guest_details(name):
                 driving_license_details["image_1"] = pre_checkins.image_1
                 driving_license_details["image_2"] = pre_checkins.image_2
                 return {"success":True, "data":driving_license_details}
-            if pre_checkins.guest_id_type == "voterId":
+            if pre_checkins.guest_id_type == "voterId" or pre_checkins.guest_id_type == "voter_id":
                 voter_details = {}
                 if company_doc.scan_ezy_module == 1:
                     voter_details["scan_ezy"] = True
