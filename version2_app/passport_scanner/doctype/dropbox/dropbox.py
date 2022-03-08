@@ -162,19 +162,19 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
             new_dropbox.merged_on = datetime.datetime.now()
 
         new_dropbox.insert(ignore_permissions=True)
-        enqueue(
-            extract_text,
-            queue="default",
-            timeout=800000,
-            event="data_extraction",
-            now=False,
-            data={"dropbox": new_dropbox,
-                  "image_1": image_1,
-                  "image_2": image_2,
-                  "id_type": id_type,
-                  },
-            is_async=True,
-        )
+        # enqueue(
+        #     extract_text,
+        #     queue="default",
+        #     timeout=800000,
+        #     event="data_extraction",
+        #     now=False,
+        #     data={"dropbox": new_dropbox,
+        #           "image_1": image_1,
+        #           "image_2": image_2,
+        #           "id_type": id_type,
+        #           },
+        #     is_async=True,
+        # )
         # if company.scan_ezy_module:
         #     if new_dropbox.id_type == 'aadhaar':
         #         enqueue(
