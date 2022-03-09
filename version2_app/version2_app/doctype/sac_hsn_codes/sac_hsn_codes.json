@@ -229,12 +229,12 @@
    "fieldname": "category",
    "fieldtype": "Select",
    "label": "Category",
-   "options": "Food\nRoom\nMiscellaneous"
+   "options": "Food\nRooms\nMiscellaneous"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-26 15:52:16.137068",
+ "modified": "2022-03-07 10:46:24.852545",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

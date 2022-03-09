@@ -12,7 +12,9 @@
   "tax_payer_details",
   "between_dates",
   "phone_number",
-  "land_line_number"
+  "land_line_number",
+  "location",
+  "legal_name"
  ],
  "fields": [
   {
@@ -64,11 +66,22 @@
    "fieldname": "land_line_number",
    "fieldtype": "Data",
    "label": "Land Line Number"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Taxpayer Locations"
+  },
+  {
+   "fieldname": "legal_name",
+   "fieldtype": "Data",
+   "label": "Legal Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-04 11:33:46.469283",
+ "modified": "2022-03-08 15:43:43.249571",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",

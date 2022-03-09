@@ -25,7 +25,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Food\nRoom\nMiscellaneous"
+   "options": "Food\nRooms\nMiscellaneous"
   },
   {
    "fieldname": "invoice_type",
@@ -61,7 +61,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-02 12:44:03.678388",
+ "modified": "2022-03-07 10:30:19.069443",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",

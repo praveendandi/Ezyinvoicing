@@ -18,5 +18,5 @@ scipy
 pytesseract
 pdf2image
 pytesseract
-weasyprint
+WeasyPrint==52
 # opencv-python

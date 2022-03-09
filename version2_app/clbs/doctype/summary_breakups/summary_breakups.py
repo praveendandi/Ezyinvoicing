@@ -13,7 +13,9 @@ from pathlib import Path
 import frappe
 import pandas as pd
 import pdfkit
+import requests
 from frappe.model.document import Document
+from frappe.utils import cstr
 from weasyprint import HTML
 
 # from xhtml2pdf import pisa
@@ -24,47 +26,51 @@ class SummaryBreakups(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def create_html_to_pdf(name):
+def summary_print_formats(name):
     try:
         doc = frappe.db.get_value(
             "Summaries", name, ["name", "tax_payer_details"], as_dict=1)
         if doc:
-            # ["Summary","Rooms","Food","Misc"]
-            templates = frappe.db.get_all("Print Format", filters={
-                                          "name": ["in", ["Summary", "Rooms", "Food", "Misc"]]}, fields=["*"])
-            # for each in templates:
-            #     if each["name"]=="Summary":
-
-            # html=""
-            for each_template in templates:
-                html = frappe.render_template(each_template["html"], doc)
-                # html+='<div style="page-break-before: always;"></div>'
-                responce = html_to_pdf(html, each_template["name"])
-            return responce
+            get_categroies = frappe.db.get_list(
+                "Summary Breakups", {"summaries": name}, pluck="category")
+            if len(get_categroies) > 0:
+                templates = frappe.db.get_all("Print Format", filters={
+                    "name": ["in", get_categroies]}, fields=["*"])
+                if len(templates) == 0:
+                    return {"success": False, ",message": "please add print formats"}
+                total_reports = {}
+                for each_template in templates:
+                    html = frappe.render_template(each_template["html"], doc)
+                    total_reports.update({each_template["name"]:html})
+                    # html += '<div style="page-break-before: always;"></div>'
+                    # responce = html_to_pdf(html, each_template["name"], name)
+                return {"success": True, "html": total_reports}
+            else:
+                return {"success": False, "message": "summary breakups not found"}
+        else:
+            return {"success": False, "message": "data not found"}
     except Exception as e:
         frappe.log_error("Error in create_html_to_pdf: ",
                          frappe.get_traceback())
         return {"Success": False, "message": str(e)}
 
 
-def html_to_pdf(html_data, filename):
+@frappe.whitelist(allow_guest=True)
+def html_to_pdf(html_data, filename, name):
     try:
-        # filename = datetime.now().strftime("%Y%m%d-%H%M%S")
+        company = frappe.get_last_doc('company')
+        if not company.host:
+            return {'success': False, 'message': "please specify host in company"}
         cwd = os.getcwd()
-        # f= open(filename+".html","w")
-        # f.write(str(html_data))
-        # f.close()
-        # options = {
-        #         "enable-local-file-access": None
-        #         }
-        # with open(filename+'.html','r') as f:
-        #     file_pdf = pdfkit.from_file(f,filename + '.pdf',options=options)
-        #     file_path = cwd + "/" + filename + '.pdf'
-        # .render(stylesheets=[mycss])
+        site_name = cstr(frappe.local.site)
         htmldoc = HTML(string=html_data, base_url="")
-        file_path = cwd + "/" + filename + '.pdf'
+        file_path = cwd + "/" + site_name + "/public/files/" + filename + name + '.pdf'
         htmldoc.write_pdf(file_path)
-        print("===========")
+        files_new = {"file": open(file_path, 'rb')}
+        payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
+                       'docname': name, 'fieldname': filename}
+        file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                      data=payload_new, verify=False).json()
         return {"Success": True, "message": "pdf created successfully"}
     except Exception as e:
         frappe.log_error("Error in html_to_pdf: ", frappe.get_traceback())
@@ -122,7 +128,7 @@ def extract_summary_breakup_details(df, summaries):
         filter_food_columns["parentfield"] = "summary_breakup_details"
         filter_food_columns["parenttype"] = "Summary Breakups"
         filter_food_columns["doctype"] = "Summary Breakup Details"
-        if summaries["category"] == "Room":
+        if summaries["category"] == "Rooms":
             filter_food_columns["checkin_date"] = filter_food_columns["date"]
             filter_food_columns["checkout_date"] = filter_food_columns["date"] + \
                 timedelta(1)
@@ -230,10 +236,9 @@ def update_invoices(invoices=[], data={}):
 @frappe.whitelist(allow_guest=True)
 def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
     try:
-        print(type(deleted_invoices))
+        deleted_invoices = json.loads(deleted_invoices)
         if len(deleted_invoices) == 0:
             return {"success": False, "message": "please select invoices for delete"}
-        deleted_invoices = json.loads(deleted_invoices)
         get_invoices_under_summary = frappe.db.get_list(
             "Invoices", {"summary": summary}, pluck="name")
         if len(get_invoices_under_summary) > 0:
@@ -260,9 +265,17 @@ def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
 
 
 @frappe.whitelist(allow_guest=True)
-def update_summary_breakup():
+def update_summary_breakup(data):
     try:
-        pass
+        if len(data["summary"]) == 0:
+            return {"success": False, "message": "No data found"}
+        for each in data["summary"]:
+            name = each["name"]
+            del each["name"]
+            update_breakup_summary = frappe.db.set_value(
+                "Summary Breakup Details", name, each)
+            frappe.db.commit()
+        return {"success": True, "message": "data updated successfully"}
     except Exception as e:
         frappe.log_error(str(e), "update_summary_breakup")
         return {"success": False, "message": str(e)}
@@ -289,3 +302,13 @@ def get_summary_breakup(summary=None):
     except Exception as e:
         frappe.log_error(str(e), "get_summary_breakup")
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_gst_summary(summaries):
+    get_summary_breakups = frappe.db.get_list(
+        "Summary Breakups", {"summaries": summaries}, pluck="name")
+    if len(get_summary_breakups) > 0:
+        get_breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[["parent", "in", get_summary_breakups]], fields=[
+                                                 "sum(cgst) as cgst", "sum(sgst) as sgst", "sum(igst) as igst", "tax"], group_by="tax")
+        print(get_breakup_details)
