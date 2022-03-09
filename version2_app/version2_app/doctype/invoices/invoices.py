@@ -351,12 +351,12 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": round(invoice.other_charges,2),
+            "OthChrg": round(invoice.other_charges,2) if company_details['data'].vat_reporting==1 else round(invoice.other_charges_before_tax,2),
             "RndOffAmt": 0,
             "TotInvVal": round(TotInnVal,2),
             "TotInvValFc": round(TotInvValFc, 2)
         }
-        print(gst_data)
+        print(gst_data["ValDtls"],"=============")
         
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
