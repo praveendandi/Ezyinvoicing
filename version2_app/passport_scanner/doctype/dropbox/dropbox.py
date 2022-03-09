@@ -12,10 +12,12 @@ import datetime
 from frappe.utils.background_jobs import enqueue
 from version2_app.passport_scanner.doctype.dropbox.ocr_details import scan_aadhar
 import datetime
+import re
+# from frappe.utils.data import format_date
+import time
 
 
-classify_api = 'http://localhost:5000/predict'
-detection_api = 'http://localhost:5000/detect'
+
 
 
 class Dropbox(Document):
@@ -131,19 +133,21 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
             new_dropbox.reservation_found = 1
         else:
             new_dropbox.reservation_found = 0
-
+        
         new_precheckin = frappe.new_doc("Precheckins")
         if front != '':
+            ts = time.time()
             image_1_url = convert_base64_to_image(
-                front, 'Front', site_folder_path, company)
+                front, reservation_number+id_type+str(ts), site_folder_path, company)
             if 'message' in image_1_url:
                 new_precheckin.image_1 = image_1_url['message']['file_url']
                 new_precheckin.guest_first_name = guest_name
                 new_dropbox.front = image_1_url['message']['file_url']
 
         if back != '':
+            ts = time.time()
             image_2_url = convert_base64_to_image(
-                back, 'Back', site_folder_path, company)
+                back, reservation_number+id_type+str(ts), site_folder_path, company)
             if 'message' in image_2_url:
                 new_precheckin.image_2 = image_2_url['message']['file_url']
                 new_dropbox.back = image_2_url['message']['file_url']
@@ -151,6 +155,7 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
         new_precheckin.confirmation_number = reservation_number
         # print(reseravtions_data)
         if reseravtions_data:
+            new_precheckin.guest_id_type = id_type
             new_precheckin.insert(ignore_permissions=True)
             new_dropbox.merged = "Merged"
             new_dropbox.merged_to = reservation_number
@@ -162,7 +167,7 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
         #     queue="default",
         #     timeout=800000,
         #     event="data_extraction",
-        #     now=True,
+        #     now=False,
         #     data={"dropbox": new_dropbox,
         #           "image_1": image_1,
         #           "image_2": image_2,
@@ -221,7 +226,7 @@ def extract_text(data: dict):
                 for key in image_1_response:
                     if 'aadhar_no_details' in key:
                         if image_1_response[key]:
-                            details['aadhar_no'] = image_1_response[key]['aadhar_no']
+                            details['AADHAR_NO'] = image_1_response[key]['aadhar_no']
                     elif 'aadhar_front_details' in key:
                         if image_1_response[key]['aadhar_front_details']:
                             for aadhar_front_details in image_1_response[key]['aadhar_front_details']:
@@ -231,25 +236,26 @@ def extract_text(data: dict):
 
         if data['image_2']:
             image_2_response = requests.post(
-                detection_api, json={"base": data['image_2'], "thresh": thresh})
+                company.detection_api, json={"base": data['image_2'], "thresh": thresh})
             try:
                 image_2_response = image_2_response.json()
                 # print(image_2_response)
                 for key in image_2_response:
-                    if 'Aadhar_Back_No' in key:
-                        if image_2_response[key]['data']:
-                            details['aadhar_back_no'] = image_2_response[key]['data']
-                    elif 'aadhar_back_details' in key:
-                        if image_2_response[key]['data']:
-                            details['aadhar_address'] = image_2_response[key]['data']
+                    if 'aadhar_back_details' in key:
+                        if image_2_response[key]['aadhar_back_details']:
+                            for aadhar_back_details in image_2_response[key]['aadhar_back_details']:
+                                details[aadhar_back_details] = image_2_response[key]['aadhar_back_details'][aadhar_back_details]
+                    elif 'aadhar_back_no_details' in key:
+                        if image_2_response[key]:
+                            details['AADHAR_BACK_NO'] = image_2_response[key]['aadhar_back_no']
+                    
 
                 # print(image_2_response)
             except ValueError:
                 raise
 
         # print(details)
-
-        if data['id_type'] == 'aadhar':
+        if data['id_type'] == 'aadhaar':
             create_guest_update_precheckin_details(details, data['dropbox'])
 
     except Exception as e:
@@ -265,7 +271,58 @@ def create_guest_update_precheckin_details(details, dropbox):
     update precheckin based on aadhar details
     '''
     try:
-        print(details,dropbox)
+        print(details,dropbox,"hey hiee")
+        main_guest = True
+        if 'Guest' not in dropbox.guest_name:
+            main_guest = False
+        aadhar_details = {
+            'doctype': 'Guest Details',
+            'confirmation_number': dropbox.reservation_no,
+            'nationality':"IND",
+            'country':'IND',
+            'id_image1':dropbox.front,
+            'id_image2':dropbox.back,
+            'id_type':'aadhaar',
+            'main_guest':main_guest,
+            'whether_employed_in_india':'N',
+            "status": "In House"
+        }
+        for key in details:
+            if key == 'ADRESS':
+                address = re.sub(r"[\n\t\s]*", "", details[key])
+                aadhar_details["address"] = address
+            elif key == 'AADHAR_NO':
+                aadhar_details["local_id_number"] = details[key]
+            elif key == 'NAME':
+                if main_guest:
+                    aadhar_details["guest_full_name"] = dropbox.guest_name
+                    aadhar_details["given_name"] = details[key]
+                else:
+                    aadhar_details["guest_full_name"] = details[key]
+                    aadhar_details["given_name"] = details[key]
+            elif key == 'DOB':
+                aadhar_details["date_of_birth"] = format_date(details[key],'yyyy/mm/dd')
+            elif key == 'GENDER':
+                aadhar_details["gender"] = 'M' if details[key] == 'Male' else 'F'
+            elif key == 'STATE':
+                pass
+                # aadhar_details["gender"] = details[key]
+            elif key == 'PINCODE':
+                pincode = re.sub('\D', '', details[key])
+                aadhar_details["postal_code"] = pincode
+            elif key == 'LOCATION' or key == 'CITY':
+                if key == 'CITY':
+                    aadhar_details["city"] = details[key]
+                else:
+                    if 'city' not in aadhar_details:
+                        aadhar_details["city"] = details[key]
+            elif key == 'AADHAR_BACK_NO':
+                pass
+            elif key == 'AADHAR_BACK_DETAILS':
+                pass
+
+        new_guest_details = frappe.get_doc(aadhar_details)
+        new_guest_details.insert()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -598,14 +655,15 @@ def create_precheckin(new_dropbox, company, guest_name=None):
 
 def convert_base64_to_image(base, name, site_folder_path, company):
     try:
-        file = site_folder_path+"/private/files/"+name+".png"
+        file = site_folder_path+"/private/files/"+name+".jpg"
+
         # res = bytes(base, 'utf-8')
         with open(file, "wb") as fh:
             fh.write(base64.b64decode(base))
         files = {"file": open(file, 'rb')}
         payload = {
             "is_private": 0,
-            "folder": "Home",
+            "folder": "Home"
             # "doctype": "Precheckins",
         }
         site = company.host
