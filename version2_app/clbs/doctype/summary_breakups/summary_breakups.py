@@ -34,16 +34,19 @@ def summary_print_formats(name):
             get_categroies = frappe.db.get_list(
                 "Summary Breakups", {"summaries": name}, pluck="category")
             if len(get_categroies) > 0:
+                print(type(get_categroies))
+                get_categroies.append("Summary")
                 templates = frappe.db.get_all("Print Format", filters={
                     "name": ["in", get_categroies]}, fields=["*"])
                 if len(templates) == 0:
                     return {"success": False, ",message": "please add print formats"}
-                total_reports = {}
+                total_reports = []
                 for each_template in templates:
                     html = frappe.render_template(each_template["html"], doc)
-                    total_reports.update({each_template["name"]:html})
-                    # html += '<div style="page-break-before: always;"></div>'
-                    # responce = html_to_pdf(html, each_template["name"], name)
+                    # total_reports.append({each_template["name"]:html})
+                    total_reports.append({each_template["name"]:html})
+                    html += '<div style="page-break-before: always;"></div>'
+                    responce = html_to_pdf(html, each_template["name"], name)
                 return {"success": True, "html": total_reports}
             else:
                 return {"success": False, "message": "summary breakups not found"}
@@ -71,7 +74,9 @@ def html_to_pdf(html_data, filename, name):
                        'docname': name, 'fieldname': filename}
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
                                       data=payload_new, verify=False).json()
-        return {"Success": True, "message": "pdf created successfully"}
+        if "file_url" in file_response["message"].keys():
+            os.remove(file_path)
+        # return {"Success": True, "message": "pdf created successfully"}
     except Exception as e:
         frappe.log_error("Error in html_to_pdf: ", frappe.get_traceback())
         return {"Success": False, "message": str(e)}
