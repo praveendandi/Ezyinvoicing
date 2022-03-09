@@ -23,5 +23,5 @@ tensorflow
 razorpay
 selenium
 pytesseract
-weasyprint
+WeasyPrint==52
 # opencv-python

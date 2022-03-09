@@ -7,15 +7,20 @@
  "field_order": [
   "location",
   "address",
+  "city",
+  "state",
+  "pin_code",
   "taxpayer_details",
-  "company"
+  "company",
+  "status"
  ],
  "fields": [
   {
    "fieldname": "location",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Location"
+   "label": "Location",
+   "reqd": 1
   },
   {
    "fieldname": "address",
@@ -27,18 +32,42 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Taxpayer Details",
-   "options": "TaxPayerDetail"
+   "options": "TaxPayerDetail",
+   "reqd": 1
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "company"
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "pin_code",
+   "fieldtype": "Data",
+   "label": "Pin Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "default": "0",
+   "fieldname": "status",
+   "fieldtype": "Check",
+   "label": "Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-02 10:16:48.592872",
+ "modified": "2022-03-07 12:16:26.567947",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Taxpayer Locations",

@@ -8,16 +8,20 @@
   "contact_name",
   "email_id",
   "phone_number",
+  "land_line_number",
   "contact_type",
   "taxpayer",
   "company",
-  "location"
+  "location",
+  "status"
  ],
  "fields": [
   {
    "fieldname": "email_id",
    "fieldtype": "Data",
-   "label": "Email Id"
+   "in_list_view": 1,
+   "label": "Email Id",
+   "reqd": 1
   },
   {
    "fieldname": "phone_number",
@@ -27,14 +31,18 @@
   {
    "fieldname": "contact_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Contact Type",
-   "options": "Biller\nAccountant"
+   "options": "Biller\nAccountant",
+   "reqd": 1
   },
   {
    "fieldname": "taxpayer",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Taxpayer",
-   "options": "TaxPayerDetail"
+   "options": "TaxPayerDetail",
+   "reqd": 1
   },
   {
    "fieldname": "company",
@@ -45,18 +53,31 @@
   {
    "fieldname": "contact_name",
    "fieldtype": "Data",
-   "label": "Contact Name"
+   "in_list_view": 1,
+   "label": "Contact Name",
+   "reqd": 1
   },
   {
    "fieldname": "location",
    "fieldtype": "Link",
    "label": "Location",
    "options": "Taxpayer Locations"
+  },
+  {
+   "fieldname": "land_line_number",
+   "fieldtype": "Data",
+   "label": "land_line_number"
+  },
+  {
+   "default": "0",
+   "fieldname": "status",
+   "fieldtype": "Check",
+   "label": "Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-02 11:12:04.695928",
+ "modified": "2022-03-07 12:16:46.296408",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Contacts",
