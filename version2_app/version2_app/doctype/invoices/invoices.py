@@ -181,7 +181,7 @@ def generateIrn(data):
         }
         taxpayer_details = get_tax_payer_details(GspData)
         #gst data
-        print("dataaaaaaaaaaaaaaaaaaaaa",taxpayer_details)
+        print("dataaaaaaaaaaaaaaaaaaaaa",data)
         print(taxpayer_details["data"].__dict__,"-----------------------------")
         if company_details['data'].mode == 'Testing':
             if len(invoice.invoice_number) > 13:
@@ -351,12 +351,12 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": round(invoice.other_charges,2),
+            "OthChrg": round(invoice.other_charges,2) if company_details['data'].vat_reporting==1 else round(invoice.other_charges_before_tax,2),
             "RndOffAmt": 0,
             "TotInvVal": round(TotInnVal,2),
             "TotInvValFc": round(TotInvValFc, 2)
         }
-        print(gst_data)
+        print(gst_data["ValDtls"],"=============")
         
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
@@ -1547,12 +1547,6 @@ def calulate_items(data):
     try:
         total_items = []
         second_list = []
-        if "lut" not in data.keys():
-            invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
-            if invoice_doc:
-                data["lut"] = invoice_doc.lut
-            else:
-                data["lut"] = False
         companyDetails = frappe.get_doc('company', data['company_code'])
         if any("split_value" in check for check in data["items"]):
             non_split = list(sv for sv in data["items"] if "split_value" not in sv)
@@ -1611,8 +1605,6 @@ def calulate_items(data):
             else:
                 placeofsupply = companyDetails.state_code
         for item in data['items']:
-            if "lut_exempted" not in item.keys():
-                item["lut_exempted"] = False
             final_item = {}
             if "quantity" in list(item.keys()):
                 final_item['unit_of_measurement']=item['unit_of_measurement']
@@ -2027,16 +2019,6 @@ def calulate_items(data):
                     final_item['sac_code_found'] = 'Yes'
                     final_item['taxable'] = sac_code_based_gst_rates.taxble
                     final_item['sort_order'] = item['sort_order']
-                    if data["lut"] == True and data["items"]["lut_exempted"] == True and data["sez"] == 1:
-                        final_item["sgst"] = 0
-                        final_item["cgst"] = 0
-                        final_item["igst"] = 0
-                        final_item['type'] = "Excempted"
-                        final_item['cgst_amount'] = 0
-                        final_item['igst_amount'] = 0
-                        final_item['sgst_amount'] = 0
-                        final_item['other_charges'] = 0
-                        final_item["lut_exempted"] = True
                 else:
                     # if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
                     if (item['sac_code'] != "996311" or item['sac_code'] != "997321") and sac_code_based_gst_rates.taxble == "No":
@@ -2052,7 +2034,7 @@ def calulate_items(data):
                             final_item['sgst_amount'] = gst_amount_value/2
                             final_item['igst'] = 0
                             final_item['igst_amount'] = 0
-                            final_item['gst_rate'] = gst_tax_percentage					
+                            final_item['gst_rate'] = gst_tax_percentage						
                         else:
                             # if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
                             # 	calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
@@ -2876,7 +2858,6 @@ def get_tax_payer_details(data):
                     get_doc = frappe.get_doc('TaxPayerDetail', data['gstNumber'])
                     return {"success": True, "data": get_doc}
             else:
-                print(data,"-=--=-=--")
                 print(data['gstNumber'],"-----------------")
                 response = request_get(
                     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
