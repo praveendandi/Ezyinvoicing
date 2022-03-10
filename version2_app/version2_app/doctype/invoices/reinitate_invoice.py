@@ -392,15 +392,41 @@ def reprocess_calulate_items(data):
             lut = data["lut"]
         else:
             lut = invoice_details.lut
+        if sez == 0 and lut == 1:
+            lut = 0
         for each_item in data['items_data']:
+            if (lut == 1 and sez == 1):
+                item_details = frappe.db.get_value("Items", {"name":each_item["name"],"lut_exempted": 1}, "lut_exempted")
+                if item_details:
+                    if item_details != each_item["lut_exempted"]:
+                        each_item["lut_exempted_value"] = "Yes"
+            if (lut == 0 and sez == 1):
+                item_details = frappe.db.get_value("Items", {"name":each_item["name"],"lut_exempted": 1}, "name")
+                if item_details:
+                    each_item["manual_edit"] = "Yes"
+                    each_item["lut_exempted_value"] = "Yes"
+                    # each_item["previous_lut_item"] = item_details.previous_lut_item
+            if (lut == 0 and sez == 0):
+                item_details = frappe.db.get_value("Items", {"name":each_item["name"],"lut_exempted": 1}, "name")
+                if item_details:
+                    each_item["is_manual_edit"] = "No"
+                # item_details = frappe.db.get_value("Items", {"name":each_item["name"],"previous_lut_item": 1}, "name")
+                # if item_details:
+                #     each_item["is_manual_edit"] = "No"
+                    # each_item["previous_lut_item"] = 0
+            # if "previous_lut_item" not in each_item:
+            #     each_item["previous_lut_item"] = frappe.db.get_value("Items", {"name":each_item["name"]}, "previous_lut_item")
+            
             if sez == 0:
                 if each_item["is_manual_edit"] == "Yes":
                     if "manual_edit" not in each_item:
+                        print("/////////////////")
                         each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                         total_items.append(each_item)
                         continue
                     else:
                         if each_item["manual_edit"] == "No":
+                            print("............")
                             each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                             total_items.append(each_item)
                             continue
@@ -449,7 +475,7 @@ def reprocess_calulate_items(data):
                             total_items_data["sgst"] = 0
                         elif sez == 1:
                             if sac_code_based_gst_rates.exempted == 0:
-                                if each_item["igst"] == 0 and each_item["lut_exempted"] == False:
+                                if each_item["igst"] == 0 and each_item["lut_exempted"] == 0:
                                     total_items_data["igst"] = sac_code_based_gst_rates.igst
                                 else:
                                     total_items_data["igst"] = float(each_item["igst"])
@@ -597,6 +623,9 @@ def reprocess_calulate_items(data):
                 total_items_data["item_value_after_gst"] = each_item["item_value_after_gst"]
                 total_items_data["line_edit_net"] = each_item["line_edit_net"]
                 total_items_data["lut_exempted"] = each_item["lut_exempted"]
+                total_items_data["previous_lut_item"] = each_item["previous_lut_item"]
+                if "lut_exempted_value" in each_item.keys():
+                    total_items_data["lut_exempted_value"] = each_item["lut_exempted_value"]
                 item_list.append(total_items_data)
         for service_charge_items in total_items:
             if service_charge_items["is_service_charge_item"] == "Yes":
@@ -630,10 +659,13 @@ def reprocess_calulate_items(data):
                 if percentage_gst["success"] == True:
                     acc_gst_percentage = percentage_gst["gst_percentage"]
                     acc_igst_percentage = percentage_gst["igst_percentage"]
-                    if item["lut_exempted"] == False and sez == 1:
-                        item["igst"] = percentage_gst["igst_percentage"]
+                    if item["lut_exempted"] == 0 and sez == 1:
+                        if "lut_exempted_value" in item:
+                            print(".........")
+                            item["igst"] = percentage_gst["igst_percentage"]
                 else:
                     {"success": False, "message": "error in slab helper function"}
+                print()
             service_charge_name = (companyDetails.sc_name)
             if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1 and item["manual_edit"] == "No"):
                 service_charge_name = service_charge_name.strip()
@@ -834,6 +866,7 @@ def reprocess_calulate_items(data):
                         service_dict['sgst_amount'] = 0
                         service_dict['other_charges'] = 0
                         service_dict["gst_rate"] = 0
+                        service_dict["previous_lut_item"] = 1
                         service_dict["lut_exempted"] = 1
             if sac_code_based_gst_rates.type == "Discount":
                 final_item['sac_code'] = 'No Sac'
@@ -868,6 +901,7 @@ def reprocess_calulate_items(data):
                         final_item['igst'] = 0
                         final_item['type'] = "Excempted"
                     else:
+                        print(".....................", acc_igst_percentage)
                         final_item['cgst'] = acc_gst_percentage/2
                         final_item['sgst'] = acc_gst_percentage/2
                         final_item['igst'] = acc_igst_percentage
@@ -978,6 +1012,7 @@ def reprocess_calulate_items(data):
                 final_item['other_charges'] = 0
                 final_item["gst_rate"] = 0
                 final_item["lut_exempted"] = 1
+                final_item["previous_lut_item"] = 1
                 final_item['item_value_after_gst'] = final_item['item_value']
             final_item['state_cess'] = item["state_cess"]
             if final_item['state_cess'] > 0:
@@ -1000,7 +1035,10 @@ def reprocess_calulate_items(data):
             final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
             if sez == 1 and sac_code_based_gst_rates.exempted == 1:
                 final_item['type'] = "Excempted"
-            total_items.append({
+            if "lut_exempted_value" in item:
+                if item["lut_exempted_value"] == "Yes":
+                    item["manual_edit"] = "No"
+            data_details = {
                 'doctype':
                 'Items',
                 'sac_code':
@@ -1065,7 +1103,9 @@ def reprocess_calulate_items(data):
                 "discount_value" : item["discount_value"],
                 "line_edit_net": item["net"],
                 "lut_exempted": item["lut_exempted"]
-            })
+            }
+            # data_details["previous_lut_item"] = item["previous_lut_item"]
+            total_items.append(data_details)
         total_items.extend(second_list)
         for xyz in total_items:
             xyz["date"] = datetime.datetime.strptime(xyz["date"],"%d-%m-%y").strftime('%Y-%m-%d %H:%M:%S')
