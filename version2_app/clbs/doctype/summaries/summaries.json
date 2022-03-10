@@ -14,7 +14,10 @@
   "phone_number",
   "land_line_number",
   "location",
-  "legal_name"
+  "legal_name",
+  "header",
+  "footer",
+  "terms_and_conditions"
  ],
  "fields": [
   {
@@ -77,11 +80,26 @@
    "fieldname": "legal_name",
    "fieldtype": "Data",
    "label": "Legal Name"
+  },
+  {
+   "fieldname": "header",
+   "fieldtype": "Text",
+   "label": "Header"
+  },
+  {
+   "fieldname": "footer",
+   "fieldtype": "Text",
+   "label": "Footer"
+  },
+  {
+   "fieldname": "terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "Terms and Conditions"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-08 15:43:43.249571",
+ "modified": "2022-03-10 08:53:26.830221",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
