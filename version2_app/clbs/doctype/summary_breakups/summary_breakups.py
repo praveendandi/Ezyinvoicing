@@ -74,6 +74,8 @@ def html_to_pdf(html_data, filename, name):
                                       data=payload_new, verify=False).json()
         if "file_url" in file_response["message"].keys():
             os.remove(file_path)
+        else:
+            return {"success": False, "message": "something went wrong"}    
         return {"success": True, "file_url": file_response["message"]["file_url"]}
     except Exception as e:
         frappe.log_error("Error in html_to_pdf: ", frappe.get_traceback())
@@ -85,13 +87,21 @@ def download_pdf(name):
         summary_format = summary_print_formats(name)
         if summary_format["success"] == False:
             return summary_format
+        file_urls = []
         if len(summary_format["html"]) > 0:
+            delete_files = frappe.db.delete("File", {"attached_to_name":name})
+            frappe.db.commit()
             for each in summary_format["html"]:
-                html_to_pdf = html_to_pdf(each[each["category"]])
-                print(html_to_pdf)
-            
+                get_pdf = html_to_pdf(each[each["category"]], each["category"], name)
+                if get_pdf["success"] == False:
+                    return get_pdf
+                file_urls.append({each["category"]: get_pdf["file_url"]})
+            return {"success": True, "files": file_urls}
+        else:
+            return {"success": False, "message": "no data found"}
     except Exception as e:
-        pass
+        frappe.log_error(str(e), "download_pdf")
+        return {"success": False, "message": str(e)}
 
 def extract_summary_breakups(filters, summary):
     try:
@@ -105,6 +115,7 @@ def extract_summary_breakups(filters, summary):
             invoice_doc = frappe.get_doc("Invoices", each.parent)
             each["invoice_category"] = invoice_doc.invoice_category
             each["invoice_file"] = invoice_doc.invoice_file
+            each["qr_code_image"] = invoice_doc.qr_code_image
             sac_category = frappe.db.get_value(
                 "SAC HSN CODES", each.description, "category")
             if sac_category:
@@ -137,7 +148,7 @@ def extract_summary_breakup_details(df, summaries):
         summary_breakup_details = df[df['service_type']
                                      == summaries["category"]]
         filter_food_columns = summary_breakup_details[["date", "parent", "sac_code", "item_value_after_gst",
-                                                       "item_taxable_value", "cgst_amount", "sgst_amount", "igst_amount", "gst_rate", "service_type", "description", "invoice_file"]]
+                                                       "item_taxable_value", "cgst_amount", "sgst_amount", "igst_amount", "gst_rate", "service_type", "description", "invoice_file", "qr_code_image"]]
         filter_food_columns.rename(columns={'parent': 'invoice_no', 'item_value_after_gst': 'amount', 'cgst_amount': 'cgst', "sgst_amount": "sgst", "igst_amount": "igst", "gst_rate": "tax",
                                             'item_taxable_value': 'base_amount', 'service_type': 'category', 'description': 'particulars'}, inplace=True)
         # filter_food_columns["parent"] = doc.name
@@ -183,6 +194,8 @@ def create_breakup_details(doc, details_data, summary):
             child_items["parent"] = doc.name
             invoice_file = child_items["invoice_file"]
             del child_items["invoice_file"]
+            qr_code_image = child_items["qr_code_image"]
+            del child_items["qr_code_image"]
             child_doc = frappe.get_doc(child_items)
             child_doc.insert()
             frappe.db.commit()
@@ -194,7 +207,7 @@ def create_breakup_details(doc, details_data, summary):
                 invoice_doc.save(
                     ignore_permissions=True, ignore_version=True)
                 document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
-                                               "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"]})
+                                               "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
                 document_doc.insert()
                 frappe.db.commit()
         return {"success": True}
@@ -258,21 +271,20 @@ def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
         get_invoices_under_summary = frappe.db.get_list(
             "Invoices", {"summary": summary}, pluck="name")
         if len(get_invoices_under_summary) > 0:
-            remaining_invoices = list(
-                set(get_invoices_under_summary)-set(deleted_invoices))
+            remaining_invoices = list(set(get_invoices_under_summary)-set(deleted_invoices))
+            frappe.db.delete("Summary Breakups", {"summaries": summary})
+            frappe.db.delete("Summary Documents", {"summary": summary})
+            frappe.db.commit()
+            update_invoice = update_invoices(
+                deleted_invoices, {"summary": None, "clbs_summary_generated": 0})
+            if update_invoice["success"] == False:
+                return update_invoice
             if len(remaining_invoices) > 0:
-                frappe.db.delete("Summary Breakups", {"summaries": summary})
-                frappe.db.delete("Summary Documents", {"summary": summary})
-                frappe.db.commit()
-                update_invoice = update_invoices(
-                    deleted_invoices, {"summary": None, "clbs_summary_generated": 0})
-                if update_invoice["success"] == False:
-                    return update_invoice
                 create_breakups = create_summary_breakup(
                     [["parent", "in", remaining_invoices]], summary)
                 if create_breakups["success"] == False:
                     return create_breakups
-                return {"success": True, "message": "Invoice is deleted from this summary"}
+            return {"success": True, "message": "Invoice is deleted from this summary"}
         else:
             return {"success": False, "message": "something went wrong"}
     except Exception as e:
