@@ -192,7 +192,6 @@ def extract_data(payload,company_doc):
 
 def give_print(text, ip, logo_path, qr_path,port,company_doc,added_text="",invoice_number="",short_url=''):
     try:
-        b = text.encode('utf-8')
         kitchen = Network(ip,int(port))  # Printer IP Address
         # kitchen = Network(ip)
         kitchen.set("CENTER", "A", "B")
@@ -208,7 +207,21 @@ def give_print(text, ip, logo_path, qr_path,port,company_doc,added_text="",invoi
         else:
             kitchen.set("CENTER", "A","B")
             kitchen.text('\n')
-        kitchen._raw(b)
+        b = (text).encode('utf-8')
+        split_amount = [each for each in text.split("\n") if re.match(company_doc.normal_check_total_amt_regex,each.strip())]
+        if len(split_amount) == 1:
+            split_string = text.split(split_amount[0])
+            if len(split_string) == 2:
+                kitchen.set("CENTER", "A")
+                kitchen._raw(split_string[0].encode('utf-8'))
+                kitchen.set("CENTER", "A","B",1,2)
+                kitchen._raw(split_amount[0].encode('utf-8'))
+                kitchen.set("CENTER", "A")
+                kitchen._raw(split_string[1].encode('utf-8'))
+            else:
+                kitchen._raw(b)
+        else:
+            kitchen._raw(b)
         kitchen.hw('INIT')
         kitchen.set("CENTER", "A", "B")
         if short_url!='':
@@ -324,7 +337,6 @@ def print_pos_bill(data):
             qr_path = path+outlet_values[0]["static_payment_qr_code"]
         else:
             qr_path = new_path+outlet_values[0]["static_payment_qr_code"]
-        b = (check_doc.payload).encode('utf-8')
         # b = (company_name+address+mobile+gst_details+check_doc.payload+"\n").encode('utf-8')
         kitchen = Network(printer_doc.printer_ip,int(printer_doc.port) if printer_doc.port != "" else 9100)  # Printer IP Address
         # kitchen = Network(printer_doc.printer_ip)
@@ -341,7 +353,23 @@ def print_pos_bill(data):
         else:
             kitchen.set("CENTER", "A","B")
             kitchen.text('\n')
-        kitchen._raw(b)
+        payload_text = check_doc.payload
+        split_amount = [each for each in payload_text.split("\n") if re.match(company_doc.normal_check_total_amt_regex,each.strip())]
+        if len(split_amount) == 1:
+            split_string = payload_text.split(split_amount[0])
+            if len(split_string) == 2:
+                kitchen.set("CENTER", "A")
+                kitchen._raw(split_string[0].encode('utf-8'))
+                kitchen.set("CENTER", "A","B",1,2)
+                kitchen._raw(split_amount[0].encode('utf-8'))
+                kitchen.set("CENTER", "A")
+                kitchen._raw(split_string[1].encode('utf-8'))
+            else:
+                b = (payload_text).encode('utf-8')
+                kitchen._raw(b)
+        else:
+            b = (payload_text).encode('utf-8')
+            kitchen._raw(b)
         kitchen.hw('INIT')
         kitchen.set("CENTER", "A", "B")
         if check_doc.check_type == "Normal Check":
