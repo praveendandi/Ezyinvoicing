@@ -1102,8 +1102,8 @@ def insert_invoice(data):
                     roundoff_amount = 0
                     data['invoice_round_off_amount'] = 0
                     pms_invoice_summary = data['total_invoice_amount']
-                    other_charges = data['total_invoice_amount']
-                    other_charges_before_tax = data["total_invoice_amount"]
+                    # other_charges = data['total_invoice_amount']
+                    # other_charges_before_tax = data["total_invoice_amount"]
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)

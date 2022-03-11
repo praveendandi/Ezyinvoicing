@@ -90,6 +90,7 @@ def Reinitiate_invoice(data):
             for item in data['items_data']:
                 if item['taxable'] == 'No' and item['item_type'] != "Discount":
                     other_charges += float(item['item_value_after_gst'])
+                    print(item["taxable"],"---------------",item['item_value_after_gst'])
                     other_charges_before_tax += float(item['item_value'])
                     total_vat_amount += float(item['vat_amount'])
                 elif item['taxable']=="No" and item['item_type']=="Discount":
@@ -324,7 +325,7 @@ def Reinitiate_invoice(data):
                 doc.invoice_object_from_file = data['invoice_object_from_file']
         doc.save()
         
-
+        print(doc.as_dict(),"========")
         items = data['items_data']
         # items = [x for x in items if x['sac_code']!="Liquor"]
 
