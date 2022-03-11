@@ -322,13 +322,17 @@ def get_summary_breakup(summary=None):
                     breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[
                                                          ["parent", "=", each["name"]]], fields=["*"])
                     each["summary_breakup_details"] = breakup_details
+                    get_breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[["parent", "=",  each["name"]]], fields=[
+                                                    "sum(base_amount) as base_amount", "sum(cgst)+sum(sgst)+sum(igst) as gst_amount", "sum(amount) as total_amount","sum(cgst) as cgst", "sum(sgst) as sgst", "sum(igst) as igst", "tax", "category"], group_by="tax, category")
+                    each["gst_details"] = get_breakup_details
                 get_summary_info = get_summary(summary)
                 if get_summary_info["success"] == False:
                     return get_summary_info
-                gst_summary = get_gst_summary(summary)
-                if gst_summary["success"] == False:
-                    return gst_summary
-                return {"success": True, "data": get_summary_breakups, "summary_info": get_summary_info["data"],"gst_summary": gst_summary["data"], "get_totals": gst_summary["get_totals"]}
+                # gst_summary = get_gst_summary(summary)
+                # if gst_summary["success"] == False:
+                #     return gst_summary
+                
+                return {"success": True, "data": get_summary_breakups, "summary_info": get_summary_info["data"]}
             else:
                 return {"success": False, "message": "summary breakups not found"}
         else:
@@ -345,10 +349,10 @@ def get_gst_summary(summaries):
             "Summary Breakups", {"summaries": summaries}, pluck="name")
         if len(get_summary_breakups) > 0:
             get_breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[["parent", "in", get_summary_breakups]], fields=[
-                                                    "sum(base_amount) as base_amount", "sum(amount) as total_amount","sum(cgst) as cgst", "sum(sgst) as sgst", "sum(igst) as igst", "tax"], group_by="tax")
-            get_total = frappe.db.get_value("Summary Breakup Details", {"parent":["in", get_summary_breakups]}, [
-                                                    "sum(base_amount) as base_amount","sum(cgst)+sum(sgst)+sum(igst) as gst_amount", "sum(amount) as total_amount"], as_dict=1)
-            return {"success": True, "data": get_breakup_details, "get_totals": get_total}
+                                                    "sum(base_amount) as base_amount", "sum(cgst)+sum(sgst)+sum(igst) as gst_amount", "sum(amount) as total_amount","sum(cgst) as cgst", "sum(sgst) as sgst", "sum(igst) as igst", "tax", "category"], group_by="tax, category")
+            # get_total = frappe.db.get_value("Summary Breakup Details", {"parent":["in", get_summary_breakups]}, [
+            #                                         "sum(base_amount) as base_amount","sum(cgst)+sum(sgst)+sum(igst) as gst_amount", "sum(amount) as total_amount"], as_dict=1)
+            return {"success": True, "data": get_breakup_details}
         else:
             return {"success": False, "message": "no data found"}
     except Exception as e:

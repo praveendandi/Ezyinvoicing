@@ -17,7 +17,7 @@ def get_summary(name):
     try:
         get_summary = frappe.db.get_value('Summaries', name, ["summary_title", "between_dates", "tax_payer_details", "location", "header", "footer", "terms_and_conditions"], as_dict=1)
         tax_payer_details = frappe.db.get_value('TaxPayerDetail', get_summary["tax_payer_details"], ["legal_name"], as_dict=1)
-        tax_payer_location = frappe.db.get_value("Taxpayer Locations", get_summary["location"],["location","address","city","state","pin_code"])
+        tax_payer_location = frappe.db.get_value("Taxpayer Locations", get_summary["location"],["address","location","city","state","pin_code"])
         total_data = get_summary.update(tax_payer_details)
         if tax_payer_location:
             total_data["location"] = ", ".join(tax_payer_location)
