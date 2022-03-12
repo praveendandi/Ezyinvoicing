@@ -23,7 +23,8 @@
   "column_break_16",
   "oci",
   "images_section",
-  "images"
+  "images",
+  "ocr_process_status"
  ],
  "fields": [
   {
@@ -120,11 +121,17 @@
   {
    "fieldname": "column_break_16",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ocr_process_status",
+   "fieldtype": "Select",
+   "label": "ocr process status",
+   "options": "Pending\nFailed\nSuccess"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-07 15:09:12.969076",
+ "modified": "2022-03-12 18:09:30.971109",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Dropbox",
