@@ -13,7 +13,7 @@ from frappe.utils.background_jobs import enqueue
 from version2_app.passport_scanner.doctype.dropbox.ocr_details import scan_aadhar
 import datetime
 import re
-from frappe.utils import format_date
+from frappe.utils.data import format_datetime
 import time
 
 
@@ -398,7 +398,7 @@ def create_guest_update_precheckin_details(details, dropbox):
                     aadhar_details["guest_full_name"] = details[key]
                     aadhar_details["given_name"] = details[key]
             elif key == 'DOB':
-                aadhar_details["date_of_birth"] = format_date(details[key],'yyyy/mm/dd')
+                aadhar_details["date_of_birth"] = format_datetime(details[key],'yyyy/mm/dd')
             elif key == 'GENDER':
                 aadhar_details["gender"] = 'M' if details[key] == 'Male' else 'F'
             elif key == 'STATE':
