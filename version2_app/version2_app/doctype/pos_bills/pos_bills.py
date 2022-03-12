@@ -54,9 +54,7 @@ def create_pos_bills(bills):
         # bill_exist = frappe.db.exists({'doctype': 'Pos Bills', 'check_number': bills['check_no']})
         bill_exist = frappe.db.get_value(
             'Pos Bills', {'check_number': bills['check_no']}, ['name'])
-        print(bill_exist,bills['check_no'],"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^66")
         if bill_exist is None:
-            print("If&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
             doc = frappe.get_doc({
                 'doctype': 'Pos Bills',
                 'check_number': bills['check_no'],

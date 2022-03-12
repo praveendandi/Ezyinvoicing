@@ -30,6 +30,7 @@ def Reinitiate_invoice(data):
         total_invoice_amount = data['total_invoice_amount']
         # del data['total_invoice_amount']
         company = frappe.get_doc('company',data['company_code'])
+        invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
         if "place_of_supply" in data.keys():
             place_of_supply = data['place_of_supply']
         else:
@@ -206,6 +207,7 @@ def Reinitiate_invoice(data):
 
 
         doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+        
         # if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
         # 	data['guest_data']['invoice_category'] = "Debit Invoice"
         # 	invoice_category = "Debit Invoice"
@@ -226,6 +228,10 @@ def Reinitiate_invoice(data):
         doc.invoice_date=datetime.datetime.strptime(data['guest_data']['invoice_date'],'%d-%b-%y %H:%M:%S')
         doc.legal_name=data['taxpayer']['legal_name']
         doc.address_1=data['taxpayer']['address_1']
+        if "lut" in data:
+            doc.lut = data["lut"]
+        else:
+            doc.lut = doc.lut
         doc.email=data['taxpayer']['email']
         doc.confirmation_number = data['guest_data']['confirmation_number']
         doc.trade_name=data['taxpayer']['trade_name']
@@ -277,8 +283,7 @@ def Reinitiate_invoice(data):
 
         doc.irn_generated=irn_generated
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
-        print(data['total_invoice_amount'],pms_invoice_summary, other_charges,"==================")
-        if converted_from_tax_invoices_to_manual_tax_invoices == "No" and invoice_from != "Web": 
+        if converted_from_tax_invoices_to_manual_tax_invoices == "No" and invoice_from != "Web" and doc.lut == 0:
             if len(data['items_data'])==0:
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
@@ -296,7 +301,7 @@ def Reinitiate_invoice(data):
                 # 	doc.irn_generated ="Pending"
                 # 	doc.ready_to_generate_irn = "Yes"		
         else:
-            if len(data['items_data'])==0 and data['total_invoice_amount'] == 0 and invoice_from != "Web":
+            if len(data['items_data'])==0 and data['total_invoice_amount'] == 0 and invoice_from != "Web" and doc.lut == 0:
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
                 generateb2cQr = False
@@ -384,15 +389,45 @@ def reprocess_calulate_items(data):
             sez = data["sez"]
         else:
             sez = 0
+        if "lut" in data.keys():
+            lut = data["lut"]
+        else:
+            lut = invoice_details.lut
+        if sez == 0 and lut == 1:
+            lut = 0
         for each_item in data['items_data']:
+            if (lut == 1 and sez == 1):
+                item_details = frappe.db.get_value("Items", {"name":each_item["name"],"lut_exempted": 1}, "lut_exempted")
+                if item_details:
+                    if item_details != each_item["lut_exempted"]:
+                        each_item["lut_exempted_value"] = "Yes"
+            if (lut == 0 and sez == 1):
+                item_details = frappe.db.get_value("Items", {"name":each_item["name"],"lut_exempted": 1}, "name")
+                if item_details:
+                    each_item["manual_edit"] = "Yes"
+                    each_item["lut_exempted_value"] = "Yes"
+                    # each_item["previous_lut_item"] = item_details.previous_lut_item
+            if (lut == 0 and sez == 0):
+                item_details = frappe.db.get_value("Items", {"name":each_item["name"],"lut_exempted": 1}, "name")
+                if item_details:
+                    each_item["is_manual_edit"] = "No"
+                # item_details = frappe.db.get_value("Items", {"name":each_item["name"],"previous_lut_item": 1}, "name")
+                # if item_details:
+                #     each_item["is_manual_edit"] = "No"
+                    # each_item["previous_lut_item"] = 0
+            # if "previous_lut_item" not in each_item:
+            #     each_item["previous_lut_item"] = frappe.db.get_value("Items", {"name":each_item["name"]}, "previous_lut_item")
+            
             if sez == 0:
                 if each_item["is_manual_edit"] == "Yes":
                     if "manual_edit" not in each_item:
+                        print("/////////////////")
                         each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                         total_items.append(each_item)
                         continue
                     else:
                         if each_item["manual_edit"] == "No":
+                            print("............")
                             each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                             total_items.append(each_item)
                             continue
@@ -441,7 +476,10 @@ def reprocess_calulate_items(data):
                             total_items_data["sgst"] = 0
                         elif sez == 1:
                             if sac_code_based_gst_rates.exempted == 0:
-                                total_items_data["igst"] = float(each_item["igst"])
+                                if each_item["igst"] == 0 and each_item["lut_exempted"] == 0:
+                                    total_items_data["igst"] = sac_code_based_gst_rates.igst
+                                else:
+                                    total_items_data["igst"] = float(each_item["igst"])
                                 total_items_data["cgst"] = 0
                                 total_items_data["sgst"] = 0
                             else:
@@ -585,6 +623,10 @@ def reprocess_calulate_items(data):
                 total_items_data["sac_index"] = sac_code_based_gst_rates.sac_index
                 total_items_data["item_value_after_gst"] = each_item["item_value_after_gst"]
                 total_items_data["line_edit_net"] = each_item["line_edit_net"]
+                total_items_data["lut_exempted"] = each_item["lut_exempted"]
+                total_items_data["previous_lut_item"] = each_item["previous_lut_item"]
+                if "lut_exempted_value" in each_item.keys():
+                    total_items_data["lut_exempted_value"] = each_item["lut_exempted_value"]
                 item_list.append(total_items_data)
         for service_charge_items in total_items:
             if service_charge_items["is_service_charge_item"] == "Yes":
@@ -618,8 +660,13 @@ def reprocess_calulate_items(data):
                 if percentage_gst["success"] == True:
                     acc_gst_percentage = percentage_gst["gst_percentage"]
                     acc_igst_percentage = percentage_gst["igst_percentage"]
+                    if item["lut_exempted"] == 0 and sez == 1:
+                        if "lut_exempted_value" in item:
+                            print(".........")
+                            item["igst"] = percentage_gst["igst_percentage"]
                 else:
                     {"success": False, "message": "error in slab helper function"}
+                print()
             service_charge_name = (companyDetails.sc_name)
             if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1 and item["manual_edit"] == "No"):
                 service_charge_name = service_charge_name.strip()
@@ -805,7 +852,23 @@ def reprocess_calulate_items(data):
                     service_dict["is_service_charge_item"] = item["service_charge"]
                     service_dict["exempted"] = sac_code_based_gst_rates.exempted
                     service_dict["discount_value"] = 0
-                    second_list.append(service_dict)
+                    service_dict["lut_exempted"] = item
+                    if lut == 1 and item["lut_exempted"] == True and data["sez"] == 1:
+                        # print(data["total_inovice_amount"], final_item['igst_amount'], "..............")
+                        # data["total_inovice_amount"] = data["total_inovice_amount"]-service_dict['igst_amount']
+                        # print(data["total_inovice_amount"], final_item['igst_amount'], "..............")
+                        service_dict['item_value_after_gst'] =  service_dict['item_value']
+                        service_dict["sgst"] = 0
+                        service_dict["cgst"] = 0
+                        service_dict["igst"] = 0
+                        service_dict['type'] = "Excempted"
+                        service_dict['cgst_amount'] = 0
+                        service_dict['igst_amount'] = 0
+                        service_dict['sgst_amount'] = 0
+                        service_dict['other_charges'] = 0
+                        service_dict["gst_rate"] = 0
+                        service_dict["previous_lut_item"] = 1
+                        service_dict["lut_exempted"] = 1
             if sac_code_based_gst_rates.type == "Discount":
                 final_item['sac_code'] = 'No Sac'
                 final_item['sac_code_found'] = 'No'
@@ -839,6 +902,7 @@ def reprocess_calulate_items(data):
                         final_item['igst'] = 0
                         final_item['type'] = "Excempted"
                     else:
+                        print(".....................", acc_igst_percentage)
                         final_item['cgst'] = acc_gst_percentage/2
                         final_item['sgst'] = acc_gst_percentage/2
                         final_item['igst'] = acc_igst_percentage
@@ -935,6 +999,22 @@ def reprocess_calulate_items(data):
                         final_item['item_mode'] = ItemMode
                     else:
                         final_item['item_mode'] = "Debit"
+            if lut == 1 and item["lut_exempted"] == True and data["sez"] == 1:
+                # print(data["total_inovice_amount"], final_item['igst_amount'], "..............")
+                # data["total_inovice_amount"] = data["total_inovice_amount"]-final_item['igst_amount']
+                # print(data["total_inovice_amount"], final_item['igst_amount'], "//////////")
+                final_item["sgst"] = 0
+                final_item["cgst"] = 0
+                final_item["igst"] = 0
+                final_item['type'] = "Excempted"
+                final_item['cgst_amount'] = 0
+                final_item['igst_amount'] = 0
+                final_item['sgst_amount'] = 0
+                final_item['other_charges'] = 0
+                final_item["gst_rate"] = 0
+                final_item["lut_exempted"] = 1
+                final_item["previous_lut_item"] = 1
+                final_item['item_value_after_gst'] = final_item['item_value']
             final_item['state_cess'] = item["state_cess"]
             if final_item['state_cess'] > 0:
                 final_item["state_cess_amount"] = (item["item_value"]*(final_item['state_cess']/100))
@@ -956,7 +1036,10 @@ def reprocess_calulate_items(data):
             final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
             if sez == 1 and sac_code_based_gst_rates.exempted == 1:
                 final_item['type'] = "Excempted"
-            total_items.append({
+            if "lut_exempted_value" in item:
+                if item["lut_exempted_value"] == "Yes":
+                    item["manual_edit"] = "No"
+            data_details = {
                 'doctype':
                 'Items',
                 'sac_code':
@@ -1019,12 +1102,15 @@ def reprocess_calulate_items(data):
                 'quantity': item["quantity"],
                 'unit_of_measurement_description': item["unit_of_measurement_description"],
                 "discount_value" : item["discount_value"],
-                "line_edit_net": item["net"]
-            })
+                "line_edit_net": item["net"],
+                "lut_exempted": item["lut_exempted"]
+            }
+            # data_details["previous_lut_item"] = item["previous_lut_item"]
+            total_items.append(data_details)
         total_items.extend(second_list)
         for xyz in total_items:
             xyz["date"] = datetime.datetime.strptime(xyz["date"],"%d-%m-%y").strftime('%Y-%m-%d %H:%M:%S')
-        final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply})
+        final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply,"lut":lut})
         reinitiate = Reinitiate_invoice(final_data)
         doc_inv = frappe.get_doc("Invoices",data["invoice_number"])
         doc_inv.sez = sez
