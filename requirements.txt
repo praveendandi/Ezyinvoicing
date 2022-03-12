@@ -19,4 +19,5 @@ pytesseract
 pdf2image
 pytesseract
 WeasyPrint==52
+html2text
 # opencv-python

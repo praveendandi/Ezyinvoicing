@@ -13,6 +13,7 @@ import frappe
 import pandas as pd
 import pdfkit
 import requests
+from frappe.core.doctype.communication.email import make
 from frappe.model.document import Document
 from frappe.utils import cstr
 from weasyprint import HTML
@@ -428,3 +429,25 @@ def submit_summary(summary):
     except Exception as e:
         frappe.log_error(str(e), "submit_summary")
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)    
+def send_summary_mail(data):
+    try:
+        files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
+        if not files:
+            generate_pdf = download_pdf(data["summary"])
+            if generate_pdf["success"] == False:
+                return generate_pdf
+        response = make(recipients = data["email"],
+            subject = data["subject"],
+            content = data["response"],
+            doctype = None,
+            name = None,
+            attachments = json.dumps(files),
+            send_email=1
+        )
+        return {"success": True, "message": "Mail Send"}
+    except Exception as e:
+        frappe.log_error(str(e), "get_summary")
+        return{"success": False,"message": str(e)}

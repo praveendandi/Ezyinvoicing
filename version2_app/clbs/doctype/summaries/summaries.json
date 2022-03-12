@@ -95,7 +95,7 @@
   },
   {
    "fieldname": "terms_and_conditions",
-   "fieldtype": "Text",
+   "fieldtype": "Markdown Editor",
    "label": "Terms and Conditions"
   },
   {
@@ -114,7 +114,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 12:15:55.572217",
+ "modified": "2022-03-12 19:22:24.881766",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
