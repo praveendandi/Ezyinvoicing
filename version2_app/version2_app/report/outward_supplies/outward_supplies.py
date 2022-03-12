@@ -11,11 +11,19 @@ import traceback
 def execute(filters=None):
 	try:
 		# print(filters,"======")
-		pd.set_option("display.max_rows", None, "display.max_columns", None)
-		columns = ["Invoice Number","Document Type","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges"]
-		
-		fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges"]
-		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
+		company_data=frappe.db.get_all("company",fields=["*"])
+		if company_data[0]["show_pending_invoices_in_reports"]==1:
+			pd.set_option("display.max_rows", None, "display.max_columns", None)
+			columns = ["Invoice Number","Document Type","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges"]
+			
+			fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges"]
+			doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
+		else:
+			pd.set_option("display.max_rows", None, "display.max_columns", None)
+			columns = ["Invoice Number","Document Type","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges"]
+			
+			fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges"]
+			doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']},fields=fields,as_list=True)
 		if len(doc) == 0:
 			data = []
 			columns = []
