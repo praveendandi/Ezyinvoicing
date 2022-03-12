@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 import json
 import os
 from datetime import datetime, timedelta
-# import weasyprint as wp
 from pathlib import Path
 
 import frappe
@@ -19,7 +18,6 @@ from frappe.utils import cstr
 from weasyprint import HTML
 
 from version2_app.clbs.doctype.summaries.summaries import get_summary
-# from xhtml2pdf import pisa
 
 
 class SummaryBreakups(Document):
@@ -53,7 +51,7 @@ def summary_print_formats(name):
         else:
             return {"success": False, "message": "data not found"}
     except Exception as e:
-        frappe.log_error("Error in create_html_to_pdf: ",
+        frappe.log_error("Error in summary_print_formats: ",
                          frappe.get_traceback())
         return {"success": False, "message": str(e)}
 
@@ -137,8 +135,8 @@ def extract_summary_breakups(filters, summary):
             each['summaries'] = summary
             total_items.append(each)
         df = pd.DataFrame.from_records(total_items)
-        data = df.groupby(['service_type','invoice_number'], as_index=False).agg(
-            {"Date_string": 'first', "service_type": 'first', "invoice_category": 'first', "item_value_after_gst": 'sum', "company": 'first', "summaries": 'first','invoice_number': 'first'})
+        data = df.groupby(['service_type', 'invoice_number'], as_index=False).agg(
+            {"Date_string": 'first', "service_type": 'first', "invoice_category": 'first', "item_value_after_gst": 'sum', "company": 'first', "summaries": 'first', 'invoice_number': 'first'})
         data.rename(columns={'Date_string': 'date', 'service_type': 'category',
                     'invoice_category': 'invoice_type', 'item_value_after_gst': 'amount'}, inplace=True)
         data = data.to_dict('records')
@@ -174,7 +172,7 @@ def extract_summary_breakup_details(df, summaries):
 def create_summary_breakups(summaries, summary):
     try:
         get_existing_breakup = frappe.db.get_value("Summary Breakups", {
-            "category": summaries["category"], "summaries": summary, "invoice_number": summaries["invoice_number"],}, ["name", "amount"], as_dict=True)
+            "category": summaries["category"], "summaries": summary, "invoice_number": summaries["invoice_number"], }, ["name", "amount"], as_dict=True)
         if get_existing_breakup:
             doc = frappe.get_doc(
                 "Summary Breakups", get_existing_breakup["name"])
@@ -279,7 +277,8 @@ def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
             remaining_invoices = list(
                 set(get_invoices_under_summary)-set(deleted_invoices))
             frappe.db.delete("Summary Breakups", {"summaries": summary})
-            frappe.db.delete("Summary Documents", {"invoice_number": ["in", deleted_invoices]})
+            frappe.db.delete("Summary Documents", {
+                             "invoice_number": ["in", deleted_invoices]})
             frappe.db.commit()
             update_invoice = update_invoices(
                 deleted_invoices, {"summary": None, "clbs_summary_generated": 0})
@@ -328,28 +327,30 @@ def get_summary_breakup(summary=None):
                 "Summary Breakups", filters=[["summaries", "=", summary]], fields=["*"])
             if len(get_summary_breakups) > 0:
                 breakup_details_data = []
-                breakups_names = frappe.db.get_list("Summary Breakups",filters=[["summaries", "=", summary]], pluck="name")
-                breakups_categories = frappe.db.get_list("Summary Breakups",filters=[["summaries", "=", summary]], pluck="category")
+                breakups_names = frappe.db.get_list("Summary Breakups", filters=[
+                                                    ["summaries", "=", summary]], pluck="name")
+                breakups_categories = frappe.db.get_list("Summary Breakups", filters=[
+                                                         ["summaries", "=", summary]], pluck="category")
                 if len(breakups_categories) > 0:
                     breakups_categories = list(set(breakups_categories))
                     details = {}
-                    
+
                     for each in breakups_categories:
                         details = {}
                         breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[
-                                                            ["parent", "in", breakups_names], ["category", "=", each]], fields=["*"])
+                            ["parent", "in", breakups_names], ["category", "=", each]], fields=["*"])
                         details["category"] = each
                         details["breakup_details"] = breakup_details
-                        get_breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[["parent", "in",breakups_names], ["category","=",each]], fields=[
+                        get_breakup_details = frappe.db.get_list("Summary Breakup Details", filters=[["parent", "in", breakups_names], ["category", "=", each]], fields=[
                             "sum(cgst) as cgst", "sum(sgst) as sgst", "sum(igst) as igst", "tax", "category"], group_by="tax, category")
                         details["gst_details"] = get_breakup_details
-                        get_total = frappe.db.get_value("Summary Breakup Details", {"parent": ["in", breakups_names], "category": each},[
+                        get_total = frappe.db.get_value("Summary Breakup Details", {"parent": ["in", breakups_names], "category": each}, [
                             "sum(base_amount) as base_amount", "sum(cgst)+sum(sgst)+sum(igst) as gst_amount", "sum(amount) as total_amount"], as_dict=True)
                         details["get_total"] = get_total
                         breakup_details_data.append(details)
-                return {"success": True, "data": get_summary_breakups, "breakup_details_data":breakup_details_data, "summary_info": get_summary_info["data"]}
+                return {"success": True, "data": get_summary_breakups, "breakup_details_data": breakup_details_data, "summary_info": get_summary_info["data"]}
             else:
-                return {"success": True, "summary_info": get_summary_info["data"], "data":[]}
+                return {"success": True, "summary_info": get_summary_info["data"], "data": []}
         else:
             return {"success": False, "message": "summary not found"}
     except Exception as e:
@@ -378,18 +379,52 @@ def get_gst_summary(summaries):
 @frappe.whitelist(allow_guest=True)
 def update_summary(data, name):
     try:
-        if not frappe.db.exists({'doctype': 'Summaries',"name":name,"from_date":data["from_date"], "to_date":data["to_date"]}):
-            get_invoices = frappe.db.get_list("Invoices", filters={"summary":name}, pluck="name")
-            if len(get_invoices)>0:
-                update_invoice = update_invoices(get_invoices, {"summary": None, "clbs_summary_generated": 0})
+        if not frappe.db.exists({'doctype': 'Summaries', "name": name, "from_date": data["from_date"], "to_date": data["to_date"]}):
+            get_invoices = frappe.db.get_list(
+                "Invoices", filters={"summary": name}, pluck="name")
+            if len(get_invoices) > 0:
+                update_invoice = update_invoices(
+                    get_invoices, {"summary": None, "clbs_summary_generated": 0})
                 if update_invoice["success"] == False:
                     return update_invoice
-            if frappe.db.exists({'doctype': 'Summary Breakups','summaries': name}):
+            if frappe.db.exists({'doctype': 'Summary Breakups', 'summaries': name}):
                 frappe.db.delete("Summary Breakups", {"summaries": name})
                 frappe.db.delete("Summary Documents", {"summary": name})
         frappe.db.set_value('Summaries', name, data)
         frappe.db.commit()
-        return {"success":True, "message": "updated successfully"}
+        return {"success": True, "message": "updated successfully"}
     except Exception as e:
         frappe.log_error(str(e), "update_summary")
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def submit_summary(summary):
+    try:
+        if frappe.db.exists({"doctype": "Summaries", "name": summary}):
+            if frappe.db.exists({"doctype": "Summary Breakups", "summaries": summary}):
+                if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
+                    frappe.db.set_value("Summaries", summary, {
+                                        "status": "Submitted"})
+                    frappe.db.commit()
+                    get_invoices = frappe.db.get_list(
+                        "Invoices", filters=[["summary", "=", summary]], pluck="name")
+                    invoices_update = update_invoices(
+                        get_invoices, {"invoice_submitted_in_clbs": 1})
+                    if invoices_update["success"] == False:
+                        frappe.db.set_value("Summaries", summary, {
+                                            "status": "Draft"})
+                        frappe.db.commit()
+                        update_invoices(
+                            get_invoices, {"invoice_submitted_in_clbs": 0})
+                        return invoices_update
+                    return {"success": True, "message": "Summary submitted"}
+                else:
+                    return {"success": False, "message": "something went wrong"}
+            else:
+                return {"success": False, "message": "no data found in summary breakups"}
+        else:
+            return {"success": False, "message": "no data found in summaries"}
+    except Exception as e:
+        frappe.log_error(str(e), "submit_summary")
         return {"success": False, "message": str(e)}

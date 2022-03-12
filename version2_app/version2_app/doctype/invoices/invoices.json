@@ -142,7 +142,8 @@
   "signature",
   "amount_in_word",
   "summary",
-  "clbs_summary_generated"
+  "clbs_summary_generated",
+  "invoice_submitted_in_clbs"
  ],
  "fields": [
   {
@@ -929,12 +930,18 @@
    "fieldname": "clbs_summary_generated",
    "fieldtype": "Check",
    "label": "CLBS Summary Generated"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_submitted_in_clbs",
+   "fieldtype": "Check",
+   "label": "Invoice Submitted in CLBS"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-03-02 15:49:06.047144",
+ "modified": "2022-03-12 12:41:56.087107",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

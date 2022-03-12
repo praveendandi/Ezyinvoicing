@@ -144,7 +144,8 @@
   "ipp_printer_file_path",
   "summary_header",
   "summary_terms_and_conditions",
-  "summary_footer"
+  "summary_footer",
+  "clbs"
  ],
  "fields": [
   {
@@ -931,11 +932,17 @@
    "fieldname": "summary_footer",
    "fieldtype": "Text",
    "label": "Summary Footer"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
+   "fieldtype": "Check",
+   "label": "CLBS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-10 08:28:50.040527",
+ "modified": "2022-03-12 14:09:46.709813",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

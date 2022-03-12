@@ -18,7 +18,8 @@
   "header",
   "footer",
   "terms_and_conditions",
-  "contacts"
+  "contacts",
+  "status"
  ],
  "fields": [
   {
@@ -102,11 +103,18 @@
    "fieldname": "contacts",
    "fieldtype": "Data",
    "label": "Contacts"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nSubmitted"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-11 12:24:39.138312",
+ "modified": "2022-03-12 12:15:55.572217",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
