@@ -249,8 +249,8 @@ def extract_text(data: dict):
 
         if data['image_2']:
             image_2_response = requests.post(
-                # company.detection_api, json={"base": data['image_2'], "thresh": thresh,"class":data['back_detected_doc_type']})
-                company.detection_api, json={"base": data['image_2'], "thresh": thresh,"class":'printed_visa'})
+                company.detection_api, json={"base": data['image_2'], "thresh": thresh,"class":data['back_detected_doc_type']})
+                # company.detection_api, json={"base": data['image_2'], "thresh": thresh,"class":'printed_visa'})
             try:
                 image_2_response = image_2_response.json()
                 # print(image_2_response)
