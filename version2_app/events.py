@@ -35,7 +35,7 @@ from requests.exceptions import RetryError
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 from frappe.core.doctype.communication.email import make
-from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
+# from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 
 user_name = frappe.session.user
 
