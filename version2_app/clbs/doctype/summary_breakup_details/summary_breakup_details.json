@@ -22,7 +22,8 @@
   "no_of_nights",
   "no_of_guests",
   "room_rate",
-  "category"
+  "category",
+  "summary"
  ],
  "fields": [
   {
@@ -125,12 +126,18 @@
    "fieldname": "tax",
    "fieldtype": "Int",
    "label": "Tax %"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Link",
+   "label": "Summary",
+   "options": "Summaries"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-07 10:49:56.614958",
+ "modified": "2022-03-12 11:03:18.740631",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakup Details",

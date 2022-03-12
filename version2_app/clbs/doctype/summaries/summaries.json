@@ -17,7 +17,8 @@
   "legal_name",
   "header",
   "footer",
-  "terms_and_conditions"
+  "terms_and_conditions",
+  "contacts"
  ],
  "fields": [
   {
@@ -95,11 +96,17 @@
    "fieldname": "terms_and_conditions",
    "fieldtype": "Text",
    "label": "Terms and Conditions"
+  },
+  {
+   "default": "[]",
+   "fieldname": "contacts",
+   "fieldtype": "Data",
+   "label": "Contacts"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-10 08:53:26.830221",
+ "modified": "2022-03-11 12:24:39.138312",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",

@@ -728,10 +728,10 @@ def fetch_invoice_details(filters=[]):
 
 def summaries_insert(doc, method=None):
     try:
-        start_date = datetime.datetime.strptime("%Y-%m-%d",doc.from_date).strftime("%d %B %Y")
-        end_date = datetime.datetime.strptime("%Y-%m-%d", doc.to_date).strftime("%d %B %Y")
-        print(start_date+" to "+end_date,"////////////////")
+        start_date = datetime.datetime.strptime(doc.from_date,"%Y-%m-%d").strftime("%d %B %Y")
+        end_date = datetime.datetime.strptime(doc.to_date,"%Y-%m-%d").strftime("%d %B %Y")
         doc.between_dates = start_date+" to "+end_date
         doc.save(ignore_permissions=True, ignore_version=True)
     except Exception as e:
+        frappe.log_error(str(e), "summaries_insert")
         return {"Success":False,"message":str(e)}

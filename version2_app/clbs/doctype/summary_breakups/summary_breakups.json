@@ -11,7 +11,8 @@
   "amount",
   "company",
   "summaries",
-  "summary_breakup_details"
+  "summary_breakup_details",
+  "invoice_number"
  ],
  "fields": [
   {
@@ -25,14 +26,16 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Food\nRooms\nMiscellaneous"
+   "options": "Food\nRooms\nMiscellaneous",
+   "reqd": 1
   },
   {
    "fieldname": "invoice_type",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Invoice Type",
-   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice"
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice",
+   "reqd": 1
   },
   {
    "fieldname": "amount",
@@ -44,7 +47,8 @@
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "company"
+   "options": "company",
+   "reqd": 1
   },
   {
    "fieldname": "summaries",
@@ -57,11 +61,16 @@
    "fieldtype": "Table",
    "label": "Summary Breakup Details",
    "options": "Summary Breakup Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-07 10:30:19.069443",
+ "modified": "2022-03-12 09:56:40.060307",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",
