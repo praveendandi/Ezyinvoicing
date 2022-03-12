@@ -13,7 +13,7 @@ from frappe.utils.background_jobs import enqueue
 from version2_app.passport_scanner.doctype.dropbox.ocr_details import scan_aadhar
 import datetime
 import re
-# from frappe.utils.data import format_date
+from frappe.utils import format_date
 import time
 
 
@@ -231,7 +231,7 @@ def extract_text(data: dict):
                                              "base": data['image_1'], "thresh": thresh,"class":data['front_detected_doc_type']})
             try:
                 image_1_response = image_1_response.json()
-                print(image_1_response)
+                # print(image_1_response)
                 for key in image_1_response:
                     if 'aadhar_no_details' in key:
                         if image_1_response[key]:
@@ -348,8 +348,9 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         new_guest_details = frappe.get_doc(guest_details)
         new_guest_details.insert()
         print(guest_details,"guest deatils")
+        frappe.db.set_value('Task', 'TASK00002', 'subject', 'New Subject')
 
-        arrival_info = frappe.get_doc({'doctype': 'Arrival Information',"confirmation_number":dropbox.reservation_no})
+        arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
         arrival_info.status = 'Scanned'
         arrival_info.save()
 
@@ -420,7 +421,9 @@ def create_guest_update_precheckin_details(details, dropbox):
         new_guest_details = frappe.get_doc(aadhar_details)
         new_guest_details.insert()
 
-        arrival_info = frappe.get_doc({'doctype': 'Arrival Information',"confirmation_number":dropbox.reservation_no})
+        # arrival_info = frappe.get_doc({'doctype': 'Arrival Information',"confirmation_number":dropbox.reservation_no})
+        arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
+
         arrival_info.status = 'Scanned'
         arrival_info.save()
 
