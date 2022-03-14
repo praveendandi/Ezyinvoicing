@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2021-12-25 11:20:11.942565",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "text",
+  "label",
+  "filepath",
+  "ocr_type",
+  "clean_text"
+ ],
+ "fields": [
+  {
+   "fieldname": "text",
+   "fieldtype": "Text",
+   "label": "text"
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "label"
+  },
+  {
+   "fieldname": "filepath",
+   "fieldtype": "Text",
+   "label": "filepath"
+  },
+  {
+   "fieldname": "ocr_type",
+   "fieldtype": "Data",
+   "label": "ocr type"
+  },
+  {
+   "fieldname": "clean_text",
+   "fieldtype": "Text",
+   "label": "clean text"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-12-25 15:21:35.565664",
+ "modified_by": "Administrator",
+ "module": "Passport Scanner",
+ "name": "Id Text Document Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

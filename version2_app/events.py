@@ -35,6 +35,8 @@ from requests.exceptions import RetryError
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
+from frappe.core.doctype.communication.email import make
+# from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 
 user_name = frappe.session.user
 
@@ -178,7 +180,7 @@ def precheckinsdocuments(doc, method=None):
     try:
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
-        confirmation_number = doc.confirmation_number
+        confirmation_number = str(doc.confirmation_number)
         if "-" in confirmation_number:
             confirmation_number = confirmation_number.split("-")[0]
 
@@ -319,6 +321,7 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
+        # print(doc.__dict__)
         if 'job-' in doc.file_name:
             if not frappe.db.exists({'doctype': 'Document Bin', 'invoice_file': doc.file_url}):
                 update_documentbin(doc.file_url, "")
@@ -349,17 +352,17 @@ def fileCreated(doc, method=None):
                 if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                     update_documentbin(doc.file_url, "")
 
-                print('Normal File')
+                # print('Normal File')
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
         # frappe.log_error(traceback.print_exc())
         logger.error(f"fileCreated,   {traceback.print_exc()}")
-        print(str(e), "fileCreated")
+        # print(str(e), "fileCreated")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing fileCreated Event",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
         update_documentbin(doc.file_url, str(e))
-        print(traceback.print_exc())
+        #print(traceback.print_exc())
         return {"success": False, "message": str(e)}
 
 
@@ -1199,8 +1202,8 @@ def send_email(confirmation_number, company):
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
-        frappe.log_error(
-            "Ezy-pre_mail", "====================================")
+        # frappe.log_error(
+        #     "Ezy-pre_mail", "====================================")
         if not company.site_domain:
             return {"success": False, "message": "Please add site domain in property setting"}
         if company.mail_schedule == "True":

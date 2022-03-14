@@ -158,6 +158,12 @@
   "work_station_pass_code",
   "device_font_style_document",
   "self_assisted",
+  "show_pending_invoices_in_reports",
+  "bulkupload_json",
+  "pos_footer",
+  "pos_text",
+  "enable_pdf_upload",
+  "vat_reporting",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -244,18 +250,23 @@
   "column_break_235",
   "pathik_password",
   "pathik_session",
-  "bulkupload_json",
-  "pos_footer",
-  "pos_text",
-  "enable_pdf_upload",
-  "skip_ssl_verify",
-  "ipp_printer_file_path",
-  "vat_reporting",
-  "show_pending_invoices_in_reports",
+  "clbs_details_section",
+  "clbs",
   "summary_header",
+  "column_break_248",
   "summary_terms_and_conditions",
   "summary_footer",
-  "clbs"
+  "scan_ezy_settings_section",
+  "classfiy_api",
+  "in_house_passport_ocr",
+  "in_house_visa_ocr",
+  "in_house_voter_ocr",
+  "column_break_246",
+  "detection_api",
+  "in_house_aadhar_ocr",
+  "in_house_driving_ocr",
+  "section_break_248",
+  "ome_scanner"
  ],
  "fields": [
   {
@@ -1630,11 +1641,79 @@
    "fieldname": "clbs",
    "fieldtype": "Check",
    "label": "CLBS"
+  },
+  {
+   "fieldname": "scan_ezy_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Scan Ezy Settings"
+  },
+  {
+   "fieldname": "classfiy_api",
+   "fieldtype": "Text",
+   "label": "Classfiy Api"
+  },
+  {
+   "fieldname": "detection_api",
+   "fieldtype": "Text",
+   "label": "Detection Api"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_passport_ocr",
+   "fieldtype": "Check",
+   "label": "In House Passport Ocr"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_visa_ocr",
+   "fieldtype": "Check",
+   "label": "In House Visa Ocr"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_aadhar_ocr",
+   "fieldtype": "Check",
+   "label": "In House Aadhar Ocr"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_driving_ocr",
+   "fieldtype": "Check",
+   "label": "In House Driving Ocr"
+  },
+  {
+   "fieldname": "column_break_246",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "in_house_voter_ocr",
+   "fieldtype": "Check",
+   "label": "In House Voter Ocr"
+  },
+  {
+   "fieldname": "section_break_248",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "ome_scanner",
+   "fieldtype": "Check",
+   "label": "OME scanner"
+  },
+  {
+   "fieldname": "clbs_details_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS Details"
+  },
+  {
+   "fieldname": "column_break_248",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 14:09:46.709813",
+ "modified": "2022-03-14 19:02:47.990406",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
