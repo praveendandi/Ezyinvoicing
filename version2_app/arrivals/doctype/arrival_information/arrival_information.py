@@ -3,6 +3,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from tabnanny import check
 import frappe
 import datetime
 import os
@@ -23,7 +24,7 @@ class ArrivalInformation(Document):
 
 @frappe.whitelist(allow_guest=True)
 def arrivalActivity(company, file_url, source):
-    try:
+    # try:
         company_doc = frappe.get_doc("company", company)
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = company_doc.site_name
@@ -41,13 +42,29 @@ def arrivalActivity(company, file_url, source):
         duplicateCount = 0
         alreadyCheckinCount = 0
         total_count = 0
+        check_len = 0
         for each_reservation in data:
             split_line = each_reservation.split("|")
             replace_new = [x.replace("\n", "") for x in split_line]
             if len(replace_new) > 4:
                 confirmation_number = ""
                 IS_GROUP_CODE = ""
-                print(len(replace_new), column_indexs["GROUP_CODE"])
+                if company_doc.name == "GMM-01":
+                    if check_len != 0:
+                        print("....,,,,,,,", check_len, len(replace_new))
+                        if check_len != len(replace_new):
+                            find_index = data.index(each_reservation)
+                            print(len(data[find_index+1]), check_len/2)
+                            if len(data[find_index+1]) < check_len:
+                                new_split_line = data[find_index+1].split("|")
+                                update_data = [x.replace("\n", "") for x in new_split_line]
+                                replace_new.extend(update_data)
+                                print(replace_new)
+                                del data[find_index+1]
+                    else:
+                        check_len = len(replace_new)
+                if check_len == len(replace_new) or check_len == 0:
+                    check_len = len(replace_new)
                 if column_indexs["GROUP_CODE"] <= len(replace_new):
                     if replace_new[column_indexs["GROUP_CODE"]] != "":
                         confirmation_number = replace_new[column_indexs["GROUP_CODE"]]
@@ -167,11 +184,11 @@ def arrivalActivity(company, file_url, source):
             frappe.db.commit()
         return {"success": True, "message": "Arrivals added successfully"}
 
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Arrivals arrivalActivity", "line No:{}\n{}".format(
-            exc_tb.tb_lineno, traceback.format_exc()))
-        return {"success": False, "message": str(e)}
+    # except Exception as e:
+    #     exc_type, exc_obj, exc_tb = sys.exc_info()
+    #     frappe.log_error("Arrivals arrivalActivity", "line No:{}\n{}".format(
+    #         exc_tb.tb_lineno, traceback.format_exc()))
+    #     return {"success": False, "message": str(e)}
 
 
 def update_guestdetails():
