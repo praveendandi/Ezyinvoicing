@@ -49,7 +49,7 @@ def arrivalActivity(company, file_url, source):
             if len(replace_new) > 4:
                 confirmation_number = ""
                 IS_GROUP_CODE = ""
-                if company_doc.name == "GMM-01":
+                if company_doc.name == "RDV-01":
                     if check_len != 0:
                         if check_len != len(replace_new):
                             find_index = data.index(each_reservation)
