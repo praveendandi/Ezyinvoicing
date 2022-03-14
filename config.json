@@ -4,8 +4,8 @@
     "proxy_password":"kiran",
     "proxy_username":"Kiran@123",
     "proxyhost":"h615",
-    "host":"http://192.168.1.15:8000/",
+    "host":"http://0.0.0.0:8000/",
     "skip_ssl_verify":0,
     "file_path":"/home/caratred/Desktop/files/*.txt",
-    "name":"RAH-01"
+    "name":"GMM-01"
 }
