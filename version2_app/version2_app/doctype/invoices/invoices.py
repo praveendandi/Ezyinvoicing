@@ -351,12 +351,12 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": round(invoice.other_charges,2),
+            "OthChrg": round(invoice.other_charges,2) if company_details['data'].vat_reporting==1 else round(invoice.other_charges_before_tax,2),
             "RndOffAmt": 0,
             "TotInvVal": round(TotInnVal,2),
             "TotInvValFc": round(TotInvValFc, 2)
         }
-        print(gst_data)
+        print(gst_data["ValDtls"],"=============")
         
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
@@ -1102,8 +1102,8 @@ def insert_invoice(data):
                     roundoff_amount = 0
                     data['invoice_round_off_amount'] = 0
                     pms_invoice_summary = data['total_invoice_amount']
-                    other_charges = data['total_invoice_amount']
-                    other_charges_before_tax = data["total_invoice_amount"]
+                    # other_charges = data['total_invoice_amount']
+                    # other_charges_before_tax = data["total_invoice_amount"]
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)

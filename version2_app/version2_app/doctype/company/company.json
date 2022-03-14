@@ -247,7 +247,11 @@
   "bulkupload_json",
   "pos_footer",
   "pos_text",
-  "enable_pdf_upload"
+  "enable_pdf_upload",
+  "skip_ssl_verify",
+  "ipp_printer_file_path",
+  "vat_reporting",
+  "show_pending_invoices_in_reports"
  ],
  "fields": [
   {
@@ -1589,11 +1593,23 @@
    "fieldname": "enable_pdf_upload",
    "fieldtype": "Check",
    "label": "Enable PDF Upload"
+  },
+  {
+   "default": "1",
+   "fieldname": "vat_reporting",
+   "fieldtype": "Check",
+   "label": "Vat Reporting"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_pending_invoices_in_reports",
+   "fieldtype": "Check",
+   "label": "Show Pending Invoices In Reports"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-02-21 10:45:10.723752",
+ "modified": "2022-03-12 12:38:58.132859",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

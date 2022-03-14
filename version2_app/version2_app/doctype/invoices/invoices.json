@@ -143,7 +143,8 @@
   "agree",
   "amount_in_word",
   "summary",
-  "clbs_summary_generated"
+  "clbs_summary_generated",
+  "lut"
  ],
  "fields": [
   {
@@ -936,12 +937,18 @@
    "fieldname": "clbs_summary_generated",
    "fieldtype": "Check",
    "label": "CLBS Summary Generated"
+  },
+  {
+   "default": "0",
+   "fieldname": "lut",
+   "fieldtype": "Check",
+   "label": "Lut"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-03-02 15:49:06.047144",
+ "modified": "2022-03-08 13:02:45.760164",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
