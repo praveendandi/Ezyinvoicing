@@ -781,7 +781,7 @@ def reprocess_zero_invoices():
 def get_company():
     try:
         company = frappe.get_last_doc('company')
-        get_company_value = frappe.db.get_value('company',company.name,["name","company_name","company_logo","card_type_detect_api"], as_dict=1)
+        get_company_value = frappe.db.get_value('company',company.name,["name","company_name","company_logo","card_type_detect_api","ome_scanner"], as_dict=1)
         return {"success":True,"company":get_company_value}
     except Exception as e:
         print("reprocess_pending_inoices", str(e))
