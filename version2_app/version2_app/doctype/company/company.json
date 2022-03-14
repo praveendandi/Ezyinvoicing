@@ -252,7 +252,9 @@
   "column_break_246",
   "detection_api",
   "in_house_aadhar_ocr",
-  "in_house_driving_ocr"
+  "in_house_driving_ocr",
+  "section_break_248",
+  "ome_scanner"
  ],
  "fields": [
   {
@@ -1622,14 +1624,25 @@
    "fieldname": "in_house_voter_ocr",
    "fieldtype": "Check",
    "label": "In House Voter Ocr"
+  },
+  {
+   "fieldname": "section_break_248",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "ome_scanner",
+   "fieldtype": "Check",
+   "label": "OME scanner"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-03 19:37:13.018909",
+ "modified": "2022-03-14 15:46:28.162882",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
