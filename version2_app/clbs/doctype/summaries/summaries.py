@@ -34,7 +34,7 @@ def get_summary(name):
                 get_summary["header"] = company_doc.summary_header
             if not get_summary["footer"]:
                 get_summary["footer"] = company_doc.summary_footer
-            if get_summary["terms_and_conditions"] == "":
+            if get_summary["terms_and_conditions"] == "" or get_summary["terms_and_conditions"] == None:
                 get_summary["terms_and_conditions"] = company_doc.summary_terms_and_conditions
             else:
                 ht = html2text.HTML2Text()
