@@ -1183,8 +1183,8 @@ def send_email(confirmation_number, company):
 def pre_mail():
     try:
         company = frappe.get_last_doc("company")
-        frappe.log_error(
-            "Ezy-pre_mail", "====================================")
+        # frappe.log_error(
+        #     "Ezy-pre_mail", "====================================")
         if not company.site_domain:
             return {"success": False, "message": "Please add site domain in property setting"}
         if company.mail_schedule == "True":

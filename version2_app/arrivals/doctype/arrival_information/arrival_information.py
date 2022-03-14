@@ -51,15 +51,12 @@ def arrivalActivity(company, file_url, source):
                 IS_GROUP_CODE = ""
                 if company_doc.name == "GMM-01":
                     if check_len != 0:
-                        print("....,,,,,,,", check_len, len(replace_new))
                         if check_len != len(replace_new):
                             find_index = data.index(each_reservation)
-                            print(len(data[find_index+1]), check_len/2)
                             if len(data[find_index+1]) < check_len:
                                 new_split_line = data[find_index+1].split("|")
                                 update_data = [x.replace("\n", "") for x in new_split_line]
                                 replace_new.extend(update_data)
-                                print(replace_new)
                                 del data[find_index+1]
                     else:
                         check_len = len(replace_new)
