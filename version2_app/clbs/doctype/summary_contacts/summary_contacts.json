@@ -1,58 +1,40 @@
 {
  "actions": [],
- "creation": "2022-03-02 14:07:22.527354",
+ "creation": "2022-03-09 16:49:32.029170",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "document_type",
-  "document",
-  "summary",
-  "company",
-  "invoice_number",
-  "qr_code_image"
+  "summaries",
+  "contacts",
+  "company"
  ],
  "fields": [
   {
-   "fieldname": "document_type",
+   "fieldname": "summaries",
    "fieldtype": "Link",
-   "label": "document_type",
-   "options": "Document Types"
-  },
-  {
-   "fieldname": "document",
-   "fieldtype": "Attach",
-   "label": "Document"
-  },
-  {
-   "fieldname": "summary",
-   "fieldtype": "Link",
-   "label": "Summary",
+   "label": "Summaries",
    "options": "Summaries"
+  },
+  {
+   "fieldname": "contacts",
+   "fieldtype": "Link",
+   "label": "Contacts",
+   "options": "Contacts"
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
    "options": "company"
-  },
-  {
-   "fieldname": "invoice_number",
-   "fieldtype": "Data",
-   "label": "Invoice Number"
-  },
-  {
-   "fieldname": "qr_code_image",
-   "fieldtype": "Attach",
-   "label": "QR Code Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-10 11:50:42.142206",
+ "modified": "2022-03-09 16:49:32.029170",
  "modified_by": "Administrator",
  "module": "CLBS",
- "name": "Summary Documents",
+ "name": "Summary Contacts",
  "owner": "Administrator",
  "permissions": [
   {
