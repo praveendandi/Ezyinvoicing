@@ -641,7 +641,7 @@ def backup_file_perticulerdoctypes(data):
         mypath = cwd+"/"+site_name+"/private/backups/*.gz"
         filename=max(glob.glob(mypath), key=os.path.getmtime)
         shutil.move(filename,cwd+"/"+site_name+"/public/files")
-        return get_company.host+"files/{}".format(os.path.basename(filename))
+        return "/files/{}".format(os.path.basename(filename))
     except Exception as e:
         frappe.log_error("backupfile:"+str(e))
 
