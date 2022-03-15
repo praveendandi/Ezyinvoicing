@@ -353,11 +353,9 @@ def generateIrn(data):
             "Discount": round(discount_after_value,2),
             "OthChrg": round(invoice.other_charges,2) if company_details['data'].vat_reporting==1 else round(invoice.other_charges_before_tax,2),
             "RndOffAmt": 0,
-            "TotInvVal": round(TotInnVal,2),
+            "TotInvVal": round(TotInnVal,2) if company_details['data'].vat_reporting==1 else round(TotInnVal-invoice.total_vat_amount, 2),
             "TotInvValFc": round(TotInvValFc, 2)
-        }
-        print(gst_data["ValDtls"],"=============")
-        
+        }        
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
             return {"success":False,"message":"Items cannot be Empty"}

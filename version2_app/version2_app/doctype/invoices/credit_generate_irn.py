@@ -584,9 +584,9 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
             "CesVal": round(total_cess_calue,2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": 0,
-            "OthChrg": 0,
+            "OthChrg": abs(round(invoice.other_charges,2)) if company_details['data'].vat_reporting==1 else abs(round(invoice.other_charges_before_tax,2)),
             "RndOffAmt": 0,
-            "TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
+            "TotInvVal": abs(round(invoice.sales_amount_after_tax, 2)) if company_details["data"].vat_reporting == 1 else round(abs(invoice.sales_amount_after_tax)-abs(invoice.total_vat_amount),2),
             "TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
         }
         if company.name == "FMBW-01":
