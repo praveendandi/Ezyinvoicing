@@ -625,6 +625,7 @@ def send_invoicedata_to_gcb(invoice_number):
                 box_size=3,
                 border=4
             )
+            print(response['data'],"/////////")
             qrurl = company.b2c_qr_url + response['data']
             qr.add_data(qrurl)
             qr.make(fit=True)
