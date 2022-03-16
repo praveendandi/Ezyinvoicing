@@ -87,7 +87,6 @@ def intiate():
         options.add_argument("--headless")
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--no-sandbox')
-        options.add_argument("--remote-debugging-port=9222")
         # options.headless = True if company.cform_chrome_headless == 1 else False
         print(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
         driver = webdriver.Chrome(
