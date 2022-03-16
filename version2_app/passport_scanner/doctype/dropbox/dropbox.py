@@ -39,8 +39,7 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
         front_detected_doc_type = None
         back_detected_doc_type = None
         if image_1:
-            image_1_response = requests.post(company.classfiy_api, json={
-                                             "base": image_1}, verify=False)
+            image_1_response = requests.post(company.classfiy_api, json={"base": image_1}, verify=False)
             try:
                 image_1_response = image_1_response.json()
                 front_doc_type = image_1_response['doc_type']
@@ -167,38 +166,23 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
             new_dropbox.ocr_process_status 
 
         new_dropbox.insert(ignore_permissions=True)
-        
-        enqueue(
-            extract_text,
-            queue="default",
-            timeout=800000,
-            event="data_extraction",
-            now=False,
-            data={"dropbox": new_dropbox,
-                  "image_1": image_1,
-                  "image_2": image_2,
-                  "id_type": id_type,
-                  "front_detected_doc_type":front_detected_doc_type,
-                  "back_detected_doc_type":back_detected_doc_type
-                  },
-            is_async=True,
-        )
-        # if company.scan_ezy_module:
-        #     if new_dropbox.id_type == 'aadhaar':
-        #         enqueue(
-        #             scan_aadhar,
-        #             queue="default",
-        #             timeout=800000,
-        #             event="vision_api_extraction",
-        #             now=True,
-        #             data = {
-        #             "front_base_image":front,
-        #             "back_base_image":back,
-        #             "dropbox":new_dropbox,
-        #             "company":company
-        #             },
-        #             is_async = True,
-        #         )
+        if reseravtions_data:
+            enqueue(
+                extract_text,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=False,
+                data={"dropbox": new_dropbox,
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": id_type,
+                    "front_detected_doc_type":front_detected_doc_type,
+                    "back_detected_doc_type":back_detected_doc_type
+                    },
+                is_async=True,
+            )
+       
         return {
             "success": True,
             "Message": "Dropbox created successfully"
@@ -272,6 +256,9 @@ def extract_text(data: dict):
                 # print(image_2_response)
             except ValueError:
                 raise
+
+        if 'merged_to' in data.keys():
+            data['dropbox'].reservation_no = data['merged_to']
         
         # print(details)
         if data['id_type'] == 'aadhaar':
@@ -311,6 +298,7 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
             'whether_employed_in_india':'N',
             "status": "In House",
         }
+        guest_details['given_name'] = dropbox.guest_name
         for key in details:
             if key == "name":
                 guest_details['guest_full_name'] = details[key]
@@ -319,8 +307,8 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
                 guest_details['passport_no'] = details[key]
             elif key == "surname":
                 guest_details['passport_no'] = details[key]
-            elif key == 'birth_date':
-                guest_details['date_of_birth'] = details[key]
+            # elif key == 'birth_date':
+            #     guest_details['date_of_birth'] = details[key]
             elif key == 'sex':
                 guest_details['gender'] = details[key]
             elif key == 'nationality':
@@ -560,3 +548,50 @@ def convert_base64_to_image(base, name, site_folder_path, company):
 #         # exc_type, exc_obj, exc_tb = sys.exc_info()
 #         # frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 #         return {"success":False,"message":str(e)}
+
+def merge_guest_to_guest_details(doc, method=None):
+    '''
+    merge guest to guest details
+    '''
+    try:
+        # drop_box = frappe.get_doc("Dropbox", name)
+        # print(drop_box)
+        # return True
+        # print(doc.__dict__)
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path+'/sites/'+company.site_name+'/public'
+        if doc.front:
+            front_file_path = site_folder_path + doc.front
+            with open(front_file_path, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+            image_1 = encoded_string.decode("utf-8")
+        if doc.back:
+            back_file_path = site_folder_path + doc.front
+            with open(back_file_path, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read())
+            image_2 = encoded_string.decode("utf-8")
+        
+        enqueue(
+                extract_text,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=False,
+                data={"dropbox": doc,
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": doc.id_type,
+                    "front_detected_doc_type":doc.id_type,
+                    "back_detected_doc_type":doc.id_type,
+                    "merged_to": doc.merged_to,
+                    },
+                is_async=True,
+            )
+        return True
+    except Exception as e:
+        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("merge_guest_to_guest_details",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()))
+        return {"success": False, "message": str(e)}
