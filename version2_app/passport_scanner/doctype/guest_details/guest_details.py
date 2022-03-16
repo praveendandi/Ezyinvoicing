@@ -77,7 +77,7 @@ def guest_details_opera(confirmation_number):
 
 def helper_utility(data):
     try:
-        url = "http://localhost:8000/api/method/version2_app.passport_scanner.doctype.reservations.reservations."+data["api"]
+        url = "http://localhost:8001/api/method/version2_app.passport_scanner.doctype.reservations.reservations."+data["api"]
         del data["api"]
         x = requests.post(url, data = data)
         return {"success": True,"data":x.json()}
