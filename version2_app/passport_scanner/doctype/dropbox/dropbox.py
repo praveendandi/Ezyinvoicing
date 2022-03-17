@@ -173,7 +173,7 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=False,
+                now=True,
                 data={"dropbox": new_dropbox,
                     "image_1": image_1,
                     "image_2": image_2,
@@ -299,6 +299,8 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
             'whether_employed_in_india':'N',
             "status": "In House",
         }
+        print(dropbox.__dict__)
+
         guest_details['given_name'] = dropbox.guest_name
         for key in details:
             if key == "name":
@@ -373,6 +375,9 @@ def create_guest_update_precheckin_details(details, dropbox):
             'whether_employed_in_india':'N',
             "status": "In House"
         }
+        print(dropbox.guest_name)
+
+        aadhar_details['given_name'] = dropbox.guest_name
         for key in details:
             if key == 'ADRESS':
                 address = re.sub(r"[\n\t\s]*", "", details[key])
@@ -550,12 +555,13 @@ def convert_base64_to_image(base, name, site_folder_path, company):
 #         # frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 #         return {"success":False,"message":str(e)}
 
-def merge_guest_to_guest_details(doc, method=None):
+@frappe.whitelist(allow_guest=True)
+def merge_guest_to_guest_details(name:str):
     '''
     merge guest to guest details
     '''
     try:
-        # drop_box = frappe.get_doc("Dropbox", name)
+        doc = frappe.get_doc("Dropbox", name)
         # print(drop_box)
         # return True
         # print(doc.__dict__)
@@ -578,7 +584,7 @@ def merge_guest_to_guest_details(doc, method=None):
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=False,
+                now=True,
                 data={"dropbox": doc,
                     "image_1": image_1,
                     "image_2": image_2,

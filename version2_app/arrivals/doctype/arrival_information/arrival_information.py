@@ -245,7 +245,7 @@ def autocomplete_arrival_info(confirmation_number: str, company: str):
             'company': company},
             fields=["name","guest_first_name","no_of_adults","no_of_children","booking_status",'virtual_checkin_status','status'])
         
-        # print(auto_complete_data)
+        print(auto_complete_data)
         return {"success": True, "data": auto_complete_data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
