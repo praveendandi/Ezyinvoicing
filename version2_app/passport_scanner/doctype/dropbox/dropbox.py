@@ -306,7 +306,6 @@ def extract_text(data: dict):
         elif data["id_type"] == "indianpassport":
             create_passport_guest_update_precheckin_details(
                 details, data["dropbox"])
-
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -451,8 +450,8 @@ def create_guest_update_precheckin_details(details, dropbox):
                 pass
             elif key == "AADHAR_BACK_DETAILS":
                 pass
-            if aadhar_details["given_name"] == "":
-                aadhar_details["given_name"] = "    "
+            if "given_name" not in aadhar_details.keys():
+                aadhar_details["given_name"] = "Guest"
         new_guest_details = frappe.get_doc(aadhar_details)
         new_guest_details.insert()
 
@@ -600,7 +599,7 @@ def merge_guest_to_guest_details(doc, method=None):
         # drop_box = frappe.get_doc("Dropbox", name)
         # print(drop_box)
         # return True
-        # print(doc.__dict__)
+        print(method)
         company = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
@@ -614,25 +613,28 @@ def merge_guest_to_guest_details(doc, method=None):
             with open(back_file_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
             image_2 = encoded_string.decode("utf-8")
-
-        enqueue(
-            extract_text,
-            queue="default",
-            timeout=800000,
-            event="data_extraction",
-            now=True,
-            data={
-                "dropbox": doc,
-                "image_1": image_1,
-                "image_2": image_2,
-                "id_type": doc.id_type,
-                "front_detected_doc_type": doc.id_type,
-                "back_detected_doc_type": doc.id_type,
-                "merged_to": doc.merged_to,
-            },
-            is_async=True,
-        )
-        return True
+        if method is not None:
+            enqueue(
+                extract_text,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=True,
+                data={
+                    "dropbox": doc,
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": doc.id_type,
+                    "front_detected_doc_type": doc.id_type,
+                    "back_detected_doc_type": doc.id_type,
+                    "merged_to": doc.merged_to,
+                },
+                is_async=True,
+            )
+            return True
+        else:
+            data={"dropbox": doc, "image_1": image_1, "image_2": image_2, "id_type": doc.id_type, "front_detected_doc_type": doc.id_type, "back_detected_doc_type": doc.id_type, "merged_to": doc.merged_to}
+            return {"success": True, "data": data}
     except Exception as e:
         print(e)
         exc_type, exc_obj, exc_tb = sys.exc_info()

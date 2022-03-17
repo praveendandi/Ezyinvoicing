@@ -12,6 +12,7 @@ import traceback
 from datetime import date
 
 import frappe
+from frappe.utils import logger
 from frappe.model.document import Document
 
 frappe.utils.logger.set_log_level("DEBUG")
