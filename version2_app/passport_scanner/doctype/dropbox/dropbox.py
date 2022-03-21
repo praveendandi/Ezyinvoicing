@@ -167,6 +167,9 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
             new_dropbox.ocr_process_status 
 
         new_dropbox.insert(ignore_permissions=True)
+        arrival_info = frappe.get_doc('Arrival Information',reservation_number)
+        arrival_info.status = 'Scanned'
+        arrival_info.virtual_checkin_status = 1
         if reseravtions_data:
             enqueue(
                 extract_text,
