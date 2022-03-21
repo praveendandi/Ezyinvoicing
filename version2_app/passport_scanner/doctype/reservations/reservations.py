@@ -112,7 +112,7 @@ def detect_faces(image_path, number):
             cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 2)
             break
         return {"success": True, "data": face_path}
-    except exceptions as e:
+    except exception as e:
         # exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy detect_faces", str(e))
         return {"success": False, "error": str(e), "message": "Unable to scan your id"}
