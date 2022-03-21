@@ -961,7 +961,7 @@ def arrival_information(doc, method=None):
     frappe.db.commit()
     if frappe.db.exists('Arrival Information', doc.name):
         if frappe.db.exists({"doctype": "Dropbox", "reservation_no": doc.name, "merged": "Not Merged"}):
-            get_dropbox = frappe.db.get_list("Dropbox", filters={"reservation_no": doc.name}, pluck = "name")
+            get_dropbox = frappe.db.get_list("Dropbox", filters={"reservation_no": doc.name}, fields=["name"])
             if len(get_dropbox) > 0:
                 for each in get_dropbox:
                     merge_data = merge_guest_to_guest_details(each, method=True)
