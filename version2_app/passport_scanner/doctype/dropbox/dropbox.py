@@ -167,6 +167,9 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
             new_dropbox.ocr_process_status 
 
         new_dropbox.insert(ignore_permissions=True)
+        arrival_info = frappe.get_doc('Arrival Information',reservation_number)
+        arrival_info.status = 'Scanned'
+        arrival_info.virtual_checkin_status = 1
         if reseravtions_data:
             enqueue(
                 extract_text,
@@ -339,10 +342,11 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         new_guest_details = frappe.get_doc(guest_details)
         new_guest_details.insert()
         print(guest_details,"guest deatils")
-        frappe.db.set_value('Task', 'TASK00002', 'subject', 'New Subject')
 
         arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
         arrival_info.status = 'Scanned'
+        arrival_info.virtual_checkin_status = 1
+
         arrival_info.save()
 
 
@@ -425,6 +429,7 @@ def create_guest_update_precheckin_details(details, dropbox):
         arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
 
         arrival_info.status = 'Scanned'
+        arrival_info.virtual_checkin_status = 1
         arrival_info.save()
 
     except Exception as e:
