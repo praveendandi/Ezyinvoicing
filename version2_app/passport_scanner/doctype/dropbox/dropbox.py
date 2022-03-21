@@ -295,7 +295,7 @@ def extract_text(data: dict):
                 # print(image_2_response)
             except ValueError:
                 raise
-
+        print(data,"/////////")
         if "merged_to" in data.keys():
             data["dropbox"].reservation_no = data["merged_to"]
 
@@ -324,6 +324,7 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         main_guest = True
         if "Guest" not in dropbox.guest_name:
             main_guest = False
+        print(dropbox.reservation_no,"////////",dropbox.__dict__)
         guest_details = {
             "doctype": "Guest Details",
             "confirmation_number": dropbox.reservation_no,

@@ -186,7 +186,7 @@ doc_events = {
         # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
     },
     "Dropbox":{
-        'on_update':'version2_app.passport_scanner.doctype.dropbox.dropbox.merge_guest_to_guest_details'
+        # 'on_update':'version2_app.passport_scanner.doctype.dropbox.dropbox.merge_guest_to_guest_details'
     }
 }
 

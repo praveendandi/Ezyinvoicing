@@ -958,15 +958,18 @@ def arrival_information(doc, method=None):
                                   "confirmation_number": doc.confirmation_number})
     get_doc.insert()
     frappe.db.commit()
-    if frappe.db.exists({"doctype": "Dropbox", "reservation_no": doc.name, "merged": "Not Merged"}):
-        get_dropbox = frappe.db.get_value("Dropbox", {"reservation_no": doc.name}, "name")
-        if get_dropbox:
-            update_dropbox = frappe.get_doc("Dropbox",get_dropbox)
-            merge_data = merge_guest_to_guest_details(update_dropbox)
-            if merge_data["success"] is True:
-                extract_text(merge_data["data"])
-                frappe.db.set_value("Dropbox", get_dropbox, {"merged_to": doc.name, "merged": "Merged"})
-                frappe.db.commit()
+    if frappe.db.exists('Arrival Information', doc.name):
+        print("///////////")
+        if frappe.db.exists({"doctype": "Dropbox", "reservation_no": doc.name, "merged": "Not Merged"}):
+            get_dropbox = frappe.db.get_value("Dropbox", {"reservation_no": doc.name}, "name")
+            if get_dropbox:
+                update_dropbox = frappe.get_doc("Dropbox",get_dropbox)
+                update_dropbox.merged_to = doc.name
+                merge_data = merge_guest_to_guest_details(update_dropbox)
+                if merge_data["success"] is True:
+                    extract_text(merge_data["data"])
+                    frappe.db.set_value("Dropbox", get_dropbox, {"merged_to": doc.name, "merged": "Merged"})
+                    frappe.db.commit()
         # update_dropbox = frappe.get_doc("Dropbox",get_dropbox)
         # update_dropbox.merged_to = doc.name
         # update_dropbox.merged = "Merged"
