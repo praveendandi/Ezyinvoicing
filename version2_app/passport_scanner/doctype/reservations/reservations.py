@@ -112,7 +112,7 @@ def detect_faces(image_path, number):
             cv2.rectangle(image, (x, y), (x+w, y+h), (255, 255, 0), 2)
             break
         return {"success": True, "data": face_path}
-    except IndexError as e:
+    except exceptions as e:
         # exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy detect_faces", str(e))
         return {"success": False, "error": str(e), "message": "Unable to scan your id"}
@@ -1492,10 +1492,6 @@ def pass_detect_text(image_file):
         # exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text", str(e))
         return ({"success": False, "type": "partial data", "message": "Unable to scan your id", "error": str(e), "expired": False})
-    # except NoneType as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("SignEzy pass_detect_text","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
-    #     return ({"success":False, "type":"partial data","message":str(e),"expired":False})
     except Exception as e:
         # exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("SignEzy pass_detect_text", str(e))
