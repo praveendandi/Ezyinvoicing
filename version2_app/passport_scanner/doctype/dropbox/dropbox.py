@@ -337,7 +337,9 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
             "whether_employed_in_india": "N",
             "status": "In House",
         }
-        guest_details["given_name"] = dropbox.guest_name
+        print(dropbox.__dict__)
+
+        guest_details['given_name'] = dropbox.guest_name
         for key in details:
             if key == "name":
                 guest_details["guest_full_name"] = details[key]
@@ -411,6 +413,9 @@ def create_guest_update_precheckin_details(details, dropbox):
             "whether_employed_in_india": "N",
             "status": "In House",
         }
+        print(dropbox.guest_name)
+
+        aadhar_details['given_name'] = dropbox.guest_name
         for key in details:
             print(key, "/////////", aadhar_details)
             if key == "ADRESS":
@@ -591,16 +596,15 @@ def convert_base64_to_image(base, name, site_folder_path, company):
 #         # frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 #         return {"success":False,"message":str(e)}
 
-
-def merge_guest_to_guest_details(doc, method=None):
+@frappe.whitelist(allow_guest=True)
+def merge_guest_to_guest_details(name:str, method=False):
     """
     merge guest to guest details
     """
     try:
-        # drop_box = frappe.get_doc("Dropbox", name)
+        doc = frappe.get_doc("Dropbox", name)
         # print(drop_box)
         # return True
-        print(method)
         company = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
@@ -614,13 +618,13 @@ def merge_guest_to_guest_details(doc, method=None):
             with open(back_file_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
             image_2 = encoded_string.decode("utf-8")
-        if method is not None:
+        if not method:
             enqueue(
                 extract_text,
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=True,
+                now=False,
                 data={
                     "dropbox": doc,
                     "image_1": image_1,
