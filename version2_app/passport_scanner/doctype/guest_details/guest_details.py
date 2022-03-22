@@ -5,11 +5,11 @@
 from __future__ import unicode_literals
 
 import base64
-import datetime
 import json
 import re
 import sys
 import traceback
+from datetime import datetime
 
 import frappe
 import requests
@@ -135,13 +135,17 @@ def guest_details_opera(confirmation_number):
 
 def helper_utility(data):
     try:
-        url = (
-            "http://localhost:8001/api/method/version2_app.passport_scanner.doctype.reservations.reservations."
-            + data["api"]
-        )
-        del data["api"]
-        x = requests.post(url, data=data)
-        return {"success": True, "data": x.json()}
+        company = frappe.get_last_doc("company")
+        if company.host != "" or company.host != None:
+            company_host = (company.host).rstrip("/")
+            url = (
+                company_host+"/api/method/version2_app.passport_scanner.doctype.reservations.reservations."+ data["api"]
+            )
+            del data["api"]
+            x = requests.post(url, data=data)
+            return {"success": True, "data": x.json()}
+        else:
+            return {"success": False, "message":"please mention host in company"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -936,7 +940,7 @@ def add_guest_details():
                             postal_code if len(postal_code) == 6 else ""
                         )
             if frappe.db.exists("Arrival Information", data["confirmation_number"]):
-                now = datetime.datetime.now()
+                now = datetime.now()
                 arrival_doc = frappe.get_doc(
                     "Arrival Information", data["confirmation_number"]
                 )
@@ -960,8 +964,8 @@ def add_guest_details():
                     data["city"] = pre_checkins["guest_city"]
                     data["country"] = pre_checkins["guest_country"]
             if data["date_of_birth"] != "":
-                today = datetime.datetime.today()
-                birthDate = datetime.datetime.strptime(
+                today = datetime.today()
+                birthDate = datetime.strptime(
                     data["date_of_birth"], "%Y-%m-%d"
                 )
                 data["age"] = (
@@ -1004,7 +1008,7 @@ def add_guest_details():
                 arrival_doc.save(ignore_permissions=True, ignore_version=True)
                 frappe.db.commit()
             else:
-                arrival_date = datetime.datetime.now().date()
+                arrival_date = datetime.now().date()
                 arrival_info_doc = frappe.get_doc(
                     {
                         "doctype": "Arrival Information",
