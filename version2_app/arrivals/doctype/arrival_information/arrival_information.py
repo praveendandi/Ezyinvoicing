@@ -49,15 +49,17 @@ def arrivalActivity(company, file_url, source):
             if len(replace_new) > 4:
                 confirmation_number = ""
                 IS_GROUP_CODE = ""
-                if company_doc.name == "RDV-01":
+                if company_doc.name in ["RDV-01","HRDR-01","GMM-01"]:
                     if check_len != 0:
                         if check_len != len(replace_new):
                             find_index = data.index(each_reservation)
-                            if len(data[find_index + 1]) < check_len:
-                                new_split_line = data[find_index + 1].split("|")
-                                update_data = [
-                                    x.replace("\n", "") for x in new_split_line
-                                ]
+                            if len(data[find_index+1]) < check_len:
+                                new_split_line = data[find_index+1].split("|")
+                                update_data = [x.replace("\n", "") for x in new_split_line]
+                                if company_doc.name in ["HRDR-01", "GMM-01"]:
+                                    if len(update_data)>0:
+                                        if update_data[0] == "":
+                                            del update_data[0]
                                 replace_new.extend(update_data)
                                 del data[find_index + 1]
                     else:
