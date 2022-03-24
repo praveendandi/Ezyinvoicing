@@ -128,8 +128,9 @@
   },
   {
    "fieldname": "guest_id_type",
-   "fieldtype": "Data",
-   "label": "Guest Id Type"
+   "fieldtype": "Select",
+   "label": "Guest Id Type",
+   "options": "Aadhaar\nVoter Card\nPan Card\nDriving License\nIndian Passport\nForeigner"
   },
   {
    "fieldname": "signature",
@@ -349,7 +350,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-23 10:06:42.368215",
+ "modified": "2022-03-24 12:45:56.257478",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",
