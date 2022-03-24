@@ -129,8 +129,9 @@ def Reinitiate_invoice(data):
                     #     value_after_gst += float(item['item_value_after_gst'])
                     #     print("++++++++++",value_after_gst)
                     pass
-        if "Arrival" in data["taxpayer"]["email"]:
-            data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
+        if "taxpayer" in data and "email" in data:
+            if "Arrival" in data["taxpayer"]["email"]:
+                data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
         if "invoice_from" in data.keys():
             if data["invoice_from"] != "Web":
                 if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:

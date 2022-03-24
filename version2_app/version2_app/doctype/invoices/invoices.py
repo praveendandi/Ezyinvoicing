@@ -353,11 +353,9 @@ def generateIrn(data):
             "Discount": round(discount_after_value,2),
             "OthChrg": round(invoice.other_charges,2) if company_details['data'].vat_reporting==1 else round(invoice.other_charges_before_tax,2),
             "RndOffAmt": 0,
-            "TotInvVal": round(TotInnVal,2),
+            "TotInvVal": round(TotInnVal,2) if company_details['data'].vat_reporting==1 else round(TotInnVal-invoice.total_vat_amount, 2),
             "TotInvValFc": round(TotInvValFc, 2)
-        }
-        print(gst_data["ValDtls"],"=============")
-        
+        }        
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
             return {"success":False,"message":"Items cannot be Empty"}
@@ -1136,8 +1134,9 @@ def insert_invoice(data):
                         
                         return{"success":False,"message":TotalMismatchErrorAPI['message']}
         # qr_generated = "Pending"
-        if "Arrival" in data["taxpayer"]["email"]:
-            data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "").strip()
+        if "taxpayer" in data and "email" in data:
+            if "Arrival" in data["taxpayer"]["email"]:
+                data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "").strip()
         if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
             irn_generated = "Zero Invoice"
             taxpayer= {"legal_name": "","email":data['taxpayer']['email'],"address_1": "","address_2": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
