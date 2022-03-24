@@ -165,8 +165,13 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
             new_dropbox.merged_on = datetime.datetime.now()
             new_dropbox.ocr_process_status 
 
-        new_dropbox.insert(ignore_permissions=True)
-        if reseravtions_data:
+            new_dropbox.insert(ignore_permissions=True)
+            arrival_info = frappe.get_doc('Arrival Information',reservation_number)
+            arrival_info.status = 'Scanned'
+            arrival_info.virtual_checkin_status = 'Yes'
+            arrival_info.save(ignore_permissions=True)
+            
+        if reseravtions_data:   
             enqueue(
                 extract_text,
                 queue="default",
@@ -298,6 +303,8 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
             'whether_employed_in_india':'N',
             "status": "In House",
         }
+        print(dropbox.__dict__)
+
         guest_details['given_name'] = dropbox.guest_name
         for key in details:
             if key == "name":
@@ -336,10 +343,11 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         new_guest_details = frappe.get_doc(guest_details)
         new_guest_details.insert()
         print(guest_details,"guest deatils")
-        frappe.db.set_value('Task', 'TASK00002', 'subject', 'New Subject')
 
         arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
         arrival_info.status = 'Scanned'
+        arrival_info.virtual_checkin_status = 'Yes'
+
         arrival_info.save()
 
 
@@ -372,6 +380,9 @@ def create_guest_update_precheckin_details(details, dropbox):
             'whether_employed_in_india':'N',
             "status": "In House"
         }
+        print(dropbox.guest_name)
+
+        aadhar_details['given_name'] = dropbox.guest_name
         for key in details:
             if key == 'ADRESS':
                 address = re.sub(r"[\n\t\s]*", "", details[key])
@@ -419,6 +430,7 @@ def create_guest_update_precheckin_details(details, dropbox):
         arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
 
         arrival_info.status = 'Scanned'
+        arrival_info.virtual_checkin_status = 'Yes'
         arrival_info.save()
 
     except Exception as e:
@@ -549,12 +561,13 @@ def convert_base64_to_image(base, name, site_folder_path, company):
 #         # frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 #         return {"success":False,"message":str(e)}
 
-def merge_guest_to_guest_details(doc, method=None):
+@frappe.whitelist(allow_guest=True)
+def merge_guest_to_guest_details(name:str):
     '''
     merge guest to guest details
     '''
     try:
-        # drop_box = frappe.get_doc("Dropbox", name)
+        doc = frappe.get_doc("Dropbox", name)
         # print(drop_box)
         # return True
         # print(doc.__dict__)

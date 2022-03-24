@@ -49,13 +49,17 @@ def arrivalActivity(company, file_url, source):
             if len(replace_new) > 4:
                 confirmation_number = ""
                 IS_GROUP_CODE = ""
-                if company_doc.name == "RDV-01":
+                if company_doc.name in ["RDV-01","HRDR-01","GMM-01"]:
                     if check_len != 0:
                         if check_len != len(replace_new):
                             find_index = data.index(each_reservation)
                             if len(data[find_index+1]) < check_len:
                                 new_split_line = data[find_index+1].split("|")
                                 update_data = [x.replace("\n", "") for x in new_split_line]
+                                if company_doc.name in ["HRDR-01", "GMM-01"]:
+                                    if len(update_data)>0:
+                                        if update_data[0] == "":
+                                            del update_data[0]
                                 replace_new.extend(update_data)
                                 del data[find_index+1]
                     else:
@@ -245,7 +249,7 @@ def autocomplete_arrival_info(confirmation_number: str, company: str):
             'company': company},
             fields=["name","guest_first_name","no_of_adults","no_of_children","booking_status",'virtual_checkin_status','status'])
         
-        # print(auto_complete_data)
+        print(auto_complete_data)
         return {"success": True, "data": auto_complete_data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
