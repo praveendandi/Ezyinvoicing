@@ -1115,6 +1115,7 @@ def reprocess_calulate_items(data):
         reinitiate = Reinitiate_invoice(final_data)
         doc_inv = frappe.get_doc("Invoices",data["invoice_number"])
         doc_inv.sez = sez
+        doc_inv.suptyp="B2B" if sez==0 else doc_inv.suptyp
         doc_inv.save(ignore_permissions=True)
         if reinitiate["success"] == True:
             return {"success": True}
