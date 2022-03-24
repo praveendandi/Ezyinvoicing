@@ -4,9 +4,12 @@
 
 from __future__ import unicode_literals
 import datetime
+import json
 import re
 import frappe
-import sys,traceback
+import sys
+import traceback
+import requests
 import base64
 from frappe.model.document import Document
 from version2_app.passport_scanner.doctype.reservations.reservations import *
@@ -139,7 +142,7 @@ def update_guest_details(name):
                     file_path1 = folder_path+'/sites/'+company_doc.site_name+"/public"+pre_checkins.image_1
                 convert1= convert_image_to_base64(file_path1)
                 print(file_path1)
-                if convert1["success"] == False:
+                if convert1["success"] is False:
                     return convert1
             if pre_checkins.image_2:
                 if "private" in pre_checkins.image_2:
@@ -148,7 +151,7 @@ def update_guest_details(name):
                     file_path2 = folder_path+'/sites/'+company_doc.site_name+"/public"+pre_checkins.image_2
                 # file_path2 = folder_path+'/sites/'+company_doc.site_name+pre_checkins.image_2
                 convert2= convert_image_to_base64(file_path2)
-                if convert2["success"] == False:
+                if convert2["success"] is False:
                     return convert2
             if pre_checkins.guest_id_type == "aadhaar":
                 aadhar_details = {}
@@ -163,7 +166,7 @@ def update_guest_details(name):
                     aadhar_details["pre_Nationality"] = pre_checkins.guest_nationality
                     aadhar_front = helper_utility({"api":"scan_aadhar", "aadhar_image":convert1["data"], "scanView":"front"})
                     if "success" in aadhar_front["data"]["message"].keys():
-                        if aadhar_front["data"]["message"]["success"] == False:
+                        if aadhar_front["data"]["message"]["success"] is False:
                             aadhar_details["image_1"] = pre_checkins.image_1
                             aadhar_details["image_2"] = pre_checkins.image_2
                             aadhar_details.update(aadhar_front["data"]["message"])
@@ -185,7 +188,7 @@ def update_guest_details(name):
                 if file_path2:
                     aadhar_back = helper_utility({"api":"scan_aadhar", "aadhar_image":convert2["data"], "scanView":"back"})
                     if "message" in aadhar_back["data"].keys():
-                        if aadhar_back["data"]["message"]["success"] == False:
+                        if aadhar_back["data"]["message"]["success"] is False:
                             aadhar_details["image_2"] = pre_checkins.image_2
                             aadhar_details.update(aadhar_back["data"]["message"])
                             del aadhar_details["success"]

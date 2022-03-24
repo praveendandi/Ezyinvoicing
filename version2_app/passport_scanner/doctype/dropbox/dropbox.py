@@ -10,8 +10,6 @@ import sys
 import traceback
 import datetime
 from frappe.utils.background_jobs import enqueue
-from version2_app.passport_scanner.doctype.dropbox.ocr_details import scan_aadhar
-import datetime
 import re
 # from frappe.utils.data import format_datetime
 import time
@@ -65,14 +63,12 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
                 if front_doc_type == '':
                     front_doc_type = image_2_response['doc_type']
                 del image_2_response['base']
-                # print(image_2_response)
                 doc_type = detect_front_back(image_2_response['doc_type'])
                 back_detected_doc_type = image_2_response['doc_type']
                 if back == '' or doc_type == 'Back':
                     back = image_2
                 else:
                     front = image_2
-                # print(doc_type)
 
             except ValueError:
                 raise
@@ -157,7 +153,6 @@ def create_doc_using_base_files(reservation_number: str, image_1: str = None, im
                 new_dropbox.back = image_2_url['message']['file_url']
 
         new_precheckin.confirmation_number = reservation_number
-        # print(reseravtions_data)
         if reseravtions_data:
             new_precheckin.guest_id_type = id_type
             new_precheckin.insert(ignore_permissions=True)
@@ -259,7 +254,6 @@ def extract_text(data: dict):
                                     details[visa_details] = image_1_response[key]['visa_details'][visa_details]
                     
             
-                # print(image_2_response)
             except ValueError:
                 raise
 
@@ -304,7 +298,6 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
             'whether_employed_in_india':'N',
             "status": "In House",
         }
-        print(dropbox.__dict__)
 
         guest_details['given_name'] = dropbox.guest_name
         for key in details:
@@ -343,7 +336,6 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
             
         new_guest_details = frappe.get_doc(guest_details)
         new_guest_details.insert()
-        print(guest_details,"guest deatils")
 
         arrival_info = frappe.get_doc('Arrival Information',dropbox.reservation_no)
         arrival_info.status = 'Scanned'
@@ -411,7 +403,7 @@ def create_guest_update_precheckin_details(details, dropbox):
                 pass
                 # aadhar_details["gender"] = details[key]
             elif key == 'PINCODE':
-                pincode = re.sub('\D', '', details[key])
+                pincode = re.sub(r'\D', '', details[key])
                 aadhar_details["postal_code"] = pincode
             elif key == 'LOCATION' or key == 'CITY':
                 if key == 'CITY':

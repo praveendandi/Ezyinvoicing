@@ -3,17 +3,17 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-from tabnanny import check
-import frappe
+
 import datetime
+import json
 import os
 import sys
 import traceback
-import json
 from datetime import date
+
+import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
-
 
 frappe.utils.logger.set_log_level("DEBUG")
 
@@ -24,20 +24,20 @@ class ArrivalInformation(Document):
 
 @frappe.whitelist(allow_guest=True)
 def arrivalActivity(company, file_url, source):
-    # try:
+    try:
         company_doc = frappe.get_doc("company", company)
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = company_doc.site_name
         if not company_doc.arrival_report:
             return {"success": False, "message": "Please upload the arrival json file."}
-        json_file_path = folder_path+'/sites/' + \
-            site_folder_path+company_doc.arrival_report
+        json_file_path = (
+            folder_path + "/sites/" + site_folder_path + company_doc.arrival_report
+        )
         with open(json_file_path) as f:
             column_indexs = json.load(f)
-        file_path = folder_path+'/sites/'+site_folder_path+file_url
+        file_path = folder_path + "/sites/" + site_folder_path + file_url
         with open(file_path) as file:
             data = file.readlines()[3:]
-        total_data = []
         processedCount = 0
         duplicateCount = 0
         alreadyCheckinCount = 0
@@ -49,19 +49,21 @@ def arrivalActivity(company, file_url, source):
             if len(replace_new) > 4:
                 confirmation_number = ""
                 IS_GROUP_CODE = ""
-                if company_doc.name in ["RDV-01","HRDR-01","GMM-01"]:
+                if company_doc.name in ["RDV-01", "HRDR-01", "GMM-01"]:
                     if check_len != 0:
                         if check_len != len(replace_new):
                             find_index = data.index(each_reservation)
-                            if len(data[find_index+1]) < check_len:
-                                new_split_line = data[find_index+1].split("|")
-                                update_data = [x.replace("\n", "") for x in new_split_line]
+                            if len(data[find_index + 1]) < check_len:
+                                new_split_line = data[find_index + 1].split("|")
+                                update_data = [
+                                    x.replace("\n", "") for x in new_split_line
+                                ]
                                 if company_doc.name in ["HRDR-01", "GMM-01"]:
-                                    if len(update_data)>0:
+                                    if len(update_data) > 0:
                                         if update_data[0] == "":
                                             del update_data[0]
                                 replace_new.extend(update_data)
-                                del data[find_index+1]
+                                del data[find_index + 1]
                     else:
                         check_len = len(replace_new)
                 if check_len == len(replace_new) or check_len == 0:
@@ -71,92 +73,157 @@ def arrivalActivity(company, file_url, source):
                         confirmation_number = replace_new[column_indexs["GROUP_CODE"]]
                         IS_GROUP_CODE = "Yes"
                     else:
-                        confirmation_number = replace_new[column_indexs["CONFIRMATION_NO"]]
+                        confirmation_number = replace_new[
+                            column_indexs["CONFIRMATION_NO"]
+                        ]
                         IS_GROUP_CODE = "No"
                 else:
                     confirmation_number = replace_new[column_indexs["CONFIRMATION_NO"]]
                     IS_GROUP_CODE = "No"
-                reservation = {"guest_title": replace_new[column_indexs["GUEST_TITLE"]],
-                               "guest_first_name": replace_new[column_indexs["GUEST_FIRST_NAME"]],
-                               "guest_last_name": replace_new[column_indexs["GUEST_LAST_NAME"]],
-                               "guest_email_address": replace_new[column_indexs["GUEST_EMAIL_ADDRESS"]] if company != "GMM-01" else "susmitha@caratred.com",
-                               "room_type": replace_new[column_indexs["ROOM_TYPE"]],
-                               "guest_phone_no": replace_new[column_indexs["GUEST_PHONE_NO"]],
-                               "travel_agent_name": replace_new[column_indexs["TRAVEL_AGENT_NAME"]],
-                               "no_of_adults": replace_new[column_indexs["NO_OF_ADULTS"]],
-                               "no_of_children": replace_new[column_indexs["NO_OF_CHILDREN"]],
-                               "no_of_nights": replace_new[column_indexs["NO_OF_NIGHTS"]],
-                               "billing_instructions": replace_new[column_indexs["BILLING_INSTRUCTIONS"]],
-                               "no_of_rooms": replace_new[column_indexs["NO_OF_ROOMS"]],
-                               "confirmation_number": confirmation_number,
-                               "csr_id": replace_new[column_indexs["CRS_ID"]],
-                               "print_rate": "Yes" if replace_new[column_indexs["PRINT_RATE_YN"]] == "Y" else "No",
-                               "room_rate": replace_new[column_indexs["ROOM_RATE"]],
-                               "reservation_clerk": replace_new[column_indexs["RESERVATION_CLERK"]],
-                               "membership_no": replace_new[column_indexs["MEMBERSHIP_NO"]],
-                               "membership_type": replace_new[column_indexs["MEMBERSHIP_TYPE"]],
-                               "total_visits": replace_new[column_indexs["TOTAL_VISITS"]],
-                               "cc_number": replace_new[column_indexs["CC_NUMBER"]],
-                               "company_name": replace_new[column_indexs["COMPANY_NAME"]],
-                               "booking_status": replace_new[column_indexs["BOOKING_STATUS"]],
-                               "is_group_code": IS_GROUP_CODE,
-                               "number_of_guests": str(int(replace_new[column_indexs["NO_OF_ADULTS"]])+int(replace_new[column_indexs["NO_OF_CHILDREN"]])),
-                               "virtual_checkin_status": "No",
-                               "company": company,
-                               "cc_exp_date": replace_new[column_indexs["CC_EXP_DATE"]],
-                               "room_number": str(replace_new[column_indexs["room_number"]]),
-                               "checkin_time": replace_new[column_indexs["checkin_time"]] if replace_new[column_indexs["checkin_time"]] != "" else "00:00:00",
-                               "checkout_time": replace_new[column_indexs["checkout_time"]] if replace_new[column_indexs["checkout_time"]] != "" else "00:00:00"
-                               }
+                reservation = {
+                    "guest_title": replace_new[column_indexs["GUEST_TITLE"]],
+                    "guest_first_name": replace_new[column_indexs["GUEST_FIRST_NAME"]],
+                    "guest_last_name": replace_new[column_indexs["GUEST_LAST_NAME"]],
+                    "guest_email_address": replace_new[
+                        column_indexs["GUEST_EMAIL_ADDRESS"]
+                    ]
+                    if company != "GMM-01"
+                    else "susmitha@caratred.com",
+                    "room_type": replace_new[column_indexs["ROOM_TYPE"]],
+                    "guest_phone_no": replace_new[column_indexs["GUEST_PHONE_NO"]],
+                    "travel_agent_name": replace_new[
+                        column_indexs["TRAVEL_AGENT_NAME"]
+                    ],
+                    "no_of_adults": replace_new[column_indexs["NO_OF_ADULTS"]],
+                    "no_of_children": replace_new[column_indexs["NO_OF_CHILDREN"]],
+                    "no_of_nights": replace_new[column_indexs["NO_OF_NIGHTS"]],
+                    "billing_instructions": replace_new[
+                        column_indexs["BILLING_INSTRUCTIONS"]
+                    ],
+                    "no_of_rooms": replace_new[column_indexs["NO_OF_ROOMS"]],
+                    "confirmation_number": confirmation_number,
+                    "csr_id": replace_new[column_indexs["CRS_ID"]],
+                    "print_rate": "Yes"
+                    if replace_new[column_indexs["PRINT_RATE_YN"]] == "Y"
+                    else "No",
+                    "room_rate": replace_new[column_indexs["ROOM_RATE"]],
+                    "reservation_clerk": replace_new[
+                        column_indexs["RESERVATION_CLERK"]
+                    ],
+                    "membership_no": replace_new[column_indexs["MEMBERSHIP_NO"]],
+                    "membership_type": replace_new[column_indexs["MEMBERSHIP_TYPE"]],
+                    "total_visits": replace_new[column_indexs["TOTAL_VISITS"]],
+                    "cc_number": replace_new[column_indexs["CC_NUMBER"]],
+                    "company_name": replace_new[column_indexs["COMPANY_NAME"]],
+                    "booking_status": replace_new[column_indexs["BOOKING_STATUS"]],
+                    "is_group_code": IS_GROUP_CODE,
+                    "number_of_guests": str(
+                        int(replace_new[column_indexs["NO_OF_ADULTS"]])
+                        + int(replace_new[column_indexs["NO_OF_CHILDREN"]])
+                    ),
+                    "virtual_checkin_status": "No",
+                    "company": company,
+                    "cc_exp_date": replace_new[column_indexs["CC_EXP_DATE"]],
+                    "room_number": str(replace_new[column_indexs["room_number"]]),
+                    "checkin_time": replace_new[column_indexs["checkin_time"]]
+                    if replace_new[column_indexs["checkin_time"]] != ""
+                    else "00:00:00",
+                    "checkout_time": replace_new[column_indexs["checkout_time"]]
+                    if replace_new[column_indexs["checkout_time"]] != ""
+                    else "00:00:00",
+                }
                 arrival_date = datetime.datetime.strptime(
-                    replace_new[column_indexs["ARRIVAL_DATE"]], "%d-%b-%y").date()
+                    replace_new[column_indexs["ARRIVAL_DATE"]], "%d-%b-%y"
+                ).date()
                 today = date.today()
                 process = False
                 if arrival_date >= today:
                     process = True
-                reservation["arrival_date"] = datetime.datetime.strptime(replace_new[column_indexs["ARRIVAL_DATE"]], "%d-%b-%y").strftime(
-                    '%Y-%m-%d %H:%M:%S') if replace_new[column_indexs["ARRIVAL_DATE"]] != "" else None
-                reservation["departure_date"] = datetime.datetime.strptime(replace_new[column_indexs["DEPARTURE_DATE"]], "%d-%b-%y").strftime(
-                    '%Y-%m-%d %H:%M:%S') if replace_new[column_indexs["DEPARTURE_DATE"]] != "" else None
-                if frappe.db.exists('Arrival Information', reservation["confirmation_number"]):
+                reservation["arrival_date"] = (
+                    datetime.datetime.strptime(
+                        replace_new[column_indexs["ARRIVAL_DATE"]], "%d-%b-%y"
+                    ).strftime("%Y-%m-%d %H:%M:%S")
+                    if replace_new[column_indexs["ARRIVAL_DATE"]] != ""
+                    else None
+                )
+                reservation["departure_date"] = (
+                    datetime.datetime.strptime(
+                        replace_new[column_indexs["DEPARTURE_DATE"]], "%d-%b-%y"
+                    ).strftime("%Y-%m-%d %H:%M:%S")
+                    if replace_new[column_indexs["DEPARTURE_DATE"]] != ""
+                    else None
+                )
+                if frappe.db.exists(
+                    "Arrival Information", reservation["confirmation_number"]
+                ):
                     arrival_info_doc = frappe.get_doc(
-                        'Arrival Information', reservation["confirmation_number"])
+                        "Arrival Information", reservation["confirmation_number"]
+                    )
                     if reservation["booking_status"] != "CANCELLED":
-                        if (arrival_info_doc.virtual_checkin_status == "No" and process == True):
+                        if (
+                            arrival_info_doc.virtual_checkin_status == "No"
+                            and process is True
+                        ):
                             duplicateCount += 1
-                            if(reservation["booking_status"] == "CHECKED IN"):
-                                reservation['checkin_date'] = reservation["arrival_date"]
-                            if(reservation["booking_status"] == "CHECKED OUT"):
-                                reservation['checkout_date'] = reservation["departure_date"]
+                            if reservation["booking_status"] == "CHECKED IN":
+                                reservation["checkin_date"] = reservation[
+                                    "arrival_date"
+                                ]
+                            if reservation["booking_status"] == "CHECKED OUT":
+                                reservation["checkout_date"] = reservation[
+                                    "departure_date"
+                                ]
                             frappe.db.set_value(
-                                'Arrival Information', reservation["confirmation_number"], reservation)
+                                "Arrival Information",
+                                reservation["confirmation_number"],
+                                reservation,
+                            )
                         else:
                             alreadyCheckinCount += 1
-                            if(reservation["booking_status"] == "CHECKED IN" or reservation["booking_status"] == "CHECKED OUT"):
+                            if (
+                                reservation["booking_status"] == "CHECKED IN"
+                                or reservation["booking_status"] == "CHECKED OUT"
+                            ):
                                 update_reservation = {
-                                    "booking_status": reservation["booking_status"]}
-                                if(reservation["booking_status"] == "CHECKED IN"):
-                                    update_reservation['checkin_date'] = reservation["arrival_date"]
-                                if(reservation["booking_status"] == "CHECKED OUT"):
-                                    update_reservation['checkout_date'] = reservation["departure_date"]
+                                    "booking_status": reservation["booking_status"]
+                                }
+                                if reservation["booking_status"] == "CHECKED IN":
+                                    update_reservation["checkin_date"] = reservation[
+                                        "arrival_date"
+                                    ]
+                                if reservation["booking_status"] == "CHECKED OUT":
+                                    update_reservation["checkout_date"] = reservation[
+                                        "departure_date"
+                                    ]
                                 frappe.db.set_value(
-                                    'Arrival Information', reservation["confirmation_number"], update_reservation)
+                                    "Arrival Information",
+                                    reservation["confirmation_number"],
+                                    update_reservation,
+                                )
                     else:
                         alreadyCheckinCount += 1
                         duplicateCount += 1
-                        if (arrival_info_doc.booking_status == "DUE IN" or arrival_info_doc.booking_status == "RESERVED") and (arrival_info_doc.arrival_date >= arrival_date):
+                        if (
+                            arrival_info_doc.booking_status == "DUE IN"
+                            or arrival_info_doc.booking_status == "RESERVED"
+                        ) and (arrival_info_doc.arrival_date >= arrival_date):
                             frappe.db.set_value(
-                                'Arrival Information', reservation["confirmation_number"], reservation)
+                                "Arrival Information",
+                                reservation["confirmation_number"],
+                                reservation,
+                            )
                         if arrival_info_doc.booking_status == "CANCELLED":
                             frappe.db.set_value(
-                                'Arrival Information', reservation["confirmation_number"], reservation)
+                                "Arrival Information",
+                                reservation["confirmation_number"],
+                                reservation,
+                            )
                 else:
                     if process:
                         processedCount += 1
                         reservation["doctype"] = "Arrival Information"
                         arrival_info = frappe.get_doc(reservation)
-                        arrival_info.insert(
-                            ignore_permissions=True, ignore_links=True)
+                        arrival_info.insert(ignore_permissions=True, ignore_links=True)
                         frappe.db.commit()
                     else:
                         pass
@@ -171,42 +238,42 @@ def arrivalActivity(company, file_url, source):
                 "already_checkin_count": alreadyCheckinCount,
                 "total_count": total_count,
                 "doctype": "Arrival Activities",
-                "status": "CSV import Done"
+                "status": "CSV import Done",
             }
             arrival_act = frappe.get_doc(arrival_activity)
             arrival_act.insert(ignore_permissions=True, ignore_links=True)
             frappe.db.commit()
             date_time = datetime.datetime.now()
             user_name = frappe.session.user
-            activity_data = {"doctype": "Activity Logs", "datetime": date_time, "module": "Scanezy",
-                             "event": "PreArrivals", "user": user_name, "activity": "Arrivals added successfully"}
+            activity_data = {
+                "doctype": "Activity Logs",
+                "datetime": date_time,
+                "module": "Scanezy",
+                "event": "PreArrivals",
+                "user": user_name,
+                "activity": "Arrivals added successfully",
+            }
             event_doc = frappe.get_doc(activity_data)
             event_doc.insert()
             frappe.db.commit()
         return {"success": True, "message": "Arrivals added successfully"}
-
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Arrivals arrivalActivity", "line No:{}\n{}".format(
-    #         exc_tb.tb_lineno, traceback.format_exc()))
-    #     return {"success": False, "message": str(e)}
-
-
-def update_guestdetails():
-    try:
-        pass
     except Exception as e:
-        pass
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Arrivals arrivalActivity",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
-def updateEmail(confirmation='', mobile='', email=''):
+def updateEmail(confirmation="", mobile="", email=""):
     try:
         if frappe.db.exists("Arrival Information", confirmation):
             arrival_doc = frappe.get_doc("Arrival Information", confirmation)
             arrival_doc.guest_eamil2 = email
             arrival_doc.guest_mobile_no2 = mobile
-            if email != '':
+            if email != "":
                 arrival_doc.send_invoice_mail = 1
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
             frappe.db.commit()
@@ -215,8 +282,10 @@ def updateEmail(confirmation='', mobile='', email=''):
     except Exception as e:
         print(str(e), "//////////////")
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("updateEmail", "line No:{}\n{}".format(
-            exc_tb.tb_lineno, traceback.format_exc()))
+        frappe.log_error(
+            "updateEmail",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
 
 
@@ -224,35 +293,53 @@ def updateEmail(confirmation='', mobile='', email=''):
 def get_arrival_info(confirmation, company):
     try:
         check_confirmation = frappe.db.sql(
-            """SELECT * FROM `tabArrival Information` where (name = '{}' or csr_id = '{}') and booking_status in ('RESERVED','DUE IN') and status = 'Pending' and company = '{}'""".format(confirmation, confirmation, company), as_dict=1)
+            """SELECT * FROM `tabArrival Information` where (name = '{}' or csr_id = '{}') and booking_status in ('RESERVED','DUE IN') and status = 'Pending' and company = '{}'""".format(
+                confirmation, confirmation, company
+            ),
+            as_dict=1,
+        )
         if len(check_confirmation) > 0:
-            return {"success": True, 'data': check_confirmation}
-        return {"success": False, 'message': "Invalid confirmation number or csr id"}
+            return {"success": True, "data": check_confirmation}
+        return {"success": False, "message": "Invalid confirmation number or csr id"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("get_arrival_info", "line No:{}\n{}".format(
-            exc_tb.tb_lineno, traceback.format_exc()))
+        frappe.log_error(
+            "get_arrival_info",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
 def autocomplete_arrival_info(confirmation_number: str, company: str):
-    '''
+    """
     get arrival information by confirmation
     :param confirmation_number: confirmation number
     :param company: company code
     :param fields: list of fields to be returned
-    '''
+    """
     try:
-        auto_complete_data = frappe.db.get_list("Arrival Information", filters={
-            'name': ['like', '%'+confirmation_number+'%'],
-            'company': company},
-            fields=["name","guest_first_name","no_of_adults","no_of_children","booking_status",'virtual_checkin_status','status'])
-        
-        print(auto_complete_data)
+        auto_complete_data = frappe.db.get_list(
+            "Arrival Information",
+            filters={
+                "name": ["like", "%" + confirmation_number + "%"],
+                "company": company,
+            },
+            fields=[
+                "name",
+                "guest_first_name",
+                "no_of_adults",
+                "no_of_children",
+                "booking_status",
+                "virtual_checkin_status",
+                "status",
+            ],
+        )
         return {"success": True, "data": auto_complete_data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("autocomplete_arrival_info", "line No:{}\n{}".format(
-            exc_tb.tb_lineno, traceback.format_exc()))
+        frappe.log_error(
+            "autocomplete_arrival_info",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
