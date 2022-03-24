@@ -128,6 +128,7 @@ def download_captcha():
         if not os.path.exists(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha'):
             os.mkdir(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha')
         company = frappe.get_last_doc("company")
+        print(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha/test.png')
         driver.find_element_by_id('capt').screenshot(
             folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/captcha/test.png')
         convert_base = convert_image_to_base64(
