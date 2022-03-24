@@ -3,6 +3,7 @@
 import base64
 import datetime
 import glob
+from heapq import merge
 import importlib.util
 import itertools
 import json
@@ -20,6 +21,7 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
+from frappe.utils.background_jobs import enqueue
 from subprocess import PIPE, STDOUT, Popen
 
 # from requests.sessions import _Data
@@ -37,6 +39,7 @@ from requests.exceptions import RetryError
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 from frappe.core.doctype.communication.email import make
+from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 
 user_name = frappe.session.user
@@ -976,6 +979,33 @@ def arrival_information(doc, method=None):
                                   "confirmation_number": doc.confirmation_number})
     get_doc.insert()
     frappe.db.commit()
+    if frappe.db.exists('Arrival Information', doc.name):
+        if frappe.db.exists({"doctype": "Dropbox", "reservation_no": doc.name, "merged": "Not Merged"}):
+            get_dropbox = frappe.db.get_list("Dropbox", filters={"reservation_no": doc.name}, fields=["name"])
+            if len(get_dropbox) > 0:
+                for each in get_dropbox:
+                    merge_data = merge_guest_to_guest_details(each, method=True)
+                    if merge_data["success"] is True:
+                        enqueue(
+                            extract_text,
+                            queue="default",
+                            timeout=800000,
+                            event="data_extraction",
+                            now=False,
+                            data={
+                                "dropbox": merge_data["data"]["dropbox"],
+                                "image_1": merge_data["data"]["image_1"],
+                                "image_2": merge_data["data"]["image_2"],
+                                "id_type": merge_data["data"]["id_type"],
+                                "front_detected_doc_type": merge_data["data"]["front_detected_doc_type"],
+                                "back_detected_doc_type": merge_data["data"]["back_detected_doc_type"],
+                                "merged_to": doc.name,
+                            },
+                            is_async=True,
+                        )
+                        # extract_text(merge_data["data"])
+                        frappe.db.set_value("Dropbox", each, {"merged_to": doc.name, "merged": "Merged"})
+                        frappe.db.commit()
     data_get = {"doctype": "Documents", "number_of_guests": doc.number_of_guests,
                 "confirmation_number": doc.confirmation_number}
     if len(get_data) == 0:
@@ -1619,7 +1649,6 @@ def delete_arrival_activity():
 def get_apikey(user):
     try:
         if frappe.db.exists("User", user):
-            company = frappe.get_last_doc("company")
             user_api = frappe.get_doc("User", user)
             secret = user_api.get_password(
                 fieldname='api_secret', raise_exception=True)

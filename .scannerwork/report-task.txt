@@ -1,6 +1,0 @@
-projectKey=ezy-invoicing-client
-serverUrl=http://0.0.0.0:9000
-serverVersion=9.3.0.51899
-dashboardUrl=http://0.0.0.0:9000/dashboard?id=ezy-invoicing-client
-ceTaskId=AX-NLqxL9DKU-qlJL50e
-ceTaskUrl=http://0.0.0.0:9000/api/ce/task?id=AX-NLqxL9DKU-qlJL50e
