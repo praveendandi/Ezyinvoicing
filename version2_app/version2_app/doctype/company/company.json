@@ -1204,7 +1204,7 @@
   },
   {
    "fieldname": "pms_property_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "PMS Property URL"
   },
   {
@@ -1214,7 +1214,7 @@
   },
   {
    "fieldname": "cform_user_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "CForm User Name"
   },
   {
@@ -1229,7 +1229,7 @@
   },
   {
    "fieldname": "cform_password",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "CForm Password"
   },
   {
@@ -1257,7 +1257,7 @@
   },
   {
    "fieldname": "member_ship_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Member Ship URL"
   },
   {
@@ -1494,12 +1494,12 @@
   },
   {
    "fieldname": "reg_card_identification_text",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Reg Card Identification Text"
   },
   {
    "fieldname": "paid_out_receipts",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Paid Out Receipts Identification"
   },
   {
@@ -1508,17 +1508,17 @@
   },
   {
    "fieldname": "reg_card_confirmation_no_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Reg Card Confirmation no Regex"
   },
   {
    "fieldname": "paid_out_confirmation_no_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Paid Out Confirmation no Regex"
   },
   {
    "fieldname": "advance_deposits_identification",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Advance Deposits Identification"
   },
   {
@@ -1580,12 +1580,12 @@
   },
   {
    "fieldname": "pathik_username",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pathik Username"
   },
   {
    "fieldname": "pathik_password",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pathik Password"
   },
   {
@@ -1713,7 +1713,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-14 19:02:47.990406",
+ "modified": "2022-03-25 11:52:03.958701",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
