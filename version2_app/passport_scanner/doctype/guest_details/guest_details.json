@@ -32,6 +32,7 @@
   "address1",
   "address2",
   "guest_city",
+  "guest_state",
   "guest_country",
   "zip_code",
   "arrival_from_country",
@@ -450,14 +451,14 @@
    "fieldname": "guest_first_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Guest First Name"
+   "label": "Guest First Name",
+   "reqd": 1
   },
   {
    "fieldname": "guest_last_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Guest Last Name",
-   "reqd": 1
+   "label": "Guest Last Name"
   },
   {
    "fieldname": "guest_nationality",
@@ -494,11 +495,16 @@
    "fieldname": "zip_code",
    "fieldtype": "Data",
    "label": "Zip Code"
+  },
+  {
+   "fieldname": "guest_state",
+   "fieldtype": "Data",
+   "label": "Guest State"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-24 14:13:47.521147",
+ "modified": "2022-03-25 16:48:14.326317",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

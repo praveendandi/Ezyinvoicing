@@ -506,7 +506,6 @@ def get_reservation_details(reseravtion: str):
 def convert_base64_to_image(base, name, site_folder_path, company):
     try:
         file = site_folder_path+"/private/files/"+name+".jpg"
-
         # res = bytes(base, 'utf-8')
         with open(file, "wb") as fh:
             fh.write(base64.b64decode(base))

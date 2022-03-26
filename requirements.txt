@@ -22,3 +22,5 @@ pyshorteners
 tensorflow
 razorpay
 selenium
+datefinder
+flatdict

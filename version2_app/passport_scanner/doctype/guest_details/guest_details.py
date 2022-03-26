@@ -181,6 +181,8 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         response = upload_qr_image.json()
         if "message" in response:
             return response
+        else:
+            return {"success": False, "message":"something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
