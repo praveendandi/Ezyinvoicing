@@ -1,7 +1,5 @@
 import re
 
-import datefinder
-
 # import flatdict
 import frappe
 import pandas as pd
@@ -11,6 +9,10 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
     get_address_from_zipcode,
 )
+
+# import datefinder
+
+
 
 
 @frappe.whitelist(allow_guest=True)
@@ -72,13 +74,16 @@ def aadhaar_data_changes(data):
                 re.findall(r"\d+", data["aadhar_no_details_aadhar_no"])
             )
         if "aadhar_front_details_aadhar_front_details_DOB" in data:
-            matches = list(
-                datefinder.find_dates(
-                    data["aadhar_front_details_aadhar_front_details_DOB"]
-                )
+            # matches = list(
+            #     datefinder.find_dates(
+            #         data["aadhar_front_details_aadhar_front_details_DOB"]
+            #     )
+            # )
+            # if len(matches) > 0:
+            aadhaar_details["guest_dob"] = frappe.utils.formatdate(
+                data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
+                "yyyy-mm-dd",
             )
-            if len(matches) > 0:
-                aadhaar_details["guest_dob"] = matches[0].strftime("%Y-%m-%d")
         if "aadhar_back_details_aadhar_back_details_ADRESS" in data:
             aadhaar_details["address1"] = data[
                 "aadhar_back_details_aadhar_back_details_ADRESS"

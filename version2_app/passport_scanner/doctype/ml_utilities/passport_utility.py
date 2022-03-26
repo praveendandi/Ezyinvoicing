@@ -1,6 +1,3 @@
-import re
-
-import datefinder
 import frappe
 import pandas as pd
 import requests
@@ -93,8 +90,15 @@ def passport_data_changes(data):
             passport_details["passport_place_of_issued_country"] = data[
                 "passport_details_passport_details_country"
             ]
-        if "passport_details_passport_details_sex" in data or "visa_details_visa_details_sex" in data:
-            passport_details["gender"] = data["passport_details_passport_details_sex"]  if "passport_details_passport_details_sex" in data else data["visa_details_visa_details_sex"]
+        if (
+            "passport_details_passport_details_sex" in data
+            or "visa_details_visa_details_sex" in data
+        ):
+            passport_details["gender"] = (
+                data["passport_details_passport_details_sex"]
+                if "passport_details_passport_details_sex" in data
+                else data["visa_details_visa_details_sex"]
+            )
         if "passport_details_passport_details_document_number" in data:
             passport_details["passport_number"] = data[
                 "passport_details_passport_details_document_number"
@@ -115,7 +119,9 @@ def passport_data_changes(data):
                 "yyyy-mm-dd",
             )
         if "visa_details_visa_details_document_number" in data:
-            passport_details["visa_number"] = data["visa_details_visa_details_document_number"]
+            passport_details["visa_number"] = data[
+                "visa_details_visa_details_document_number"
+            ]
         if "visa_type_visa_type" in data:
             passport_details["visa_type"] = data["visa_type_visa_type"]
         return {"success": True, "data": passport_details}
