@@ -15,7 +15,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def fetch_aadhaar_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -35,8 +35,6 @@ def fetch_aadhaar_details(image_1=None, image_2=None):
             # return image_response
             if "success" in image_response:
                 return image_response
-            image_response["data"]["image_1"] = image_1
-            image_response["data"]["image_2"] = image_2
             data_changes = aadhaar_data_changes(image_response)
             if not data_changes["success"]:
                 return data_changes
@@ -54,7 +52,6 @@ def aadhaar_data_changes(data):
         # data = flatdict.FlatDict(data, delimiter="_")
         df = pd.json_normalize(data, sep="_")
         data = df.to_dict(orient="records")[0]
-        print(data,"////////")
         aadhaar_details = {}
         if "Aadhar_Face_Image_base_64" in data:
             folder_path = frappe.utils.get_bench_path()

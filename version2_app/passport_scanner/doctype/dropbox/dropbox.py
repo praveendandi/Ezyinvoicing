@@ -21,6 +21,9 @@ from version2_app.passport_scanner.doctype.ml_utilities.aadhaar_utility import (
 from version2_app.passport_scanner.doctype.ml_utilities.passport_utility import (
     fetch_passport_details,
 )
+from version2_app.passport_scanner.doctype.ml_utilities.driving_utility import (
+    fetch_driving_details,
+)
 
 
 class Dropbox(Document):
@@ -47,6 +50,8 @@ def create_doc_using_base_files(
         front_doc_type = ""
         front_detected_doc_type = None
         back_detected_doc_type = None
+        id_image1 = None
+        id_image2 = None
         if image_1:
             image_1_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
@@ -66,7 +71,6 @@ def create_doc_using_base_files(
 
             except ValueError:
                 raise
-
         if image_2:
             image_2_response = requests.post(
                 company.classfiy_api, json={"base": image_2}
@@ -98,30 +102,29 @@ def create_doc_using_base_files(
                 raise
 
         if "voter_back" in front_doc_type or "voter_front" in front_doc_type:
-            id_type = "voterid"
+            id_type = "Voter Card"
         elif "businessCard" in front_doc_type:
-            id_type = "aadhaar"
+            id_type = "Aadhaar"
         elif "invoice" in front_doc_type:
-            id_type = "invoice"
+            id_type = "Invoice"
         elif "driving_back" in front_doc_type or "driving_front" in front_doc_type:
-            id_type = "driving"
+            id_type = "Driving License"
         elif "panFront" in front_doc_type:
-            id_type = "pan"
+            id_type = "Pan Card"
         elif "passport_back" in front_doc_type or "passport_front" in front_doc_type:
-            id_type = "indianpassport"
+            id_type = "Indian Passport"
         elif "printed_visa" in front_doc_type or "written_visa" in front_doc_type:
-            id_type = "indianpassport"
+            id_type = "Indian Passport"
         elif "oci" in front_doc_type:
-            id_type = "oci"
+            id_type = "OCI"
         elif "aadhar_front" in front_doc_type or "aadhar_back" in front_doc_type:
-            id_type = "aadhaar"
+            id_type = "Aadhaar"
         else:
-            id_type = "others"
-
+            id_type = "Others"
         reseravtions_data = get_reservation_details(reservation_number)
-        dropbox_exist = frappe.db.exists(
-            {"doctype": "Dropbox", "reservation_no": reservation_number}
-        )
+        # dropbox_exist = frappe.db.exists(
+        #     {"doctype": "Dropbox", "reservation_no": reservation_number}
+        # )
 
         new_dropbox = frappe.new_doc("Dropbox")
         new_dropbox.reservation_no = reservation_number
@@ -159,7 +162,7 @@ def create_doc_using_base_files(
                 new_precheckin.image_1 = image_1_url["message"]["file_url"]
                 new_precheckin.guest_first_name = guest_name
                 new_dropbox.front = image_1_url["message"]["file_url"]
-
+                id_image1 = image_1_url["message"]["file_url"]
         if back != "":
             ts = time.time()
             image_2_url = convert_base64_to_image(
@@ -168,7 +171,7 @@ def create_doc_using_base_files(
             if "message" in image_2_url:
                 new_precheckin.image_2 = image_2_url["message"]["file_url"]
                 new_dropbox.back = image_2_url["message"]["file_url"]
-
+                id_image2 = image_2_url["message"]["file_url"]
         new_precheckin.confirmation_number = reservation_number
         if reseravtions_data:
             new_precheckin.guest_id_type = id_type
@@ -196,8 +199,8 @@ def create_doc_using_base_files(
                     "image_2": image_2,
                     "id_type": id_type,
                     "reservation_number": reservation_number,
-                    "front_detected_doc_type": front_detected_doc_type,
-                    "back_detected_doc_type": back_detected_doc_type,
+                    "id_image2": id_image2,
+                    "id_image1": id_image1,
                 },
                 is_async=True,
             )
@@ -732,7 +735,7 @@ def create_guest_using_base_files(
 def extract_id_details(data={}):
     try:
         details = {}
-        if data["id_type"] == "aadhaar":
+        if data["id_type"] == "Aadhaar":
             if data["image_1"]:
                 aadhaar_front_details = fetch_aadhaar_details(data["image_1"])
                 if not aadhaar_front_details["success"]:
@@ -743,7 +746,7 @@ def extract_id_details(data={}):
                 if not aadhaar_back_details["success"]:
                     return aadhaar_back_details
                 details.update(aadhaar_back_details["data"])
-        elif data["id_type"] == "indianpassport":
+        elif data["id_type"] == "Indian Passport":
             if data["image_1"]:
                 passport_front_details = fetch_passport_details(data["image_1"])
                 if not passport_front_details["success"]:
@@ -754,28 +757,28 @@ def extract_id_details(data={}):
                 if not passport_back_details["success"]:
                     return passport_back_details
                 details.update(passport_back_details["data"])
-        elif data["id_type"] == "voterid":
+        elif data["id_type"] == "Voter Card":
             pass
-        elif data["id_type"] == "invoice":
+        elif data["id_type"] == "Invoice":
             pass
-        elif data["id_type"] == "driving":
+        elif data["id_type"] == "Driving License":
             if data["image_1"]:
-                driving_front_details = fetch_aadhaar_details(data["image_1"])
+                driving_front_details = fetch_driving_details(data["image_1"])
                 if not driving_front_details["success"]:
                     return driving_front_details
                 details.update(driving_front_details["data"])
-            if data["image_2"]:
-                driving_back_details = fetch_aadhaar_details(data["image_2"])
-                if not driving_back_details["success"]:
-                    return driving_back_details
-                details.update(driving_back_details["data"])
-        elif data["id_type"] == "oci":
+            # if data["image_2"]:
+            #     driving_back_details = fetch_driving_details(data["image_2"])
+            #     if not driving_back_details["success"]:
+            #         return driving_back_details
+            #     details.update(driving_back_details["data"])
+        elif data["id_type"] == "OCI":
             pass
         else:
             pass
         if details:
-            details["id_image1"] = data["front_detected_doc_type"]
-            details["id_image2"] = data["back_detected_doc_type"]
+            details["id_image1"] = data["id_image1"]
+            details["id_image2"] = data["id_image2"]
             details["doctype"] = "Guest Details"
             details["confirmation_number"] = data["reservation_number"]
             guest_details = create_guest_details(details)
@@ -794,6 +797,8 @@ def extract_id_details(data={}):
 
 def create_guest_details(data):
     try:
+        if "guest_details" not in data:
+            data["guest_details"] = "Guest"
         doc = frappe.get_doc(data)
         doc.insert(ignore_permissions=True)
         frappe.db.commit()
