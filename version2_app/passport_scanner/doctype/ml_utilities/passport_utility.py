@@ -17,6 +17,7 @@ def fetch_passport_details(image_1=None, image_2=None):
             # "class": "indianpassport",
             "version": "v2",
             "filters": ["confidence", "detections", "predection", "file_name"],
+            # "preprocess": True
         }
         image_response = requests.post(
             company.detection_api,
@@ -26,6 +27,7 @@ def fetch_passport_details(image_1=None, image_2=None):
             image_response = image_response.json()
             if "success" in image_response:
                 return image_response
+            # return image_response
             passport_details = passport_data_changes(image_response)
             if not passport_details["success"]:
                 return passport_details
@@ -90,6 +92,12 @@ def passport_data_changes(data):
             passport_details["passport_place_of_issued_country"] = data[
                 "passport_details_passport_details_country"
             ]
+            if data["passport_details_passport_details_country"] == "IND":
+                passport_details["status"] = "In House"
+                passport_details["guest_id_type"] = "Indian Passport"
+            else:
+                passport_details["status"] = "Pending Review"
+                passport_details["guest_id_type"] = "Foreigner"
         if (
             "passport_details_passport_details_sex" in data
             or "visa_details_visa_details_sex" in data

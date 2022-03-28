@@ -1,5 +1,4 @@
 import base64
-import datetime
 import glob
 import importlib.util
 import itertools
@@ -24,6 +23,7 @@ import requests
 from frappe.core.doctype.communication.email import make
 from frappe.utils import cstr, logger
 from PIL import Image
+import datetime
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -1503,9 +1503,9 @@ def guest_attachments(doc, method=None):
                 guest_doc.save(ignore_permissions=True, ignore_version=True)
                 frappe.db.commit()
             doc.no_of_children = arrival_doc.no_of_children
-        given_name = doc.given_name if doc.given_name else ""
-        surname = doc.surname if doc.surname else ""
-        if doc.id_type == "Foreigner":
+        given_name = doc.guest_first_name if doc.guest_first_name else ""
+        surname = doc.guest_last_name if doc.guest_last_name else ""
+        if doc.guest_id_type == "Foreigner":
             if frappe.db.exists(
                 {
                     "doctype": "Precheckins",
@@ -1521,10 +1521,10 @@ def guest_attachments(doc, method=None):
                 doc.address = pre_checkins["address1"]
                 doc.city = pre_checkins["guest_city"]
                 doc.country = pre_checkins["guest_country"]
-        if doc.date_of_birth:
+        if doc.guest_dob:
             today = datetime.datetime.today()
             birthDate = datetime.datetime.strptime(
-                doc.date_of_birth, "%Y-%m-%d")
+                doc.guest_dob, "%Y-%m-%d")
             doc.age = (
                 today.year
                 - birthDate.year
@@ -1544,8 +1544,8 @@ def guest_attachments(doc, method=None):
 @frappe.whitelist(allow_guest=True)
 def guest_update_attachment_logs(doc, method=None):
     try:
-        given_name = doc.given_name if doc.given_name else ""
-        surname = doc.surname if doc.surname else ""
+        given_name = doc.guest_first_name if doc.guest_first_name else ""
+        surname = doc.guest_last_name if doc.guest_last_name else ""
         frappe.db.set_value(
             "Guest Details", doc.name, {
                 "guest_full_name": given_name + " " + surname}
@@ -2425,19 +2425,19 @@ def ezy_suite_dashboard(from_date, to_date):
             as_dict=1,
         )
         pending_reviews = frappe.db.sql(
-            """select count(name) as pending_reviews from `tabGuest Details` where uploaded_to_frro=0 and id_type='Foreigner'""",
+            """select count(name) as pending_reviews from `tabGuest Details` where uploaded_to_frro=0 and guest_id_type='Foreigner'""",
             as_dict=1,
         )
         uploaded_cform_count = frappe.db.sql(
-            """select count(name) as uploaded_cfrom_count from `tabGuest Details` where uploaded_to_frro=1 and id_type='Foreigner'""",
+            """select count(name) as uploaded_cfrom_count from `tabGuest Details` where uploaded_to_frro=1 and guest_id_type='Foreigner'""",
             as_dict=1,
         )
         pathik_pending = frappe.db.sql(
-            """select count(name) as pending_pathik from `tabGuest Details` where pending_pathik=0 and id_type='Foreigner' and main_guest=1""",
+            """select count(name) as pending_pathik from `tabGuest Details` where pending_pathik=0 and guest_id_type='Foreigner' and main_guest=1""",
             as_dict=1,
         )
         uploaded_pathik = frappe.db.sql(
-            """select count(name) as uploaded_pathik from `tabGuest Details` where pending_pathik=1 and id_type='Foreigner' and main_guest=1""",
+            """select count(name) as uploaded_pathik from `tabGuest Details` where pending_pathik=1 and guest_id_type='Foreigner' and main_guest=1""",
             as_dict=1,
         )
         return {
