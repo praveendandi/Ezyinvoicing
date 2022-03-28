@@ -129,8 +129,9 @@ def Reinitiate_invoice(data):
                     #     value_after_gst += float(item['item_value_after_gst'])
                     #     print("++++++++++",value_after_gst)
                     pass
-        if "Arrival" in data["taxpayer"]["email"]:
-            data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
+        if "taxpayer" in data and "email" in data:
+            if "Arrival" in data["taxpayer"]["email"]:
+                data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "")
         if "invoice_from" in data.keys():
             if data["invoice_from"] != "Web":
                 if len(data['items_data'])==0 and data['total_invoice_amount'] == 0:
@@ -1114,6 +1115,7 @@ def reprocess_calulate_items(data):
         reinitiate = Reinitiate_invoice(final_data)
         doc_inv = frappe.get_doc("Invoices",data["invoice_number"])
         doc_inv.sez = sez
+        doc_inv.suptyp="B2B" if sez==0 else doc_inv.suptyp
         doc_inv.save(ignore_permissions=True)
         if reinitiate["success"] == True:
             return {"success": True}
