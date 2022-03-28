@@ -20,8 +20,8 @@ import shutil
 from frappe.utils import logger
 from frappe.utils.data import money_in_words
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+# frappe.utils.logger.set_log_level("DEBUG")
+# logger = frappe.logger("api", file_count=50)
 
 @frappe.whitelist(allow_guest=True)
 def num_to_words(num):
