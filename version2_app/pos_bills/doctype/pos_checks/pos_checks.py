@@ -17,7 +17,7 @@ from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api", file_count=50)
 
 class POSChecks(Document):
     pass

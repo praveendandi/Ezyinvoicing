@@ -24,7 +24,7 @@ from frappe.utils import logger
 
 
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api", file_count=50)
 
 
 @frappe.whitelist(allow_guest=True)

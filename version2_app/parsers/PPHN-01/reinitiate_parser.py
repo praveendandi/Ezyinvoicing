@@ -19,7 +19,7 @@ folder_path = frappe.utils.get_bench_path()
 
 
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api", file_count=50)
 # site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 

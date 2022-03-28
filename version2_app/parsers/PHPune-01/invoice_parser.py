@@ -16,9 +16,6 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 # from version2_app.version2_app.doctype.invoices.reinitate_invoice import *
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
-
 
 folder_path = frappe.utils.get_bench_path()
 
