@@ -13,10 +13,6 @@ import traceback,os,sys
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", file_count=50)
-
-
 def check_company_exist_for_Irn(code):
     try:
         company = frappe.get_doc('company', code)
@@ -657,7 +653,6 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
     except Exception as e:
         print(str(e), "Credit generate Irn")
         # frappe.log_error(frappe.get_traceback(),invoice_number)
-        logger.error(f"{invoice_number},     Credit Generate Irn,   {str(e)}")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing CreditgenerateIrn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
@@ -700,7 +695,6 @@ def postIrn(gst_data, gsp,company,invoice_number):
             insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company['data'].name})
             insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             response_error_message = str(irn_response.text)
-            logger.error(f"{invoice_number},     Credit Post Irn,   {response_error_message}")
             frappe.log_error(frappe.get_traceback(),invoice_number)
             return {"success": False, 'message': irn_response.text}
         # print(irn_response.text)
@@ -709,6 +703,5 @@ def postIrn(gst_data, gsp,company,invoice_number):
         # frappe.log_error(frappe.get_traceback(),invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing postIrn Credit","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        logger.error(f"{invoice_number},     Credit Generate Irn,   {str(e)}")
         return {"success": False, 'message':str(e)}
 
