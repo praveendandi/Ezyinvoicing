@@ -17,5 +17,5 @@ text-to-image
 scipy
 pytesseract
 pdf2image
-pytesseract
+razorpay
 # opencv-python
