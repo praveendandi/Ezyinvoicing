@@ -329,5 +329,4 @@ def file_parsing(filepath):
 		print(str(e),"       invoice parsing")
 		print(traceback.print_exc())
 		frappe.log_error(frappe.get_traceback())
-		logger.error(str(e))
 		return {"success":False,"message":str(e)}
