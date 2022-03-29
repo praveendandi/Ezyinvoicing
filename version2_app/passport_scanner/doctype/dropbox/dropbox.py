@@ -179,7 +179,7 @@ def create_doc_using_base_files(
             new_dropbox.merged = "Merged"
             new_dropbox.merged_to = reservation_number
             new_dropbox.merged_on = datetime.datetime.now()
-            new_dropbox.ocr_process_status
+            new_dropbox.ocr_process_status = "Success"
 
             new_dropbox.insert(ignore_permissions=True)
             arrival_info = frappe.get_doc("Arrival Information", reservation_number)
