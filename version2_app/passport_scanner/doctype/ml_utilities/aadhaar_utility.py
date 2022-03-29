@@ -103,7 +103,7 @@ def aadhaar_data_changes(data):
         aadhaar_details["guest_country"] = "IND"
         aadhaar_details["guest_nationality"] = "IND"
         aadhaar_details["status"] = "In House"
-        aadhaar_details["guest_id_type"] = "Aadhaar"
+        aadhaar_details["guest_id_type"] = "aadhaar"
         if "aadhar_back_no_details_aadhar_back_no" in data:
             aadhaar_details["back_aadhaar_no"] = "".join(
                 re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])

@@ -83,7 +83,8 @@
   "pathik_status",
   "pending_pathik",
   "pathik_locality",
-  "guest_company_name"
+  "guest_company_name",
+  "uploaded_to_opera"
  ],
  "fields": [
   {
@@ -445,7 +446,7 @@
    "fieldname": "guest_id_type",
    "fieldtype": "Select",
    "label": "Guest Id Type",
-   "options": "Aadhaar\nVoter Card\nPan Card\nDriving License\nIndian Passport\nForeigner\nOthers\nOCI\nInvoice"
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
   },
   {
    "fieldname": "guest_first_name",
@@ -500,11 +501,17 @@
    "fieldname": "guest_state",
    "fieldtype": "Data",
    "label": "Guest State"
+  },
+  {
+   "default": "0",
+   "fieldname": "uploaded_to_opera",
+   "fieldtype": "Check",
+   "label": "Uploaded to Opera"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-28 17:21:59.593678",
+ "modified": "2022-03-29 15:50:35.113406",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

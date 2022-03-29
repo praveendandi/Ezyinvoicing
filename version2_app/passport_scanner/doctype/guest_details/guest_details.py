@@ -15,6 +15,9 @@ import frappe
 import requests
 from frappe.model.document import Document
 
+# from version2_app.passport_scanner.doctype.dropbox.dropbox import (
+#     merge_guest_to_guest_details,
+# )
 from version2_app.passport_scanner.doctype.guest_details.cform import intiate
 from version2_app.passport_scanner.doctype.guest_details.pathik import intiate_pathik
 
@@ -182,7 +185,7 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         if "message" in response:
             return response
         else:
-            return {"success": False, "message":"something went wrong"}
+            return {"success": False, "message": "something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -264,8 +267,7 @@ def update_guest_details(name):
                         if aadhar_front["data"]["message"]["success"] is False:
                             aadhar_details["image_1"] = pre_checkins.image_1
                             aadhar_details["image_2"] = pre_checkins.image_2
-                            aadhar_details.update(
-                                aadhar_front["data"]["message"])
+                            aadhar_details.update(aadhar_front["data"]["message"])
                             del aadhar_details["success"]
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
@@ -312,8 +314,7 @@ def update_guest_details(name):
                     if "message" in aadhar_back["data"].keys():
                         if aadhar_back["data"]["message"]["success"] is False:
                             aadhar_details["image_2"] = pre_checkins.image_2
-                            aadhar_details.update(
-                                aadhar_back["data"]["message"])
+                            aadhar_details.update(aadhar_back["data"]["message"])
                             del aadhar_details["success"]
                             del aadhar_details["aadhar_details"]
                             aadhar_details["id_type"] = "aadhaar"
@@ -687,13 +688,11 @@ def update_guest_details(name):
                         )
                         if visa_details["data"]["message"]["success"] is False:
                             passport_details["image_2"] = pre_checkins.image_2
-                            passport_details.update(
-                                visa_details["data"]["message"])
+                            passport_details.update(visa_details["data"]["message"])
                             del passport_details["success"]
                             passport_details["id_type"] = pre_checkins.guest_id_type
                             return {"success": True, "data": passport_details}
-                        passport_details.update(
-                            visa_details["data"]["message"]["data"])
+                        passport_details.update(visa_details["data"]["message"]["data"])
                     # aadhar_back["data"]["message"]["details"]["back_image"] = aadhar_back["data"]["message"]["aadhar_details"]["base64_string"]
                     # del visa_details["data"]["message"]["details"]["data"]["base64_string"]
                     passport_details["image_2"] = pre_checkins.image_2
@@ -717,8 +716,7 @@ def update_guest_details(name):
                     if driving_license["data"]["message"]["success"] is False:
                         other_details["image_1"] = pre_checkins.image_1
                         other_details["image_2"] = pre_checkins.image_2
-                        other_details.update(
-                            driving_license["data"]["message"])
+                        other_details.update(driving_license["data"]["message"])
                         del other_details["success"]
                         other_details["id_type"] = "other"
                         return {"success": True, "data": other_details}
@@ -745,8 +743,7 @@ def update_guest_details(name):
                     )
                     if back2["data"]["message"]["success"] is False:
                         other_details["image_2"] = pre_checkins.image_2
-                        other_details.update(
-                            driving_license["data"]["message"])
+                        other_details.update(driving_license["data"]["message"])
                         del other_details["success"]
                         other_details["id_type"] = "other"
                         return {"success": True, "data": other_details}
@@ -862,14 +859,11 @@ def add_guest_details():
             # if company_doc.ezy_checkins_module == 0 and company_doc.scan_ezy_module == 1:
             #     pre_checkins_count = frappe.db.get_value('Arrival Information',{"confirmation_number":data["confirmation_number"]},"no_of_adults")
             if "-" in data["confirmation_number"]:
-                data["confirmation_number"] = data["confirmation_number"].split(
-                    "-")[0]
+                data["confirmation_number"] = data["confirmation_number"].split("-")[0]
             scan_guest_details = frappe.db.count(
-                "Guest Details", {
-                    "confirmation_number": data["confirmation_number"]}
+                "Guest Details", {"confirmation_number": data["confirmation_number"]}
             )
-            name = data["given_name"] + \
-                data["confirmation_number"] + data["id_type"]
+            name = data["given_name"] + data["confirmation_number"] + data["id_type"]
             if data["id_image1"]:
                 if (
                     "private" not in data["id_image1"]
@@ -976,8 +970,7 @@ def add_guest_details():
                 data["age"] = (
                     today.year
                     - birthDate.year
-                    - ((today.month, today.day) <
-                       (birthDate.month, birthDate.day))
+                    - ((today.month, today.day) < (birthDate.month, birthDate.day))
                 )
             doc = frappe.get_doc(data)
             doc.insert(ignore_permissions=True, ignore_links=True)
@@ -1027,8 +1020,7 @@ def add_guest_details():
                         "guest_first_name": data["given_name"],
                     }
                 )
-                arrival_info_doc.insert(
-                    ignore_permissions=True, ignore_links=True)
+                arrival_info_doc.insert(ignore_permissions=True, ignore_links=True)
             return {"success": True, "message": "Guest added"}
         else:
             return {"success": False, "message": "Scan-Ezy module is not enabled"}
@@ -1048,7 +1040,7 @@ def process_cform():
         # data = data["data"]
         # company = frappe.get_last_doc("company")
         # if company.cform_session == 1:
-        #     return {"success":False,"message":"Already cform inpogress"}       
+        #     return {"success":False,"message":"Already cform inpogress"}
         cform = intiate()
         return {"success": True, "message": cform}
         # company_doc.cform_session = 0
@@ -1082,8 +1074,7 @@ def process_pathik(guest_details):
         company_status = update_company(company.name, {"pathik_session": 1})
         if company_status["success"] is False:
             return company_status
-        obj = {"userId": company.pathik_username,
-               "password": company.pathik_password}
+        obj = {"userId": company.pathik_username, "password": company.pathik_password}
         status = intiate_pathik(obj, guest_details)
         update_company(company.name, {"pathik_session": 0})
         if company_status["success"] is False:
@@ -1110,6 +1101,50 @@ def update_company(company_code, obj):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-update_company",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def guest_details_for_opera(confirmation_number: str = None):
+    try:
+        # company = frappe.get_last_doc("company")
+        if confirmation_number:
+            if not frappe.db.exists("Arrival Information", confirmation_number):
+                return {"success": False, "message": "reservation not found"}
+            # if company.ome_scanner == 1:
+            #     if not frappe.db.exists("Dropbox", {"reservation_no": confirmation_number}):
+            #         return {"success": False, "message": "data not found in dropbox"}
+            if not frappe.db.exists(
+                "Guest Details", {"confirmation_number": confirmation_number}
+            ):
+                return {"success": False, "message": "data not found in guest details"}
+            else:
+                get_guest_details = frappe.db.get_list(
+                    "Guest Details",
+                    filters={"confirmation_number": confirmation_number},
+                    fields=[
+                        "guest_full_name",
+                        "confirmation_number",
+                        "guest_first_name",
+                        "name",
+                        "guest_id_type",
+                        "uploaded_to_opera"
+                    ],
+                )
+                get_booking_status = frappe.db.get_value("Arrival Information", confirmation_number, "booking_status")
+                get_guest_details = [dict(item, booking_status=get_booking_status) for item in get_guest_details]
+                return {"success": True, "data": get_guest_details}
+        else:
+            return {
+                "success": False,
+                "message": "please enter a valid confirmation number",
+            }
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-guest_details_for_opera",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
         )
         return {"success": False, "message": str(e)}

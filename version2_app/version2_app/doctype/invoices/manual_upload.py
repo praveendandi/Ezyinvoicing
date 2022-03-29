@@ -175,7 +175,6 @@ def manual_upload_data(data):
         #     frappe.db.commit()
         #     frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
         #     return {"success":False,"message":"Invoice data mismatch"}
-        print("[===============[===================")
         gst_data_file = data['gst_file']
         gst_file_path = folder_path+'/sites/'+site_folder_path+gst_data_file
         gst_dataframe = pd.read_csv(gst_file_path)

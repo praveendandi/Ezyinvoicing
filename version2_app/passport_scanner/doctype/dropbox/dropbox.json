@@ -112,7 +112,7 @@
    "fieldname": "id_type",
    "fieldtype": "Select",
    "label": "Id Type",
-   "options": "Aadhaar\nVoter Card\nIndian Passport\nDriving License\nPan Card\nOthers\nOCI\nInvoice"
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
   },
   {
    "fieldname": "column_break_14",
@@ -131,7 +131,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-28 17:21:47.602729",
+ "modified": "2022-03-29 13:44:07.209573",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Dropbox",

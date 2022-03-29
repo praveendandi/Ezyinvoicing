@@ -102,25 +102,25 @@ def create_doc_using_base_files(
                 raise
 
         if "voter_back" in front_doc_type or "voter_front" in front_doc_type:
-            id_type = "Voter Card"
+            id_type = "voterId"
         elif "businessCard" in front_doc_type:
-            id_type = "Aadhaar"
+            id_type = "aadhaar"
         elif "invoice" in front_doc_type:
             id_type = "Invoice"
         elif "driving_back" in front_doc_type or "driving_front" in front_doc_type:
-            id_type = "Driving License"
+            id_type = "driving"
         elif "panFront" in front_doc_type:
             id_type = "Pan Card"
         elif "passport_back" in front_doc_type or "passport_front" in front_doc_type:
-            id_type = "Indian Passport"
+            id_type = "indianPassport"
         elif "printed_visa" in front_doc_type or "written_visa" in front_doc_type:
-            id_type = "Indian Passport"
+            id_type = "indianPassport"
         elif "oci" in front_doc_type:
             id_type = "OCI"
         elif "aadhar_front" in front_doc_type or "aadhar_back" in front_doc_type:
-            id_type = "Aadhaar"
+            id_type = "aadhaar"
         else:
-            id_type = "Others"
+            id_type = "other"
         reseravtions_data = get_reservation_details(reservation_number)
         # dropbox_exist = frappe.db.exists(
         #     {"doctype": "Dropbox", "reservation_no": reservation_number}
@@ -612,19 +612,26 @@ def merge_guest_to_guest_details(name: str):
         company = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
+        private_folder_path = folder_path + "/sites/" + company.site_name
         if doc.front:
-            front_file_path = site_folder_path + doc.front
+            if "private" not in doc.front:
+                front_file_path = site_folder_path + doc.front
+            else:
+                front_file_path = private_folder_path + doc.front
             with open(front_file_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
             image_1 = encoded_string.decode("utf-8")
         if doc.back:
-            back_file_path = site_folder_path + doc.front
+            if "private" not in doc.front:
+                back_file_path = site_folder_path + doc.front
+            else:
+                back_file_path = private_folder_path + doc.front
             with open(back_file_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
             image_2 = encoded_string.decode("utf-8")
 
         enqueue(
-            extract_text,
+            extract_id_details,
             queue="default",
             timeout=800000,
             event="data_extraction",
@@ -634,13 +641,14 @@ def merge_guest_to_guest_details(name: str):
                 "image_1": image_1,
                 "image_2": image_2,
                 "id_type": doc.id_type,
-                "front_detected_doc_type": doc.id_type,
-                "back_detected_doc_type": doc.id_type,
+                "reservation_number": doc.reservation_no,
+                "id_image1": doc.front,
+                "id_image2": doc.back,
                 "merged_to": doc.merged_to,
             },
             is_async=True,
         )
-        return True
+        return {"success": True}
     except Exception as e:
         print(e)
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -693,7 +701,7 @@ def create_guest_using_base_files(
                     return image_3_response
                 id_type_image3 = image_3_response["doc_type"]
         if (id_type_image1 or id_type_image2) in ["aadhar_front", "aadhar_back", "businessCard"]:
-            id_type = "Aadhaar"
+            id_type = "aadhaar"
         elif (id_type_image1 or id_type_image2) in ["passport_front", "printed_visa", "passport_back", "written_visa"]:
             id_type = "Passport"
         elif (id_type_image1 or id_type_image2) in ["voter_back", "voter_front"]:
@@ -735,7 +743,7 @@ def create_guest_using_base_files(
 def extract_id_details(data={}):
     try:
         details = {}
-        if data["id_type"] == "Aadhaar":
+        if data["id_type"] == "aadhaar":
             if data["image_1"]:
                 aadhaar_front_details = fetch_aadhaar_details(data["image_1"])
                 if not aadhaar_front_details["success"]:
@@ -746,7 +754,7 @@ def extract_id_details(data={}):
                 if not aadhaar_back_details["success"]:
                     return aadhaar_back_details
                 details.update(aadhaar_back_details["data"])
-        elif data["id_type"] == "Indian Passport":
+        elif data["id_type"] == "indianPassport":
             if data["image_1"]:
                 passport_front_details = fetch_passport_details(data["image_1"])
                 if not passport_front_details["success"]:
@@ -757,11 +765,11 @@ def extract_id_details(data={}):
                 if not passport_back_details["success"]:
                     return passport_back_details
                 details.update(passport_back_details["data"])
-        elif data["id_type"] == "Voter Card":
+        elif data["id_type"] == "voterId":
             pass
         elif data["id_type"] == "Invoice":
             pass
-        elif data["id_type"] == "Driving License":
+        elif data["id_type"] == "driving":
             if data["image_1"]:
                 driving_front_details = fetch_driving_details(data["image_1"])
                 if not driving_front_details["success"]:

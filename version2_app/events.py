@@ -25,6 +25,10 @@ from frappe.utils import cstr, logger
 from PIL import Image
 import datetime
 
+from version2_app.passport_scanner.doctype.dropbox.dropbox import (
+    merge_guest_to_guest_details,
+)
+
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
@@ -36,11 +40,9 @@ def invoice_created(doc, method=None):
     try:
         print("Invoice Created", doc.name)
         if frappe.db.exists("Invoice Reconciliations", doc.name):
-            reconciliations_doc = frappe.get_doc(
-                "Invoice Reconciliations", doc.name)
+            reconciliations_doc = frappe.get_doc("Invoice Reconciliations", doc.name)
             reconciliations_doc.invoice_found = "Yes"
-            reconciliations_doc.save(
-                ignore_permissions=True, ignore_version=True)
+            reconciliations_doc.save(ignore_permissions=True, ignore_version=True)
         if doc.invoice_from == "Pms":
             if frappe.db.exists(
                 {"doctype": "Document Bin", "invoice_file": doc.invoice_file}
@@ -67,8 +69,7 @@ def invoice_created(doc, method=None):
             get_doc.insert()
             frappe.db.commit()
         get_doc = frappe.db.set_value(
-            "Documents", doc.confirmation_number, {
-                "tax_invoice_file": doc.invoice_file}
+            "Documents", doc.confirmation_number, {"tax_invoice_file": doc.invoice_file}
         )
         frappe.db.commit()
         company = frappe.get_doc("company", doc.company)
@@ -115,8 +116,7 @@ def invoice_created(doc, method=None):
                     }
                     data["uuid"] = tabletconfig.tablet
                     frappe.publish_realtime(
-                        "custom_socket", {
-                            "message": "Push To Tab", "data": data}
+                        "custom_socket", {"message": "Push To Tab", "data": data}
                     )
                     return {"success": True, "data": data}
     except Exception as e:
@@ -274,8 +274,7 @@ def invoiceCreated(doc):
         soc_doc.insert(ignore_permissions=True)
 
         filename = doc.invoice_file
-        bin_name = frappe.db.get_value(
-            "Document Bin", {"invoice_file": filename})
+        bin_name = frappe.db.get_value("Document Bin", {"invoice_file": filename})
         if frappe.db.exists({"doctype": "Document Bin", "name": bin_name}):
             bin_doc = frappe.get_doc("Document Bin", bin_name)
             bin_doc.print_by = doc.print_by
@@ -368,8 +367,7 @@ def insert_folios(company, file_path):
                         document_type.append(key)
         for i in raw_data:
             if "advance_deposits_identification" in document_type:
-                pattern = re.compile(
-                    company.advance_deposits_confirmation_no_regex)
+                pattern = re.compile(company.advance_deposits_confirmation_no_regex)
                 check_confirmation = re.findall(pattern, i)
                 if len(check_confirmation) > 0:
                     confirmation = list(itertools.chain(*tuple))
@@ -411,8 +409,7 @@ def fileCreated(doc, method=None):
                         + "/invoice_parser.py"
                     )
                 module_name = "file_parsing"
-                spec = importlib.util.spec_from_file_location(
-                    module_name, file_path)
+                spec = importlib.util.spec_from_file_location(module_name, file_path)
                 module = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(module)
                 module.file_parsing(doc.file_url)
@@ -470,8 +467,7 @@ def Updateemitsocket(doc, method=None):
 def DocumentBinSocket(doc, method=None):
     try:
         company = frappe.get_last_doc("company")
-        frappe.log_error("Document Bin Insert",
-                         " {'message':'Docuemnt Bin Insert'}")
+        frappe.log_error("Document Bin Insert", " {'message':'Docuemnt Bin Insert'}")
         frappe.publish_realtime(
             "custom_socket",
             {
@@ -558,8 +554,7 @@ def information_folio_created(doc, method=None):
             get_doc.insert()
             frappe.db.commit()
         get_doc = frappe.db.set_value(
-            "Documents", doc.confirmation_number, {
-                "invoice_file": doc.invoice_file}
+            "Documents", doc.confirmation_number, {"invoice_file": doc.invoice_file}
         )
         frappe.db.commit()
         company = frappe.get_doc("company", doc.company)
@@ -605,8 +600,7 @@ def information_folio_created(doc, method=None):
                     }
                     data["uuid"] = tabletconfig.tablet
                     frappe.publish_realtime(
-                        "custom_socket", {
-                            "message": "Push To Tab", "data": data}
+                        "custom_socket", {"message": "Push To Tab", "data": data}
                     )
                     return {"success": True, "data": data}
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
@@ -641,8 +635,7 @@ def remove_mapping(doc, method=None):
     try:
         tablet = frappe.db.get_value("Active Tablets", doc.tablet, "tablet")
         frappe.publish_realtime(
-            "custom_socket", {
-                "message": "Remove Tablet config", "data": doc.__dict__}
+            "custom_socket", {"message": "Remove Tablet config", "data": doc.__dict__}
         )
         frappe.publish_realtime(
             "custom_socket",
@@ -660,8 +653,7 @@ def remove_mapping(doc, method=None):
 def tablet_connected(doc, method=None):
     try:
         frappe.publish_realtime(
-            "custom_socket", {
-                "message": "Tablet Connected", "data": doc.__dict__}
+            "custom_socket", {"message": "Tablet Connected", "data": doc.__dict__}
         )
         # frappe.publish_realtime("custom_socket", {'message':'information Folio','type':"bench completed"})
     except Exception as e:
@@ -675,8 +667,7 @@ def tablet_disconnected(doc, method=None):
             {"message": "Tablet Config Disconnected", "data": doc.__dict__},
         )
         frappe.publish_realtime(
-            "custom_socket", {
-                "message": "Tablet Disconnected", "data": doc.__dict__}
+            "custom_socket", {"message": "Tablet Disconnected", "data": doc.__dict__}
         )
     except Exception as e:
         print(e)
@@ -772,8 +763,7 @@ def create_redg_card(doc, method=None):
             frappe.db.commit()
         user_name = frappe.session.user
         data = {"redg_file": doc.redg_file}
-        get_doc = frappe.db.set_value(
-            "Documents", doc.confirmation_number, data)
+        get_doc = frappe.db.set_value("Documents", doc.confirmation_number, data)
         frappe.db.commit()
     except Exception as e:
         print(e, "=================================================")
@@ -861,8 +851,7 @@ def create_payment_receipts(doc, method=None):
 def create_pos_bill(doc, method=None):
     try:
         frappe.publish_realtime(
-            "custom_socket", {
-                "message": "Pos Bills Created", "data": doc.__dict__}
+            "custom_socket", {"message": "Pos Bills Created", "data": doc.__dict__}
         )
     except Exception as e:
         print(e)
@@ -884,8 +873,7 @@ def deleteemailfilesdaily():
                 delete = frappe.delete_doc("File", value[0]["fid"])
                 print(delete)
         lastdate = date.today() - timedelta(days=6)
-        frappe.db.sql(
-            """DELETE FROM `tabDocument Bin` WHERE creation < %s""", lastdate)
+        frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""", lastdate)
         frappe.db.commit()
         return {"success": True}
     except Exception as e:
@@ -1047,15 +1035,13 @@ def InvoiceDataTolicensing():
             today = date.today()  # - timedelta(days=43)
             Invoice_count = frappe.db.get_list(
                 "Invoices",
-                filters={"creation": ["Between", [
-                    today, today]], "mode": "Testing"},
+                filters={"creation": ["Between", [today, today]], "mode": "Testing"},
                 fields=["count(name) as count", "invoice_category", "mode"],
                 group_by="invoice_category",
             )
             Invoice_count2 = frappe.db.get_list(
                 "Invoices",
-                filters={"creation": ["Between", [
-                    today, today]], "mode": "Production"},
+                filters={"creation": ["Between", [today, today]], "mode": "Production"},
                 fields=["count(name) as count", "invoice_category", "mode"],
                 group_by="invoice_category",
             )
@@ -1118,8 +1104,7 @@ def InvoiceDataTolicensing():
 def dailyDeletedocumentBin():
     try:
         lastdate = date.today() - timedelta(days=6)
-        frappe.db.sql(
-            """DELETE FROM `tabDocument Bin` WHERE creation < %s""", lastdate)
+        frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""", lastdate)
         frappe.db.commit()
         return {"success": True}
     except Exception as e:
@@ -1222,8 +1207,7 @@ def updatepropertiesdetails():
 def promotionsSocket(doc, method=None):
     try:
         frappe.publish_realtime(
-            "custom_socket", {
-                "message": "Promotions Created", "data": doc.__dict__}
+            "custom_socket", {"message": "Promotions Created", "data": doc.__dict__}
         )
     except Exception as e:
         print(str(e))
@@ -1232,8 +1216,7 @@ def promotionsSocket(doc, method=None):
 def deletePromotionsSocket(doc, method=None):
     try:
         frappe.publish_realtime(
-            "custom_socket", {
-                "message": "Promotions Deleted", "data": doc.__dict__}
+            "custom_socket", {"message": "Promotions Deleted", "data": doc.__dict__}
         )
     except Exception as e:
         print(str(e))
@@ -1292,38 +1275,61 @@ def backup_file_perticulerdoctypes(data):
 
 @frappe.whitelist(allow_guest=True)
 def arrival_information(doc, method=None):
-    user_name = frappe.session.user
-    date_time = datetime.datetime.now()
-    date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
-    data = {
-        "doctype": "Activity Logs",
-        "datetime": date_time,
-        "confirmation_number": doc.confirmation_number,
-        "module": "Sign Ezy",
-        "event": "PreArrivals",
-        "user": user_name,
-        "activity": "Reservation Created",
-    }
-    get_doc = frappe.get_doc(data)
-    get_data = frappe.db.get_list(
-        doctype="Documents", filters={"confirmation_number": doc.confirmation_number}
-    )
-    get_doc.insert()
-    frappe.db.commit()
-    data_get = {
-        "doctype": "Documents",
-        "number_of_guests": doc.number_of_guests,
-        "confirmation_number": doc.confirmation_number,
-    }
-    if len(get_data) == 0:
-        get_doc = frappe.get_doc(data_get)
+    try:
+        user_name = frappe.session.user
+        date_time = datetime.datetime.now()
+        date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
+        get_dropbox_details = frappe.db.get_list(
+            "Dropbox",
+            filters={"reservation_no": doc.name, "merged": "Not merged"},
+            pluck="name",
+        )
+        if len(get_dropbox_details) > 0:
+            for each in get_dropbox_details:
+                merge_guest_details = merge_guest_to_guest_details(each)
+                if not merge_guest_details["success"]:
+                    frappe.log_error("Ezy-merge_guest_details", merge_guest_details["message"])
+                else:
+                    frappe.db.set_value("Dropbox", each, {"merged_to": doc.name, "merged": "Merged", "reservation_found": 1, "merged_on": date_time})
+                    frappe.db.commit()
+        data = {
+            "doctype": "Activity Logs",
+            "datetime": date_time,
+            "confirmation_number": doc.confirmation_number,
+            "module": "Sign Ezy",
+            "event": "PreArrivals",
+            "user": user_name,
+            "activity": "Reservation Created",
+        }
+        get_doc = frappe.get_doc(data)
+        get_data = frappe.db.get_list(
+            doctype="Documents",
+            filters={"confirmation_number": doc.confirmation_number},
+        )
         get_doc.insert()
         frappe.db.commit()
-    else:
-        frappe.db.set_value(
-            "Documents", get_data[0]["name"], {
-                "number_of_guests": doc.number_of_guests}
+        data_get = {
+            "doctype": "Documents",
+            "number_of_guests": doc.number_of_guests,
+            "confirmation_number": doc.confirmation_number,
+        }
+        if len(get_data) == 0:
+            get_doc = frappe.get_doc(data_get)
+            get_doc.insert()
+            frappe.db.commit()
+        else:
+            frappe.db.set_value(
+                "Documents",
+                get_data[0]["name"],
+                {"number_of_guests": doc.number_of_guests},
+            )
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Ezy-arrival_information",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
         )
+        return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
@@ -1339,11 +1345,9 @@ def send_invoice_mail_scheduler():
         )
         if len(get_arrivals) > 0:
             for each in get_arrivals:
-                get_arrivals = frappe.get_doc(
-                    "Arrival Information", each["name"])
+                get_arrivals = frappe.get_doc("Arrival Information", each["name"])
                 if frappe.db.exists(
-                    {"doctype": "Invoices",
-                        "confirmation_number": each["name"]}
+                    {"doctype": "Invoices", "confirmation_number": each["name"]}
                 ):
                     get_doc = frappe.db.get_value(
                         "Invoices",
@@ -1381,8 +1385,7 @@ def send_invoice_mail_scheduler():
                         send_email=1,
                     )
                     get_arrivals.invoice_send_mail_send = 1
-                    get_arrivals.save(ignore_permissions=True,
-                                      ignore_version=True)
+                    get_arrivals.save(ignore_permissions=True, ignore_version=True)
                     frappe.db.commit()
                     return {"success": True, "message": "Mail Send"}
     except Exception as e:
@@ -1443,8 +1446,7 @@ def guest_attachments(doc, method=None):
                 "module_name": "Scan Ezy",
                 "user": user_name,
             }
-            get_doc = frappe.db.set_value(
-                "Documents", get_data[0]["name"], data)
+            get_doc = frappe.db.set_value("Documents", get_data[0]["name"], data)
             frappe.db.commit()
             update_doc = frappe.get_doc("Documents", get_data[0]["name"])
             update_doc.append(
@@ -1459,15 +1461,13 @@ def guest_attachments(doc, method=None):
             update_doc.save()
             frappe.db.commit()
         if frappe.db.exists("Arrival Information", doc.confirmation_number):
-            arrival_doc = frappe.get_doc(
-                "Arrival Information", doc.confirmation_number)
+            arrival_doc = frappe.get_doc("Arrival Information", doc.confirmation_number)
             guest_count = arrival_doc.no_of_adults
             now = datetime.datetime.now()
             doc.no_of_nights = arrival_doc.no_of_nights
             doc.checkin_time = now.strftime("%H:%M:%S")
             added_guest_count = frappe.db.count(
-                "Guest Details", {
-                    "confirmation_number": doc.confirmation_number}
+                "Guest Details", {"confirmation_number": doc.confirmation_number}
             )
             if guest_count != 0:
                 arrival_doc.booking_status = "CHECKED IN"
@@ -1484,14 +1484,12 @@ def guest_attachments(doc, method=None):
             if arrival_doc.checkout_time:
                 doc.checkout_time = arrival_doc.checkout_time
             doc.checkout_date = (
-                datetime.datetime.strptime(
-                    str(arrival_doc.departure_date), "%Y-%m-%d")
+                datetime.datetime.strptime(str(arrival_doc.departure_date), "%Y-%m-%d")
                 if arrival_doc.departure_date
                 else None
             )
             doc.checkin_date = (
-                datetime.datetime.strptime(
-                    str(arrival_doc.arrival_date), "%Y-%m-%d")
+                datetime.datetime.strptime(str(arrival_doc.arrival_date), "%Y-%m-%d")
                 if arrival_doc.arrival_date
                 else None
             )
@@ -1523,8 +1521,7 @@ def guest_attachments(doc, method=None):
                 doc.country = pre_checkins["guest_country"]
         if doc.guest_dob:
             today = datetime.datetime.today()
-            birthDate = datetime.datetime.strptime(
-                doc.guest_dob, "%Y-%m-%d")
+            birthDate = datetime.datetime.strptime(doc.guest_dob, "%Y-%m-%d")
             doc.age = (
                 today.year
                 - birthDate.year
@@ -1547,8 +1544,7 @@ def guest_update_attachment_logs(doc, method=None):
         given_name = doc.guest_first_name if doc.guest_first_name else ""
         surname = doc.guest_last_name if doc.guest_last_name else ""
         frappe.db.set_value(
-            "Guest Details", doc.name, {
-                "guest_full_name": given_name + " " + surname}
+            "Guest Details", doc.name, {"guest_full_name": given_name + " " + surname}
         )
         frappe.db.commit()
         user_name = frappe.session.user
@@ -1600,8 +1596,7 @@ def send_email(confirmation_number, company):
     data = data.replace("{{hotelName}}", company_doc.company_name)
     logopath = folder_path + "/sites/" + site_folder_path + company_doc.company_logo
     logofilename, logofile_extension = os.path.splitext(logopath)
-    baneer_image = folder_path + "/sites/" + \
-        site_folder_path + company_doc.email_banner
+    baneer_image = folder_path + "/sites/" + site_folder_path + company_doc.email_banner
     bannerfilename, bannerfile_extension = os.path.splitext(baneer_image)
     with open(baneer_image, "rb") as f:
         filecontent = f.read()
@@ -1673,8 +1668,7 @@ def pre_mail():
             now = datetime.datetime.now()
             current_time = now.strftime("%H:%M")
             time_company = str(company.mail_schedule_time)[:-3:]
-            str_date = str(company.mail_schedule_time +
-                           timedelta(minutes=1))[:-3:]
+            str_date = str(company.mail_schedule_time + timedelta(minutes=1))[:-3:]
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = company.site_name
             file_path = (
@@ -1695,8 +1689,7 @@ def pre_mail():
                         data = f.read()
                         data = data.replace("{{name}}", guest_first_name)
                         data = data.replace("{{lastName}}", guest_last_name)
-                        data = data.replace(
-                            "{{hotelName}}", company.company_name)
+                        data = data.replace("{{hotelName}}", company.company_name)
                         data = data.replace("{{email}}", company.email)
                         data = data.replace("{{phone}}", company.phone_number)
                         company_logo = (company.site_domain).rstrip(
@@ -1755,8 +1748,7 @@ def pre_mail():
                         data = f.read()
                         data = data.replace("{{name}}", guest_first_name)
                         data = data.replace("{{lastName}}", guest_last_name)
-                        data = data.replace(
-                            "{{hotelName}}", company.company_name)
+                        data = data.replace("{{hotelName}}", company.company_name)
                         data = data.replace("{{email}}", company.email)
                         data = data.replace("{{phone}}", company.phone_number)
                         company_logo = (company.site_domain).rstrip(
@@ -1833,8 +1825,7 @@ def pre_mail():
                         data = f.read()
                         data = data.replace("{{name}}", x["guest_first_name"])
                         # data = data.replace('{{lastName}}',arrival_doc.guest_last_name)
-                        data = data.replace(
-                            "{{hotelName}}", company.company_name)
+                        data = data.replace("{{hotelName}}", company.company_name)
                         data = data.replace("{{email}}", company.email)
                         data = data.replace("{{phone}}", company.phone_number)
                         frappe.sendmail(
@@ -1928,13 +1919,10 @@ def manual_mail(data):
         frappe.db.set_value(
             "Arrival Information", conf_number, "guest_email_address", email_address
         )
-        frappe.db.set_value("Arrival Information",
-                            conf_number, "mail_via", "Manual")
-        frappe.db.set_value("Arrival Information",
-                            conf_number, "mail_sent", "Yes")
+        frappe.db.set_value("Arrival Information", conf_number, "mail_via", "Manual")
+        frappe.db.set_value("Arrival Information", conf_number, "mail_sent", "Yes")
         count = count + 1
-        frappe.db.set_value("Arrival Information",
-                            conf_number, "mail_count", count)
+        frappe.db.set_value("Arrival Information", conf_number, "mail_count", count)
         activity_data = {
             "doctype": "Activity Logs",
             "datetime": date_time,
@@ -1968,13 +1956,10 @@ def manual_mail(data):
             message=data,
             now=True,
         )
-        frappe.db.set_value("Arrival Information",
-                            conf_number, "mail_via", "Manual")
-        frappe.db.set_value("Arrival Information",
-                            conf_number, "mail_sent", "Yes")
+        frappe.db.set_value("Arrival Information", conf_number, "mail_via", "Manual")
+        frappe.db.set_value("Arrival Information", conf_number, "mail_sent", "Yes")
         count = count + 1
-        frappe.db.set_value("Arrival Information",
-                            conf_number, "mail_count", count)
+        frappe.db.set_value("Arrival Information", conf_number, "mail_count", count)
         activity_data = {
             "doctype": "Activity Logs",
             "datetime": date_time,
@@ -2141,8 +2126,7 @@ def precheckins():
         except PIL.UnidentifiedImageError:
             pass
         if company.ezycheckin_signature == "0":
-            i["signature"] = "/files/signature" + \
-                i["confirmation_number"] + ".png"
+            i["signature"] = "/files/signature" + i["confirmation_number"] + ".png"
         i["image_1"] = "/files/image1" + i["confirmation_number"] + ".png"
         i["image_2"] = "/files/image2" + i["confirmation_number"] + ".png"
         i.update({"doctype": "Precheckins"})
@@ -2153,8 +2137,7 @@ def precheckins():
             if get_arrival_data == 1:
                 nam = (i["confirmation_number"] + "-") + str(get_arrival_data)
             else:
-                nam = (i["confirmation_number"] + "-") + \
-                    str(get_arrival_data - 1)
+                nam = (i["confirmation_number"] + "-") + str(get_arrival_data - 1)
             i["confirmation_number"] = nam
         precheckins_doc = frappe.get_doc(i)
         frappe.db.set_value(
@@ -2243,16 +2226,14 @@ def upload_propery_logo_pms(data):
             if company.skip_ssl_verify == 0:
                 json_response = requests.post(
                     "https://gst.caratred.in/ezy/api/addCompanyLogo",
-                    data={"company": company.name,
-                          "file_extension": file_extension},
+                    data={"company": company.name, "file_extension": file_extension},
                     files=files,
                     verify=False,
                 )
             else:
                 json_response = requests.post(
                     "https://gst.caratred.in/ezy/api/addCompanyLogo",
-                    data={"company": company.name,
-                          "file_extension": file_extension},
+                    data={"company": company.name, "file_extension": file_extension},
                     files=files,
                     verify=False,
                 )
@@ -2263,8 +2244,7 @@ def upload_propery_logo_pms(data):
         else:
             json_response = requests.post(
                 "https://gst.caratred.in/ezy/api/addCompanyLogo",
-                data={"company": company.name,
-                      "file_extension": file_extension},
+                data={"company": company.name, "file_extension": file_extension},
                 files=files,
                 proxies=proxies,
                 verify=False,
@@ -2327,8 +2307,7 @@ def get_apikey(user):
     try:
         if frappe.db.exists("User", user):
             user_api = frappe.get_doc("User", user)
-            secret = user_api.get_password(
-                fieldname="api_secret", raise_exception=True)
+            secret = user_api.get_password(fieldname="api_secret", raise_exception=True)
             api_key = user_api.api_key
             # generate = generate_keys(user)
             return {"success": True, "api_key": api_key, "api_secret": secret}
@@ -2347,8 +2326,7 @@ def get_apikey(user):
 def update_mail_send_confirmation(confirmation_number):
     try:
         if frappe.db.exists("Arrival Information", confirmation_number):
-            arrival_doc = frappe.get_doc(
-                "Arrival Information", confirmation_number)
+            arrival_doc = frappe.get_doc("Arrival Information", confirmation_number)
             arrival_doc.invoice_send_mail_send = 1
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
             frappe.db.commit()

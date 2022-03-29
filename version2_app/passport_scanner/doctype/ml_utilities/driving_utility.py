@@ -147,6 +147,10 @@ def driving_data_changes(message):
             ).date()
             if dob_date < before_date:
                 driving_details["guest_dob"] = dob_date
+        driving_details["guest_country"] = "IND"
+        driving_details["guest_nationality"] = "IND"
+        driving_details["status"] = "In House"
+        driving_details["guest_id_type"] = "driving"
         return {"success": True, "data": driving_details}
     except Exception as e:
         frappe.log_error(str(e), "driving_data_changes")
