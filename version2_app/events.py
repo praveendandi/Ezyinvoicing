@@ -628,7 +628,7 @@ def block_irn():
 @frappe.whitelist(allow_guest=True)
 def backup_file_perticulerdoctypes(data):
     try:
-        get_company=frappe.get_doc("company",data["company_code"],fields=["host","site_name"])
+        get_company=frappe.get_doc(doctype="company",filters={"name":data["company_code"]},fields=["host","site_name"])
         site_name = cstr(frappe.local.site)
         run_command=os.system('bench --site {} backup --only "company,SAC HSN CODES,Payment Types,GSP APIS"'.format(site_name))
         cwd=cwd = os.getcwd() 
