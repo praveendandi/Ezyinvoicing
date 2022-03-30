@@ -13,7 +13,7 @@ def fetch_passport_details(image_1=None, image_2=None):
         company = frappe.get_last_doc("company")
         post_data = {
             "base": image_1 if image_1 is not None else image_2,
-            "thresh": 0.5,
+            "thresh": 0.4,
             # "class": "indianpassport",
             "version": "v2",
             "filters": ["confidence", "detections", "predection", "file_name"],
