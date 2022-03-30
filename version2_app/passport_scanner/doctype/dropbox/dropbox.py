@@ -196,7 +196,7 @@ def create_doc_using_base_files(
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=True,
+                now=False,
                 data={
                     "image_1": image_1,
                     "image_2": image_2,

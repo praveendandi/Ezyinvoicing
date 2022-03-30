@@ -1277,16 +1277,14 @@ def arrival_information(doc, method=None):
     try:
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
-        print(date_time,"///////")
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         get_dropbox_details = frappe.db.get_list(
             "Dropbox",
-            filters={"reservation_no": doc.name, "merged": "Not merged"},
-            pluck="name",
+            filters={"reservation_no": doc.name, "merged": "Not merged"}, fields=["name"]
         )
         if len(get_dropbox_details) > 0:
             for each in get_dropbox_details:
-                merge_guest_details = merge_guest_to_guest_details(each)
+                merge_guest_details = merge_guest_to_guest_details(each["name"])
                 if not merge_guest_details["success"]:
                     frappe.log_error(
                         "Ezy-merge_guest_details", merge_guest_details["message"]
@@ -1294,7 +1292,7 @@ def arrival_information(doc, method=None):
                 else:
                     frappe.db.set_value(
                         "Dropbox",
-                        each,
+                        each["name"],
                         {
                             "merged_to": doc.name,
                             "merged": "Merged",
