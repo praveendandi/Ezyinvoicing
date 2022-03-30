@@ -18,13 +18,16 @@ from frappe.utils.background_jobs import enqueue
 from version2_app.passport_scanner.doctype.ml_utilities.aadhaar_utility import (
     fetch_aadhaar_details,
 )
-from version2_app.passport_scanner.doctype.ml_utilities.passport_utility import (
-    fetch_passport_details,
-)
 from version2_app.passport_scanner.doctype.ml_utilities.driving_utility import (
     fetch_driving_details,
 )
-
+from version2_app.passport_scanner.doctype.ml_utilities.passport_utility import (
+    fetch_passport_details,
+)
+from version2_app.passport_scanner.doctype.ml_utilities.voter_utility import (
+    fetch_voter_details,
+)
+# from version2_app.events import guest_attachments
 
 class Dropbox(Document):
     pass
@@ -622,10 +625,10 @@ def merge_guest_to_guest_details(name: str):
                 encoded_string = base64.b64encode(image_file.read())
             image_1 = encoded_string.decode("utf-8")
         if doc.back:
-            if "private" not in doc.front:
-                back_file_path = site_folder_path + doc.front
+            if "private" not in doc.back:
+                back_file_path = site_folder_path + doc.back
             else:
-                back_file_path = private_folder_path + doc.front
+                back_file_path = private_folder_path + doc.back
             with open(back_file_path, "rb") as image_file:
                 encoded_string = base64.b64encode(image_file.read())
             image_2 = encoded_string.decode("utf-8")
@@ -700,9 +703,18 @@ def create_guest_using_base_files(
                 if "success" in image_3_response:
                     return image_3_response
                 id_type_image3 = image_3_response["doc_type"]
-        if (id_type_image1 or id_type_image2) in ["aadhar_front", "aadhar_back", "businessCard"]:
+        if (id_type_image1 or id_type_image2) in [
+            "aadhar_front",
+            "aadhar_back",
+            "businessCard",
+        ]:
             id_type = "aadhaar"
-        elif (id_type_image1 or id_type_image2) in ["passport_front", "printed_visa", "passport_back", "written_visa"]:
+        elif (id_type_image1 or id_type_image2) in [
+            "passport_front",
+            "printed_visa",
+            "passport_back",
+            "written_visa",
+        ]:
             id_type = "Passport"
         elif (id_type_image1 or id_type_image2) in ["voter_back", "voter_front"]:
             id_type = "voterid"
@@ -721,7 +733,7 @@ def create_guest_using_base_files(
             queue="default",
             timeout=800000,
             event="data_extraction",
-            now=True,
+            now=False,
             data={
                 "image_1": image_1,
                 "image_2": image_2,
@@ -746,49 +758,58 @@ def extract_id_details(data={}):
         if data["id_type"] == "aadhaar":
             if data["image_1"]:
                 aadhaar_front_details = fetch_aadhaar_details(data["image_1"])
-                if not aadhaar_front_details["success"]:
-                    return aadhaar_front_details
-                details.update(aadhaar_front_details["data"])
+                if aadhaar_front_details["success"]:
+                    # return aadhaar_front_details
+                    details.update(aadhaar_front_details["data"])
             if data["image_2"]:
                 aadhaar_back_details = fetch_aadhaar_details(data["image_2"])
-                if not aadhaar_back_details["success"]:
-                    return aadhaar_back_details
-                details.update(aadhaar_back_details["data"])
+                if aadhaar_back_details["success"]:
+                    # return aadhaar_back_details
+                    details.update(aadhaar_back_details["data"])
         elif data["id_type"] == "indianPassport":
             if data["image_1"]:
                 passport_front_details = fetch_passport_details(data["image_1"])
-                if not passport_front_details["success"]:
-                    return passport_front_details
-                details.update(passport_front_details["data"])
+                if passport_front_details["success"]:
+                    # return passport_front_details
+                    details.update(passport_front_details["data"])
             if data["image_2"]:
                 passport_back_details = fetch_passport_details(data["image_2"])
-                if not passport_back_details["success"]:
-                    return passport_back_details
-                details.update(passport_back_details["data"])
+                if passport_back_details["success"]:
+                    # return passport_back_details
+                    details.update(passport_back_details["data"])
         elif data["id_type"] == "voterId":
-            pass
+            if data["image_1"]:
+                voter_front_details = fetch_voter_details(data["image_1"])
+                if voter_front_details["success"]:
+                    details.update(voter_front_details["data"])
+            if data["image_2"]:
+                voter_back_details = fetch_voter_details(data["image_2"])
+                if voter_back_details["success"]:
+                    details.update(voter_back_details["data"])
         elif data["id_type"] == "Invoice":
             pass
         elif data["id_type"] == "driving":
             if data["image_1"]:
                 driving_front_details = fetch_driving_details(data["image_1"])
-                if not driving_front_details["success"]:
-                    return driving_front_details
-                details.update(driving_front_details["data"])
-            # if data["image_2"]:
-            #     driving_back_details = fetch_driving_details(data["image_2"])
-            #     if not driving_back_details["success"]:
-            #         return driving_back_details
-            #     details.update(driving_back_details["data"])
+                if driving_front_details["success"]:
+                    # return driving_front_details
+                    details.update(driving_front_details["data"])
+            if data["image_2"]:
+                driving_back_details = fetch_driving_details(data["image_2"])
+                if driving_back_details["success"]:
+                    # return driving_back_details
+                    details.update(driving_back_details["data"])
         elif data["id_type"] == "OCI":
             pass
         else:
             pass
+        details["id_image1"] = data["id_image1"]
+        details["id_image2"] = data["id_image2"]
+        if "guest_id_type" not in details:
+            details["guest_id_type"] = data["id_type"]
+        details["doctype"] = "Guest Details"
+        details["confirmation_number"] = data["reservation_number"]
         if details:
-            details["id_image1"] = data["id_image1"]
-            details["id_image2"] = data["id_image2"]
-            details["doctype"] = "Guest Details"
-            details["confirmation_number"] = data["reservation_number"]
             guest_details = create_guest_details(details)
             if not guest_details["success"]:
                 return guest_details
@@ -801,15 +822,17 @@ def extract_id_details(data={}):
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
             "extract_id_details",
         )
-        return {"success": False, "message": str(e)} 
+        return {"success": False, "message": str(e)}
+
 
 def create_guest_details(data):
     try:
-        if "guest_details" not in data:
-            data["guest_details"] = "Guest"
+        if "guest_first_name" not in data:
+            data["guest_first_name"] = "Guest"
         doc = frappe.get_doc(data)
-        doc.insert(ignore_permissions=True)
-        frappe.db.commit()
+        doc.insert()
+        # frappe.db.commit()
+        # guest_attachments(doc, method="Manula")
         return {"success": True, "message": "Guest Created"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

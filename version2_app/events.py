@@ -23,12 +23,11 @@ import requests
 from frappe.core.doctype.communication.email import make
 from frappe.utils import cstr, logger
 from PIL import Image
-import datetime
 
 from version2_app.passport_scanner.doctype.dropbox.dropbox import (
     merge_guest_to_guest_details,
 )
-
+import datetime
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
@@ -1278,6 +1277,7 @@ def arrival_information(doc, method=None):
     try:
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
+        print(date_time,"///////")
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
         get_dropbox_details = frappe.db.get_list(
             "Dropbox",
@@ -1288,9 +1288,20 @@ def arrival_information(doc, method=None):
             for each in get_dropbox_details:
                 merge_guest_details = merge_guest_to_guest_details(each)
                 if not merge_guest_details["success"]:
-                    frappe.log_error("Ezy-merge_guest_details", merge_guest_details["message"])
+                    frappe.log_error(
+                        "Ezy-merge_guest_details", merge_guest_details["message"]
+                    )
                 else:
-                    frappe.db.set_value("Dropbox", each, {"merged_to": doc.name, "merged": "Merged", "reservation_found": 1, "merged_on": date_time})
+                    frappe.db.set_value(
+                        "Dropbox",
+                        each,
+                        {
+                            "merged_to": doc.name,
+                            "merged": "Merged",
+                            "reservation_found": 1,
+                            "merged_on": date_time,
+                        },
+                    )
                     frappe.db.commit()
         data = {
             "doctype": "Activity Logs",
@@ -1397,7 +1408,7 @@ def send_invoice_mail_scheduler():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def guest_attachments(doc, method=None):
     try:
         user_name = frappe.session.user
@@ -1484,12 +1495,12 @@ def guest_attachments(doc, method=None):
             if arrival_doc.checkout_time:
                 doc.checkout_time = arrival_doc.checkout_time
             doc.checkout_date = (
-                datetime.datetime.strptime(str(arrival_doc.departure_date), "%Y-%m-%d")
+                frappe.utils.formatdate(arrival_doc.departure_date, "yyyy-mm-dd")
                 if arrival_doc.departure_date
                 else None
             )
             doc.checkin_date = (
-                datetime.datetime.strptime(str(arrival_doc.arrival_date), "%Y-%m-%d")
+                frappe.utils.formatdate(arrival_doc.arrival_date, "yyyy-mm-dd")
                 if arrival_doc.arrival_date
                 else None
             )
@@ -1521,18 +1532,19 @@ def guest_attachments(doc, method=None):
                 doc.country = pre_checkins["guest_country"]
         if doc.guest_dob:
             today = datetime.datetime.today()
-            birthDate = datetime.datetime.strptime(doc.guest_dob, "%Y-%m-%d")
-            doc.age = (
+            birthDate = datetime.datetime.strptime(doc.guest_dob, '%Y-%m-%d')
+            doc.guest_age= (
                 today.year
                 - birthDate.year
                 - ((today.month, today.day) < (birthDate.month, birthDate.day))
             )
         doc.guest_full_name = given_name + " " + surname
-        # doc.save()
+        # doc.save(ignore_permissions=True, ignore_version=True)
+        # frappe.db.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "Ezy-invoicing Guest Attachments",
+            "Ezy-Guest Attachments",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
         )
         return {"success": False, "message": str(e)}
