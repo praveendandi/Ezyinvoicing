@@ -50,56 +50,57 @@ def aadhaar_data_changes(data):
     try:
         company = frappe.get_last_doc("company")
         # data = flatdict.FlatDict(data, delimiter="_")
-        df = pd.json_normalize(data, sep="_")
-        data = df.to_dict(orient="records")[0]
         aadhaar_details = {}
-        if "Aadhar_Face_Image_base_64" in data:
-            folder_path = frappe.utils.get_bench_path()
-            site_folder_path = folder_path + "/sites/" + company.site_name
-            face_image = convert_base64_to_image(
-                data["Aadhar_Face_Image_base_64"],
-                "aadhar_image",
-                site_folder_path,
-                company,
-            )
-            if "success" not in face_image:
-                aadhaar_details["face_image"] = face_image["message"]["file_url"]
-        if "aadhar_front_details_aadhar_front_details_NAME" in data:
-            aadhaar_details["guest_first_name"] = data[
-                "aadhar_front_details_aadhar_front_details_NAME"
-            ]
-        if "aadhar_front_details_aadhar_front_details_GENDER" in data:
-            aadhaar_details["gender"] = data[
-                "aadhar_front_details_aadhar_front_details_GENDER"
-            ]
-        if "aadhar_no_details_aadhar_no" in data:
-            aadhaar_details["local_id_number"] = "".join(
-                re.findall(r"\d+", data["aadhar_no_details_aadhar_no"])
-            )
-        if "aadhar_front_details_aadhar_front_details_DOB" in data:
-            regex_complie = re.compile(
-                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
-            )
-            if re.match(
-                regex_complie,
-                data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
-            ):
-                aadhaar_details["guest_dob"] = frappe.utils.formatdate(
-                    data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
-                    "yyyy-mm-dd",
+        if bool(data):
+            df = pd.json_normalize(data, sep="_")
+            data = df.to_dict(orient="records")[0]
+            if "Aadhar_Face_Image_base_64" in data:
+                folder_path = frappe.utils.get_bench_path()
+                site_folder_path = folder_path + "/sites/" + company.site_name
+                face_image = convert_base64_to_image(
+                    data["Aadhar_Face_Image_base_64"],
+                    "aadhar_image",
+                    site_folder_path,
+                    company,
                 )
-        if "aadhar_back_details_aadhar_back_details_ADRESS" in data:
-            aadhaar_details["address1"] = data[
-                "aadhar_back_details_aadhar_back_details_ADRESS"
-            ]
-        if "aadhar_back_details_aadhar_back_details_PINCODE" in data:
-            pincode = data["aadhar_back_details_aadhar_back_details_PINCODE"]
-            regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
-            if re.match(regex_complie, pincode):
-                aadhaar_details["zip_code"] = pincode
-                address_details = get_address_from_zipcode(pincode)
-                if address_details["success"]:
-                    aadhaar_details.update(address_details["data"])
+                if "success" not in face_image:
+                    aadhaar_details["face_image"] = face_image["message"]["file_url"]
+            if "aadhar_front_details_aadhar_front_details_NAME" in data:
+                aadhaar_details["guest_first_name"] = data[
+                    "aadhar_front_details_aadhar_front_details_NAME"
+                ]
+            if "aadhar_front_details_aadhar_front_details_GENDER" in data:
+                aadhaar_details["gender"] = data[
+                    "aadhar_front_details_aadhar_front_details_GENDER"
+                ]
+            if "aadhar_no_details_aadhar_no" in data:
+                aadhaar_details["local_id_number"] = "".join(
+                    re.findall(r"\d+", data["aadhar_no_details_aadhar_no"])
+                )
+            if "aadhar_front_details_aadhar_front_details_DOB" in data:
+                regex_complie = re.compile(
+                    r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
+                )
+                if re.match(
+                    regex_complie,
+                    data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
+                ):
+                    aadhaar_details["guest_dob"] = frappe.utils.formatdate(
+                        data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
+                        "yyyy-mm-dd",
+                    )
+            if "aadhar_back_details_aadhar_back_details_ADRESS" in data:
+                aadhaar_details["address1"] = data[
+                    "aadhar_back_details_aadhar_back_details_ADRESS"
+                ]
+            if "aadhar_back_details_aadhar_back_details_PINCODE" in data:
+                pincode = data["aadhar_back_details_aadhar_back_details_PINCODE"]
+                regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
+                if re.match(regex_complie, pincode):
+                    aadhaar_details["zip_code"] = pincode
+                    address_details = get_address_from_zipcode(pincode)
+                    if address_details["success"]:
+                        aadhaar_details.update(address_details["data"])
         aadhaar_details["guest_country"] = "IND"
         aadhaar_details["guest_nationality"] = "IND"
         aadhaar_details["status"] = "In House"

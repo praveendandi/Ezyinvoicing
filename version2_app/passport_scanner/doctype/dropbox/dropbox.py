@@ -651,6 +651,12 @@ def merge_guest_to_guest_details(name: str):
             },
             is_async=True,
         )
+        reseravtions_data = get_reservation_details(doc.reservation_no)
+        if reseravtions_data:
+            arrival_doc = frappe.get_doc("Arrival Information", doc.reservation_no)
+            arrival_doc.status = "Scanned"
+            arrival_doc.virtual_checkin_status = "Yes"
+            arrival_doc.save(ignore_permissions=True, ignore_version=True)
         return {"success": True}
     except Exception as e:
         print(e)
@@ -830,8 +836,8 @@ def create_guest_details(data):
         if "guest_first_name" not in data:
             data["guest_first_name"] = "Guest"
         doc = frappe.get_doc(data)
-        doc.insert()
-        # frappe.db.commit()
+        doc.insert(ignore_permissions=True)
+        frappe.db.commit()
         # guest_attachments(doc, method="Manula")
         return {"success": True, "message": "Guest Created"}
     except Exception as e:

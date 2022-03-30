@@ -6,7 +6,7 @@ import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
-    get_address_from_zipcode,
+    # get_address_from_zipcode,
 )
 
 
@@ -42,7 +42,7 @@ def fetch_voter_details(image_1=None, image_2=None):
 def voter_data_changes(data):
     try:
         voter_details = {}
-        if not bool(data):
+        if bool(data):
             df = pd.json_normalize(data, sep="_")
             data = df.to_dict(orient="records")[0]
             if "voter_address_details_voter_address_details_NAME" in data:

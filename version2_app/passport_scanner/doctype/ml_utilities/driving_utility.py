@@ -43,110 +43,111 @@ def driving_data_changes(message):
     try:
         data=message
         driving_details = {}
-        company = frappe.get_last_doc("company")
-        df = pd.json_normalize(data, sep="_")
-        data = df.to_dict(orient="records")[0]
-        dob_list = []
-        if "driving_front_details_driving_front_details_NAME" in data:
-            driving_details["guest_first_name"] = data[
-                "driving_front_details_driving_front_details_NAME"
-            ].strip()
-        if "Driving_Front_Face_Image_base_64" in data:
-            folder_path = frappe.utils.get_bench_path()
-            site_folder_path = folder_path + "/sites/" + company.site_name
-            face_image = convert_base64_to_image(
-                data["Driving_Front_Face_Image_base_64"],
-                "driving_image",
-                site_folder_path,
-                company,
-            )
-            if "success" not in face_image:
-                driving_details["face_image"] = face_image["message"]["file_url"]
-        if "driving_front_details_driving_front_details_DOB" in data:
-            regex_complie = re.compile(
-                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
-            )
-            if re.match(
-                regex_complie,
-                data["driving_front_details_driving_front_details_DOB"].strip(),
-            ):
-                dob_list.append(
-                    frappe.utils.formatdate(
-                        data["driving_front_details_driving_front_details_DOB"].strip(),
-                        "yyyy-mm-dd",
-                    )
+        if bool(data):
+            company = frappe.get_last_doc("company")
+            df = pd.json_normalize(data, sep="_")
+            data = df.to_dict(orient="records")[0]
+            dob_list = []
+            if "driving_front_details_driving_front_details_NAME" in data:
+                driving_details["guest_first_name"] = data[
+                    "driving_front_details_driving_front_details_NAME"
+                ].strip()
+            if "Driving_Front_Face_Image_base_64" in data:
+                folder_path = frappe.utils.get_bench_path()
+                site_folder_path = folder_path + "/sites/" + company.site_name
+                face_image = convert_base64_to_image(
+                    data["Driving_Front_Face_Image_base_64"],
+                    "driving_image",
+                    site_folder_path,
+                    company,
                 )
-        if "driving_front_details_driving_front_details_DOB1" in data:
-            regex_complie = re.compile(
-                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
-            )
-            if re.match(
-                regex_complie,
-                data["driving_front_details_driving_front_details_DOB1"].strip(),
-            ):
-                dob_list.append(
-                    frappe.utils.formatdate(
-                        data[
-                            "driving_front_details_driving_front_details_DOB1"
-                        ].strip(),
-                        "yyyy-mm-dd",
-                    )
+                if "success" not in face_image:
+                    driving_details["face_image"] = face_image["message"]["file_url"]
+            if "driving_front_details_driving_front_details_DOB" in data:
+                regex_complie = re.compile(
+                    r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
                 )
-        if "driving_front_details_driving_front_details_DOB2" in data:
-            regex_complie = re.compile(
-                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
-            )
-            if re.match(
-                regex_complie,
-                data["driving_front_details_driving_front_details_DOB2"].strip(),
-            ):
-                dob_list.append(
-                    frappe.utils.formatdate(
-                        data[
-                            "driving_front_details_driving_front_details_DOB2"
-                        ].strip(),
-                        "yyyy-mm-dd",
+                if re.match(
+                    regex_complie,
+                    data["driving_front_details_driving_front_details_DOB"].strip(),
+                ):
+                    dob_list.append(
+                        frappe.utils.formatdate(
+                            data["driving_front_details_driving_front_details_DOB"].strip(),
+                            "yyyy-mm-dd",
+                        )
                     )
+            if "driving_front_details_driving_front_details_DOB1" in data:
+                regex_complie = re.compile(
+                    r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
                 )
-        if "driving_front_details_driving_front_details_DOB3" in data:
-            regex_complie = re.compile(
-                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
-            )
-            if re.match(
-                regex_complie,
-                data["driving_front_details_driving_front_details_DOB3"].strip(),
-            ):
-                dob_list.append(
-                    frappe.utils.formatdate(
-                        data[
-                            "driving_front_details_driving_front_details_DOB3"
-                        ].strip(),
-                        "yyyy-mm-dd",
+                if re.match(
+                    regex_complie,
+                    data["driving_front_details_driving_front_details_DOB1"].strip(),
+                ):
+                    dob_list.append(
+                        frappe.utils.formatdate(
+                            data[
+                                "driving_front_details_driving_front_details_DOB1"
+                            ].strip(),
+                            "yyyy-mm-dd",
+                        )
                     )
+            if "driving_front_details_driving_front_details_DOB2" in data:
+                regex_complie = re.compile(
+                    r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
                 )
-        if "driving_front_details_driving_front_details_DOB4" in data:
-            regex_complie = re.compile(
-                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
-            )
-            if re.match(
-                regex_complie,
-                data["driving_front_details_driving_front_details_DOB4"].strip(),
-            ):
-                dob_list.append(
-                    frappe.utils.formatdate(
-                        data[
-                            "driving_front_details_driving_front_details_DOB4"
-                        ].strip(),
-                        "yyyy-mm-dd",
+                if re.match(
+                    regex_complie,
+                    data["driving_front_details_driving_front_details_DOB2"].strip(),
+                ):
+                    dob_list.append(
+                        frappe.utils.formatdate(
+                            data[
+                                "driving_front_details_driving_front_details_DOB2"
+                            ].strip(),
+                            "yyyy-mm-dd",
+                        )
                     )
+            if "driving_front_details_driving_front_details_DOB3" in data:
+                regex_complie = re.compile(
+                    r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
                 )
-        if len(dob_list) > 0:
-            dob_date = datetime.datetime.strptime(min(dob_list), "%Y-%m-%d").date()
-            before_date = (
-                datetime.datetime.today() - datetime.timedelta(days=18 * 365)
-            ).date()
-            if dob_date < before_date:
-                driving_details["guest_dob"] = dob_date
+                if re.match(
+                    regex_complie,
+                    data["driving_front_details_driving_front_details_DOB3"].strip(),
+                ):
+                    dob_list.append(
+                        frappe.utils.formatdate(
+                            data[
+                                "driving_front_details_driving_front_details_DOB3"
+                            ].strip(),
+                            "yyyy-mm-dd",
+                        )
+                    )
+            if "driving_front_details_driving_front_details_DOB4" in data:
+                regex_complie = re.compile(
+                    r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
+                )
+                if re.match(
+                    regex_complie,
+                    data["driving_front_details_driving_front_details_DOB4"].strip(),
+                ):
+                    dob_list.append(
+                        frappe.utils.formatdate(
+                            data[
+                                "driving_front_details_driving_front_details_DOB4"
+                            ].strip(),
+                            "yyyy-mm-dd",
+                        )
+                    )
+            if len(dob_list) > 0:
+                dob_date = datetime.datetime.strptime(min(dob_list), "%Y-%m-%d").date()
+                before_date = (
+                    datetime.datetime.today() - datetime.timedelta(days=18 * 365)
+                ).date()
+                if dob_date < before_date:
+                    driving_details["guest_dob"] = dob_date
         driving_details["guest_country"] = "IND"
         driving_details["guest_nationality"] = "IND"
         driving_details["status"] = "In House"

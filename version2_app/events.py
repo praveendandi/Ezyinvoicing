@@ -1411,6 +1411,7 @@ def send_invoice_mail_scheduler():
 # @frappe.whitelist(allow_guest=True)
 def guest_attachments(doc, method=None):
     try:
+        # print("/////////////////")
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
         date_time = date_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -1553,10 +1554,74 @@ def guest_attachments(doc, method=None):
 @frappe.whitelist(allow_guest=True)
 def guest_update_attachment_logs(doc, method=None):
     try:
+        data = {}
+        if frappe.db.exists("Arrival Information", doc.confirmation_number):
+            arrival_doc = frappe.get_doc("Arrival Information", doc.confirmation_number)
+            guest_count = arrival_doc.no_of_adults
+            now = datetime.datetime.now()
+            data["no_of_nights"] = arrival_doc.no_of_nights
+            data["checkin_time"] = now.strftime("%H:%M:%S")
+            added_guest_count = frappe.db.count(
+                "Guest Details", {"confirmation_number": doc.confirmation_number}
+            )
+            if guest_count != 0:
+                arrival_doc.booking_status = "CHECKED IN"
+                if added_guest_count > guest_count:
+                    arrival_doc.no_of_adults = guest_count + 1
+            else:
+                arrival_doc.no_of_adults = guest_count + 1
+                arrival_doc.booking_status = "CHECKED IN"
+            arrival_doc.save(ignore_permissions=True, ignore_version=True)
+            if arrival_doc.room_number:
+                data["room_number"] = arrival_doc.room_number
+            if arrival_doc.checkin_time:
+                data["checkin_time"] = arrival_doc.checkin_time
+            if arrival_doc.checkout_time:
+                data["checkout_time"] = arrival_doc.checkout_time
+            data["checkout_date"] = (
+                frappe.utils.formatdate(arrival_doc.departure_date, "yyyy-mm-dd")
+                if arrival_doc.departure_date
+                else None
+            )
+            data["checkin_date"] = (
+                frappe.utils.formatdate(arrival_doc.arrival_date, "yyyy-mm-dd")
+                if arrival_doc.arrival_date
+                else None
+            )
+            if doc.main_guest == 1:
+                data["no_of_adults"] = 1
+            else:
+                data["no_of_adults"] = arrival_doc.no_of_adults
+            data["no_of_children"] = arrival_doc.no_of_children
         given_name = doc.guest_first_name if doc.guest_first_name else ""
         surname = doc.guest_last_name if doc.guest_last_name else ""
+        if doc.guest_id_type == "Foreigner":
+            if frappe.db.exists(
+                {
+                    "doctype": "Precheckins",
+                    "confirmation_number": doc.confirmation_number,
+                }
+            ):
+                pre_checkins = frappe.db.get_value(
+                    "Precheckins",
+                    {"confirmation_number": doc.confirmation_number},
+                    ["address1", "guest_city", "guest_country"],
+                    as_dict=1,
+                )
+                data["address"] = pre_checkins["address1"]
+                data["city"] = pre_checkins["guest_city"]
+                data["country"] = pre_checkins["guest_country"]
+        if doc.guest_dob:
+            today = datetime.datetime.today()
+            birthDate = datetime.datetime.strptime(doc.guest_dob, '%Y-%m-%d')
+            data["guest_age"] = (
+                today.year
+                - birthDate.year
+                - ((today.month, today.day) < (birthDate.month, birthDate.day))
+            )
+        data["guest_full_name"] = given_name + " " + surname
         frappe.db.set_value(
-            "Guest Details", doc.name, {"guest_full_name": given_name + " " + surname}
+            "Guest Details", doc.name, data
         )
         frappe.db.commit()
         user_name = frappe.session.user
@@ -1573,7 +1638,7 @@ def guest_update_attachment_logs(doc, method=None):
             "status": doc.status,
         }
         event_doc = frappe.get_doc(activity_data)
-        event_doc.insert()
+        event_doc.insert(ignore_permissions=True)
         frappe.db.commit()
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
