@@ -8,6 +8,7 @@ import requests
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
     get_address_from_zipcode,
+    format_date
 )
 
 # import datefinder
@@ -15,7 +16,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 
 
 
-# @frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)
 def fetch_aadhaar_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -85,10 +86,13 @@ def aadhaar_data_changes(data):
                     regex_complie,
                     data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
                 ):
-                    aadhaar_details["guest_dob"] = frappe.utils.formatdate(
-                        data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
-                        "yyyy-mm-dd",
-                    )
+                    try:
+                        aadhaar_details["guest_dob"] = format_date(
+                            data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
+                            "yyyy-mm-dd",
+                        )
+                    except Exception as e:
+                        print(e)
             if "aadhar_back_details_aadhar_back_details_ADRESS" in data:
                 address = data[
                     "aadhar_back_details_aadhar_back_details_ADRESS"

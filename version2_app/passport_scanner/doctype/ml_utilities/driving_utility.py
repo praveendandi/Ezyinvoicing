@@ -7,6 +7,7 @@ import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
+    format_date
 )
 
 
@@ -16,7 +17,7 @@ def fetch_driving_details(image_1=None, image_2=None):
         company = frappe.get_last_doc("company")
         post_data = {
             "base": image_1 if image_1 is not None else image_2,
-            "thresh": 0.4,
+            "thresh": 0.3,
             "version": "v2",
             "filters": ["confidence", "detections", "predection", "file_name"],
         }
@@ -28,6 +29,7 @@ def fetch_driving_details(image_1=None, image_2=None):
             image_response = image_response.json()
             if "success" in image_response:
                 return image_response
+            # return image_response
             driving_details = driving_data_changes(image_response)
             if not driving_details["success"]:
                 return driving_details
@@ -72,7 +74,7 @@ def driving_data_changes(message):
                     data["driving_front_details_driving_front_details_DOB"].strip(),
                 ):
                     dob_list.append(
-                        frappe.utils.formatdate(
+                        format_date(
                             data["driving_front_details_driving_front_details_DOB"].strip(),
                             "yyyy-mm-dd",
                         )
@@ -86,7 +88,7 @@ def driving_data_changes(message):
                     data["driving_front_details_driving_front_details_DOB1"].strip(),
                 ):
                     dob_list.append(
-                        frappe.utils.formatdate(
+                        format_date(
                             data[
                                 "driving_front_details_driving_front_details_DOB1"
                             ].strip(),
@@ -102,7 +104,7 @@ def driving_data_changes(message):
                     data["driving_front_details_driving_front_details_DOB2"].strip(),
                 ):
                     dob_list.append(
-                        frappe.utils.formatdate(
+                        format_date(
                             data[
                                 "driving_front_details_driving_front_details_DOB2"
                             ].strip(),
@@ -118,7 +120,7 @@ def driving_data_changes(message):
                     data["driving_front_details_driving_front_details_DOB3"].strip(),
                 ):
                     dob_list.append(
-                        frappe.utils.formatdate(
+                        format_date(
                             data[
                                 "driving_front_details_driving_front_details_DOB3"
                             ].strip(),
@@ -134,7 +136,7 @@ def driving_data_changes(message):
                     data["driving_front_details_driving_front_details_DOB4"].strip(),
                 ):
                     dob_list.append(
-                        frappe.utils.formatdate(
+                        format_date(
                             data[
                                 "driving_front_details_driving_front_details_DOB4"
                             ].strip(),

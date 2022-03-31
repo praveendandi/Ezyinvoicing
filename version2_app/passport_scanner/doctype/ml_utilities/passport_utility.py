@@ -6,6 +6,7 @@ import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
+    format_date
 )
 
 
@@ -78,7 +79,7 @@ def passport_data_changes(data):
                     "passport_details_passport_details_name"
                 ]
             if "passport_details_passport_details_birth_date" in data:
-                passport_details["guest_dob"] = frappe.utils.formatdate(
+                passport_details["guest_dob"] = format_date(
                     data["passport_details_passport_details_birth_date"].strip(),
                     "yyyy-mm-dd",
                 )
@@ -108,27 +109,31 @@ def passport_data_changes(data):
                 "passport_details_passport_details_sex" in data
                 or "visa_details_visa_details_sex" in data
             ):
-                passport_details["gender"] = (
+                gender = (
                     data["passport_details_passport_details_sex"]
                     if "passport_details_passport_details_sex" in data
                     else data["visa_details_visa_details_sex"]
                 )
+                if gender in ["Male", "MALE", "male", "m", "M"]:
+                    passport_details["gender"] = "Male"
+                if gender in ["Female", "FEMALE", "female", "F", "f"]:
+                    passport_details["gender"] = "Female"
             if "passport_details_passport_details_document_number" in data:
                 passport_details["passport_number"] = data[
                     "passport_details_passport_details_document_number"
                 ]
             if "visa_details_visa_details_birth_date" in data:
-                passport_details["visa_guest_dob"] = frappe.utils.formatdate(
+                passport_details["visa_guest_dob"] = format_date(
                     data["visa_details_visa_details_birth_date"].strip(),
                     "yyyy-mm-dd",
                 )
             if "visa_date_of_issue_visa_date_of_issue" in data:
-                passport_details["visa_date_of_issue"] = frappe.utils.formatdate(
+                passport_details["visa_date_of_issue"] = format_date(
                     data["visa_date_of_issue_visa_date_of_issue"].strip(),
                     "yyyy-mm-dd",
                 )
             if "visa_details_visa_details_expiry_date" in data:
-                passport_details["visa_valid_till"] = frappe.utils.formatdate(
+                passport_details["visa_valid_till"] = format_date(
                     data["visa_details_visa_details_expiry_date"].strip(),
                     "yyyy-mm-dd",
                 )
