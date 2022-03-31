@@ -12,6 +12,7 @@ import string
 from frappe.utils import get_site_name
 import pandas as pd
 import numpy as np
+import pathlib
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
@@ -38,19 +39,20 @@ def holidayinManualupload(data):
             folioid=""
             site_folder_path = companyData.site_name
             items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-            if ".csv" in items_file_path:
+            file_extension = pathlib.Path(items_file_path).suffix
+            if ".csv" == file_extension.lower():
                 try:
                     items_dataframe = pd.read_csv(items_file_path,error_bad_lines=False,delimiter='|')
                 except UnicodeDecodeError:
                     items_dataframe = pd.read_csv(items_file_path,encoding ='latin1',error_bad_lines=False,delimiter='|')
-            elif ".xml" in items_file_path:
+            elif ".xml" ==file_extension.lower():
                 with open(items_file_path) as xml_file:
                     items_dataframe = xmltodict.parse(xml_file.read())
             else:
                 items_dataframe = pd.read_excel(items_file_path,error_bad_lines=False,delimiter='|')
 
             # items_dataframe = pd.read_excel(items_file_path)
-            if ".xml" not in items_file_path:
+            if ".xml" != file_extension.lower():
                 items_dataframe = items_dataframe.fillna('empty')
                 items_dataframe = items_dataframe.sort_values("taxinvnum")
                 invoice_columns = list(items_dataframe.columns.values)

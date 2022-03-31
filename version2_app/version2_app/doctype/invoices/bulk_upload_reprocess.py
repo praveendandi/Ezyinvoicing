@@ -116,7 +116,7 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Bulkupload Without Headers":
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Bulkupload Without Headers" or companyData.bulk_excel_upload_type=="Bulkupload With Headers":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date
