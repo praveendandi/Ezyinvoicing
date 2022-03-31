@@ -316,7 +316,8 @@ def holidayinManualupload(data):
                         # if each["sac_code"] == "Found":
                         if each["total_invoice_amount"] < 0:
                             each['invoice_category'] = "Credit Invoice"
-                        get_invoice_data=frappe.db.get_value("Invoices",{"invoice_number":each["folioid"],"irn_generated":["in",["Success","Cancelled"]]},as_dict=1)
+                        get_invoice_data=frappe.db.get_value('Invoices',{"name":each["invoice_number"],"irn_generated":["in",["Success","Cancelled"]]},as_dict=1)
+                        print(get_invoice_data,"++++++++++++++++",each["folioid"])
                         if reupload==False and get_invoice_data==None:
                             
                             insertInvoiceApiResponse = insert_invoice({"folioid":each["folioid"],"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
@@ -340,7 +341,7 @@ def holidayinManualupload(data):
                                 
                                 output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-                        else:
+                        elif get_invoice_data==None:
                             insertInvoiceApiResponse = Reinitiate_invoice({"folioid":each["folioid"],"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:
                                 
@@ -458,11 +459,12 @@ def holidayinManualupload(data):
             frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
             countIn+=1
         df = pd.DataFrame(output_date)
-        df = df.groupby('date').count().reset_index()
-        output_data = df.to_dict('records')
-        InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'] if "username" in data else "","start_time":str(start_time),"referrence_file":data['invoice_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
-        # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
+        if df.empty is False:
+            df = df.groupby('date').count().reset_index()
+            output_data = df.to_dict('records')
+            InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'] if "username" in data else "","start_time":str(start_time),"referrence_file":data['invoice_file']})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+            # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
         print(traceback.print_exc())
