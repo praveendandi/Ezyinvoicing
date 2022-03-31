@@ -654,9 +654,9 @@ def merge_guest_to_guest_details(name: str):
             },
             is_async=True,
         )
-        reseravtions_data = get_reservation_details(doc.reservation_no)
+        reseravtions_data = get_reservation_details(doc.merged_to)
         if reseravtions_data:
-            arrival_doc = frappe.get_doc("Arrival Information", doc.reservation_no)
+            arrival_doc = frappe.get_doc("Arrival Information", doc.merged_to)
             arrival_doc.status = "Scanned"
             arrival_doc.virtual_checkin_status = "Yes"
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
@@ -818,6 +818,9 @@ def extract_id_details(data={}):
             details["guest_id_type"] = data["id_type"]
         details["doctype"] = "Guest Details"
         details["confirmation_number"] = data["reservation_number"]
+        if "merged_to" in data:
+            if data["merged_to"] != "" or data["merged_to"] is not None:
+                details["confirmation_number"] = data["merged_to"]
         if details:
             guest_details = create_guest_details(details)
             if not guest_details["success"]:
