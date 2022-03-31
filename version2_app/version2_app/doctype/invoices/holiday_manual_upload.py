@@ -316,8 +316,9 @@ def holidayinManualupload(data):
                         # if each["sac_code"] == "Found":
                         if each["total_invoice_amount"] < 0:
                             each['invoice_category'] = "Credit Invoice"
-
-                        if reupload==False:
+                        get_invoice_data=frappe.db.get_value("Invoices",{"invoice_number":each["folioid"],"irn_generated":["in",["Success","Cancelled"]]},as_dict=1)
+                        if reupload==False and get_invoice_data==None:
+                            
                             insertInvoiceApiResponse = insert_invoice({"folioid":each["folioid"],"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:
                                 
