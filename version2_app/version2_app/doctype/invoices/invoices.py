@@ -33,7 +33,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api")
 
 class Invoices(Document):
 
@@ -351,7 +351,7 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": round(invoice.other_charges,2) if company_details['data'].vat_reporting==1 else round(invoice.other_charges_before_tax,2),
+            "OthChrg": abs(round(invoice.other_charges,2)) if company_details['data'].vat_reporting==1 else abs(round(invoice.other_charges_before_tax,2)),
             "RndOffAmt": 0,
             "TotInvVal": round(TotInnVal,2) if company_details['data'].vat_reporting==1 else round(TotInnVal-invoice.total_vat_amount, 2),
             "TotInvValFc": round(TotInvValFc, 2)
@@ -625,6 +625,7 @@ def send_invoicedata_to_gcb(invoice_number):
                 box_size=3,
                 border=4
             )
+            print(response['data'],"/////////")
             qrurl = company.b2c_qr_url + response['data']
             qr.add_data(qrurl)
             qr.make(fit=True)

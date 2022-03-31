@@ -20,8 +20,6 @@ import shutil
 from frappe.utils import logger
 from frappe.utils.data import money_in_words
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
 
 @frappe.whitelist(allow_guest=True)
 def num_to_words(num):
@@ -194,7 +192,6 @@ def fileCreated(doc, method=None):
                 spec.loader.exec_module(module)
                 module.file_parsing(doc.file_url)
                 frappe.log_error(traceback.print_exc())
-                logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
             company = frappe.get_last_doc("company")
             if company.block_print == "True":
@@ -203,10 +200,8 @@ def fileCreated(doc, method=None):
                 update_documentbin(doc.file_url,"")
 
             print('Normal File')
-        logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
         # frappe.log_error(traceback.print_exc())
-        logger.error(f"fileCreated,   {traceback.print_exc()}")
         print(str(e), "fileCreated")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing fileCreated Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -642,7 +637,7 @@ def block_irn():
 @frappe.whitelist(allow_guest=True)
 def backup_file_perticulerdoctypes(data):
     try:
-        get_company=frappe.get_doc("company",data["company_code"],fields=["host","site_name"])
+        get_company=frappe.get_doc(doctype="company",filters={"name":data["company_code"]},fields=["host","site_name"])
         site_name = cstr(frappe.local.site)
         run_command=os.system('bench --site {} backup --only "company,SAC HSN CODES,Payment Types,GSP APIS"'.format(site_name))
         cwd=cwd = os.getcwd() 
