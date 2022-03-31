@@ -7,7 +7,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 )
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def fetch_passport_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -27,7 +27,7 @@ def fetch_passport_details(image_1=None, image_2=None):
             image_response = image_response.json()
             if "success" in image_response:
                 return image_response
-            return image_response
+            # return image_response
             passport_details = passport_data_changes(image_response)
             if not passport_details["success"]:
                 return passport_details
