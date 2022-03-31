@@ -1,4 +1,5 @@
 import os
+import json
 import frappe
 import pandas as pd
 import requests
@@ -35,16 +36,16 @@ def fetch_passport_details(image_1=None, image_2=None):
             return {"success": True, "data": passport_details["data"]}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        frappe.log_error(str(e), "fetch_aadhaar_details")
+        frappe.log_error(str(e), "fetch_passport_details")
         return {"success": False, "message": str(e)}
 
 
 # @frappe.whitelist(allow_guest=True)
 def passport_data_changes(data):
     try:
-        print(os.path.dirname(os.path.abspath(__file__)))
-        # with open("visa-types.py", 'r') as data:
-        #     print(data)
+        file_path = os.path.dirname(os.path.abspath(__file__))
+        with open(file_path+'/visa-types.json', 'r') as myfile:
+            visa_types = json.loads(myfile.read())
         passport_details = {}
         company = frappe.get_last_doc("company")
         if bool(data):
@@ -136,8 +137,19 @@ def passport_data_changes(data):
                     "visa_details_visa_details_document_number"
                 ]
             if "visa_type_visa_type" in data:
-                passport_details["visa_type"] = data["visa_type_visa_type"]
+                # passport_details["visa_type"] = data["visa_type_visa_type"]
+                for each in visa_types:
+                    if data["visa_type_visa_type"] == each["viewValue"]:
+                        passport_details["visa_type"] = each["value"]
+                        break
+                    for visa_types in each["subTypes"]:
+                        if len(visa_types) > 0:
+                            get_visa_type = visa_types["viewValue"].split(" - ")[0].strip()
+                            if data["visa_type_visa_type"] == get_visa_type:
+                                passport_details["visa_sub_type"] = visa_types["value"]
+                                passport_details["visa_type"] = each["value"]
+                                break
         return {"success": True, "data": passport_details}
     except Exception as e:
-        frappe.log_error(str(e), "fetch_aadhaar_details")
+        frappe.log_error(str(e), "passport_data_changes")
         return {"success": False, "message": str(e)}

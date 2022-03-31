@@ -15,7 +15,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def fetch_aadhaar_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -90,9 +90,13 @@ def aadhaar_data_changes(data):
                         "yyyy-mm-dd",
                     )
             if "aadhar_back_details_aadhar_back_details_ADRESS" in data:
-                aadhaar_details["address1"] = data[
+                address = data[
                     "aadhar_back_details_aadhar_back_details_ADRESS"
                 ]
+                if address != "":
+                    address = address.replace("Address:","").strip()
+                    address = address.replace("\n"," ")
+                aadhaar_details["address1"] = address 
             if "aadhar_back_details_aadhar_back_details_PINCODE" in data:
                 pincode = data["aadhar_back_details_aadhar_back_details_PINCODE"]
                 regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")

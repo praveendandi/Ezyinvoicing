@@ -764,6 +764,7 @@ def create_guest_using_base_files(
 def extract_id_details(data={}):
     try:
         details = {}
+        print(details)
         if data["id_type"] == "aadhaar":
             if data["image_1"]:
                 aadhaar_front_details = fetch_aadhaar_details(data["image_1"])
@@ -819,8 +820,10 @@ def extract_id_details(data={}):
         details["doctype"] = "Guest Details"
         details["confirmation_number"] = data["reservation_number"]
         if "merged_to" in data:
+            print(data["merged_to"],"/////////")
             if data["merged_to"] != "" or data["merged_to"] is not None:
                 details["confirmation_number"] = data["merged_to"]
+        print(details,"/////.......")
         if details:
             guest_details = create_guest_details(details)
             if not guest_details["success"]:

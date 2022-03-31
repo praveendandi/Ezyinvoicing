@@ -1284,13 +1284,7 @@ def arrival_information(doc, method=None):
         )
         if len(get_dropbox_details) > 0:
             for each in get_dropbox_details:
-                merge_guest_details = merge_guest_to_guest_details(each["name"])
-                if not merge_guest_details["success"]:
-                    frappe.log_error(
-                        "Ezy-merge_guest_details", merge_guest_details["message"]
-                    )
-                else:
-                    frappe.db.set_value(
+                frappe.db.set_value(
                         "Dropbox",
                         each["name"],
                         {
@@ -1300,7 +1294,12 @@ def arrival_information(doc, method=None):
                             "merged_on": date_time,
                         },
                     )
-                    frappe.db.commit()
+                frappe.db.commit()
+                merge_guest_details = merge_guest_to_guest_details(each["name"])
+                if not merge_guest_details["success"]:
+                    frappe.log_error(
+                        "Ezy-merge_guest_details", merge_guest_details["message"]
+                    )    
         data = {
             "doctype": "Activity Logs",
             "datetime": date_time,
@@ -1529,7 +1528,7 @@ def guest_attachments(doc, method=None):
                 doc.address = pre_checkins["address1"]
                 doc.city = pre_checkins["guest_city"]
                 doc.country = pre_checkins["guest_country"]
-        if doc.guest_dob:
+        if doc.guest_dob is not None:
             today = datetime.datetime.today()
             birthDate = datetime.datetime.strptime(doc.guest_dob, '%Y-%m-%d')
             doc.guest_age= (
@@ -1609,7 +1608,7 @@ def guest_update_attachment_logs(doc, method=None):
                 data["address"] = pre_checkins["address1"]
                 data["city"] = pre_checkins["guest_city"]
                 data["country"] = pre_checkins["guest_country"]
-        if doc.guest_dob:
+        if doc.guest_dob is not None:
             today = datetime.datetime.today()
             birthDate = datetime.datetime.strptime(doc.guest_dob, '%Y-%m-%d')
             data["guest_age"] = (

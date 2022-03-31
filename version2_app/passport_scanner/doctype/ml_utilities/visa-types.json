@@ -1,0 +1,391 @@
+[
+  {
+    "altValue": "B", "value": "1", "viewValue": "BUSINESS VISA",
+    "subTypes": [
+      {
+        "value": "233",
+        "viewValue": " B-1  -    [For those coming to establish an industrial/business venture, those required to travel frequently on long-term business activities and for investors]"
+      },
+      {
+        "value": "236",
+        "viewValue": " B-1X  -    [For dependent of those coming to establish an industrial/business venture, those required to travel frequently on long-term business activities and for investors]"
+      },
+      {
+        "value": "234",
+        "viewValue": " B-2  -    [For all other business activities (other than those covered under B-1 and sports persons)]"
+      },
+      {
+        "value": "237",
+        "viewValue": " B-2X  -    [For dependent of business person coming for all other business activities (other than those covered under B-1 and sports persons)]"
+      },
+      {
+        "value": "235",
+        "viewValue": " B-3  -    [For sports persons and coaches including those engaged in commercial sports events in India on contract with remuneration]"
+      }
+    ]
+  },
+  {
+    "altValue": "C", "value": "2", "viewValue": "CONFERENCE VISA",
+    "subTypes": [
+      {
+        "value": "",
+        "viewValue": "Select"
+      },
+      {
+        "value": "148",
+        "viewValue": " C-1  -    [Participant of conferences organized by government authorities]"
+      },
+      {
+        "value": "149",
+        "viewValue": " C-2  -    [Participant of conferences organized by non-government authorities]"
+      }
+    ]
+  },
+  {
+    "altValue": "", "value": "91", "viewValue": "DIPLOMATIC DEPENDENT VISA",
+    "subTypes": []
+  },
+  {
+    "altValue": "D", "value": "3", "viewValue": "DIPLOMATIC VISA",
+    "subTypes": [
+      {
+        "value": "165",
+        "viewValue": " D-1  -    [Diplomat assigned in India (on diplomatic passport only)]"
+      },
+      {
+        "value": "168",
+        "viewValue": " D-1X  -    [Dependent of diplomat(Diplomat assigned in India (on diplomatic passport only))]"
+      },
+      {
+        "value": "166",
+        "viewValue": " D-2  -    [Diplomat on a visit to India for official purpose (on diplomatic passport only)]"
+      },
+      {
+        "value": "169",
+        "viewValue": " D-2X  -    [Dependent of diplomat(Diplomat on a visit to India for official purpose (on diplomatic passport only)))]"
+      },
+      {
+        "value": "167",
+        "viewValue": " D-3  -    [Diplomat assigned to non-UN international organization in India]"
+      },
+      {
+        "value": "170",
+        "viewValue": " D-3X  -    [Dependent of diplomat(Diplomat assigned to non-UN international organization in India)]"
+      },
+      {
+        "value": "175",
+        "viewValue": " UD-1  -    [UN diplomat assigned to India]"
+      },
+      {
+        "value": "177",
+        "viewValue": " UD-1X  -    [Dependent of UN diplomat assigned to India]"
+      },
+      {
+        "value": "176",
+        "viewValue": " UD-2  -    [UN diplomat on a visit to India]"
+      },
+      {
+        "value": "178",
+        "viewValue": " UD-2X  -    [Dependent of UN diplomat on a visit to India]"
+      }
+    ]
+  },
+  {
+    "altValue": "", "value": "97", "viewValue": "DOUBLE ENTRY VISA (ONLY FOR BANGLADESH NATIONALS)",
+    "subTypes": [
+      {
+        "value": "258",
+        "viewValue": " X-Double Entry  -    [Double Entry Visa]"
+      }
+    ]
+  },
+  {
+    "altValue": "E", "value": "4", "viewValue": "EMPLOYMENT VISA",
+    "subTypes": [
+      {
+        "value": "225",
+        "viewValue": " E1  -    [All cases of employment (except intra company transferees and employment in NGOs)]"
+      },
+      {
+        "value": "229",
+        "viewValue": " E-1X  -    [For dependent of Employment visa holders]"
+      },
+      {
+        "value": "226",
+        "viewValue": " E2  -    [Intra-company transferee]"
+      },
+      {
+        "value": "230",
+        "viewValue": " E-2X  -    [For dependent of Intra-company transferee]"
+      },
+      {
+        "value": "227",
+        "viewValue": " E3  -    [For employment in NGOs]"
+      },
+      {
+        "value": "231",
+        "viewValue": " E-3X  -    [For dependent of employees employed in NGOs]"
+      },
+      {
+        "value": "228",
+        "viewValue": " E4  -    [For those coming to execute projects in Power and steel sectors]"
+      },
+      {
+        "value": "232",
+        "viewValue": " E-4X  -    [For dependent of those coming to execute projects in Power and steel sectors]"
+      }
+    ]
+  },
+  {
+    "altValue": "XE", "value": "94", "viewValue": "ENTRY VISA",
+    "subTypes": [
+      {
+        "value": "246",
+        "viewValue": " X-1  -    [For Persons of Indian Origin and spouse and children of an Indian citizen / Person of Indian Origin / OCI cardholder (other than those registered as OCI cardholder)]"
+      },
+      {
+        "value": "247",
+        "viewValue": " X-2  -    [For those coming to join Auroville Foundation, Aurobindo Ashram, Missionaries of Charity, Temples or similar approved organizations]"
+      },
+      {
+        "value": "248",
+        "viewValue": " X-Misc  -    [For those categories for which X-Misc visa  has been specified in various chapters of the Visa manual and for purposes which are not covered by any other visa category]"
+      }
+    ]
+  },
+  {
+    "altValue": "", "value": "98", "viewValue": "e-VISA",
+    "subTypes": [
+      {
+        "value": "220",
+        "viewValue": " e-BV  -    [e-Business Visa]"
+      },
+      {
+        "value": "223",
+        "viewValue": " e-CV  -    [e-Conference Visa]"
+      },
+      {
+        "value": "221",
+        "viewValue": " e-Med V  -    [e-Medical Visa]"
+      },
+      {
+        "value": "222",
+        "viewValue": " e-Med X V  -    [e-Medical Attendant Visa]"
+      },
+      {
+        "value": "219",
+        "viewValue": " e-TV  -    [e-Tourist Visa]"
+      }
+    ]
+  },
+  {
+    "altValue": "F", "value": "28", "viewValue": "FILMS VISA",
+    "subTypes": [
+      {
+        "value": "238",
+        "viewValue": " F  -    [For foreign nationals coming for shooting of feature films, reality TV and Web shows/ series, commercial TV Serials/Shows and Web Shows/Series and for location recce]"
+      }
+    ]
+  },
+  {
+    "altValue": "J", "value": "6", "viewValue": "JOURNALIST VISA",
+    "subTypes": [
+      {
+        "value": "239",
+        "viewValue": " J-1  -    [For journalists accredited in India and also for journalists visiting India for any purpose including tourism, conference etc.]"
+      },
+      {
+        "value": "241",
+        "viewValue": " J-1X  -    [Dependent of  journalists accredited in India and also for journalists visiting India for any purpose including tourism, conference etc.]"
+      },
+      {
+        "value": "240",
+        "viewValue": " J-2  -    [Foreign nationals involved in shooting of advertisement / documentary films etc.]"
+      }
+    ]
+  },
+  {
+    "altValue": "L", "value": "7", "viewValue": "LONG TERM VISA",
+    "subTypes": [
+      {
+        "value": "188",
+        "viewValue": " L  -    [Long Term Visa]"
+      }
+    ]
+  },
+  {
+    "altValue": "ME", "value": "92", "viewValue": "MEDICAL VISA",
+    "subTypes": [
+      {
+        "value": "151",
+        "viewValue": " M-1  -    [Missionary / religious worker of approved organization]"
+      },
+      {
+        "value": "152",
+        "viewValue": " M-1X  -    [Dependent of missionary / religious worker of approved organization]"
+      }
+    ]
+  },
+  {
+    "altValue": "SP", "value": "10", "viewValue": "MISC SP PERMISSION",
+    "subTypes": [
+      {
+        "value": "245",
+        "viewValue": " MX  -    [Mountaineering expeditions]"
+      }
+    ]
+  },
+  {
+    "altValue": "M", "value": "11", "viewValue": "MISSIONARY VISA",
+    "subTypes": [
+      {
+        "value": "151",
+        "viewValue": " M-1  -    [Missionary / religious worker of approved organization]"
+      },
+      {
+        "value": "152",
+        "viewValue": " M-1X  -    [Dependent of missionary / religious worker of approved organization]"
+      }
+    ]
+  },
+  {
+    "altValue": "MO", "value": "93", "viewValue": "MOUNTAINEERING VISA",
+    "subTypes": [
+      {
+        "value": "245",
+        "viewValue": " MX  -    [Mountaineering expeditions]"
+      }
+    ]
+  },
+  { "altValue": "OC", "value": "22", "viewValue": "OCI", "subTypes": [] },
+  { "altValue": "", "value": "90", "viewValue": "OFFICIAL DEPENDENT VISA", "subTypes": [] },
+  {
+    "altValue": "O", "value": "12", "viewValue": "OFFICIAL VISA",
+    "subTypes": [
+      {
+        "value": "171",
+        "viewValue": " O-1  -    [Non-diplomatic official assigned to a diplomatic mission in India (official/service/special passport only)]"
+      },
+      {
+        "value": "173",
+        "viewValue": " O-1X  -    [Dependent of non-diplomatic official assigned in India]"
+      },
+      {
+        "value": "172",
+        "viewValue": " O-2  -    [Non-diplomatic official on a visit to India for official purpose]"
+      },
+      {
+        "value": "174",
+        "viewValue": " O-2X  -    [Dependent of non-diplomatic official visiting India]"
+      },
+      {
+        "value": "179",
+        "viewValue": " UO-1  -    [UN non-diplomatic official assigned to India]"
+      },
+      {
+        "value": "181",
+        "viewValue": " UO-1X  -    [Dependent of UN non-diplomatic official assigned to India]"
+      },
+      {
+        "value": "180",
+        "viewValue": " UO-2  -    [UN non-diplomatic official on a visit to India]"
+      },
+      {
+        "value": "182",
+        "viewValue": " UO-2X  -    [Dependent of UN non-diplomatic official on a visit to India]"
+      }
+    ]
+  },
+  { "altValue": "PI", "value": "13", "viewValue": "PIO CARD HOLDER", "subTypes": [] },
+  {
+    "altValue": "PL", "value": "96", "viewValue": "PLIGRIM VISA(ONLY FOR PAKISTAN NATIONALS)",
+    "subTypes": [
+      {
+        "value": "256",
+        "viewValue": " PG-1  -    [Pilgrim Visa (under religious protocol)]"
+      },
+      {
+        "value": "257",
+        "viewValue": " PG-2  -    [Group pilgrim visa for minority communities in Pakistan]"
+      }
+    ]
+  },
+  {
+    "altValue": "S", "value": "16", "viewValue": "STUDENT VISA",
+    "subTypes": [
+      {
+        "value": "249",
+        "viewValue": " S-1  -    [For higher education (including in South Asian University and Nalanda University) , provisional student visa, for short term courses and for those coming under Student Exchange Programme]"
+      },
+      {
+        "value": "116",
+        "viewValue": " S-1X  -    [Dependent of student of regular courses in Universities imparting higer education]"
+      },
+      {
+        "value": "110",
+        "viewValue": " S-2  -    [School education in India]"
+      },
+      {
+        "value": "250",
+        "viewValue": " S-3  -    [Studying Yoga, Vedic culture, Indian system of music and dance and Buddhist studies]"
+      },
+      {
+        "value": "254",
+        "viewValue": " S-3X  -    [Dependend of student Studying Yoga, Vedic culture, Indian system of music and dance and Buddhist studies]"
+      },
+      {
+        "value": "251",
+        "viewValue": " S-4  -    [For Theological Studies and for Missionary Students]"
+      },
+      {
+        "value": "252",
+        "viewValue": " S-5  -    [For research scholar, visiting research faculty, research scholar on bilateral exchange programme, members of Botanical Scientific, Anthropological etc. expeditions]"
+      },
+      {
+        "value": "255",
+        "viewValue": " S-5X  -    [Dependent of student for  research scholar, visiting research faculty, research scholar on bilateral exchange programme, members of Botanical Scientific, Anthropological etc. expeditions]"
+      },
+      {
+        "value": "253",
+        "viewValue": " S-6  -    [For those coming for internship in India (including those coming under French VIE Programme)]"
+      }
+    ]
+  },
+  {
+    "altValue": "TL", "value": "24", "viewValue": "TEMPORARY LANDING PERMIT",
+    "subTypes": []
+  },
+  {
+    "altValue": "T", "value": "17", "viewValue": "TOURIST VISA",
+    "subTypes": [
+      {
+        "value": "242",
+        "viewValue": " T  -    [For recreation,sight seeing, casual visit to meet friends or relatives, attending a short term yoga programme and short duration medical  treatment including treatment under Indian systems of Medicine]"
+      }
+    ]
+  },
+  {
+    "altValue": "TR", "value": "18", "viewValue": "TRANSIT VISA",
+    "subTypes": [
+      {
+        "value": "122",
+        "viewValue": " TR  -    [Travelling through India to a destination outside India]"
+      }
+    ]
+  },
+  { "altValue": "", "value": "33", "viewValue": "UN DIPLOMAT VISA", "subTypes": [] },
+  { "altValue": "U", "value": "19", "viewValue": "UNITED NATION", "subTypes": [] },
+  { "altValue": "", "value": "34", "viewValue": "UN OFFICIAL VISA", "subTypes": [] },
+  {
+    "altValue": "", "value": "99", "viewValue": "VISA-ON-ARRIVAL",
+    "subTypes": [
+      {
+        "value": "224",
+        "viewValue": " VoA  -    [Visa on arrival for Japanaese and South Korean nationals]"
+      }
+    ]
+  },
+  {
+    "altValue": "", "value": "95", "viewValue": "VISITOR VISA(ONLY FOR PAKISTAN NATIONALS)", "subTypes": []
+  }
+]
