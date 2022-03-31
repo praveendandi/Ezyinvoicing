@@ -1114,7 +1114,7 @@ def guest_details_for_opera(confirmation_number: str = None):
             if not frappe.db.exists("Arrival Information", confirmation_number):
                 return {"success": False, "message": "reservation not found"}
             if company.ome_scanner == 1:
-                if not frappe.db.exists("Dropbox", {"reservation_no": confirmation_number}):
+                if not frappe.db.exists("Dropbox", {"merged_to": confirmation_number}):
                     return {"success": False, "message": "data not found in dropbox"}
             if not frappe.db.exists(
                 "Guest Details", {"confirmation_number": confirmation_number}
