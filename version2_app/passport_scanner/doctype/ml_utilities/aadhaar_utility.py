@@ -87,6 +87,10 @@ def aadhaar_data_changes(data):
                     data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
                 ):
                     try:
+                        guest_dob = data["aadhar_front_details_aadhar_front_details_DOB"].strip()
+                        guest_dob = guest_dob.replace(" ", "")
+                        guest_dob = guest_dob.replace("/", "")
+                        guest_dob = guest_dob.replace("-", "")
                         aadhaar_details["guest_dob"] = format_date(
                             data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
                             "yyyy-mm-dd",

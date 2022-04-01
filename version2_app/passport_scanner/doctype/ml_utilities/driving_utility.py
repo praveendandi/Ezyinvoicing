@@ -11,7 +11,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 )
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def fetch_driving_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -40,7 +40,7 @@ def fetch_driving_details(image_1=None, image_2=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def driving_data_changes(message):
     try:
         data=message
@@ -73,12 +73,15 @@ def driving_data_changes(message):
                     regex_complie,
                     data["driving_front_details_driving_front_details_DOB"].strip(),
                 ):
-                    dob_list.append(
-                        format_date(
-                            data["driving_front_details_driving_front_details_DOB"].strip(),
-                            "yyyy-mm-dd",
+                    try:
+                        dob_list.append(
+                            format_date(
+                                data["driving_front_details_driving_front_details_DOB"].strip(),
+                                "yyyy-mm-dd",
+                            )
                         )
-                    )
+                    except Exception as e:
+                        print(str(e))
             if "driving_front_details_driving_front_details_DOB1" in data:
                 regex_complie = re.compile(
                     r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
@@ -87,14 +90,17 @@ def driving_data_changes(message):
                     regex_complie,
                     data["driving_front_details_driving_front_details_DOB1"].strip(),
                 ):
-                    dob_list.append(
-                        format_date(
-                            data[
-                                "driving_front_details_driving_front_details_DOB1"
-                            ].strip(),
-                            "yyyy-mm-dd",
+                    try:
+                        dob_list.append(
+                            format_date(
+                                data[
+                                    "driving_front_details_driving_front_details_DOB1"
+                                ].strip(),
+                                "yyyy-mm-dd",
+                            )
                         )
-                    )
+                    except Exception as e:
+                        print(str(e))
             if "driving_front_details_driving_front_details_DOB2" in data:
                 regex_complie = re.compile(
                     r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
@@ -103,14 +109,17 @@ def driving_data_changes(message):
                     regex_complie,
                     data["driving_front_details_driving_front_details_DOB2"].strip(),
                 ):
-                    dob_list.append(
-                        format_date(
-                            data[
-                                "driving_front_details_driving_front_details_DOB2"
-                            ].strip(),
-                            "yyyy-mm-dd",
+                    try:
+                        dob_list.append(
+                            format_date(
+                                data[
+                                    "driving_front_details_driving_front_details_DOB2"
+                                ].strip(),
+                                "yyyy-mm-dd",
+                            )
                         )
-                    )
+                    except Exception as e:
+                        print(str(e))
             if "driving_front_details_driving_front_details_DOB3" in data:
                 regex_complie = re.compile(
                     r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
@@ -119,14 +128,17 @@ def driving_data_changes(message):
                     regex_complie,
                     data["driving_front_details_driving_front_details_DOB3"].strip(),
                 ):
-                    dob_list.append(
-                        format_date(
-                            data[
-                                "driving_front_details_driving_front_details_DOB3"
-                            ].strip(),
-                            "yyyy-mm-dd",
+                    try:
+                        dob_list.append(
+                            format_date(
+                                data[
+                                    "driving_front_details_driving_front_details_DOB3"
+                                ].strip(),
+                                "yyyy-mm-dd",
+                            )
                         )
-                    )
+                    except Exception as e:
+                        print(str(e))
             if "driving_front_details_driving_front_details_DOB4" in data:
                 regex_complie = re.compile(
                     r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/)([1-9]|0[1-9]|1[0-2])(\.|-|/)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
@@ -135,14 +147,17 @@ def driving_data_changes(message):
                     regex_complie,
                     data["driving_front_details_driving_front_details_DOB4"].strip(),
                 ):
-                    dob_list.append(
-                        format_date(
-                            data[
-                                "driving_front_details_driving_front_details_DOB4"
-                            ].strip(),
-                            "yyyy-mm-dd",
+                    try:
+                        dob_list.append(
+                            format_date(
+                                data[
+                                    "driving_front_details_driving_front_details_DOB4"
+                                ].strip(),
+                                "yyyy-mm-dd",
+                            )
                         )
-                    )
+                    except Exception as e:
+                        print(str(e))
             if len(dob_list) > 0:
                 dob_date = datetime.datetime.strptime(min(dob_list), "%Y-%m-%d").date()
                 before_date = (

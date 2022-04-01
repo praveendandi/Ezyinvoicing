@@ -30,7 +30,6 @@ def fetch_passport_details(image_1=None, image_2=None):
             image_response = image_response.json()
             if "success" in image_response:
                 return image_response
-            # return image_response
             passport_details = passport_data_changes(image_response)
             if not passport_details["success"]:
                 return passport_details
@@ -79,15 +78,21 @@ def passport_data_changes(data):
                     "passport_details_passport_details_name"
                 ]
             if "passport_details_passport_details_birth_date" in data:
-                passport_details["guest_dob"] = format_date(
-                    data["passport_details_passport_details_birth_date"].strip(),
-                    "yyyy-mm-dd",
-                )
+                try:
+                    passport_details["guest_dob"] = format_date(
+                        data["passport_details_passport_details_birth_date"].strip(),
+                        "yyyy-mm-dd",
+                    )
+                except Exception as e:
+                    print(str(e))
             if "passport_details_passport_details_expiry_date" in data:
-                passport_details["passport_valid_till"] = frappe.utils.format_date(
-                    data["passport_details_passport_details_expiry_date"].strip(),
-                    "yyyy-mm-dd",
-                )
+                try:
+                    passport_details["passport_valid_till"] = format_date(
+                        data["passport_details_passport_details_expiry_date"].strip(),
+                        "yyyy-mm-dd",
+                    )
+                except Exception as e:
+                    print(str(e))
             if "passport_details_passport_details_nationality" in data:
                 passport_details["guest_nationality"] = data[
                     "passport_details_passport_details_nationality"
@@ -115,28 +120,37 @@ def passport_data_changes(data):
                     else data["visa_details_visa_details_sex"]
                 )
                 if gender in ["Male", "MALE", "male", "m", "M"]:
-                    passport_details["gender"] = "Male"
+                    passport_details["gender"] = "MALE"
                 if gender in ["Female", "FEMALE", "female", "F", "f"]:
-                    passport_details["gender"] = "Female"
+                    passport_details["gender"] = "FEMALE"
             if "passport_details_passport_details_document_number" in data:
                 passport_details["passport_number"] = data[
                     "passport_details_passport_details_document_number"
                 ]
             if "visa_details_visa_details_birth_date" in data:
-                passport_details["visa_guest_dob"] = format_date(
-                    data["visa_details_visa_details_birth_date"].strip(),
-                    "yyyy-mm-dd",
-                )
+                try:
+                    passport_details["visa_guest_dob"] = format_date(
+                        data["visa_details_visa_details_birth_date"].strip(),
+                        "yyyy-mm-dd",
+                    )
+                except Exception as e:
+                    print(str(e))
             if "visa_date_of_issue_visa_date_of_issue" in data:
-                passport_details["visa_date_of_issue"] = format_date(
-                    data["visa_date_of_issue_visa_date_of_issue"].strip(),
-                    "yyyy-mm-dd",
-                )
+                try:
+                    passport_details["visa_date_of_issue"] = format_date(
+                        data["visa_date_of_issue_visa_date_of_issue"].strip(),
+                        "yyyy-mm-dd",
+                    )
+                except Exception as e:
+                    print(str(e))
             if "visa_details_visa_details_expiry_date" in data:
-                passport_details["visa_valid_till"] = format_date(
-                    data["visa_details_visa_details_expiry_date"].strip(),
-                    "yyyy-mm-dd",
-                )
+                try:
+                    passport_details["visa_valid_till"] = format_date(
+                        data["visa_details_visa_details_expiry_date"].strip(),
+                        "yyyy-mm-dd",
+                    )
+                except Exception as e:
+                    print(str(e))
             if "visa_details_visa_details_document_number" in data:
                 passport_details["visa_number"] = data[
                     "visa_details_visa_details_document_number"
@@ -154,6 +168,10 @@ def passport_data_changes(data):
                                 passport_details["visa_sub_type"] = visa_types["value"]
                                 passport_details["visa_type"] = each["value"]
                                 break
+            if "visa_details_visa_details_surname" in data:
+                passport_details["visa_last_name"] = data["visa_details_visa_details_surname"]
+            if "visa_details_visa_details_name" in data:
+                passport_details["visa_first_name"] = data["visa_details_visa_details_surname"]
         return {"success": True, "data": passport_details}
     except Exception as e:
         frappe.log_error(str(e), "passport_data_changes")
