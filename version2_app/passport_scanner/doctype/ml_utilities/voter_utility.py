@@ -1,13 +1,15 @@
 import re
+import sys
+import traceback
 
 import frappe
 import pandas as pd
 import requests
 
-from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
-    convert_base64_to_image,
-    # get_address_from_zipcode,
-)
+# from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
+#     convert_base64_to_image,
+#     get_address_from_zipcode,
+# )
 
 
 @frappe.whitelist(allow_guest=True)
@@ -35,9 +37,13 @@ def fetch_voter_details(image_1=None, image_2=None):
             return {"success": True, "data": data_changes["data"]}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        frappe.log_error(str(e), "fetch_voter_details")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "fetch_voter_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
-    
+
 
 def voter_data_changes(data):
     try:
@@ -67,5 +73,9 @@ def voter_data_changes(data):
         voter_details["guest_id_type"] = "voterId"
         return {"success": True, "data": voter_details}
     except Exception as e:
-        frappe.log_error(str(e), "voter_data_changes")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "voter_data_changes",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}

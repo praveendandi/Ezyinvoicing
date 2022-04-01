@@ -1,4 +1,6 @@
 import re
+import sys
+import traceback
 
 # import flatdict
 import frappe
@@ -7,13 +9,11 @@ import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
+    format_date,
     get_address_from_zipcode,
-    format_date
 )
 
 # import datefinder
-
-
 
 
 # @frappe.whitelist(allow_guest=True)
@@ -42,7 +42,11 @@ def fetch_aadhaar_details(image_1=None, image_2=None):
             return {"success": True, "data": data_changes["data"]}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        frappe.log_error(str(e), "fetch_aadhaar_details")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "fetch_aadhaar_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
 
 
@@ -87,7 +91,9 @@ def aadhaar_data_changes(data):
                     data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
                 ):
                     try:
-                        guest_dob = data["aadhar_front_details_aadhar_front_details_DOB"].strip()
+                        guest_dob = data[
+                            "aadhar_front_details_aadhar_front_details_DOB"
+                        ].strip()
                         guest_dob = guest_dob.replace(" ", "/")
                         aadhaar_details["guest_dob"] = format_date(
                             guest_dob,
@@ -96,13 +102,11 @@ def aadhaar_data_changes(data):
                     except Exception as e:
                         print(e)
             if "aadhar_back_details_aadhar_back_details_ADRESS" in data:
-                address = data[
-                    "aadhar_back_details_aadhar_back_details_ADRESS"
-                ]
+                address = data["aadhar_back_details_aadhar_back_details_ADRESS"]
                 if address != "":
-                    address = address.replace("Address:","").strip()
-                    address = address.replace("\n"," ")
-                aadhaar_details["address1"] = address 
+                    address = address.replace("Address:", "").strip()
+                    address = address.replace("\n", " ")
+                aadhaar_details["address1"] = address
             if "aadhar_back_details_aadhar_back_details_PINCODE" in data:
                 pincode = data["aadhar_back_details_aadhar_back_details_PINCODE"]
                 regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
@@ -121,5 +125,9 @@ def aadhaar_data_changes(data):
             )
         return {"success": True, "data": aadhaar_details}
     except Exception as e:
-        frappe.log_error(str(e), "aadhaar_data_changes")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "aadhaar_data_changes",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}

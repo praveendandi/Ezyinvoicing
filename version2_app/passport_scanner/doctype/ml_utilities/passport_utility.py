@@ -1,16 +1,19 @@
-import os
 import json
+import os
+import sys
+import traceback
+
 import frappe
 import pandas as pd
 import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
-    format_date
+    format_date,
 )
 
 
-# @frappe.whitelist(allow_guest=True) 
+# @frappe.whitelist(allow_guest=True)
 def fetch_passport_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -36,7 +39,11 @@ def fetch_passport_details(image_1=None, image_2=None):
             return {"success": True, "data": passport_details["data"]}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        frappe.log_error(str(e), "fetch_passport_details")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "fetch_passport_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
 
 
@@ -44,7 +51,7 @@ def fetch_passport_details(image_1=None, image_2=None):
 def passport_data_changes(data):
     try:
         file_path = os.path.dirname(os.path.abspath(__file__))
-        with open(file_path+'/visa-types.json', 'r') as myfile:
+        with open(file_path + "/visa-types.json", "r") as myfile:
             visa_types = json.loads(myfile.read())
         passport_details = {}
         company = frappe.get_last_doc("company")
@@ -68,7 +75,9 @@ def passport_data_changes(data):
                             "file_url"
                         ]
                     else:
-                        passport_details["face_image"] = face_image["message"]["file_url"]
+                        passport_details["face_image"] = face_image["message"][
+                            "file_url"
+                        ]
             if "passport_details_passport_details_surname" in data:
                 passport_details["guest_last_name"] = data[
                     "passport_details_passport_details_surname"
@@ -163,17 +172,27 @@ def passport_data_changes(data):
                         break
                     for visa_types in each["subTypes"]:
                         if len(visa_types) > 0:
-                            get_visa_type = visa_types["viewValue"].split(" - ")[0].strip()
+                            get_visa_type = (
+                                visa_types["viewValue"].split(" - ")[0].strip()
+                            )
                             if data["visa_type_visa_type"] == get_visa_type:
                                 passport_details["visa_sub_type"] = visa_types["value"]
                                 passport_details["visa_type"] = each["value"]
                                 break
             if "visa_details_visa_details_surname" in data:
-                passport_details["visa_last_name"] = data["visa_details_visa_details_surname"]
+                passport_details["visa_last_name"] = data[
+                    "visa_details_visa_details_surname"
+                ]
             if "visa_details_visa_details_name" in data:
-                passport_details["visa_first_name"] = data["visa_details_visa_details_surname"]
+                passport_details["visa_first_name"] = data[
+                    "visa_details_visa_details_surname"
+                ]
         passport_details = {k: v for k, v in passport_details.items() if v}
         return {"success": True, "data": passport_details}
     except Exception as e:
-        frappe.log_error(str(e), "passport_data_changes")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "passport_data_changes",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}

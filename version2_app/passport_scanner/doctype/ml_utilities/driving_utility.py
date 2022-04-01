@@ -1,5 +1,7 @@
 import datetime
 import re
+import sys
+import traceback
 
 import frappe
 import pandas as pd
@@ -7,8 +9,8 @@ import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
+    format_date,
     get_address_from_zipcode,
-    format_date
 )
 
 
@@ -37,14 +39,18 @@ def fetch_driving_details(image_1=None, image_2=None):
             return {"success": True, "data": driving_details["data"]}
         return image_response
     except Exception as e:
-        frappe.log_error(str(e), "fetch_driving_details")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "fetch_driving_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
 
 
 # @frappe.whitelist(allow_guest=True)
 def driving_data_changes(message):
     try:
-        data=message
+        data = message
         driving_details = {}
         if bool(data):
             company = frappe.get_last_doc("company")
@@ -52,11 +58,11 @@ def driving_data_changes(message):
             data = df.to_dict(orient="records")[0]
             dob_list = []
             if "driving_front_details_driving_front_details_DLNBR" in data:
-                driving_details["local_id_number"] = data["driving_front_details_driving_front_details_DLNBR"]
+                driving_details["local_id_number"] = data[
+                    "driving_front_details_driving_front_details_DLNBR"
+                ]
             if "driving_front_details_driving_front_details_NAME" in data:
-                name = data[
-                    "driving_front_details_driving_front_details_NAME"
-                ].strip()
+                name = data["driving_front_details_driving_front_details_NAME"].strip()
                 if "\n" in name:
                     name = name.split("\n")[0]
                 driving_details["guest_first_name"] = name
@@ -82,7 +88,9 @@ def driving_data_changes(message):
                     try:
                         dob_list.append(
                             format_date(
-                                data["driving_front_details_driving_front_details_DOB"].strip(),
+                                data[
+                                    "driving_front_details_driving_front_details_DOB"
+                                ].strip(),
                                 "yyyy-mm-dd",
                             )
                         )
@@ -172,15 +180,15 @@ def driving_data_changes(message):
                 if dob_date < before_date:
                     driving_details["guest_dob"] = dob_date
             if "driving_address_details_driving_address_details_ADRESS" in data:
-                address = data[
-                    "driving_address_details_driving_address_details_ADRESS"
-                ]
+                address = data["driving_address_details_driving_address_details_ADRESS"]
                 if address != "":
-                    address = address.replace("Address:","").strip()
-                    address = address.replace("\n"," ")
-                driving_details["address1"] = address 
+                    address = address.replace("Address:", "").strip()
+                    address = address.replace("\n", " ")
+                driving_details["address1"] = address
             if "driving_address_details_driving_address_details_PINCODE" in data:
-                pincode = data["driving_address_details_driving_address_details_PINCODE"]
+                pincode = data[
+                    "driving_address_details_driving_address_details_PINCODE"
+                ]
                 regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
                 if re.match(regex_complie, pincode):
                     driving_details["zip_code"] = pincode
@@ -193,5 +201,9 @@ def driving_data_changes(message):
         driving_details["guest_id_type"] = "driving"
         return {"success": True, "data": driving_details}
     except Exception as e:
-        frappe.log_error(str(e), "driving_data_changes")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "driving_data_changes",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
         return {"success": False, "message": str(e)}
