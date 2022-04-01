@@ -33,6 +33,7 @@ def fetch_passport_details(image_1=None, image_2=None):
             image_response = image_response.json()
             if "success" in image_response:
                 return image_response
+            # return image_response
             passport_details = passport_data_changes(image_response)
             if not passport_details["success"]:
                 return passport_details
@@ -136,6 +137,16 @@ def passport_data_changes(data):
                 passport_details["passport_number"] = data[
                     "passport_details_passport_details_document_number"
                 ]
+            if "passport_place_of_issue_passport_place_of_issue" in data:
+                if data["passport_place_of_issue_passport_place_of_issue"] != "":
+                    try:
+                        get_date = "".join(filter(str.isdigit, data["passport_place_of_issue_passport_place_of_issue"]))
+                        passport_details["passport_date_of_issue"] = format_date(
+                            str(get_date),
+                            "yyyy-mm-dd",
+                        )
+                    except Exception as e:
+                        print(e)
             if "visa_details_visa_details_birth_date" in data:
                 try:
                     passport_details["visa_guest_dob"] = format_date(
