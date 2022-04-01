@@ -2,6 +2,8 @@ import base64
 import datetime
 import sys
 import traceback
+import json
+import os
 
 import babel.dates
 import frappe
@@ -49,7 +51,12 @@ def get_address_from_zipcode(postal_code):
         if not pd.isna(location.county_name):
             data["guest_city"] = location.county_name
         if not pd.isna(location.state_name):
-            data["guest_state"] = location.state_name
+            file_path = os.path.dirname(os.path.abspath(__file__))
+            with open(file_path+'/statesAndDistricts.json', 'r') as myfile:
+                state_names = json.loads(myfile.read())
+                for each in state_names:
+                    if (location.state_name).upper() == each["name"]:
+                        data["guest_state"] = each["value"]
         if not pd.isna(location.country_code):
             if location.country_code == "IN":
                 data["guest_country"] = "IND"

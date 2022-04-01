@@ -1,0 +1,2947 @@
+[
+    {
+        "name": "ANDAMAN AND NICOBAR ISLANDS",
+        "value": "1",
+        "district": [
+
+            {
+                "name": "SOUTH ANDAMAN",
+                "value": "1D"
+            },
+            {
+                "name": "NORTH AND MIDDLE ANDAMAN",
+                "value": "3D"
+            },
+            {
+                "name": "NICOBAR",
+                "value": "2D"
+            }
+        ]
+    },
+    {
+        "name": "ANDHRA PRADESH",
+        "value": "2",
+        "district": [
+            {
+                "name": "YSR DISTRICT KADAPA",
+                "value": "4D"
+            },
+            {
+                "name": "GUNTUR",
+                "value": "6D"
+            },
+            {
+                "name": "NELLORE",
+                "value": "15D"
+            },
+            {
+                "name": "EAST GODAVARI",
+                "value": "5D"
+            },
+            {
+                "name": "KRISHNA",
+                "value": "10D"
+            },
+            {
+                "name": "KURNOOL",
+                "value": "11D"
+            },
+            {
+                "name": "PRAKASAM",
+                "value": "17D"
+            },
+            {
+                "name": "SRIKAKULAM",
+                "value": "19D"
+            },
+            {
+                "name": "WEST GODAVARI",
+                "value": "23D"
+            },
+            {
+                "name": "ANANTHAPURAMU",
+                "value": "2D"
+            },
+            {
+                "name": "CHITTOOR",
+                "value": "3D"
+            },
+            {
+                "name": "VISAKHAPATNAM",
+                "value": "20D"
+            },
+            {
+                "name": "VIJAYWADA",
+                "value": "13C"
+            },
+            {
+                "name": "VIZIANAGARAM",
+                "value": "21D"
+            }
+        ]
+    },
+    {
+        "name": "ARUNACHAL PRADESH",
+        "value": "3",
+        "district": [
+            {
+                "name": "LOWER SUBANSIRI",
+                "value": "79D"
+            },
+            {
+                "name": "EAST SIANG",
+                "value": "4D"
+            },
+            {
+                "name": "EAST KAMENG",
+                "value": "3D"
+            },
+            {
+                "name": "WEST SIANG",
+                "value": "15D"
+            },
+            {
+                "name": "TAWANG",
+                "value": "10D"
+            },
+            {
+                "name": "WEST KAMENG",
+                "value": "14D"
+            },
+            {
+                "name": "KURUNG KUMEY",
+                "value": "5D"
+            },
+            {
+                "name": "DIBANG VALLEY",
+                "value": "2D"
+            },
+            {
+                "name": "PAPUM PARE",
+                "value": "9D"
+            },
+            {
+                "name": "TIRAP",
+                "value": "11D"
+            },
+            {
+                "name": "UPPER SUBANSIRI",
+                "value": "13D"
+            },
+            {
+                "name": "LOHIT",
+                "value": "6D"
+            },
+            {
+                "name": "CHANGLANG",
+                "value": "1D"
+            },
+            {
+                "name": "UPPER SIANG",
+                "value": "12D"
+            },
+            {
+                "name": "LOWER DIBANG VALLEY",
+                "value": "7D"
+            }
+        ]
+    },
+    {
+        "name": "ASSAM",
+        "value": "4",
+        "district": [
+            {
+                "name": "GOLAGHAT",
+                "value": "9D"
+            },
+            {
+                "name": "DHUBRI",
+                "value": "6D"
+            },
+            {
+                "name": "KARBI ANGLONG",
+                "value": "13D"
+            },
+            {
+                "name": "MAJULI",
+                "value": "29D"
+            },
+            {
+                "name": "NAGAON",
+                "value": "18D"
+            },
+            {
+                "name": "CHIRANG",
+                "value": "8D"
+            },
+            {
+                "name": "HAMREN",
+                "value": "25C"
+            },
+            {
+                "name": "NALBARI",
+                "value": "19D"
+            },
+            {
+                "name": "TINSUKIA",
+                "value": "23D"
+            },
+            {
+                "name": "DIBRUGARH",
+                "value": "7D"
+            },
+            {
+                "name": "LAKHIMPUR",
+                "value": "81D"
+            },
+            {
+                "name": "BARPETA",
+                "value": "1D"
+            },
+            {
+                "name": "SONITPUR",
+                "value": "22D"
+            },
+            {
+                "name": "GUWAHATI",
+                "value": "149D"
+            },
+            {
+                "name": "HOJAI",
+                "value": "26D"
+            },
+            {
+                "name": "SIVASAGAR",
+                "value": "21D"
+            },
+            {
+                "name": "GOALPARA",
+                "value": "80D"
+            },
+            {
+                "name": "BONGAIGAON",
+                "value": "2D"
+            },
+            {
+                "name": "HAILAKANDI",
+                "value": "10D"
+            },
+            {
+                "name": "BAKSA",
+                "value": "4D"
+            },
+            {
+                "name": "UDALGURI",
+                "value": "24D"
+            },
+            {
+                "name": "CACHAR",
+                "value": "3D"
+            },
+            {
+                "name": "DARRANG",
+                "value": "16D"
+            },
+            {
+                "name": "JORHAT",
+                "value": "11D"
+            },
+            {
+                "name": "DHEMAJI",
+                "value": "5D"
+            },
+            {
+                "name": "KARIMGANJ",
+                "value": "14D"
+            },
+            {
+                "name": "MORIGAON",
+                "value": "17D"
+            },
+            {
+                "name": "BISWANATH",
+                "value": "28D"
+            },
+            {
+                "name": "NORTH CACHAR HILLS",
+                "value": "20D"
+            },
+            {
+                "name": "KAMRUP",
+                "value": "12D"
+            },
+            {
+                "name": "SOUTH SALMARA",
+                "value": "27D"
+            },
+            {
+                "name": "KOKRAJHAR",
+                "value": "15D"
+            },
+            {
+                "name": "SADIA",
+                "value": "25D"
+            }
+        ]
+    },
+    {
+        "name": "BIHAR",
+        "value": "5",
+        "district": [
+            {
+                "name": "KHAGARIA",
+                "value": "8D"
+            },
+            {
+                "name": "BEGUSARAI",
+                "value": "142D"
+            },
+            {
+                "name": "BHAGALPUR",
+                "value": "5D"
+            },
+            {
+                "name": "KAIMUR",
+                "value": "14D"
+            },
+            {
+                "name": "SITAMARHI",
+                "value": "33D"
+            },
+            {
+                "name": "SIWAN",
+                "value": "34D"
+            },
+            {
+                "name": "SHEOHAR",
+                "value": "16D"
+            },
+            {
+                "name": "SARAN",
+                "value": "30D"
+            },
+            {
+                "name": "SHEIKHPURA",
+                "value": "31D"
+            },
+            {
+                "name": "JAMUI",
+                "value": "12D"
+            },
+            {
+                "name": "VAISHALI",
+                "value": "36D"
+            },
+            {
+                "name": "SUPAUL",
+                "value": "35D"
+            },
+            {
+                "name": "PATNA",
+                "value": "25D"
+            },
+            {
+                "name": "MADHUBANI",
+                "value": "20D"
+            },
+            {
+                "name": "PURNIA",
+                "value": "26D"
+            },
+            {
+                "name": "NAWADA",
+                "value": "24D"
+            },
+            {
+                "name": "GAYA",
+                "value": "10D"
+            },
+            {
+                "name": "MUZAFFARPUR",
+                "value": "22D"
+            },
+            {
+                "name": "SAMASTIPUR",
+                "value": "29D"
+            },
+            {
+                "name": "ARWAL",
+                "value": "4D"
+            },
+            {
+                "name": "MUNGER",
+                "value": "21D"
+            },
+            {
+                "name": "NALANDA",
+                "value": "23D"
+            },
+            {
+                "name": "KATIHAR",
+                "value": "15D"
+            },
+            {
+                "name": "ARARIA",
+                "value": "1D"
+            },
+            {
+                "name": "MADHEPURA",
+                "value": "19D"
+            },
+            {
+                "name": "EAST CHAMPARAN",
+                "value": "9D"
+            },
+            {
+                "name": "KISHANGANJ",
+                "value": "17D"
+            },
+            {
+                "name": "LAKHISARAI",
+                "value": "18D"
+            },
+            {
+                "name": "ROHTAS",
+                "value": "27D"
+            },
+            {
+                "name": "JEHANABAD",
+                "value": "13D"
+            },
+            {
+                "name": "NAUGACHIA",
+                "value": "27C"
+            },
+            {
+                "name": "BHOJPUR",
+                "value": "6D"
+            },
+            {
+                "name": "AURANGABAD",
+                "value": "2D"
+            },
+            {
+                "name": "BANKA",
+                "value": "3D"
+            },
+            {
+                "name": "BUXAR",
+                "value": "7D"
+            },
+            {
+                "name": "DARBHANGA",
+                "value": "77D"
+            },
+            {
+                "name": "SAHARSA",
+                "value": "28D"
+            },
+            {
+                "name": "WEST CHAMPARAN",
+                "value": "37D"
+            },
+            {
+                "name": "GOPALGANJ",
+                "value": "11D"
+            },
+            {
+                "name": "BAGAHA",
+                "value": "26C"
+            }
+        ]
+    },
+    {
+        "name": "CHANDIGARH",
+        "value": "34",
+        "district": [
+            {
+                "name": "CHANDIGARH",
+                "value": "71D"
+            }
+        ]
+    },
+    {
+        "name": "CHHATTISGARH",
+        "value": "6",
+        "district": [
+            {
+                "name": "BALRAMPUR",
+                "value": "16D"
+            },
+            {
+                "name": "MAHASAMUND",
+                "value": "12D"
+            },
+            {
+                "name": "DURG",
+                "value": "5D"
+            },
+            {
+                "name": "BILASPUR",
+                "value": "2D"
+            },
+            {
+                "name": "BEMETARA",
+                "value": "18D"
+            },
+            {
+                "name": "GARIABAND",
+                "value": "20D"
+            },
+            {
+                "name": "NARAYANPUR",
+                "value": "23D"
+            },
+            {
+                "name": "JANJGIR-CHAMPA",
+                "value": "6D"
+            },
+            {
+                "name": "SURAJPUR",
+                "value": "25D"
+            },
+            {
+                "name": "BIJAPUR",
+                "value": "19D"
+            },
+            {
+                "name": "RAIGARH",
+                "value": "13D"
+            },
+            {
+                "name": "SUKMA",
+                "value": "24D"
+            },
+            {
+                "name": "BALODA BAZAR",
+                "value": "8D"
+            },
+            {
+                "name": "SURGUJA",
+                "value": "83D"
+            },
+            {
+                "name": "BALOD",
+                "value": "4D"
+            },
+            {
+                "name": "DHAMTARI",
+                "value": "17D"
+            },
+            {
+                "name": "KONDAGAON",
+                "value": "21D"
+            },
+            {
+                "name": "RAJNANDGAON",
+                "value": "15D"
+            },
+            {
+                "name": "BASTAR",
+                "value": "1D"
+            },
+            {
+                "name": "JASHPUR",
+                "value": "7D"
+            },
+            {
+                "name": "KANKER",
+                "value": "82D"
+            },
+            {
+                "name": "RAIPUR",
+                "value": "14D"
+            },
+            {
+                "name": "KABIRDHAM",
+                "value": "9D"
+            },
+            {
+                "name": "KOREA",
+                "value": "11D"
+            },
+            {
+                "name": "KORBA",
+                "value": "10D"
+            },
+            {
+                "name": "DANTEWADA",
+                "value": "3D"
+            },
+            {
+                "name": "MUNGELI",
+                "value": "22D"
+            }
+        ]
+    },
+    {
+        "name": "DADRA AND NAGAR HAVELI",
+        "value": "35",
+        "district": [
+            {
+                "name": "SILVASSA",
+                "value": "139D"
+            }
+        ]
+    },
+    {
+        "name": "DAMAN AND DIU",
+        "value": "7",
+        "district": [
+            {
+                "name": "DAMAN",
+                "value": "1D"
+            },
+            {
+                "name": "DIU",
+                "value": "2D"
+            }
+        ]
+    },
+    {
+        "name": "DELHI",
+        "value": "8",
+        "district": [
+            {
+                "name": "DELHI",
+                "value": "1C"
+            }
+        ]
+    },
+    {
+        "name": "GOA",
+        "value": "9",
+        "district": [
+            {
+                "name": "GOA",
+                "value": "15C"
+            }
+        ]
+    },
+    {
+        "name": "GUJARAT",
+        "value": "10",
+        "district": [
+            {
+                "name": "PORBANDAR",
+                "value": "19D"
+            },
+            {
+                "name": "BOTAD",
+                "value": "16D"
+            },
+            {
+                "name": "MORBI",
+                "value": "33D"
+            },
+            {
+                "name": "VADODARA",
+                "value": "25D"
+            },
+            {
+                "name": "ANAND",
+                "value": "3D"
+            },
+            {
+                "name": "JUNAGADH",
+                "value": "11D"
+            },
+            {
+                "name": "NARMADA",
+                "value": "15D"
+            },
+            {
+                "name": "BHARUCH",
+                "value": "6D"
+            },
+            {
+                "name": "DEVBHOOMI DWARKA",
+                "value": "30D"
+            },
+            {
+                "name": "PATAN",
+                "value": "18D"
+            },
+            {
+                "name": "BHAVNAGAR",
+                "value": "7D"
+            },
+            {
+                "name": "DAHOD",
+                "value": "84D"
+            },
+            {
+                "name": "TAPI",
+                "value": "4D"
+            },
+            {
+                "name": "SABARKANTHA",
+                "value": "21D"
+            },
+            {
+                "name": "THE DANGS",
+                "value": "24D"
+            },
+            {
+                "name": "SURENDRANAGAR",
+                "value": "23D"
+            },
+            {
+                "name": "AHMEDABAD",
+                "value": "1D"
+            },
+            {
+                "name": "MAHISAGAR",
+                "value": "32D"
+            },
+            {
+                "name": "JAMNAGAR",
+                "value": "10D"
+            },
+            {
+                "name": "VALSAD",
+                "value": "26D"
+            },
+            {
+                "name": "CHHOTA UDEPUR",
+                "value": "29D"
+            },
+            {
+                "name": "SURAT",
+                "value": "22D"
+            },
+            {
+                "name": "PANCHMAHAL",
+                "value": "17D"
+            },
+            {
+                "name": "NAVSARI",
+                "value": "145D"
+            },
+            {
+                "name": "MEHSANA",
+                "value": "14D"
+            },
+            {
+                "name": "GANDHINAGAR",
+                "value": "9D"
+            },
+            {
+                "name": "KHEDA",
+                "value": "13D"
+            },
+            {
+                "name": "AMRELI",
+                "value": "2D"
+            },
+            {
+                "name": "KUTCH",
+                "value": "12D"
+            },
+            {
+                "name": "GIR SOMNATH",
+                "value": "31D"
+            },
+            {
+                "name": "RAJKOT",
+                "value": "20D"
+            },
+            {
+                "name": "BANASKANTHA",
+                "value": "27D"
+            },
+            {
+                "name": "ARAVALLI",
+                "value": "8D"
+            }
+        ]
+    },
+    {
+        "name": "HARYANA",
+        "value": "11",
+        "district": [
+            {
+                "name": "FATEHABAD",
+                "value": "87D"
+            },
+            {
+                "name": "PANCHKULA",
+                "value": "13D"
+            },
+            {
+                "name": "YAMUNANAGAR",
+                "value": "19D"
+            },
+            {
+                "name": "KARNAL",
+                "value": "10D"
+            },
+            {
+                "name": "MEWAT",
+                "value": "4D"
+            },
+            {
+                "name": "SONIPAT",
+                "value": "18D"
+            },
+            {
+                "name": "MAHENDRAGARH",
+                "value": "12D"
+            },
+            {
+                "name": "SIRSA",
+                "value": "17D"
+            },
+            {
+                "name": "BHIWANI",
+                "value": "2D"
+            },
+            {
+                "name": "REWARI",
+                "value": "15D"
+            },
+            {
+                "name": "KURUKSHETRA",
+                "value": "11D"
+            },
+            {
+                "name": "JHAJJAR",
+                "value": "7D"
+            },
+            {
+                "name": "PALWAL",
+                "value": "8D"
+            },
+            {
+                "name": "FARIDABAD",
+                "value": "3D"
+            },
+            {
+                "name": "CHARKHI DADRI",
+                "value": "16D"
+            },
+            {
+                "name": "AMBALA",
+                "value": "1D"
+            },
+            {
+                "name": "KAITHAL",
+                "value": "9D"
+            },
+            {
+                "name": "JIND",
+                "value": "88D"
+            },
+            {
+                "name": "ROHTAK",
+                "value": "89D"
+            },
+            {
+                "name": "PANIPAT",
+                "value": "14D"
+            },
+            {
+                "name": "GURGAON",
+                "value": "5D"
+            },
+            {
+                "name": "HISAR",
+                "value": "6D"
+            }
+        ]
+    },
+    {
+        "name": "HIMACHAL PRADESH",
+        "value": "12",
+        "district": [
+            {
+                "name": "LAHAUL AND SPITI",
+                "value": "7D"
+            },
+            {
+                "name": "SHIMLA",
+                "value": "9D"
+            },
+            {
+                "name": "BILASPUR",
+                "value": "1D"
+            },
+            {
+                "name": "UNA",
+                "value": "12D"
+            },
+            {
+                "name": "SOLAN",
+                "value": "11D"
+            },
+            {
+                "name": "MANDI",
+                "value": "86D"
+            },
+            {
+                "name": "KULLU",
+                "value": "6D"
+            },
+            {
+                "name": "HAMIRPUR",
+                "value": "3D"
+            },
+            {
+                "name": "SIRMAUR",
+                "value": "10D"
+            },
+            {
+                "name": "KINNAUR",
+                "value": "5D"
+            },
+            {
+                "name": "KANGRA",
+                "value": "85D"
+            },
+            {
+                "name": "CHAMBA",
+                "value": "2D"
+            }
+        ]
+    },
+    {
+        "name": "JAMMU AND KASHMIR",
+        "value": "13",
+        "district": [
+            {
+                "name": "LEH",
+                "value": "14D"
+            },
+            {
+                "name": "KULGAM",
+                "value": "20D"
+            },
+            {
+                "name": "DODA",
+                "value": "91D"
+            },
+            {
+                "name": "BANDIPORE",
+                "value": "8D"
+            },
+            {
+                "name": "KUPWARA",
+                "value": "90D"
+            },
+            {
+                "name": "GANDERBAL",
+                "value": "15D"
+            },
+            {
+                "name": "RAMBAN",
+                "value": "19D"
+            },
+            {
+                "name": "SRINAGAR",
+                "value": "12D"
+            },
+            {
+                "name": "ANANTNAG",
+                "value": "1D"
+            },
+            {
+                "name": "RAJOURI",
+                "value": "11D"
+            },
+            {
+                "name": "BUDGAM",
+                "value": "3D"
+            },
+            {
+                "name": "PULWAMA",
+                "value": "10D"
+            },
+            {
+                "name": "KISHTWAR",
+                "value": "18D"
+            },
+            {
+                "name": "KARGIL",
+                "value": "6D"
+            },
+            {
+                "name": "KATHUA",
+                "value": "7D"
+            },
+            {
+                "name": "BARAMULLA",
+                "value": "2D"
+            },
+            {
+                "name": "POONCH",
+                "value": "9D"
+            },
+            {
+                "name": "JAMMU",
+                "value": "5D"
+            },
+            {
+                "name": "UDHAMPUR",
+                "value": "13D"
+            },
+            {
+                "name": "SAMBA",
+                "value": "17D"
+            },
+            {
+                "name": "SHOPIAN",
+                "value": "4D"
+            },
+            {
+                "name": "REASI",
+                "value": "16D"
+            }
+        ]
+    },
+    {
+        "name": "JHARKHAND",
+        "value": "14",
+        "district": [
+            {
+                "name": "DHANBAD",
+                "value": "4D"
+            },
+            {
+                "name": "DUMKA",
+                "value": "5D"
+            },
+            {
+                "name": "LATEHAR",
+                "value": "14D"
+            },
+            {
+                "name": "WEST SINGHBHUM",
+                "value": "22D"
+            },
+            {
+                "name": "CHATRA",
+                "value": "2D"
+            },
+            {
+                "name": "GUMLA",
+                "value": "10D"
+            },
+            {
+                "name": "SERAIKELA",
+                "value": "20D"
+            },
+            {
+                "name": "RAMGARH",
+                "value": "16D"
+            },
+            {
+                "name": "BOKARO",
+                "value": "1D"
+            },
+            {
+                "name": "HAZARIBAG",
+                "value": "11D"
+            },
+            {
+                "name": "KODERMA",
+                "value": "13D"
+            },
+            {
+                "name": "PAKUR",
+                "value": "92D"
+            },
+            {
+                "name": "SIMDEGA",
+                "value": "21D"
+            },
+            {
+                "name": "GARHWA",
+                "value": "7D"
+            },
+            {
+                "name": "EAST SINGHBHUM",
+                "value": "6D"
+            },
+            {
+                "name": "JAMTARA",
+                "value": "12D"
+            },
+            {
+                "name": "LOHARDAGA",
+                "value": "15D"
+            },
+            {
+                "name": "SAHIBGANJ",
+                "value": "19D"
+            },
+            {
+                "name": "PALAMU",
+                "value": "17D"
+            },
+            {
+                "name": "GIRIDIH",
+                "value": "93D"
+            },
+            {
+                "name": "KHUNTI",
+                "value": "8D"
+            },
+            {
+                "name": "RANCHI",
+                "value": "18D"
+            },
+            {
+                "name": "GODDA",
+                "value": "9D"
+            },
+            {
+                "name": "DEOGHAR",
+                "value": "3D"
+            }
+        ]
+    },
+    {
+        "name": "KARNATAKA",
+        "value": "15",
+        "district": [
+            {
+                "name": "BELAGAVI",
+                "value": "141D"
+            },
+            {
+                "name": "DAKSHINA KANNADA",
+                "value": "25D"
+            },
+            {
+                "name": "MYSORE",
+                "value": "21D"
+            },
+            {
+                "name": "YADGIR",
+                "value": "16D"
+            },
+            {
+                "name": "CHIKBALLAPUR",
+                "value": "8D"
+            },
+            {
+                "name": "CHITRADURGA",
+                "value": "10D"
+            },
+            {
+                "name": "HAVERI",
+                "value": "94D"
+            },
+            {
+                "name": "KODAGU",
+                "value": "17D"
+            },
+            {
+                "name": "GULBARGA",
+                "value": "14D"
+            },
+            {
+                "name": "UDUPI",
+                "value": "27D"
+            },
+            {
+                "name": "DAVANAGERE",
+                "value": "11D"
+            },
+            {
+                "name": "BIJAPUR",
+                "value": "7D"
+            },
+            {
+                "name": "KOLAR",
+                "value": "18D"
+            },
+            {
+                "name": "UTTARA KANNADA",
+                "value": "22D"
+            },
+            {
+                "name": "KOPPAL",
+                "value": "19D"
+            },
+            {
+                "name": "RAICHUR",
+                "value": "23D"
+            },
+            {
+                "name": "BELLARY",
+                "value": "5D"
+            },
+            {
+                "name": "SHIMOGA",
+                "value": "24D"
+            },
+            {
+                "name": "TUMKUR",
+                "value": "26D"
+            },
+            {
+                "name": "HASSAN",
+                "value": "15D"
+            },
+            {
+                "name": "MANDYA",
+                "value": "20D"
+            },
+            {
+                "name": "CHAMARAJANAGAR",
+                "value": "95D"
+            },
+            {
+                "name": "BANGALURU",
+                "value": "5C"
+            },
+            {
+                "name": "CHICKMAGALUR",
+                "value": "9D"
+            },
+            {
+                "name": "BAGALKOT",
+                "value": "1D"
+            },
+            {
+                "name": "BIDAR",
+                "value": "6D"
+            },
+            {
+                "name": "KOLAR GOLD FIELDS",
+                "value": "10C"
+            },
+            {
+                "name": "RAMNAGARA",
+                "value": "4D"
+            },
+            {
+                "name": "GADAG",
+                "value": "13D"
+            },
+            {
+                "name": "DHARWAD",
+                "value": "12D"
+            }
+        ]
+    },
+    {
+        "name": "KERALA",
+        "value": "16",
+        "district": [
+            {
+                "name": "THIRUVANANTHAPURAM",
+                "value": "12D"
+            },
+            {
+                "name": "KOLLAM",
+                "value": "6D"
+            },
+            {
+                "name": "KOZHIKODE",
+                "value": "15D"
+            },
+            {
+                "name": "WAYANAD",
+                "value": "14D"
+            },
+            {
+                "name": "KOTTAYAM",
+                "value": "7D"
+            },
+            {
+                "name": "COCHIN",
+                "value": "19D"
+            },
+            {
+                "name": "MALAPPURAM",
+                "value": "9D"
+            },
+            {
+                "name": "KANNUR",
+                "value": "96D"
+            },
+            {
+                "name": "PALAKKAD",
+                "value": "10D"
+            },
+            {
+                "name": "PATHANAMTHITTA",
+                "value": "11D"
+            },
+            {
+                "name": "ALAPPUZHA",
+                "value": "1D"
+            },
+            {
+                "name": "IDUKKI",
+                "value": "3D"
+            },
+            {
+                "name": "THRISSUR",
+                "value": "13D"
+            },
+            {
+                "name": "KASARAGOD",
+                "value": "5D"
+            }
+        ]
+    },
+    {
+        "name": "LAKSHADWEEP",
+        "value": "36",
+        "district": [
+            {
+                "name": "KAVARATTI",
+                "value": "140D"
+            }
+        ]
+    },
+    {
+        "name": "MADHYA PRADESH",
+        "value": "17",
+        "district": [
+            {
+                "name": "SEONI",
+                "value": "39D"
+            },
+            {
+                "name": "NEEMUCH",
+                "value": "30D"
+            },
+            {
+                "name": "HOSHANGABAD",
+                "value": "19D"
+            },
+            {
+                "name": "MANDSAUR",
+                "value": "27D"
+            },
+            {
+                "name": "NARSINGHPUR",
+                "value": "29D"
+            },
+            {
+                "name": "GWALIOR",
+                "value": "17D"
+            },
+            {
+                "name": "BETUL",
+                "value": "5D"
+            },
+            {
+                "name": "SHAJAPUR",
+                "value": "41D"
+            },
+            {
+                "name": "BHOPAL",
+                "value": "7D"
+            },
+            {
+                "name": "RAISEN",
+                "value": "49D"
+            },
+            {
+                "name": "SINGRAULI",
+                "value": "4D"
+            },
+            {
+                "name": "SEHORE",
+                "value": "38D"
+            },
+            {
+                "name": "REWA",
+                "value": "35D"
+            },
+            {
+                "name": "BARWANI",
+                "value": "102D"
+            },
+            {
+                "name": "SAGAR",
+                "value": "36D"
+            },
+            {
+                "name": "AGAR MALWA",
+                "value": "8D"
+            },
+            {
+                "name": "MORENA",
+                "value": "28D"
+            },
+            {
+                "name": "GUNA",
+                "value": "103D"
+            },
+            {
+                "name": "TIKAMGARH",
+                "value": "45D"
+            },
+            {
+                "name": "VIDISHA",
+                "value": "48D"
+            },
+            {
+                "name": "RATLAM",
+                "value": "34D"
+            },
+            {
+                "name": "BURHANPUR",
+                "value": "32D"
+            },
+            {
+                "name": "INDORE",
+                "value": "20D"
+            },
+            {
+                "name": "SHAHDOL",
+                "value": "40D"
+            },
+            {
+                "name": "CHHINDWARA",
+                "value": "10D"
+            },
+            {
+                "name": "UJJAIN",
+                "value": "46D"
+            },
+            {
+                "name": "ANUPPUR",
+                "value": "1D"
+            },
+            {
+                "name": "JABALPUR",
+                "value": "21D"
+            },
+            {
+                "name": "DATIA",
+                "value": "12D"
+            },
+            {
+                "name": "UMARIA",
+                "value": "47D"
+            },
+            {
+                "name": "DINDORI",
+                "value": "15D"
+            },
+            {
+                "name": "CHHATARPUR",
+                "value": "9D"
+            },
+            {
+                "name": "KHARGONE",
+                "value": "25D"
+            },
+            {
+                "name": "MANDLA",
+                "value": "26D"
+            },
+            {
+                "name": "HARDA",
+                "value": "18D"
+            },
+            {
+                "name": "DAMOH",
+                "value": "11D"
+            },
+            {
+                "name": "BALAGHAT",
+                "value": "3D"
+            },
+            {
+                "name": "SHIVPURI",
+                "value": "43D"
+            },
+            {
+                "name": "SIDHI",
+                "value": "44D"
+            },
+            {
+                "name": "KHANDWA",
+                "value": "24D"
+            },
+            {
+                "name": "ALIRAJPUR",
+                "value": "16D"
+            },
+            {
+                "name": "DEWAS",
+                "value": "13D"
+            },
+            {
+                "name": "PANNA",
+                "value": "31D"
+            },
+            {
+                "name": "RAJGARH",
+                "value": "33D"
+            },
+            {
+                "name": "DHAR",
+                "value": "14D"
+            },
+            {
+                "name": "SHEOPUR",
+                "value": "42D"
+            },
+            {
+                "name": "SATNA",
+                "value": "37D"
+            },
+            {
+                "name": "KATNI",
+                "value": "23D"
+            },
+            {
+                "name": "BHIND",
+                "value": "6D"
+            },
+            {
+                "name": "ASHOKNAGAR",
+                "value": "2D"
+            },
+            {
+                "name": "JHABUA",
+                "value": "22D"
+            }
+        ]
+    },
+    {
+        "name": "MAHARASHTRA",
+        "value": "18",
+        "district": [
+            {
+                "name": "DHULE",
+                "value": "9D"
+            },
+            {
+                "name": "AKOLA",
+                "value": "153D"
+            },
+            {
+                "name": "JALGAON",
+                "value": "13D"
+            },
+            {
+                "name": "YAVATMAL",
+                "value": "34D"
+            },
+            {
+                "name": "THANE",
+                "value": "31D"
+            },
+            {
+                "name": "KOLHAPUR",
+                "value": "15D"
+            },
+            {
+                "name": "NAGPUR",
+                "value": "18D"
+            },
+            {
+                "name": "NANDED",
+                "value": "19D"
+            },
+            {
+                "name": "OSMANABAD",
+                "value": "22D"
+            },
+            {
+                "name": "NASHIK",
+                "value": "21D"
+            },
+            {
+                "name": "RATNAGIRI",
+                "value": "26D"
+            },
+            {
+                "name": "RAIGAD",
+                "value": "25D"
+            },
+            {
+                "name": "BHANDARA",
+                "value": "6D"
+            },
+            {
+                "name": "JALNA",
+                "value": "14D"
+            },
+            {
+                "name": "SOLAPUR",
+                "value": "30D"
+            },
+            {
+                "name": "WASHIM",
+                "value": "33D"
+            },
+            {
+                "name": "NANDURBAR",
+                "value": "20D"
+            },
+            {
+                "name": "HINGOLI",
+                "value": "12D"
+            },
+            {
+                "name": "SATARA",
+                "value": "28D"
+            },
+            {
+                "name": "SANGLI",
+                "value": "27D"
+            },
+            {
+                "name": "SINDHUDURG",
+                "value": "29D"
+            },
+            {
+                "name": "NAVI MUMBAI",
+                "value": "11C"
+            },
+            {
+                "name": "PARBHANI",
+                "value": "23D"
+            },
+            {
+                "name": "GONDIA",
+                "value": "11D"
+            },
+            {
+                "name": "AURANGABAD",
+                "value": "3D"
+            },
+            {
+                "name": "AHMEDNAGAR",
+                "value": "1D"
+            },
+            {
+                "name": "CHANDRAPUR",
+                "value": "147D"
+            },
+            {
+                "name": "MUMBAI",
+                "value": "2C"
+            },
+            {
+                "name": "AMRAVATI",
+                "value": "98D"
+            },
+            {
+                "name": "GADCHIROLI",
+                "value": "10D"
+            },
+            {
+                "name": "PALGHAR",
+                "value": "32D"
+            },
+            {
+                "name": "BEED",
+                "value": "5D"
+            },
+            {
+                "name": "LATUR",
+                "value": "99D"
+            },
+            {
+                "name": "BULDHANA",
+                "value": "7D"
+            },
+            {
+                "name": "WARDHA",
+                "value": "152D"
+            },
+            {
+                "name": "PUNE",
+                "value": "24D"
+            }
+        ]
+    },
+    {
+        "name": "MANIPUR",
+        "value": "19",
+        "district": [
+            {
+                "name": "IMPHAL WEST",
+                "value": "5D"
+            },
+            {
+                "name": "CHURACHANDPUR",
+                "value": "3D"
+            },
+            {
+                "name": "TAMENGLONG",
+                "value": "7D"
+            },
+            {
+                "name": "THOUBAL",
+                "value": "101D"
+            },
+            {
+                "name": "IMPHAL EAST",
+                "value": "4D"
+            },
+            {
+                "name": "CHANDEL",
+                "value": "2D"
+            },
+            {
+                "name": "SENAPATI",
+                "value": "6D"
+            },
+            {
+                "name": "UKHRUL",
+                "value": "9D"
+            },
+            {
+                "name": "BISHNUPUR",
+                "value": "1D"
+            }
+        ]
+    },
+    {
+        "name": "MEGHALAYA",
+        "value": "20",
+        "district": [
+            {
+                "name": "RIBHOI",
+                "value": "100D"
+            },
+            {
+                "name": "WEST GARO HILLS",
+                "value": "6D"
+            },
+            {
+                "name": "SOUTH GARO HILLS",
+                "value": "5D"
+            },
+            {
+                "name": "EAST KHASI HILLS",
+                "value": "2D"
+            },
+            {
+                "name": "WEST KHASI HILLS",
+                "value": "7D"
+            },
+            {
+                "name": "EAST GARO HILLS",
+                "value": "1D"
+            },
+            {
+                "name": "JAINTIA HILLS",
+                "value": "3D"
+            }
+        ]
+    },
+    {
+        "name": "MIZORAM",
+        "value": "21",
+        "district": [
+            {
+                "name": "AIZAWL",
+                "value": "1D"
+            },
+            {
+                "name": "LUNGLEI",
+                "value": "5D"
+            },
+            {
+                "name": "CHAMPHAI",
+                "value": "2D"
+            },
+            {
+                "name": "KOLASIB",
+                "value": "3D"
+            },
+            {
+                "name": "MAMIT",
+                "value": "6D"
+            },
+            {
+                "name": "LAWNGTLAI",
+                "value": "106D"
+            },
+            {
+                "name": "SAIHA",
+                "value": "7D"
+            },
+            {
+                "name": "SERCHHIP",
+                "value": "107D"
+            }
+        ]
+    },
+    {
+        "name": "NAGALAND",
+        "value": "22",
+        "district": [
+            {
+                "name": "MON",
+                "value": "108D"
+            },
+            {
+                "name": "PHEK",
+                "value": "5D"
+            },
+            {
+                "name": "TUENSANG",
+                "value": "6D"
+            },
+            {
+                "name": "PEREN",
+                "value": "8D"
+            },
+            {
+                "name": "KOHIMA",
+                "value": "2D"
+            },
+            {
+                "name": "LONGLENG",
+                "value": "9D"
+            },
+            {
+                "name": "ZUNHEBOTO",
+                "value": "109D"
+            },
+            {
+                "name": "DIMAPUR",
+                "value": "1D"
+            },
+            {
+                "name": "KIPHIRE",
+                "value": "10D"
+            },
+            {
+                "name": "MOKOKCHUNG",
+                "value": "3D"
+            },
+            {
+                "name": "WOKHA",
+                "value": "7D"
+            }
+        ]
+    },
+    {
+        "name": "ODISHA",
+        "value": "23",
+        "district": [
+            {
+                "name": "PURI",
+                "value": "26D"
+            },
+            {
+                "name": "KORAPUT",
+                "value": "20D"
+            },
+            {
+                "name": "KHORDHA",
+                "value": "19D"
+            },
+            {
+                "name": "NAYAGARH",
+                "value": "24D"
+            },
+            {
+                "name": "DHENKANAL",
+                "value": "9D"
+            },
+            {
+                "name": "BALANGIR",
+                "value": "2D"
+            },
+            {
+                "name": "NUAPADA",
+                "value": "25D"
+            },
+            {
+                "name": "BALASORE",
+                "value": "3D"
+            },
+            {
+                "name": "GAJAPATI",
+                "value": "10D"
+            },
+            {
+                "name": "JAGATSINGHAPUR",
+                "value": "12D"
+            },
+            {
+                "name": "KEONJHAR",
+                "value": "112D"
+            },
+            {
+                "name": "BHUBANESWAR",
+                "value": "14C"
+            },
+            {
+                "name": "MAYURBHANJ",
+                "value": "22D"
+            },
+            {
+                "name": "JAJPUR",
+                "value": "13D"
+            },
+            {
+                "name": "ROURKELA",
+                "value": "23C"
+            },
+            {
+                "name": "SAMBALPUR",
+                "value": "28D"
+            },
+            {
+                "name": "NABARANGAPUR",
+                "value": "23D"
+            },
+            {
+                "name": "BHADRAK",
+                "value": "5D"
+            },
+            {
+                "name": "SUNDARGARH",
+                "value": "30D"
+            },
+            {
+                "name": "ANGUL",
+                "value": "1D"
+            },
+            {
+                "name": "KENDRAPARA",
+                "value": "17D"
+            },
+            {
+                "name": "GANJAM",
+                "value": "11D"
+            },
+            {
+                "name": "RAYAGADA",
+                "value": "27D"
+            },
+            {
+                "name": "SONEPUR",
+                "value": "29D"
+            },
+            {
+                "name": "KANDHAMAL",
+                "value": "114D"
+            },
+            {
+                "name": "CUTTACK",
+                "value": "7D"
+            },
+            {
+                "name": "DEOGARH",
+                "value": "111D"
+            },
+            {
+                "name": "KALAHANDI",
+                "value": "113D"
+            },
+            {
+                "name": "BERHAMPUR",
+                "value": "22C"
+            },
+            {
+                "name": "BARGARH",
+                "value": "4D"
+            },
+            {
+                "name": "BOUDH",
+                "value": "6D"
+            },
+            {
+                "name": "MALKANGIRI",
+                "value": "21D"
+            },
+            {
+                "name": "JHARSUGUDA",
+                "value": "14D"
+            }
+        ]
+    },
+    {
+        "name": "PUDUCHERRY",
+        "value": "24",
+        "district": [
+            {
+                "name": "KARAIKAL",
+                "value": "1D"
+            },
+            {
+                "name": "YANAM",
+                "value": "118D"
+            },
+            {
+                "name": "PONDICHERRY AND AUREVILLE",
+                "value": "9C"
+            },
+            {
+                "name": "MAHE",
+                "value": "2D"
+            }
+        ]
+    },
+    {
+        "name": "PUNJAB",
+        "value": "25",
+        "district": [
+            {
+                "name": "PATIALA",
+                "value": "15D"
+            },
+            {
+                "name": "FEROZEPUR",
+                "value": "5D"
+            },
+            {
+                "name": "LUDHIANA",
+                "value": "10D"
+            },
+            {
+                "name": "AMRITSAR",
+                "value": "7C"
+            },
+            {
+                "name": "SANGRUR",
+                "value": "17D"
+            },
+            {
+                "name": "MOHALI",
+                "value": "150D"
+            },
+            {
+                "name": "KAPURTHALA",
+                "value": "9D"
+            },
+            {
+                "name": "FARIDKOT",
+                "value": "3D"
+            },
+            {
+                "name": "PATHANKOT",
+                "value": "16D"
+            },
+            {
+                "name": "MANSA",
+                "value": "11D"
+            },
+            {
+                "name": "GURDASPUR",
+                "value": "6D"
+            },
+            {
+                "name": "FATEHGARH SAHIB",
+                "value": "115D"
+            },
+            {
+                "name": "HOSHIARPUR",
+                "value": "7D"
+            },
+            {
+                "name": "BATHINDA",
+                "value": "2D"
+            },
+            {
+                "name": "MOGA",
+                "value": "12D"
+            },
+            {
+                "name": "JALANDHAR",
+                "value": "8D"
+            },
+            {
+                "name": "RUPNAGAR",
+                "value": "117D"
+            },
+            {
+                "name": "FAZILKA",
+                "value": "19D"
+            },
+            {
+                "name": "BATALA",
+                "value": "21C"
+            },
+            {
+                "name": "SHRI MUKATSAR SAHIB",
+                "value": "13D"
+            },
+            {
+                "name": "TARN TARAN",
+                "value": "4D"
+            },
+            {
+                "name": "BARNALA",
+                "value": "18D"
+            },
+            {
+                "name": "KHANNA",
+                "value": "16C"
+            },
+            {
+                "name": "NAWANSHAHR",
+                "value": "14D"
+            }
+        ]
+    },
+    {
+        "name": "RAJASTHAN",
+        "value": "26",
+        "district": [
+            {
+                "name": "RAJSAMAND",
+                "value": "27D"
+            },
+            {
+                "name": "BHIWADI",
+                "value": "28C"
+            },
+            {
+                "name": "DHOLPUR",
+                "value": "13D"
+            },
+            {
+                "name": "CHURU",
+                "value": "11D"
+            },
+            {
+                "name": "ALWAR",
+                "value": "2D"
+            },
+            {
+                "name": "BARMER",
+                "value": "5D"
+            },
+            {
+                "name": "SIKAR",
+                "value": "30D"
+            },
+            {
+                "name": "BUNDI",
+                "value": "9D"
+            },
+            {
+                "name": "BHARATPUR",
+                "value": "6D"
+            },
+            {
+                "name": "BANSWARA",
+                "value": "3D"
+            },
+            {
+                "name": "BARAN",
+                "value": "120D"
+            },
+            {
+                "name": "TONK",
+                "value": "32D"
+            },
+            {
+                "name": "DAUSA",
+                "value": "12D"
+            },
+            {
+                "name": "CHITTORGARH",
+                "value": "10D"
+            },
+            {
+                "name": "SIROHI",
+                "value": "31D"
+            },
+            {
+                "name": "PALI",
+                "value": "26D"
+            },
+            {
+                "name": "SAWAI MADHOPUR",
+                "value": "28D"
+            },
+            {
+                "name": "JAIPUR",
+                "value": "17D"
+            },
+            {
+                "name": "DUNGARPUR",
+                "value": "14D"
+            },
+            {
+                "name": "BIKANER",
+                "value": "8D"
+            },
+            {
+                "name": "SRI GANGANAGAR",
+                "value": "15D"
+            },
+            {
+                "name": "NAGAUR",
+                "value": "25D"
+            },
+            {
+                "name": "KOTA",
+                "value": "24D"
+            },
+            {
+                "name": "UDAIPUR",
+                "value": "33D"
+            },
+            {
+                "name": "JODHPUR",
+                "value": "22D"
+            },
+            {
+                "name": "HANUMANGARH",
+                "value": "121D"
+            },
+            {
+                "name": "JHUNJHUNU",
+                "value": "21D"
+            },
+            {
+                "name": "JALORE",
+                "value": "19D"
+            },
+            {
+                "name": "KARAULI",
+                "value": "23D"
+            },
+            {
+                "name": "PRATAPGARH",
+                "value": "4D"
+            },
+            {
+                "name": "AJMER",
+                "value": "1D"
+            },
+            {
+                "name": "JHALAWAR",
+                "value": "20D"
+            },
+            {
+                "name": "NEEMRANA",
+                "value": "29C"
+            },
+            {
+                "name": "JAISALMER",
+                "value": "18D"
+            },
+            {
+                "name": "BHILWARA",
+                "value": "7D"
+            }
+        ]
+    },
+    {
+        "name": "SIKKIM",
+        "value": "27",
+        "district": [
+            {
+                "name": "SOUTH SIKKIM",
+                "value": "3D"
+            },
+            {
+                "name": "NORTH SIKKIM",
+                "value": "2D"
+            },
+            {
+                "name": "WEST SIKKIM",
+                "value": "122D"
+            },
+            {
+                "name": "EAST SIKKIM",
+                "value": "1D"
+            }
+        ]
+    },
+    {
+        "name": "TAMIL NADU",
+        "value": "28",
+        "district": [
+            {
+                "name": "KRISHNAGIRI",
+                "value": "10D"
+            },
+            {
+                "name": "VILLUPURAM",
+                "value": "127D"
+            },
+            {
+                "name": "COIMBATORE",
+                "value": "2D"
+            },
+            {
+                "name": "TIRUNELVELI",
+                "value": "24D"
+            },
+            {
+                "name": "NAMAKKAL",
+                "value": "13D"
+            },
+            {
+                "name": "RAMANATHAPURAM",
+                "value": "17D"
+            },
+            {
+                "name": "TIRUVARUR",
+                "value": "30D"
+            },
+            {
+                "name": "VELLORE",
+                "value": "31D"
+            },
+            {
+                "name": "ARIYALUR",
+                "value": "123D"
+            },
+            {
+                "name": "VIRUDHUNAGAR",
+                "value": "33D"
+            },
+            {
+                "name": "KARUR",
+                "value": "9D"
+            },
+            {
+                "name": "DHARMAPURI",
+                "value": "124D"
+            },
+            {
+                "name": "NAGAPATTINAM",
+                "value": "12D"
+            },
+            {
+                "name": "MADURAI",
+                "value": "11D"
+            },
+            {
+                "name": "PUDUKKOTTAI",
+                "value": "126D"
+            },
+            {
+                "name": "KANCHIPURAM",
+                "value": "7D"
+            },
+            {
+                "name": "THOOTHUKUDI",
+                "value": "22D"
+            },
+            {
+                "name": "THANJAVUR",
+                "value": "20D"
+            },
+            {
+                "name": "PERAMBALUR",
+                "value": "15D"
+            },
+            {
+                "name": "TIRUVANNAMALAI",
+                "value": "29D"
+            },
+            {
+                "name": "ERODE",
+                "value": "6D"
+            },
+            {
+                "name": "SALEM",
+                "value": "18D"
+            },
+            {
+                "name": "CHENNAI",
+                "value": "4C"
+            },
+            {
+                "name": "THENI",
+                "value": "21D"
+            },
+            {
+                "name": "NILGIRIS",
+                "value": "14D"
+            },
+            {
+                "name": "TIRUPPUR",
+                "value": "4D"
+            },
+            {
+                "name": "KANYAKUMARI",
+                "value": "125D"
+            },
+            {
+                "name": "SIVAGANGA",
+                "value": "19D"
+            },
+            {
+                "name": "TIRUVALLUR",
+                "value": "25D"
+            },
+            {
+                "name": "TIRUCHIRAPPALLI",
+                "value": "23D"
+            },
+            {
+                "name": "DINDIGUL",
+                "value": "5D"
+            },
+            {
+                "name": "CUDDALORE",
+                "value": "3D"
+            }
+        ]
+    },
+    {
+        "name": "TELANGANA",
+        "value": "37",
+        "district": [
+            {
+                "name": "NALGONDA",
+                "value": "7D"
+            },
+            {
+                "name": "RANGAREDDY",
+                "value": "9D"
+            },
+            {
+                "name": "MEDAK",
+                "value": "6D"
+            },
+            {
+                "name": "WARANGAL",
+                "value": "10D"
+            },
+            {
+                "name": "HYDERABAD",
+                "value": "2D"
+            },
+            {
+                "name": "KHAMMAM",
+                "value": "4D"
+            },
+            {
+                "name": "MAHABUBNAGAR",
+                "value": "5D"
+            },
+            {
+                "name": "ADILABAD",
+                "value": "1D"
+            },
+            {
+                "name": "NIZAMABAD",
+                "value": "8D"
+            },
+            {
+                "name": "KARIMNAGAR",
+                "value": "3D"
+            }
+        ]
+    },
+    {
+        "name": "TRIPURA",
+        "value": "29",
+        "district": [
+            {
+                "name": "GOMATI",
+                "value": "4D"
+            },
+            {
+                "name": "DHALAI",
+                "value": "1D"
+            },
+            {
+                "name": "SEPAHIJALA",
+                "value": "6D"
+            },
+            {
+                "name": "KHOWAI",
+                "value": "5D"
+            },
+            {
+                "name": "UNAKOTI",
+                "value": "7D"
+            },
+            {
+                "name": "SOUTH TRIPURA",
+                "value": "3D"
+            },
+            {
+                "name": "WEST TRIPURA",
+                "value": "128D"
+            },
+            {
+                "name": "NORTH TRIPURA",
+                "value": "2D"
+            }
+        ]
+    },
+    {
+        "name": "UTTARAKHAND",
+        "value": "31",
+        "district": [
+            {
+                "name": "NAINITAL",
+                "value": "7D"
+            },
+            {
+                "name": "UDHAM SINGH NAGAR",
+                "value": "12D"
+            },
+            {
+                "name": "DEHRADUN",
+                "value": "5D"
+            },
+            {
+                "name": "TEHRI GARHWAL",
+                "value": "11D"
+            },
+            {
+                "name": "UTTARKASHI",
+                "value": "13D"
+            },
+            {
+                "name": "CHAMOLI",
+                "value": "3D"
+            },
+            {
+                "name": "BAGESHWAR",
+                "value": "2D"
+            },
+            {
+                "name": "PAURI GARHWAL",
+                "value": "135D"
+            },
+            {
+                "name": "RUDRAPRAYAG",
+                "value": "10D"
+            },
+            {
+                "name": "PITHORAGARH",
+                "value": "9D"
+            },
+            {
+                "name": "HARIDWAR",
+                "value": "6D"
+            },
+            {
+                "name": "ALMORA",
+                "value": "1D"
+            },
+            {
+                "name": "CHAMPAWAT",
+                "value": "134D"
+            }
+        ]
+    },
+    {
+        "name": "UTTAR PRADESH",
+        "value": "30",
+        "district": [
+            {
+                "name": "SITAPUR",
+                "value": "66D"
+            },
+            {
+                "name": "SHAMLI",
+                "value": "16D"
+            },
+            {
+                "name": "BANDA",
+                "value": "11D"
+            },
+            {
+                "name": "PRATAPGARH",
+                "value": "57D"
+            },
+            {
+                "name": "AGRA",
+                "value": "1D"
+            },
+            {
+                "name": "KUSHINAGAR",
+                "value": "44D"
+            },
+            {
+                "name": "BALRAMPUR",
+                "value": "10D"
+            },
+            {
+                "name": "KANPUR DEHAT",
+                "value": "40D"
+            },
+            {
+                "name": "CHANDAULI",
+                "value": "18D"
+            },
+            {
+                "name": "SANT RAVIDAS NAGAR",
+                "value": "62D"
+            },
+            {
+                "name": "SHAHJAHANPUR",
+                "value": "63D"
+            },
+            {
+                "name": "GHAZIPUR",
+                "value": "29D"
+            },
+            {
+                "name": "PILIBHIT",
+                "value": "56D"
+            },
+            {
+                "name": "SAHARANPUR",
+                "value": "60D"
+            },
+            {
+                "name": "UNNAO",
+                "value": "69D"
+            },
+            {
+                "name": "SHRAVASTI",
+                "value": "64D"
+            },
+            {
+                "name": "ETAWAH",
+                "value": "22D"
+            },
+            {
+                "name": "JAUNPUR",
+                "value": "36D"
+            },
+            {
+                "name": "KANNAUJ",
+                "value": "39D"
+            },
+            {
+                "name": "AMBEDKAR NAGAR",
+                "value": "129D"
+            },
+            {
+                "name": "MAHARAJGANJ",
+                "value": "47D"
+            },
+            {
+                "name": "LUCKNOW",
+                "value": "46D"
+            },
+            {
+                "name": "MUZAFFARNAGAR",
+                "value": "55D"
+            },
+            {
+                "name": "GAUTAM BUDDHA NAGAR",
+                "value": "27D"
+            },
+            {
+                "name": "HATHRAS",
+                "value": "34D"
+            },
+            {
+                "name": "JYOTIBA PHULE NAGAR",
+                "value": "38D"
+            },
+            {
+                "name": "MIRZAPUR",
+                "value": "53D"
+            },
+            {
+                "name": "HAMIRPUR",
+                "value": "76D"
+            },
+            {
+                "name": "AURAIYA",
+                "value": "5D"
+            },
+            {
+                "name": "FIROZABAD",
+                "value": "26D"
+            },
+            {
+                "name": "BULANDSHAHR",
+                "value": "17D"
+            },
+            {
+                "name": "AMETHI",
+                "value": "4D"
+            },
+            {
+                "name": "DEORIA",
+                "value": "20D"
+            },
+            {
+                "name": "BARABANKI",
+                "value": "12D"
+            },
+            {
+                "name": "MAINPURI",
+                "value": "49D"
+            },
+            {
+                "name": "LALITPUR",
+                "value": "45D"
+            },
+            {
+                "name": "BAGPAT",
+                "value": "7D"
+            },
+            {
+                "name": "FATEHPUR",
+                "value": "25D"
+            },
+            {
+                "name": "MAU",
+                "value": "51D"
+            },
+            {
+                "name": "BASTI",
+                "value": "14D"
+            },
+            {
+                "name": "HAPUR",
+                "value": "8D"
+            },
+            {
+                "name": "LAKHIMPUR KHERI",
+                "value": "32D"
+            },
+            {
+                "name": "HARDOI",
+                "value": "151D"
+            },
+            {
+                "name": "SANT KABIR NAGAR",
+                "value": "61D"
+            },
+            {
+                "name": "ETAH",
+                "value": "21D"
+            },
+            {
+                "name": "BAHRAICH",
+                "value": "131D"
+            },
+            {
+                "name": "JALAUN",
+                "value": "35D"
+            },
+            {
+                "name": "GHAZIABAD",
+                "value": "28D"
+            },
+            {
+                "name": "SONBHADRA",
+                "value": "67D"
+            },
+            {
+                "name": "BUDAUN",
+                "value": "130D"
+            },
+            {
+                "name": "AZAMGARH",
+                "value": "6D"
+            },
+            {
+                "name": "MAHOBA",
+                "value": "48D"
+            },
+            {
+                "name": "SAMBHAL",
+                "value": "72D"
+            },
+            {
+                "name": "BAREILLY",
+                "value": "13D"
+            },
+            {
+                "name": "VARANASI",
+                "value": "70D"
+            },
+            {
+                "name": "SULTANPUR",
+                "value": "68D"
+            },
+            {
+                "name": "KAUSHAMBI",
+                "value": "42D"
+            },
+            {
+                "name": "GORAKHPUR",
+                "value": "31D"
+            },
+            {
+                "name": "KASGANJ",
+                "value": "71D"
+            },
+            {
+                "name": "RAMPUR",
+                "value": "59D"
+            },
+            {
+                "name": "MATHURA",
+                "value": "50D"
+            },
+            {
+                "name": "FARRUKHABAD",
+                "value": "24D"
+            },
+            {
+                "name": "KANPUR NAGAR",
+                "value": "41D"
+            },
+            {
+                "name": "CHITRAKOOT",
+                "value": "19D"
+            },
+            {
+                "name": "RAE BARELI",
+                "value": "133D"
+            },
+            {
+                "name": "BIJNOR",
+                "value": "15D"
+            },
+            {
+                "name": "MORADABAD",
+                "value": "54D"
+            },
+            {
+                "name": "MEERUT",
+                "value": "52D"
+            },
+            {
+                "name": "JHANSI",
+                "value": "37D"
+            },
+            {
+                "name": "ALLAHABAD",
+                "value": "3D"
+            },
+            {
+                "name": "ALIGARH",
+                "value": "2D"
+            },
+            {
+                "name": "FAIZABAD",
+                "value": "23D"
+            },
+            {
+                "name": "SIDDHARTHNAGAR",
+                "value": "65D"
+            },
+            {
+                "name": "BALLIA",
+                "value": "9D"
+            },
+            {
+                "name": "GONDA",
+                "value": "30D"
+            }
+        ]
+    },
+    {
+        "name": "WEST BENGAL",
+        "value": "32",
+        "district": [
+            {
+                "name": "Cooch Behar",
+                "value": "137D"
+            },
+            {
+                "name": "BURDWAN",
+                "value": "2D"
+            },
+            {
+                "name": "ALIPURDUAR",
+                "value": "4D"
+            },
+            {
+                "name": "SOUTH DINAJPUR",
+                "value": "17D"
+            },
+            {
+                "name": "BIDHANNAGAR",
+                "value": "18C"
+            },
+            {
+                "name": "BANKURA",
+                "value": "1D"
+            },
+            {
+                "name": "West Medinipur",
+                "value": "18D"
+            },
+            {
+                "name": "NADIA",
+                "value": "12D"
+            },
+            {
+                "name": "KOLKATA",
+                "value": "3C"
+            },
+            {
+                "name": "CHANDANNAGAR",
+                "value": "8D"
+            },
+            {
+                "name": "JALPAIGURI",
+                "value": "9D"
+            },
+            {
+                "name": "Purulia",
+                "value": "15D"
+            },
+            {
+                "name": "Howrah",
+                "value": "136D"
+            },
+            {
+                "name": "Darjeeling",
+                "value": "5D"
+            },
+            {
+                "name": "NORTH 24 PARGANAS",
+                "value": "13D"
+            },
+            {
+                "name": "NORTH DINAJPUR",
+                "value": "14D"
+            },
+            {
+                "name": "SOUTH 24 PARGANAS",
+                "value": "146D"
+            },
+            {
+                "name": "East Medinipur",
+                "value": "6D"
+            },
+            {
+                "name": "MURSHIDABAD",
+                "value": "11D"
+            },
+            {
+                "name": "JHARGRAM",
+                "value": "20C"
+            },
+            {
+                "name": "SILIGURI",
+                "value": "12C"
+            },
+            {
+                "name": "BARRACKPUR",
+                "value": "19C"
+            },
+            {
+                "name": "BIRBHUM",
+                "value": "3D"
+            },
+            {
+                "name": "ASANSOL DURGAPUR",
+                "value": "24C"
+            },
+            {
+                "name": "HOOGHLY RURAL",
+                "value": "7D"
+            },
+            {
+                "name": "MALDA",
+                "value": "10D"
+            }
+        ]
+    }
+]

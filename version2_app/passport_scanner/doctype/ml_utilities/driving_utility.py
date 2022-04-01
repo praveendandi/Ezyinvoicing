@@ -7,6 +7,7 @@ import requests
 
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
+    get_address_from_zipcode,
     format_date
 )
 
@@ -50,10 +51,15 @@ def driving_data_changes(message):
             df = pd.json_normalize(data, sep="_")
             data = df.to_dict(orient="records")[0]
             dob_list = []
+            if "driving_front_details_driving_front_details_DLNBR" in data:
+                driving_details["local_id_number"] = data["driving_front_details_driving_front_details_DLNBR"]
             if "driving_front_details_driving_front_details_NAME" in data:
-                driving_details["guest_first_name"] = data[
+                name = data[
                     "driving_front_details_driving_front_details_NAME"
                 ].strip()
+                if "\n" in name:
+                    name = name.split("\n")[0]
+                driving_details["guest_first_name"] = name
             if "Driving_Front_Face_Image_base_64" in data:
                 folder_path = frappe.utils.get_bench_path()
                 site_folder_path = folder_path + "/sites/" + company.site_name
@@ -166,7 +172,21 @@ def driving_data_changes(message):
                 if dob_date < before_date:
                     driving_details["guest_dob"] = dob_date
             if "driving_address_details_driving_address_details_ADRESS" in data:
-                pass
+                address = data[
+                    "driving_address_details_driving_address_details_ADRESS"
+                ]
+                if address != "":
+                    address = address.replace("Address:","").strip()
+                    address = address.replace("\n"," ")
+                driving_details["address1"] = address 
+            if "driving_address_details_driving_address_details_PINCODE" in data:
+                pincode = data["driving_address_details_driving_address_details_PINCODE"]
+                regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
+                if re.match(regex_complie, pincode):
+                    driving_details["zip_code"] = pincode
+                    address_details = get_address_from_zipcode(pincode)
+                    if address_details["success"]:
+                        driving_details.update(address_details["data"])
         driving_details["guest_country"] = "IND"
         driving_details["guest_nationality"] = "IND"
         driving_details["status"] = "In House"
