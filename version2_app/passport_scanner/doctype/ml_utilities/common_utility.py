@@ -113,10 +113,11 @@ def getdate(string_date=None):
     try:
         return parser.parse(string_date).date()
     except ParserError:
-        frappe.throw(
-            frappe._("{} is not a valid date string.").format(frappe.bold(string_date)),
-            title=frappe._("Invalid Date"),
-        )
+        pass
+        # frappe.throw(
+        #     frappe._("{} is not a valid date string.").format(frappe.bold(string_date)),
+        #     title=frappe._("Invalid Date"),
+        # )
 
 
 def is_invalid_date_string(date_string):
@@ -150,7 +151,8 @@ def get_datetime(datetime_str=None):
     try:
         return datetime.datetime.strptime(datetime_str, DATETIME_FORMAT)
     except ValueError:
-        return parser.parse(datetime_str)
+        pass
+        # return parser.parse(datetime_str)
 
 
 def now_datetime():
@@ -165,7 +167,8 @@ def convert_utc_to_user_timezone(utc_timestamp):
     try:
         return utcnow.astimezone(timezone(get_time_zone()))
     except UnknownTimeZoneError:
-        return utcnow
+        pass
+        # return utcnow
 
 
 def get_user_date_format():

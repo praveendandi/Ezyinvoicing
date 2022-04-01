@@ -16,7 +16,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 
 
 
-@frappe.whitelist(allow_guest=True)
+# @frappe.whitelist(allow_guest=True)
 def fetch_aadhaar_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -88,11 +88,9 @@ def aadhaar_data_changes(data):
                 ):
                     try:
                         guest_dob = data["aadhar_front_details_aadhar_front_details_DOB"].strip()
-                        guest_dob = guest_dob.replace(" ", "")
-                        guest_dob = guest_dob.replace("/", "")
-                        guest_dob = guest_dob.replace("-", "")
+                        guest_dob = guest_dob.replace(" ", "/")
                         aadhaar_details["guest_dob"] = format_date(
-                            data["aadhar_front_details_aadhar_front_details_DOB"].strip(),
+                            guest_dob,
                             "yyyy-mm-dd",
                         )
                     except Exception as e:

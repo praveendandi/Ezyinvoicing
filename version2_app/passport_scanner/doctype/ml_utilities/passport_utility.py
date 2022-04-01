@@ -172,6 +172,7 @@ def passport_data_changes(data):
                 passport_details["visa_last_name"] = data["visa_details_visa_details_surname"]
             if "visa_details_visa_details_name" in data:
                 passport_details["visa_first_name"] = data["visa_details_visa_details_surname"]
+        passport_details = {k: v for k, v in passport_details.items() if v}
         return {"success": True, "data": passport_details}
     except Exception as e:
         frappe.log_error(str(e), "passport_data_changes")
