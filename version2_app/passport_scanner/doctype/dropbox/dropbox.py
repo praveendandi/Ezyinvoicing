@@ -641,7 +641,7 @@ def merge_guest_to_guest_details(name: str):
             queue="default",
             timeout=800000,
             event="data_extraction",
-            now=True,
+            now=False,
             data={
                 "dropbox": doc,
                 "image_1": image_1,
