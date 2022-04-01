@@ -1530,7 +1530,7 @@ def guest_attachments(doc, method=None):
                 doc.country = pre_checkins["guest_country"]
         if doc.guest_dob is not None:
             today = datetime.datetime.today()
-            birthDate = datetime.datetime.strptime(doc.guest_dob, '%Y-%m-%d')
+            birthDate = datetime.datetime.strptime(str(doc.guest_dob), '%Y-%m-%d')
             doc.guest_age= (
                 today.year
                 - birthDate.year
@@ -1610,7 +1610,7 @@ def guest_update_attachment_logs(doc, method=None):
                 data["country"] = pre_checkins["guest_country"]
         if doc.guest_dob is not None:
             today = datetime.datetime.today()
-            birthDate = datetime.datetime.strptime(doc.guest_dob, '%Y-%m-%d')
+            birthDate = datetime.datetime.strptime(str(doc.guest_dob), '%Y-%m-%d')
             data["guest_age"] = (
                 today.year
                 - birthDate.year
