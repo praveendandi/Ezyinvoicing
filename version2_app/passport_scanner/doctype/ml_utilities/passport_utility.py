@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 import traceback
 
@@ -10,6 +11,7 @@ import requests
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     convert_base64_to_image,
     format_date,
+    get_address_from_zipcode,
 )
 
 
@@ -42,8 +44,8 @@ def fetch_passport_details(image_1=None, image_2=None):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "fetch_passport_details",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "fetch_passport_details"
         )
         return {"success": False, "message": str(e)}
 
@@ -140,7 +142,12 @@ def passport_data_changes(data):
             if "passport_place_of_issue_passport_place_of_issue" in data:
                 if data["passport_place_of_issue_passport_place_of_issue"] != "":
                     try:
-                        get_date = "".join(filter(str.isdigit, data["passport_place_of_issue_passport_place_of_issue"]))
+                        get_date = "".join(
+                            filter(
+                                str.isdigit,
+                                data["passport_place_of_issue_passport_place_of_issue"],
+                            )
+                        )
                         passport_details["passport_date_of_issue"] = format_date(
                             str(get_date),
                             "yyyy-mm-dd",
@@ -198,12 +205,33 @@ def passport_data_changes(data):
                 passport_details["visa_first_name"] = data[
                     "visa_details_visa_details_surname"
                 ]
+            if "passport_back_address_passport_back_address_ADRESS" in data:
+                address = data["passport_back_address_passport_back_address_ADRESS"]
+                address = address.replace("\n", "")
+                passport_details["address1"] = address
+            if "passport_back_address_passport_back_address_PINCODE" in data:
+                pincode = data["passport_back_address_passport_back_address_PINCODE"]
+                pincode = pincode.replace("PIN:", "")
+                regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
+                if re.match(regex_complie, pincode):
+                    passport_details["zip_code"] = pincode
+                    address_details = get_address_from_zipcode(pincode)
+                    if address_details["success"]:
+                        passport_details.update(address_details["data"])
+            if "passport_back_address_passport_back_address_STATE" in data:
+                if "guest_state" not in passport_details:
+                    file_path = os.path.dirname(os.path.abspath(__file__))
+                    with open(file_path+'/statesAndDistricts.json', 'r') as myfile:
+                        state_names = json.loads(myfile.read())
+                        for each in state_names:
+                            if (data["passport_back_address_passport_back_address_STATE"]).upper() == each["name"]:
+                                data["guest_state"] = each["value"]
         passport_details = {k: v for k, v in passport_details.items() if v}
         return {"success": True, "data": passport_details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "passport_data_changes",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "passport_data_changes"
         )
         return {"success": False, "message": str(e)}

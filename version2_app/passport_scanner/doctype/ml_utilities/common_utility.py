@@ -35,8 +35,8 @@ def convert_base64_to_image(base, name, site_folder_path, company):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "Scan-Guest Details Opera",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "convert_base64_to_image"
         )
         return {"success": False, "message": str(e)}
 
@@ -64,8 +64,8 @@ def get_address_from_zipcode(postal_code):
         return {"success": True, "data": data}
     except Exception as e:
         frappe.log_error(
-            "Scan-update_company",
             traceback.format_exc(),
+            "get_address_from_zipcode"
         )
         return {"success": False, "message": str(e)}
 

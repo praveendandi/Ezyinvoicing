@@ -44,8 +44,8 @@ def fetch_aadhaar_details(image_1=None, image_2=None):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "fetch_aadhaar_details",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "fetch_aadhaar_details"
         )
         return {"success": False, "message": str(e)}
 
@@ -127,7 +127,7 @@ def aadhaar_data_changes(data):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "aadhaar_data_changes",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "aadhaar_data_changes"
         )
         return {"success": False, "message": str(e)}

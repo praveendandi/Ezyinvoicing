@@ -39,8 +39,8 @@ def fetch_voter_details(image_1=None, image_2=None):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "fetch_voter_details",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "fetch_voter_details"
         )
         return {"success": False, "message": str(e)}
 
@@ -75,7 +75,7 @@ def voter_data_changes(data):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "voter_data_changes",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "voter_data_changes"
         )
         return {"success": False, "message": str(e)}

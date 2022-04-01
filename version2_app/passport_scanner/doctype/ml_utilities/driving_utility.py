@@ -41,8 +41,8 @@ def fetch_driving_details(image_1=None, image_2=None):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "fetch_driving_details",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "fetch_driving_details"
         )
         return {"success": False, "message": str(e)}
 
@@ -203,7 +203,7 @@ def driving_data_changes(message):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "driving_data_changes",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "driving_data_changes"
         )
         return {"success": False, "message": str(e)}
