@@ -21,7 +21,6 @@ from frappe.model.document import Document
 from version2_app.passport_scanner.doctype.guest_details.cform import intiate
 from version2_app.passport_scanner.doctype.guest_details.pathik import intiate_pathik
 
-
 class GuestDetails(Document):
     pass
 
@@ -138,11 +137,12 @@ def guest_details_opera(confirmation_number):
 def helper_utility(data):
     try:
         url = (
-            "http://localhost:8001/api/method/version2_app.passport_scanner.doctype.reservations.reservations."
+            "http://0.0.0.0:8000/api/method/version2_app.passport_scanner.doctype.reservations.reservations."
             + data["api"]
         )
         del data["api"]
         x = requests.post(url, data=data)
+        print(x)
         return {"success": True, "data": x.json()}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -222,7 +222,6 @@ def update_guest_details(name):
                         + pre_checkins.image_1
                     )
                 convert1 = convert_image_to_base64(file_path1)
-                print(file_path1)
                 if convert1["success"] is False:
                     return convert1
             if pre_checkins.image_2:
@@ -1148,3 +1147,51 @@ def guest_details_for_opera(confirmation_number: str = None):
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
         )
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def opera_scan_api(type=None, name=None, image_1=None, image_2=None, document_type=None):
+    try:
+        if frappe.db.exists("Guest Details", name):
+            guest_details = frappe.db.get_value("Guest Details", name, ["id_image1","id_image2","confirmation_number","guest_id_type"], as_dict=1)
+            # return guest_details
+            if type == "rotate":
+                get_data = get_data_vision_api(image_1, image_2, name, guest_details["guest_id_type"])
+                return get_data
+                # if not get_data["success"]:
+                #     return get_data
+            if type == "upload":
+                pass
+            if type == "refetch":
+                pass
+    except Exception as e:
+        print(e)
+
+def get_aadhaar_data(image1=None, image2=None):
+    try:
+        if image1:
+            print("////////,,,,,,")
+            aadhar_front = helper_utility(
+                        {
+                            "api": "scan_aadhar",
+                            "aadhar_image": image1,
+                            "scanView": "front",
+                        }
+                    )
+            if not aadhar_front["success"]:
+                return aadhar_front
+            return {"success": True, "data": aadhar_front}
+        if image2:
+            pass
+    except Exception as e:
+        pass
+
+def get_data_vision_api(image1=None, image2=None, name=None, document_type=None):
+    try:
+        if document_type:
+            if document_type == "aadhaar":
+                get_aadhaar_data(image1, image2)
+                return get_aadhaar_data
+    except Exception as e:
+        print(e)
+    
