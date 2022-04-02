@@ -203,7 +203,7 @@ def passport_data_changes(data):
                 ]
             if "visa_details_visa_details_name" in data:
                 passport_details["visa_first_name"] = data[
-                    "visa_details_visa_details_surname"
+                    "visa_details_visa_details_name"
                 ]
             if "passport_back_address_passport_back_address_ADRESS" in data:
                 address = data["passport_back_address_passport_back_address_ADRESS"]
