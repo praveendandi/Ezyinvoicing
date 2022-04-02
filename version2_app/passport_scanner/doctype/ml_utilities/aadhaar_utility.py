@@ -24,7 +24,7 @@ def fetch_aadhaar_details(image_1=None, image_2=None):
             "base": image_1 if image_1 is not None else image_2,
             "thresh": 0.4,
             "class": "aadhaar",
-            "version": "v1",
+            "version": "v2",
             "filters": ["confidence", "detections", "predection", "file_name"],
         }
         image_response = requests.post(
