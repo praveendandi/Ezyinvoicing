@@ -275,8 +275,8 @@ def aadhar_detect_text(image_file, doc_type):
         ]
         # req_start = time.time()
         text_data = text_getter(image_file)
-        if text_data["success"] is False:
-            return {"success": False, "message": text_data["message"]}
+        if not text_data["success"]:
+            return text_data
         text = text_data["data"]
         block = str(text).split("\n")
         if doc_type == "front":
@@ -553,11 +553,11 @@ def scan_aadhar():
         base = frappe.local.form_dict.get("aadhar_image")
         doc_type = frappe.local.form_dict.get("scanView")
         company = frappe.get_last_doc("company")
-        api_time = time.time()
+        # api_time = time.time()
         # base = data['aadhar_image']
         # doc_type = data['scanView']
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/aadhardoc.jpeg"
         with open(filename, "wb") as f:
@@ -565,32 +565,18 @@ def scan_aadhar():
         details = ""
         croppedaadhar = image_processing(filename)
         if croppedaadhar["success"] is False:
-            return {
-                "success": False,
-                "error": croppedaadhar["message"],
-                "message": "Unable to scan Aadhar",
-            }
+            return croppedaadhar
         cropped_aadhar = croppedaadhar["data"]
         aadhar_text = aadhar_detect_text(base, doc_type)
         if aadhar_text["success"] is False:
-            return {
-                "success": False,
-                "error": aadhar_text["message"],
-                "aadhar_details": {"base64_string": cropped_aadhar},
-                "message": "Unable to scan Aadhar",
-            }
+            return aadhar_text
         details = aadhar_text["data"]
         details["base64_string"] = cropped_aadhar
         image_string = " "
         rand_int = str(datetime.now())
         face_detect = detect_faces(filename, rand_int)
         if face_detect["success"] is False:
-            return {
-                "success": False,
-                "error": face_detect["message"],
-                "aadhar_details": {"base64_string": cropped_aadhar},
-                "message": "Unable to scan Aadhar",
-            }
+            return face_detect
         face = face_detect["data"]
         os.remove(filename)
         if doc_type == "front":
@@ -608,16 +594,19 @@ def scan_aadhar():
                     details["success"] = False
                     return details
                 elif len(details.keys()) > 1:
-                    return {"success": True, "aadhar_details": details}
+                    details["success"] = False
+                    return details
             elif "error" not in details.keys():
-                return {"success": True, "aadhar_details": details}
+                details["success"] = True
+                return details
         elif doc_type == "back":
             if "error" in details.keys():
                 details["success"] = False
                 return details
             elif "error" not in details.keys():
+                details["success"] = True
                 details["doc_type"] = "back"
-                return {"success": True, "aadhar_details": details}
+                return details
 
     except IndexError as e:
         company = frappe.get_last_doc("company")
@@ -625,7 +614,7 @@ def scan_aadhar():
         base = frappe.local.form_dict.get("aadhar_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/aadhardoc.jpeg"
         with open(filename, "wb") as f:
@@ -656,11 +645,7 @@ def scan_aadhar():
 
         croppedaadhar = image_processing(filename)
         if croppedaadhar["success"] is False:
-            return {
-                "success": False,
-                "error": croppedaadhar["message"],
-                "message": "Unable to scan Aadhar",
-            }
+            return croppedaadhar
         cropped_aadhar = croppedaadhar["data"]
         details = {"base64_string": cropped_aadhar}
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -678,10 +663,10 @@ def scan_aadhar():
 
 def license_detect_text(image_file):
     try:
-        req_time = time.time()
+        # req_time = time.time()
         text_data = text_getter(image_file)
-        if text_data["success"] == False:
-            return {"success": False, "message": text_data["message"]}
+        if not text_data["success"]:
+            return text_data
         text = text_data["data"]
         # logger.info(
         #     f"time elapsed for vision request is{time.time()-req_time}")
@@ -863,13 +848,13 @@ def license_detect_text(image_file):
         state = ""
         if person_address != "":
             person_address = re.sub(
-                "Issued on|Issued|Date of First Issue|ssued|DoB|[0-9]{2}\/[0-9]{2}\/[0-9]{4}|Addressress|Address|ADDRESS|address",
+                r"Issued on|Issued|Date of First Issue|ssued|DoB|[0-9]{2}\/[0-9]{2}\/[0-9]{4}|Addressress|Address|ADDRESS|address",
                 "",
                 person_address,
             )
-            if re.search("\d{6}", person_address):
+            if re.search(r"\d{6}", person_address):
                 postal_code_data = re.match(
-                    "^.*(?P<zipcode>\d{6}).*$", person_address
+                    r"^.*(?P<zipcode>\d{6}).*$", person_address
                 ).groupdict()["zipcode"]
                 postal_code = postal_code_data if len(postal_code_data) == 6 else ""
             if "," in person_address:
@@ -906,34 +891,30 @@ def license_detect_text(image_file):
 def scan_driving_license():
     try:
         company = frappe.get_last_doc("company")
-        api_time = time.time()
+        # api_time = time.time()
         file_type = frappe.local.form_dict.get("scanView")
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/driverdoc.jpeg"
         with open(filename, "wb") as f:
             f.write(imgdata)
         details = ""
         details_data = license_detect_text(base)
-        if details_data["success"] == False:
+        if not details_data["success"]:
             return details_data
         details = details_data["data"]
         drivingcropped = image_processing(filename)
-        if drivingcropped["success"] == False:
-            return {"success": False, "message": drivingcropped["message"]}
+        if not drivingcropped["success"]:
+            return drivingcropped
         driving_cropped = drivingcropped["data"]
         details["base64_string"] = driving_cropped
-        image_string = " "
+        image_string = ""
         rand_int = str(datetime.now())
         face_detect = detect_faces(filename, rand_int)
-        if face_detect["success"] == False:
-            return {
-                "success": False,
-                "message": face_detect["message"],
-                "driving_details": details,
-            }
+        if not face_detect["success"]:
+            return face_detect
         face = face_detect["data"]
         os.remove(filename)
         if file_type == "back":
@@ -958,25 +939,25 @@ def scan_driving_license():
                 face_ex = {
                     key: value for key, value in details.items() if key != "face"
                 }
-
-                return {"success": True, "driving_details": details}
+                details["success"] = True
+                return details
         elif "error" not in details.keys():
             face_ex = {key: value for key, value in details.items() if key != "face"}
-
-            return {"success": True, "driving_details": details}
+            details["success"] = True
+            return details
 
     except IndexError as e:
         company = frappe.get_last_doc("company")
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/driverdoc.jpeg"
         with open(filename, "wb") as f:
             f.write(imgdata)
         drivingcropped = image_processing(filename)
-        if drivingcropped["success"] == False:
-            return {"success": False, "message": drivingcropped["message"]}
+        if not drivingcropped["success"]:
+            return drivingcropped
         driving_cropped = drivingcropped["data"]
         details = {"base64_string": driving_cropped}
         os.remove(filename)
@@ -995,14 +976,14 @@ def scan_driving_license():
         company = frappe.get_last_doc("company")
         base = frappe.local.form_dict.get("driving_image")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/driverdoc.jpeg"
         with open(filename, "wb") as f:
             f.write(imgdata)
         drivingcropped = image_processing(filename)
-        if drivingcropped["success"] == False:
-            return {"success": False, "message": drivingcropped["message"]}
+        if not drivingcropped["success"]:
+            return drivingcropped
         driving_cropped = drivingcropped["data"]
         details = {"base64_string": driving_cropped}
         os.remove(filename)
@@ -1081,7 +1062,7 @@ def pan_detect_text(image_file):
         names = [x for x in names if x not in unlike]
         face_detect = detect_faces(image_file, bca[0])
         if face_detect["success"] == False:
-            return {"success": False, "message": face_detect["message"]}
+            return face_detect
         face = face_detect["data"]
         image_string = ""
         if os.path.isfile(face) is True:
@@ -1223,10 +1204,10 @@ def voter_detect_text(image_file, doc_type):
             "Date of Birtta",
             "IDENTITY CARD",
         ]
-        req_time = time.time()
+        # req_time = time.time()
         text_data = text_getter(image_file)
-        if text_data["success"] == False:
-            return {"success": False, "message": text_data["message"]}
+        if not text_data["success"]:
+            return text_data
         text = text_data["data"]
         # logger.info(f"time elapsed for vision request is {time.time()-req_time}")
         block = str(text).split("\n")
@@ -1264,7 +1245,6 @@ def voter_detect_text(image_file, doc_type):
             if sex == "":
                 for x in block:
                     if "sex:" in x and "/" in x:
-                        print(x.split("/"))
                         sex = x.split("/")[-1]
             noun = re.compile(
                 "([a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+ [a-zA-Z]+|[a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+)"
@@ -1535,8 +1515,8 @@ def scan_votercard():
             f.write(imgdata)
         details = ""
         votercropped = image_processing(filename)
-        if votercropped["success"] == False:
-            return {"success": False, "message": votercropped["message"]}
+        if not votercropped["success"]:
+            return votercropped
         voter_cropped = votercropped["data"]
         details = voter_detect_text(base, doc_type)
         # logger.info(details)
@@ -1544,8 +1524,8 @@ def scan_votercard():
         image_string = " "
         rand_int = str(datetime.now())
         face_detect = detect_faces(filename, rand_int)
-        if face_detect["success"] == False:
-            return {"success": False, "message": face_detect["message"]}
+        if not face_detect["success"]:
+            return face_detect
         face = face_detect["data"]
         os.remove(filename)
         if doc_type == "front":
@@ -1609,8 +1589,8 @@ def scan_votercard():
         with open(filename, "wb") as f:
             f.write(imgdata)
         votercropped = image_processing(filename)
-        if votercropped["success"] == False:
-            return {"success": False, "message": votercropped["message"]}
+        if not votercropped["success"]:
+            return votercropped
         voter_cropped = votercropped["data"]
         details = {"base64_string": voter_cropped}
         os.remove(filename)
@@ -1637,8 +1617,8 @@ def scan_votercard():
         with open(filename, "wb") as f:
             f.write(imgdata)
         votercropped = image_processing(filename)
-        if votercropped["success"] == False:
-            return {"success": False, "message": votercropped["message"]}
+        if not votercropped["success"]:
+            return votercropped
         voter_cropped = votercropped["data"]
         details = {"base64_string": voter_cropped}
         os.remove(filename)
@@ -1682,10 +1662,10 @@ def pass_detect_text(image_file):
         loss = []
         exact_length = []
         two_lines_mrz = []
-        req_time = time.time()
+        # req_time = time.time()
         text_data = text_getter(image_file)
-        if text_data["success"] == False:
-            return {"success": False, "message": text_data["message"]}
+        if not text_data["success"]:
+            return text_data
         text = text_data["data"]
         # logger.info(f"time elapsed for vision request is{time.time()-req_time}")
         full_text = str(text).split("\n")
@@ -1737,17 +1717,17 @@ def pass_detect_text(image_file):
             except:
                 Date_of_issue = " "
 
-            country_code = re.sub("\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
+            country_code = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
 
             name_with_symbols = first[5:45]
 
             fullname = name_with_symbols.strip("<")
             name_spliting = fullname.split("<<")
-            surname = re.sub("\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", name_spliting[0])
+            surname = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", name_spliting[0])
 
             if len(name_spliting) == 2:
-                mrx = re.sub("\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", name_spliting[1])
-                givenname = re.sub("[^A-Za-z0-9]+", "", mrx)
+                mrx = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", name_spliting[1])
+                givenname = re.sub("[^A-Za-z0-9]+", " ", mrx)
                 # print("given name:",givenname)
             else:
                 givenname = ""
@@ -1755,7 +1735,7 @@ def pass_detect_text(image_file):
             document_no = second[0:9]
             passport_no = re.sub(r"[^\w]", " ", document_no)
 
-            nationality = re.sub("\ |\?|\.|\!|\/|\;|\:|\<", " ", second[10:13])
+            nationality = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", second[10:13])
 
             birthdate = second[13:19]
             birth_joindate = "/".join([birthdate[:2], birthdate[2:4], birthdate[4:]])
@@ -1803,32 +1783,34 @@ def pass_detect_text(image_file):
                 "Date_of_Birth": date_of_birth,
                 "Gender": sex,
                 "Date_of_Expiry": date_of_expiry,
+                "type": "PASSPORT"
             }
-            details = {"type": "PASSPORT", "data": data}
+            # details = {"type": "PASSPORT", "data": data}
             if date_of_expiry != " ":
                 expiry = datetime.strptime(date_of_expiry, "%Y-%m-%d").date()
                 today_date = datetime.now().date()
                 if expiry <= today_date:
+                    data["expired"] = True
                     return {
-                        "success": False,
-                        "details": details,
+                        "success": True,
+                        "data": data,
                         "message": "Passport is expired",
-                        "expired": True,
+                        "expired": True
                     }
             # logger.info(
             #     f"time elapsed for text parse is{time.time()-req_time}")
-            return {"success": True, "data": details, "expired": False}
+            data["expired"] = False
+            return {"success": True, "data": data, "expired": False}
         elif first[0] == "V":
             visa_type = "\n".join(tuple(loss))
 
             type = first[0]
-            issuingcountry = re.sub("\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
+            issuingcountry = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
             if first[1].isalpha():
                 date_issue = re.findall(
                     r"\s([0-9][0-9] [a-zA-Z]+ \d{4}|\d{2}/\d{2}/\d{4}|\d{2}.\d{2}.\d{4}|\d{2} \w+/\w+ \d{4}|\d{2} \d{2} \d{4}|\d{2}-d{2}-d{4}|\d{2} \w+ /\w+ \d{2}|\d{2} \w+/\w+ \d{4} \w+|\d{2}-\w+-\d{4}|\d{2} \w+\d{4})",
                     text,
                 )
-                print("date of issue:", date_issue)
                 static = [" ", ".", "/", "-"]
                 dates = []
                 for x in date_issue:
@@ -1913,24 +1895,20 @@ def pass_detect_text(image_file):
                     entry = matched_entries[0]
             name_with_symbols = (first[5:]).strip("<")
             fullname = name_with_symbols.split("<<")
-            surname = re.sub("\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", fullname[0])
+            surname = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", fullname[0])
             if len(fullname) == 2:
-                mrx = re.sub("\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", fullname[1])
-                givenname = re.sub("[^A-Za-z0-9]+", "", mrx)
-
+                mrx = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<|\>", " ", fullname[1])
+                givenname = re.sub(r"[^A-Za-z0-9]+", " ", mrx)
             else:
                 givenname = ""
-
             visa_number = re.sub(r"[^\w]", " ", second[0:9])
-
-            nationality = re.sub("\ |\?|\.|\!|\/|\;|\:|\<", " ", second[10:13])
+            nationality = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", second[10:13])
             birthdate = second[13:19]
-
             birth_joindate = "/".join([birthdate[:2], birthdate[2:4], birthdate[4:]])
             parsed_birth = dateparser.parse(
                 birth_joindate, settings={"DATE_ORDER": "YMD"}
             )
-            if parsed_birth == None:
+            if parsed_birth is None:
                 date_of_birth = ""
             else:
                 date_of_birth = str((parsed_birth).date())
@@ -1951,7 +1929,7 @@ def pass_detect_text(image_file):
             parsed_expiry = dateparser.parse(
                 expiry_joindate, settings={"DATE_ORDER": "YMD"}
             )
-            if parsed_expiry == None:
+            if parsed_expiry:
                 date_of_expiry = " "
             else:
                 date_of_expiry = str((parsed_expiry).date())
@@ -1971,21 +1949,23 @@ def pass_detect_text(image_file):
                 "Date_of_Birth": date_of_birth,
                 "Gender": sex,
                 "Visa_Expiry_Date": date_of_expiry,
+                "type": "VISA"
             }
-            details = {"type": "VISA", "data": data}
             if date_of_expiry != " ":
                 expiry = datetime.strptime(date_of_expiry, "%Y-%m-%d").date()
                 today_date = datetime.now().date()
                 if expiry <= today_date:
+                    data["expired"] = True
                     return {
-                        "success": False,
-                        "details": details,
+                        "success": True,
+                        "data": data,
                         "message": "Visa is expired",
                         "expired": True,
                     }
             # logger.info(
             #     f"time elapsed for text parse is{time.time()-req_time}")
-            return {"success": True, "data": details, "expired": False}
+            data["expired"] = False
+            return {"success": True, "data": data, "expired": False}
             # else:
             #     details={"type":"partial data","message":"image not scaned properly"}
             #     return
@@ -2043,7 +2023,7 @@ def rotate(imagepath, number):
 def passportvisadetails():
     try:
         company = frappe.get_last_doc("company")
-        api_time = time.time()
+        # api_time = time.time()
         # startlog.info("api call hits")
         # file = request.form
         base = frappe.local.form_dict.get("Passport_Image")
@@ -2052,16 +2032,16 @@ def passportvisadetails():
         pass_details = pass_detect_text(base)
         if pass_details is None:
             return {"success": False, "message": "unable to scan your ID"}
-        if pass_details["success"] == False:
+        if not pass_details["success"]:
             return pass_details
         details = pass_details["data"]
         # startlog.info(details)
         unique_no = str(datetime.now())
         if details["type"] == "PASSPORT":
-            no = details["data"]["Passport_Document_No"]
+            no = details["Passport_Document_No"]
             unique_no = no[5:]
         elif details["type"] == "VISA":
-            no = details["data"]["Visa_Number"]
+            no = details["Visa_Number"]
             unique_no = no[5:]
         #  elif details['type']=='partial data':
         #      rand_int=random.randint(0,10000)
@@ -2077,8 +2057,8 @@ def passportvisadetails():
                 "{:,.0f}".format(os.path.getsize(filename) / float(1 << 10)) + " KB"
             )
             face_detect = detect_faces(crop, unique_no)
-            if face_detect["success"] == False:
-                return {"success": False, "message": face_detect["message"]}
+            if not face_detect["success"]:
+                return face_detect
             face = face_detect["data"]
             os.remove(crop)
             os.remove(filename)
@@ -2087,8 +2067,8 @@ def passportvisadetails():
                 "{:,.0f}".format(os.path.getsize(filename) / float(1 << 10)) + " KB"
             )
             face_detect = detect_faces(filename, unique_no)
-            if face_detect["success"] == False:
-                return {"success": False, "message": face_detect["message"]}
+            if not face_detect["success"]:
+                return face_detect
             face = face_detect["data"]
             os.remove(filename)
 
@@ -2109,7 +2089,8 @@ def passportvisadetails():
         details["base64_string"] = base
         # logger.info(
         #     f"time elapsed for api request is{time.time()-api_time}")
-        return {"success": True, "details": details}
+        details["success"] = True
+        return details
     except OSError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -2147,17 +2128,12 @@ def passportvisadetails():
 
 def passport_address_detect_text(image_file):
     try:
-        req_time = time.time()
+        # req_time = time.time()
         text_data = text_getter(image_file)
-        if text_data["success"] == False:
-            return {"success": False, "message": text_data["message"]}
+        if not text_data["success"]:
+            return text_data
         text = text_data["data"]
-        # logger.info(f"time elapsed for vision request is {time.time()-req_time}")
-
-        # logger.info(f"extracted text from vision {text}")
-
         split_text = str(text).split("\n")
-
         modified_Text = ",".join(map(str, split_text))
         person_address = ""
         for x in split_text:
@@ -2180,7 +2156,7 @@ def passport_address_detect_text(image_file):
                     addr = split_text[abc : abc + 3]
                     person_address = ",".join(addr)
                 break
-            elif re.search("\d+", x) and person_address == "":
+            elif re.search(r"\d+", x) and person_address == "":
                 abc = split_text.index(x)
                 if abc == 0:
                     continue
@@ -2194,11 +2170,11 @@ def passport_address_detect_text(image_file):
         # logger.info(f"time elapsed for parse text is {time.time()-req_time}")
         address1 = ""
         address2 = ""
-        person_address = re.sub("[^a-zA-Z0-9:\s,-]|", "", person_address)
+        person_address = re.sub(r"[^a-zA-Z0-9:\s,-]|", "", person_address)
         if person_address != "":
-            if re.search("\d{6}", person_address):
+            if re.search(r"\d{6}", person_address):
                 postal_code_data = re.match(
-                    "^.*(?P<zipcode>\d{6}).*$", person_address
+                    r"^.*(?P<zipcode>\d{6}).*$", person_address
                 ).groupdict()["zipcode"]
                 postal_code = postal_code_data if len(postal_code_data) == 6 else ""
             if "," in person_address:
@@ -2230,20 +2206,20 @@ def passport_address_detect_text(image_file):
 @frappe.whitelist(allow_guest=True)
 def passport_address():
     try:
-        api_time = time.time()
+        # api_time = time.time()
         # logger.info(f"request get from client")
         base = frappe.local.form_dict.get("Passport_Image")
-        imgdata = base64.b64decode(base)
+        # imgdata = base64.b64decode(base)
         add_details = passport_address_detect_text(base)
-        if add_details["success"] == False:
+        if not add_details["success"]:
             return add_details
         details = add_details["data"]
         details["base64_string"] = base
         # logger.info(f"extracted address is {details}")
         # logger.info(
         #     f"time elapsed for api request is {time.time()-api_time}")
-
-        return {"data": details, "success": True}
+        details["success"] = True
+        return details
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -2535,12 +2511,11 @@ def qr_detect_text(image_file):
             "eMEDICAL ATTENDANT VISA",
         ]
         text_data = text_getter(image_file)
-        if text_data["success"] == False:
-            return {"success": False, "message": text_data["message"]}
+        if not text_data["success"]:
+            return text_data
         text = text_data["data"]
         text = re.sub("INDIAN E-VISA", "", text)
         block = str(text).split("\n")
-        print("fulltext:", text)
         entries = ["MULTIPLE", "SINGLE", "DOUBLE", "Double", "Single", "Multiple"]
         entry = " "
         for y in block:
@@ -2551,7 +2526,6 @@ def qr_detect_text(image_file):
                     break
             result = "".join(i for i in y if not i.isdigit())
             matched_entries = get_close_matches(result, entries)
-            print(f"matched entries are{matched_entries}")
             if len(matched_entries) == 1:
                 entry = matched_entries[0]
                 print("entry:", entry)
@@ -2559,7 +2533,6 @@ def qr_detect_text(image_file):
 
         get = country_with_codes.values()
         get = [x.upper() for x in list(get)]
-        # print(".....:",get)
         nation = []
         nationality = ""
         for x in block:
@@ -2578,7 +2551,6 @@ def qr_detect_text(image_file):
         for x in block:
             result = "".join(i for i in x if not i.isdigit())
             matched_entries = get_close_matches(result, service)
-            print(f"matched_entries{matched_entries}")
             if len(matched_entries) >= 1:
                 type_visa.append(matched_entries[0])
 
@@ -2591,7 +2563,6 @@ def qr_detect_text(image_file):
         details["Issued_country"] = "INDIA"
         details["Document_Type"] = "e-VISA"
 
-        print("details:", details)
         return {"success": True, "data": details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2666,14 +2637,14 @@ def other_images():
         base = frappe.local.form_dict.get("image")
         # doc_type = file['scanView']
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/otherimage.jpeg"
         with open(filename, "wb") as f:
             f.write(imgdata)
         croppedother = image_processing(filename)
-        if croppedother["success"] == False:
-            return {"success": False, "message": croppedother["message"]}
+        if not croppedother["success"]:
+            return croppedother
         cropped_other = croppedother["data"]
         details = {"base64_string": cropped_other}
         os.remove(filename)
