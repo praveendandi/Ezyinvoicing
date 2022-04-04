@@ -15,6 +15,7 @@
   "merged_to",
   "merged_on",
   "merged",
+  "processing",
   "files_section",
   "front",
   "id_type",
@@ -127,11 +128,17 @@
    "fieldtype": "Select",
    "label": "Guest Id Type",
    "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "processing",
+   "fieldtype": "Check",
+   "label": "Processing"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-31 17:34:12.403120",
+ "modified": "2022-04-04 17:27:24.125310",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Dropbox",

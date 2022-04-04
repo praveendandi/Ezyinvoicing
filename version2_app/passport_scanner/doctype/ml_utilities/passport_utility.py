@@ -242,7 +242,6 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                             for each in state_names:
                                 if (data["passport_back_address_passport_back_address_STATE"]).upper() == each["name"]:
                                     data["guest_state"] = each["value"]
-        print(passport_details,"......")
         passport_details = {k: v for k, v in passport_details.items() if v}
         return {"success": True, "data": passport_details}
     except Exception as e:
