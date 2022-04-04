@@ -95,9 +95,12 @@ def holidayinManualupload(data):
             del each['arrdate']# = str(each['arrdate'])
             del each['depdate']# = str(each['depdate'])
             del each['org_invoicedate']
+            get_invoice_data=frappe.db.get_value('Invoices',{"name":each['taxinvnum'],"irn_generated":"Cancelled"},as_dict=1)
+            print(get_invoice_data,"++++++++++++++++",each["taxinvnum"])
+            if get_invoice_data:
+                each['taxinvnum']=str(each['taxinvnum'])+"-1"
                 
             if each['taxinvnum'] not in invoice_referrence_objects:
-                
                 invoice_referrence_objects[each['taxinvnum']] = []
                 invoice_referrence_objects[each['taxinvnum']].append(each)
             else:
