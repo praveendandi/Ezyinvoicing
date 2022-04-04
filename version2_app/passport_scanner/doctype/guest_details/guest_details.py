@@ -7,10 +7,11 @@ from __future__ import unicode_literals
 import base64
 import datetime
 import json
-from pydoc import doc
+# from pydoc import doc
+# from pydoc import doc
 import re
 import sys
-import os
+# import os
 import traceback
 
 import frappe
@@ -1255,7 +1256,7 @@ def localids_details_change(data):
         return {"success": True, "data": details}
     except Exception as e:
         print(e)
-        return {"success": False, "message": "something went wrong"}
+        return {"success": False, "message": str(e)}
         
 def get_passport_details(image1=None, image2=None, document_type=None):
     try:
@@ -1322,7 +1323,7 @@ def get_passport_details(image1=None, image2=None, document_type=None):
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
         print(e)
-        return {"success": False, "message": "something went wrong"}
+        return {"success": False, "message": str(e)}
 
 def check_date(date_time):
     try:
@@ -1430,7 +1431,7 @@ def change_passport_details(data):
         return {"success": True, "data": details}
     except Exception as e:
         print(e)
-        return {"success": False, "message": "something went wrong"}
+        return {"success": False, "message": str(e)}
 
 def get_driving_details(image1=None):
     try:
@@ -1451,6 +1452,41 @@ def get_driving_details(image1=None):
         else:
             return {"success": False, "message": "something went wrong"}
     except Exception as e:
+        return {"success": False, "message": str(e)}
+
+def get_voter_details(image1=None, image2=None):
+    try:
+        details={}
+        if image1:
+            voter_front = helper_utility(
+                {
+                    "api": "scan_votercard",
+                    "voter_image": image1,
+                    "scanView": "front",
+                }
+            )
+            if not voter_front["success"]:
+                return voter_front
+            details.update(voter_front["data"])
+        if image2:
+            voter_back = helper_utility(
+                {
+                    "api": "scan_votercard",
+                    "voter_image": image2,
+                    "scanView": "back",
+                }
+            )
+            if not voter_back["success"]:
+                return voter_back
+            details.update(voter_back["data"])
+        if bool(details):
+            voter_details = localids_details_change(details)
+            if not voter_details["success"]:
+                return voter_details
+            return {"success": True, "data": voter_details["data"]}
+        return {"success":False, "data": {}}
+    except Exception as e:
+        print(e)
         return {"success": False, "message": str(e)}
 
 def get_data_vision_api(image1=None, image2=None, name=None, document_type=None, type=None, image_to_base=False, confirmation_number=None):
@@ -1523,6 +1559,11 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
                 if not driving["success"]:
                     return driving
                 details.update(driving["data"])
+            if document_type == "voterId":
+                voter = get_voter_details(image1, image2)
+                if not voter["success"]:
+                    return voter
+                details.update(voter["data"])
         else:
             return {"success": False, "message": "something went wrong"}
         if bool(details):
@@ -1530,9 +1571,14 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
                 details["guest_id_type"] = document_type
             if confirmation_number:
                 details["confirmation_number"] = confirmation_number
-            update_details = guest_details_update(details, name)
-            return update_details
-        return {"success": False, "message": "something went wrong"}
+            return {"success": True, "data": details}
+            # if document_type:
+            #     details["guest_id_type"] = document_type
+            # if confirmation_number:
+            #     details["confirmation_number"] = confirmation_number
+            # update_details = guest_details_update(details, name)
+            # return update_details
+        return {"success": False, "message": "something went wrong", "data": details}
     except Exception as e:
         return {"success": False, "message": str(e)}
 

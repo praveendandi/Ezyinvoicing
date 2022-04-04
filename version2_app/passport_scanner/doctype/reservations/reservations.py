@@ -1489,12 +1489,12 @@ def voter_detect_text(image_file, doc_type):
 def scan_votercard():
     try:
         company = frappe.get_last_doc("company")
-        api_time = time.time()
+        # api_time = time.time()
         # logger.info("api call hits")
         base = frappe.local.form_dict.get("voter_image")
         doc_type = frappe.local.form_dict.get("scanView")
         imgdata = base64.b64decode(base)
-        rand_no = str(datetime.now())
+        # rand_no = str(datetime.now())
         # I assume you have a way of picking unique filenames
         filename = basedir + company.site_name + "/private/files/voterdoc.jpeg"
         with open(filename, "wb") as f:
@@ -1505,6 +1505,9 @@ def scan_votercard():
             return votercropped
         voter_cropped = votercropped["data"]
         details = voter_detect_text(base, doc_type)
+        if not details["success"]:
+            return details
+        details = details["data"]
         # logger.info(details)
         details["base64_string"] = voter_cropped
         image_string = " "
@@ -1536,6 +1539,7 @@ def scan_votercard():
 
                     return details
                 elif len(details.keys()) > 1:
+                    details["success"] = True
                     face_ex = {
                         key: value for key, value in details.items() if key != "face"
                     }
@@ -1544,13 +1548,13 @@ def scan_votercard():
 
                     return details
             elif "error" not in details.keys():
+                details["success"] = True
                 face_ex = {
                     key: value for key, value in details.items() if key != "face"
                 }
                 # logger.info(
                 #     f"time elapsed for api request is {time.time()-api_time}")
-
-                return {"success": True, "voter_details": details}
+                return details
         elif doc_type == "back":
             if "error" in details.keys():
                 details["success"] = False
@@ -1558,10 +1562,11 @@ def scan_votercard():
                 #     f"time elapsed for api request is {time.time()-api_time}")
                 return details
             elif "error" not in details.keys():
+                details["success"] = True
                 details["doc_type"] = "back"
                 # logger.info(
                 #     f"time elapsed for api request is {time.time()-api_time}")
-                return {"success": True, "voter_details": details}
+                return details
 
     except IndexError as e:
         company = frappe.get_last_doc("company")

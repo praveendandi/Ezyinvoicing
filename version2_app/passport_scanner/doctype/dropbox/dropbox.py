@@ -766,45 +766,45 @@ def extract_id_details(data={}):
         details = {}
         if data["id_type"] == "aadhaar":
             if data["image_1"]:
-                aadhaar_front_details = fetch_aadhaar_details(data["image_1"])
+                aadhaar_front_details = fetch_aadhaar_details(data["image_1"], None)
                 if aadhaar_front_details["success"]:
                     # return aadhaar_front_details
                     details.update(aadhaar_front_details["data"])
             if data["image_2"]:
-                aadhaar_back_details = fetch_aadhaar_details(data["image_2"])
+                aadhaar_back_details = fetch_aadhaar_details(None,data["image_2"])
                 if aadhaar_back_details["success"]:
                     # return aadhaar_back_details
                     details.update(aadhaar_back_details["data"])
         elif data["id_type"] == "indianPassport":
             if data["image_1"]:
-                passport_front_details = fetch_passport_details(data["image_1"])
+                passport_front_details = fetch_passport_details(data["image_1"], None)
                 if passport_front_details["success"]:
                     # return passport_front_details
                     details.update(passport_front_details["data"])
             if data["image_2"]:
-                passport_back_details = fetch_passport_details(data["image_2"])
+                passport_back_details = fetch_passport_details(None, data["image_2"])
                 if passport_back_details["success"]:
                     # return passport_back_details
                     details.update(passport_back_details["data"])
         elif data["id_type"] == "voterId":
             if data["image_1"]:
-                voter_front_details = fetch_voter_details(data["image_1"])
+                voter_front_details = fetch_voter_details(data["image_1"], None)
                 if voter_front_details["success"]:
                     details.update(voter_front_details["data"])
             if data["image_2"]:
-                voter_back_details = fetch_voter_details(data["image_2"])
+                voter_back_details = fetch_voter_details(None, data["image_2"])
                 if voter_back_details["success"]:
                     details.update(voter_back_details["data"])
         elif data["id_type"] == "Invoice":
             pass
         elif data["id_type"] == "driving":
             if data["image_1"]:
-                driving_front_details = fetch_driving_details(data["image_1"])
+                driving_front_details = fetch_driving_details(data["image_1"], None)
                 if driving_front_details["success"]:
                     # return driving_front_details
                     details.update(driving_front_details["data"])
             if data["image_2"]:
-                driving_back_details = fetch_driving_details(data["image_2"])
+                driving_back_details = fetch_driving_details(None, data["image_2"])
                 if driving_back_details["success"]:
                     # return driving_back_details
                     details.update(driving_back_details["data"])
