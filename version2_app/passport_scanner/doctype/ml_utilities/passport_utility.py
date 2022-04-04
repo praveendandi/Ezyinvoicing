@@ -142,19 +142,33 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                     ]
                 if "passport_place_of_issue_passport_place_of_issue" in data:
                     if data["passport_place_of_issue_passport_place_of_issue"] != "":
-                        try:
+                        regex_complie = re.compile(
+                            r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/|\s)([1-9]|0[1-9]|1[0-2])(\.|-|/|\s)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/|\s)([1-9]|0[1-9]|1[0-2])(\.|-|/|\s)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
+                        )
+                        if re.match(
+                            regex_complie,
+                            data["passport_place_of_issue_passport_place_of_issue"].strip(),
+                        ):
                             get_date = "".join(
                                 filter(
                                     str.isdigit,
                                     data["passport_place_of_issue_passport_place_of_issue"],
                                 )
                             )
-                            passport_details["passport_date_of_issue"] = format_date(
-                                str(get_date),
-                                "yyyy-mm-dd",
-                            )
-                        except Exception as e:
-                            print(e)
+                            try:
+                                passport_details["passport_date_of_issue"] = format_date(
+                                    str(get_date),
+                                    "yyyy-mm-dd",
+                                )
+                            except Exception as e:
+                                print(e)
+                if "passport_details_passport_details_raw_text" in data:
+                    if data["passport_details_passport_details_raw_text"][2:5] == "IND":
+                        passport_details["status"] = "In House"
+                        passport_details["guest_id_type"] = "indianPassport"
+                    else:
+                        passport_details["status"] = "Pending Review"
+                        passport_details["guest_id_type"] = "Foreigner" 
             if image_2:
                 if "visa_details_visa_details_birth_date" in data:
                     try:
