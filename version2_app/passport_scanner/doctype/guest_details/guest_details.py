@@ -1185,7 +1185,11 @@ def opera_scan_api(type=None, name=None, image_1=None, image_2=None, document_ty
                 get_data = get_data_vision_api(guest_details["id_image1"], guest_details["id_image2"], name, guest_details["guest_id_type"], type, True, guest_details["confirmation_number"])
                 return get_data
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-opera_scan_api",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": "something went wrong"}
 
 def get_aadhaar_data(image1=None, image2=None):
@@ -1220,7 +1224,11 @@ def get_aadhaar_data(image1=None, image2=None):
             return {"success": True, "data": aadhaar_details["data"]}
         return {"success":False, "data": {}}
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_aadhaar_data",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": "something went wrong"}
 
 def localids_details_change(data):
@@ -1256,7 +1264,11 @@ def localids_details_change(data):
             details["guest_id_type"] = "aadhaar"
         return {"success": True, "data": details}
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-localids_details_change",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
         
 def get_passport_details(image1=None, image2=None, document_type=None):
@@ -1323,7 +1335,11 @@ def get_passport_details(image1=None, image2=None, document_type=None):
             return {"success": False, "data": {}}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_passport_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
 
 def check_date(date_time):
@@ -1348,7 +1364,11 @@ def check_date(date_time):
                 return None
         return None
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-check_date",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return None
 
 def change_passport_details(data):
@@ -1423,15 +1443,20 @@ def change_passport_details(data):
                     if address_details["success"]:
                         details.update(address_details["data"])
         if bool(details):
-            if details["guest_country"] == "IND":
-                details["status"] = "In House"
-                details["guest_id_type"] = "indianPassport"
-            else:
-                details["status"] = "Pending Review"
-                details["guest_id_type"] = "Foreigner"
+            if "guest_country" in details:
+                if details["guest_country"] == "IND":
+                    details["status"] = "In House"
+                    details["guest_id_type"] = "indianPassport"
+                else:
+                    details["status"] = "Pending Review"
+                    details["guest_id_type"] = "Foreigner"
         return {"success": True, "data": details}
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-change_passport_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
 
 def get_driving_details(image1=None):
@@ -1453,6 +1478,11 @@ def get_driving_details(image1=None):
         else:
             return {"success": False, "message": "something went wrong"}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_driving_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
 
 def get_voter_details(image1=None, image2=None):
@@ -1487,7 +1517,11 @@ def get_voter_details(image1=None, image2=None):
             return {"success": True, "data": voter_details["data"]}
         return {"success":False, "data": {}}
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_voter_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
 
 def get_data_vision_api(image1=None, image2=None, name=None, document_type=None, type=None, image_to_base=False, confirmation_number=None):
@@ -1544,7 +1578,7 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
                 if convert2["success"] is False:
                     return convert2
                 image2 = convert1["data"]
-        if document_type: 
+        if document_type:
             if document_type == "aadhaar":
                 aadhaar_data = get_aadhaar_data(image1, image2)
                 if not aadhaar_data["success"]:
@@ -1570,6 +1604,10 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
         if bool(details):
             if document_type:
                 details["guest_id_type"] = document_type
+                if document_type in ["voterId", "driving", "indianPassport", "aadhaar"]:
+                    details["status"] = "In House"
+                elif document_type in ["Foreigner"]:
+                    details["status"] = "Pending Review"
             if confirmation_number:
                 details["confirmation_number"] = confirmation_number
             return {"success": True, "data": details}
@@ -1581,6 +1619,11 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
             # return update_details
         return {"success": False, "message": "something went wrong", "data": details}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_data_vision_api",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
 
 
@@ -1595,4 +1638,9 @@ def guest_details_update(data={},name=None):
         guest_update_attachment_logs(arrival_doc)
         return {"success": True, "message": "data updated"}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-guest_details_update",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
         return {"success": False, "message": str(e)}
