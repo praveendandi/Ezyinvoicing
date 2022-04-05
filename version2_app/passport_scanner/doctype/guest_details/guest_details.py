@@ -1146,6 +1146,7 @@ def guest_details_for_opera(confirmation_number: str = None):
                         "guest_id_type",
                         "uploaded_to_opera"
                     ],
+                    order_by='creation asc'
                 )
                 get_booking_status = frappe.db.get_value("Arrival Information", confirmation_number, "booking_status")
                 get_guest_details = [dict(item, booking_status=get_booking_status) for item in get_guest_details]
