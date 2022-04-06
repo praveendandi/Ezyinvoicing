@@ -55,7 +55,7 @@ def create_doc_using_base_files(
         back_detected_doc_type = None
         id_image1 = None
         id_image2 = None
-        # now = datetime.datetime.now()
+        now = datetime.datetime.now()
         if image_1:
             image_1_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
@@ -186,14 +186,15 @@ def create_doc_using_base_files(
             new_dropbox.merged_to = reservation_number
             new_dropbox.merged_on = datetime.datetime.now()
             new_dropbox.ocr_process_status = "Success"
-            # new_dropbox.processing = 1
-            # current_time = now.strftime("%H:%M:%S")
+            new_dropbox.processing = 1
+            current_time = now.strftime("%H:%M:%S")
+            new_dropbox.processing_time = str(current_time)
             # new_dropbox.insert(ignore_permissions=True)
             arrival_info = frappe.get_doc("Arrival Information", reservation_number)
             arrival_info.status = "Scanned"
             arrival_info.virtual_checkin_status = "Yes"
             arrival_info.save(ignore_permissions=True)
-        new_dropbox.insert(ignore_permissions=True)
+        new_dropbox.insert(ignore_permissions=True, ignore_links=True)
         frappe.db.commit()
 
 
@@ -211,7 +212,7 @@ def create_doc_using_base_files(
                     "reservation_number": reservation_number,
                     "id_image2": id_image2,
                     "id_image1": id_image1,
-                    # "dropbox": new_dropbox.name
+                    "dropbox": new_dropbox.name
                 },
                 is_async=True,
             )
@@ -511,7 +512,7 @@ def check_drop_exist(reservation_number: str, guest_name: str):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "check_drop_exist",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": "Error while checking Dropbox exist"}
 
@@ -586,30 +587,6 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         return {"success": False, "message": str(e)}
 
 
-# def convert_base64_to_image(base,name,file_path,company):
-#     try:
-#         file = file_path
-#         # res = bytes(base, 'utf-8')
-#         with open(file, "wb") as fh:
-#             fh.write(base64.b64decode(base))
-#         files = {"file": open(file, 'rb')}
-#         payload = {
-#             "is_private": 0,
-#             "folder": "Home"
-#         }
-#         site = company.host
-#         upload_qr_image = requests.post(site + "api/method/upload_file",
-#                                         files=files,
-#                                         data=payload)
-#         response = upload_qr_image.json()
-#         if 'message' in response:
-#             return response
-#     except Exception as e:
-#         # exc_type, exc_obj, exc_tb = sys.exc_info()
-#         # frappe.log_error("Scan-Guest Details Opera","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-#         return {"success":False,"message":str(e)}
-
-
 @frappe.whitelist(allow_guest=True)
 def merge_guest_to_guest_details(name: str):
     """
@@ -648,7 +625,7 @@ def merge_guest_to_guest_details(name: str):
             event="data_extraction",
             now=False,
             data={
-                "dropbox": doc,
+                "dropbox": doc.name,
                 "image_1": image_1,
                 "image_2": image_2,
                 "id_type": doc.id_type,
@@ -659,6 +636,10 @@ def merge_guest_to_guest_details(name: str):
             },
             is_async=True,
         )
+        now = datetime.datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        frappe.db.set_value('Dropbox', name, {'processing': 1,'processing_time': str(current_time)})
+        frappe.db.commit()
         reseravtions_data = get_reservation_details(doc.merged_to)
         if reseravtions_data:
             arrival_doc = frappe.get_doc("Arrival Information", doc.merged_to)
@@ -817,8 +798,10 @@ def extract_id_details(data={}):
             pass
         else:
             pass
-        details["id_image1"] = data["id_image1"]
-        details["id_image2"] = data["id_image2"]
+        if "id_image1" in data:
+            details["id_image1"] = data["id_image1"]
+        if "id_image2" in data:
+            details["id_image2"] = data["id_image2"]
         if "guest_id_type" not in details:
             details["guest_id_type"] = data["id_type"]
         details["doctype"] = "Guest Details"
@@ -827,21 +810,28 @@ def extract_id_details(data={}):
             if data["merged_to"] != "" or data["merged_to"] is not None:
                 details["confirmation_number"] = data["merged_to"]
         if details:
+            if "guest_details" in data:
+                return {"success": True, "data": details}
             guest_details = create_guest_details(details)
             if not guest_details["success"]:
                 return guest_details
-            # if "dropbox" in data:
-            #     if data["dropbox"] or data["dropbox"] != "":
-            #         dropbox_doc = frappe.get_doc('Dropbox', data["dropbox"])
-            #         dropbox_doc.processing = 0
-            #         dropbox_doc.save(ignore_permissions=True, ignore_version=True)
+            if "dropbox" in data:
+                if data["dropbox"] or data["dropbox"] != "":
+                    dropbox_doc = frappe.get_doc('Dropbox', data["dropbox"])
+                    dropbox_doc.processing = 0
+                    started_time = str(dropbox_doc.processing_time)
+                    now = datetime.datetime.now()
+                    current_time = now.strftime("%H:%M:%S")
+                    dropbox_doc.processing_time = datetime.datetime.strptime(current_time, '%H:%M:%S') - datetime.datetime.strptime(started_time, '%H:%M:%S')
+                    dropbox_doc.save(ignore_permissions=True, ignore_version=True)
+                    frappe.db.commit()
             return {"success": True, "data": details}
         else:
             return {"success": False, "message": "Something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
             "extract_id_details",
         )
         return {"success": False, "message": str(e)}

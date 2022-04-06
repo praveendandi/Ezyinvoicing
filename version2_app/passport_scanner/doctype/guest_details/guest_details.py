@@ -28,6 +28,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
     get_address_from_zipcode,
 )
 from version2_app.events import guest_update_attachment_logs
+from version2_app.passport_scanner.doctype.dropbox.dropbox import extract_id_details
 
 class GuestDetails(Document):
     pass
@@ -1451,7 +1452,7 @@ def change_passport_details(data):
                     details["guest_id_type"] = "indianPassport"
                 else:
                     details["status"] = "Pending Review"
-                    details["guest_id_type"] = "Foreigner"
+                    # details["guest_id_type"] = "Foreigner"
         return {"success": True, "data": details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -1612,6 +1613,8 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
         else:
             return {"success": False, "message": "something went wrong"}
         if bool(details):
+            if document_type:
+                details["guest_id_type"] = document_type
             return {"success": True, "data": details}
             # if document_type:
             #     details["guest_id_type"] = document_type
@@ -1643,6 +1646,46 @@ def guest_details_update(data={},name=None):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-guest_details_update",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+    
+@frappe.whitelist(allow_guest=True)
+def extract_data_getting_from_opera(document_type=None, image_1=None, image_2=None, guest_details=False, confirmation_number=None):
+    try:
+        details = {}
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path + "/sites/" + company.site_name
+        if document_type and confirmation_number:
+            if image_1:
+                image1 = convert_base64_to_image(image_1, "image1"+document_type, site_folder_path, company)
+                if "success" in  image1:
+                    return image1
+                if "file_url" in image1["message"].keys():
+                    details["id_image1"] = image1["message"]["file_url"]
+            if image_2:
+                image2 = convert_base64_to_image(image_2, "image2"+document_type, site_folder_path, company)
+                if "success" in  image2:
+                    return image2
+                if "file_url" in image2["message"].keys():
+                    details["id_image2"] = image2["message"]["file_url"]
+            extract_detils = extract_id_details({
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": document_type,
+                    "reservation_number": confirmation_number
+                })
+            if not extract_detils["success"]:
+                return extract_detils
+            details.update(extract_detils["data"])
+            return {"success": False, "data": details}
+        else:
+            return {"success": False, "message": "confirmation number or document type should be mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-extract_data_getting_from_opera",
             "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}

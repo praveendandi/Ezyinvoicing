@@ -16,6 +16,7 @@
   "merged_on",
   "merged",
   "processing",
+  "processing_time",
   "files_section",
   "front",
   "id_type",
@@ -134,11 +135,16 @@
    "fieldname": "processing",
    "fieldtype": "Check",
    "label": "Processing"
+  },
+  {
+   "fieldname": "processing_time",
+   "fieldtype": "Time",
+   "label": "Processing Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-04 17:27:24.125310",
+ "modified": "2022-04-06 11:10:41.043632",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Dropbox",
