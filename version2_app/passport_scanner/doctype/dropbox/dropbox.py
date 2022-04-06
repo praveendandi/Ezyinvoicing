@@ -55,6 +55,7 @@ def create_doc_using_base_files(
         back_detected_doc_type = None
         id_image1 = None
         id_image2 = None
+        # now = datetime.datetime.now()
         if image_1:
             image_1_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
@@ -63,7 +64,8 @@ def create_doc_using_base_files(
                 image_1_response = image_1_response.json()
                 front_doc_type = image_1_response["doc_type"]
                 front_detected_doc_type = image_1_response["doc_type"]
-                del image_1_response["base"]
+                if "base" in image_1_response:
+                    del image_1_response["base"]
 
                 doc_type = detect_front_back(image_1_response["doc_type"])
                 if doc_type == "" or doc_type == "Front":
@@ -82,7 +84,8 @@ def create_doc_using_base_files(
                 image_2_response = image_2_response.json()
                 if front_doc_type == "":
                     front_doc_type = image_2_response["doc_type"]
-                del image_2_response["base"]
+                if "base" in image_2_response:
+                    del image_2_response["base"]
                 doc_type = detect_front_back(image_2_response["doc_type"])
                 back_detected_doc_type = image_2_response["doc_type"]
                 if back == "" or doc_type == "Back":
@@ -183,7 +186,8 @@ def create_doc_using_base_files(
             new_dropbox.merged_to = reservation_number
             new_dropbox.merged_on = datetime.datetime.now()
             new_dropbox.ocr_process_status = "Success"
-
+            # new_dropbox.processing = 1
+            # current_time = now.strftime("%H:%M:%S")
             # new_dropbox.insert(ignore_permissions=True)
             arrival_info = frappe.get_doc("Arrival Information", reservation_number)
             arrival_info.status = "Scanned"
@@ -207,6 +211,7 @@ def create_doc_using_base_files(
                     "reservation_number": reservation_number,
                     "id_image2": id_image2,
                     "id_image1": id_image1,
+                    # "dropbox": new_dropbox.name
                 },
                 is_async=True,
             )
@@ -825,6 +830,11 @@ def extract_id_details(data={}):
             guest_details = create_guest_details(details)
             if not guest_details["success"]:
                 return guest_details
+            # if "dropbox" in data:
+            #     if data["dropbox"] or data["dropbox"] != "":
+            #         dropbox_doc = frappe.get_doc('Dropbox', data["dropbox"])
+            #         dropbox_doc.processing = 0
+            #         dropbox_doc.save(ignore_permissions=True, ignore_version=True)
             return {"success": True, "data": details}
         else:
             return {"success": False, "message": "Something went wrong"}

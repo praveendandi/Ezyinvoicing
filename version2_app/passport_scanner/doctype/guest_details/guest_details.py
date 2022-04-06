@@ -146,8 +146,10 @@ def guest_details_opera(confirmation_number):
 
 def helper_utility(data):
     try:
+        company = frappe.get_last_doc("company")
+        site_domain = (company.site_domain).rstrip("/")
         url = (
-            "http://0.0.0.0:8000/api/method/version2_app.passport_scanner.doctype.reservations.reservations."
+            site_domain+"/api/method/version2_app.passport_scanner.doctype.reservations.reservations."
             + data["api"]
         )
         del data["api"]
@@ -163,7 +165,7 @@ def helper_utility(data):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Helper Utility",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
 
@@ -179,7 +181,7 @@ def convert_image_to_base64(image):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Guest Details Opera",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
 
@@ -205,7 +207,7 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Guest Details Opera",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
 
@@ -1530,6 +1532,14 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
         company = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path + "/sites/" + company.site_name
+        if document_type:
+            details["guest_id_type"] = document_type
+            if document_type in ["voterId", "driving", "indianPassport", "aadhaar"]:
+                details["status"] = "In House"
+            elif document_type in ["Foreigner"]:
+                details["status"] = "Pending Review"
+        if confirmation_number:
+            details["confirmation_number"] = confirmation_number
         if type in ["rotate", "upload"] and not image_to_base:
             if image1:
                 image_1 = convert_base64_to_image(image1, name, site_folder_path, company)
@@ -1582,34 +1592,26 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
             if document_type == "aadhaar":
                 aadhaar_data = get_aadhaar_data(image1, image2)
                 if not aadhaar_data["success"]:
-                    return aadhaar_data
+                    return {"success": False, "data": details, "message": "something went wrong"}
                 details.update(aadhaar_data["data"])
             if document_type in ["indianPassport", "Foreigner"]:
                 indian_passport = get_passport_details(image1, image2, document_type)
                 if not indian_passport["success"]:
-                    return indian_passport
+                    return {"success": False, "data": details, "message": "something went wrong"}
                 details.update(indian_passport["data"])
             if document_type == "driving":
                 driving = get_driving_details(image1)
                 if not driving["success"]:
-                    return driving
+                    return {"success": False, "data": details, "message": "something went wrong"}
                 details.update(driving["data"])
             if document_type == "voterId":
                 voter = get_voter_details(image1, image2)
                 if not voter["success"]:
-                    return voter
+                    return {"success": False, "data": details, "message": "something went wrong"}
                 details.update(voter["data"])
         else:
             return {"success": False, "message": "something went wrong"}
         if bool(details):
-            if document_type:
-                details["guest_id_type"] = document_type
-                if document_type in ["voterId", "driving", "indianPassport", "aadhaar"]:
-                    details["status"] = "In House"
-                elif document_type in ["Foreigner"]:
-                    details["status"] = "Pending Review"
-            if confirmation_number:
-                details["confirmation_number"] = confirmation_number
             return {"success": True, "data": details}
             # if document_type:
             #     details["guest_id_type"] = document_type
