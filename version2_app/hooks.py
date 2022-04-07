@@ -205,8 +205,7 @@ doc_events = {
 # 	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
 # 			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
 # 			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
-# 			"0 12 * * *":["version2_app.events.block_irn"],
-#             "* * * * *":["version2_app.events.pre_mail"]}	
+# 			"0 11 * * *":["version2_app.events.block_irn"]}	
 # }	
 
 
@@ -215,10 +214,10 @@ scheduler_events = {
     #     "version2_app.version2_app.doctype.emailTemplat.sampleFun"
     # ],
     "cron": {
-        # "1-59 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
-        "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
-        "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
-        # "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
+        "1-59 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
+        # "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+        # "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+        "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
         "0 12 * * *":["version2_app.events.block_irn"],
         "0 2 * * *":["version2_app.events.delete_arrival_activity"],
         "* * * * *":["version2_app.events.pre_mail"],

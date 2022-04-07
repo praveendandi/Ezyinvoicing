@@ -906,12 +906,19 @@ def deleteemailfilesdaily():
         return {"success": True}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error(
-            "Ezy-invoicing deletemailfilesdaily Event",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
-        )
-        return {"success": False, "message": str(e)}
+        frappe.log_error("Ezy-invoicing deletemailfilesdaily Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def delete_error_logs():
+    lastdate = date.today() - timedelta(days=7)
+    print(lastdate)
+    get_list=frappe.db.get_all("Error Log",filters={"creation":["<",lastdate]},pluck="name")
+    print(get_list)
+    # data = frappe.db.sql("""DELETE FROM `Error Log` WHERE creation < %s""",lastdate)
+    # print(data)
+    # frappe.db.commit()
+    # return {"success":True}
 
 def gspmeteringhook(doc, method=None):
     try:

@@ -29,3 +29,5 @@ html2text
 datefinder
 flatdict
 pgeocode
+paytmchecksum
+# opencv-python

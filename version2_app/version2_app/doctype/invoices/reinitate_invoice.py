@@ -667,7 +667,6 @@ def reprocess_calulate_items(data):
                             item["igst"] = percentage_gst["igst_percentage"]
                 else:
                     {"success": False, "message": "error in slab helper function"}
-                print()
             service_charge_name = (companyDetails.sc_name)
             if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1 and item["manual_edit"] == "No"):
                 service_charge_name = service_charge_name.strip()
@@ -870,6 +869,7 @@ def reprocess_calulate_items(data):
                         service_dict["gst_rate"] = 0
                         service_dict["previous_lut_item"] = 1
                         service_dict["lut_exempted"] = 1
+                    second_list.append(service_dict)
             if sac_code_based_gst_rates.type == "Discount":
                 final_item['sac_code'] = 'No Sac'
                 final_item['sac_code_found'] = 'No'
@@ -1115,6 +1115,7 @@ def reprocess_calulate_items(data):
         reinitiate = Reinitiate_invoice(final_data)
         doc_inv = frappe.get_doc("Invoices",data["invoice_number"])
         doc_inv.sez = sez
+        doc_inv.suptyp="B2B" if sez==0 else doc_inv.suptyp
         doc_inv.save(ignore_permissions=True)
         if reinitiate["success"] == True:
             return {"success": True}
