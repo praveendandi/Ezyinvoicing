@@ -359,13 +359,13 @@
   },
   {
    "fieldname": "address_1",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address 1",
    "reqd": 1
   },
   {
    "fieldname": "address_2",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address 2",
    "reqd": 1
   },
@@ -388,12 +388,12 @@
   },
   {
    "fieldname": "merchant_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Merchant Name"
   },
   {
    "fieldname": "b2c_qr_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "B2C QR URL"
   },
   {
@@ -402,7 +402,7 @@
   },
   {
    "fieldname": "location",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Location",
    "reqd": 1
   },
@@ -435,7 +435,7 @@
   },
   {
    "fieldname": "merchant_virtual_payment_address",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Merchant Virtual Payment Address"
   },
   {
@@ -488,7 +488,7 @@
   },
   {
    "fieldname": "site_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Site Name"
   },
   {
@@ -499,12 +499,12 @@
   },
   {
    "fieldname": "invoice_item_date_format",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Invoice Item Date Format"
   },
   {
    "fieldname": "font_file_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Font File Path"
   },
   {
@@ -520,7 +520,7 @@
   },
   {
    "fieldname": "proxy_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy Url"
   },
   {
@@ -584,17 +584,17 @@
   },
   {
    "fieldname": "sc_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "SC Name"
   },
   {
    "fieldname": "sc_gst_percentage",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "SC GST Percentage"
   },
   {
    "fieldname": "adjustment_service_charge_list",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Adjustment Service Charge List"
   },
   {
@@ -634,22 +634,22 @@
   },
   {
    "fieldname": "parsers_branch_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Parsers Branch Name"
   },
   {
    "fieldname": "ui_git_branch",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ui Git Branch"
   },
   {
    "fieldname": "angular_project_production_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Angular Project Production Path"
   },
   {
    "fieldname": "backend_git_branch",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Backend Git Branch"
   },
   {
@@ -686,7 +686,7 @@
   },
   {
    "fieldname": "system_storage_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "System Storage Path"
   },
   {
@@ -738,7 +738,7 @@
   },
   {
    "fieldname": "licensing_host",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Licensing Host"
   },
   {
@@ -773,7 +773,7 @@
   },
   {
    "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ipp Printer File Path"
   },
   {
@@ -805,102 +805,102 @@
   {
    "default": "0",
    "fieldname": "whats_app",
-   "fieldtype": "Check",
+   "fieldtype": "Small Text",
    "label": "Whats App"
   },
   {
    "fieldname": "scenario_key",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Scenario Key"
   },
   {
    "fieldname": "template_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Template Name"
   },
   {
    "fieldname": "api_key",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Api Key"
   },
   {
    "fieldname": "api",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Api"
   },
   {
    "fieldname": "domain_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Domain URL"
   },
   {
    "fieldname": "void_check_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Void Check Reference"
   },
   {
    "fieldname": "void_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Void Total Amt Regex"
   },
   {
    "fieldname": "closed_check_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Closed Check Reference"
   },
   {
    "fieldname": "closed_check_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Closed Check Total Amt Regex"
   },
   {
    "fieldname": "normal_check_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Normal Check Total Amt Regex"
   },
   {
    "fieldname": "check_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Check Number Reference"
   },
   {
    "fieldname": "check_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Check Number Regex"
   },
   {
    "fieldname": "table_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Table Number Reference"
   },
   {
    "fieldname": "table_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Table Number Regex"
   },
   {
    "fieldname": "guest_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest Number Reference"
   },
   {
    "fieldname": "guest_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest Number Regex"
   },
   {
    "fieldname": "bill_amount_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Bill Amount Regex"
   },
   {
    "fieldname": "fssai_number",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "FSSAI Number"
   },
   {
    "fieldname": "print_check_type",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Print Check Type"
   },
   {
@@ -923,7 +923,7 @@
   },
   {
    "fieldname": "block_irn_information",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Block Irn Information"
   },
   {
@@ -1093,17 +1093,17 @@
   },
   {
    "fieldname": "pre_checkin_mail_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pre Checkin Mail Subject"
   },
   {
    "fieldname": "cancellation_email_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Cancellation Email Subject"
   },
   {
    "fieldname": "thank_you_mail_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Thank You Mail Subject"
   },
   {
@@ -1479,12 +1479,12 @@
   },
   {
    "fieldname": "dynamic_colour_for_tab",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Dynamic Colour for Tab"
   },
   {
    "fieldname": "work_station_pass_code",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Work Station Pass Code"
   },
   {
