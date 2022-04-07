@@ -1130,13 +1130,14 @@ def guest_details_for_opera(confirmation_number: str = None):
         if confirmation_number:
             if not frappe.db.exists("Arrival Information", confirmation_number):
                 return {"success": False, "message": "reservation not found"}
+            arrival_info = frappe.db.get_value('Arrival Information', confirmation_number, ["guest_first_name","guest_last_name","no_of_adults"], as_dict=True)
             if company.ome_scanner == 1:
                 if not frappe.db.exists("Dropbox", {"merged_to": confirmation_number}):
-                    return {"success": False, "message": "data not found in dropbox"}
+                    return {"success": True, "data": arrival_info, "is_guest_details": False}
             if not frappe.db.exists(
                 "Guest Details", {"confirmation_number": confirmation_number}
             ):
-                return {"success": False, "message": "data not found in guest details"}
+                return {"success": True, "data": arrival_info, "is_guest_details": False}
             else:
                 get_guest_details = frappe.db.get_list(
                     "Guest Details",
@@ -1153,7 +1154,7 @@ def guest_details_for_opera(confirmation_number: str = None):
                 )
                 get_booking_status = frappe.db.get_value("Arrival Information", confirmation_number, "booking_status")
                 get_guest_details = [dict(item, booking_status=get_booking_status) for item in get_guest_details]
-                return {"success": True, "data": get_guest_details}
+                return {"success": True, "data": get_guest_details, "is_guest_details": True}
         else:
             return {
                 "success": False,
