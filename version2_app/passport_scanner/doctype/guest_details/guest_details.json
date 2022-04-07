@@ -9,14 +9,14 @@
   "frro_id",
   "room_number",
   "guest_full_name",
-  "surname",
+  "guest_first_name",
   "middle_name",
-  "given_name",
+  "guest_last_name",
   "gender",
-  "date_of_birth",
-  "age",
+  "guest_dob",
+  "guest_age",
   "category",
-  "nationality",
+  "guest_nationality",
   "passport_number",
   "passport_place_of_issued_country",
   "passport_place_of_issued_city",
@@ -29,11 +29,12 @@
   "visa_valid_till",
   "visa_type",
   "visa_sub_type",
-  "address",
+  "address1",
   "address2",
-  "city",
-  "country",
-  "postal_code",
+  "guest_city",
+  "guest_state",
+  "guest_country",
+  "zip_code",
   "arrival_from_country",
   "arrival_from_city",
   "arrival_place",
@@ -55,8 +56,8 @@
   "id_image3",
   "face_image",
   "status",
-  "email",
-  "id_type",
+  "guest_email_address",
+  "guest_id_type",
   "local_id_number",
   "checkin_date",
   "checkin_time",
@@ -82,22 +83,10 @@
   "pathik_status",
   "pending_pathik",
   "pathik_locality",
-  "guest_company_name"
+  "guest_company_name",
+  "uploaded_to_opera"
  ],
  "fields": [
-  {
-   "fieldname": "surname",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Surname"
-  },
-  {
-   "fieldname": "given_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Given Name",
-   "reqd": 1
-  },
   {
    "fieldname": "gender",
    "fieldtype": "Data",
@@ -105,26 +94,10 @@
    "label": "Gender"
   },
   {
-   "fieldname": "date_of_birth",
-   "fieldtype": "Date",
-   "label": "Date of Birth"
-  },
-  {
-   "fieldname": "age",
-   "fieldtype": "Int",
-   "label": "Age"
-  },
-  {
    "fieldname": "category",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Category"
-  },
-  {
-   "fieldname": "nationality",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Nationality"
   },
   {
    "fieldname": "passport_number",
@@ -169,12 +142,12 @@
   },
   {
    "fieldname": "visa_date_of_issue",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Visa Date of Issue"
   },
   {
    "fieldname": "visa_valid_till",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Visa Valid Till"
   },
   {
@@ -186,21 +159,6 @@
    "fieldname": "visa_sub_type",
    "fieldtype": "Data",
    "label": "Visa Sub Type"
-  },
-  {
-   "fieldname": "address",
-   "fieldtype": "Long Text",
-   "label": "Address"
-  },
-  {
-   "fieldname": "city",
-   "fieldtype": "Data",
-   "label": "City"
-  },
-  {
-   "fieldname": "country",
-   "fieldtype": "Data",
-   "label": "Country"
   },
   {
    "fieldname": "arrival_from_country",
@@ -286,18 +244,9 @@
   },
   {
    "fieldname": "status",
-   "fieldtype": "Data",
-   "label": "Status"
-  },
-  {
-   "fieldname": "email",
-   "fieldtype": "Data",
-   "label": "Email"
-  },
-  {
-   "fieldname": "id_type",
-   "fieldtype": "Data",
-   "label": "Id Type"
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "In House\nPending Review\nPending Frro"
   },
   {
    "fieldname": "local_id_number",
@@ -395,11 +344,6 @@
    "label": "Guest Full Name"
   },
   {
-   "fieldname": "postal_code",
-   "fieldtype": "Data",
-   "label": "Postal Code"
-  },
-  {
    "fieldname": "address2",
    "fieldtype": "Small Text",
    "label": "Address2"
@@ -486,17 +430,88 @@
   {
    "fieldname": "middle_name",
    "fieldtype": "Data",
-   "label": "Middle Name"
+   "label": "Guest Middle Name"
   },
   {
    "fieldname": "guest_company_name",
    "fieldtype": "Data",
    "label": "Guest Company Name"
+  },
+  {
+   "fieldname": "guest_email_address",
+   "fieldtype": "Data",
+   "label": "Guest Email Address"
+  },
+  {
+   "fieldname": "guest_id_type",
+   "fieldtype": "Select",
+   "label": "Guest Id Type",
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
+  },
+  {
+   "fieldname": "guest_first_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest First Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "guest_last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest Last Name"
+  },
+  {
+   "fieldname": "guest_nationality",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest Nationality"
+  },
+  {
+   "fieldname": "address1",
+   "fieldtype": "Small Text",
+   "label": "Address1"
+  },
+  {
+   "fieldname": "guest_city",
+   "fieldtype": "Data",
+   "label": "Guest City"
+  },
+  {
+   "fieldname": "guest_country",
+   "fieldtype": "Data",
+   "label": "Guest Country"
+  },
+  {
+   "fieldname": "guest_age",
+   "fieldtype": "Int",
+   "label": "Guest Age"
+  },
+  {
+   "fieldname": "guest_dob",
+   "fieldtype": "Date",
+   "label": "Guest DOB"
+  },
+  {
+   "fieldname": "zip_code",
+   "fieldtype": "Data",
+   "label": "Zip Code"
+  },
+  {
+   "fieldname": "guest_state",
+   "fieldtype": "Data",
+   "label": "Guest State"
+  },
+  {
+   "default": "0",
+   "fieldname": "uploaded_to_opera",
+   "fieldtype": "Check",
+   "label": "Uploaded to Opera"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-21 15:47:31.547698",
+ "modified": "2022-03-29 15:50:35.113406",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",

@@ -5,20 +5,30 @@
 from __future__ import unicode_literals
 
 import base64
+import datetime
 import json
+# from pydoc import doc
+# from pydoc import doc
 import re
 import sys
+# import os
 import traceback
-from datetime import datetime
 
 import frappe
 import requests
 from frappe.model.document import Document
 
+# from version2_app.passport_scanner.doctype.dropbox.dropbox import (
+#     merge_guest_to_guest_details,
+# )
 from version2_app.passport_scanner.doctype.guest_details.cform import intiate
 from version2_app.passport_scanner.doctype.guest_details.pathik import intiate_pathik
-from version2_app.passport_scanner.doctype.reservations.reservations import *
-
+from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
+    format_date,
+    get_address_from_zipcode,
+)
+from version2_app.events import guest_update_attachment_logs
+from version2_app.passport_scanner.doctype.dropbox.dropbox import extract_id_details
 
 class GuestDetails(Document):
     pass
@@ -49,9 +59,11 @@ def empty_guest_details(name):
                 "parent",
                 "parentfield",
                 "parenttype",
+                "age"
             ]
         }
-        column_dict["age"] = 0
+        column_dict["uploaded_to_opera"] = False
+        column_dict["guest_age"] = 0
         column_dict["no_of_nights"] = 0
         column_dict["uploaded_to_frro"] = 0
         column_dict["frro_checkout"] = 0
@@ -60,7 +72,7 @@ def empty_guest_details(name):
         column_dict["no_of_children"] = get_doc.no_of_children
         column_dict["main_guest"] = get_doc.main_guest
         column_dict["confirmation_number"] = get_doc.confirmation_number
-        column_dict["given_name"] = get_doc.given_name
+        column_dict["guest_first_name"] = "Guest"
         frappe.db.set_value("Guest Details", get_doc.name, column_dict)
         frappe.db.commit()
         return {"success": True, "message": "guest details are empty"}
@@ -136,21 +148,25 @@ def guest_details_opera(confirmation_number):
 def helper_utility(data):
     try:
         company = frappe.get_last_doc("company")
-        if company.host != "" or company.host != None:
-            company_host = (company.host).rstrip("/")
-            url = (
-                company_host+"/api/method/version2_app.passport_scanner.doctype.reservations.reservations."+ data["api"]
-            )
-            del data["api"]
-            x = requests.post(url, data=data)
-            return {"success": True, "data": x.json()}
+        site_domain = (company.site_domain).rstrip("/")
+        url = (
+            site_domain+"/api/method/version2_app.passport_scanner.doctype.reservations.reservations."
+            + data["api"]
+        )
+        del data["api"]
+        x = requests.post(url, data=data)
+        if x.status_code == 200:
+            data = x.json()
+            if not data["message"]["success"]:
+                return data["message"]
+            return {"success": True, "data": data["message"]}
         else:
-            return {"success": False, "message":"please mention host in company"}
+            return {"success": False, "message": "something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Helper Utility",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
 
@@ -166,7 +182,7 @@ def convert_image_to_base64(image):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Guest Details Opera",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
 
@@ -186,11 +202,13 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         response = upload_qr_image.json()
         if "message" in response:
             return response
+        else:
+            return {"success": False, "message": "something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Guest Details Opera",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
 
@@ -201,7 +219,6 @@ def update_guest_details(name):
         company_doc = frappe.get_last_doc("company")
         if company_doc.scan_ezy_module == 1 or company_doc.vision_api == 1:
             pre_checkins = frappe.get_doc("Precheckins", name)
-            print(pre_checkins.image_1)
             folder_path = frappe.utils.get_bench_path()
             site_folder_path = folder_path + "/sites/" + company_doc.site_name
             file_path1 = ""
@@ -223,7 +240,6 @@ def update_guest_details(name):
                         + pre_checkins.image_1
                     )
                 convert1 = convert_image_to_base64(file_path1)
-                print(file_path1)
                 if convert1["success"] is False:
                     return convert1
             if pre_checkins.image_2:
@@ -932,15 +948,15 @@ def add_guest_details():
                 del data["address1"]
             if "address2" in data.keys():
                 if data["address2"] != "":
-                    if re.search("\d{6}", data["address2"]):
+                    if re.search(r"\d{6}", data["address2"]):
                         postal_code = re.match(
-                            "^.*(?P<zipcode>\d{6}).*$", data["address2"]
+                            r"^.*(?P<zipcode>\d{6}).*$", data["address2"]
                         ).groupdict()["zipcode"]
                         data["postal_code"] = (
                             postal_code if len(postal_code) == 6 else ""
                         )
             if frappe.db.exists("Arrival Information", data["confirmation_number"]):
-                now = datetime.now()
+                now = datetime.datetime.now()
                 arrival_doc = frappe.get_doc(
                     "Arrival Information", data["confirmation_number"]
                 )
@@ -964,8 +980,8 @@ def add_guest_details():
                     data["city"] = pre_checkins["guest_city"]
                     data["country"] = pre_checkins["guest_country"]
             if data["date_of_birth"] != "":
-                today = datetime.today()
-                birthDate = datetime.strptime(
+                today = datetime.datetime.today()
+                birthDate = datetime.datetime.strptime(
                     data["date_of_birth"], "%Y-%m-%d"
                 )
                 data["age"] = (
@@ -1008,7 +1024,7 @@ def add_guest_details():
                 arrival_doc.save(ignore_permissions=True, ignore_version=True)
                 frappe.db.commit()
             else:
-                arrival_date = datetime.now().date()
+                arrival_date = datetime.datetime.now().date()
                 arrival_info_doc = frappe.get_doc(
                     {
                         "doctype": "Arrival Information",
@@ -1042,38 +1058,6 @@ def process_cform():
         # company = frappe.get_last_doc("company")
         # if company.cform_session == 1:
         #     return {"success":False,"message":"Already cform inpogress"}
-        # if len(data)>0:
-        #     company_doc = frappe.get_doc('company',company.name)
-        #     company_doc.cform_session = 1
-        #     company_doc.save(ignore_permissions=True,ignore_version=True)
-        #     for index, each in enumerate(data):
-        #         each_data = frappe.db.get_value("Guest Details",each,["surname","given_name","gender","date_of_birth","select_category",
-        #         "nationality","address","city","country","passport_number","passport_place_of_issued_city",
-        #         "passport_place_of_issued_country","passport_date_of_issue","passport_valid_till","visa_number","visa_place_of_issued_city","visa_place_of_issued_country",
-        #         "visa_date_of_issue","visa_valid_till","visa_type","visa_sub_type","arrival_from_country","arrival_from_city","arrival_place",
-        #         "date_of_arrival_in_india","checkin_date","checkin_time","no_of_nights","whether_employed_in_india","purpose_of_visit","next_destination","next_destination_place",
-        #         "next_destination_state","next_destination_city","next_destination_country","contact_phone_no","contact_mobile_no","permanent_phone_no","permanent_mobile_no","remarks","face_image","name"], as_dict=1)
-        #         each_data["hotelAddress"] = company.address_1+" ,"+company.address_2
-        #         each_data["hote_state"] = company.state
-        #         each_data["hotel_city"] = company.city
-        #         each_data["hotel_pincode"] = company.pincode
-        #         if each_data["date_of_birth"]:
-        #             each_data["date_of_birth"] = each_data["date_of_birth"].strftime("%d/%m/%Y")
-        #         if each_data["passport_date_of_issue"]:
-        #             each_data["passport_date_of_issue"] = each_data["passport_date_of_issue"].strftime("%d%m%Y")
-        #         if each_data["passport_valid_till"]:
-        #             each_data["passport_valid_till"] = each_data["passport_valid_till"].strftime("%d%m%Y")
-        #         if each_data["visa_date_of_issue"]:
-        #             each_data["visa_date_of_issue"] = datetime.datetime.strptime(each_data["visa_date_of_issue"], '%Y-%m-%d').strftime("%d%m%Y")
-        #         if each_data["visa_valid_till"]:
-        #             each_data["visa_valid_till"] = datetime.datetime.strptime(each_data["visa_valid_till"], '%Y-%m-%d').strftime("%d%m%Y")
-        #         if each_data["date_of_arrival_in_india"]:
-        #             each_data["date_of_arrival_in_india"] = each_data["date_of_arrival_in_india"].strftime("%d/%m/%Y")
-        #         if each_data["checkin_date"]:
-        #             each_data["checkin_date"] = each_data["checkin_date"].strftime("%d/%m/%Y")
-        #         if each_data["checkin_time"]:
-        #             each_data["checkin_time"] = str(each_data["checkin_time"])
-        #         each_data = {k: "" if not v else v for k, v in each_data.items()}
         cform = intiate()
         return {"success": True, "message": cform}
         # company_doc.cform_session = 0
@@ -1134,5 +1118,587 @@ def update_company(company_code, obj):
         frappe.log_error(
             "Scan-update_company",
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def guest_details_for_opera(confirmation_number: str = None):
+    try:
+        company = frappe.get_last_doc("company")
+        if confirmation_number:
+            if not frappe.db.exists("Arrival Information", confirmation_number):
+                return {"success": False, "message": "reservation not found"}
+            arrival_info = frappe.db.get_value('Arrival Information', confirmation_number, ["guest_first_name","guest_last_name","no_of_adults"], as_dict=True)
+            if company.ome_scanner == 1:
+                if not frappe.db.exists("Dropbox", {"merged_to": confirmation_number}):
+                    return {"success": True, "data": arrival_info, "is_guest_details": False}
+            if not frappe.db.exists(
+                "Guest Details", {"confirmation_number": confirmation_number}
+            ):
+                return {"success": True, "data": arrival_info, "is_guest_details": False}
+            else:
+                get_guest_details = frappe.db.get_list(
+                    "Guest Details",
+                    filters={"confirmation_number": confirmation_number},
+                    fields=[
+                        "guest_full_name",
+                        "confirmation_number",
+                        "guest_first_name",
+                        "name",
+                        "guest_id_type",
+                        "uploaded_to_opera"
+                    ],
+                    order_by='creation asc'
+                )
+                get_booking_status = frappe.db.get_value("Arrival Information", confirmation_number, "booking_status")
+                get_guest_details = [dict(item, booking_status=get_booking_status) for item in get_guest_details]
+                return {"success": True, "data": get_guest_details, "is_guest_details": True}
+        else:
+            return {
+                "success": False,
+                "message": "please enter a valid confirmation number",
+            }
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-guest_details_for_opera",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def opera_scan_api(type=None, name=None, image_1=None, image_2=None, document_type=None):
+    try:
+        if frappe.db.exists("Guest Details", name):
+            guest_details = frappe.db.get_value("Guest Details", name, ["id_image1","id_image2","confirmation_number","guest_id_type"], as_dict=1)
+            if type == "rotate":
+                get_data = get_data_vision_api(image_1, image_2, name, guest_details["guest_id_type"], type, False, guest_details["confirmation_number"])
+                return get_data
+            if type == "upload":
+                if document_type:
+                    guest_details["guest_id_type"] = document_type
+                if image_1 or image_2:
+                    get_data = get_data_vision_api(image_1, image_2, name, guest_details["guest_id_type"], type, False, guest_details["confirmation_number"])
+                else:
+                    get_data = get_data_vision_api(guest_details["id_image1"], guest_details["id_image2"], name, guest_details["guest_id_type"], type, True, guest_details["confirmation_number"])
+                return get_data
+            if type == "refetch":
+                get_data = get_data_vision_api(guest_details["id_image1"], guest_details["id_image2"], name, guest_details["guest_id_type"], type, True, guest_details["confirmation_number"])
+                return get_data
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-opera_scan_api",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": "something went wrong"}
+
+def get_aadhaar_data(image1=None, image2=None):
+    try:
+        details = {}
+        if image1:
+            aadhar_front = helper_utility(
+                        {
+                            "api": "scan_aadhar",
+                            "aadhar_image": image1,
+                            "scanView": "front",
+                        }
+                    )
+            if not aadhar_front["success"]:
+                return aadhar_front
+            details.update(aadhar_front["data"])
+        if image2:
+            aadhar_back = helper_utility(
+                        {
+                            "api": "scan_aadhar",
+                            "aadhar_image": image2,
+                            "scanView": "back",
+                        }
+                    )
+            if not aadhar_back["success"]:
+                return aadhar_back
+            details.update(aadhar_back["data"])
+        if bool(details):
+            aadhaar_details = localids_details_change(details)
+            if not aadhaar_details["success"]:
+                return aadhaar_details
+            return {"success": True, "data": aadhaar_details["data"]}
+        return {"success":False, "data": {}}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_aadhaar_data",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": "something went wrong"}
+
+def localids_details_change(data):
+    try:
+        details = {}
+        if "Date_of_birth" in data:
+            check_dob = check_date(data["Date_of_birth"])
+            if check_dob:
+                details["guest_dob"] = check_dob
+        if "sex" in data:
+            if data["sex"] in ["male", "Male", "MALE", "M", "m"]:
+                details["gender"] = "MALE"
+            if data["sex"] in ["Female", "FeMale", "FEMALE", "F", "f"]:
+                details["gender"] = "FEMALE"
+        if "uid" in data:
+            details["local_id_number"] = data["uid"].replace(" ", "")
+        if "name" in data:
+            details["guest_first_name"] = data["name"]
+        if "postal_code" in data:
+            pincode = data["postal_code"]
+            regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
+            if re.match(regex_complie, pincode):
+                details["zip_code"] = pincode
+                address_details = get_address_from_zipcode(pincode)
+                if address_details["success"]:
+                    details.update(address_details["data"])
+        if "person_address" in data:
+            details["address1"] = data["person_address"]
+        if bool(details):
+            details["guest_nationality"] = "IND"
+            details["guest_country"] = "IND"
+            details["status"] = "In House"
+            details["guest_id_type"] = "aadhaar"
+        return {"success": True, "data": details}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-localids_details_change",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+        
+def get_passport_details(image1=None, image2=None, document_type=None):
+    try:
+        details = {}
+        if document_type:
+            if image1:
+                passport_front = helper_utility(
+                            {
+                                "api": "passportvisadetails",
+                                "Passport_Image": image1,
+                                "scan_type": "web",
+                            }
+                        )
+                if not passport_front["success"]:
+                    return passport_front
+                details.update(passport_front["data"])
+            if image2:
+                if document_type == "Foreigner":
+                    passport_back = helper_utility(
+                                {
+                                    "api": "passportvisadetails",
+                                    "Passport_Image": image2,
+                                    "scan_type": "web",
+                                }
+                            )
+                    if not passport_back["success"]:
+                        return passport_back
+                    passport_back_details = passport_back["data"]
+                    if "Given_Name" in passport_back_details:
+                        passport_back_details["Visa_Given_Name"] = passport_back_details["Given_Name"]
+                        del passport_back_details["Given_Name"]
+                    if "FamilyName" in passport_back_details:
+                        passport_back_details["Visa_Family_Name"] = passport_back_details["FamilyName"]
+                        del passport_back_details["FamilyName"]
+                    if "Document_Type" in passport_back_details:
+                        passport_back_details["Visa_Document_Type"] = passport_back_details["Document_Type"]
+                        del passport_back_details["Document_Type"] 
+                    if "Issued_country" in passport_back_details:
+                        passport_back_details["Visa_Issued_country"] = passport_back_details["Issued_country"]
+                        del passport_back_details["Issued_country"]
+                    if "Nationality" in passport_back_details:
+                        passport_back_details["Visa_Nationality"] = passport_back_details["Nationality"]
+                        del passport_back_details["Nationality"]
+                    if "Date_of_Birth" in passport_back_details:
+                        passport_back_details["Visa_Date_of_Birth"] = passport_back_details["Date_of_Birth"]
+                        del passport_back_details["Date_of_Birth"]
+                    details.update(passport_back_details)
+                else:
+                    passport_back = helper_utility(
+                        {
+                            "api": "passport_address",
+                            "Passport_Image": image2,
+                        }
+                    )
+                    if not passport_back["success"]:
+                        return passport_back
+                    details.update(passport_back["data"])
+            if bool(details):
+                passport_data = change_passport_details(details)
+                if not passport_data["success"]:
+                    return passport_data
+                return {"success": True, "data": passport_data["data"]}
+            return {"success": False, "data": {}}
+        return {"success": False, "message": "something went wrong"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_passport_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
+def check_date(date_time):
+    try:
+        regex_complie = re.compile(
+                r"^([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])(\.|-|/|\s)([1-9]|0[1-9]|1[0-2])(\.|-|/|\s)([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])$|^([0-9][0-9]|19[0-9][0-9]|20[0-9][0-9])(\.|-|/|\s)([1-9]|0[1-9]|1[0-2])(\.|-|/|\s)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$|([\d]{1,2}(\.|-|/|\s)(January|February|March|April|May|June|July|August|September|October|November|December)(\.|-|/|\s)[\d]{4})"
+            )
+        if re.match(
+            regex_complie,
+            date_time.strip(),
+        ):
+            try:
+                guest_date = date_time.strip()
+                guest_date = guest_date.replace(" ", "/")
+                guest_date = format_date(
+                    guest_date,
+                    "yyyy-mm-dd",
+                )
+                return guest_date
+            except Exception as e:
+                print(e)
+                return None
+        return None
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-check_date",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return None
+
+def update_company(company_code, obj):
+    try:
+        frappe.db.set_value("company", company_code, obj)
+        frappe.db.commit()
+        return {"success": True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-update_company",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}
+
+def change_passport_details(data):
+    try:
+        details = {}
+        if "country_code" in data:
+            details["guest_country"] = data["country_code"]
+        if "FamilyName" in data:
+            details["guest_last_name"] = data["FamilyName"]
+        if "Given_Name" in data:
+            details["guest_first_name"] = data["Given_Name"]
+        if "Passport_Document_No" in data:
+            details["passport_number"]  = data["Passport_Document_No"]
+        if "Gender" in data:
+            if data["Gender"] in ["male", "Male", "MALE", "M", "m"]:
+                details["gender"] = "MALE"
+            if data["Gender"] in ["Female", "FeMale", "FEMALE", "F", "f"]:
+                details["gender"] = "FEMALE"   
+        if "Date_of_Issue" in data:
+            check_doi = check_date(data["Date_of_Issue"])
+            if check_doi:
+                details["passport_date_of_issue"] = check_doi
+        if "Date_of_Expiry" in data:
+            check_doe = check_date(data["Date_of_Expiry"])
+            if check_doe:
+                details["passport_valid_till"] = check_doe
+        if "Date_of_Birth" in data:
+            check_dob = check_date(data["Date_of_Birth"])
+            if check_dob:
+                details["guest_dob"] = check_dob
+        if "Nationality" in data:
+            details["guest_nationality"] = data["Nationality"]
+        if "Visa_Issue_Date" in data:
+            check_vid = check_date(data["Visa_Issue_Date"])
+            if check_vid:
+                details["visa_date_of_issue"] = check_vid
+        if "Visa_Number" in data:
+            details["visa_number"] = data["Visa_Number"]
+        if "Visa_Expiry_Date" in data:
+            check_ved = check_date(data["Visa_Expiry_Date"])
+            if check_ved:
+                details["visa_valid_till"] = check_ved
+        if "Visa_Issued_country" in data:
+            details["visa_place_of_issued_country"] = data["Visa_Issued_country"]
+        if "visa_Type" in data:
+            file_path = frappe.utils.get_bench_path()
+            with open(file_path + "/apps/version2_app/version2_app/passport_scanner/doctype/ml_utilities/visa-types.json", "r") as myfile:
+                visa_types = json.loads(myfile.read())
+            for each in visa_types:
+                if data["visa_Type"] == each["altValue"]:
+                    details["visa_type"] = each["value"]
+                    break
+                for visa_types in each["subTypes"]:
+                    if len(visa_types) > 0:
+                        get_visa_type = (
+                            visa_types["viewValue"].split(" - ")[0].strip()
+                        )
+                        if data["visa_Type"] == get_visa_type:
+                            details["visa_sub_type"] = visa_types["value"]
+                            details["visa_type"] = each["value"]
+                            break
+        if "personaddress" in data:
+            details["address1"] = data["personaddress"]
+            reg = re.compile(r'(\d{6})')
+            match = re.findall(reg, data["personaddress"])
+            if len(match) > 0:
+                pin_code = match[0]
+                regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
+                if re.match(regex_complie, pin_code):
+                    details["zip_code"] = pin_code
+                    address_details = get_address_from_zipcode(pin_code)
+                    if address_details["success"]:
+                        details.update(address_details["data"])
+        if bool(details):
+            if "guest_country" in details:
+                if details["guest_country"] == "IND":
+                    details["status"] = "In House"
+                    details["guest_id_type"] = "indianPassport"
+                else:
+                    details["status"] = "Pending Review"
+                    # details["guest_id_type"] = "Foreigner"
+        return {"success": True, "data": details}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-change_passport_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
+def get_driving_details(image1=None):
+    try:
+        if image1:
+            driving_license = helper_utility(
+                {
+                    "api": "scan_driving_license",
+                    "driving_image": image1,
+                }
+            )
+            if not driving_license["success"]:
+                return driving_license
+            details = driving_license["data"]
+            driving_details = localids_details_change(details)
+            if not driving_details["success"]:
+                return driving_details
+            return {"success": True, "data": driving_details["data"]}
+        else:
+            return {"success": False, "message": "something went wrong"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_driving_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
+def get_voter_details(image1=None, image2=None):
+    try:
+        details={}
+        if image1:
+            voter_front = helper_utility(
+                {
+                    "api": "scan_votercard",
+                    "voter_image": image1,
+                    "scanView": "front",
+                }
+            )
+            if not voter_front["success"]:
+                return voter_front
+            details.update(voter_front["data"])
+        if image2:
+            voter_back = helper_utility(
+                {
+                    "api": "scan_votercard",
+                    "voter_image": image2,
+                    "scanView": "back",
+                }
+            )
+            if not voter_back["success"]:
+                return voter_back
+            details.update(voter_back["data"])
+        if bool(details):
+            voter_details = localids_details_change(details)
+            if not voter_details["success"]:
+                return voter_details
+            return {"success": True, "data": voter_details["data"]}
+        return {"success":False, "data": {}}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_voter_details",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
+def get_data_vision_api(image1=None, image2=None, name=None, document_type=None, type=None, image_to_base=False, confirmation_number=None):
+    try:
+        details = {}
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path + "/sites/" + company.site_name
+        if document_type:
+            details["guest_id_type"] = document_type
+            if document_type in ["voterId", "driving", "indianPassport", "aadhaar"]:
+                details["status"] = "In House"
+            elif document_type in ["Foreigner"]:
+                details["status"] = "Pending Review"
+        if confirmation_number:
+            details["confirmation_number"] = confirmation_number
+        if type in ["rotate", "upload"] and not image_to_base:
+            if image1:
+                image_1 = convert_base64_to_image(image1, name, site_folder_path, company)
+                if "success" in  image_1:
+                    return image_1
+                if "file_url" in image_1["message"].keys():
+                    details["id_image1"] = image_1["message"]["file_url"]
+            if image2:
+                image_2 = convert_base64_to_image(image2, name, site_folder_path, company)
+                if "success" in  image_2:
+                    return image_2
+                if "file_url" in image_2["message"].keys():
+                    details["id_image2"] = image_2["message"]["file_url"]
+        if image_to_base:
+            if image1:
+                details["id_image1"] = image1
+                if "private" in image1:
+                    file_path1 = (
+                        site_folder_path
+                        + image1
+                    )
+                else:
+                    file_path1 = (
+                        site_folder_path
+                        + "/public"
+                        + image1
+                    )
+                convert1 = convert_image_to_base64(file_path1)
+                if convert1["success"] is False:
+                    return convert1
+                image1 = convert1["data"]
+            if image2:
+                details["id_image2"] = image2
+                if "private" in image2:
+                    file_path2 = (
+                        site_folder_path
+                        + image2
+                    )
+                else:
+                    file_path2 = (
+                        site_folder_path
+                        + "/public"
+                        + image2
+                    )
+                convert2 = convert_image_to_base64(file_path2)
+                if convert2["success"] is False:
+                    return convert2
+                image2 = convert1["data"]
+        if document_type:
+            if document_type == "aadhaar":
+                aadhaar_data = get_aadhaar_data(image1, image2)
+                if not aadhaar_data["success"]:
+                    return {"success": False, "data": details, "message": "something went wrong"}
+                details.update(aadhaar_data["data"])
+            if document_type in ["indianPassport", "Foreigner"]:
+                indian_passport = get_passport_details(image1, image2, document_type)
+                if not indian_passport["success"]:
+                    return {"success": False, "data": details, "message": "something went wrong"}
+                details.update(indian_passport["data"])
+            if document_type == "driving":
+                driving = get_driving_details(image1)
+                if not driving["success"]:
+                    return {"success": False, "data": details, "message": "something went wrong"}
+                details.update(driving["data"])
+            if document_type == "voterId":
+                voter = get_voter_details(image1, image2)
+                if not voter["success"]:
+                    return {"success": False, "data": details, "message": "something went wrong"}
+                details.update(voter["data"])
+        else:
+            return {"success": False, "message": "something went wrong"}
+        if bool(details):
+            if document_type:
+                details["guest_id_type"] = document_type
+            return {"success": True, "data": details}
+            # if document_type:
+            #     details["guest_id_type"] = document_type
+            # if confirmation_number:
+            #     details["confirmation_number"] = confirmation_number
+            # update_details = guest_details_update(details, name)
+            # return update_details
+        return {"success": False, "message": "something went wrong", "data": details}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-get_data_vision_api",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
+
+def guest_details_update(data={},name=None):
+    try:
+        empty_details = empty_guest_details(name)
+        if not empty_details["success"]:
+            return empty_details
+        frappe.db.set_value('Guest Details', name, data)
+        frappe.db.commit()
+        arrival_doc = frappe.get_doc("Guest Details", name)
+        guest_update_attachment_logs(arrival_doc)
+        return {"success": True, "message": "data updated"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-guest_details_update",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+    
+@frappe.whitelist(allow_guest=True)
+def extract_data_getting_from_opera(document_type=None, image_1=None, image_2=None, guest_details=False, confirmation_number=None):
+    try:
+        details = {}
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path + "/sites/" + company.site_name
+        if document_type and confirmation_number:
+            if image_1:
+                image1 = convert_base64_to_image(image_1, "image1"+document_type, site_folder_path, company)
+                if "success" in  image1:
+                    return image1
+                if "file_url" in image1["message"].keys():
+                    details["id_image1"] = image1["message"]["file_url"]
+            if image_2:
+                image2 = convert_base64_to_image(image_2, "image2"+document_type, site_folder_path, company)
+                if "success" in  image2:
+                    return image2
+                if "file_url" in image2["message"].keys():
+                    details["id_image2"] = image2["message"]["file_url"]
+            extract_detils = extract_id_details({
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": document_type,
+                    "reservation_number": confirmation_number
+                })
+            if not extract_detils["success"]:
+                return extract_detils
+            details.update(extract_detils["data"])
+            return {"success": False, "data": details}
+        else:
+            return {"success": False, "message": "confirmation number or document type should be mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-extract_data_getting_from_opera",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
