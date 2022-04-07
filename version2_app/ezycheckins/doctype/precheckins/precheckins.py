@@ -57,7 +57,9 @@ def add_pre_checkins():
                     date_time, "%Y-%m-%dT%H:%M:%S.%f"
                 ).strftime("%H:%M")
         company = frappe.get_doc("company", data["company"])
-        no_of_adults = data["no_of_adults"]
+        no_of_adults = 0
+        if "no_of_adults" in data:
+            no_of_adults = data["no_of_adults"]
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path + "/sites/" + company.site_name
         pre_checkins = {}
