@@ -271,21 +271,21 @@
   },
   {
    "fieldname": "company_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Company Name",
    "reqd": 1
   },
   {
    "fieldname": "trade_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Trade Name",
    "reqd": 1
   },
   {
    "fieldname": "legal_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Legal Name",
    "reqd": 1
@@ -347,13 +347,13 @@
   },
   {
    "fieldname": "address_1",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address 1",
    "reqd": 1
   },
   {
    "fieldname": "address_2",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address 2",
    "reqd": 1
   },
@@ -376,12 +376,12 @@
   },
   {
    "fieldname": "merchant_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Merchant Name"
   },
   {
    "fieldname": "b2c_qr_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "B2C QR URL"
   },
   {
@@ -423,7 +423,7 @@
   },
   {
    "fieldname": "merchant_virtual_payment_address",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Merchant Virtual Payment Address"
   },
   {
@@ -508,7 +508,7 @@
   },
   {
    "fieldname": "proxy_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy Url"
   },
   {
@@ -674,7 +674,7 @@
   },
   {
    "fieldname": "system_storage_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "System Storage Path"
   },
   {
@@ -761,7 +761,7 @@
   },
   {
    "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ipp Printer File Path"
   },
   {
@@ -803,92 +803,92 @@
   },
   {
    "fieldname": "template_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Template Name"
   },
   {
    "fieldname": "api_key",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Api Key"
   },
   {
    "fieldname": "api",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Api"
   },
   {
    "fieldname": "domain_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Domain URL"
   },
   {
    "fieldname": "void_check_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Void Check Reference"
   },
   {
    "fieldname": "void_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Void Total Amt Regex"
   },
   {
    "fieldname": "closed_check_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Closed Check Reference"
   },
   {
    "fieldname": "closed_check_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Closed Check Total Amt Regex"
   },
   {
    "fieldname": "normal_check_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Normal Check Total Amt Regex"
   },
   {
    "fieldname": "check_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Check Number Reference"
   },
   {
    "fieldname": "check_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Check Number Regex"
   },
   {
    "fieldname": "table_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Table Number Reference"
   },
   {
    "fieldname": "table_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Table Number Regex"
   },
   {
    "fieldname": "guest_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest Number Reference"
   },
   {
    "fieldname": "guest_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest Number Regex"
   },
   {
    "fieldname": "bill_amount_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Bill Amount Regex"
   },
   {
    "fieldname": "fssai_number",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "FSSAI Number"
   },
   {
    "fieldname": "print_check_type",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Print Check Type"
   },
   {
@@ -1081,12 +1081,12 @@
   },
   {
    "fieldname": "pre_checkin_mail_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pre Checkin Mail Subject"
   },
   {
    "fieldname": "cancellation_email_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Cancellation Email Subject"
   },
   {
@@ -1245,7 +1245,7 @@
   },
   {
    "fieldname": "member_ship_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Member Ship URL"
   },
   {
@@ -1467,12 +1467,12 @@
   },
   {
    "fieldname": "dynamic_colour_for_tab",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Dynamic Colour for Tab"
   },
   {
    "fieldname": "work_station_pass_code",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Work Station Pass Code"
   },
   {
@@ -1482,12 +1482,12 @@
   },
   {
    "fieldname": "reg_card_identification_text",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Reg Card Identification Text"
   },
   {
    "fieldname": "paid_out_receipts",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Paid Out Receipts Identification"
   },
   {
@@ -1496,17 +1496,17 @@
   },
   {
    "fieldname": "reg_card_confirmation_no_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Reg Card Confirmation no Regex"
   },
   {
    "fieldname": "paid_out_confirmation_no_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Paid Out Confirmation no Regex"
   },
   {
    "fieldname": "advance_deposits_identification",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Advance Deposits Identification"
   },
   {
@@ -1638,7 +1638,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-14 15:46:28.162882",
+ "modified": "2022-04-08 12:10:48.531613",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
