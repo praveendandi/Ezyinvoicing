@@ -12,7 +12,8 @@
   "company",
   "summaries",
   "summary_breakup_details",
-  "invoice_number"
+  "invoice_number",
+  "sac_codes"
  ],
  "fields": [
   {
@@ -66,11 +67,16 @@
    "fieldname": "invoice_number",
    "fieldtype": "Data",
    "label": "Invoice Number"
+  },
+  {
+   "fieldname": "sac_codes",
+   "fieldtype": "Small Text",
+   "label": "SAC Codes"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 09:56:40.060307",
+ "modified": "2022-04-08 11:35:31.052355",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",

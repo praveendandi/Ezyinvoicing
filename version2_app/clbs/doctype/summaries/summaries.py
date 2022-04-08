@@ -56,4 +56,13 @@ def get_all_summary(filters=[], limit_start=0, limit_page_length=20):
             print(sql_filters)
         data = frappe.db.sql("""SELECT acc.account_number gl.debit gl.credit FROM `tabGL Entry` gl LEFT JOIN `tabAccount` acc ON gl.account = acc.name{} LIMIT 10 OFFSET 15""".format(filters), as_dict=0)
     except Exception as e:
+        frappe.log_error(str(e), "get_summary")
+        return {"success": False, "message": str(e)}
+    
+@frappe.whitelist(allow_guest=True)
+def delete_summaries(name=None):
+    try:
         pass
+    except Exception as e:
+        frappe.log_error(str(e), "get_summary")
+        return {"success": False, "message": str(e)}
