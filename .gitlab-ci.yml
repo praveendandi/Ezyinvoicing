@@ -14,3 +14,4 @@ sonarqube-check:
     - merge_requests
     - master
     - stable-version
+    - Merge_Branches
