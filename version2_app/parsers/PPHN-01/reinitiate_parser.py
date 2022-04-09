@@ -18,8 +18,7 @@ from version2_app.version2_app.doctype.invoices.credit_generate_irn import *
 folder_path = frappe.utils.get_bench_path()
 
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+
 # site_folder_path = "mhkcp_local.com/"
 # host = "http://localhost:8000/api/method/"
 
@@ -27,7 +26,6 @@ logger = frappe.logger("api", allow_site=True, file_count=50)
 @frappe.whitelist(allow_guest=True)
 def reinitiateInvoice(data):
 	try:
-		logger.info(data)
 		filepath = data['filepath']
 		reupload_inv_number = data['invoice_number']
 		start_time = datetime.datetime.utcnow()

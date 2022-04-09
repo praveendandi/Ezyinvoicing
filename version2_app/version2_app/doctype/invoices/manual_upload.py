@@ -41,7 +41,6 @@ from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newd
 # 	# print(data,type(data))
 # 	return {"success":True}
 # 	# except Exception as e:
-# 	# 	logger.error(f"manual upload queue  {str(e)}")
 # 	# 	return {"success":False,"message":str(e)}
 
 

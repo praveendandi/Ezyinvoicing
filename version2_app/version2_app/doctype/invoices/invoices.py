@@ -33,7 +33,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
 frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
+logger = frappe.logger("api")
 
 class Invoices(Document):
 
@@ -351,13 +351,11 @@ def generateIrn(data):
             "CesVal": round(total_cess_value, 2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": round(discount_after_value,2),
-            "OthChrg": round(invoice.other_charges,2),
+            "OthChrg": abs(round(invoice.other_charges,2)) if company_details['data'].vat_reporting==1 else abs(round(invoice.other_charges_before_tax,2)),
             "RndOffAmt": 0,
-            "TotInvVal": round(TotInnVal,2),
+            "TotInvVal": round(TotInnVal,2) if company_details['data'].vat_reporting==1 else round(TotInnVal-invoice.total_vat_amount, 2),
             "TotInvValFc": round(TotInvValFc, 2)
-        }
-        print(gst_data)
-        
+        }        
         # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
             return {"success":False,"message":"Items cannot be Empty"}
@@ -599,11 +597,12 @@ def send_invoicedata_to_gcb(invoice_number):
                         "https://gst.caratred.in/ezy/api/addJsonToGcb",
                         headers=headers,
                         json=b2c_data,verify=False)
-                response = json_response.json()
-                if response["success"] == False:
+                if json_response.status_code==200:
+                    response = json_response.json()
+                if json_response.status_code!=200:
                     return {
                         "success": False,
-                        "message": response["message"]
+                        "message": "status code"+str(json_response.status_code)+"reason"+str(json_response.reason)
                     }
             else:
                 print(proxies, "     proxy console")
@@ -626,6 +625,7 @@ def send_invoicedata_to_gcb(invoice_number):
                 box_size=3,
                 border=4
             )
+            print(response['data'],"/////////")
             qrurl = company.b2c_qr_url + response['data']
             qr.add_data(qrurl)
             qr.make(fit=True)
@@ -1101,8 +1101,8 @@ def insert_invoice(data):
                     roundoff_amount = 0
                     data['invoice_round_off_amount'] = 0
                     pms_invoice_summary = data['total_invoice_amount']
-                    other_charges = data['total_invoice_amount']
-                    other_charges_before_tax = data["total_invoice_amount"]
+                    # other_charges = data['total_invoice_amount']
+                    # other_charges_before_tax = data["total_invoice_amount"]
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
                 print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
@@ -1135,8 +1135,9 @@ def insert_invoice(data):
                         
                         return{"success":False,"message":TotalMismatchErrorAPI['message']}
         # qr_generated = "Pending"
-        if "Arrival" in data["taxpayer"]["email"]:
-            data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "").strip()
+        if "taxpayer" in data and "email" in data:
+            if "Arrival" in data["taxpayer"]["email"]:
+                data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "").strip()
         if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
             irn_generated = "Zero Invoice"
             taxpayer= {"legal_name": "","email":data['taxpayer']['email'],"address_1": "","address_2": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}

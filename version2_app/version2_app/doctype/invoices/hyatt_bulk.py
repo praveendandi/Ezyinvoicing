@@ -29,6 +29,7 @@ def hyatt_bulkupload(data):
         gst_df=pd.read_excel(folder_path+'/sites/'+site_folder_path+invoice_data["gst_file"])
         # data_to_dict=gst_df
         # gst_df=gst_df.iloc[0]
+        gst_df.fillna('', inplace=True)
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
             # if invoice_data["company"]=="GHM-01":
@@ -46,7 +47,7 @@ def hyatt_bulkupload(data):
             if each[bulk_meta_data["detail_folio"]["invoice_number"]] in gst_data.keys():
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
-                            'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
+                            'gstNumber':str(gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]]).strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']]},'invoice_type':"B2B"}
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]

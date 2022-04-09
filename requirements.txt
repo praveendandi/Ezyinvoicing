@@ -22,3 +22,5 @@ WeasyPrint==52
 html2text
 # opencv-python
 typing-extensions
+paytmchecksum
+# opencv-python

@@ -20,13 +20,6 @@ import datetime
 from frappe.utils import get_site_name
 from frappe.utils import logger
 
-
-
-
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api", allow_site=True, file_count=50)
-
-
 @frappe.whitelist(allow_guest=True)
 def IrnObject(invoice_number):
     try:

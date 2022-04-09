@@ -25,9 +25,10 @@ def BulkUploadReprocess(data):
         if "data" not in line_items.keys():
             line_items = {"data": line_items}
             invoice_data.invoice_object_from_file = json.dumps(line_items)
-        if "data" in line_items["data"].keys():
-            line_items = line_items["data"]
-            invoice_data.invoice_object_from_file = json.dumps(line_items)
+        if isinstance(line_items["data"], dict):
+            if "data" in line_items["data"].keys():
+                line_items = line_items["data"]
+                invoice_data.invoice_object_from_file = json.dumps(line_items)
         invoice_total_amount = invoice_data.total_invoice_amount
         print(invoice_total_amount)
         print(invoice_data.gst_number,"=-=-=-=-=-=-")
@@ -55,7 +56,7 @@ def BulkUploadReprocess(data):
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             if invoice_data.change_gst_number=="Yes" and invoice_data.converted_from_b2c=="No":
-                if line_items['data'][0]['taxid'] == "empty":
+                if line_items['data'][0]['taxid'] == "empty" or line_items['data'][0]['taxid'] == "":
                     gstNumber == ""
                     invoiceType = "B2C"
                 else:
@@ -115,7 +116,7 @@ def BulkUploadReprocess(data):
                     item_dict['sort_order'] = sort_order
                     sort_order+=1
                     items.append(item_dict)	
-        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Bulkupload Without Headers":
+        elif company.bulk_excel_upload_type == "Hyatt Mumbai" or company.bulk_excel_upload_type=="Hyatt Bulkupload" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Novotel Vijayawada" or company.bulk_excel_upload_type == "Hyatt Hyderabad" or company.bulk_excel_upload_type=="Grand" or company.bulk_excel_upload_type=="Bulkupload Without Headers" or companyData.bulk_excel_upload_type=="Bulkupload With Headers":
             # line_items = json.loads(invoice_data.invoice_object_from_file)
             
             # invoice_date = invoice_data.invoice_date

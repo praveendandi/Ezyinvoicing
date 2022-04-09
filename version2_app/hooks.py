@@ -182,17 +182,17 @@ doc_events = {
 
 # Scheduled Tasks/home/caratred/frappe_projects/Einvoice_Bench/apps/version2_app/version2_app/version2_app/doctype/emailTemplat.py
 # ---------------
-scheduler_events = {
+# scheduler_events = {
 	
 
-	# "daily":[
-	# 	"version2_app.events.deleteemailfilesdaily"
-	# ],
-	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
-			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
-			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
-			"0 11 * * *":["version2_app.events.block_irn"]}	
-}	
+# 	# "daily":[
+# 	# 	"version2_app.events.deleteemailfilesdaily"
+# 	# ],
+# 	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+# 			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+# 			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
+# 			"0 11 * * *":["version2_app.events.block_irn"]}	
+# }	
 
 
 scheduler_events = {
@@ -200,6 +200,10 @@ scheduler_events = {
         "version2_app.version2_app.doctype.emailTemplat.sampleFun"
     ],
     "cron": {
+        # "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+        # "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+        "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
+        "0 11 * * *":["version2_app.events.block_irn"],
         "1-59 * * * *": [
             "version2_app.version2_app.doctype.emailTemplat.sampleFun"
         ],
