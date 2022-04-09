@@ -60,9 +60,18 @@ def get_all_summary(filters=[], limit_start=0, limit_page_length=20):
         return {"success": False, "message": str(e)}
     
 @frappe.whitelist(allow_guest=True)
-def delete_summaries(name=None):
+def delete_summaries(name=None, status=None):
     try:
-        pass
+        if not status:
+            return {"success": False, "message": "status is required"}
+        if frappe.db.exists("Summaries", name):
+            frappe.db.set_value('Summaries', name, "status", status)
+            # frappe.db.sql("""UPDATE `tabSummary Breakups` SET deleted_breakups=1 where summaries='{}'""".format(name))
+            frappe.db.sql("""UPDATE `tabInvoices` SET summary=null, clbs_summary_generated=0, invoice_submitted_in_clbs=0 where summary='{}'""".format(name))
+            frappe.db.commit()
+            return {'success': True, 'message': "summary "+status}
+        else:
+            return {"success": False, 'message': "summary not found"}
     except Exception as e:
         frappe.log_error(str(e), "get_summary")
         return {"success": False, "message": str(e)}

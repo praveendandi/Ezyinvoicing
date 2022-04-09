@@ -13,7 +13,8 @@
   "summaries",
   "summary_breakup_details",
   "invoice_number",
-  "sac_codes"
+  "sac_codes",
+  "deleted_breakups"
  ],
  "fields": [
   {
@@ -72,11 +73,17 @@
    "fieldname": "sac_codes",
    "fieldtype": "Small Text",
    "label": "SAC Codes"
+  },
+  {
+   "default": "0",
+   "fieldname": "deleted_breakups",
+   "fieldtype": "Check",
+   "label": "Deleted Breakups"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-08 11:35:31.052355",
+ "modified": "2022-04-08 17:13:31.379362",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",

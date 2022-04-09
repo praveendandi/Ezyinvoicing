@@ -145,7 +145,8 @@
   "summary_header",
   "summary_terms_and_conditions",
   "summary_footer",
-  "clbs"
+  "clbs",
+  "cc_mail_ids_for_clbs_reports"
  ],
  "fields": [
   {
@@ -938,11 +939,16 @@
    "fieldname": "clbs",
    "fieldtype": "Check",
    "label": "CLBS"
+  },
+  {
+   "fieldname": "cc_mail_ids_for_clbs_reports",
+   "fieldtype": "Small Text",
+   "label": "CC Mail IDs For CLBS Reports"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 14:09:46.709813",
+ "modified": "2022-04-09 12:17:14.973439",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

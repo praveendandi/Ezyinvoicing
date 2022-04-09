@@ -440,6 +440,13 @@ def submit_summary(summary):
 @frappe.whitelist(allow_guest=True)    
 def send_summary_mail(data):
     try:
+        company = frappe.get_last_doc('company')
+        cc_emails = None
+        if company.cc_mail_ids_for_clbs_reports and company.cc_mail_ids_for_clbs_reports != "":
+            cc_emails = company.cc_mail_ids_for_clbs_reports
+        # if cc_emails:
+        #     if "cc_emails" in data:
+        #         cc_emails = data["cc_emails"]
         files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
         if not files:
             generate_pdf = download_pdf(data["summary"])
@@ -450,6 +457,7 @@ def send_summary_mail(data):
             content = data["response"],
             doctype = None,
             name = None,
+            cc = cc_emails,
             attachments = json.dumps(files),
             send_email=1
         )

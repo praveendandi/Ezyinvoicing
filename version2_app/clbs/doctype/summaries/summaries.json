@@ -19,7 +19,8 @@
   "footer",
   "terms_and_conditions",
   "contacts",
-  "status"
+  "status",
+  "reference"
  ],
  "fields": [
   {
@@ -109,12 +110,17 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nSubmitted"
+   "options": "Draft\nSubmitted\nDeleted\nVoid"
+  },
+  {
+   "fieldname": "reference",
+   "fieldtype": "Data",
+   "label": "Reference"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 19:22:24.881766",
+ "modified": "2022-04-09 11:11:06.641935",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
