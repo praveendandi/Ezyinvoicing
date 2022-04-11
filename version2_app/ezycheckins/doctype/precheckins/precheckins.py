@@ -145,15 +145,16 @@ def add_pre_checkins():
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
         if frappe.db.exists("Arrival Information", {"name": data["confirmation_number"], "is_group_code":"Yes"}):
-            get_adults_count = frappe.db.get_value("Arrival Information", data["confirmation_number"], "no_of_adults")
-            get_percheckins_count = frappe.db.count('Precheckins', {'confirmation_number': ["like", data["confirmation_number"]+"%"]})
-            if get_percheckins_count == get_adults_count:
-                frappe.db.set_value(
-                    "Arrival Information",
-                    data["confirmation_number"],
-                    "virtual_checkin_status",
-                    "Yes",
-                )
+            # get_adults_count = frappe.db.get_value("Arrival Information", data["confirmation_number"], "no_of_adults")
+            # get_percheckins_count = frappe.db.count('Precheckins', {'confirmation_number': ["like", data["confirmation_number"]+"%"]})
+            # if get_percheckins_count == get_adults_count:
+            #     frappe.db.set_value(
+            #         "Arrival Information",
+            #         data["confirmation_number"],
+            #         "virtual_checkin_status",
+            #         "Yes",
+            #     )
+            pass
         else:
             frappe.db.set_value(
                 "Arrival Information",
