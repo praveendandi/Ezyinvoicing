@@ -78,6 +78,11 @@ def add_pre_checkins():
         count = 1
         guest_images = []
         for each in images:
+            if "id_type" in each:
+                if each["id_type"] == "passport":
+                    each["guest_id_type"] = "Foreigner"
+                else:
+                    each["guest_id_type"] = each["id_type"]
             if each["img_1"] != "":
                 name = data["confirmation_number"] + each["id_type"] + "front"
                 front = convert_base64_to_image(
@@ -98,7 +103,7 @@ def add_pre_checkins():
                 pre_checkins["image_2"] = back["message"]["file_url"]
             else:
                 pre_checkins["image_2"] = ""
-            pre_checkins["guest_id_type"] = each["id_type"]
+            # pre_checkins["guest_id_type"] = each["id_type"]
             pre_checkins.update(data)
             if "ids" in pre_checkins.keys():
                 del pre_checkins["ids"]
@@ -128,12 +133,23 @@ def add_pre_checkins():
             count += 1
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
-        frappe.db.set_value(
-            "Arrival Information",
-            data["confirmation_number"],
-            "virtual_checkin_status",
-            "Yes",
-        )
+        if frappe.db.exists("Arrival Information", {"name": data["confirmation_number"], "is_group_code":"Yes"}):
+            get_adults_count = frappe.db.get_value("Arrival Information", data["confirmation_number"], "no_of_adults")
+            get_percheckins_count = frappe.db.count('Precheckins', {'confirmation_number': ["like", data["confirmation_number"]+"%"]})
+            if get_percheckins_count == get_adults_count:
+                frappe.db.set_value(
+                    "Arrival Information",
+                    data["confirmation_number"],
+                    "virtual_checkin_status",
+                    "Yes",
+                )
+        else:
+            frappe.db.set_value(
+                "Arrival Information",
+                data["confirmation_number"],
+                "virtual_checkin_status",
+                "Yes",
+            )
         activity_data = {
             "doctype": "Activity Logs",
             "datetime": date_time,
