@@ -103,6 +103,17 @@ def add_pre_checkins():
                 pre_checkins["image_2"] = back["message"]["file_url"]
             else:
                 pre_checkins["image_2"] = ""
+            if each["img_3"] != "":
+                name = data["confirmation_number"] + each["id_type"] + "oci"
+                back = convert_base64_to_image(
+                    each["img_3"], name, site_folder_path, company
+                )
+                if "success" in back:
+                    if back["success"] is False:
+                        return back
+                pre_checkins["image_3"] = back["message"]["file_url"]
+            else:
+                pre_checkins["image_3"] = ""
             # pre_checkins["guest_id_type"] = each["id_type"]
             pre_checkins.update(data)
             if "ids" in pre_checkins.keys():

@@ -50,6 +50,7 @@
   "business_card",
   "image_1",
   "image_2",
+  "image_3",
   "epoch",
   "company",
   "smoking_preferences",
@@ -346,11 +347,16 @@
    "fieldname": "membership_number",
    "fieldtype": "Data",
    "label": "Membership Number"
+  },
+  {
+   "fieldname": "image_3",
+   "fieldtype": "Attach",
+   "label": "Image 3"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-30 12:35:33.626270",
+ "modified": "2022-04-11 15:18:42.013101",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",
