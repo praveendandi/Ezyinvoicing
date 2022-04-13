@@ -49,7 +49,8 @@
   "send_invoice_mail",
   "room_number",
   "checkin_time",
-  "checkout_time"
+  "checkout_time",
+  "group_checkin_detail_form"
  ],
  "fields": [
   {
@@ -289,15 +290,20 @@
    "fieldname": "checkout_time",
    "fieldtype": "Time",
    "label": "Checkout Time"
+  },
+  {
+   "default": "0",
+   "fieldname": "group_checkin_detail_form",
+   "fieldtype": "Check",
+   "label": "Group Checkin Detail Form"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-20 11:24:46.192107",
+ "modified": "2022-04-13 11:43:30.878831",
  "modified_by": "Administrator",
  "module": "Arrivals",
  "name": "Arrival Information",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
