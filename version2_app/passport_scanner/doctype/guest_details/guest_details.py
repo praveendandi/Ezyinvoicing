@@ -1636,9 +1636,9 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
 def guest_details_update(data={},name=None):
     try:
         if name and bool(data):
-            empty_details = empty_guest_details(name)
-            if not empty_details["success"]:
-                return empty_details
+            # empty_details = empty_guest_details(name)
+            # if not empty_details["success"]:
+            #     return empty_details
             frappe.db.set_value('Guest Details', name, data)
             frappe.db.commit()
             arrival_doc = frappe.get_doc("Guest Details", name)
