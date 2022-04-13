@@ -1639,6 +1639,9 @@ def guest_details_update(data={},name=None):
             # empty_details = empty_guest_details(name)
             # if not empty_details["success"]:
             #     return empty_details
+            if "guest_dob" in data:
+                if data["guest_dob"] == "" or data["guest_dob"] is None:
+                    del data["guest_dob"]
             frappe.db.set_value('Guest Details', name, data)
             frappe.db.commit()
             arrival_doc = frappe.get_doc("Guest Details", name)
