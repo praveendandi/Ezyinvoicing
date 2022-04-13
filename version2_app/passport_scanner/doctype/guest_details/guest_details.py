@@ -1632,17 +1632,19 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
         )
         return {"success": False, "message": str(e)}
 
-
+@frappe.whitelist(allow_guest=True)
 def guest_details_update(data={},name=None):
     try:
-        empty_details = empty_guest_details(name)
-        if not empty_details["success"]:
-            return empty_details
-        frappe.db.set_value('Guest Details', name, data)
-        frappe.db.commit()
-        arrival_doc = frappe.get_doc("Guest Details", name)
-        guest_update_attachment_logs(arrival_doc)
-        return {"success": True, "message": "data updated"}
+        if name and bool(data):
+            empty_details = empty_guest_details(name)
+            if not empty_details["success"]:
+                return empty_details
+            frappe.db.set_value('Guest Details', name, data)
+            frappe.db.commit()
+            arrival_doc = frappe.get_doc("Guest Details", name)
+            guest_update_attachment_logs(arrival_doc)
+            return {"success": True, "message": "data updated"}
+        return {"success": False, "message": "data should not be empty"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
