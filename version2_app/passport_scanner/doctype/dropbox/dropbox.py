@@ -836,9 +836,11 @@ def extract_id_details(data={}):
         )
         return {"success": False, "message": str(e)}
 
-
+@frappe.whitelist(allow_guest=True)
 def create_guest_details(data):
     try:
+        if not bool(data):
+            return {"success": False, "message": "data is empty"}
         if "guest_first_name" not in data:
             data["guest_first_name"] = "Guest"
         doc = frappe.get_doc(data)
