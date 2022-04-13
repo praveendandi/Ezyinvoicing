@@ -7,6 +7,7 @@ import frappe
 import pandas as pd
 import traceback
 import calendar
+import sys
 import numpy as np
 
 
@@ -105,5 +106,7 @@ def execute(filters=None):
 		return columns, data
 	except Exception as e:
 		# print(str(e))
+		exc_type, exc_obj, exc_tb = sys.exc_info()
+		frappe.log_error("Ezy-invoicing invoice_created Event","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
 		print(traceback.print_exc())
 		return {"success":False,"message":str(e)}
