@@ -127,7 +127,10 @@ def extract_summary_breakups(filters, summary):
             else:
                 sac_category = frappe.db.get_value(
                     "SAC HSN CODES", {"sac_index": each.sac_index}, "category")
-                each["service_type"] = sac_category
+                if sac_category:
+                    each["service_type"] = sac_category
+                else:
+                    return {"success": False, "message": "categories not found in sac/hsn codes"}
             # start_date = datetime.datetime.strptime(str(min(get_item_dates)),'%Y-%m-%d').strftime("%d %B %Y")
             start_date = min(get_item_dates).strftime("%d %B %Y")
             end_date = max(get_item_dates).strftime("%d %B %Y")

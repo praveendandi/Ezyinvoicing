@@ -28,7 +28,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Food\nRooms\nMiscellaneous",
+   "options": "Rooms\nFood & beverages\nFood IRD\nBanquet\nBanquet-ODC\nBanquet Hall hire\nOther banquet Misc\nBanquet AV\nLaundry\nSpa and Health Clubs\nConcierge service\nShared Services\nTobacco\nLiquor",
    "reqd": 1
   },
   {
@@ -83,7 +83,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-08 17:13:31.379362",
+ "modified": "2022-04-13 15:45:06.499530",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",
