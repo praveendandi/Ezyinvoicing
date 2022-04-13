@@ -18,9 +18,9 @@ def execute(filters=None):
 		fields = ['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','irn_number','ack_no','ack_date']
 		debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Debit Invoice']},fields=fields,as_list=True)
 		credit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Credit Invoice']},fields=fields,as_list=True)
-		sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
+		# sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
 
-		doc = debit_invoices+credit_invoices+sysCredit_invoices
+		doc = debit_invoices+credit_invoices
 		if len(doc) == 0:
 			data = []
 			columns = []
@@ -31,9 +31,8 @@ def execute(filters=None):
 		debit_names = [x[0] for x in debit_names_list]
 		credit_names_list = [list(x) for x in credit_invoices]
 		credit_names = [x[0] for x in credit_names_list]
-		sys_names_list = [list(x) for x in sysCredit_invoices]
-		sys_names = [x[0] for x in sys_names_list]
-		# print(invoice_names)
+		# sys_names_list = [list(x) for x in sysCredit_invoices]
+		# sys_names = [x[0] for x in sys_names_list]
 		items_fields = ['parent','sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount']
 		items_columns = ['invoice_number','sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount']
 		if len(debit_invoices)>0:
