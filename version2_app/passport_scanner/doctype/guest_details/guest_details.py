@@ -1130,13 +1130,13 @@ def guest_details_for_opera(confirmation_number: str = None):
             if not frappe.db.exists("Arrival Information", confirmation_number):
                 return {"success": False, "message": "reservation not found"}
             arrival_info = frappe.db.get_value('Arrival Information', confirmation_number, ["guest_first_name","guest_last_name","no_of_adults"], as_dict=True)
-            if company.ome_scanner == 1:
-                if not frappe.db.exists("Dropbox", {"merged_to": confirmation_number}):
-                    return {"success": True, "data": arrival_info, "is_guest_details": False}
+            # if company.ome_scanner == 1:
+            #     if not frappe.db.exists("Dropbox", {"merged_to": confirmation_number}):
+            #         return {"success": True, "arrival": arrival_info, "is_guest_details": False}
             if not frappe.db.exists(
                 "Guest Details", {"confirmation_number": confirmation_number}
             ):
-                return {"success": True, "data": arrival_info, "is_guest_details": False}
+                return {"success": True, "arrival": arrival_info, "is_guest_details": False}
             else:
                 get_guest_details = frappe.db.get_list(
                     "Guest Details",
@@ -1153,7 +1153,7 @@ def guest_details_for_opera(confirmation_number: str = None):
                 )
                 get_booking_status = frappe.db.get_value("Arrival Information", confirmation_number, "booking_status")
                 get_guest_details = [dict(item, booking_status=get_booking_status) for item in get_guest_details]
-                return {"success": True, "data": get_guest_details, "is_guest_details": True}
+                return {"success": True, "data": get_guest_details, "arrival": arrival_info, "is_guest_details": True, "type": "scan-ezy"}
         else:
             return {
                 "success": False,
@@ -1644,17 +1644,22 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
         )
         return {"success": False, "message": str(e)}
 
-
+@frappe.whitelist(allow_guest=True)
 def guest_details_update(data={},name=None):
     try:
-        empty_details = empty_guest_details(name)
-        if not empty_details["success"]:
-            return empty_details
-        frappe.db.set_value('Guest Details', name, data)
-        frappe.db.commit()
-        arrival_doc = frappe.get_doc("Guest Details", name)
-        guest_update_attachment_logs(arrival_doc)
-        return {"success": True, "message": "data updated"}
+        if name and bool(data):
+            # empty_details = empty_guest_details(name)
+            # if not empty_details["success"]:
+            #     return empty_details
+            if "guest_dob" in data:
+                if data["guest_dob"] == "" or data["guest_dob"] is None:
+                    del data["guest_dob"]
+            frappe.db.set_value('Guest Details', name, data)
+            frappe.db.commit()
+            arrival_doc = frappe.get_doc("Guest Details", name)
+            guest_update_attachment_logs(arrival_doc)
+            return {"success": True, "message": "data updated"}
+        return {"success": False, "message": "data should not be empty"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -1687,12 +1692,16 @@ def extract_data_getting_from_opera(document_type=None, image_1=None, image_2=No
                     "image_1": image_1,
                     "image_2": image_2,
                     "id_type": document_type,
-                    "reservation_number": confirmation_number
+                    "reservation_number": confirmation_number,
+                    "guest_details": guest_details
                 })
             if not extract_detils["success"]:
                 return extract_detils
             details.update(extract_detils["data"])
-            return {"success": False, "data": details}
+            if image_1:
+                if "guest_first_name" not in details:
+                    details["guest_first_name"] = "Guest"
+            return {"success": True, "data": details}
         else:
             return {"success": False, "message": "confirmation number or document type should be mandatory"}
     except Exception as e:
