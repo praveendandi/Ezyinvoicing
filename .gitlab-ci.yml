@@ -1,0 +1,17 @@
+image:
+  name: sonarsource/sonar-scanner-cli:latest
+  entrypoint: [""]
+variables:
+  SONAR_TOKEN: "b59206dc234c2b0884c96f69d3127f2f899085a4"
+  SONAR_HOST_URL: "http://202.62.75.94:9000"
+  GIT_DEPTH: 0
+sonarqube-check:
+  stage: test
+  script:
+    - sonar-scanner -Dsonar.qualitygate.wait=true
+  allow_failure: true
+  only:
+    - merge_requests
+    - master
+    - stable-version
+    - Merge_Branches
