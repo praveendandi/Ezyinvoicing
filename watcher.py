@@ -43,7 +43,7 @@ def getfiles():
                     print(line),
                 retval = p.wait()
                 if path.exists(file_path):
-                    # os.remove(file_path)
+                    os.remove(file_path)
                     pass
                 file_path = new_file_path
 
@@ -66,7 +66,7 @@ def getfiles():
             if path.exists(file_path):
                 pass
             #time.sleep(5)
-                # os.remove(file_path)
+                os.remove(file_path)
     except Exception as e:
         print(e,"am from exception")
         #invoicefile['file'].close()
