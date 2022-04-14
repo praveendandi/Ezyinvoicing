@@ -57,6 +57,7 @@ def aadhaar_data_changes(data):
         # data = flatdict.FlatDict(data, delimiter="_")
         aadhaar_details = {}
         if bool(data):
+            # print(data,"this aadhar data")
             df = pd.json_normalize(data, sep="_")
             data = df.to_dict(orient="records")[0]
             if "Aadhar_Face_Image_base_64" in data:
@@ -107,14 +108,27 @@ def aadhaar_data_changes(data):
                     address = address.replace("Address:", "").strip()
                     address = address.replace("\n", " ")
                 aadhaar_details["address1"] = address
+            
+
             if "aadhar_back_details_aadhar_back_details_PINCODE" in data:
-                pincode = data["aadhar_back_details_aadhar_back_details_PINCODE"]
+                pincode = ''.join([n for n in  data["aadhar_back_details_aadhar_back_details_PINCODE"] if n.isdigit()])
+    
                 regex_complie = re.compile(r"^[1-9]{1}[0-9]{2}[0-9]{3}$")
                 if re.match(regex_complie, pincode):
                     aadhaar_details["zip_code"] = pincode
                     address_details = get_address_from_zipcode(pincode)
                     if address_details["success"]:
                         aadhaar_details.update(address_details["data"])
+            if 'guest_state' not in aadhaar_details.keys() and "aadhar_back_details_aadhar_back_details_STATE" in data:
+                aadhaar_details['guest_state'] = data[
+                    "aadhar_back_details_aadhar_back_details_STATE"
+                ]
+
+            if "guest_city" not in aadhaar_details.keys() and "aadhar_back_details_aadhar_back_details_LOCATION" in data:
+                aadhaar_details['guest_city'] = data[
+                    "aadhar_back_details_aadhar_back_details_LOCATION"
+                ]
+
         aadhaar_details["guest_country"] = "IND"
         aadhaar_details["guest_nationality"] = "IND"
         aadhaar_details["status"] = "In House"
