@@ -138,13 +138,13 @@ def aadhaar_data_changes(data):
                 aadhaar_details["local_id_number"] = "".join(
                     re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
                 )
-                aadhaar_details["back_aadhaar_no"] = "".join(
-                    re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
-                )
-            else:
-                aadhaar_details["back_aadhaar_no"] = "".join(
-                    re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
-                )
+            #     aadhaar_details["back_aadhaar_no"] = "".join(
+            #         re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
+            #     )
+            # else:
+            #     aadhaar_details["back_aadhaar_no"] = "".join(
+            #         re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
+            #     )
         return {"success": True, "data": aadhaar_details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
