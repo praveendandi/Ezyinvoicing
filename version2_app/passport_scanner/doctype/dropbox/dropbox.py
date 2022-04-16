@@ -146,8 +146,9 @@ def create_doc_using_base_files(
         new_dropbox.id_type = id_type
         new_dropbox.front = front
         new_dropbox.guest_name = guest_name
+        new_dropbox.reservation_found = 1
 
-        if reseravtions_data:
+        # if reseravtions_data:
             # if dropbox_exist:
             #     last_drop_box = frappe.get_last_doc('Dropbox', reservation_number)
             #     if 'Guest' in last_drop_box.guest_name:
@@ -163,9 +164,9 @@ def create_doc_using_base_files(
             #     new_dropbox.room = reseravtions_data['room_no']
             #     new_dropbox.no_of_guests = reseravtions_data['no_of_adults'] + \
             #         reseravtions_data['no_of_children']
-            new_dropbox.reservation_found = 1
-        else:
-            new_dropbox.reservation_found = 0
+        #     new_dropbox.reservation_found = 1
+        # else:
+        #     new_dropbox.reservation_found = 0
 
         new_precheckin = frappe.new_doc("Precheckins")
         if front != "":
@@ -188,21 +189,21 @@ def create_doc_using_base_files(
                 new_dropbox.back = image_2_url["message"]["file_url"]
                 id_image2 = image_2_url["message"]["file_url"]
         new_precheckin.confirmation_number = reservation_number
-        if reseravtions_data:
-            new_precheckin.guest_id_type = id_type
-            new_precheckin.insert(ignore_permissions=True)
-            new_dropbox.merged = "Merged"
-            new_dropbox.merged_to = reservation_number
-            new_dropbox.merged_on = datetime.datetime.now()
-            new_dropbox.ocr_process_status = "Success"
-            new_dropbox.processing = 1
-            current_time = now.strftime("%H:%M:%S")
-            new_dropbox.processing_time = str(current_time)
-            # new_dropbox.insert(ignore_permissions=True)
-            arrival_info = frappe.get_doc("Arrival Information", reservation_number)
-            arrival_info.status = "Scanned"
-            arrival_info.virtual_checkin_status = "Yes"
-            arrival_info.save(ignore_permissions=True)
+        # if reseravtions_data:
+        new_precheckin.guest_id_type = id_type
+        new_precheckin.insert(ignore_permissions=True)
+        new_dropbox.merged = "Merged"
+        new_dropbox.merged_to = reservation_number
+        new_dropbox.merged_on = datetime.datetime.now()
+        new_dropbox.ocr_process_status = "Success"
+        new_dropbox.processing = 1
+        current_time = now.strftime("%H:%M:%S")
+        new_dropbox.processing_time = str(current_time)
+        # new_dropbox.insert(ignore_permissions=True)
+        arrival_info = frappe.get_doc("Arrival Information", reservation_number)
+        arrival_info.status = "Scanned"
+        arrival_info.virtual_checkin_status = "Yes"
+        arrival_info.save(ignore_permissions=True)
         new_dropbox.insert(ignore_permissions=True, ignore_links=True)
         frappe.db.commit()
 
