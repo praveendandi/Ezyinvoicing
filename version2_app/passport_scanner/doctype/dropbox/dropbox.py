@@ -8,7 +8,6 @@ import sys
 
 # from frappe.utils.data import format_datetime
 import time
-from tkinter.messagebox import NO
 import traceback
 
 import frappe
