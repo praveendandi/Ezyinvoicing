@@ -8,6 +8,7 @@ import sys
 
 # from frappe.utils.data import format_datetime
 import time
+from tkinter.messagebox import NO
 import traceback
 
 import frappe
@@ -131,6 +132,14 @@ def create_doc_using_base_files(
         # dropbox_exist = frappe.db.exists(
         #     {"doctype": "Dropbox", "reservation_no": reservation_number}
         # )
+        if reseravtions_data == None:
+            reservation_doc = frappe.new_doc('Arrival Information')
+            reservation_doc.confirmation_number = reservation_number
+            reservation_doc.checkin_date = datetime.datetime.today()
+            reservation_doc.arrival_date = datetime.datetime.today()
+            reservation_doc.number_of_guests = 1
+            reservation_doc.insert()
+            frappe.db.commit()
 
         new_dropbox = frappe.new_doc("Dropbox")
         new_dropbox.reservation_no = reservation_number
@@ -198,24 +207,25 @@ def create_doc_using_base_files(
         frappe.db.commit()
 
 
-        if reseravtions_data:
-            enqueue(
-                extract_id_details,
-                queue="default",
-                timeout=800000,
-                event="data_extraction",
-                now=False,
-                data={
-                    "image_1": image_1,
-                    "image_2": image_2,
-                    "id_type": id_type,
-                    "reservation_number": reservation_number,
-                    "id_image2": id_image2,
-                    "id_image1": id_image1,
-                    "dropbox": new_dropbox.name
-                },
-                is_async=True,
-            )
+       
+
+        enqueue(
+            extract_id_details,
+            queue="default",
+            timeout=800000,
+            event="data_extraction",
+            now=False,
+            data={
+                "image_1": image_1,
+                "image_2": image_2,
+                "id_type": id_type,
+                "reservation_number": reservation_number,
+                "id_image2": id_image2,
+                "id_image1": id_image1,
+                "dropbox": new_dropbox.name
+            },
+            is_async=True,
+        )
 
         return {"success": True, "Message": "Dropbox created successfully"}
     except Exception as e:
