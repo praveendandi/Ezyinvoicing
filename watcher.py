@@ -1,9 +1,11 @@
 import threading
 import requests
 import glob
-import os
+import os,random
 from os import path
 import time
+import subprocess
+
 # def printit():
 # 	threading.Timer(5.0, printit).start()
 # 	files = glob.glob("/home/caratred/test/*.pdf")
@@ -25,13 +27,28 @@ import time
 # 				os.remove(file_path)
 # printit()
 
+cid_issue = True
 def getfiles():
     try:
         time.sleep(5)
         print("waiting for print")
-        files = glob.glob("/home/frappe/files/*.pdf")
+        files = glob.glob("/home/caratred/Desktop/projects/watcher/invoice_files/*.pdf")
         for file_path in files:
-            data = {"company":"MJH-01","host":"http://0.0.0.0:8000/api/method/"}
+            random_nbr = str(random.randint(0, 9999))
+            new_file_path = file_path.split(".pdf")[0]+random_nbr+'.pdf'
+            if cid_issue == True:
+                cmd = "gs -dPDFA -dBATCH -dNOPAUSE -dUseCIEColor -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite -sPDFACompatibilityPolicy=1 -sOutputFile="+new_file_path+" "+file_path
+                p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                for line in p.stdout.readlines():
+                    print(line),
+                retval = p.wait()
+                if path.exists(file_path):
+                    os.remove(file_path)
+                    pass
+                file_path = new_file_path
+
+
+            data = {"company":"MJH-01","host":"http://0.0.0.0:8003/api/method/"} 
             print(data,"config data")
             invoicefile = {'file': open(file_path, 'rb')}
             payload = {
@@ -47,6 +64,7 @@ def getfiles():
             invoicefile['file'].close()
             #if file_response:
             if path.exists(file_path):
+                pass
             #time.sleep(5)
                 os.remove(file_path)
     except Exception as e:
