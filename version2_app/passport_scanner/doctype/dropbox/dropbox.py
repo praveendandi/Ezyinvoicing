@@ -138,7 +138,7 @@ def create_doc_using_base_files(
             reservation_doc.checkin_date = datetime.datetime.today()
             reservation_doc.arrival_date = datetime.datetime.today()
             reservation_doc.number_of_guests = 1
-            reseravtions_data.guest_first_name ='Guest'
+            reservation_doc.guest_first_name ='Guest'
             reservation_doc.insert()
             frappe.db.commit()
 
