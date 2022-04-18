@@ -898,7 +898,7 @@ def create_guest_details(data,name=None,update=False):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_images(name:str,now=False):
     '''
     reprocess images if not detected correctly
@@ -927,7 +927,7 @@ def reprocess_images(name:str,now=False):
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=now,
+                now=True,
                 data={
                     "image_1": image_1,
                     "image_2": image_2,
