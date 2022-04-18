@@ -1699,3 +1699,18 @@ def extract_data_getting_from_opera(document_type=None, image_1=None, image_2=No
             "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         return {"success": False, "message": str(e)}
+
+
+def rotate_image(base:str,name:str):
+    '''
+    rotate image based on base64
+    '''
+    try:
+        pass
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "rotate image",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
