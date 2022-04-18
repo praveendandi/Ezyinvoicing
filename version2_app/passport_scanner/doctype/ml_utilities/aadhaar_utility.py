@@ -56,6 +56,7 @@ def aadhaar_data_changes(data):
         company = frappe.get_last_doc("company")
         # data = flatdict.FlatDict(data, delimiter="_")
         aadhaar_details = {}
+        # print(data,"******************88")
         if bool(data):
             # print(data,"this aadhar data")
             df = pd.json_normalize(data, sep="_")
@@ -134,7 +135,7 @@ def aadhaar_data_changes(data):
         aadhaar_details["status"] = "In House"
         aadhaar_details["guest_id_type"] = "aadhaar"
         if "aadhar_back_no_details_aadhar_back_no" in data:
-            if 'local_id_number' not in aadhaar_details.keys():
+            if 'local_id_number' not in aadhaar_details.keys() and data["aadhar_back_no_details_aadhar_back_no"] != '':
                 aadhaar_details["local_id_number"] = "".join(
                     re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
                 )
@@ -145,6 +146,7 @@ def aadhaar_data_changes(data):
             #     aadhaar_details["back_aadhaar_no"] = "".join(
             #         re.findall(r"\d+", data["aadhar_back_no_details_aadhar_back_no"])
             #     )
+        # print(aadhaar_details,"heeelooo")
         return {"success": True, "data": aadhaar_details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
