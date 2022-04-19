@@ -132,10 +132,12 @@ def create_doc_using_base_files(
         #     {"doctype": "Dropbox", "reservation_no": reservation_number}
         # )
         if reseravtions_data == None:
+            current_time = now.strftime("%H:%M:%S")
             reservation_doc = frappe.new_doc('Arrival Information')
             reservation_doc.confirmation_number = reservation_number
             reservation_doc.checkin_date = datetime.datetime.today()
             reservation_doc.arrival_date = datetime.datetime.today()
+            reservation_doc.checkin_time = current_time
             reservation_doc.number_of_guests = 1
             reservation_doc.guest_first_name ='Guest'
             reservation_doc.insert()

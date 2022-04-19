@@ -17,6 +17,8 @@ import traceback
 import frappe
 import requests
 from frappe.model.document import Document
+# from PIL import Image
+
 
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import (
 #     merge_guest_to_guest_details,
@@ -1700,17 +1702,75 @@ def extract_data_getting_from_opera(document_type=None, image_1=None, image_2=No
         )
         return {"success": False, "message": str(e)}
 
-
-def rotate_image(base:str,name:str):
+@frappe.whitelist(allow_guest=True)
+def rotate_image(angle:str,name:str,front_back:str):
     '''
     rotate image based on base64
     '''
     try:
-        pass
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path + "/sites/" + company.site_name+'/public'
+        guest_details = frappe.get_doc('Guest Details',name)
+        if front_back == "front":
+            print(guest_details.id_image1)
+            img = Image.open(site_folder_path+guest_details.id_image1)
+            width, height = img.size
+            print(width, height)
+            x = img.rotate(int(angle),expand=True)
+            print(width, height)
+            x = x.crop(box=(x.size[0]/2 - img.size[0]/2,x.size[1]/2 - img.size[1]/2,x.size[0]/2 + img.size[0]/2,x.size[1]/2 + img.size[1]/2))
+            x.save(site_folder_path+guest_details.id_image1)
+
+        else:
+            print(guest_details.id_image2)
+            img = Image.open(site_folder_path+guest_details.id_image2)
+            x = img.rotate(int(angle),expand=True)
+            # img.save(site_folder_path+guest_details.id_image2)
+            x = x.crop(box=(x.size[0]/2 - img.size[0]/2,x.size[1]/2 - img.size[1]/2,x.size[0]/2 + img.size[0]/2,x.size[1]/2 + img.size[1]/2))
+            x.save(site_folder_path+guest_details.id_image2)
+
+
+       
+        return {"success":True,"message":"Please reprocess image"}
+        # else:
+        # return {"success":False,"message":"Error While rotationg Image please try again"}
+        
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "rotate image",
             "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
+
+
+
+def convert_base64_to_image(base, name, site_folder_path, company):
+    try:
+        file = site_folder_path + "/private/files/" + name + ".jpg"
+        # res = bytes(base, 'utf-8')
+        with open(file, "wb") as fh:
+            fh.write(base64.b64decode(base))
+        files = {"file": open(file, "rb")}
+        payload = {
+            "is_private": 0,
+            "folder": "Home"
+            # "doctype": "Precheckins",
+        }
+        site = company.host
+        upload_qr_image = requests.post(
+            site + "api/method/upload_file", files=files, data=payload
+        )
+        response = upload_qr_image.json()
+        if "message" in response:
+            return response
+    except Exception as e:
+        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-Guest Details Opera",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
         )
         return {"success": False, "message": str(e)}
