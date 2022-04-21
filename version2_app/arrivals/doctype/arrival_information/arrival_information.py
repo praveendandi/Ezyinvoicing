@@ -80,6 +80,7 @@ def arrivalActivity(company, file_url, source):
                 else:
                     confirmation_number = replace_new[column_indexs["CONFIRMATION_NO"]]
                     IS_GROUP_CODE = "No"
+                
                 reservation = {
                     "guest_title": replace_new[column_indexs["GUEST_TITLE"]],
                     "guest_first_name": replace_new[column_indexs["GUEST_FIRST_NAME"]],
@@ -153,81 +154,85 @@ def arrivalActivity(company, file_url, source):
                     if replace_new[column_indexs["DEPARTURE_DATE"]] != ""
                     else None
                 )
-                if frappe.db.exists(
-                    "Arrival Information", reservation["confirmation_number"]
-                ):
-                    arrival_info_doc = frappe.get_doc(
+                if reservation["booking_status"] != 'PROSPECT':
+                    if frappe.db.exists(
                         "Arrival Information", reservation["confirmation_number"]
-                    )
-                    if reservation["booking_status"] != "CANCELLED":
-                        if (
-                            arrival_info_doc.virtual_checkin_status == "No"
-                            and process is True
-                        ):
-                            duplicateCount += 1
-                            if reservation["booking_status"] == "CHECKED IN":
-                                reservation["checkin_date"] = reservation[
-                                    "arrival_date"
-                                ]
-                            if reservation["booking_status"] == "CHECKED OUT":
-                                reservation["checkout_date"] = reservation[
-                                    "departure_date"
-                                ]
-                            frappe.db.set_value(
-                                "Arrival Information",
-                                reservation["confirmation_number"],
-                                reservation,
-                            )
-                        else:
-                            alreadyCheckinCount += 1
+                    ):
+                        arrival_info_doc = frappe.get_doc(
+                            "Arrival Information", reservation["confirmation_number"]
+                        )
+                        if reservation["booking_status"] != "CANCELLED":
                             if (
-                                reservation["booking_status"] == "CHECKED IN"
-                                or reservation["booking_status"] == "CHECKED OUT"
+                                arrival_info_doc.virtual_checkin_status == "No"
+                                and process is True
                             ):
-                                update_reservation = {
-                                    "booking_status": reservation["booking_status"]
-                                }
+                                duplicateCount += 1
                                 if reservation["booking_status"] == "CHECKED IN":
-                                    update_reservation["checkin_date"] = reservation[
+                                    reservation["checkin_date"] = reservation[
                                         "arrival_date"
                                     ]
                                 if reservation["booking_status"] == "CHECKED OUT":
-                                    update_reservation["checkout_date"] = reservation[
+                                    reservation["checkout_date"] = reservation[
                                         "departure_date"
                                     ]
                                 frappe.db.set_value(
                                     "Arrival Information",
                                     reservation["confirmation_number"],
-                                    update_reservation,
+                                    reservation,
+                                )
+                            else:
+                                alreadyCheckinCount += 1
+                                if (
+                                    reservation["booking_status"] == "CHECKED IN"
+                                    or reservation["booking_status"] == "CHECKED OUT"
+                                ):
+                                    update_reservation = {
+                                        "booking_status": reservation["booking_status"]
+                                    }
+                                    if reservation["booking_status"] == "CHECKED IN":
+                                        update_reservation["checkin_date"] = reservation[
+                                            "arrival_date"
+                                        ]
+                                    if reservation["booking_status"] == "CHECKED OUT":
+                                        update_reservation["checkout_date"] = reservation[
+                                            "departure_date"
+                                        ]
+                                    frappe.db.set_value(
+                                        "Arrival Information",
+                                        reservation["confirmation_number"],
+                                        update_reservation,
+                                    )
+                        else:
+                            alreadyCheckinCount += 1
+                            duplicateCount += 1
+                            if (
+                                arrival_info_doc.booking_status == "DUE IN"
+                                or arrival_info_doc.booking_status == "RESERVED"
+                            ) and (arrival_info_doc.arrival_date >= arrival_date):
+                                frappe.db.set_value(
+                                    "Arrival Information",
+                                    reservation["confirmation_number"],
+                                    reservation,
+                                )
+                            if arrival_info_doc.booking_status == "CANCELLED":
+                                frappe.db.set_value(
+                                    "Arrival Information",
+                                    reservation["confirmation_number"],
+                                    reservation,
                                 )
                     else:
-                        alreadyCheckinCount += 1
-                        duplicateCount += 1
-                        if (
-                            arrival_info_doc.booking_status == "DUE IN"
-                            or arrival_info_doc.booking_status == "RESERVED"
-                        ) and (arrival_info_doc.arrival_date >= arrival_date):
-                            frappe.db.set_value(
-                                "Arrival Information",
-                                reservation["confirmation_number"],
-                                reservation,
-                            )
-                        if arrival_info_doc.booking_status == "CANCELLED":
-                            frappe.db.set_value(
-                                "Arrival Information",
-                                reservation["confirmation_number"],
-                                reservation,
-                            )
+                        if process:
+                            processedCount += 1
+                            reservation["doctype"] = "Arrival Information"
+                            arrival_info = frappe.get_doc(reservation)
+                            arrival_info.insert(ignore_permissions=True, ignore_links=True)
+                            frappe.db.commit()
+                        else:
+                            pass
+                    total_count += 1
                 else:
-                    if process:
-                        processedCount += 1
-                        reservation["doctype"] = "Arrival Information"
-                        arrival_info = frappe.get_doc(reservation)
-                        arrival_info.insert(ignore_permissions=True, ignore_links=True)
-                        frappe.db.commit()
-                    else:
-                        pass
-                total_count += 1
+                    print("booking_status is PROSPECT")
+            
         if total_count > 0:
             arrival_activity = {
                 "file_name": os.path.basename(file_url),
@@ -256,6 +261,8 @@ def arrivalActivity(company, file_url, source):
             event_doc = frappe.get_doc(activity_data)
             event_doc.insert()
             frappe.db.commit()
+
+        
         return {"success": True, "message": "Arrivals added successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
