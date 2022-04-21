@@ -91,7 +91,6 @@ def html_to_pdf(html_data, filename, name):
 def combine_pdf(files, filename, name):
     try:
         files = [values for each in files for key,values in each.items()]
-        print(files,"........")
         company = frappe.get_last_doc('company')
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
