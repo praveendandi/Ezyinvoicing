@@ -131,14 +131,26 @@ def create_doc_using_base_files(
         # dropbox_exist = frappe.db.exists(
         #     {"doctype": "Dropbox", "reservation_no": reservation_number}
         # )
+        if reseravtions_data == None:
+            current_time = now.strftime("%H:%M:%S")
+            reservation_doc = frappe.new_doc('Arrival Information')
+            reservation_doc.confirmation_number = reservation_number
+            reservation_doc.checkin_date = datetime.datetime.today()
+            reservation_doc.arrival_date = datetime.datetime.today()
+            reservation_doc.checkin_time = current_time
+            reservation_doc.number_of_guests = 1
+            reservation_doc.guest_first_name ='Guest'
+            reservation_doc.insert()
+            frappe.db.commit()
 
         new_dropbox = frappe.new_doc("Dropbox")
         new_dropbox.reservation_no = reservation_number
         new_dropbox.id_type = id_type
         new_dropbox.front = front
         new_dropbox.guest_name = guest_name
+        new_dropbox.reservation_found = 1
 
-        if reseravtions_data:
+        # if reseravtions_data:
             # if dropbox_exist:
             #     last_drop_box = frappe.get_last_doc('Dropbox', reservation_number)
             #     if 'Guest' in last_drop_box.guest_name:
@@ -154,9 +166,9 @@ def create_doc_using_base_files(
             #     new_dropbox.room = reseravtions_data['room_no']
             #     new_dropbox.no_of_guests = reseravtions_data['no_of_adults'] + \
             #         reseravtions_data['no_of_children']
-            new_dropbox.reservation_found = 1
-        else:
-            new_dropbox.reservation_found = 0
+        #     new_dropbox.reservation_found = 1
+        # else:
+        #     new_dropbox.reservation_found = 0
 
         new_precheckin = frappe.new_doc("Precheckins")
         if front != "":
@@ -179,43 +191,44 @@ def create_doc_using_base_files(
                 new_dropbox.back = image_2_url["message"]["file_url"]
                 id_image2 = image_2_url["message"]["file_url"]
         new_precheckin.confirmation_number = reservation_number
-        if reseravtions_data:
-            new_precheckin.guest_id_type = id_type
-            new_precheckin.insert(ignore_permissions=True)
-            new_dropbox.merged = "Merged"
-            new_dropbox.merged_to = reservation_number
-            new_dropbox.merged_on = datetime.datetime.now()
-            new_dropbox.ocr_process_status = "Success"
-            new_dropbox.processing = 1
-            current_time = now.strftime("%H:%M:%S")
-            new_dropbox.processing_time = str(current_time)
-            # new_dropbox.insert(ignore_permissions=True)
-            arrival_info = frappe.get_doc("Arrival Information", reservation_number)
-            arrival_info.status = "Scanned"
-            arrival_info.virtual_checkin_status = "Yes"
-            arrival_info.save(ignore_permissions=True)
+        # if reseravtions_data:
+        new_precheckin.guest_id_type = id_type
+        new_precheckin.insert(ignore_permissions=True)
+        new_dropbox.merged = "Merged"
+        new_dropbox.merged_to = reservation_number
+        new_dropbox.merged_on = datetime.datetime.now()
+        new_dropbox.ocr_process_status = "Success"
+        new_dropbox.processing = 1
+        current_time = now.strftime("%H:%M:%S")
+        new_dropbox.processing_time = str(current_time)
+        # new_dropbox.insert(ignore_permissions=True)
+        arrival_info = frappe.get_doc("Arrival Information", reservation_number)
+        arrival_info.status = "Scanned"
+        arrival_info.virtual_checkin_status = "Yes"
+        arrival_info.save(ignore_permissions=True)
         new_dropbox.insert(ignore_permissions=True, ignore_links=True)
         frappe.db.commit()
 
 
-        if reseravtions_data:
-            enqueue(
-                extract_id_details,
-                queue="default",
-                timeout=800000,
-                event="data_extraction",
-                now=False,
-                data={
-                    "image_1": image_1,
-                    "image_2": image_2,
-                    "id_type": id_type,
-                    "reservation_number": reservation_number,
-                    "id_image2": id_image2,
-                    "id_image1": id_image1,
-                    "dropbox": new_dropbox.name
-                },
-                is_async=True,
-            )
+       
+
+        enqueue(
+            extract_id_details,
+            queue="default",
+            timeout=800000,
+            event="data_extraction",
+            now=False,
+            data={
+                "image_1": image_1,
+                "image_2": image_2,
+                "id_type": id_type,
+                "reservation_number": reservation_number,
+                "id_image2": id_image2,
+                "id_image1": id_image1,
+                "dropbox": new_dropbox.name
+            },
+            is_async=True,
+        )
 
         return {"success": True, "Message": "Dropbox created successfully"}
     except Exception as e:
@@ -750,6 +763,7 @@ def create_guest_using_base_files(
 def extract_id_details(data={}):
     try:
         details = {}
+        print(data['id_type'])
         if data["id_type"] == "aadhaar":
             if data["image_1"]:
                 aadhaar_front_details = fetch_aadhaar_details(data["image_1"], None)
@@ -798,36 +812,42 @@ def extract_id_details(data={}):
             pass
         else:
             pass
-        if "id_image1" in data:
-            details["id_image1"] = data["id_image1"]
-        if "id_image2" in data:
-            details["id_image2"] = data["id_image2"]
-        if "guest_id_type" not in details:
-            details["guest_id_type"] = data["id_type"]
-        details["doctype"] = "Guest Details"
-        details["confirmation_number"] = data["reservation_number"]
-        if "merged_to" in data:
-            if data["merged_to"] != "" or data["merged_to"] is not None:
-                details["confirmation_number"] = data["merged_to"]
-        if details:
-            if "guest_details" in data:
-                return {"success": True, "data": details}
-            guest_details = create_guest_details(details)
-            if not guest_details["success"]:
-                return guest_details
-            if "dropbox" in data:
-                if data["dropbox"] or data["dropbox"] != "":
-                    dropbox_doc = frappe.get_doc('Dropbox', data["dropbox"])
-                    dropbox_doc.processing = 0
-                    started_time = str(dropbox_doc.processing_time)
-                    now = datetime.datetime.now()
-                    current_time = now.strftime("%H:%M:%S")
-                    dropbox_doc.processing_time = datetime.datetime.strptime(current_time, '%H:%M:%S') - datetime.datetime.strptime(started_time, '%H:%M:%S')
-                    dropbox_doc.save(ignore_permissions=True, ignore_version=True)
-                    frappe.db.commit()
-            return {"success": True, "data": details}
+        
+        if "guest_details_name" in data:
+            # details["doctype"] = "Guest Details"
+            # details["name"] = data["guest_details_name"]
+            guest_details = create_guest_details(details,data["guest_details_name"],True)
         else:
-            return {"success": False, "message": "Something went wrong"}
+            if "id_image1" in data:
+                details["id_image1"] = data["id_image1"]
+            if "id_image2" in data:
+                details["id_image2"] = data["id_image2"]
+            if "guest_id_type" not in details:
+                details["guest_id_type"] = data["id_type"]
+            details["doctype"] = "Guest Details"
+            details["confirmation_number"] = data["reservation_number"]
+            if "merged_to" in data:
+                if data["merged_to"] != "" or data["merged_to"] is not None:
+                    details["confirmation_number"] = data["merged_to"]
+            if details:
+                if "guest_details" in data:
+                    return {"success": True, "data": details}
+                guest_details = create_guest_details(details)
+                if not guest_details["success"]:
+                    return guest_details
+                if "dropbox" in data:
+                    if data["dropbox"] or data["dropbox"] != "":
+                        dropbox_doc = frappe.get_doc('Dropbox', data["dropbox"])
+                        dropbox_doc.processing = 0
+                        started_time = str(dropbox_doc.processing_time)
+                        now = datetime.datetime.now()
+                        current_time = now.strftime("%H:%M:%S")
+                        dropbox_doc.processing_time = datetime.datetime.strptime(current_time, '%H:%M:%S') - datetime.datetime.strptime(started_time, '%H:%M:%S')
+                        dropbox_doc.save(ignore_permissions=True, ignore_version=True)
+                        frappe.db.commit()
+                return {"success": True, "data": details}
+            else:
+                return {"success": False, "message": "Something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -837,20 +857,37 @@ def extract_id_details(data={}):
         return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def create_guest_details(data):
+def create_guest_details(data,name=None,update=False):
     try:
-        if not bool(data):
-            return {"success": False, "message": "data is empty"}
-        if "guest_first_name" not in data:
-            data["guest_first_name"] = "Guest"
-        if "guest_dob" in data:
-            if data["guest_dob"] == "" or data["guest_dob"] is None:
-                del data["guest_dob"]
-        doc = frappe.get_doc(data)
-        doc.insert(ignore_permissions=True)
-        frappe.db.commit()
-        # guest_attachments(doc, method="Manula")
-        return {"success": True, "message": "Guest Created"}
+        if update == False:
+            if not bool(data):
+                return {"success": False, "message": "data is empty"}
+            if "guest_first_name" not in data:
+                data["guest_first_name"] = "Guest"
+            if "guest_dob" in data:
+                if data["guest_dob"] == "" or data["guest_dob"] is None:
+                    del data["guest_dob"]
+            doc = frappe.get_doc(data)
+            doc.insert(ignore_permissions=True)
+            frappe.db.commit()
+            # guest_attachments(doc, method="Manula")
+            return {"success": True, "message": "Guest Created"}
+        else:
+            if not bool(data):
+                return {"success": False, "message": "data is empty"}
+            if "guest_first_name" not in data:
+                data["guest_first_name"] = "Guest"
+            if "guest_dob" in data:
+                if data["guest_dob"] == "" or data["guest_dob"] is None:
+                    del data["guest_dob"]
+            print(data)
+            print(name)
+
+            frappe.db.set_value('Guest Details',name,data)
+            # frappe.db.commit()
+            # doc.insert(ignore_permissions=True)
+            # guest_attachments(doc, method="Manula")
+            return {"success": True, "message": "Guest Updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -858,3 +895,63 @@ def create_guest_details(data):
             "create_guest_details",
         )
         return {"success": False, "message": str(e)}
+
+
+
+
+
+@frappe.whitelist()
+def reprocess_images(name:str,now=False):
+    '''
+    reprocess images if not detected correctly
+
+    '''
+    try:
+        # company = frappe.get_last_doc("company")
+        # folder_path = frappe.utils.get_bench_path()
+        # site_folder_path = folder_path + "/sites/" + company.site_name
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
+        private_folder_path = folder_path + "/sites/" + company.site_name
+        guest_details = frappe.get_doc('Guest Details',name)
+        print(site_folder_path+guest_details.id_image1)
+
+        with open(site_folder_path+guest_details.id_image1, "rb") as image_file:
+            encoded_string_image_1 = base64.b64encode(image_file.read())
+            image_1 = encoded_string_image_1.decode("utf-8")
+        
+        with open(site_folder_path+guest_details.id_image2, "rb") as image_file:
+            encoded_string_image_2 = base64.b64encode(image_file.read())
+            image_2 = encoded_string_image_2.decode("utf-8")
+        enqueue(
+                extract_id_details,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=True,
+                data={
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": guest_details.guest_id_type,
+                    "reservation_number": guest_details.confirmation_number,
+                    "guest_details_name":name
+                },
+                is_async=True,
+            )
+        
+        return {
+            "success":True,
+            "message":"Reprocess Done sucessfully"
+        }
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "create_doc_using_base_files",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        print(e)
+        return {
+            "success": False,
+            "Message": "Error While reporcess images",
+        }

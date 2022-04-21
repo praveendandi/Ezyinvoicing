@@ -21,7 +21,7 @@ def fetch_passport_details(image_1=None, image_2=None):
         company = frappe.get_last_doc("company")
         post_data = {
             "base": image_1 if image_1 is not None else image_2,
-            "thresh": 0.4,
+            "thresh": 0.4,  
             # "class": "indianpassport",
             "version": "v2",
             "filters": ["confidence", "detections", "predection", "file_name"],
@@ -49,6 +49,7 @@ def fetch_passport_details(image_1=None, image_2=None):
         )
         return {"success": False, "message": str(e)}
 
+from datetime import datetime
 
 # @frappe.whitelist(allow_guest=True)
 def passport_data_changes(data={}, image_1=None, image_2=None):
@@ -92,10 +93,21 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                     ]
                 if "passport_details_passport_details_birth_date" in data:
                     try:
-                        passport_details["guest_dob"] = format_date(
+                        passport_dob = format_date(
                             data["passport_details_passport_details_birth_date"].strip(),
                             "yyyy-mm-dd",
                         )
+                        passport_details["guest_dob"] = ""
+                        past = datetime.strptime(passport_dob, "%Y-%m-%d")
+                        present = datetime.now()
+                        if past.date() < present.date():
+                            print("earlier")
+                            passport_details["guest_dob"] = passport_dob
+                        else:
+                            print("wrong")
+
+
+
                     except Exception as e:
                         print(str(e))
                 if "passport_details_passport_details_expiry_date" in data:
