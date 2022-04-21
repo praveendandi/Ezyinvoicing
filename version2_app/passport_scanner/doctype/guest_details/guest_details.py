@@ -1126,7 +1126,7 @@ def update_company(company_code, obj):
 @frappe.whitelist(allow_guest=True)
 def guest_details_for_opera(confirmation_number: str = None):
     try:
-        company = frappe.get_last_doc("company")
+        # company = frappe.get_last_doc("company")
         if confirmation_number:
             if not frappe.db.exists("Arrival Information", confirmation_number):
                 return {"success": False, "message": "reservation not found"}
@@ -1137,7 +1137,11 @@ def guest_details_for_opera(confirmation_number: str = None):
             if not frappe.db.exists(
                 "Guest Details", {"confirmation_number": confirmation_number}
             ):
-                return {"success": True, "arrival": arrival_info, "is_guest_details": False}
+                get_list = frappe.db.get_list("Precheckins",filters={"confirmation_number": confirmation_number},fields=["guest_first_name","guest_last_name","no_of_adults","no_of_children","confirmation_number","address1","address2","zip_code","guest_city","guest_state","guest_country","guest_dob","guest_age","guest_nationality","guest_id_type","image_1","image_2","image_3"])
+                if len(get_list)>0:
+                    return {"success": True, "checkins": get_list, "is_guest_details": False, "pre_checkins":True}
+                else:
+                    return {"success": True, "arrival": arrival_info, "is_guest_details": False, "pre_checkins":False}
             else:
                 get_guest_details = frappe.db.get_list(
                     "Guest Details",
@@ -1154,7 +1158,7 @@ def guest_details_for_opera(confirmation_number: str = None):
                 )
                 get_booking_status = frappe.db.get_value("Arrival Information", confirmation_number, "booking_status")
                 get_guest_details = [dict(item, booking_status=get_booking_status) for item in get_guest_details]
-                return {"success": True, "data": get_guest_details, "arrival": arrival_info, "is_guest_details": True, "type": "scan-ezy"}
+                return {"success": True, "data": get_guest_details, "arrival": arrival_info, "is_guest_details": True, "type": "scan-ezy", "pre_checkins":False}
         else:
             return {
                 "success": False,
