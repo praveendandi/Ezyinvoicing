@@ -10,9 +10,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import frappe
+import base64
 import pandas as pd
 import pdfkit
 import requests
+import sys
 from frappe.core.doctype.communication.email import make
 from frappe.model.document import Document
 from frappe.utils import cstr
@@ -26,13 +28,44 @@ class SummaryBreakups(Document):
     pass
 
 
+def convert_image_to_base64(image):
+    try:
+        with open(image, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        encoded_str = encoded_string.decode("utf-8")
+        print(encoded_str)
+        return {"success": True, "data": encoded_str}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-Guest Details Opera",
+            str(e),
+        )
+        return {"success": False, "message": str(e)}
+
 @frappe.whitelist(allow_guest=True)
 def summary_print_formats(name):
     try:
         doc = frappe.db.get_value(
             "Summaries", name, ["name", "tax_payer_details"], as_dict=1)
         if doc:
-            # company = frappe.get_last_doc("company")
+            company = frappe.get_last_doc("company")
+            if company.company_logo:
+                company_logo = company.company_logo
+                folder_path = frappe.utils.get_bench_path()
+                site_folder_path = folder_path + "/sites/" + company.site_name
+                file_path1 = (
+                        folder_path
+                        + "/sites/"
+                        + company.site_name
+                        + company.company_logo
+                    )
+                convimgtobase = convert_image_to_base64(file_path1)
+                if not convimgtobase["success"]:
+                    return convimgtobase
+                doc["base"] = "data:image/png;base64,"+convimgtobase["data"]
+            else:
+                doc["base"] = ""
             get_categroies = frappe.db.get_list(
                 "Summary Breakups", {"summaries": name}, pluck="category")
             if len(get_categroies) > 0:
