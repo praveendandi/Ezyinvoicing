@@ -1141,7 +1141,7 @@ def guest_details_for_opera(confirmation_number: str = None):
             ):
                 get_list = frappe.db.get_list("Precheckins",filters={"confirmation_number": ["like",confirmation_number+"%"]},fields=["guest_first_name","guest_last_name","no_of_adults","no_of_children","substring_index(confirmation_number,'-',1) as confirmation_number","address1","address2","zip_code","guest_city","guest_state","guest_country","guest_dob","guest_age","guest_nationality","guest_id_type","image_1","image_2","image_3"])
                 if len(get_list)>0:
-                    return {"success": True, "data": get_list, "is_guest_details": False, "pre_checkins":True}
+                    return {"success": True, "arrival": arrival_info, "data": get_list, "is_guest_details": False, "pre_checkins":True}
                 else:
                     return {"success": True, "arrival": arrival_info, "is_guest_details": False, "pre_checkins":False}
             else:
