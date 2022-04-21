@@ -1,0 +1,51 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2022-04-20 16:56:05.979156",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "json": "{}",
+ "modified": "2022-04-21 10:07:38.880548",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "Invoices Not In Summary",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Invoices",
+ "report_name": "Invoices Not In Summary",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "ezy-IT"
+  },
+  {
+   "role": "ezy-Finance"
+  },
+  {
+   "role": "ezy-FrontOffice"
+  },
+  {
+   "role": "Guest"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "ezy-Inbox"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "All"
+  }
+ ]
+}

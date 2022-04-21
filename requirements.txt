@@ -26,8 +26,6 @@ pytesseract
 WeasyPrint==52
 html2text
 # opencv-python
-datefinder
-flatdict
-pgeocode
+typing-extensions
 paytmchecksum
 # opencv-python
