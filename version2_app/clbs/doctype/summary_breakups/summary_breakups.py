@@ -77,7 +77,10 @@ def summary_print_formats(name):
                 total_reports = []
                 # html = ""
                 for each_template in templates:
-                    html_data = frappe.render_template(each_template["html"], doc)
+                    if each_template in ["Summary","Rooms"]:
+                        html_data = frappe.render_template(each_template["html"], doc)
+                    else:
+                        pass
                     # if company.clbs_document_preview == "INDIVIDUAL":
                     # total_reports.append({each_template["name"]:html})
                     total_reports.append({each_template["name"]: html_data, "category": each_template["name"]})
