@@ -12,7 +12,9 @@
   "company",
   "summaries",
   "summary_breakup_details",
-  "invoice_number"
+  "invoice_number",
+  "sac_codes",
+  "deleted_breakups"
  ],
  "fields": [
   {
@@ -26,7 +28,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Category",
-   "options": "Food\nRooms\nMiscellaneous",
+   "options": "Rooms\nFood & beverages\nFood IRD\nBanquet\nBanquet-ODC\nBanquet Hall hire\nOther banquet Misc\nBanquet AV\nLaundry\nSpa and Health Clubs\nConcierge service\nShared Services\nTobacco\nLiquor",
    "reqd": 1
   },
   {
@@ -66,11 +68,22 @@
    "fieldname": "invoice_number",
    "fieldtype": "Data",
    "label": "Invoice Number"
+  },
+  {
+   "fieldname": "sac_codes",
+   "fieldtype": "Small Text",
+   "label": "SAC Codes"
+  },
+  {
+   "default": "0",
+   "fieldname": "deleted_breakups",
+   "fieldtype": "Check",
+   "label": "Deleted Breakups"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 09:56:40.060307",
+ "modified": "2022-04-13 15:45:06.499530",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",

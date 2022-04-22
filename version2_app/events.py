@@ -2586,6 +2586,16 @@ def summaries_insert(doc, method=None):
         start_date = datetime.datetime.strptime(doc.from_date,"%Y-%m-%d").strftime("%d %B %Y")
         end_date = datetime.datetime.strptime(doc.to_date,"%Y-%m-%d").strftime("%d %B %Y")
         doc.between_dates = start_date+" to "+end_date
+        today_date = datetime.datetime.today().strftime('%Y%m%d')
+        reference = frappe.db.get_list('Summaries',filters=[["name",'!=',doc.name],["tax_payer_details","=",doc.tax_payer_details]],order_by='creation desc',pluck='reference')
+        if len(reference) > 0:
+            if reference[0]:
+                reference_number = int(reference[0].split("-")[-1])
+                doc.reference = doc.tax_payer_details+"-"+today_date
+            else:
+                doc.reference = doc.tax_payer_details+"-"+today_date
+        else:
+            doc.reference = doc.tax_payer_details+"-"+today_date
         doc.save(ignore_permissions=True, ignore_version=True)
     except Exception as e:
         frappe.log_error(str(e), "summaries_insert")
