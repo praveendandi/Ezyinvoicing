@@ -15,7 +15,7 @@ import qrcode
 import requests
 from frappe.model.document import Document
 from frappe.utils.background_jobs import enqueue
-
+from version2_app.passport_scanner.doctype.dropbox.dropbox import extract_id_details
 
 class Precheckins(Document):
     pass
@@ -81,6 +81,8 @@ def add_pre_checkins():
             if "id_type" in each:
                 if each["id_type"] == "passport":
                     each["guest_id_type"] = "Foreigner"
+                elif each["id_type"] == "others":
+                    each["guest_id_type"] = "other"
                 else:
                     each["guest_id_type"] = each["id_type"]
             if each["img_1"] != "":
@@ -92,6 +94,8 @@ def add_pre_checkins():
                     if front["success"] is False:
                         return front
                 pre_checkins["image_1"] = front["message"]["file_url"]
+            else:
+                pre_checkins["image_1"] = ""
             if each["img_2"] != "":
                 name = data["confirmation_number"] + each["id_type"] + "back"
                 back = convert_base64_to_image(
@@ -143,6 +147,22 @@ def add_pre_checkins():
                 {"image1": pre_checkins["image_1"], "image2": pre_checkins["image_2"]}
             )
             count += 1
+            enqueue(
+                extract_id_details,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=False,
+                data={
+                    "image_1": each["img_1"] if each["img_1"] != "" else None,
+                    "image_2": each["img_1"] if each["img_1"] != "" else None,
+                    "id_type": each["guest_id_type"],
+                    "reservation_number": data["confirmation_number"],
+                    "id_image2": pre_checkins["image_1"] if pre_checkins["image_1"] != "" else None,
+                    "id_image1": pre_checkins["image_2"] if pre_checkins["image_2"] != "" else None
+                },
+                is_async=True,
+            )
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
         if frappe.db.exists("Arrival Information", {"name": data["confirmation_number"], "is_group_code":"Yes"}):
