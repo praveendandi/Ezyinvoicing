@@ -65,10 +65,15 @@ def create_pos_bills(data):
                                     added_text1 = "Guest Copy\n\n".encode("utf-8")
                                 elif count == 1:
                                     added_text1 = "Merchant Copy\n".encode("utf-8")
+                                elif count == 2:
+                                    added_text1 = "Finance Copy\n".encode("utf-8")
                                 if company_doc.enable_pos_extra_text == 1:
                                     added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    if count != 1:
+                                        added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                                 else:
                                     added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                             give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,short_url['short_url'])
                         data["printed"] = 1
                 else:
@@ -78,10 +83,15 @@ def create_pos_bills(data):
                                 added_text1 = "Guest Copy\n\n".encode("utf-8")
                             elif count == 1:
                                 added_text1 = "Merchant Copy\n".encode("utf-8")
+                            elif count == 2:
+                                added_text1 = "Finance Copy\n".encode("utf-8")
                             if company_doc.enable_pos_extra_text == 1:
                                 added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                if count != 1:
+                                    added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                             else:
                                 added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                         give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number)
                     data["printed"] = 1
             if outlet_doc.print == "Yes" and data["check_type"] == "Check Closed":
@@ -96,12 +106,18 @@ def create_pos_bills(data):
                             added_text1 = "Guest Copy\n\n".encode("utf-8")
                         elif count == 1:
                             added_text1 = "Merchant Copy\n".encode("utf-8")
+                        elif count == 2:
+                            added_text1 = "Finance Copy\n".encode("utf-8")
                         if company_doc.enable_pos_extra_text == 1:
                             added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            if count != 1:
+                                added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                         else:
                             added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                     if company_doc.pos_footer:
                         data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
+                    print(added_text,"/////")
                     give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
                 data["gcp_file_url"] = pos_bills['data']
                 data["printed"] = 1
@@ -264,29 +280,35 @@ def razorPay(total_bill_amount,check_no,outlet,company_doc):
 
 def add_extra_text_while_print(check_no,outlet,company_doc):
     try:
-        text = company_doc.pos_text
+        if company_doc.pos_text:
+            text = company_doc.pos_text
+        else:
+            text = ""
         outlet_doc = frappe.get_doc("Outlets",outlet)
-        format = outlet_doc.invoice_number_format
-        monformat = ""
-        yearformat = ""
-        dayformat = ""
-        x = datetime.now()
-        if format:
-            countofy = format.count("Y")
-            if countofy!=0:
-                yearformat = x.strftime("%y") if countofy == 2 else x.strftime("%Y")
-            countofm = format.count("M")
-            if countofm!=0:
-                monformat = x.strftime("%m") if countofy == 2 else x.strftime("%m")
-            countofd = format.count("D")
-            if countofd!=0:
-                dayformat = x.strftime("%d")
-        # company_name = '{}'.format(company_doc.company_name)+"\n"+company_doc.address_1+"\n"
-        # address = company_doc.address_2+", "+company_doc.location+"-"+str(company_doc.pincode)+", INDIA"
-        # mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
-        # gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{} CIN NO:{}\nPlace Of Supply:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,company_doc.place_of_supply)
-        invoice_number = "\nInvoice No "+yearformat+monformat+dayformat+check_no + "\n"
-        # print(invoice_number,"-----------------------------------------")
+        if outlet_doc.invoice_number_format:
+            format = outlet_doc.invoice_number_format
+            monformat = ""
+            yearformat = ""
+            dayformat = ""
+            x = datetime.now()
+            if format:
+                countofy = format.count("Y")
+                if countofy!=0:
+                    yearformat = x.strftime("%y") if countofy == 2 else x.strftime("%Y")
+                countofm = format.count("M")
+                if countofm!=0:
+                    monformat = x.strftime("%m") if countofy == 2 else x.strftime("%m")
+                countofd = format.count("D")
+                if countofd!=0:
+                    dayformat = x.strftime("%d")
+        
+            # company_name = '{}'.format(company_doc.company_name)+"\n"+company_doc.address_1+"\n"
+            # address = company_doc.address_2+", "+company_doc.location+"-"+str(company_doc.pincode)+", INDIA"
+            # mobile = "\nTel:"+company_doc.phone_number+" "+outlet_doc.website
+            # gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{} CIN NO:{}\nPlace Of Supply:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,company_doc.place_of_supply)
+            invoice_number = "\nInvoice No "+yearformat+monformat+dayformat+check_no + "\n"
+        else:
+            invoice_number = ""
         return {"success":True,"string":text,"invoice_number":invoice_number}
     except Exception as e:
         print(str(e))
