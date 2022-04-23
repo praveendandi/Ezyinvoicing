@@ -70,24 +70,27 @@ def summary_print_formats(name):
                 "Summary Breakups", {"summaries": name}, pluck="category")
             if len(get_categroies) > 0:
                 get_categroies.append("Summary")
-                templates = frappe.db.get_all("Print Format", filters={
-                    "name": ["in", get_categroies]}, fields=["*"])
-                if len(templates) == 0:
-                    return {"success": False, ",message": "please add print formats"}
+                # templates = frappe.db.get_all("Print Format", filters={
+                #     "name": ["in", get_categroies]}, fields=["*"])
+                # if len(templates) == 0:
+                    # return {"success": False, ",message": "please add print formats"}
+                get_categroies = list(set(get_categroies))
                 total_reports = []
-                # html = ""
-                for each_template in templates:
-                    if each_template in ["Summary","Rooms"]:
-                        html_data = frappe.render_template(each_template["html"], doc)
+                for category in get_categroies:
+                    if category in ["Summary","Rooms"]:
+                        if category == "Summary":
+                            category = "Summary With Border"
+                        templates = frappe.db.get_value("Print Format", {"name": category}, ["html"])
+                        if not templates:
+                            return {"success": False, ",message": "please add print formats"}
+                        html_data = frappe.render_template(templates, doc)
                     else:
-                        pass
-                    # if company.clbs_document_preview == "INDIVIDUAL":
-                    # total_reports.append({each_template["name"]:html})
-                    total_reports.append({each_template["name"]: html_data, "category": each_template["name"]})
-                    # else:
-                    #     html += (html_data + '<div style="page-break-before: always;"></div>')
-                # if company.clbs_document_preview == "COMBINED":
-                #     total_reports = [{each_template["name"]: html, "category": "Summary"}]
+                        templates = frappe.db.get_value("Print Format", {"name": "Category"}, ["html"])
+                        if not templates:
+                            return {"success": False, ",message": "please add print formats"}
+                        doc["category"] =  category
+                        html_data = frappe.render_template(templates, doc)
+                    total_reports.append({category: html_data, "category": category})
                 return {"success": True, "html": total_reports}
             else:
                 return {"success": False, "message": "summary breakups not found"}
@@ -173,7 +176,7 @@ def download_pdf(name):
                 if not combine:
                     return combine
                 file_urls = []
-                file_urls.append({each["category"]: combine["file_url"]})
+                file_urls.append({"Summary": combine["file_url"]})
             return {"success": True, "files": file_urls}
         else:
             return {"success": False, "message": "no data found"}
@@ -531,7 +534,7 @@ def send_summary_mail(data):
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
         files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
-        if not files:
+        if len(files) == 0:
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
