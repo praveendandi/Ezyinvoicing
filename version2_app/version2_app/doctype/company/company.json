@@ -145,10 +145,12 @@
   "summary_header",
   "summary_terms_and_conditions",
   "summary_footer",
+  "vat_reporting",
+  "show_pending_invoices_in_reports",
+  "clbs_section",
   "clbs",
   "cc_mail_ids_for_clbs_reports",
-  "vat_reporting",
-  "show_pending_invoices_in_reports"
+  "clbs_document_preview"
  ],
  "fields": [
   {
@@ -958,11 +960,23 @@
    "fieldname": "show_pending_invoices_in_reports",
    "fieldtype": "Check",
    "label": "Show Pending Invoices In Reports"
+  },
+  {
+   "default": "INDIVIDUAL",
+   "fieldname": "clbs_document_preview",
+   "fieldtype": "Select",
+   "label": "CLBS Document Preview",
+   "options": "INDIVIDUAL\nCOMBINED"
+  },
+  {
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-04 12:38:58.132859",
+ "modified": "2022-04-19 12:15:10.248447",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -21,7 +21,8 @@
   "terms_and_conditions",
   "contacts",
   "status",
-  "reference"
+  "reference",
+  "po_number"
  ],
  "fields": [
   {
@@ -117,11 +118,16 @@
    "fieldname": "reference",
    "fieldtype": "Data",
    "label": "Reference"
+  },
+  {
+   "fieldname": "po_number",
+   "fieldtype": "Data",
+   "label": "PO Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-13 15:41:27.183473",
+ "modified": "2022-04-21 14:54:12.015780",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
