@@ -117,8 +117,10 @@ def create_pos_bills(data):
                             added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
                     if company_doc.pos_footer:
                         data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
-                    print(added_text,"/////")
-                    give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl)
+                    extra_text_after_qr = None
+                    if company_doc.pos_extra_text_after_qr:
+                        extra_text_after_qr = company_doc.pos_extra_text_after_qr
+                    give_print(data["payload"],printer_doc.printer_ip,logopath,qrpath,port,company_doc,added_text,invoice_number,qrurl,extra_text_after_qr)
                 data["gcp_file_url"] = pos_bills['data']
                 data["printed"] = 1
             doc = frappe.get_doc(data)
@@ -204,7 +206,7 @@ def extract_data(payload,company_doc):
         frappe.log_error("Ezy-invoicing extract data","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-def give_print(text, ip, logo_path, qr_path,port,company_doc,added_text="",invoice_number="",short_url=''):
+def give_print(text, ip, logo_path, qr_path,port,company_doc,added_text="",invoice_number="",short_url='',extra_text_after_qr=None):
     try:
         kitchen = Network(ip,int(port))  # Printer IP Address
         # kitchen = Network(ip)
@@ -244,6 +246,10 @@ def give_print(text, ip, logo_path, qr_path,port,company_doc,added_text="",invoi
         else:
             kitchen.image(qr_path)
             kitchen.hw('INIT')
+        if extra_text_after_qr:
+            kitchen.set("CENTER", "A")
+            kitchen.text('\n')
+            kitchen._raw(extra_text_after_qr.encode('utf-8'))    
         kitchen.cut()
         kitchen.hw('INIT')
     except Exception as e:
