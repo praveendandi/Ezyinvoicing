@@ -80,6 +80,8 @@ def summary_print_formats(name):
                     if category in ["Summary","Rooms"]:
                         # if category == "Summary":
                         #     category = "Summary With Border"
+                        # if category == "Rooms":
+                        #     category = "Rooms With Border"
                         templates = frappe.db.get_value("Print Format", {"name": category}, ["html"])
                         if not templates:
                             return {"success": False, ",message": "please add print formats"}
