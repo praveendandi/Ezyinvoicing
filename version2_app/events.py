@@ -2583,8 +2583,8 @@ def fetch_invoice_details(filters=[]):
 
 def summaries_insert(doc, method=None):
     try:
-        start_date = datetime.datetime.strptime(doc.from_date,"%Y-%m-%d").strftime("%d %B %Y")
-        end_date = datetime.datetime.strptime(doc.to_date,"%Y-%m-%d").strftime("%d %B %Y")
+        start_date = datetime.datetime.strptime(doc.from_date,"%Y/%m/%d").strftime("%d %B %Y")
+        end_date = datetime.datetime.strptime(doc.to_date,"%Y/%m/%d").strftime("%d %B %Y")
         doc.between_dates = start_date+" to "+end_date
         today_date = datetime.datetime.today().strftime('%Y%m%d')
         reference = frappe.db.get_list('Summaries',filters=[["name",'!=',doc.name],["tax_payer_details","=",doc.tax_payer_details]],order_by='creation desc',pluck='reference')

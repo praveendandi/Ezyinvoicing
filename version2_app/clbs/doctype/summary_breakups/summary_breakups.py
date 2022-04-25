@@ -10,9 +10,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import frappe
+import base64
 import pandas as pd
 import pdfkit
 import requests
+import sys
 from frappe.core.doctype.communication.email import make
 from frappe.model.document import Document
 from frappe.utils import cstr
@@ -26,32 +28,69 @@ class SummaryBreakups(Document):
     pass
 
 
+def convert_image_to_base64(image):
+    try:
+        with open(image, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        encoded_str = encoded_string.decode("utf-8")
+        print(encoded_str)
+        return {"success": True, "data": encoded_str}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-Guest Details Opera",
+            str(e),
+        )
+        return {"success": False, "message": str(e)}
+
 @frappe.whitelist(allow_guest=True)
 def summary_print_formats(name):
     try:
         doc = frappe.db.get_value(
             "Summaries", name, ["name", "tax_payer_details"], as_dict=1)
         if doc:
-            # company = frappe.get_last_doc("company")
+            company = frappe.get_last_doc("company")
+            if company.company_logo:
+                company_logo = company.company_logo
+                folder_path = frappe.utils.get_bench_path()
+                site_folder_path = folder_path + "/sites/" + company.site_name
+                file_path1 = (
+                        folder_path
+                        + "/sites/"
+                        + company.site_name
+                        + company.company_logo
+                    )
+                convimgtobase = convert_image_to_base64(file_path1)
+                if not convimgtobase["success"]:
+                    return convimgtobase
+                doc["base"] = "data:image/png;base64,"+convimgtobase["data"]
+            else:
+                doc["base"] = ""
             get_categroies = frappe.db.get_list(
                 "Summary Breakups", {"summaries": name}, pluck="category")
             if len(get_categroies) > 0:
                 get_categroies.append("Summary")
-                templates = frappe.db.get_all("Print Format", filters={
-                    "name": ["in", get_categroies]}, fields=["*"])
-                if len(templates) == 0:
-                    return {"success": False, ",message": "please add print formats"}
+                # templates = frappe.db.get_all("Print Format", filters={
+                #     "name": ["in", get_categroies]}, fields=["*"])
+                # if len(templates) == 0:
+                    # return {"success": False, ",message": "please add print formats"}
+                get_categroies = list(set(get_categroies))
                 total_reports = []
-                # html = ""
-                for each_template in templates:
-                    html_data = frappe.render_template(each_template["html"], doc)
-                    # if company.clbs_document_preview == "INDIVIDUAL":
-                    # total_reports.append({each_template["name"]:html})
-                    total_reports.append({each_template["name"]: html_data, "category": each_template["name"]})
-                    # else:
-                    #     html += (html_data + '<div style="page-break-before: always;"></div>')
-                # if company.clbs_document_preview == "COMBINED":
-                #     total_reports = [{each_template["name"]: html, "category": "Summary"}]
+                for category in get_categroies:
+                    if category in ["Summary","Rooms"]:
+                        # if category == "Summary":
+                        #     category = "Summary With Border"
+                        templates = frappe.db.get_value("Print Format", {"name": category}, ["html"])
+                        if not templates:
+                            return {"success": False, ",message": "please add print formats"}
+                        html_data = frappe.render_template(templates, doc)
+                    else:
+                        templates = frappe.db.get_value("Print Format", {"name": "Category"}, ["html"])
+                        if not templates:
+                            return {"success": False, ",message": "please add print formats"}
+                        doc["category"] =  category
+                        html_data = frappe.render_template(templates, doc)
+                    total_reports.append({category: html_data, "category": category})
                 return {"success": True, "html": total_reports}
             else:
                 return {"success": False, "message": "summary breakups not found"}
@@ -137,7 +176,7 @@ def download_pdf(name):
                 if not combine:
                     return combine
                 file_urls = []
-                file_urls.append({each["category"]: combine["file_url"]})
+                file_urls.append({"Summary": combine["file_url"]})
             return {"success": True, "files": file_urls}
         else:
             return {"success": False, "message": "no data found"}
@@ -495,7 +534,7 @@ def send_summary_mail(data):
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
         files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
-        if not files:
+        if len(files) == 0:
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
