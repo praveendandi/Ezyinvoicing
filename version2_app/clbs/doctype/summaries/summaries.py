@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+import json
 import frappe
 import html2text
 from frappe.model.document import Document
@@ -75,3 +76,36 @@ def delete_summaries(name=None, status=None):
     except Exception as e:
         frappe.log_error(str(e), "get_summary")
         return {"success": False, "message": str(e)}
+    
+@frappe.whitelist(allow_guest=True)
+def summary_activity_log(summary=None):
+    try:
+        if summary:
+            get_summary_log = frappe.db.get_list("Version",filters=[["docname","=",summary]], fields=['*'])
+            for each in get_summary_log:
+                if "terms_and_conditions" in each["data"]:
+                    log = json.loads(each["data"])
+                    terms_list = log["changed"][0]
+                    each["data"] = json.dumps({"changed":[["terms and conditions has been changed"]]})
+                if "contacts" in each["data"]:
+                    # each = each.as_dict()
+                    log = json.loads(each["data"])
+                    contact_list = log["changed"][0]
+                    for index, con in enumerate(contact_list):
+                        if con not in ["contacts","[]"]:
+                            con = json.loads(con)
+                            if isinstance(con, list):
+                                if len(con)>0:
+                                    contacts = frappe.db.get_list("Contacts",filters=[["name","in",con]], pluck="contact_name")
+                                    contact_list[index] =  json.dumps(contacts)
+                    log["changed"][0] = contact_list
+                    each["data"] = json.dumps(log)
+            get_payments_names = frappe.db.get_list("Summary Payments", filters=[["summary","=",summary]], pluck="name")
+            if get_payments_names or len(get_payments_names) > 0:
+                get_payment_log = frappe.db.get_list("Version", filters=[["docname","in",get_payments_names]], fields=['*'])
+                get_summary_log.extend(get_payment_log)
+            return {"success":True, "data":get_summary_log}
+    except Exception as e:
+        frappe.log_error(str(e), "summary_activity_log")
+        return {"success": False, "message": str(e)}
+    
