@@ -1458,6 +1458,9 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
                     if item_gst_percentage != float(sac_code_obj.cgst) + float(sac_code_obj.sgst):
                         gst_percentage = item_gst_percentage
                         igst_percentage = item_igst_percentage
+                    else:
+                        gst_percentage = item_gst_percentage
+                        igst_percentage = item_igst_percentage
                 else:
                     calulateslab = (companyDetails.slab_12_ending_range*12)/100
                     slab_amount = calulateslab+companyDetails.slab_12_ending_range
