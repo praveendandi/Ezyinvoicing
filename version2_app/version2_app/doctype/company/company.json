@@ -142,8 +142,15 @@
   "enable_pdf_upload",
   "skip_ssl_verify",
   "ipp_printer_file_path",
+  "summary_header",
+  "summary_terms_and_conditions",
+  "summary_footer",
   "vat_reporting",
-  "show_pending_invoices_in_reports"
+  "show_pending_invoices_in_reports",
+  "clbs_section",
+  "clbs",
+  "cc_mail_ids_for_clbs_reports",
+  "clbs_document_preview"
  ],
  "fields": [
   {
@@ -917,6 +924,32 @@
    "label": "Enable PDF Upload"
   },
   {
+   "fieldname": "summary_header",
+   "fieldtype": "Text",
+   "label": "Summary Header"
+  },
+  {
+   "fieldname": "summary_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "Summary Terms and Conditions"
+  },
+  {
+   "fieldname": "summary_footer",
+   "fieldtype": "Text",
+   "label": "Summary Footer"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
+   "fieldtype": "Check",
+   "label": "CLBS"
+  },
+  {
+   "fieldname": "cc_mail_ids_for_clbs_reports",
+   "fieldtype": "Small Text",
+   "label": "CC Mail IDs For CLBS Reports"
+  },
+  {
    "default": "1",
    "fieldname": "vat_reporting",
    "fieldtype": "Check",
@@ -927,11 +960,23 @@
    "fieldname": "show_pending_invoices_in_reports",
    "fieldtype": "Check",
    "label": "Show Pending Invoices In Reports"
+  },
+  {
+   "default": "INDIVIDUAL",
+   "fieldname": "clbs_document_preview",
+   "fieldtype": "Select",
+   "label": "CLBS Document Preview",
+   "options": "INDIVIDUAL\nCOMBINED"
+  },
+  {
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-04 12:38:58.132859",
+ "modified": "2022-04-19 12:15:10.248447",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

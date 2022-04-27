@@ -141,6 +141,9 @@
   "suptyp",
   "signature",
   "amount_in_word",
+  "summary",
+  "clbs_summary_generated",
+  "invoice_submitted_in_clbs",
   "lut"
  ],
  "fields": [
@@ -916,6 +919,24 @@
    "fieldname": "amount_in_word",
    "fieldtype": "Data",
    "label": "Amount In Word"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Link",
+   "label": "Summary",
+   "options": "Summaries"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs_summary_generated",
+   "fieldtype": "Check",
+   "label": "CLBS Summary Generated"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_submitted_in_clbs",
+   "fieldtype": "Check",
+   "label": "Invoice Submitted in CLBS"
   },
   {
    "default": "0",

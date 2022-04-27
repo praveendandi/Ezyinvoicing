@@ -178,20 +178,23 @@ def fileCreated(doc, method=None):
             if not frappe.db.exists({'doctype': 'Document Bin','invoice_file': doc.file_url}):
                 update_documentbin(doc.file_url,"")
                 abs_path = os.path.dirname(os.getcwd())
-                company_doc = frappe.get_doc("company",doc.attached_to_name)
-                new_parsers = company_doc.new_parsers
-                if company_doc.block_print == "True":
-                    return {"success":False,"message":"Print has been Blocked"}
-                if new_parsers == 0:
-                    file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
-                else:
-                    file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
-                module_name = 'file_parsing'
-                spec = importlib.util.spec_from_file_location(module_name, file_path)
-                module = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(module)
-                module.file_parsing(doc.file_url)
-                frappe.log_error(traceback.print_exc())
+                company = frappe.db.get_value("company",doc.attached_to_name)
+                if company:
+                    company_doc = frappe.get_doc("company",doc.attached_to_name)
+                    new_parsers = company_doc.new_parsers
+                    if company_doc.block_print == "True":
+                        return {"success":False,"message":"Print has been Blocked"}
+                    if new_parsers == 0:
+                        file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                    else:
+                        file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc.attached_to_name+'/invoice_parser.py'
+                    module_name = 'file_parsing'
+                    spec = importlib.util.spec_from_file_location(module_name, file_path)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
+                    module.file_parsing(doc.file_url)
+                    frappe.log_error(traceback.print_exc())
+                    logger.error(f"fileCreated,   {traceback.print_exc()}")
         else:
             company = frappe.get_last_doc("company")
             if company.block_print == "True":
@@ -726,4 +729,24 @@ def fetch_invoice_details(filters=[]):
             return {"success":False, "message":"filters not be empty"}
     except Exception as e:
         return {"Success":False,"message":str(e)}
-       
+
+
+def summaries_insert(doc, method=None):
+    try:
+        start_date = datetime.datetime.strptime(doc.from_date,"%Y/%m/%d").strftime("%d %B %Y")
+        end_date = datetime.datetime.strptime(doc.to_date,"%Y/%m/%d").strftime("%d %B %Y")
+        doc.between_dates = start_date+" to "+end_date
+        today_date = datetime.datetime.today().strftime('%Y%m%d')
+        reference = frappe.db.get_list('Summaries',filters=[["name",'!=',doc.name],["tax_payer_details","=",doc.tax_payer_details]],order_by='creation desc',pluck='reference')
+        if len(reference) > 0:
+            if reference[0]:
+                reference_number = int(reference[0].split("-")[-1])
+                doc.reference = doc.tax_payer_details+"-"+today_date
+            else:
+                doc.reference = doc.tax_payer_details+"-"+today_date
+        else:
+            doc.reference = doc.tax_payer_details+"-"+today_date
+        doc.save(ignore_permissions=True, ignore_version=True)
+    except Exception as e:
+        frappe.log_error(str(e), "summaries_insert")
+        return {"Success":False,"message":str(e)}
