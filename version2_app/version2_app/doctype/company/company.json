@@ -150,7 +150,9 @@
   "clbs_section",
   "clbs",
   "cc_mail_ids_for_clbs_reports",
-  "clbs_document_preview"
+  "clbs_document_preview",
+  "ezy_gst_section",
+  "ezy_gst_module"
  ],
  "fields": [
   {
@@ -972,11 +974,22 @@
    "fieldname": "clbs_section",
    "fieldtype": "Section Break",
    "label": "CLBS"
+  },
+  {
+   "fieldname": "ezy_gst_section",
+   "fieldtype": "Section Break",
+   "label": "EZY GST"
+  },
+  {
+   "default": "0",
+   "fieldname": "ezy_gst_module",
+   "fieldtype": "Check",
+   "label": "Ezy GST Module"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-19 12:15:10.248447",
+ "modified": "2022-04-27 15:49:51.609055",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
