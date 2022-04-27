@@ -1648,6 +1648,16 @@ def calulate_items(data):
                     return{"success":False,"message":"SAC Code "+ item_description +" not found"}
                 if item['sac_code'] == "No Sac" and SAC_CODE.isdigit():
                     item['sac_code'] = sac_code_based_gst_rates.code
+                if "net" in item:
+                    net_value = item["net"]
+                else:
+                    net_value = sac_code_based_gst_rates.net
+                if net_value == "Yes":
+                    item_data = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
+                    if item_data["success"] == True:
+                        item = item_data["data"]
+                    else:
+                        return item_data
                 if item['sac_code'] == '996311' or item['sac_code'] == "997321":
                     if "adjustment" in data:
                         acc_gst_percentage = item["cgst"]+item["sgst"]
@@ -1660,16 +1670,6 @@ def calulate_items(data):
                         else:
                             {"success": False, "message": "error in slab helper function"}
                 service_charge_name = (companyDetails.sc_name)
-                if "net" in item:
-                    net_value = item["net"]
-                else:
-                    net_value = sac_code_based_gst_rates.net
-                if net_value == "Yes":
-                    item_data = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
-                    if item_data["success"] == True:
-                        item = item_data["data"]
-                    else:
-                        return item_data
                 if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
                     gst_value = 0
                     service_dict = {}
