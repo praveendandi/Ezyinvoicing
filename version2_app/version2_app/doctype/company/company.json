@@ -139,6 +139,7 @@
   "bulkupload_json",
   "pos_footer",
   "pos_text",
+  "pos_extra_text_after_qr",
   "enable_pdf_upload",
   "skip_ssl_verify",
   "ipp_printer_file_path",
@@ -927,11 +928,16 @@
    "fieldname": "show_pending_invoices_in_reports",
    "fieldtype": "Check",
    "label": "Show Pending Invoices In Reports"
+  },
+  {
+   "fieldname": "pos_extra_text_after_qr",
+   "fieldtype": "Text",
+   "label": "POS Extra Text After QR"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-04 12:38:58.132859",
+ "modified": "2022-04-25 11:54:15.068116",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
