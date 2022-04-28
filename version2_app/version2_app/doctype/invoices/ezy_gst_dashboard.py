@@ -52,3 +52,72 @@ def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, yea
     except Exception as e:
         print(str(e))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist()
+def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, company=None):
+    try:
+        if isinstance(filters, str):
+            filters = json.loads(filters)
+        start_date = year+'-'+month+"-01"
+        end_date = date_util.get_last_day(start_date)
+        filters = filters + \
+            [['invoice_date', 'Between', [start_date, end_date]]]
+        invoice_list = frappe.db.get_list(
+            "Invoices", filters=filters, as_list=1)
+        invoice_list = list(sum(invoice_list, ()))
+        gst_invoice_list = frappe.db.get_list(
+            "GSTR One Saved Invoices", filters=filters, as_list=1)
+        gst_invoice_list = list(sum(gst_invoice_list, ()))
+        if any("property" in sublist for sublist in filters):
+            miscellaneous_gst_invoice_list = frappe.db.get_list(
+                "GSTR One Saved Invoices", filters=filters, as_list=1)
+        matching = len(list(set(invoice_list).intersection(gst_invoice_list)))
+        missing_in_einvoice = len(
+            list(set(gst_invoice_list)-set(invoice_list)))
+        missing_in_gst = len(list(set(invoice_list)-set(gst_invoice_list)))
+        data = {"total_invoices": matching+missing_in_einvoice+missing_in_gst,
+                "matching": matching,
+                "missing_in_einvoice": missing_in_einvoice,
+                "missing_in_gst": missing_in_gst}
+        month_year = (month+year).lstrip('0')
+        gstr_one_saved_filter = [["period","=",month_year]]
+        if any("company" in sublist for sublist in filters):
+            company = [each[2] for each in filters if "company" in each]
+            gstr_one_saved_filter += [["company","=",company[0]]]
+        last_reconciled_on = frappe.db.get_list("Gstr One Saved Details",filters=gstr_one_saved_filter,fields=["creation"], order_by='creation desc')
+        if len(last_reconciled_on) > 0:
+            last_reconciled_on = last_reconciled_on[0]["creation"]
+        else:
+            last_reconciled_on = ""
+        return {"success": True, "data": data,"last_reconciled_on":last_reconciled_on}
+    except Exception as e:
+        print(str(e))
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist()
+def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, year=None):
+    try:
+        if isinstance(filters, str):
+            filters = json.loads(filters)
+        sql_filters = ""
+        if len(filters) > 0:
+            sql_filters = " and " + \
+                (' and '.join("{} {} '{}'".format(
+                    value[0], value[1], value[2]) for value in filters))
+            if "invoice_number" in sql_filters:
+                sql_filters = sql_filters.replace("invoice_number","`tabInvoices`.invoice_number")
+        get_hsn_summary = frappe.db.sql(
+            """SELECT `tabInvoices`.invoice_number as invoice_number, `tabInvoices`.invoice_date as invoice_date,
+            `tabInvoices`.gst_number as gst_number,`tabInvoices`.legal_name as legal_name, `tabInvoices`.invoice_type as invoice_type,
+            `tabInvoices`.invoice_category as invoice_category, `tabSAC HSN Tax Summaries`.sac_hsn_code as sac_hsn_code, `tabSAC HSN Tax Summaries`.cgst as cgst,
+            `tabSAC HSN Tax Summaries`.sgst as sgst, `tabSAC HSN Tax Summaries`.igst as igst, `tabSAC HSN Tax Summaries`.cess as central_cess,
+            `tabSAC HSN Tax Summaries`.state_cess as state_cess, (`tabSAC HSN Tax Summaries`.cgst+`tabSAC HSN Tax Summaries`.sgst+`tabSAC HSN Tax Summaries`.igst) as total_gst,`tabSAC HSN Tax Summaries`.amount_before_gst as total_tax_amount,
+            `tabSAC HSN Tax Summaries`.amount_after_gst as total_amount from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} order by invoice_number LIMIT {},{}""".format(year, month, sql_filters, limit_start, limit_page_length), as_dict=1)
+        get_hsn_summary_for_count = frappe.db.sql(
+            """SELECT `tabInvoices`.invoice_number as invoice_number from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} order by invoice_number""".format(year, month, sql_filters))
+        return {"success": True, "data": get_hsn_summary,"count":len(get_hsn_summary_for_count)}
+    except Exception as e:
+        print(str(e))
+        return {"success": False, "message": str(e)}
