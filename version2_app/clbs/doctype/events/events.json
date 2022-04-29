@@ -1,6 +1,5 @@
 {
  "actions": [],
- "autoname": "field:event_name",
  "creation": "2022-03-01 15:49:44.714740",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -13,7 +12,9 @@
   {
    "fieldname": "event_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Event Name",
+   "reqd": 1,
    "unique": 1
   },
   {
@@ -25,7 +26,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-02 09:48:56.440101",
+ "modified": "2022-04-27 12:08:07.444901",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Events",
