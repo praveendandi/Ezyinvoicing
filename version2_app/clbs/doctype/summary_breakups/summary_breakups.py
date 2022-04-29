@@ -514,6 +514,7 @@ def submit_summary(summary):
                         update_invoices(
                             get_invoices, {"invoice_submitted_in_clbs": 0})
                         return invoices_update
+                    generate_pdf = download_pdf(summary)
                     return {"success": True, "message": "Summary submitted"}
                 else:
                     return {"success": False, "message": "something went wrong"}
@@ -542,11 +543,11 @@ def send_summary_mail(data):
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
-            printformat_files = [value for each in generate_pdf["files"] for key,value in each.items()]
-            if len(printformat_files)>0:
-                summary_files = summary_files+printformat_files
         files_summary = frappe.db.get_list("File", filters={"file_url":["in",summary_files]}, group_by='file_url', pluck='name')
-        files = files_summary+printformat_files
+        if len(printformat_files) > 0:
+            files = files_summary+printformat_files
+        else:
+            files = files_summary
         response = make(recipients = data["email"],
             subject = data["subject"],
             content = data["response"],
