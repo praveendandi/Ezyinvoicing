@@ -9,12 +9,12 @@ import pandas as pd
 
 def execute(filters=None):
     try:
-        columns, data = ["Summary ID", "Summary Name", "Generated Date", "Status", "Dispatch Date", "Total Value"], []
+        columns, data = ["Summary ID", "Summary Name", "GST Number", "Generated Date", "Status", "Dispatch Date", "Total Value"], []
         if 'tax_payer_details' in filters:
             filters = {'creation': ['Between',(filters['from_date'],filters['to_date'])],'tax_payer_details':['like',"%"+filters['tax_payer_details']+"%"]}
         else:
             filters = {'creation': ['Between',(filters['from_date'],filters['to_date'])]}
-        summary_details = frappe.db.get_list("Summaries",filters=filters, fields=["name","reference","summary_title","DATE(creation)", "status"], as_list=False)
+        summary_details = frappe.db.get_list("Summaries",filters=filters, fields=["name","reference","summary_title","tax_payer_details","DATE(creation)", "status"], as_list=False)
         if len(summary_details)>0:
             for each in summary_details:
                 each["DATE(creation)"] = str(each["DATE(creation)"])
