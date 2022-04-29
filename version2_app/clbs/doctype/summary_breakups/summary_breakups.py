@@ -14,6 +14,7 @@ import base64
 import pandas as pd
 import pdfkit
 import requests
+import time
 import sys
 from frappe.core.doctype.communication.email import make
 from frappe.model.document import Document
@@ -535,11 +536,17 @@ def send_summary_mail(data):
         # if cc_emails:
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
-        files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
-        if len(files) == 0:
+        summary_files = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]]}, pluck="document")
+        printformat_files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
+        if len(printformat_files) == 0:
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
+            printformat_files = [value for each in generate_pdf["files"] for key,value in each.items()]
+            if len(printformat_files)>0:
+                summary_files = summary_files+printformat_files
+        files_summary = frappe.db.get_list("File", filters={"file_url":["in",summary_files]}, group_by='file_url', pluck='name')
+        files = files_summary+printformat_files
         response = make(recipients = data["email"],
             subject = data["subject"],
             content = data["response"],
