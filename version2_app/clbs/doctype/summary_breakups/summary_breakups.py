@@ -540,6 +540,7 @@ def send_summary_mail(data):
         summary_files = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]]}, pluck="document")
         printformat_files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
         if len(printformat_files) == 0:
+            return {"success": False, "message":"Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
