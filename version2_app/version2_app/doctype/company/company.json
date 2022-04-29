@@ -139,6 +139,7 @@
   "bulkupload_json",
   "pos_footer",
   "pos_text",
+  "pos_extra_text_after_qr",
   "enable_pdf_upload",
   "skip_ssl_verify",
   "ipp_printer_file_path",
@@ -985,11 +986,16 @@
    "fieldname": "ezy_gst_module",
    "fieldtype": "Check",
    "label": "Ezy GST Module"
+  },
+  {
+   "fieldname": "pos_extra_text_after_qr",
+   "fieldtype": "Text",
+   "label": "POS Extra Text After QR"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-27 18:34:02.015948",
+ "modified": "2022-04-29 18:18:20.143090",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

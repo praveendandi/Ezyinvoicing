@@ -33,7 +33,8 @@ def hyatt_bulkupload(data):
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
             # if invoice_data["company"]=="GHM-01":
-            gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]]
+            if item[bulk_meta_data["Gst_details"]["gst_number"]] != "":
+                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]]
             # else:
             #     gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
         paymentTypes = GetPaymentTypes()
