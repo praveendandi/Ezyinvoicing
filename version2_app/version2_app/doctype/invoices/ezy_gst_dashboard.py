@@ -150,3 +150,9 @@ def export_invoices(filters=[], month=None, year=None):
         print(str(e))
         return {"success": False, "message": str(e)}
     
+    
+def nil_rated_supplies():
+    try:
+        pass
+    except Exception as e:
+        pass
