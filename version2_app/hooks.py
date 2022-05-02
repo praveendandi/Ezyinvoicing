@@ -181,7 +181,7 @@ doc_events = {
         "on_trash": "version2_app.events.deletePromotionsSocket",       
     },
     'Precheckins':{
-        'after_insert':"version2_app.events.precheckinsdocuments",
+        # 'after_insert':"version2_app.events.precheckinsdocuments",
         # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
         # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
     },
