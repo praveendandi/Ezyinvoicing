@@ -109,18 +109,18 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
             sql_filters = " and " + \
                 (' and '.join("{} {} '{}'".format(
                     value[0], value[1], value[2]) for value in filters))
-            if "invoice_number" in sql_filters:
-                sql_filters = sql_filters.replace("invoice_number","`tabInvoices`.invoice_number")
+            # if "invoice_number" in sql_filters:
+            #     sql_filters = sql_filters.replace("invoice_number","`tabInvoices`.invoice_number")
         get_hsn_summary = frappe.db.sql(
-            """SELECT `tabInvoices`.invoice_number as invoice_number, `tabInvoices`.invoice_date as invoice_date,
-            `tabInvoices`.gst_number as gst_number,`tabInvoices`.legal_name as legal_name, `tabInvoices`.invoice_type as invoice_type,
-            `tabInvoices`.invoice_category as invoice_category, `tabSAC HSN Tax Summaries`.sac_hsn_code as sac_hsn_code, `tabSAC HSN Tax Summaries`.cgst as cgst,
-            `tabSAC HSN Tax Summaries`.sgst as sgst, `tabSAC HSN Tax Summaries`.igst as igst, `tabSAC HSN Tax Summaries`.cess as central_cess,
-            `tabSAC HSN Tax Summaries`.state_cess as state_cess, (`tabSAC HSN Tax Summaries`.cgst+`tabSAC HSN Tax Summaries`.sgst+`tabSAC HSN Tax Summaries`.igst) as total_gst,`tabSAC HSN Tax Summaries`.amount_before_gst as total_tax_amount,
-            `tabSAC HSN Tax Summaries`.amount_after_gst as total_amount from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} order by invoice_number LIMIT {},{}""".format(year, month, sql_filters, limit_start, limit_page_length), as_dict=1)
-        get_hsn_summary_for_count = frappe.db.sql(
-            """SELECT `tabInvoices`.invoice_number as invoice_number from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} order by invoice_number""".format(year, month, sql_filters))
-        return {"success": True, "data": get_hsn_summary,"count":len(get_hsn_summary_for_count)}
+            """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as cgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabItems`.sac_code""".format(year, month, sql_filters), as_dict=1)        
+        # get_hsn_summary = frappe.db.sql(
+        #     """SELECT `tabSAC HSN Tax Summaries`.sac_hsn_code as sac_hsn_code, sum(`tabSAC HSN Tax Summaries`.cgst) as cgst,
+        #     sum(`tabSAC HSN Tax Summaries`.sgst) as sgst, sum(`tabSAC HSN Tax Summaries`.igst) as igst, sum(`tabSAC HSN Tax Summaries`.cess) as central_cess,
+        #     sum(`tabSAC HSN Tax Summaries`.state_cess) as state_cess, (sum(`tabSAC HSN Tax Summaries`.cgst)+sum(`tabSAC HSN Tax Summaries`.sgst)+sum(`tabSAC HSN Tax Summaries`.igst)) as total_gst,sum(`tabSAC HSN Tax Summaries`.amount_before_gst) as total_tax_amount,
+        #     sum(`tabSAC HSN Tax Summaries`.amount_after_gst) as total_amount from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabSAC HSN Tax Summaries`.sac_hsn_code""".format(year, month, sql_filters), as_dict=1)
+        # get_hsn_summary_for_count = frappe.db.sql(
+        #     """SELECT `tabInvoices`.invoice_number as invoice_number from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} order by invoice_number""".format(year, month, sql_filters))
+        return {"success": True, "data": get_hsn_summary}
     except Exception as e:
         print(str(e))
         return {"success": False, "message": str(e)}
