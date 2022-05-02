@@ -124,6 +124,7 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
         #     sum(`tabSAC HSN Tax Summaries`.amount_after_gst) as total_amount from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabSAC HSN Tax Summaries`.sac_hsn_code""".format(year, month, sql_filters), as_dict=1)
         # get_hsn_summary_for_count = frappe.db.sql(
         #     """SELECT `tabInvoices`.invoice_number as invoice_number from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} order by invoice_number""".format(year, month, sql_filters))
+        # print(success,"=====")
         return {"success": True, "data": get_hsn_summary}
     except Exception as e:
         print(str(e))
