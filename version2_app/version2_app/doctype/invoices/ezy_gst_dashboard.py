@@ -21,8 +21,8 @@ def getGSTR1DashboardDetails(year=None, month=None):
         get_hsn_summary = frappe.db.sql(
             """SELECT count(`tabSAC HSN Tax Summaries`.parent) as count, sum(`tabSAC HSN Tax Summaries`.cgst+`tabSAC HSN Tax Summaries`.sgst+`tabSAC HSN Tax Summaries`.igst) as tax_amount, sum(`tabSAC HSN Tax Summaries`.amount_before_gst) as before_gst, sum(`tabSAC HSN Tax Summaries`.amount_after_gst) as taxable_value, 'hsn-summary' as invoice_category from `tabSAC HSN Tax Summaries` INNER JOIN `tabInvoices` ON `tabSAC HSN Tax Summaries`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format(year, month), as_dict=1)
         nil_rated_supplies = frappe.db.sql("""SELECT count(`tabItems`.name) as count, sum(item_taxable_value) as taxable_value, sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount) as tax_amount, sum(item_value_after_gst) as before_gst, 'Nil Rated Supplies' as invoice_type from `tabInvoices` INNER JOIN `tabItems` ON `tabItems`.parent = `tabInvoices`.name where ((`tabItems`.gst_rate = 0 and `tabItems`.taxable = "Yes") or (`tabItems`.taxable = "No") or (`tabInvoices`.sez = 1 and `tabItems`.type = "Excempted")) and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)='{}' and MONTH(invoice_date)='{}'""".format(year, month), as_dict=1)
-        sez = frappe.db.sql(
-            """SELECT count(name) as count, sum(total_gst_amount) as tax_amount, sum(pms_invoice_summary_without_gst) as taxable_value, sum(pms_invoice_summary) as before_gst, invoice_category, '{}' as invoice_type from `tabInvoices` where invoice_category='Tax Invoice' and sez = 0 or sez = 1 and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
+        get_sez = frappe.db.sql(
+            """SELECT count(name) as count, sum(total_gst_amount) as tax_amount, sum(pms_invoice_summary_without_gst) as taxable_value, sum(pms_invoice_summary) as before_gst, invoice_category, '{}' as invoice_type from `tabInvoices` where invoice_category='Tax Invoice' and sez = 1 and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
 
         advance_received = {"count": 0, "tax_amount": 0, "before_gst": 0,
                             "taxable_value": 0, "invoice_category": "advance-received"}
@@ -33,6 +33,7 @@ def getGSTR1DashboardDetails(year=None, month=None):
                       "credit_b2b": {k: (0 if v is None else v) for k, v in get_b2b_credit_debit_invoice_summaries[0].items()},
                       "credit_b2c": {k: (0 if v is None else v) for k, v in get_b2c_credit_debit_invoice_summaries[0].items()},
                       "nil_rated_supplies": {k: (0 if v is None else v) for k, v in nil_rated_supplies[0].items()},
+                      "sez": {k: (0 if v is None else v) for k, v in get_sez[0].items()},
                       "advance_received": advance_received,
                       "adjustment_of_advances": adjustment_of_advances,
                       "get_hsn_summary": {k: (0 if v is None else v) for k, v in get_hsn_summary[0].items()}}
