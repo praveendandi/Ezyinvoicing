@@ -1,0 +1,121 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:invoice_number",
+ "creation": "2022-01-27 10:44:25.130754",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "invoice_type",
+  "invoice_date",
+  "invoice_category",
+  "company",
+  "column_break_8",
+  "invoice_total_value",
+  "place_of_supply",
+  "chksum",
+  "property",
+  "section_break_9",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Invoice Number",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Invoice Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Invoice Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_total_value",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Invoice Total Value",
+   "reqd": 1
+  },
+  {
+   "fieldname": "place_of_supply",
+   "fieldtype": "Data",
+   "label": "Place Of Supply",
+   "reqd": 1
+  },
+  {
+   "fieldname": "chksum",
+   "fieldtype": "Text",
+   "label": "chksum",
+   "reqd": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "ITEMS",
+   "options": "GSTR One Saved Invoice Items"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "property",
+   "fieldtype": "Link",
+   "label": "Property",
+   "options": "Properties"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Data",
+   "label": "Invoice Category"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-01-31 18:46:49.168156",
+ "modified_by": "Administrator",
+ "module": "EZYGST",
+ "name": "GSTR One Saved Invoices",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
