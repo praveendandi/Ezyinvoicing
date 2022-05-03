@@ -77,11 +77,11 @@ def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, compan
             "Invoices", filters=filters, as_list=1)
         invoice_list = list(sum(invoice_list, ()))
         gst_invoice_list = frappe.db.get_list(
-            "GSTR One Saved Invoices", filters=filters, as_list=1)
+            "GSTR One Saved Invoices", filters=[["invoice_number","in",invoice_list]], as_list=1)
         gst_invoice_list = list(sum(gst_invoice_list, ()))
         if any("property" in sublist for sublist in filters):
             miscellaneous_gst_invoice_list = frappe.db.get_list(
-                "GSTR One Saved Invoices", filters=filters, as_list=1)
+                "GSTR One Saved Invoices", filters=[["invoice_number","in",invoice_list]], as_list=1)
         matching = len(list(set(invoice_list).intersection(gst_invoice_list)))
         missing_in_einvoice = len(
             list(set(gst_invoice_list)-set(invoice_list)))

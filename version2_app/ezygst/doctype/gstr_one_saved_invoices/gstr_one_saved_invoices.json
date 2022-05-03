@@ -16,7 +16,6 @@
   "invoice_total_value",
   "place_of_supply",
   "chksum",
-  "property",
   "section_break_9",
   "items"
  ],
@@ -84,12 +83,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "property",
-   "fieldtype": "Link",
-   "label": "Property",
-   "options": "Properties"
-  },
-  {
    "fieldname": "invoice_category",
    "fieldtype": "Data",
    "label": "Invoice Category"
@@ -97,7 +90,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-31 18:46:49.168156",
+ "modified": "2022-05-02 18:22:35.580876",
  "modified_by": "Administrator",
  "module": "EZYGST",
  "name": "GSTR One Saved Invoices",
