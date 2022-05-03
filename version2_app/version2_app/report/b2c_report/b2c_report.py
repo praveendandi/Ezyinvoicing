@@ -23,7 +23,7 @@ def execute(filters=None):
 		
 		items_fields = ['parent','taxable','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
 		items_columns = ['invoice_number','taxable','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
-		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
+		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names]},fields =items_fields ,as_list=True)
 		items_df = pd.DataFrame(items_doc,columns=items_columns)
 		items_df = items_df.round(2)
 		

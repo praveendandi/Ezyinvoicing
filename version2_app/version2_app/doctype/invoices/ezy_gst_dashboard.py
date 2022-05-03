@@ -47,17 +47,23 @@ def getGSTR1DashboardDetails(year=None, month=None):
 
 
 @frappe.whitelist(allow_guest=True)
-def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, year=None):
+def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, year=None, export=False):
     try:
-        filters = json.loads(filters)
+        if isinstance(filters, str):
+            filters = json.loads(filters)
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
-        filters = filters + [['invoice_date', 'between', [start_date, end_date]]]
+        filters = filters + \
+            [['invoice_date', 'between', [start_date, end_date]]]
         invoice_summary = frappe.db.get_list("Invoices", filters=filters, fields=['COUNT(DISTINCT(gst_number)) as no_of_suppliers', 'COUNT(DISTINCT(name)) as no_of_invoices', 'SUM(pms_invoice_summary_without_gst) as total_taxable_value',
                                                                                   'SUM(total_gst_amount) as total_gst_amount', 'SUM(pms_invoice_summary) as total_invoices_amount', 'SUM(other_charges) as other_charges', 'SUM(igst_amount) as total_igst', 'SUM(sgst_amount) as total_sgst',
                                                                                   'SUM(cgst_amount) as total_cgst', 'SUM(total_central_cess_amount+total_state_cess_amount) as cess'])
-        invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=[
-                                          '*'], start=int(limit_start), page_length=int(limit_page_length))
+        if export == False:
+            invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=[
+                '*'], start=int(limit_start), page_length=int(limit_page_length))
+        else:
+            invoice_data = frappe.db.get_list(
+                "Invoices", filters=filters, fields=['*'])
         return {"success": True, "data": invoice_data, "summary": invoice_summary[0]}
     except Exception as e:
         print(str(e))
@@ -91,16 +97,17 @@ def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, compan
                 "missing_in_einvoice": missing_in_einvoice,
                 "missing_in_gst": missing_in_gst}
         month_year = (month+year).lstrip('0')
-        gstr_one_saved_filter = [["period","=",month_year]]
+        gstr_one_saved_filter = [["period", "=", month_year]]
         if any("company" in sublist for sublist in filters):
             company = [each[2] for each in filters if "company" in each]
-            gstr_one_saved_filter += [["company","=",company[0]]]
-        last_reconciled_on = frappe.db.get_list("Gstr One Saved Details",filters=gstr_one_saved_filter,fields=["creation"], order_by='creation desc')
+            gstr_one_saved_filter += [["company", "=", company[0]]]
+        last_reconciled_on = frappe.db.get_list("Gstr One Saved Details", filters=gstr_one_saved_filter, fields=[
+                                                "creation"], order_by='creation desc')
         if len(last_reconciled_on) > 0:
             last_reconciled_on = last_reconciled_on[0]["creation"]
         else:
             last_reconciled_on = ""
-        return {"success": True, "data": data,"last_reconciled_on":last_reconciled_on}
+        return {"success": True, "data": data, "last_reconciled_on": last_reconciled_on}
     except Exception as e:
         print(str(e))
         return {"success": False, "message": str(e)}
@@ -119,7 +126,7 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
             # if "invoice_number" in sql_filters:
             #     sql_filters = sql_filters.replace("invoice_number","`tabInvoices`.invoice_number")
         get_hsn_summary = frappe.db.sql(
-            """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.gst_rate as Gst_Rate, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount,sum(`tabItems`.cess_amount) as central_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(year, month, sql_filters), as_dict=1)        
+            """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.gst_rate as Gst_Rate, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount,sum(`tabItems`.cess_amount) as central_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(year, month, sql_filters), as_dict=1)
         # get_hsn_summary = frappe.db.sql(
         #     """SELECT `tabSAC HSN Tax Summaries`.sac_hsn_code as sac_hsn_code, sum(`tabSAC HSN Tax Summaries`.cgst) as cgst,
         #     sum(`tabSAC HSN Tax Summaries`.sgst) as sgst, sum(`tabSAC HSN Tax Summaries`.igst) as igst, sum(`tabSAC HSN Tax Summaries`.cess) as central_cess,
@@ -133,11 +140,13 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
         print(str(e))
         return {"success": False, "message": str(e)}
 
+
 @frappe.whitelist()
 def export_invoices(filters=[], month=None, year=None):
     try:
-        invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'invoice_date as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt', "sales_amount_before_tax as TatalTaxableAmount","cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate"])
-        if len(invoice_data)>0:
+        invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'invoice_date as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt',
+                                          "sales_amount_before_tax as TatalTaxableAmount", "cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate"])
+        if len(invoice_data) > 0:
             company = frappe.get_last_doc("company")
             cwd = os.getcwd()
             site_name = cstr(frappe.local.site)
@@ -147,7 +156,7 @@ def export_invoices(filters=[], month=None, year=None):
             files_new = {"file": open(file_path, 'rb')}
             payload_new = {'is_private': 1, 'folder': 'Home'}
             file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                        data=payload_new, verify=False).json()
+                                          data=payload_new, verify=False).json()
             if "file_url" in file_response["message"].keys():
                 os.remove(file_path)
                 return {"success": True, "file_url": file_response["message"]["file_url"]}
@@ -157,25 +166,90 @@ def export_invoices(filters=[], month=None, year=None):
     except Exception as e:
         print(str(e))
         return {"success": False, "message": str(e)}
-    
-@frappe.whitelist()    
+
+
+@frappe.whitelist()
+def export_workbook(month=None, year=None):
+    # try:
+        total_data = {}
+        get_summary = getGSTR1DashboardDetails(month, year)
+        if not get_summary["success"]:
+            return get_summary
+        total_data["Summary"] = get_summary["data"]
+        filter_list = {"B2B": [["invoice_type", "=", "B2B"], ["invoice_category", "=", "Tax Invoice"], ["irn_generated", "=", "Success"], ["sez", "=", 0]], "B2C": [["invoice_type", "=", "B2C", ], ["irn_generated", "=", "Success"]], "Credit-Debit-B2B": [["invoice_type", "=", "B2B"], ["invoice_category", "in", ["Debit Invoice", "Credit Invoice"]], ["irn_generated", "=", "Success"], ["sez", "=", 0]], "Credit-Debit-B2C": [["invoice_type", "=", "B2C"], [
+            "invoice_category", "in", ["Debit Invoice", "Credit Invoice"]], ["irn_generated", "=", "Success"]], "B2B-SEZWP": [["invoice_type", "=", "B2B"], ["invoice_category", "=", "Tax Invoice"], ["irn_generated", "=", "Success"], ["sez", "=", 1], ["suptyp", "=", "SEZWP"]], "B2B-SEZWOP": [["invoice_type", "=", "B2B"], ["invoice_category", "=", "Tax Invoice"], ["irn_generated", "=", "Success"], ["sez", "=", 1], ["suptyp", "=", "SEZWOP"]]}
+        # filter_list.columns = filter_list.items
+        # filter_list.columns=filter_list.iloc[0]
+        # filter_list1 = filter_list.transpose()
+        for key,value in filter_list.items():
+            get_invoices_data = getInvoices(filters=value, month=month, year=year, export=True)
+            if not get_invoices_data["success"]:
+                return get_invoices_data
+            total_data.update({key: get_invoices_data["data"]})
+        writer = pd.ExcelWriter('multiple.xlsx', engine='xlsxwriter')
+        for key,value in total_data.items():
+            df = pd.DataFrame.from_dict(value)
+            df.to_excel(writer, sheet_name=key)
+        writer.save()
+
+        # invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'invoice_date as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt', "sales_amount_before_tax as TatalTaxableAmount","cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate"])
+        # if len(invoice_data)>0:
+        #     company = frappe.get_last_doc("company")
+        #     cwd = os.getcwd()
+        #     site_name = cstr(frappe.local.site)
+        #     file_path = cwd + "/" + site_name + "/public/files/workbook_export.xlsx"
+        #     df = pd.DataFrame.from_records(invoice_data)
+        #     df.to_excel(file_path, index=False)
+        #     files_new = {"file": open(file_path, 'rb')}
+        #     payload_new = {'is_private': 1, 'folder': 'Home'}
+        #     file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+        #                                 data=payload_new, verify=False).json()
+        #     outputxlsx = pd.DataFrame()
+        #     for file in file_response:
+        #         df = pd.concat(pd.read_excel( file, sheet_name=None), ignore_index=True, sort=False)
+        #         outputxlsx = outputxlsx.append( df, ignore_index=True)
+        #         outputxlsx.to_excel(cwd + "/" + site_name + "/public/files/workbook_export.xlsx", index=False)
+        #     if "file_url" in file["message"].keys():
+        #         os.remove(file_path)
+        #         return {"success": True, "file_url": file["message"]["file_url"]}
+        #     return {"success": False, "message": "something went wrong"}
+        # else:
+        #     return {"success": False, "message": "no data found"}
+    # except Exception as e:
+    #     print(str(e))
+    #     return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist()
 def nil_rated_supplies(month=None, year=None):
     try:
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
         company = frappe.get_last_doc("company")
-        inter_state_nill_rated_register_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0],["Items", "taxable", "=", "Yes"],["Invoices", "place_of_supply","=",company.state_code],["Invoices", "invoice_type","=","B2B"],["Invoices", "irn_generated", "=","Success"],['invoice_date', 'Between', [start_date, end_date]]], fields = ["sum(`tabItems`.item_value_after_gst) as item"])
-        inter_state_excempted_register_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"],["Invoices", "sez", "=", 1],["Invoices", "place_of_supply", "=", company.state_code],["Invoices", "invoice_type", "=", "B2B"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        inter_state_nonregister_register_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"],["Invoices", "place_of_supply", "=", company.state_code],["Invoices", "invoice_type", "=", "B2B"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        inter_state_nill_rated_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0],["Items", "taxable", "=", "Yes"],["Invoices", "place_of_supply","=",company.state_code],["Invoices", "invoice_type","=","B2C"],["Invoices", "irn_generated", "=","Success"],['invoice_date', 'Between', [start_date, end_date]]], fields = ["sum(`tabItems`.item_value_after_gst) as item"])
-        inter_state_excempted_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"],["Invoices", "sez", "=", 1],["Invoices", "place_of_supply", "=", company.state_code],["Invoices", "invoice_type", "=", "B2C"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        inter_state_nonregister_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"],["Invoices", "place_of_supply", "=", company.state_code],["Invoices", "invoice_type", "=", "B2C"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        intra_state_nill_rated_register_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0],["Items", "taxable", "=", "Yes"],["Invoices", "place_of_supply","!=",company.state_code],["Invoices", "invoice_type","=","B2B"],["Invoices", "irn_generated", "=","Success"],['invoice_date', 'Between', [start_date, end_date]]], fields = ["sum(`tabItems`.item_value_after_gst) as item"])
-        intra_state_excempted_register_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"],["Invoices", "sez", "=", 1],["Invoices", "place_of_supply", "!=", company.state_code],["Invoices", "invoice_type", "=", "B2B"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        intra_state_nonregister_register_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"],["Invoices", "place_of_supply", "!=", company.state_code],["Invoices", "invoice_type", "=", "B2B"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        intra_state_nill_rated_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0],["Items", "taxable", "=", "Yes"],["Invoices", "place_of_supply","!=",company.state_code],["Invoices", "invoice_type","=","B2C"],["Invoices", "irn_generated", "=","Success"],['invoice_date', 'Between', [start_date, end_date]]], fields = ["sum(`tabItems`.item_value_after_gst) as item"])
-        intra_state_excempted_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"],["Invoices", "sez", "=", 1],["Invoices", "place_of_supply", "!=", company.state_code],["Invoices", "invoice_type", "=", "B2C"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
-        intra_state_nonregister_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"],["Invoices", "place_of_supply", "!=", company.state_code],["Invoices", "invoice_type", "=", "B2C"],["Invoices", "irn_generated", "=", "Success"],['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        inter_state_nill_rated_register_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0], ["Items", "taxable", "=", "Yes"], ["Invoices", "place_of_supply", "=", company.state_code], [
+                                                                    "Invoices", "invoice_type", "=", "B2B"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        inter_state_excempted_register_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"], ["Invoices", "sez", "=", 1], ["Invoices", "place_of_supply", "=", company.state_code], [
+                                                                   "Invoices", "invoice_type", "=", "B2B"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        inter_state_nonregister_register_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"], ["Invoices", "place_of_supply", "=", company.state_code], ["Invoices", "invoice_type", "=", "B2B"], [
+                                                                     "Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        inter_state_nill_rated_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0], ["Items", "taxable", "=", "Yes"], ["Invoices", "place_of_supply", "=", company.state_code], [
+                                                                      "Invoices", "invoice_type", "=", "B2C"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        inter_state_excempted_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"], ["Invoices", "sez", "=", 1], ["Invoices", "place_of_supply", "=", company.state_code], [
+                                                                     "Invoices", "invoice_type", "=", "B2C"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        inter_state_nonregister_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"], ["Invoices", "place_of_supply", "=", company.state_code], ["Invoices", "invoice_type", "=", "B2C"], [
+                                                                       "Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        intra_state_nill_rated_register_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0], ["Items", "taxable", "=", "Yes"], ["Invoices", "place_of_supply", "!=", company.state_code], [
+                                                                    "Invoices", "invoice_type", "=", "B2B"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        intra_state_excempted_register_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"], ["Invoices", "sez", "=", 1], ["Invoices", "place_of_supply", "!=", company.state_code], [
+                                                                   "Invoices", "invoice_type", "=", "B2B"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        intra_state_nonregister_register_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"], ["Invoices", "place_of_supply", "!=", company.state_code], ["Invoices", "invoice_type", "=", "B2B"], [
+                                                                     "Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        intra_state_nill_rated_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "gst_rate", "=", 0], ["Items", "taxable", "=", "Yes"], ["Invoices", "place_of_supply", "!=", company.state_code], [
+                                                                      "Invoices", "invoice_type", "=", "B2C"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        intra_state_excempted_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "type", "=", "Excempted"], ["Invoices", "sez", "=", 1], ["Invoices", "place_of_supply", "!=", company.state_code], [
+                                                                     "Invoices", "invoice_type", "=", "B2C"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
+        intra_state_nonregister_unregister_person = frappe.db.get_list("Invoices", filters=[["Items", "taxable", "=", "No"], ["Invoices", "place_of_supply", "!=", company.state_code], [
+                                                                       "Invoices", "invoice_type", "=", "B2C"], ["Invoices", "irn_generated", "=", "Success"], ['invoice_date', 'Between', [start_date, end_date]]], fields=["sum(`tabItems`.item_value_after_gst) as item"])
         data = {"inter_state_nill_rated_register_person": inter_state_nill_rated_register_person[0]["item"] if inter_state_nill_rated_register_person[0]["item"] else 0,
                 "inter_state_excempted_register_person": inter_state_excempted_register_person[0]["item"] if inter_state_excempted_register_person[0]["item"] else 0,
                 "inter_state_nonregister_register_person": inter_state_nonregister_register_person[0]["item"] if inter_state_nonregister_register_person[0]["item"] else 0,
