@@ -254,7 +254,6 @@ def generateIrn(data):
             },
             "ItemList": [],
         }
-        print(gst_data)
         total_igst_value = 0
         total_sgst_value = 0
         total_cgst_value = 0
@@ -263,7 +262,8 @@ def generateIrn(data):
         discount_after_value = 0
         discount_before_value = 0
         ass_value = 0
-        for index, item in enumerate(invoice.items):
+        items_data = sorted(invoice.items, key = lambda i: i.sort_order)
+        for index, item in enumerate(items_data):
             # print(item.sac_code,"HsnCD")
             if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
                 total_igst_value += item.igst_amount
