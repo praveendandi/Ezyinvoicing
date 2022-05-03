@@ -158,8 +158,8 @@ def add_pre_checkins():
                     "image_2": each["img_2"] if each["img_2"] != "" else None,
                     "id_type": each["guest_id_type"],
                     "reservation_number": data["confirmation_number"],
-                    "id_image2": pre_checkins["image_1"] if pre_checkins["image_1"] != "" else None,
-                    "id_image1": pre_checkins["image_2"] if pre_checkins["image_2"] != "" else None
+                    "id_image1": pre_checkins["image_1"] if pre_checkins["image_1"] != "" else None,
+                    "id_image2": pre_checkins["image_2"] if pre_checkins["image_2"] != "" else None
                 },
                 is_async=True,
             )
