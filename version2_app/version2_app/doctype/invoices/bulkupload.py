@@ -35,7 +35,8 @@ def bulkupload(data):
                 if "," in item[0]:
                     item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
-            gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
+            if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
+                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
             # else:
             #     gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
         # print(gst_data,"+++++++++++++++")

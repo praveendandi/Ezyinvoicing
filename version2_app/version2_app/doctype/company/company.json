@@ -139,6 +139,7 @@
   "bulkupload_json",
   "pos_footer",
   "pos_text",
+  "pos_extra_text_after_qr",
   "enable_pdf_upload",
   "skip_ssl_verify",
   "ipp_printer_file_path",
@@ -572,12 +573,6 @@
    "options": "Yes\nNo"
   },
   {
-   "default": "0",
-   "fieldname": "skip_ssl_verify",
-   "fieldtype": "Check",
-   "label": "Skip SSL Verify"
-  },
-  {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
    "label": "Reconciliation Format",
@@ -663,11 +658,6 @@
    "fieldname": "manual_debit_invoice",
    "fieldtype": "Check",
    "label": "Manual Debit Invoice"
-  },
-  {
-   "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
-   "label": "Ipp Printer File Path"
   },
   {
    "default": "0",
@@ -972,11 +962,16 @@
    "fieldname": "clbs_section",
    "fieldtype": "Section Break",
    "label": "CLBS"
+  },
+  {
+   "fieldname": "pos_extra_text_after_qr",
+   "fieldtype": "Text",
+   "label": "POS Extra Text After QR"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-19 12:15:10.248447",
+ "modified": "2022-05-03 13:22:36.270338",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
