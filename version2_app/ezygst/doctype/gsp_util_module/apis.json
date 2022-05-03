@@ -1,0 +1,7 @@
+{
+    "ret_save":"https://gsp.adaequare.com/test/enriched/returns/gstr1?action=RETSAVE",
+    "login_api":"https://gsp.adaequare.com/gsp/authenticate?grant_type=token",
+    "ret_status":"https://gsp.adaequare.com/test/enriched/returns?action=RETSTATUS&gstin=GSTNUMBER&ret_period=RETRUNPERIOD",
+    "get_b2b":"https://gsp.adaequare.com/test/enriched/returns/gstr1?action=B2B&gstin=GSTNUMBER&ret_period=RETRUNPERIOD",
+    "ret_submit":"https://gsp.adaequare.com/test/enriched/returns/gstr1?action=RETSUBMIT"
+}
