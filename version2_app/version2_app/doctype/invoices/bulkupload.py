@@ -31,11 +31,10 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            if companyData.name == "CBMBHOPAL-01":
-                if "," in item[0]:
-                    item = item[0].split(",")
+            if "," in item[0]:
+                item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
-            if item[bulk_meta_data["Gst_details"]["gst_number"]] != "":
+            if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
             # else:
             #     gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
