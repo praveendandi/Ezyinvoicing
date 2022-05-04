@@ -139,12 +139,14 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
 @frappe.whitelist()
 def export_invoices(filters=[], month=None, year=None):
     try:
+        if isinstance(filters, str):
+            filters = json.loads(filters)
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
         filters = filters + \
             [['invoice_date', 'Between', [start_date, end_date]]]
         invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'invoice_date as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt',
-                                          "sales_amount_before_tax as TatalTaxableAmount", "cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate"])
+                                          "sales_amount_before_tax as TatalTaxableAmount", "cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate","irn_generated" "=" "Success"], order_by='invoice_number asc')
         if len(invoice_data) > 0:
             company = frappe.get_last_doc("company")
             cwd = os.getcwd()
