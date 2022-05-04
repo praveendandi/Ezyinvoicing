@@ -29,6 +29,7 @@
   "b2c_qr_url",
   "column_break_15",
   "location",
+  "country",
   "pincode",
   "state",
   "city",
@@ -1634,15 +1635,19 @@
    "fieldname": "ome_scanner",
    "fieldtype": "Check",
    "label": "OME scanner"
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "Country"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-14 15:46:28.162882",
+ "modified": "2022-05-03 11:26:53.184266",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
