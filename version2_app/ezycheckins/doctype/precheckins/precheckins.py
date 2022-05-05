@@ -37,6 +37,7 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         if "message" in response:
             return response
     except Exception as e:
+        print(str(e))
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Scan-Guest Details Opera",
@@ -155,14 +156,15 @@ def add_pre_checkins():
                 now=False,
                 data={
                     "image_1": each["img_1"] if each["img_1"] != "" else None,
-                    "image_2": each["img_1"] if each["img_1"] != "" else None,
+                    "image_2": each["img_2"] if each["img_2"] != "" else None,
                     "id_type": each["id_type"],
                     "reservation_number": data["confirmation_number"],
-                    "id_image2": pre_checkins["image_1"] if pre_checkins["image_1"] != "" else None,
-                    "id_image1": pre_checkins["image_2"] if pre_checkins["image_2"] != "" else None
+                    "id_image1": pre_checkins["image_1"] if pre_checkins["image_1"] != "" else None,
+                    "id_image2": pre_checkins["image_2"] if pre_checkins["image_2"] != "" else None
                 },
                 is_async=True,
             )
+            
         user_name = frappe.session.user
         date_time = datetime.datetime.now()
         if frappe.db.exists("Arrival Information", {"name": data["confirmation_number"], "is_group_code":"Yes"}):
@@ -220,6 +222,7 @@ def add_pre_checkins():
             )
         return {"success": True, "message": "Pre-checkin completed successfully"}
     except Exception as e:
+        print(str(e))
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "Precheckins-Add Pre Checkins",
