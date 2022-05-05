@@ -575,12 +575,6 @@
    "options": "Yes\nNo"
   },
   {
-   "default": "0",
-   "fieldname": "skip_ssl_verify",
-   "fieldtype": "Check",
-   "label": "Skip SSL Verify"
-  },
-  {
    "fieldname": "reconciliation_format",
    "fieldtype": "Select",
    "label": "Reconciliation Format",
@@ -666,11 +660,6 @@
    "fieldname": "manual_debit_invoice",
    "fieldtype": "Check",
    "label": "Manual Debit Invoice"
-  },
-  {
-   "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
-   "label": "Ipp Printer File Path"
   },
   {
    "default": "0",

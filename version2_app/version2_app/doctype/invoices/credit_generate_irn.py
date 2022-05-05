@@ -513,7 +513,8 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
         total_cess_calue = 0
         total_state_cess_value = 0
         ass_value = 0
-        for index, item in enumerate(invoice.items):
+        items_data = sorted(invoice.items, key = lambda i: i.sort_order)
+        for index, item in enumerate(items_data):
             # print(item.sac_code,"HsnCD")
             if item.item_mode == "Credit" and item.taxable == "Yes" and item.type!="Non-Gst":
                 credit_items.append(item.__dict__)
