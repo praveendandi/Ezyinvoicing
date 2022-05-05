@@ -24,3 +24,4 @@ html2text
 typing-extensions
 paytmchecksum
 # opencv-python
+fitz
