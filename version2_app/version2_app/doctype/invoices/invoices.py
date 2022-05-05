@@ -254,7 +254,6 @@ def generateIrn(data):
             },
             "ItemList": [],
         }
-        print(gst_data)
         total_igst_value = 0
         total_sgst_value = 0
         total_cgst_value = 0
@@ -263,7 +262,8 @@ def generateIrn(data):
         discount_after_value = 0
         discount_before_value = 0
         ass_value = 0
-        for index, item in enumerate(invoice.items):
+        items_data = sorted(invoice.items, key = lambda i: i.sort_order)
+        for index, item in enumerate(items_data):
             # print(item.sac_code,"HsnCD")
             if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
                 total_igst_value += item.igst_amount
@@ -1462,18 +1462,22 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
                         gst_percentage = item_gst_percentage
                         igst_percentage = item_igst_percentage
                 else:
-                    calulateslab = (companyDetails.slab_12_ending_range*12)/100
-                    slab_amount = calulateslab+companyDetails.slab_12_ending_range
-                    if float(data["item_value"]) > slab_amount:
-                        gst_percentage = 18
-                        igst_percentage = 18
-                    elif float(data["item_value"])>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
-                        gst_percentage = 12
-                        igst_percentage = 12
+                    if sac_code_obj.accommodation_slab == "Yes":
+                        calulateslab = (companyDetails.slab_12_ending_range*12)/100
+                        slab_amount = calulateslab+companyDetails.slab_12_ending_range
+                        if float(abs(data["item_value"])) > slab_amount:
+                            gst_percentage = 18
+                            igst_percentage = 18
+                        elif float(abs(data["item_value"]))>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
+                            gst_percentage = 12
+                            igst_percentage = 12
+                        else:
+                            gst_percentage = 0
+                            igst_percentage = 0
+                            data['type'] = "Excempted"
                     else:
-                        gst_percentage = 0
-                        igst_percentage = 0
-                        data['type'] = "Excempted"
+                        gst_percentage = item_gst_percentage
+                        igst_percentage = item_igst_percentage
             else:
                 gst_percentage = item_gst_percentage
                 igst_percentage = item_igst_percentage
@@ -1656,6 +1660,7 @@ def calulate_items(data):
                     item_data = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
                     if item_data["success"] == True:
                         item = item_data["data"]
+                        print(item,"/./....//.//.//./")
                     else:
                         return item_data
                 if item['sac_code'] == '996311' or item['sac_code'] == "997321":

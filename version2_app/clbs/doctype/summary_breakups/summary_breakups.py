@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import frappe
+import fitz
 import base64
 import pandas as pd
 import pdfkit
@@ -132,7 +133,13 @@ def html_to_pdf(html_data, filename, name):
 
 def combine_pdf(files, filename, name):
     try:
-        files = [values for each in files for key,values in each.items()]
+        summary_files = [values for each in files for key,values in each.items()]
+        files = []
+        for each in summary_files:
+            if "Summary" in each:
+                files.insert(0, each)
+            else:
+                files.append(each)
         company = frappe.get_last_doc('company')
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
@@ -180,6 +187,12 @@ def download_pdf(name):
                     return combine
                 file_urls = []
                 file_urls.append({"Summary": combine["file_url"]})
+            files = []
+            for each in file_urls:
+                if "Summary" in each.keys():
+                    files.insert(0, each)
+                else:
+                    files.append(each)
             return {"success": True, "files": file_urls}
         else:
             return {"success": False, "message": "no data found"}
@@ -537,7 +550,17 @@ def send_summary_mail(data):
         # if cc_emails:
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
-        summary_files = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]]}, pluck="document")
+        summary_files = []
+        checkinvoices = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]],"qr_attached_document":["=", ""],"document_type":"Invoices","qr_code_image":["!=",""]}, fields=["name","document","invoice_number","qr_code_image"])
+        if len(checkinvoices) > 0:
+            add_qr_pdf = add_qr_to_pdf(checkinvoices)
+            if not add_qr_pdf["success"]:
+                return add_qr_pdf
+            summary_files = add_qr_pdf["files"]
+        else:
+            summary_files = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]],"document_type":"Invoices"}, pluck="qr_attached_document")
+        remaining_bills = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]],"qr_code_image":["=",""]}, pluck="document")
+        summary_files.extend(remaining_bills)
         printformat_files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
         if len(printformat_files) == 0:
             return {"success": False, "message":"Templets Not Found"}
@@ -561,4 +584,49 @@ def send_summary_mail(data):
         return {"success": True, "message": "Mail Send"}
     except Exception as e:
         frappe.log_error(str(e), "get_summary")
+        return{"success": False,"message": str(e)}
+
+
+def add_qr_to_pdf(data):
+    try:
+        company = frappe.get_last_doc("company")
+        qr_coordinates = frappe.db.get_value('CLBS Settings', company.name, ['qr_rect_x0', 'qr_rect_x1', 'qr_rect_y0', 'qr_rect_y1'], as_dict=1)
+        if not qr_coordinates:
+            return {"success": False, "message": "please add coordinates in clbs settings"}
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = company.site_name
+        path = folder_path + '/sites/' + site_folder_path
+        files_urls = []
+        for each in data:
+            src_pdf_filename = path + each["document"]
+            dst_pdf_filename = path + "/private/files/" + each["invoice_number"] + 'withQr.pdf'
+            img_filename = path + each["qr_code_image"]
+            # img_rect = fitz.Rect(190, 90, 350, 220)
+            img_rect = fitz.Rect(qr_coordinates["qr_rect_x0"], qr_coordinates["qr_rect_x1"], qr_coordinates["qr_rect_y0"], qr_coordinates["qr_rect_y1"])
+            document = fitz.open(src_pdf_filename)
+            page = document[0]
+            im = open(img_filename,"rb").read()
+            page.insertImage(img_rect, stream=im)
+            document.save(dst_pdf_filename)
+            document.close()
+            files = {"file": open(dst_pdf_filename, 'rb')}
+            payload = {
+                "is_private": 1,
+                "folder": "Home"
+            }
+            site = company.host
+            upload_qr_image = requests.post(site + "api/method/upload_file",
+                                            files=files,
+                                            data=payload)
+            # print(upload_qr_image)
+            response = upload_qr_image.json()
+            if 'message' in response:
+                files_urls.append(response['message']['file_url'])
+                frappe.db.set_value('Summary Documents', each["name"], 'qr_attached_document', response['message']['file_url'])
+                frappe.db.commit()
+            else:
+                return {"success": False, "message": "something went wrong"}
+        return {"success": True, "files": files_urls}
+    except Exception as e:
+        frappe.log_error(str(e), "add_qr_to_pdf")
         return{"success": False,"message": str(e)}
