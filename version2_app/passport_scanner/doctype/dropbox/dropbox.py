@@ -948,7 +948,7 @@ def reprocess_images(name:str,now=False):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "create_doc_using_base_files",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno,str(e)),
         )
         print(e)
         return {
