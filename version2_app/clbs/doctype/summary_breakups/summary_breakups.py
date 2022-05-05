@@ -14,6 +14,7 @@ import base64
 import pandas as pd
 import pdfkit
 import requests
+import time
 import sys
 from frappe.core.doctype.communication.email import make
 from frappe.model.document import Document
@@ -80,6 +81,8 @@ def summary_print_formats(name):
                     if category in ["Summary","Rooms"]:
                         # if category == "Summary":
                         #     category = "Summary With Border"
+                        # if category == "Rooms":
+                        #     category = "Rooms With Border"
                         templates = frappe.db.get_value("Print Format", {"name": category}, ["html"])
                         if not templates:
                             return {"success": False, ",message": "please add print formats"}
@@ -511,6 +514,7 @@ def submit_summary(summary):
                         update_invoices(
                             get_invoices, {"invoice_submitted_in_clbs": 0})
                         return invoices_update
+                    generate_pdf = download_pdf(summary)
                     return {"success": True, "message": "Summary submitted"}
                 else:
                     return {"success": False, "message": "something went wrong"}
@@ -533,11 +537,18 @@ def send_summary_mail(data):
         # if cc_emails:
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
-        files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
-        if len(files) == 0:
+        summary_files = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]]}, pluck="document")
+        printformat_files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
+        if len(printformat_files) == 0:
+            return {"success": False, "message":"Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
+        files_summary = frappe.db.get_list("File", filters={"file_url":["in",summary_files]}, group_by='file_url', pluck='name')
+        if len(printformat_files) > 0:
+            files = files_summary+printformat_files
+        else:
+            files = files_summary
         response = make(recipients = data["email"],
             subject = data["subject"],
             content = data["response"],

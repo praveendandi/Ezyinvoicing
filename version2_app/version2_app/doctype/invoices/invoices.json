@@ -935,6 +935,12 @@
   },
   {
    "default": "0",
+   "fieldname": "lut",
+   "fieldtype": "Check",
+   "label": "Lut"
+  },
+  {
+   "default": "0",
    "fieldname": "clbs_summary_generated",
    "fieldtype": "Check",
    "label": "CLBS Summary Generated"
@@ -944,18 +950,12 @@
    "fieldname": "invoice_submitted_in_clbs",
    "fieldtype": "Check",
    "label": "Invoice Submitted in CLBS"
-  },
-  {
-   "default": "0",
-   "fieldname": "lut",
-   "fieldtype": "Check",
-   "label": "Lut"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-03-08 13:02:45.760164",
+ "modified": "2022-04-29 11:38:37.654093",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
