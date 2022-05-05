@@ -55,7 +55,8 @@ def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, yea
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
         filters = filters + \
-            [['invoice_date', 'between', [start_date, end_date]]]
+            [['invoice_date', 'between', [start_date, end_date]],["irn_generated","=","Success"]] 
+        
         invoice_summary = frappe.db.get_list("Invoices", filters=filters, fields=['COUNT(DISTINCT(gst_number)) as no_of_suppliers', 'COUNT(DISTINCT(name)) as no_of_invoices', 'SUM(pms_invoice_summary_without_gst) as total_taxable_value',
                                                                                   'SUM(total_gst_amount) as total_gst_amount', 'SUM(pms_invoice_summary) as total_invoices_amount', 'SUM(other_charges) as other_charges', 'SUM(igst_amount) as total_igst', 'SUM(sgst_amount) as total_sgst',
                                                                                   'SUM(cgst_amount) as total_cgst', 'SUM(total_central_cess_amount+total_state_cess_amount) as cess'])
@@ -79,7 +80,7 @@ def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, compan
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
         filters = filters + \
-            [['invoice_date', 'Between', [start_date, end_date]]]
+            [['invoice_date', 'Between', [start_date, end_date]],["irn_generated","=","Success"]]
         invoice_list = frappe.db.get_list(
             "Invoices", filters=filters, as_list=1)
         invoice_list = list(sum(invoice_list, ()))
@@ -144,9 +145,9 @@ def export_invoices(filters=[], month=None, year=None):
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
         filters = filters + \
-            [['invoice_date', 'Between', [start_date, end_date]]]
+            [['invoice_date', 'Between', [start_date, end_date]], ["irn_generated","=","Success"]]
         invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'invoice_date as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt',
-                                          "sales_amount_before_tax as TatalTaxableAmount", "cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate","irn_generated" "=" "Success"], order_by='invoice_number asc')
+                                          "sales_amount_before_tax as TatalTaxableAmount", "cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate"], order_by='invoice_number asc')
         if len(invoice_data) > 0:
             company = frappe.get_last_doc("company")
             cwd = os.getcwd()
@@ -171,12 +172,16 @@ def export_invoices(filters=[], month=None, year=None):
 
 @frappe.whitelist()
 def export_workbook(month=None, year=None):
-    # try:
+    try:
         total_data = {}
-        get_summary = getGSTR1DashboardDetails(month, year)
+        company = frappe.get_last_doc("company")
+        cwd = os.getcwd()
+        site_name = cstr(frappe.local.site)
+        file_path = cwd + "/" + site_name + "/public/files/workbook_export.xlsx"
+        get_summary = getGSTR1DashboardDetails(year,month)
         if not get_summary["success"]:
             return get_summary
-        total_data["Summary"] = get_summary["data"]
+        # total_data["Summary"] = get_summary["data"]
         get_hsn_summary = getHsnSummary(month=month, year=year, export=True)
         if not get_hsn_summary["success"]:
             return get_hsn_summary
@@ -191,43 +196,35 @@ def export_workbook(month=None, year=None):
             if not get_invoices_data["success"]:
                 return get_invoices_data
             total_data.update({key: get_invoices_data["data"]})
-        writer = pd.ExcelWriter('multiple.xlsx', engine='xlsxwriter')
+        writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
+        df_summary = pd.DataFrame(get_summary["data"], index=["count","taxable_value","tax_amount","before_gst"])
+        df_summary = df_summary.rename(index={'count': 'Count', "taxable_value": "Taxable Value", "tax_amount": "Tax amount", "before_gst": "Invoice value"})
+        df_summary = df_summary.T
+        df_summary.loc['Total'] = df_summary.sum(numeric_only=True, axis=0)
+        # df_summary.loc[:,'Total'] = df_summary.sum(numeric_only=True, axis=1)
+        # df_summary.loc[:,'Total'] = df_summary.drop('Total').mean()
+        df_summary.to_excel(writer, sheet_name="Summary")
         for key,value in total_data.items():
             if len(value) == 0:
                 value = [{'InvoiceNo': None, 'InvoiceDate': None, 'GSTINofSupplier': None, 'LegalName': None, 'InvoiceType': None, 'InvoiceAmt': None, 'TotalTaxableAmt': None, 'SGST': None, 'CGST': None, 'IGST': None, 'TotalGST': None, 'CESS': None}]
             df = pd.DataFrame.from_records(value)
+            df.loc['Total'] = df.sum(numeric_only=True)
             df.to_excel(writer, sheet_name=key, index=False)
         df1 = pd.DataFrame(get_nil_rated["data"].items(), columns=[None, 'Values'])
-        print(df1)
+        df1.loc['Total'] = df1.sum(numeric_only=True)
         df1.to_excel(writer, sheet_name="Nil Rated", index=False)
         writer.save()
-
-        # invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'invoice_date as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt', "sales_amount_before_tax as TatalTaxableAmount","cgst_amount as CGST", "sgst_amount as SGST", "igst_amount as IGST", "total_gst_amount as TotalGST", "(total_central_cess_amount+total_state_cess_amount) as CESS", "ack_date as EInvoiceGenerationDate"])
-        # if len(invoice_data)>0:
-        #     company = frappe.get_last_doc("company")
-        #     cwd = os.getcwd()
-        #     site_name = cstr(frappe.local.site)
-        #     file_path = cwd + "/" + site_name + "/public/files/workbook_export.xlsx"
-        #     df = pd.DataFrame.from_records(invoice_data)
-        #     df.to_excel(file_path, index=False)
-        #     files_new = {"file": open(file_path, 'rb')}
-        #     payload_new = {'is_private': 1, 'folder': 'Home'}
-        #     file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-        #                                 data=payload_new, verify=False).json()
-        #     outputxlsx = pd.DataFrame()
-        #     for file in file_response:
-        #         df = pd.concat(pd.read_excel( file, sheet_name=None), ignore_index=True, sort=False)
-        #         outputxlsx = outputxlsx.append( df, ignore_index=True)
-        #         outputxlsx.to_excel(cwd + "/" + site_name + "/public/files/workbook_export.xlsx", index=False)
-        #     if "file_url" in file["message"].keys():
-        #         os.remove(file_path)
-        #         return {"success": True, "file_url": file["message"]["file_url"]}
-        #     return {"success": False, "message": "something went wrong"}
-        # else:
-        #     return {"success": False, "message": "no data found"}
-    # except Exception as e:
-    #     print(str(e))
-    #     return {"success": False, "message": str(e)}
+        files_new = {"file": open(file_path, 'rb')}
+        payload_new = {'is_private': 1, 'folder': 'Home'}
+        file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                    data=payload_new, verify=False).json()
+        if "file_url" in file_response["message"].keys():
+            os.remove(file_path)
+            return {"success": True, "file_url": file_response["message"]["file_url"]}
+        return {"success": False, "message": "something went wrong"}
+    except Exception as e:
+        print(str(e))
+        return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist()
