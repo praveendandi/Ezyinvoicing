@@ -10,7 +10,8 @@
   "summary",
   "company",
   "invoice_number",
-  "qr_code_image"
+  "qr_code_image",
+  "qr_attached_document"
  ],
  "fields": [
   {
@@ -45,11 +46,16 @@
    "fieldname": "qr_code_image",
    "fieldtype": "Attach",
    "label": "QR Code Image"
+  },
+  {
+   "fieldname": "qr_attached_document",
+   "fieldtype": "Attach",
+   "label": "QR Attached Document"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-10 11:50:42.142206",
+ "modified": "2022-05-03 16:51:34.490394",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Documents",
