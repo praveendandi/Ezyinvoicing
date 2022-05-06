@@ -1,4 +1,5 @@
 from webbrowser import get
+import datetime
 import frappe
 import json
 import requests
@@ -177,7 +178,9 @@ def export_workbook(month=None, year=None):
         company = frappe.get_last_doc("company")
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
-        file_path = cwd + "/" + site_name + "/public/files/GSTR-"+month+"-"+year+".xlsx"
+        datetime_object = datetime.datetime.strptime(month, "%m")
+        month_name = datetime_object.strftime("%b")
+        file_path = cwd + "/" + site_name + "/public/files/GSTR-"+month_name+"-"+year+".xlsx"
         get_summary = getGSTR1DashboardDetails(year,month)
         if not get_summary["success"]:
             return get_summary
@@ -197,9 +200,10 @@ def export_workbook(month=None, year=None):
                 return get_invoices_data
             total_data.update({key: get_invoices_data["data"]})
         writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
-        df_summary = pd.DataFrame(get_summary["data"], index=["count","taxable_value","tax_amount","before_gst","igst_amount","cgst_amount","sgst_amount"])
-        df_summary = df_summary.rename(index={'count': 'Count', "taxable_value": "Taxable Value", "tax_amount": "Tax amount", "before_gst": "Invoice value","igst_amount":"IGST","cgst_amount":"CGST","sgst_amount":"SGST"})
+        df_summary = pd.DataFrame(get_summary["data"], index=["count","taxable_value","igst_amount","cgst_amount","sgst_amount","tax_amount","before_gst"])
+        df_summary = df_summary.rename(index={'count': 'Count', "taxable_value": "Taxable Value", "igst_amount":"IGST","cgst_amount":"CGST","sgst_amount":"SGST", "tax_amount": "Tax amount", "before_gst": "Invoice value"})
         df_summary = df_summary.T
+        print(df_summary)
         df_summary.loc['Total'] = df_summary.sum(numeric_only=True, axis=0)
         # df_summary.loc[:,'Total'] = df_summary.sum(numeric_only=True, axis=1)
         # df_summary.loc[:,'Total'] = df_summary.drop('Total').mean()
@@ -208,6 +212,9 @@ def export_workbook(month=None, year=None):
             if len(value) == 0:
                 value = [{'InvoiceNo': None, 'InvoiceDate': None, 'GSTINofSupplier': None, 'LegalName': None, 'InvoiceType': None, 'InvoiceAmt': None, 'TotalTaxableAmt': None, 'SGST': None, 'CGST': None, 'IGST': None, 'TotalGST': None, 'CESS': None}]
             df = pd.DataFrame.from_records(value)
+            # if "Credit-Debit-B2B" in key:
+                # print(df[['Taxable Value','Tax amount']])
+                # print(df[df.columns[df.columns.isin(['Taxable Value','Tax amount'])]])
             df.loc['Total'] = df.sum(numeric_only=True)
             df.to_excel(writer, sheet_name=key, index=False)
         df1 = pd.DataFrame(get_nil_rated["data"].items(), columns=[None, 'Values'])
