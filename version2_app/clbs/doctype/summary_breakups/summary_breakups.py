@@ -602,7 +602,7 @@ def add_qr_to_pdf(data):
             dst_pdf_filename = path + "/private/files/" + each["invoice_number"] + 'withQr.pdf'
             img_filename = path + each["qr_code_image"]
             # img_rect = fitz.Rect(190, 90, 350, 220)
-            img_rect = fitz.Rect(qr_coordinates["qr_rect_x0"], qr_coordinates["qr_rect_x1"], qr_coordinates["qr_rect_y0"], qr_coordinates["qr_rect_y1"])
+            img_rect = fitz.Rect(int(qr_coordinates["qr_rect_x0"]), int(qr_coordinates["qr_rect_x1"]), int(qr_coordinates["qr_rect_y0"]), int(qr_coordinates["qr_rect_y1"]))
             document = fitz.open(src_pdf_filename)
             page = document[0]
             im = open(img_filename,"rb").read()
