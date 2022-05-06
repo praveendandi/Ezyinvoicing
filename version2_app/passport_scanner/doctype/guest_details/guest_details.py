@@ -1778,3 +1778,69 @@ def convert_base64_to_image(base, name, site_folder_path, company):
             "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
         )
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def get_guest_details_by_confirmation_number(confirmation_number:str=None,name:str=None):
+    '''
+    get details by confirmation number
+    '''
+    try:
+        if confirmation_number:
+            details = frappe.db.get_list('Guest Details',
+            filters={'confirmation_number': confirmation_number},
+            fields=['confirmation_number', 'guest_first_name',"guest_id_type","guest_last_name","name","uploaded_to_opera"],)
+        else:
+            folder_path = frappe.utils.get_bench_path()
+            company_doc = frappe.get_last_doc("company")
+            site_folder_path = folder_path + "/sites/" + company_doc.site_name
+            details_list = frappe.db.get_list('Guest Details', filters={'name': name},fields=['*'])
+            details = details_list[0]
+            # details = frappe.db.get_value('Guest Details', name, 
+            # ['name',"confirmation_number",'id_image1','id_image2','confirmation_number','guest_id_type'
+            # 'passport_number','local_id_number','guest_first_name','gender','guest_dob','personaddress','address1',
+            # 'address2','face_image',], 
+            # as_dict=1)
+            print(details)
+            # if details.id_image1:
+            #     if "private" in details.id_image1:
+            #         details.id_image1 = (
+            #            "http://"
+            #             + company_doc.site_name
+            #             + details.id_image1
+            #         )
+            #     else:
+            #         details.id_image1 = (
+            #            "http://"
+            #             + company_doc.site_name
+            #             + "/public"
+            #             + details.id_image1
+            #         )
+
+            # if details.id_image2:
+            #     if "private" in details.id_image2:
+            #         details.id_image2 = (
+            #             "http://"
+            #             + company_doc.site_name
+            #             + details.id_image2
+            #         )
+            #     else:
+            #         details.id_image2 = (
+            #              "http://"
+            #             + company_doc.site_name
+            #             + "/public"
+            #             + details.id_image2
+            #         )
+            
+            # details = frappe.db.get_list('Guest Details',
+            # filters={'name': name},
+            # fields=[''])
+        return {"success":True,"data":details}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "get_guest_details_by_confirmation_number",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        return {"success": False, "message": str(e)}
+
