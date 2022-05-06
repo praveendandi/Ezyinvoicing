@@ -35,7 +35,6 @@ def convert_image_to_base64(image):
         with open(image, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
         encoded_str = encoded_string.decode("utf-8")
-        print(encoded_str)
         return {"success": True, "data": encoded_str}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -44,6 +43,7 @@ def convert_image_to_base64(image):
             str(e),
         )
         return {"success": False, "message": str(e)}
+
 
 @frappe.whitelist(allow_guest=True)
 def summary_print_formats(name):
@@ -57,11 +57,11 @@ def summary_print_formats(name):
                 folder_path = frappe.utils.get_bench_path()
                 site_folder_path = folder_path + "/sites/" + company.site_name
                 file_path1 = (
-                        folder_path
-                        + "/sites/"
-                        + company.site_name
-                        + company.company_logo
-                    )
+                    folder_path
+                    + "/sites/"
+                    + company.site_name
+                    + company.company_logo
+                )
                 convimgtobase = convert_image_to_base64(file_path1)
                 if not convimgtobase["success"]:
                     return convimgtobase
@@ -75,26 +75,29 @@ def summary_print_formats(name):
                 # templates = frappe.db.get_all("Print Format", filters={
                 #     "name": ["in", get_categroies]}, fields=["*"])
                 # if len(templates) == 0:
-                    # return {"success": False, ",message": "please add print formats"}
+                # return {"success": False, ",message": "please add print formats"}
                 get_categroies = list(set(get_categroies))
                 total_reports = []
                 for category in get_categroies:
-                    if category in ["Summary","Rooms"]:
+                    if category in ["Summary", "Rooms"]:
                         # if category == "Summary":
                         #     category = "Summary With Border"
                         # if category == "Rooms":
                         #     category = "Rooms With Border"
-                        templates = frappe.db.get_value("Print Format", {"name": category}, ["html"])
+                        templates = frappe.db.get_value(
+                            "Print Format", {"name": category}, ["html"])
                         if not templates:
                             return {"success": False, ",message": "please add print formats"}
                         html_data = frappe.render_template(templates, doc)
                     else:
-                        templates = frappe.db.get_value("Print Format", {"name": "Category"}, ["html"])
+                        templates = frappe.db.get_value(
+                            "Print Format", {"name": "Category"}, ["html"])
                         if not templates:
                             return {"success": False, ",message": "please add print formats"}
-                        doc["category"] =  category
+                        doc["category"] = category
                         html_data = frappe.render_template(templates, doc)
-                    total_reports.append({category: html_data, "category": category})
+                    total_reports.append(
+                        {category: html_data, "category": category})
                 return {"success": True, "html": total_reports}
             else:
                 return {"success": False, "message": "summary breakups not found"}
@@ -104,6 +107,17 @@ def summary_print_formats(name):
         frappe.log_error("Error in summary_print_formats: ",
                          frappe.get_traceback())
         return {"success": False, "message": str(e)}
+
+
+def get_file_size(summary):
+    try:
+        summary_files = get_all_summary_files(summary)
+        if not summary_files["success"]:
+            return summary_files
+        files = summary_files["files"]
+        print(files)
+    except Exception as e:
+        pass
 
 
 def html_to_pdf(html_data, filename, name):
@@ -133,7 +147,8 @@ def html_to_pdf(html_data, filename, name):
 
 def combine_pdf(files, filename, name):
     try:
-        summary_files = [values for each in files for key,values in each.items()]
+        summary_files = [values for each in files for key,
+                         values in each.items()]
         files = []
         for each in summary_files:
             if "Summary" in each:
@@ -164,6 +179,7 @@ def combine_pdf(files, filename, name):
         frappe.log_error(str(e), "download_pdf")
         return {"success": False, "message": str(e)}
 
+
 @frappe.whitelist(allow_guest=True)
 def download_pdf(name):
     try:
@@ -182,7 +198,7 @@ def download_pdf(name):
                 file_urls.append({each["category"]: get_pdf["file_url"]})
             company = frappe.get_last_doc('company')
             if company.clbs_document_preview == "COMBINED":
-                combine = combine_pdf(file_urls, each["category"], name)    
+                combine = combine_pdf(file_urls, each["category"], name)
                 if not combine:
                     return combine
                 file_urls = []
@@ -235,12 +251,12 @@ def extract_summary_breakups(filters, summary):
             total_items.append(each)
         df = pd.DataFrame.from_records(total_items)
         data = df.groupby(['service_type', 'invoice_number'], as_index=False).agg(
-            {"Date_string": 'first', "service_type": 'first', "invoice_category": 'first', "item_value_after_gst": 'sum', "company": 'first', "summaries": 'first', 'invoice_number': 'first',"sac_code": list})
+            {"Date_string": 'first', "service_type": 'first', "invoice_category": 'first', "item_value_after_gst": 'sum', "company": 'first', "summaries": 'first', 'invoice_number': 'first', "sac_code": list})
         data.rename(columns={'Date_string': 'date', 'service_type': 'category',
                     'invoice_category': 'invoice_type', 'item_value_after_gst': 'amount'}, inplace=True)
         data = data.to_dict('records')
         for each in data:
-            if len(each["sac_code"])>0:
+            if len(each["sac_code"]) > 0:
                 each["sac_codes"] = ", ".join(set(each["sac_code"]))
                 del each["sac_code"]
             else:
@@ -508,8 +524,10 @@ def submit_summary(summary):
     try:
         if frappe.db.exists({"doctype": "Summaries", "name": summary}):
             if frappe.db.exists({"doctype": "Summary Breakups", "summaries": summary}):
-                get_summary_breakups = frappe.db.get_list("Summary Breakups",filters={"summaries":summary,"category":["!=","Rooms"]}, pluck="name")
-                check_billno = frappe.db.get_list("Summary Breakup Details", filters={"parent":["in",get_summary_breakups],"bill_no":["=",""]})
+                get_summary_breakups = frappe.db.get_list("Summary Breakups", filters={
+                                                          "summaries": summary, "category": ["!=", "Rooms"]}, pluck="name")
+                check_billno = frappe.db.get_list("Summary Breakup Details", filters={
+                                                  "parent": ["in", get_summary_breakups], "bill_no": ["=", ""]})
                 if len(check_billno) > 0:
                     return {"success": False, "message": "	Bill No. are mandatory"}
                 if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
@@ -540,7 +558,7 @@ def submit_summary(summary):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)    
+@frappe.whitelist(allow_guest=True)
 def send_summary_mail(data):
     try:
         company = frappe.get_last_doc('company')
@@ -550,47 +568,80 @@ def send_summary_mail(data):
         # if cc_emails:
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
-        summary_files = []
-        checkinvoices = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]],"qr_attached_document":["=", ""],"document_type":"Invoices","qr_code_image":["!=",""]}, fields=["name","document","invoice_number","qr_code_image"])
-        if len(checkinvoices) > 0:
-            add_qr_pdf = add_qr_to_pdf(checkinvoices)
-            if not add_qr_pdf["success"]:
-                return add_qr_pdf
-            summary_files = add_qr_pdf["files"]
-        else:
-            summary_files = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]],"document_type":"Invoices"}, pluck="qr_attached_document")
-        remaining_bills = frappe.db.get_list("Summary Documents", filters={"summary":["=",data["summary"]],"qr_code_image":["=",""]}, pluck="document")
-        summary_files.extend(remaining_bills)
-        printformat_files=frappe.db.get_list('File',filters={'attached_to_name': ['=',data["summary"]]}, pluck='name')
+        # summary_files = []
+        # checkinvoices = frappe.db.get_list("Summary Documents", filters={"summary": ["=", data["summary"]], "qr_attached_document": [
+        #                                    "=", ""], "document_type": "Invoices", "qr_code_image": ["!=", ""]}, fields=["name", "document", "invoice_number", "qr_code_image"])
+        # if len(checkinvoices) > 0:
+        #     add_qr_pdf = add_qr_to_pdf(checkinvoices)
+        #     if not add_qr_pdf["success"]:
+        #         return add_qr_pdf
+        #     summary_files = add_qr_pdf["files"]
+        # else:
+        #     summary_files = frappe.db.get_list("Summary Documents", filters={"summary": [
+        #                                        "=", data["summary"]], "document_type": "Invoices"}, pluck="qr_attached_document")
+        # remaining_bills = frappe.db.get_list("Summary Documents", filters={"summary": [
+        #                                      "=", data["summary"]], "qr_code_image": ["=", ""]}, pluck="document")
+        # summary_files.extend(remaining_bills)
+        get_summary_files = get_all_summary_files(data["summary"])
+        if not get_summary_files["success"]:
+            return get_summary_files
+        summary_files = get_summary_files["files"]
+        printformat_files = frappe.db.get_list(
+            'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='name')
         if len(printformat_files) == 0:
-            return {"success": False, "message":"Templets Not Found"}
+            return {"success": False, "message": "Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
-        files_summary = frappe.db.get_list("File", filters={"file_url":["in",summary_files]}, group_by='file_url', pluck='name')
-        if len(printformat_files) > 0:
-            files = files_summary+printformat_files
-        else:
-            files = files_summary
-        response = make(recipients = data["email"],
-            subject = data["subject"],
-            content = data["response"],
-            doctype = None,
-            name = None,
-            cc = cc_emails,
-            attachments = json.dumps(files),
-            send_email=1
-        )
+        files_summary = frappe.db.get_list("File", filters={"file_url": [
+                                           "in", summary_files]}, group_by='file_url', pluck='name')
+        response = make(recipients=data["email"],
+                        subject=data["subject"],
+                        content=data["response"],
+                        doctype=None,
+                        name=None,
+                        cc=cc_emails,
+                        attachments=json.dumps(files_summary),
+                        send_email=1
+                        )
         return {"success": True, "message": "Mail Send"}
     except Exception as e:
-        frappe.log_error(str(e), "get_summary")
-        return{"success": False,"message": str(e)}
+        frappe.log_error(str(e), "send_summary_mail")
+        return{"success": False, "message": str(e)}
+
+
+def get_all_summary_files(summary=None):
+    try:
+        if summary:
+            summary_files = []
+            checkinvoices = frappe.db.get_list("Summary Documents", filters={"summary": ["=", summary], "qr_attached_document": [
+                "=", ""], "document_type": "Invoices", "qr_code_image": ["!=", ""]}, fields=["name", "document", "invoice_number", "qr_code_image"])
+            if len(checkinvoices) > 0:
+                add_qr_pdf = add_qr_to_pdf(checkinvoices)
+                if not add_qr_pdf["success"]:
+                    return add_qr_pdf
+                summary_files = add_qr_pdf["files"]
+            else:
+                summary_files = frappe.db.get_list("Summary Documents", filters={"summary": [
+                    "=", summary], "qr_code_image": ["!=", ""], "document_type": "Invoices"}, pluck="qr_attached_document")
+            remaining_bills = frappe.db.get_list("Summary Documents", filters={"summary": [
+                "=", summary], "qr_code_image": ["=", ""]}, pluck="document")
+            printformat_files = frappe.db.get_list(
+                'File', filters={'attached_to_name': ['=', summary]}, pluck='file_url')
+            summary_files = summary_files + remaining_bills + printformat_files
+            return {"success": True, "files": summary_files}
+        else:
+            return {"summary": False, "message": "Summary name is mandatory"}
+    except Exception as e:
+        frappe.log_error(str(e), "get_all_summary_files")
+        return{"success": False, "message": str(e)}
 
 
 def add_qr_to_pdf(data):
     try:
         company = frappe.get_last_doc("company")
-        qr_coordinates = frappe.db.get_value('CLBS Settings', company.name, ['qr_rect_x0', 'qr_rect_x1', 'qr_rect_y0', 'qr_rect_y1'], as_dict=1)
+        qr_coordinates = frappe.db.get_value('CLBS Settings', company.name, [
+                                             'qr_rect_x0', 'qr_rect_x1', 'qr_rect_y0', 'qr_rect_y1'], as_dict=1)
         if not qr_coordinates:
             return {"success": False, "message": "please add coordinates in clbs settings"}
         folder_path = frappe.utils.get_bench_path()
@@ -599,13 +650,15 @@ def add_qr_to_pdf(data):
         files_urls = []
         for each in data:
             src_pdf_filename = path + each["document"]
-            dst_pdf_filename = path + "/private/files/" + each["invoice_number"] + 'withQr.pdf'
+            dst_pdf_filename = path + "/private/files/" + \
+                each["invoice_number"] + 'withQr.pdf'
             img_filename = path + each["qr_code_image"]
             # img_rect = fitz.Rect(190, 90, 350, 220)
-            img_rect = fitz.Rect(int(qr_coordinates["qr_rect_x0"]), int(qr_coordinates["qr_rect_x1"]), int(qr_coordinates["qr_rect_y0"]), int(qr_coordinates["qr_rect_y1"]))
+            img_rect = fitz.Rect(int(qr_coordinates["qr_rect_x0"]), int(qr_coordinates["qr_rect_x1"]), int(
+                qr_coordinates["qr_rect_y0"]), int(qr_coordinates["qr_rect_y1"]))
             document = fitz.open(src_pdf_filename)
             page = document[0]
-            im = open(img_filename,"rb").read()
+            im = open(img_filename, "rb").read()
             page.insertImage(img_rect, stream=im)
             document.save(dst_pdf_filename)
             document.close()
@@ -622,11 +675,12 @@ def add_qr_to_pdf(data):
             response = upload_qr_image.json()
             if 'message' in response:
                 files_urls.append(response['message']['file_url'])
-                frappe.db.set_value('Summary Documents', each["name"], 'qr_attached_document', response['message']['file_url'])
+                frappe.db.set_value(
+                    'Summary Documents', each["name"], 'qr_attached_document', response['message']['file_url'])
                 frappe.db.commit()
             else:
                 return {"success": False, "message": "something went wrong"}
         return {"success": True, "files": files_urls}
     except Exception as e:
         frappe.log_error(str(e), "add_qr_to_pdf")
-        return{"success": False,"message": str(e)}
+        return{"success": False, "message": str(e)}

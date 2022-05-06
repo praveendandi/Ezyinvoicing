@@ -12,7 +12,7 @@
   "pin_code",
   "taxpayer_details",
   "company",
-  "status"
+  "location_status"
  ],
  "fields": [
   {
@@ -60,14 +60,14 @@
   },
   {
    "default": "0",
-   "fieldname": "status",
+   "fieldname": "location_status",
    "fieldtype": "Check",
-   "label": "Status"
+   "label": "Location Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-07 12:16:26.567947",
+ "modified": "2022-05-06 10:35:43.845846",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Taxpayer Locations",
