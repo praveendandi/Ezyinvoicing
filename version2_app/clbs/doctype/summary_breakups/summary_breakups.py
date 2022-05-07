@@ -109,13 +109,20 @@ def summary_print_formats(name):
         return {"success": False, "message": str(e)}
 
 
-def get_file_size(summary):
+def get_file_size(summary,files = []):
     try:
+        if len(files)>0:
+            files = [value for each in files for key,value in each.items()]
         summary_files = get_all_summary_files(summary)
         if not summary_files["success"]:
             return summary_files
-        files = summary_files["files"]
-        print(files)
+        documents = files + summary_files["files"]
+        cwd = os.getcwd()
+        site_name = cstr(frappe.local.site)
+        if len(documents) > 0:
+            for each in documents:
+                file_path = cwd + "/" + site_name + each
+                
     except Exception as e:
         pass
 
@@ -209,7 +216,10 @@ def download_pdf(name):
                     files.insert(0, each)
                 else:
                     files.append(each)
-            return {"success": True, "files": file_urls}
+            if len(files) > 0:
+                
+            file_size = get_file_size(name, files)
+            return {"success": True, "files": files}
         else:
             return {"success": False, "message": "no data found"}
     except Exception as e:
