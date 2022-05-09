@@ -191,7 +191,7 @@ def combine_pdf(files, filename, name):
         for each in files:
             file_path = cwd + "/" + site_name + each
             merger.append(file_path)
-        file_path = cwd + "/" + site_name + "/public/files/" + 'merge.pdf'
+        file_path = cwd + "/" + site_name + "/public/files/" + name +'.pdf'
         merger.write(file_path)
         merger.close()
         files_new = {"file": open(file_path, 'rb')}
@@ -645,7 +645,6 @@ def send_summary_mail(data):
 
         files_summary = frappe.db.get_list("File", filters={"file_url": [
                                            "in", summary_files]}, group_by='file_url', pluck='name')
-        print(files_summary,"........//////")
         response = make(recipients=data["email"],
                         subject=data["subject"],
                         content=data["response"],
