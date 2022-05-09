@@ -109,14 +109,17 @@ def summary_print_formats(name):
         return {"success": False, "message": str(e)}
 
 
-def get_file_size(summary, files=[]):
+def get_file_size(summary, files=[], combine=False):
     try:
-        if len(files) > 0:
+        if len(files) > 0 and combine == False:
             files = [value for each in files for key, value in each.items()]
-        summary_files = get_all_summary_files(summary)
-        if not summary_files["success"]:
-            return summary_files
-        documents = files + summary_files["files"]
+        if combine == False:
+            summary_files = get_all_summary_files(summary)
+            if not summary_files["success"]:
+                return summary_files
+            documents = files + summary_files["files"]
+        else:
+            documents = files
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
         filesize = 0
@@ -172,6 +175,15 @@ def combine_pdf(files, filename, name):
                 files.insert(0, each)
             else:
                 files.append(each)
+        summaryfile = get_all_summary_files(name)
+        if not summaryfile["success"]:
+            return summaryfile
+        qr_files = [each for each in summaryfile["files"] if "withQr" in each]
+        invoices = frappe.db.get_list("Summary Documents", filters={"summary": [
+                    "=", name], "document_type": "Invoices"}, pluck="document")
+        bills = frappe.db.get_list("Summary Documents", filters={"summary": [
+                    "=", name], "document_type": ["!=","Invoices"]}, pluck="document")
+        files = qr_files + invoices + files + bills
         company = frappe.get_last_doc('company')
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
@@ -193,7 +205,7 @@ def combine_pdf(files, filename, name):
             return {"success": False, "message": "something went wrong"}
         return {"success": True, "file_url": file_response["message"]["file_url"]}
     except Exception as e:
-        frappe.log_error(str(e), "download_pdf")
+        frappe.log_error(str(e), "combine_pdf")
         return {"success": False, "message": str(e)}
 
 
@@ -607,12 +619,16 @@ def send_summary_mail(data):
         # remaining_bills = frappe.db.get_list("Summary Documents", filters={"summary": [
         #                                      "=", data["summary"]], "qr_code_image": ["=", ""]}, pluck="document")
         # summary_files.extend(remaining_bills)
-        get_summary_files = get_all_summary_files(data["summary"])
-        if not get_summary_files["success"]:
-            return get_summary_files
-        summary_files = get_summary_files["files"]
         printformat_files = frappe.db.get_list(
             'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='name')
+        if company.clbs_document_preview != "COMBINED":
+            get_summary_files = get_all_summary_files(data["summary"])
+            if not get_summary_files["success"]:
+                return get_summary_files
+            summary_files = get_summary_files["files"]
+        else:
+            summary_files = frappe.db.get_list(
+            'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='file_url')
         if len(printformat_files) == 0:
             return {"success": False, "message": "Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])
@@ -621,13 +637,15 @@ def send_summary_mail(data):
         filesize = 0
         if len(summary_files) > 0:
             file_size = get_file_size(
-                data["summary"], [])
+                data["summary"], summary_files, True if company.clbs_document_preview == "COMBINED" else False)
             if file_size["success"]:
                 filesize = file_size["size"]
         if filesize > 25:
             return {"success": False, "message": "File size is more than 25MB"}
+
         files_summary = frappe.db.get_list("File", filters={"file_url": [
                                            "in", summary_files]}, group_by='file_url', pluck='name')
+        print(files_summary,"........//////")
         response = make(recipients=data["email"],
                         subject=data["subject"],
                         content=data["response"],
