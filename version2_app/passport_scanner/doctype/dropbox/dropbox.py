@@ -781,7 +781,7 @@ def extract_id_details(data={}):
                 if aadhaar_back_details["success"]:
                     # return aadhaar_back_details
                     details.update(aadhaar_back_details["data"])
-        elif data["id_type"] == "indianPassport":
+        elif data["id_type"] == "indianPassport" or data['id_type'] == 'Foreigner':
             if data["image_1"]:
                 passport_front_details = fetch_passport_details(data["image_1"], None)
                 if passport_front_details["success"]:
@@ -877,6 +877,16 @@ def create_guest_details(data,name=None,update=False):
             doc.insert(ignore_permissions=True)
             frappe.db.commit()
             # guest_attachments(doc, method="Manula")
+            frappe.db.set_value(
+                "Arrival Information",
+                data["confirmation_number"],
+                # "virtual_checkin_status",
+                # "Yes",
+                "status",
+                "Scanned",
+                update_modified=False
+            )
+            frappe.db.commit()
             return {"success": True, "message": "Guest Created"}
         else:
             if not bool(data):
@@ -893,6 +903,16 @@ def create_guest_details(data,name=None,update=False):
             # frappe.db.commit()
             # doc.insert(ignore_permissions=True)
             # guest_attachments(doc, method="Manula")
+            frappe.db.set_value(
+                "Arrival Information",
+                data["confirmation_number"],
+                # "virtual_checkin_status",
+                # "Yes",
+                "status",
+                "Scanned",
+                update_modified=False
+            )
+            frappe.db.commit()
             return {"success": True, "message": "Guest Updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -954,7 +974,7 @@ def reprocess_images(name:str,now=False):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "create_doc_using_base_files",
-            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "line No:{}\n{}".format(exc_tb.tb_lineno,str(e)),
         )
         print(e)
         return {

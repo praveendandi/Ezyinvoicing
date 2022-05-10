@@ -184,6 +184,9 @@ def add_pre_checkins():
                 data["confirmation_number"],
                 "virtual_checkin_status",
                 "Yes",
+                # "status",
+                # "Scanned",
+                # update_modified=False
             )
         activity_data = {
             "doctype": "Activity Logs",
