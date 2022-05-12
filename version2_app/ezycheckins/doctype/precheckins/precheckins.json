@@ -131,7 +131,7 @@
    "fieldname": "guest_id_type",
    "fieldtype": "Select",
    "label": "Guest Id Type",
-   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice\nnrc\nzambiaPassport"
   },
   {
    "fieldname": "signature",
@@ -356,7 +356,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-11 15:18:42.013101",
+ "modified": "2022-05-10 10:28:41.488105",
  "modified_by": "Administrator",
  "module": "EzyCheckins",
  "name": "Precheckins",

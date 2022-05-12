@@ -34,13 +34,14 @@
   },
   {
    "fieldname": "value",
-   "fieldtype": "Data",
-   "label": "Value"
+   "fieldtype": "Select",
+   "label": " Value",
+   "options": "aadhaar\npassport\ndriving\nvoterId\nindianPassport\nzambiaPassport\nnrc"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-03 18:32:40.566114",
+ "modified": "2022-05-10 10:17:05.209126",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Nationality Ids",

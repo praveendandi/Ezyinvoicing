@@ -446,7 +446,7 @@
    "fieldname": "guest_id_type",
    "fieldtype": "Select",
    "label": "Guest Id Type",
-   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice\nnrc\nzambiaPassport"
   },
   {
    "fieldname": "guest_first_name",
@@ -511,7 +511,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-29 15:50:35.113406",
+ "modified": "2022-05-10 09:54:16.278843",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
