@@ -109,15 +109,32 @@ def summary_print_formats(name):
         return {"success": False, "message": str(e)}
 
 
-def get_file_size(summary):
+def get_file_size(summary, files=[]):
     try:
+        if len(files) > 0:
+            files = [value for each in files for key, value in each.items()]
         summary_files = get_all_summary_files(summary)
         if not summary_files["success"]:
             return summary_files
-        files = summary_files["files"]
-        print(files)
+        documents = files + summary_files["files"]
+        cwd = os.getcwd()
+        site_name = cstr(frappe.local.site)
+        filesize = 0
+        if len(documents) > 0:
+            documents = list(set(documents))
+            for each in documents:
+                file_path = cwd + "/" + site_name + each
+                size = os.path.getsize(file_path)
+                filesize += size
+        if filesize > 0:
+            size_in_mb = filesize/(1024*1024)
+            return {"success": True, "size": round(size_in_mb, 2)}
+        else:
+            return {"success": False, "size": 0}
     except Exception as e:
-        pass
+        frappe.log_error("Error in summary_print_formats: ",
+                         frappe.get_traceback())
+        return {"success": False, "message": str(e)}
 
 
 def html_to_pdf(html_data, filename, name):
@@ -201,6 +218,9 @@ def download_pdf(name):
                 combine = combine_pdf(file_urls, each["category"], name)
                 if not combine:
                     return combine
+                files_to_delete = [value for each in file_urls for key, value in each.items()]
+                frappe.db.delete("File", {"file_url": ["in", files_to_delete]})
+                frappe.db.commit()  
                 file_urls = []
                 file_urls.append({"Summary": combine["file_url"]})
             files = []
@@ -209,7 +229,12 @@ def download_pdf(name):
                     files.insert(0, each)
                 else:
                     files.append(each)
-            return {"success": True, "files": file_urls}
+            filesize = 0
+            if len(files) > 0:
+                file_size = get_file_size(name, files)
+                if file_size["success"]:
+                    filesize = file_size["size"]
+            return {"success": True, "files": files, "size": filesize}
         else:
             return {"success": False, "message": "no data found"}
     except Exception as e:
@@ -593,6 +618,14 @@ def send_summary_mail(data):
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
                 return generate_pdf
+        filesize = 0
+        if len(summary_files) > 0:
+            file_size = get_file_size(
+                data["summary"], [])
+            if file_size["success"]:
+                filesize = file_size["size"]
+        if filesize > 25:
+            return {"success": False, "message": "File size is more than 25MB"}
         files_summary = frappe.db.get_list("File", filters={"file_url": [
                                            "in", summary_files]}, group_by='file_url', pluck='name')
         response = make(recipients=data["email"],
