@@ -115,8 +115,9 @@ def create_pos_bills(data):
                         else:
                             added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
-                    if company_doc.pos_footer:
-                        data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
+                    if count == 0:
+                        if company_doc.pos_footer:
+                            data["payload"] = data["payload"]+"\n"+company_doc.pos_footer+"\n"
                     extra_text_after_qr = None
                     if company_doc.pos_extra_text_after_qr:
                         extra_text_after_qr = company_doc.pos_extra_text_after_qr
