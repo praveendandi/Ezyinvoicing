@@ -656,7 +656,6 @@ def backup_file_perticulerdoctypes(data):
         frappe.log_error("Ezy-block-IRN","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-
 def upload_propery_logo_pms(data):
     try:
         # headers = {'Content-Type': 'application/json'}

@@ -180,9 +180,9 @@ def combine_pdf(files, filename, name):
             return summaryfile
         qr_files = [each for each in summaryfile["files"] if "withQr" in each]
         invoices = frappe.db.get_list("Summary Documents", filters={"summary": [
-                    "=", name], "document_type": "Invoices"}, pluck="document")
+            "=", name], "document_type": "Invoices"}, pluck="document")
         bills = frappe.db.get_list("Summary Documents", filters={"summary": [
-                    "=", name], "document_type": ["!=","Invoices"]}, pluck="document")
+            "=", name], "document_type": ["!=", "Invoices"]}, pluck="document")
         files = qr_files + invoices + files + bills
         company = frappe.get_last_doc('company')
         cwd = os.getcwd()
@@ -191,7 +191,7 @@ def combine_pdf(files, filename, name):
         for each in files:
             file_path = cwd + "/" + site_name + each
             merger.append(file_path)
-        file_path = cwd + "/" + site_name + "/public/files/" + name +'.pdf'
+        file_path = cwd + "/" + site_name + "/public/files/" + name + '.pdf'
         merger.write(file_path)
         merger.close()
         files_new = {"file": open(file_path, 'rb')}
@@ -230,9 +230,10 @@ def download_pdf(name):
                 combine = combine_pdf(file_urls, each["category"], name)
                 if not combine:
                     return combine
-                files_to_delete = [value for each in file_urls for key, value in each.items()]
+                files_to_delete = [
+                    value for each in file_urls for key, value in each.items()]
                 frappe.db.delete("File", {"file_url": ["in", files_to_delete]})
-                frappe.db.commit()  
+                frappe.db.commit()
                 file_urls = []
                 file_urls.append({"Summary": combine["file_url"]})
             files = []
@@ -628,7 +629,7 @@ def send_summary_mail(data):
             summary_files = get_summary_files["files"]
         else:
             summary_files = frappe.db.get_list(
-            'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='file_url')
+                'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='file_url')
         if len(printformat_files) == 0:
             return {"success": False, "message": "Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])

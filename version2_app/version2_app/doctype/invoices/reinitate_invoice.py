@@ -49,7 +49,7 @@ def Reinitiate_invoice(data):
                 if not isinstance(data["invoice_object_from_file"],dict):
                     data["invoice_object_from_file"] = data["invoice_object_from_file"].replace('\" \"',"")
             if data["invoice_object_from_file"] != "":
-                if "data" not in data['invoice_object_from_file'].keys():
+                if "data" not in data['invoice_object_from_file']:
                     data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
                 else:
                     data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
