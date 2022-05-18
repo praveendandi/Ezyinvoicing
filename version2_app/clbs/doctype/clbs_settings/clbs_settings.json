@@ -12,10 +12,12 @@
   "qr_rect_y1",
   "cc_mail_ids_for_clbs_reports",
   "clbs_document_preview",
+  "document_sequence",
   "company",
   "summary_header",
   "summary_terms_and_conditions",
-  "summary_footer"
+  "summary_footer",
+  "threshhold"
  ],
  "fields": [
   {
@@ -71,11 +73,21 @@
    "fieldname": "summary_footer",
    "fieldtype": "Small Text",
    "label": "Summary Footer"
+  },
+  {
+   "fieldname": "threshhold",
+   "fieldtype": "Float",
+   "label": "Threshhold"
+  },
+  {
+   "fieldname": "document_sequence",
+   "fieldtype": "Attach",
+   "label": "Document Sequence"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-16 11:14:02.526706",
+ "modified": "2022-05-18 11:19:30.711653",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "CLBS Settings",

@@ -70,6 +70,8 @@ def delete_summaries(name=None, status=None):
             # frappe.db.sql("""UPDATE `tabSummary Breakups` SET deleted_breakups=1 where summaries='{}'""".format(name))
             frappe.db.sql("""UPDATE `tabInvoices` SET summary=null, clbs_summary_generated=0, invoice_submitted_in_clbs=0 where summary='{}'""".format(name))
             frappe.db.commit()
+            delete_files = frappe.db.delete("File", {"attached_to_name": name})
+            frappe.db.commit()
             return {'success': True, 'message': "summary "+status}
         else:
             return {"success": False, 'message': "summary not found"}

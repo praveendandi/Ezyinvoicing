@@ -32,7 +32,15 @@ class SummaryBreakups(Document):
 
 def convert_image_to_base64(image):
     try:
-        with open(image, "rb") as image_file:
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        file_path1 = (
+            folder_path
+            + "/sites/"
+            + company.site_name
+            + image
+        )
+        with open(file_path1, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
         encoded_str = encoded_string.decode("utf-8")
         return {"success": True, "data": encoded_str}
@@ -53,16 +61,7 @@ def summary_print_formats(name):
         if doc:
             company = frappe.get_last_doc("company")
             if company.company_logo:
-                company_logo = company.company_logo
-                folder_path = frappe.utils.get_bench_path()
-                site_folder_path = folder_path + "/sites/" + company.site_name
-                file_path1 = (
-                    folder_path
-                    + "/sites/"
-                    + company.site_name
-                    + company.company_logo
-                )
-                convimgtobase = convert_image_to_base64(file_path1)
+                convimgtobase = convert_image_to_base64(company.company_logo)
                 if not convimgtobase["success"]:
                     return convimgtobase
                 doc["base"] = "data:image/png;base64,"+convimgtobase["data"]
@@ -140,7 +139,7 @@ def get_file_size(summary, files=[], combine=False):
         return {"success": False, "message": str(e)}
 
 
-def html_to_pdf(html_data, filename, name):
+def html_to_pdf(html_data, filename, name, etax=False):
     try:
         company = frappe.get_last_doc('company')
         if not company.host:
@@ -178,7 +177,8 @@ def combine_pdf(files, filename, name):
         summaryfile = get_all_summary_files(name)
         if not summaryfile["success"]:
             return summaryfile
-        qr_files = [each for each in summaryfile["files"] if "withQr" in each]
+        qr_files = [each for each in summaryfile["files"]
+                    if "E Tax Invoice-" in each]
         invoices = frappe.db.get_list("Summary Documents", filters={"summary": [
             "=", name], "document_type": "Invoices"}, pluck="document")
         bills = frappe.db.get_list("Summary Documents", filters={"summary": [
@@ -226,7 +226,10 @@ def download_pdf(name):
                     return get_pdf
                 file_urls.append({each["category"]: get_pdf["file_url"]})
             company = frappe.get_last_doc('company')
-            if company.clbs_document_preview == "COMBINED":
+            if not frappe.db.exists("CLBS Settings", company.name):
+                return {"success": False, "message": "No data found in clbs settings"}
+            clbs_settings_doc = frappe.get_doc("CLBS Settings", company.name)
+            if clbs_settings_doc.clbs_document_preview == "COMBINED":
                 combine = combine_pdf(file_urls, each["category"], name)
                 if not combine:
                     return combine
@@ -601,8 +604,11 @@ def send_summary_mail(data):
     try:
         company = frappe.get_last_doc('company')
         cc_emails = None
-        if company.cc_mail_ids_for_clbs_reports and company.cc_mail_ids_for_clbs_reports != "":
-            cc_emails = company.cc_mail_ids_for_clbs_reports
+        if not frappe.db.exists("CLBS Settings", company.name):
+            return {"success": False, "message": "No data found in clbs settings"}
+        clbs_settings_doc = frappe.get_doc("CLBS Settings", company.name)
+        if clbs_settings_doc.cc_mail_ids_for_clbs_reports and clbs_settings_doc.cc_mail_ids_for_clbs_reports != "":
+            cc_emails = clbs_settings_doc.cc_mail_ids_for_clbs_reports
         # if cc_emails:
         #     if "cc_emails" in data:
         #         cc_emails = data["cc_emails"]
@@ -622,14 +628,25 @@ def send_summary_mail(data):
         # summary_files.extend(remaining_bills)
         printformat_files = frappe.db.get_list(
             'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='name')
-        if company.clbs_document_preview != "COMBINED":
+        if not frappe.db.exists("CLBS Settings", company.name):
+            return {"success": False, "message": "No data found in clbs settings"}
+        clbs_settings_doc = frappe.get_doc("CLBS Settings", company.name)
+        if clbs_settings_doc.clbs_document_preview != "COMBINED":
             get_summary_files = get_all_summary_files(data["summary"])
             if not get_summary_files["success"]:
                 return get_summary_files
             summary_files = get_summary_files["files"]
         else:
-            summary_files = frappe.db.get_list(
-                'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='file_url')
+            combined_files = download_pdf(data["summary"])
+            if not combined_files["success"]:
+                return combined_files
+            print(combined_files)
+            if len(combined_files["files"]) > 0:
+                summary_files = combined_files["files"][0]["Summary"]
+            else:
+                summary_files = []
+            # summary_files = frappe.db.get_list(
+            #     'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='file_url')
         if len(printformat_files) == 0:
             return {"success": False, "message": "Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])
@@ -638,7 +655,7 @@ def send_summary_mail(data):
         filesize = 0
         if len(summary_files) > 0:
             file_size = get_file_size(
-                data["summary"], summary_files, True if company.clbs_document_preview == "COMBINED" else False)
+                data["summary"], summary_files, True if clbs_settings_doc.clbs_document_preview == "COMBINED" else False)
             if file_size["success"]:
                 filesize = file_size["size"]
         if filesize > 25:
@@ -664,19 +681,12 @@ def send_summary_mail(data):
 def get_all_summary_files(summary=None):
     try:
         if summary:
-            summary_files = []
-            checkinvoices = frappe.db.get_list("Summary Documents", filters={"summary": ["=", summary], "qr_attached_document": [
-                "=", ""], "document_type": "Invoices", "qr_code_image": ["!=", ""]}, fields=["name", "document", "invoice_number", "qr_code_image"])
-            if len(checkinvoices) > 0:
-                add_qr_pdf = add_qr_to_pdf(checkinvoices)
-                if not add_qr_pdf["success"]:
-                    return add_qr_pdf
-                summary_files = add_qr_pdf["files"]
-            else:
-                summary_files = frappe.db.get_list("Summary Documents", filters={"summary": [
-                    "=", summary], "qr_code_image": ["!=", ""], "document_type": "Invoices"}, pluck="qr_attached_document")
+            etax_tax = etax_invoice_to_pdf(summary)
+            if not etax_tax["success"]:
+                return etax_tax
+            summary_files = etax_tax["file_urls"]
             remaining_bills = frappe.db.get_list("Summary Documents", filters={"summary": [
-                "=", summary], "qr_code_image": ["=", ""]}, pluck="document")
+                "=", summary]}, pluck="document")
             printformat_files = frappe.db.get_list(
                 'File', filters={'attached_to_name': ['=', summary]}, pluck='file_url')
             summary_files = summary_files + remaining_bills + printformat_files
@@ -734,4 +744,51 @@ def add_qr_to_pdf(data):
         return {"success": True, "files": files_urls}
     except Exception as e:
         frappe.log_error(str(e), "add_qr_to_pdf")
+        return{"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def etax_invoice_to_pdf(summary):
+    try:
+        company = frappe.get_last_doc("company")
+        company_logo_base = ""
+        if company.company_logo:
+            convimgtobase = convert_image_to_base64(company.company_logo)
+            if not convimgtobase["success"]:
+                return convimgtobase
+            company_logo_base = "data:image/png;base64,"+convimgtobase["data"]
+        checkinvoices = frappe.db.get_list("Summary Breakups", filters={"Summaries": [
+                                           "=", summary]}, pluck="invoice_number", group_by="invoice_number")
+        if len(checkinvoices) > 0:
+            file_urls = []
+            for each in checkinvoices:
+                if frappe.db.exists("Invoices", each):
+                    doc = frappe.get_doc("Invoices", each)
+                    qr_image_base = ""
+                    if doc.qr_code_image:
+                        convimgtobase = convert_image_to_base64(
+                            doc.qr_code_image)
+                        if not convimgtobase["success"]:
+                            return convimgtobase
+                        qr_image_base = "data:image/png;base64," + \
+                            convimgtobase["data"]
+                    templates = frappe.db.get_value(
+                        "Print Format", {"name": "E-Tax Invoice"}, ["html"])
+                    if not templates:
+                        return {"success": False, ",message": "please add print formats"}
+                    data = doc.as_dict()
+                    data["qr_code_image"] = qr_image_base
+                    data["company_logo_base"] = company_logo_base
+                    html_data = frappe.render_template(templates, data)
+                    convert_html_to_pdf = html_to_pdf(
+                        html_data, "E Tax Invoice-", each)
+                    if not convert_html_to_pdf["success"]:
+                        return convert_html_to_pdf
+                    frappe.db.set_value(
+                        'Summary Documents', each, 'qr_attached_document', convert_html_to_pdf["file_url"])
+                    frappe.db.commit()
+                    file_urls.append(convert_html_to_pdf["file_url"])
+            return {"success": True, "file_urls": file_urls}
+    except Exception as e:
+        frappe.log_error(str(e), "etax_invoice_to_pdf")
         return{"success": False, "message": str(e)}
