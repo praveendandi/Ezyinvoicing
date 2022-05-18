@@ -20,7 +20,6 @@ def get_summary(name):
         if frappe.db.exists("Summaries", name):
             get_summary = frappe.db.get_value('Summaries', name, [
                                             "summary_title", "between_dates", "tax_payer_details", "location", "header", "footer", "terms_and_conditions"], as_dict=1)
-            print(get_summary,"//////")
             tax_payer_details = frappe.db.get_value(
                 'TaxPayerDetail', get_summary["tax_payer_details"], ["legal_name"], as_dict=1)
             tax_payer_location = frappe.db.get_value("Taxpayer Locations", get_summary["location"], [
@@ -31,14 +30,15 @@ def get_summary(name):
             else:
                 total_data["location"] = None
             company_doc = frappe.get_last_doc('company')
+            clbs_settings = frappe.get_doc("CLBS Settings",company_doc.name)
             if not get_summary["header"]:
-                get_summary["header"] = company_doc.summary_header
+                get_summary["header"] = clbs_settings.summary_header
             if not get_summary["footer"]:
-                get_summary["footer"] = company_doc.summary_footer
+                get_summary["footer"] = clbs_settings.summary_footer
+            ht = html2text.HTML2Text()
             if get_summary["terms_and_conditions"] == "" or get_summary["terms_and_conditions"] == None:
-                get_summary["terms_and_conditions"] = company_doc.summary_terms_and_conditions
+                get_summary["terms_and_conditions"] = ht.handle(clbs_settings.summary_terms_and_conditions)
             else:
-                ht = html2text.HTML2Text()
                 get_summary["terms_and_conditions"] = ht.handle(get_summary["terms_and_conditions"])
             return {"success": True, "data": total_data}
         else:
