@@ -16,6 +16,7 @@ import json
 import string
 import qrcode
 import os, os.path,sys
+import importlib.util
 import random, string
 from random import randint
 from google.cloud import storage
@@ -142,7 +143,6 @@ class Invoices(Document):
 @frappe.whitelist(allow_guest=True)
 def generateIrn(data):
     try:
-        print(data)
         company = frappe.get_last_doc("company")
         invoice_number = data['invoice_number']
 
@@ -162,9 +162,27 @@ def generateIrn(data):
         elif invoice.invoice_category == "Debit Invoice":	
             category = "DBN"
         else:
-            category = "CRN"	
+            category = "CRN"
+        # if "bulk_irn" in data:
+        #     if data["bulk_irn"]:
+        if invoice.invoice_category == "Tax Invoice" and invoice.has_credit_items == "Yes" and invoice.invoice_from == "Pms":
+            get_is_credit_items = frappe.db.get_list("Items", filters=[["parent","=",data['invoice_number']]], pluck="is_credit_item")
+            if "Yes" in get_is_credit_items:
+                abs_path = os.path.dirname(os.getcwd())
+                file_path = abs_path + '/apps/version2_app/version2_app/version2_app/doctype/invoices/reinitate_invoice.py'
+                module_name = 'auto_adjustment'
+                spec = importlib.util.spec_from_file_location(module_name, file_path)
+                module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+                auto_adj = module.auto_adjustment({"invoice_number": data["invoice_number"]})
+                if not auto_adj["success"]:
+                    return auto_adj
+                get_is_credit_items = frappe.db.get_list("Items", filters=[["parent","=",data['invoice_number']]], pluck="is_credit_item") 
+                if "Yes" in get_is_credit_items:
+                    return {"success": False, "message": "please do adjust manually"}
         # IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category})
         company_details = check_company_exist_for_Irn(invoice.company)
+        invoice = frappe.get_doc('Invoices', invoice_number)
         # get gsp_details
         credit_note_items = []
         companyData = {
@@ -181,8 +199,6 @@ def generateIrn(data):
         }
         taxpayer_details = get_tax_payer_details(GspData)
         #gst data
-        print("dataaaaaaaaaaaaaaaaaaaaa",data)
-        print(taxpayer_details["data"].__dict__,"-----------------------------")
         if company_details['data'].mode == 'Testing':
             if len(invoice.invoice_number) > 13:
                 testing_invoice_number = invoice.invoice_number
@@ -371,10 +387,8 @@ def generateIrn(data):
                     IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
                     
                     IRNObjectdoc.save()
-                    print(response['result'],"00000000000000000000000000000000000000000000000")
                     # print(IRNObjectdoc.name,"/a/a/a/")
                     invoice = frappe.get_doc('Invoices', invoice_number)
-                    print(invoice.email,"|||||||||||||||||||||||||||||||||||")
                     invoice.ack_no = response['result']['AckNo']
                     invoice.irn_number = response['result']['Irn']
                     invoice.ack_date = response['result']['AckDt']
