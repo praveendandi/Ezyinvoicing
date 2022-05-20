@@ -37,7 +37,10 @@ def get_summary(name):
                 get_summary["footer"] = clbs_settings.summary_footer
             ht = html2text.HTML2Text()
             if get_summary["terms_and_conditions"] == "" or get_summary["terms_and_conditions"] == None:
-                get_summary["terms_and_conditions"] = ht.handle(clbs_settings.summary_terms_and_conditions)
+                if clbs_settings.summary_terms_and_conditions:
+                    get_summary["terms_and_conditions"] = ht.handle(clbs_settings.summary_terms_and_conditions)
+                else:
+                    get_summary["terms_and_conditions"] = ""
             else:
                 get_summary["terms_and_conditions"] = ht.handle(get_summary["terms_and_conditions"])
             return {"success": True, "data": total_data}
