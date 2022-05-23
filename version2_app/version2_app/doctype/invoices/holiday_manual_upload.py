@@ -222,7 +222,6 @@ def holidayinManualupload(data):
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":company})
         countIn = 1
-        print(len(input_data),"count")
         if input_data == [] and len(list_data)>0:
             input_data.append(list_data)
         for each in input_data:
