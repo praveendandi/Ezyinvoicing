@@ -1,22 +1,28 @@
+from re import T
 from webbrowser import get
 import datetime
+from attr import fields
+from cv2 import sort
 import frappe
 import json
 import requests
 import os
 import pandas as pd
+import numpy as np
 from frappe.utils import data as date_util
 from frappe.utils import cstr
 import xlsxwriter
 import openpyxl
 from openpyxl import Workbook
 from openpyxl import load_workbook
-from openpyxl.styles import Color,PatternFill,Font,Fill,colors,Alignment,Border,Side
+from openpyxl.styles import Color, PatternFill, Font, Fill, colors, Alignment, Border, Side
+from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.cell import Cell
+# from invoice_reconciliations import invoicereconciliationcount
 # from xlsxwriter import add_worksheet
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getGSTR1DashboardDetails(year=None, month=None):
     try:
         get_b2b_tax_invoice_summaries = frappe.db.sql(
@@ -40,12 +46,12 @@ def getGSTR1DashboardDetails(year=None, month=None):
         adjustment_of_advances = {"count": 0, "tax_amount": 0, "before_gst": 0,
                                   "taxable_value": 0, "igst_amount": 0, "cgst_amount": 0, "sgst_amount": 0, "invoice_category": "adjustment-of-advances"}
         total_data = {"tax_b2b": {k: (0 if v is None else v) for k, v in get_b2b_tax_invoice_summaries[0].items()},
+                      "sez_with_payment": {k: (0 if v is None else v) for k, v in get_sez_SEZWP[0].items()},
+                      "sez_without_payment": {k: (0 if v is None else v) for k, v in get_sez_SEZWOP[0].items()},
                       "tax_b2c": {k: (0 if v is None else v) for k, v in get_b2c_tax_invoice_summaries[0].items()},
                       "credit_b2b": {k: (0 if v is None else v) for k, v in get_b2b_credit_debit_invoice_summaries[0].items()},
                       "credit_b2c": {k: (0 if v is None else v) for k, v in get_b2c_credit_debit_invoice_summaries[0].items()},
                       "nil_rated_supplies": {k: (0 if v is None else v) for k, v in nil_rated_supplies[0].items()},
-                      "sez_with_payment": {k: (0 if v is None else v) for k, v in get_sez_SEZWP[0].items()},
-                      "sez_without_payment": {k: (0 if v is None else v) for k, v in get_sez_SEZWOP[0].items()},
                       "advance_received": advance_received,
                       "adjustment_of_advances": adjustment_of_advances,
                       "get_hsn_summary": {k: (0 if v is None else v) for k, v in get_hsn_summary[0].items()}}
@@ -195,12 +201,23 @@ def export_workbook(month=None, year=None):
         get_summary = getGSTR1DashboardDetails(year, month)
         if not get_summary["success"]:
             return get_summary
+        df = pd.DataFrame(get_summary["data"])
+        df = df.T
+        df1 = df.rename(index={'tax_b2b': 'B2B', 'sez_with_payment': 'B2B-SEZWP', 'sez_without_payment': 'B2B-SEZWOP', 'tax_b2c': 'B2C', 'credit_b2b': 'Credit/ Debit note (Registered)', 'credit_b2c': 'Credit/ Debit note (Unregistered)',
+                               'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances', 'get_hsn_summary': 'HSN Summary of Outward supply'})
+        total = df1.sum()
+        total.name = "Total"
+        df1 = df1.append(total.transpose())
+        summary_data = df1.to_dict('index')
         get_hsn_summary = getHsnSummary(month=month, year=year, export=True)
         if not get_hsn_summary["success"]:
             return get_hsn_summary
         get_nil_rated = nil_rated_supplies(month=month, year=year)
         if not get_nil_rated["success"]:
             return get_nil_rated
+        get_count_sequence = document_sequence(month=month, year=year)
+        if not get_count_sequence["success"]:
+            return get_count_sequence
         filter_list = {"B2B": [["invoice_type", "=", "B2B"], ["invoice_category", "=", "Tax Invoice"], ["irn_generated", "=", "Success"], ["sez", "=", 0]], "B2B-SEZWP": [["invoice_type", "=", "B2B"], ["invoice_category", "=", "Tax Invoice"], ["irn_generated", "=", "Success"], ["sez", "=", 1], ["suptyp", "=", "SEZWP"]], "B2B-SEZWOP": [["invoice_type", "=", "B2B"], ["invoice_category", "=", "Tax Invoice"], ["irn_generated", "=", "Success"], ["sez", "=", 1], ["suptyp", "=", "SEZWOP"]], "B2C": [["invoice_type", "=", "B2C", ], ["irn_generated", "=", "Success"]], "Credit-Debit-B2B": [["invoice_type", "=", "B2B"], ["invoice_category", "in", ["Debit Invoice", "Credit Invoice"]], ["irn_generated", "=", "Success"], ["sez", "=", 0]], "Credit-Debit-B2C": [["invoice_type", "=", "B2C"], [
             "invoice_category", "in", ["Debit Invoice", "Credit Invoice"]], ["irn_generated", "=", "Success"]]}
         for key, value in filter_list.items():
@@ -209,129 +226,158 @@ def export_workbook(month=None, year=None):
             if not get_invoices_data["success"]:
                 return get_invoices_data
             total_data.update({key: get_invoices_data["data"]})
-
-
-
-        # wb = Workbook()
-        # ws = wb.active
-        # ws = wb.create_sheet("Summary")
-        # ws.title = "Summary"
-        # ws.move_range("A1:A3", rows=1, cols=0)
-        # for i in range(ws.min_row,ws.max_row):
-        #     ws.row_dimensions[i].height = 15
-        # # sheet = wb['Sheet1']
-        # font = Font(name = 'Cambria',size=12,bold=True,color = '00FFFFFF')
-        # blueFill = PatternFill(start_color = '0B0B45',end_color = '0B0B45',fill_type = 'solid')
-        # number_format = "#,##0"
-        # alignment = Alignment(horizontal='center',vertical='top')
-        # border = Border(left=Side(border_style='thin',color='00000000'),right=Side(border_style='thin',color='00000000'),top=Side(border_style='thin',color='00000000'),
-        # bottom=Side(border_style='thin',color='00000000'),diagonal=Side(border_style='thin',color='00000000'),diagonal_direction=0,outline=Side(border_style='thin',color='00000000'),
-        # vertical=Side(border_style='thin', color='00000000'),horizontal=Side(border_style='thin',color='00000000'))
-        # cols = ['A','B','C']
-        # for col in cols:
-        #     for i in range(2,5):
-        #         cols = ws[f'{col}{i}']
-        #         cols.fill = blueFill
-        #         cols.font = font
-        #         cols.border = border
-        # cols = ['B','C','D','E','F','G','H']
-        # for col in cols :
-        #     cols = ws[f'{col}6']
-        #     cols.fill = blueFill
-        #     cols.font = font
-        #     cols.alignment = alignment
-        #     cols.border = border
-        # cols = ['B','C','D','E','F','G','H']
-        # for col in cols:
-        #     for i in range(7,27):
-        #         cols = ws[f'{col}{i}']
-        #         cols.number_format = number_format
-        #         cols.font = Font(name = 'Cambria',size=12)
-        #         cols.border = border
-        # for col in range(7,10):
-        #     cols = ws[f'B{col}']
-        #     cols.fill = blueFill
-        #     cols.font = font
-        # cols = ['C','D','E','F','G','H']
-        # for col in cols:
-        #     cols = ws[f'{col}9']
-        #     cols.font = Font(bold = True)
-        #     cols = ws[f'{col}23']
-        #     cols.font = Font(bold = True)
-        # cols = ['C','D','E','F','G','H']
-        # for col in cols:
-        #     cols = ws[f'{col}24']
-        #     cols.font = Font(bold = True)
-        #     number_format = "(#,##0)"
-        #     cols.number_format = number_format
-        # for ws1 in ws:
-        #     for row in ws.rows:
-        #         x1=ucr(row[0].value)
-        #         row[1].value=x1
-        # ws = wb.worksheets[1]
-        # ws['A2'] = 'Hiregange associates'
-        # ws['A3'] = 'Name of the client: '
-        # ws['A4'] = "GSTR-1 Summary for the period"
-        # ws['B6'] = [('')]
-        # Invoice_value = [('Invoice value',)]
-        # # ws['B6'] = {get_summary["data"], index=["count", "taxable_value", "igst_amount", "cgst_amount", "sgst_amount", "tax_amount", "before_gst"]}
-
-        # # ws.cell(row=2, column=2).value = 2
-        # # ws.cell(coordinate="C3").value = 3
-
-        # wb.save(file_path)
-
-
-        # return True
-        writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
-        # wb = pd.DataFrame(get_summary["data"], index=[
-        #                           "count", "taxable_value", "igst_amount", "cgst_amount", "sgst_amount", "tax_amount", "before_gst"])
-        # wb = wb.rename(index={'count': 'Count', "taxable_value": "Taxable Value", "igst_amount": "IGST",
-        #                                "cgst_amount": "CGST", "sgst_amount": "SGST", "tax_amount": "Tax amount", "before_gst": "Invoice value"})
-        # wb = wb.T
-        # wb = wb.reindex({'tax_b2b': 'B2B', 'sez_with_payment': 'B2B-SEZWP', 'sez_without_payment': 'B2B-SEZWOP', 'tax_b2c': 'B2C', 'credit_b2b': 'Credit/ Debit note (Registered)', 'credit_b2c': 'Credit/ Debit note (Unregistered)',
-        #                                 'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances', 'get_hsn_summary': 'HSN Summary of Outward supply'})
-        # wb = wb.rename(index={'tax_b2b': 'B2B', 'sez_with_payment': 'B2B-SEZWP', 'sez_without_payment': 'B2B-SEZWOP', 'tax_b2c': 'B2C', 'credit_b2b': 'Credit/ Debit note (Registered)', 'credit_b2c': 'Credit/ Debit note (Unregistered)',
-        #                                'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances', 'get_hsn_summary': 'HSN Summary of Outward supply'})
-        # wb.loc['Total'] = wb.sum(numeric_only=True, axis=0)
-
-
-        df_summary = pd.DataFrame(get_summary["data"], index=[
-                                  "count", "taxable_value", "igst_amount", "cgst_amount", "sgst_amount", "tax_amount", "before_gst"])
-        df_summary = df_summary.rename(index={'count': 'Count', "taxable_value": "Taxable Value", "igst_amount": "IGST",
-                                       "cgst_amount": "CGST", "sgst_amount": "SGST", "tax_amount": "Tax amount", "before_gst": "Invoice value"})
-        df_summary = df_summary.T
-        df_summary = df_summary.reindex({'tax_b2b': 'B2B', 'sez_with_payment': 'B2B-SEZWP', 'sez_without_payment': 'B2B-SEZWOP', 'tax_b2c': 'B2C', 'credit_b2b': 'Credit/ Debit note (Registered)', 'credit_b2c': 'Credit/ Debit note (Unregistered)',
-                                        'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances', 'get_hsn_summary': 'HSN Summary of Outward supply'})
-        df_summary = df_summary.rename(index={'tax_b2b': 'B2B', 'sez_with_payment': 'B2B-SEZWP', 'sez_without_payment': 'B2B-SEZWOP', 'tax_b2c': 'B2C', 'credit_b2b': 'Credit/ Debit note (Registered)', 'credit_b2c': 'Credit/ Debit note (Unregistered)',
-                                       'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances', 'get_hsn_summary': 'HSN Summary of Outward supply'})
-        df_summary.loc['Total'] = df_summary.sum(numeric_only=True, axis=0)
-        df_summary.to_excel(writer, sheet_name="Summary")
-
-        # Summary = df_summary.add_worksheet()
-        # worksheet2 = df_summary.add_worksheet()
-        # Summary.write('A1', 123)
-        # df_summary.close()
-        # df_summary.move_range("A1:A3", rows=1, cols=0)
-        # df_summary.insert_rows(7)
+        # dataframe = pd.read_excel()
+        wb = Workbook()
+        ws = wb.active
+        ws = wb.create_sheet("Summary")
+        ws.title = "Summary"
+        ws.move_range("A1:A5", rows=1, cols=0)
+        fields = ['before_gst', 'taxable_value', 'igst_amount',
+                  'cgst_amount', 'sgst_amount', 'tax_amount']
+        ws.append(["Particulars", "Invoice value", "Taxable value",
+                   "IGST", "CGST", "SGST", "TOTAL TAX LIABILITY"])
+        for key, value in summary_data.items():
+            values = (value[k] for k in fields)
+            values = list(values)
+            values.insert(0, key)
+            ws.append(values)
+        # ws.move_range("A6:A17", rows=0, cols=0)
+        for i in range(ws.min_row, ws.max_row):
+            ws.row_dimensions[i].height = 15
+        for i in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+            ws.column_dimensions[i].width = 30
+        font = Font(name='Cambria', size=12, bold=True, color='00FFFFFF')
+        blueFill = PatternFill(start_color='0B0B45',
+                               end_color='0B0B45', fill_type='solid')
+        number_format = "#,##0"
+        alignment = Alignment(horizontal='center', vertical='top')
+        border = Border(left=Side(border_style='thin', color='00000000'), right=Side(border_style='thin', color='00000000'), top=Side(border_style='thin', color='00000000'),
+                        bottom=Side(border_style='thin', color='00000000'), diagonal=Side(border_style='thin', color='00000000'), diagonal_direction=0, outline=Side(border_style='thin', color='00000000'),
+                        vertical=Side(border_style='thin', color='00000000'), horizontal=Side(border_style='thin', color='00000000'))
+        cols = ['A', 'B', 'C']
+        for col in cols:
+            for i in range(2, 5):
+                cols = ws[f'{col}{i}']
+                cols.fill = blueFill
+                cols.font = font
+                cols.border = border
+        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+        for col in cols:
+            cols = ws[f'{col}6']
+            cols.fill = blueFill
+            cols.font = font
+            cols.alignment = alignment
+            cols.border = border
+        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+        for col in cols:
+            for i in range(7, 18):
+                cols = ws[f'{col}{i}']
+                cols.number_format = number_format
+                cols.font = Font(name='Cambria', size=12)
+                cols.border = border
+        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        for col in cols:
+            cols = ws[f'{col}17']
+            cols.font = Font(bold=True)
+        ws = wb.worksheets[1]
+        ws['A2'] = 'GST Number : '+company.gst_number
+        ws['A3'] = 'Name of the client : '+company.legal_name
+        ws['A4'] = "GSTR-1 Summary for the period {} {}".format(
+            month_name, year)
+        invoice_fields = ['InvoiceNo', 'InvoiceDate', 'GSTINofSupplier', 'LegalName', 'InvoiceType',
+                          'InvoiceAmt', 'TotalTaxableAmt', 'SGST', 'CGST', 'IGST', 'TotalGST', 'CESS']
         for key, value in total_data.items():
+            ws = wb.create_sheet(key)
+            ws.title = key
+            for i in ['A', 'B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']:
+                ws.column_dimensions[i].width = 20
+            ws.column_dimensions['D'].width = 60
+            ws.append(['Invoice No', 'Invoice Date', 'GSTIN of Supplier', 'Legal Name', 'Invoice Type',
+                      'Invoice Amt', 'Total Taxable Amt', 'SGST', 'CGST', 'IGST', 'TotalGST', 'CESS'])
             if len(value) == 0:
                 value = [{'InvoiceNo': None, 'InvoiceDate': None, 'GSTINofSupplier': None, 'LegalName': None, 'InvoiceType': None,
                           'InvoiceAmt': None, 'TotalTaxableAmt': None, 'SGST': None, 'CGST': None, 'IGST': None, 'TotalGST': None, 'CESS': None}]
-            df = pd.DataFrame.from_records(value)
-            df.to_excel(writer, sheet_name=key, index=False)
+            else:
+                invoices_df = pd.DataFrame.from_records(value)
+                total = invoices_df.sum(numeric_only=True, axis=0)
+                total.name = "Total"
+                invoices_df = invoices_df.append(total.transpose())
+                invoices_df['InvoiceNo'] = invoices_df['InvoiceNo'].replace(
+                    np.nan, "Total")
+                value = invoices_df.to_dict('records')
+            for product in value:
+                values = (product[k] for k in invoice_fields)
+                ws.append(values)
+            if ws.max_row > 2:
+                for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
+                    cell.font = Font(bold=True)
+
+            # df = pd.DataFrame.from_records(value)
         nil_rated = {"Inter state Supplies to Registered person": {"Nil Rated": get_nil_rated["data"]["inter_state_nill_rated_register_person"], "Exempted": get_nil_rated["data"]["inter_state_excempted_register_person"], "Non-GST": get_nil_rated["data"]
-                                                                   ["inter_state_nonregister_register_person"]}, "Inter state Supplies to Unregistered person": {"Nil Rated":get_nil_rated["data"]["inter_state_nill_rated_unregister_person"], "Exempted": get_nil_rated["data"]["inter_state_excempted_unregister_person"], "Non-GST": get_nil_rated["data"]["inter_state_nonregister_unregister_person"]}, 
-                                                                   "Intra state Supplies to Registered person": {"Nil Rated": get_nil_rated["data"]["intra_state_nill_rated_register_person"], "Exempted": get_nil_rated["data"]["intra_state_excempted_register_person"], "Non-GST": get_nil_rated["data"]["intra_state_nonregister_register_person"]}, 
-                                                                   "Intra state Supplies to Unregistered person": {"Nil Rated": get_nil_rated["data"]["intra_state_nill_rated_unregister_person"], "Exempted": get_nil_rated["data"]["intra_state_excempted_unregister_person"], "Non-GST": get_nil_rated["data"]["intra_state_nonregister_unregister_person"]}}
-        df1 = pd.DataFrame(nil_rated)
-        df1 = df1.T
-        df1.loc['Total'] = df1.sum(numeric_only=True)
-        df1.to_excel(writer, sheet_name="Nil Rated")
-        df2 = pd.DataFrame.from_records(get_hsn_summary["data"])
-        df2.loc['Total'] = df2.sum(numeric_only=True)
-        df2.to_excel(writer, sheet_name="HSN Summary", index=False)
-        writer.save()
+                                                                   ["inter_state_nonregister_register_person"]}, "Inter state Supplies to Unregistered person": {"Nil Rated": get_nil_rated["data"]["inter_state_nill_rated_unregister_person"], "Exempted": get_nil_rated["data"]["inter_state_excempted_unregister_person"], "Non-GST": get_nil_rated["data"]["inter_state_nonregister_unregister_person"]},
+                     "Intra state Supplies to Registered person": {"Nil Rated": get_nil_rated["data"]["intra_state_nill_rated_register_person"], "Exempted": get_nil_rated["data"]["intra_state_excempted_register_person"], "Non-GST": get_nil_rated["data"]["intra_state_nonregister_register_person"]},
+                     "Intra state Supplies to Unregistered person": {"Nil Rated": get_nil_rated["data"]["intra_state_nill_rated_unregister_person"], "Exempted": get_nil_rated["data"]["intra_state_excempted_unregister_person"], "Non-GST": get_nil_rated["data"]["intra_state_nonregister_unregister_person"]}}
+        ws = wb.create_sheet("Nil Rated")
+        ws.title = "Nil Rated"
+        ws.column_dimensions["A"].width = 40
+        for i in ['B', 'C', 'D']:
+            ws.column_dimensions[i].width = 20
+        nilrated_fields = ["Nil Rated", "Exempted", "Non-GST"]
+        ws.append(["", "Nil Rated", "Exempted", "Non-GST"])
+        nil_rated_df = pd.DataFrame(nil_rated)
+        nil_rated_df = nil_rated_df.T
+        total = nil_rated_df.sum(numeric_only=True, axis=0)
+        total.name = "Total"
+        nil_rated_df = nil_rated_df.append(total.transpose())
+        nil_rated_list = nil_rated_df.to_dict('index')
+        for key, value in nil_rated_list.items():
+            values = (value[k] for k in nilrated_fields)
+            values = list(values)
+            values.insert(0, key)
+            ws.append(values)
+        for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
+            cell.font = Font(bold=True)
+        hsn_fields = ['Sac_Code', "Gst_Rate", "UQC", "total_quantity", "cgst_amount", "sgst_amount", "igst_amount",
+                      "state_cess_amount", "central_cess_amount", "total_gst", "total_tax_amount", "total_amount"]
+        ws = wb.create_sheet("HSN_Summary")
+        ws.title = "HSN_Summary"
+        for i in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']:
+            ws.column_dimensions[i].width = 15
+        ws.append(["SAC Code", "Gst Rate", "UQC", "Total Quantity", "Cgst Amount", "Sgst Amount", "Igst Amount",
+                  "State Cess Amount", "Central Cess Amount", "Total Gst", "Total Tax Amount", "Total Amount"])
+        hsn_summary_df = pd.DataFrame.from_records(get_hsn_summary["data"])
+        total = hsn_summary_df.sum(numeric_only=True, axis=0)
+        total.name = "Total"
+        hsn_summary_df = hsn_summary_df.append(total.transpose())
+        print(len(hsn_summary_df))
+        # hsn_summary_df['Sac_Code'] = hsn_summary_df['Sac_Code'].replace(
+        #     np.nan, "Total")
+        # invoices_df['InvoiceNo'] = invoices_df['InvoiceNo'].replace(
+        #             np.nan, "Total")
+        hsn_summary = hsn_summary_df.to_dict('records')
+        for product in hsn_summary:
+            values = (product[k] for k in hsn_fields)
+            ws.append(values)
+        for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
+            cell.font = Font(bold=True)
+        if len(hsn_summary_df)>1:
+            ws.cell(row=ws.max_row, column=2).value = ""
+            ws.cell(row=ws.max_row, column=1).value = "Total"
+        # ws = wb.create_sheet("Sequence")
+        # ws.title = "Sequence"
+        # for i in ['A', 'B', 'C', 'D', 'E']:
+        #     ws.column_dimensions[i].width = 15
+        # # print(get_count_sequence["data"])
+        # ws.append(["Document","From","To","Success","Cancelled"])
+        # document_fields = ["Document","From","To","Success","Cancelled"]
+        # sequence_count = [{"Document":"Tax Invoice", "From":get_count_sequence["data"]["tax_invoice_from"], "To":get_count_sequence["data"]["tax_invoice_to"], "Success":get_count_sequence["data"]["tax_invoice_success_count"], "Cancelled":get_count_sequence["data"]["tax_invoice_cancelled_count"]},{"Document":"Credit Invoice", "From":get_count_sequence["data"]["credit_invoice_from"], "To":get_count_sequence["data"]["credit_invoice_to"], "Success":get_count_sequence["data"]["credit_invoice_success_count"], "Cancelled":get_count_sequence["data"]["credit_invoice_cancelled_count"]}]
+        # for product in sequence_count:
+        #     values = (product[k] for k in document_fields)
+        #     ws.append(values)
+        Sheet = wb['Sheet']
+        wb.remove(Sheet)
+        wb.save(file_path)
+        # return True
         files_new = {"file": open(file_path, 'rb')}
         payload_new = {'is_private': 1, 'folder': 'Home'}
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
@@ -412,6 +458,54 @@ def nill_rated_items(month=None, year=None, limit_page_length=20, limit_start=0,
         if len(supplies_count) > 0:
             count = supplies_count[0]["count"]
         return {"success": True, "data": nil_rated_supplies, "count": count}
+    except Exception as e:
+        print(str(e))
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0):
+    try:
+        data = {}
+        start_date = year+'-'+month+"-01"
+        end_date = date_util.get_last_day(start_date)
+        tax_invoice_recon_data = frappe.db.get_list("Invoice Reconciliations", filters=[["bill_generation_date", 'between', [
+                                                    start_date, end_date]], ["folio_type", "=", "TAX INVOICE"]], pluck='name')
+        credit_invoice_recon_data = frappe.db.get_list("Invoice Reconciliations", filters=[["bill_generation_date", 'between', [
+                                                       start_date, end_date]], ["folio_type", "=", "CREDIT INVOICE"]], pluck='name')
+        d110_total_invoices = tax_invoice_recon_data+credit_invoice_recon_data
+        invoices_list = frappe.db.get_list("Invoices",filters=[["invoice_date","between",[start_date,end_date]]],pluck="name")
+        filters_to_get_counts_tax_invoice={}
+        if len(tax_invoice_recon_data) > 0:
+            data["tax_invoice_from"] = min(tax_invoice_recon_data)
+            data["tax_invoice_to"] = max(tax_invoice_recon_data)
+            filters_to_get_counts_tax_invoice.update({"tax_invoice_success_count": {"name": ["in", tax_invoice_recon_data], "invoice_category": "Tax Invoice", "irn_generated": "Success"}, "tax_invoice_cancelled_count": {"invoice_category": "Tax Invoice", "irn_generated": "Cancelled", "name": ["in", tax_invoice_recon_data]}, "tax_invoice_error_count": {"name": ["in", tax_invoice_recon_data], "invoice_category": "Tax Invoice", "irn_generated": "Error"}})
+        else:
+            data["tax_invoice_from"] = ""
+            data["tax_invoice_to"] = ""
+        if len(credit_invoice_recon_data) > 0:
+            data["credit_invoice_from"] = min(credit_invoice_recon_data)
+            data["credit_invoice_to"] = max(credit_invoice_recon_data)
+            filters_to_get_counts_tax_invoice.update({"credit_invoice_success_count": {"invoice_category": "Credit Invoice", "irn_generated": "Success", "name": ["in", credit_invoice_recon_data]}, "credit_invoice_cancelled_count": {"invoice_category": "Credit Invoice", "irn_generated": "Cancelled", "name": ["in", credit_invoice_recon_data]}, "credit_invoice_error_count": {"name": ["in", credit_invoice_recon_data], "invoice_category": "Credit Invoice", "irn_generated": "Error"}})
+        else:
+            data["credit_invoice_from"] = ""
+            data["credit_invoice_to"] = ""
+        if len(d110_total_invoices) > 0  and len(invoices_list) > 0:
+            data["missing_in_d110"] = list(set(invoices_list) - set(d110_total_invoices))
+        if bool(filters_to_get_counts_tax_invoice):
+            for key, value in filters_to_get_counts_tax_invoice.items():
+                count = frappe.db.count('Invoices', value)
+                data.update({key:count})
+        else:
+            data["tax_invoice_success_count"] = 0
+            data["tax_invoice_cancelled_count"] = 0
+            data["tax_invoice_error_count"] = 0
+            data["credit_invoice_success_count"] = 0
+            data["credit_invoice_cancelled_count"] = 0
+            data["credit_invoice_error_count"] = 0
+        
+        
+        return {"success":True, "data": data}
     except Exception as e:
         print(str(e))
         return {"success": False, "message": str(e)}
