@@ -81,13 +81,13 @@
   },
   {
    "fieldname": "document_sequence",
-   "fieldtype": "Attach",
+   "fieldtype": "Data",
    "label": "Document Sequence"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-18 11:19:30.711653",
+ "modified": "2022-05-23 16:51:28.891769",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "CLBS Settings",

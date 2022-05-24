@@ -166,8 +166,17 @@ def html_to_pdf(html_data, filename, name, etax=False):
 
 def combine_pdf(files, filename, name):
     try:
+        company = frappe.get_last_doc('company')
+        # if not frappe.db.exists("CLBS Settings", company.name):
+        #     return {"success": False, "message": "Need to add clbs settings"}
+        # clbs_settings = frappe.get_doc("CLBS Settings", company.name)
+        # if not clbs_settings.document_sequence:
+        #     return {"success": False, "message": "document sequence not defined"}
+        # document_sequence = json.loads(clbs_settings.document_sequence)
+        # for key, value in document_sequence.items():
+        #     print(key,value)
         summary_files = [values for each in files for key,
-                         values in each.items()]
+                        values in each.items()]
         files = []
         for each in summary_files:
             if "Summary" in each:
@@ -183,8 +192,7 @@ def combine_pdf(files, filename, name):
             "=", name], "document_type": "Invoices"}, pluck="document")
         bills = frappe.db.get_list("Summary Documents", filters={"summary": [
             "=", name], "document_type": ["!=", "Invoices"]}, pluck="document")
-        files = qr_files + invoices + files + bills
-        company = frappe.get_last_doc('company')
+        files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
         merger = PdfFileMerger()
