@@ -1290,21 +1290,17 @@ def block_irn():
 @frappe.whitelist(allow_guest=True)
 def backup_file_perticulerdoctypes(data):
     try:
-        get_company = frappe.get_doc(
-            "company", data["company_code"], fields=["host", "site_name"]
-        )
-        site_name = cstr(frappe.local.site)
-        os.system(
-            'bench --site {} backup --only "company,SAC HSN CODES,Payment Types,GSP APIS"'.format(
-                site_name
-            )
-        )
-        cwd = cwd = os.getcwd()
-        # site_name = cstr(frappe.local.site)
-        mypath = cwd+"/"+site_name+"/private/backups/*.gz"
-        filename=max(glob.glob(mypath), key=os.path.getmtime)
-        shutil.move(filename,cwd+"/"+site_name+"/public/files")
-        return "/files/{}".format(os.path.basename(filename))
+        get_company=frappe.db.get_value("company",{"name":data["company_code"]},["host","site_name"])
+        if get_company:
+            site_name = cstr(frappe.local.site)
+            run_command=os.system('bench --site {} backup --only "company,SAC HSN CODES,Payment Types,GSP APIS"'.format(site_name))
+            cwd= os.getcwd() 
+            # site_name = cstr(frappe.local.site)
+            mypath = cwd+"/"+site_name+"/private/backups/*.gz"
+            filename=max(glob.glob(mypath), key=os.path.getmtime)
+            shutil.move(filename,cwd+"/"+site_name+"/public/files")
+            return "/files/{}".format(os.path.basename(filename))
+        return {"success":False,"message": "something went wrong"}
     except Exception as e:
         frappe.log_error("backupfile:" + str(e))
 

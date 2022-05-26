@@ -275,8 +275,6 @@
   "show_pending_invoices_in_reports",
   "clbs_section",
   "clbs",
-  "cc_mail_ids_for_clbs_reports",
-  "clbs_document_preview",
   "ezy_gst_section",
   "ezy_gst_module"
  ],
@@ -1728,13 +1726,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "INDIVIDUAL",
-   "fieldname": "clbs_document_preview",
-   "fieldtype": "Select",
-   "label": "CLBS Document Preview",
-   "options": "INDIVIDUAL\nCOMBINED"
-  },
-  {
    "fieldname": "clbs_section",
    "fieldtype": "Section Break",
    "label": "CLBS"
@@ -1763,7 +1754,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
+<<<<<<< HEAD
  "modified": "2022-05-03 11:26:53.184266",
+=======
+ "modified": "2022-05-16 11:15:04.351203",
+>>>>>>> f94527c01d34f2dc8aec728950c3b09fdca15c11
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

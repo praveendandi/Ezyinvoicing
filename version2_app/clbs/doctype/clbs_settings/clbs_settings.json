@@ -10,7 +10,14 @@
   "qr_rect_x1",
   "qr_rect_y0",
   "qr_rect_y1",
-  "company"
+  "cc_mail_ids_for_clbs_reports",
+  "clbs_document_preview",
+  "document_sequence",
+  "company",
+  "summary_header",
+  "summary_terms_and_conditions",
+  "summary_footer",
+  "threshhold"
  ],
  "fields": [
   {
@@ -39,11 +46,48 @@
    "label": "Company",
    "options": "company",
    "unique": 1
+  },
+  {
+   "fieldname": "cc_mail_ids_for_clbs_reports",
+   "fieldtype": "Small Text",
+   "label": "CC Mail IDs For CLBS Reports"
+  },
+  {
+   "default": "INDIVIDUAL",
+   "fieldname": "clbs_document_preview",
+   "fieldtype": "Select",
+   "label": "CLBS Document Preview",
+   "options": "INDIVIDUAL\nCOMBINED"
+  },
+  {
+   "fieldname": "summary_header",
+   "fieldtype": "Small Text",
+   "label": "Summary Header"
+  },
+  {
+   "fieldname": "summary_terms_and_conditions",
+   "fieldtype": "Small Text",
+   "label": "Summary Terms and Conditions"
+  },
+  {
+   "fieldname": "summary_footer",
+   "fieldtype": "Small Text",
+   "label": "Summary Footer"
+  },
+  {
+   "fieldname": "threshhold",
+   "fieldtype": "Float",
+   "label": "Threshhold"
+  },
+  {
+   "fieldname": "document_sequence",
+   "fieldtype": "Data",
+   "label": "Document Sequence"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-04 10:05:36.511720",
+ "modified": "2022-05-23 16:51:28.891769",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "CLBS Settings",
