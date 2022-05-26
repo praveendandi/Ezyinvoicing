@@ -360,7 +360,7 @@ def export_workbook(month=None, year=None):
             ws.append(values)
         for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
             cell.font = Font(bold=True)
-        if len(hsn_summary_df)>1:
+        if len(hsn_summary_df) > 1:
             ws.cell(row=ws.max_row, column=2).value = ""
             ws.cell(row=ws.max_row, column=1).value = "Total"
         # ws = wb.create_sheet("Sequence")
@@ -368,9 +368,9 @@ def export_workbook(month=None, year=None):
         # for i in ['A', 'B', 'C', 'D', 'E']:
         #     ws.column_dimensions[i].width = 15
         # # print(get_count_sequence["data"])
-        # ws.append(["Document","From","To","Success","Cancelled"])
-        # document_fields = ["Document","From","To","Success","Cancelled"]
-        # sequence_count = [{"Document":"Tax Invoice", "From":get_count_sequence["data"]["tax_invoice_from"], "To":get_count_sequence["data"]["tax_invoice_to"], "Success":get_count_sequence["data"]["tax_invoice_success_count"], "Cancelled":get_count_sequence["data"]["tax_invoice_cancelled_count"]},{"Document":"Credit Invoice", "From":get_count_sequence["data"]["credit_invoice_from"], "To":get_count_sequence["data"]["credit_invoice_to"], "Success":get_count_sequence["data"]["credit_invoice_success_count"], "Cancelled":get_count_sequence["data"]["credit_invoice_cancelled_count"]}]
+        # ws.append(["Document","From","To","Success","Cancelled", "Error"])
+        # document_fields = ["Document","From","To","Success","Cancelled", "Error"]
+        # sequence_count = [{"Document":"Tax Invoice", "From":get_count_sequence["data"]["tax_invoice_from"], "To":get_count_sequence["data"]["tax_invoice_to"], "Success":get_count_sequence["data"]["tax_invoice_success_count"], "Cancelled":get_count_sequence["data"]["tax_invoice_cancelled_count"], "Error":get_count_sequence["data"]["tax_invoice_error_count"]},{"Document":"Credit Invoice", "From":get_count_sequence["data"]["credit_invoice_from"], "To":get_count_sequence["data"]["credit_invoice_to"], "Success":get_count_sequence["data"]["credit_invoice_success_count"], "Cancelled":get_count_sequence["data"]["credit_invoice_cancelled_count"], "Error":get_count_sequence["data"]["credit_invoice_error_count"]}]
         # for product in sequence_count:
         #     values = (product[k] for k in document_fields)
         #     ws.append(values)
@@ -469,33 +469,34 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
         data = {}
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
-        tax_invoice_recon_data = frappe.db.get_list("Invoice Reconciliations", filters=[["bill_generation_date", 'between', [
-                                                    start_date, end_date]], ["folio_type", "=", "TAX INVOICE"]], pluck='name')
-        credit_invoice_recon_data = frappe.db.get_list("Invoice Reconciliations", filters=[["bill_generation_date", 'between', [
-                                                       start_date, end_date]], ["folio_type", "=", "CREDIT INVOICE"]], pluck='name')
-        d110_total_invoices = tax_invoice_recon_data+credit_invoice_recon_data
-        invoices_list = frappe.db.get_list("Invoices",filters=[["invoice_date","between",[start_date,end_date]]],pluck="name")
-        filters_to_get_counts_tax_invoice={}
+        invoice_filters = {"tax_invoice_success_count": [["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "TAX INVOICE"], ["irn_generated", "=", "Success"]], "tax_invoice_cancelled_count": [["invoice_date", 'between', [start_date, end_date]], [
+            "invoice_category", "=", "TAX INVOICE"], ["irn_generated", "=", "Cancelled"]], "tax_invoice_error_count": [["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "TAX INVOICE"], ["irn_generated", "=", "Error"]], "credit_invoice_success_count": [["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "CREDIT INVOICE"], ["irn_generated", "=", "Success"]], "credit_invoice_cancelled_count": [["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "CREDIT INVOICE"], ["irn_generated", "=", "Cancelled"]], "credit_invoice_error_count": [["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "CREDIT INVOICE"], ["irn_generated", "=", "Error"]]}
+        total_invoice_list = []
+        if bool(invoice_filters):
+            for key, value in invoice_filters.items():
+                invoice_numbers = frappe.db.get_list('Invoices', filters=value, pluck='name')
+                data.update({key: len(invoice_numbers)})
+                total_invoice_list.extend(invoice_numbers)
+        tax_invoice_recon_data = frappe.db.get_list("Invoices", filters=[["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "TAX INVOICE"]], pluck='name')
+        credit_invoice_recon_data = frappe.db.get_list("Invoices", filters=[["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "CREDIT INVOICE"]], pluck='name')
         if len(tax_invoice_recon_data) > 0:
             data["tax_invoice_from"] = min(tax_invoice_recon_data)
             data["tax_invoice_to"] = max(tax_invoice_recon_data)
-            filters_to_get_counts_tax_invoice.update({"tax_invoice_success_count": {"name": ["in", tax_invoice_recon_data], "invoice_category": "Tax Invoice", "irn_generated": "Success"}, "tax_invoice_cancelled_count": {"invoice_category": "Tax Invoice", "irn_generated": "Cancelled", "name": ["in", tax_invoice_recon_data]}, "tax_invoice_error_count": {"name": ["in", tax_invoice_recon_data], "invoice_category": "Tax Invoice", "irn_generated": "Error"}})
         else:
             data["tax_invoice_from"] = ""
             data["tax_invoice_to"] = ""
         if len(credit_invoice_recon_data) > 0:
             data["credit_invoice_from"] = min(credit_invoice_recon_data)
             data["credit_invoice_to"] = max(credit_invoice_recon_data)
-            filters_to_get_counts_tax_invoice.update({"credit_invoice_success_count": {"invoice_category": "Credit Invoice", "irn_generated": "Success", "name": ["in", credit_invoice_recon_data]}, "credit_invoice_cancelled_count": {"invoice_category": "Credit Invoice", "irn_generated": "Cancelled", "name": ["in", credit_invoice_recon_data]}, "credit_invoice_error_count": {"name": ["in", credit_invoice_recon_data], "invoice_category": "Credit Invoice", "irn_generated": "Error"}})
         else:
             data["credit_invoice_from"] = ""
             data["credit_invoice_to"] = ""
-        if len(d110_total_invoices) > 0  and len(invoices_list) > 0:
+        invoices_list = tax_invoice_recon_data + credit_invoice_recon_data
+        d110_total_invoices = frappe.db.get_list("Invoice Reconciliations", filters=[
+                                           ["bill_generation_date", "between", [start_date, end_date]]], pluck="name")
+        if len(d110_total_invoices) > 0 and len(invoices_list) > 0:
             data["missing_in_d110"] = list(set(invoices_list) - set(d110_total_invoices))
-        if bool(filters_to_get_counts_tax_invoice):
-            for key, value in filters_to_get_counts_tax_invoice.items():
-                count = frappe.db.count('Invoices', value)
-                data.update({key:count})
+            data["missing_in_ezy_invoicing"] = list(set(d110_total_invoices) - set(invoices_list))
         else:
             data["tax_invoice_success_count"] = 0
             data["tax_invoice_cancelled_count"] = 0
@@ -503,9 +504,7 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
             data["credit_invoice_success_count"] = 0
             data["credit_invoice_cancelled_count"] = 0
             data["credit_invoice_error_count"] = 0
-        
-        
-        return {"success":True, "data": data}
+        return {"success": True, "data": data}
     except Exception as e:
         print(str(e))
         return {"success": False, "message": str(e)}
