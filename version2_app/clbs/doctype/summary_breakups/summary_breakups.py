@@ -379,10 +379,11 @@ def create_breakup_details(doc, details_data, summary):
                 invoice_doc.summary = summary
                 invoice_doc.save(
                     ignore_permissions=True, ignore_version=True)
-                document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
-                                               "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
-                document_doc.insert()
-                frappe.db.commit()
+                if invoice_file.strip() != "":
+                    document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
+                                                "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
+                    document_doc.insert()
+                    frappe.db.commit()
         return {"success": True}
     except Exception as e:
         frappe.log_error(str(e), "create_breakup_details")
