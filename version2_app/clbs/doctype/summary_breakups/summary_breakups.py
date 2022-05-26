@@ -577,8 +577,8 @@ def submit_summary(summary):
                                                           "summaries": summary, "category": ["!=", "Rooms"]}, pluck="name")
                 check_billno = frappe.db.get_list("Summary Breakup Details", filters={
                                                   "parent": ["in", get_summary_breakups], "bill_no": ["=", ""]})
-                if len(check_billno) > 0:
-                    return {"success": False, "message": "	Bill No. are mandatory"}
+                # if len(check_billno) > 0:
+                #     return {"success": False, "message": "	Bill No. are mandatory"}
                 if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
                     frappe.db.set_value("Summaries", summary, {
                                         "status": "Submitted"})
