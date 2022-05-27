@@ -251,12 +251,7 @@
   "column_break_235",
   "pathik_password",
   "pathik_session",
-  "bulkupload_json",
-  "pos_footer",
-  "pos_text",
   "pos_extra_text_after_qr",
-  "enable_pdf_upload",
-  "skip_ssl_verify",
   "summary_header",
   "column_break_248",
   "summary_terms_and_conditions",
@@ -272,11 +267,12 @@
   "in_house_driving_ocr",
   "section_break_248",
   "ome_scanner",
-  "show_pending_invoices_in_reports",
   "clbs_section",
   "clbs",
   "ezy_gst_section",
-  "ezy_gst_module"
+  "ezy_gst_module",
+  "cc_mail_ids_for_clbs_reports",
+  "clbs_details_section"
  ],
  "fields": [
   {
@@ -424,12 +420,12 @@
   },
   {
    "fieldname": "state",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "State"
   },
   {
    "fieldname": "city",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "City"
   },
   {
@@ -535,12 +531,12 @@
   },
   {
    "fieldname": "proxy_username",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy UserName"
   },
   {
    "fieldname": "proxy_password",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy Password"
   },
   {
@@ -680,7 +676,7 @@
   },
   {
    "fieldname": "backend_git_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Backend Git Path"
   },
   {
@@ -1085,7 +1081,7 @@
   },
   {
    "fieldname": "no_of_days",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Mail Schedule Days"
   },
   {
@@ -1151,7 +1147,7 @@
   },
   {
    "fieldname": "ezycheckins_socket_host",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ezycheckins Socket Host"
   },
   {
@@ -1167,7 +1163,7 @@
   },
   {
    "fieldname": "guest_gst_number",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest GST Number"
   },
   {
@@ -1754,11 +1750,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2022-05-03 11:26:53.184266",
-=======
  "modified": "2022-05-16 11:15:04.351203",
->>>>>>> f94527c01d34f2dc8aec728950c3b09fdca15c11
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
