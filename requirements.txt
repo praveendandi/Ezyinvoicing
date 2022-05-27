@@ -28,7 +28,7 @@ html2text
 # opencv-python
 typing-extensions
 paytmchecksum
-# opencv-python
+opencv-python
 fitz
 PyMuPDF==1.18.14
 pgeocode
