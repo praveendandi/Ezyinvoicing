@@ -167,14 +167,13 @@ def html_to_pdf(html_data, filename, name, etax=False):
 def combine_pdf(files, filename, name):
     try:
         company = frappe.get_last_doc('company')
-        # if not frappe.db.exists("CLBS Settings", company.name):
-        #     return {"success": False, "message": "Need to add clbs settings"}
-        # clbs_settings = frappe.get_doc("CLBS Settings", company.name)
-        # if not clbs_settings.document_sequence:
-        #     return {"success": False, "message": "document sequence not defined"}
-        # document_sequence = json.loads(clbs_settings.document_sequence)
-        # for key, value in document_sequence.items():
-        #     print(key,value)
+        if not frappe.db.exists("CLBS Settings", company.name):
+            return {"success": False, "message": "Need to add clbs settings"}
+        clbs_settings = frappe.get_doc("CLBS Settings", company.name)
+        if not clbs_settings.document_sequence:
+            return {"success": False, "message": "document sequence not defined"}
+        document_sequence = json.loads(clbs_settings.document_sequence)
+        document_sequence = dict(sorted(document_sequence.items(), key=lambda item: item[1]))
         summary_files = [values for each in files for key,
                         values in each.items()]
         files = []
@@ -192,11 +191,23 @@ def combine_pdf(files, filename, name):
             "=", name], "document_type": "Invoices"}, pluck="document")
         bills = frappe.db.get_list("Summary Documents", filters={"summary": [
             "=", name], "document_type": ["!=", "Invoices"]}, pluck="document")
-        files = files + qr_files + invoices + bills
+        order_files = []
+        for key, value in document_sequence.items():
+            if "e_tax_invoice" == key:
+                order_files.extend(qr_files)
+            elif "invoice" == key:
+                order_files.extend(invoices)
+            elif "summary" == key:
+                order_files.extend(files)
+            elif "bills" == key:
+                order_files.extend(bills)
+            else:
+                pass 
+        # ordered_files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
         merger = PdfFileMerger()
-        for each in files:
+        for each in order_files:
             file_path = cwd + "/" + site_name + each
             merger.append(file_path)
         file_path = cwd + "/" + site_name + "/public/files/" + name + '.pdf'
