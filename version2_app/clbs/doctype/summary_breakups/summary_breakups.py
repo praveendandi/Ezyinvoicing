@@ -187,22 +187,16 @@ def combine_pdf(files, filename, name):
             return summaryfile
         qr_files = [each for each in summaryfile["files"]
                     if "E Tax Invoice-" in each]
-        invoices = frappe.db.get_list("Summary Documents", filters={"summary": [
-            "=", name], "document_type": "Invoices"}, pluck="document")
-        bills = frappe.db.get_list("Summary Documents", filters={"summary": [
-            "=", name], "document_type": ["!=", "Invoices"]}, pluck="document")
         order_files = []
         for key, value in document_sequence.items():
-            if "e_tax_invoice" == key:
+            if "e_tax" == key:
                 order_files.extend(qr_files)
-            elif "invoice" == key:
-                order_files.extend(invoices)
             elif "summary" == key:
                 order_files.extend(files)
-            elif "bills" == key:
-                order_files.extend(bills)
             else:
-                pass 
+                bills = frappe.db.get_list("Summary Documents", filters={"summary": ["=", name], "document_type": ["=", key]}, pluck="document") 
+                if len(bills) > 0:
+                    order_files.extend(bills)
         # ordered_files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
@@ -660,7 +654,6 @@ def send_summary_mail(data):
             combined_files = download_pdf(data["summary"])
             if not combined_files["success"]:
                 return combined_files
-            print(combined_files)
             if len(combined_files["files"]) > 0:
                 summary_files = combined_files["files"][0]["Summary"]
             else:
