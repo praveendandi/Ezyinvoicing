@@ -144,7 +144,12 @@
   "skip_ssl_verify",
   "ipp_printer_file_path",
   "vat_reporting",
-  "show_pending_invoices_in_reports"
+  "show_pending_invoices_in_reports",
+  "show_application_reference_number_in_etax",
+  "application_reference_number",
+  "data_filing",
+  "sezwp_terms_and_conditions",
+  "sezwop_terms_and_conditions"
  ],
  "fields": [
   {
@@ -933,11 +938,37 @@
    "fieldname": "pos_extra_text_after_qr",
    "fieldtype": "Text",
    "label": "POS Extra Text After QR"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_application_reference_number_in_etax",
+   "fieldtype": "Check",
+   "label": "Show Application Reference Number in ETax"
+  },
+  {
+   "fieldname": "application_reference_number",
+   "fieldtype": "Text",
+   "label": "Application Reference Number"
+  },
+  {
+   "fieldname": "data_filing",
+   "fieldtype": "Date",
+   "label": "Data Filing"
+  },
+  {
+   "fieldname": "sezwp_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "SEZWP Terms and Conditions"
+  },
+  {
+   "fieldname": "sezwop_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "SEZWOP Terms and Conditions"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-25 11:54:15.068116",
+ "modified": "2022-05-30 14:39:23.384423",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
