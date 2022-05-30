@@ -8,6 +8,7 @@ import json
 import requests
 import os
 import pandas as pd
+import os, os.path,sys
 import numpy as np
 from frappe.utils import data as date_util
 from frappe.utils import cstr
@@ -57,7 +58,8 @@ def getGSTR1DashboardDetails(year=None, month=None):
                       "get_hsn_summary": {k: (0 if v is None else v) for k, v in get_hsn_summary[0].items()}}
         return {"success": True, "data": total_data}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("getGSTR1DashboardDetails","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -83,7 +85,8 @@ def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, yea
                 "Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'DATE_FORMAT(invoice_date, "%d-%m-%Y") as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt', 'sales_amount_before_tax as TotalTaxableAmt', 'sgst_amount as SGST', 'cgst_amount as CGST', 'igst_amount as IGST', 'total_gst_amount as TotalGST', 'cess_amount as CESS'])
         return {"success": True, "data": invoice_data, "summary": invoice_summary[0]}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("getInvoices","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -127,7 +130,8 @@ def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, compan
             last_reconciled_on = ""
         return {"success": True, "data": data, "last_reconciled_on": last_reconciled_on}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("getGSTR1ReconciliationSummaryCount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -149,7 +153,8 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
                 """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.gst_rate as Gst_Rate, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount,sum(`tabItems`.cess_amount) as central_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where YEAR(invoice_date)={} and MONTH(invoice_date)={} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(year, month), as_dict=1)
         return {"success": True, "data": get_hsn_summary}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("getHsnSummary","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -183,7 +188,8 @@ def export_invoices(filters=[], month=None, year=None):
         else:
             return {"success": False, "message": "no data found"}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("export_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -387,7 +393,8 @@ def export_workbook(month=None, year=None):
             return {"success": True, "file_url": file_response["message"]["file_url"]}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("export_workbook","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -436,7 +443,8 @@ def nil_rated_supplies(month=None, year=None):
                 }
         return {"success": True, "data": data}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("nil_rated_supplies","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -459,7 +467,8 @@ def nill_rated_items(month=None, year=None, limit_page_length=20, limit_start=0,
             count = supplies_count[0]["count"]
         return {"success": True, "data": nil_rated_supplies, "count": count}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("nill_rated_items","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -506,5 +515,6 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
             data["credit_invoice_error_count"] = 0
         return {"success": True, "data": data}
     except Exception as e:
-        print(str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("document_sequence","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
