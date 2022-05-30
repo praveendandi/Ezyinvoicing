@@ -25,7 +25,7 @@ from openpyxl.cell import Cell
 # from xlsxwriter import add_worksheet
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest = True)
 def getGSTR1DashboardDetails(year=None, month=None):
     try:
         get_b2b_tax_invoice_summaries = frappe.db.sql(
