@@ -173,9 +173,10 @@ def combine_pdf(files, filename, name):
         if not clbs_settings.document_sequence:
             return {"success": False, "message": "document sequence not defined"}
         document_sequence = json.loads(clbs_settings.document_sequence)
-        document_sequence = dict(sorted(document_sequence.items(), key=lambda item: item[1]))
+        document_sequence = dict(
+            sorted(document_sequence.items(), key=lambda item: item[1]))
         summary_files = [values for each in files for key,
-                        values in each.items()]
+                         values in each.items()]
         files = []
         for each in summary_files:
             if "Summary" in each:
@@ -194,7 +195,8 @@ def combine_pdf(files, filename, name):
             elif "summary" == key:
                 order_files.extend(files)
             else:
-                bills = frappe.db.get_list("Summary Documents", filters={"summary": ["=", name], "document_type": ["=", key]}, pluck="document") 
+                bills = frappe.db.get_list("Summary Documents", filters={"summary": [
+                                           "=", name], "document_type": ["=", key]}, pluck="document")
                 if len(bills) > 0:
                     order_files.extend(bills)
         # ordered_files = files + qr_files + invoices + bills
@@ -386,7 +388,7 @@ def create_breakup_details(doc, details_data, summary):
                     ignore_permissions=True, ignore_version=True)
                 if invoice_file.strip() != "":
                     document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
-                                                "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
+                                                   "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
                     document_doc.insert()
                     frappe.db.commit()
         return {"success": True}

@@ -1,6 +1,6 @@
 frappe
 pdfplumber
-pandas
+# pandas
 qrcode
 google-cloud-storage
 XlsxWriter
@@ -26,3 +26,4 @@ paytmchecksum
 # opencv-python
 fitz
 PyMuPDF==1.18.14
+pyHanko
