@@ -8,7 +8,9 @@ import json
 import requests
 import os
 import pandas as pd
-import os, os.path,sys
+import os
+import os.path
+import sys
 import numpy as np
 from frappe.utils import data as date_util
 from frappe.utils import cstr
@@ -59,7 +61,8 @@ def getGSTR1DashboardDetails(year=None, month=None):
         return {"success": True, "data": total_data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("getGSTR1DashboardDetails","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("getGSTR1DashboardDetails",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -86,7 +89,8 @@ def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, yea
         return {"success": True, "data": invoice_data, "summary": invoice_summary[0]}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("getInvoices","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("getInvoices", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -131,7 +135,8 @@ def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, compan
         return {"success": True, "data": data, "last_reconciled_on": last_reconciled_on}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("getGSTR1ReconciliationSummaryCount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("getGSTR1ReconciliationSummaryCount",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -154,7 +159,8 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
         return {"success": True, "data": get_hsn_summary}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("getHsnSummary","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("getHsnSummary", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -189,7 +195,8 @@ def export_invoices(filters=[], month=None, year=None):
             return {"success": False, "message": "no data found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("export_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("export_invoices", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -394,7 +401,8 @@ def export_workbook(month=None, year=None):
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("export_workbook","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("export_workbook", "line No:{}\n{}".format(
+            exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -444,7 +452,8 @@ def nil_rated_supplies(month=None, year=None):
         return {"success": True, "data": data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("nil_rated_supplies","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("nil_rated_supplies",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -468,7 +477,8 @@ def nill_rated_items(month=None, year=None, limit_page_length=20, limit_start=0,
         return {"success": True, "data": nil_rated_supplies, "count": count}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("nill_rated_items","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("nill_rated_items",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -483,11 +493,14 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
         total_invoice_list = []
         if bool(invoice_filters):
             for key, value in invoice_filters.items():
-                invoice_numbers = frappe.db.get_list('Invoices', filters=value, pluck='name')
+                invoice_numbers = frappe.db.get_list(
+                    'Invoices', filters=value, pluck='name')
                 data.update({key: len(invoice_numbers)})
                 total_invoice_list.extend(invoice_numbers)
-        tax_invoice_recon_data = frappe.db.get_list("Invoices", filters=[["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "TAX INVOICE"]], pluck='name')
-        credit_invoice_recon_data = frappe.db.get_list("Invoices", filters=[["invoice_date", 'between', [start_date, end_date]], ["invoice_category", "=", "CREDIT INVOICE"]], pluck='name')
+        tax_invoice_recon_data = frappe.db.get_list("Invoices", filters=[["invoice_date", 'between', [
+                                                    start_date, end_date]], ["invoice_category", "=", "TAX INVOICE"]], pluck='name')
+        credit_invoice_recon_data = frappe.db.get_list("Invoices", filters=[["invoice_date", 'between', [
+                                                       start_date, end_date]], ["invoice_category", "=", "CREDIT INVOICE"]], pluck='name')
         if len(tax_invoice_recon_data) > 0:
             data["tax_invoice_from"] = min(tax_invoice_recon_data)
             data["tax_invoice_to"] = max(tax_invoice_recon_data)
@@ -502,10 +515,12 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
             data["credit_invoice_to"] = ""
         invoices_list = tax_invoice_recon_data + credit_invoice_recon_data
         d110_total_invoices = frappe.db.get_list("Invoice Reconciliations", filters=[
-                                           ["bill_generation_date", "between", [start_date, end_date]]], pluck="name")
+            ["bill_generation_date", "between", [start_date, end_date]]], pluck="name")
         if len(d110_total_invoices) > 0 and len(invoices_list) > 0:
-            data["missing_in_d110"] = list(set(invoices_list) - set(d110_total_invoices))
-            data["missing_in_ezy_invoicing"] = list(set(d110_total_invoices) - set(invoices_list))
+            data["missing_in_d110"] = list(
+                set(invoices_list) - set(d110_total_invoices))
+            data["missing_in_ezy_invoicing"] = list(
+                set(d110_total_invoices) - set(invoices_list))
         else:
             data["tax_invoice_success_count"] = 0
             data["tax_invoice_cancelled_count"] = 0
@@ -516,5 +531,6 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
         return {"success": True, "data": data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("document_sequence","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        frappe.log_error("document_sequence",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
