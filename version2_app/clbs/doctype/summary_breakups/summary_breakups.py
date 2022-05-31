@@ -166,8 +166,17 @@ def html_to_pdf(html_data, filename, name, etax=False):
 
 def combine_pdf(files, filename, name):
     try:
+        company = frappe.get_last_doc('company')
+        # if not frappe.db.exists("CLBS Settings", company.name):
+        #     return {"success": False, "message": "Need to add clbs settings"}
+        # clbs_settings = frappe.get_doc("CLBS Settings", company.name)
+        # if not clbs_settings.document_sequence:
+        #     return {"success": False, "message": "document sequence not defined"}
+        # document_sequence = json.loads(clbs_settings.document_sequence)
+        # for key, value in document_sequence.items():
+        #     print(key,value)
         summary_files = [values for each in files for key,
-                         values in each.items()]
+                        values in each.items()]
         files = []
         for each in summary_files:
             if "Summary" in each:
@@ -183,8 +192,7 @@ def combine_pdf(files, filename, name):
             "=", name], "document_type": "Invoices"}, pluck="document")
         bills = frappe.db.get_list("Summary Documents", filters={"summary": [
             "=", name], "document_type": ["!=", "Invoices"]}, pluck="document")
-        files = qr_files + invoices + files + bills
-        company = frappe.get_last_doc('company')
+        files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
         merger = PdfFileMerger()
@@ -371,10 +379,11 @@ def create_breakup_details(doc, details_data, summary):
                 invoice_doc.summary = summary
                 invoice_doc.save(
                     ignore_permissions=True, ignore_version=True)
-                document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
-                                               "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
-                document_doc.insert()
-                frappe.db.commit()
+                if invoice_file.strip() != "":
+                    document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
+                                                "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
+                    document_doc.insert()
+                    frappe.db.commit()
         return {"success": True}
     except Exception as e:
         frappe.log_error(str(e), "create_breakup_details")
@@ -569,8 +578,8 @@ def submit_summary(summary):
                                                           "summaries": summary, "category": ["!=", "Rooms"]}, pluck="name")
                 check_billno = frappe.db.get_list("Summary Breakup Details", filters={
                                                   "parent": ["in", get_summary_breakups], "bill_no": ["=", ""]})
-                if len(check_billno) > 0:
-                    return {"success": False, "message": "	Bill No. are mandatory"}
+                # if len(check_billno) > 0:
+                #     return {"success": False, "message": "	Bill No. are mandatory"}
                 if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
                     frappe.db.set_value("Summaries", summary, {
                                         "status": "Submitted"})
