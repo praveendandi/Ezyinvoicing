@@ -38,6 +38,7 @@ def extract_xml(file_list):
         data=[]
         if isinstance(data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"], list):
             for each in data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
+                print(each,"////////")
                 each['BILL_NO'] = each["BILL_NO"].strip()
                 if company_doc.name=="RBBORRM-01":
                     check_val=each["BILL_NO"].startswith("2018")
@@ -83,6 +84,9 @@ def extract_xml(file_list):
                         reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                         reconciliations_doc.invoice_found = "No"
                         reconciliations_doc.save()
+                doc=frappe.get_doc({"doctype":"Opera Folio Details","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"],"total_invoice_amount":each["SUMFT_DEBITPERBILL_NO"],"transaction_number":each["TRX_NO"],"transaction_code":each["TRX_CODE"],"transaction_date":each["TRX_DATE"],"debit_amount":each["FT_DEBIT"],"credit_amount":each["FT_CREDIT"],"transaction_description":each["TRANSACTION_DESCRIPTION"]})
+                doc.insert(ignore_permissions=True)
+                frappe.db.commit()
         else:
 
             each = data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]
@@ -130,6 +134,9 @@ def extract_xml(file_list):
                     reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     reconciliations_doc.invoice_found = "No"
                     reconciliations_doc.save()
+            doc=frappe.get_doc({"doctype":"Opera Folio Details","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"],"total_invoice_amount":each["SUMFT_DEBITPERBILL_NO"],"transaction_number":each["TRX_NO"],"transaction_code":each["TRX_CODE"],"transaction_date":each["TRX_DATE"],"debit_amount":each["FT_DEBIT"],"credit_amount":each["FT_CREDIT"],"transaction_description":each["TRANSACTION_DESCRIPTION"]})
+            doc.insert(ignore_permissions=True)
+            frappe.db.commit()
         return True
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

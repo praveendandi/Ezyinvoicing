@@ -534,3 +534,16 @@ def document_sequence(month=None, year=None, limit_page_length=20, limit_start=0
         frappe.log_error("document_sequence",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def reconciliation(month=None, year=None, limit_page_length=20, limit_start=0):
+    try:
+        pass
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("document_sequence",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
