@@ -26,3 +26,4 @@ paytmchecksum
 # opencv-python
 fitz
 PyMuPDF==1.18.14
+UliPlot

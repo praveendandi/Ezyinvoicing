@@ -14,7 +14,8 @@
   "status",
   "room",
   "display_name",
-  "invoice_found"
+  "invoice_found",
+  "total_invoice_amount"
  ],
  "fields": [
   {
@@ -66,11 +67,16 @@
    "fieldtype": "Select",
    "label": "Invoice Found",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "total_invoice_amount",
+   "fieldtype": "Float",
+   "label": "Total Invoice Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-08 14:58:59.160375",
+ "modified": "2022-06-01 10:08:48.501486",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoice Reconciliations",
