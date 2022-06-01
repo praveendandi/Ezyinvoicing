@@ -167,16 +167,16 @@ def html_to_pdf(html_data, filename, name, etax=False):
 def combine_pdf(files, filename, name):
     try:
         company = frappe.get_last_doc('company')
-        # if not frappe.db.exists("CLBS Settings", company.name):
-        #     return {"success": False, "message": "Need to add clbs settings"}
-        # clbs_settings = frappe.get_doc("CLBS Settings", company.name)
-        # if not clbs_settings.document_sequence:
-        #     return {"success": False, "message": "document sequence not defined"}
-        # document_sequence = json.loads(clbs_settings.document_sequence)
-        # for key, value in document_sequence.items():
-        #     print(key,value)
+        if not frappe.db.exists("CLBS Settings", company.name):
+            return {"success": False, "message": "Need to add clbs settings"}
+        clbs_settings = frappe.get_doc("CLBS Settings", company.name)
+        if not clbs_settings.document_sequence:
+            return {"success": False, "message": "document sequence not defined"}
+        document_sequence = json.loads(clbs_settings.document_sequence)
+        document_sequence = dict(
+            sorted(document_sequence.items(), key=lambda item: item[1]))
         summary_files = [values for each in files for key,
-                        values in each.items()]
+                         values in each.items()]
         files = []
         for each in summary_files:
             if "Summary" in each:
@@ -188,15 +188,22 @@ def combine_pdf(files, filename, name):
             return summaryfile
         qr_files = [each for each in summaryfile["files"]
                     if "E Tax Invoice-" in each]
-        invoices = frappe.db.get_list("Summary Documents", filters={"summary": [
-            "=", name], "document_type": "Invoices"}, pluck="document")
-        bills = frappe.db.get_list("Summary Documents", filters={"summary": [
-            "=", name], "document_type": ["!=", "Invoices"]}, pluck="document")
-        files = files + qr_files + invoices + bills
+        order_files = []
+        for key, value in document_sequence.items():
+            if "e_tax" == key:
+                order_files.extend(qr_files)
+            elif "summary" == key:
+                order_files.extend(files)
+            else:
+                bills = frappe.db.get_list("Summary Documents", filters={"summary": [
+                                           "=", name], "document_type": ["=", key]}, pluck="document")
+                if len(bills) > 0:
+                    order_files.extend(bills)
+        # ordered_files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
         merger = PdfFileMerger()
-        for each in files:
+        for each in order_files:
             file_path = cwd + "/" + site_name + each
             merger.append(file_path)
         file_path = cwd + "/" + site_name + "/public/files/" + name + '.pdf'
@@ -381,7 +388,7 @@ def create_breakup_details(doc, details_data, summary):
                     ignore_permissions=True, ignore_version=True)
                 if invoice_file.strip() != "":
                     document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
-                                                "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
+                                                   "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
                     document_doc.insert()
                     frappe.db.commit()
         return {"success": True}
@@ -649,7 +656,6 @@ def send_summary_mail(data):
             combined_files = download_pdf(data["summary"])
             if not combined_files["success"]:
                 return combined_files
-            print(combined_files)
             if len(combined_files["files"]) > 0:
                 summary_files = combined_files["files"][0]["Summary"]
             else:
