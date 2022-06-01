@@ -21,7 +21,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Color, PatternFill, Font, Fill, colors, Alignment, Border, Side
 from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.cell import Cell
-from UliPlot.XLSX import auto_adjust_xlsx_column_width
+# from UliPlot.XLSX import auto_adjust_xlsx_column_width
 # from invoice_reconciliations import invoicereconciliationcount
 # from xlsxwriter import add_worksheet
 
