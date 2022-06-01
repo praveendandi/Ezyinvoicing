@@ -1,7 +1,7 @@
 {
  "actions": [],
- "autoname": "field:bill_number",
- "creation": "2021-04-07 14:50:09.229940",
+ "allow_rename": 1,
+ "creation": "2022-05-31 10:37:07.939526",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -14,8 +14,13 @@
   "status",
   "room",
   "display_name",
-  "invoice_found",
-  "total_invoice_amount"
+  "total_invoice_amount",
+  "transaction_number",
+  "transaction_code",
+  "transaction_date",
+  "debit_amount",
+  "credit_amount",
+  "transaction_description"
  ],
  "fields": [
   {
@@ -26,8 +31,7 @@
   {
    "fieldname": "bill_number",
    "fieldtype": "Data",
-   "label": "Bill Number",
-   "unique": 1
+   "label": "Bill Number"
   },
   {
    "fieldname": "bill_generation_date",
@@ -57,29 +61,50 @@
   {
    "fieldname": "display_name",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Display Name",
-   "reqd": 1
+   "label": "Display Name"
   },
   {
-   "default": "No",
-   "fieldname": "invoice_found",
-   "fieldtype": "Select",
-   "label": "Invoice Found",
-   "options": "Yes\nNo"
+   "fieldname": "transaction_number",
+   "fieldtype": "Data",
+   "label": "Transaction Number"
+  },
+  {
+   "fieldname": "transaction_code",
+   "fieldtype": "Data",
+   "label": "Transaction Code"
+  },
+  {
+   "fieldname": "transaction_date",
+   "fieldtype": "Date",
+   "label": "Transaction Date"
+  },
+  {
+   "fieldname": "transaction_description",
+   "fieldtype": "Text",
+   "label": "Transaction Description"
+  },
+  {
+   "fieldname": "debit_amount",
+   "fieldtype": "Data",
+   "label": "Debit Amount"
+  },
+  {
+   "fieldname": "credit_amount",
+   "fieldtype": "Data",
+   "label": "Credit Amount"
   },
   {
    "fieldname": "total_invoice_amount",
-   "fieldtype": "Float",
+   "fieldtype": "Data",
    "label": "Total Invoice Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-01 10:08:48.501486",
+ "modified": "2022-05-31 10:46:11.091661",
  "modified_by": "Administrator",
- "module": "Version2 App",
- "name": "Invoice Reconciliations",
+ "module": "EZYGST",
+ "name": "Opera Folio Details",
  "owner": "Administrator",
  "permissions": [
   {
@@ -93,33 +118,8 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "All",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Guest",
-   "share": 1,
-   "write": 1
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC",
- "track_changes": 1
+ "sort_order": "DESC"
 }
