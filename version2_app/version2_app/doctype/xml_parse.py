@@ -74,10 +74,11 @@ def extract_xml(file_list):
                     frappe.db.commit()
                     d110_data = json.loads(json.dumps(each))
                     for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
-                        txn_date = datetime.datetime.strptime(txr_data["TRX_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
-                        doc=frappe.get_doc({"doctype":"Opera Invoice Items","transaction_number":txr_data["TRX_NO"],"transaction_code":txr_data["TRX_CODE"],"transaction_date":txn_date,"debit_amount":txr_data["FT_DEBIT"],"credit_amount":txr_data["FT_CREDIT"],"transaction_description":txr_data["TRANSACTION_DESCRIPTION"],"invoice_reconciliations":each["BILL_NO"]})
-                        doc.insert(ignore_permissions=True)
-                        frappe.db.commit()
+                        if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
+                            txn_date = datetime.datetime.strptime(txr_data["TRX_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
+                            doc=frappe.get_doc({"doctype":"Opera Invoice Items","transaction_number":txr_data["TRX_NO"],"transaction_code":txr_data["TRX_CODE"],"transaction_date":txn_date,"debit_amount":txr_data["FT_DEBIT"],"credit_amount":txr_data["FT_CREDIT"],"transaction_description":txr_data["TRANSACTION_DESCRIPTION"],"invoice_reconciliations":each["BILL_NO"]})
+                            doc.insert(ignore_permissions=True)
+                            frappe.db.commit()
                 if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                     if frappe.db.exists('Invoices',each["BILL_NO"]):
                         invoice_doc = frappe.get_doc('Invoices',each["BILL_NO"])
@@ -127,10 +128,11 @@ def extract_xml(file_list):
                 frappe.db.commit()
                 d110_data = json.loads(json.dumps(each))
                 for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
-                    txn_date = datetime.datetime.strptime(txr_data["TRX_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
-                    doc=frappe.get_doc({"doctype":"Opera Invoice Items","transaction_number":txr_data["TRX_NO"],"transaction_code":txr_data["TRX_CODE"],"transaction_date":txn_date,"debit_amount":txr_data["FT_DEBIT"],"credit_amount":txr_data["FT_CREDIT"],"transaction_description":txr_data["TRANSACTION_DESCRIPTION"],"invoice_reconciliations":each["BILL_NO"]})
-                    doc.insert(ignore_permissions=True)
-                    frappe.db.commit()
+                    if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
+                        txn_date = datetime.datetime.strptime(txr_data["TRX_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
+                        doc=frappe.get_doc({"doctype":"Opera Invoice Items","transaction_number":txr_data["TRX_NO"],"transaction_code":txr_data["TRX_CODE"],"transaction_date":txn_date,"debit_amount":txr_data["FT_DEBIT"],"credit_amount":txr_data["FT_CREDIT"],"transaction_description":txr_data["TRANSACTION_DESCRIPTION"],"invoice_reconciliations":each["BILL_NO"]})
+                        doc.insert(ignore_permissions=True)
+                        frappe.db.commit()
             if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                 if frappe.db.exists('Invoices',each["BILL_NO"]):
                     invoice_doc = frappe.get_doc('Invoices',each["BILL_NO"])
