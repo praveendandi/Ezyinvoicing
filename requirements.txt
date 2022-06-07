@@ -31,5 +31,4 @@ paytmchecksum
 opencv-python
 fitz
 PyMuPDF==1.18.14
-PyMuPDF==1.16.14
 pgeocode
