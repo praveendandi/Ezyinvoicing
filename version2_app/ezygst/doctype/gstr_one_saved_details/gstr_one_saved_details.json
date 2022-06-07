@@ -1,0 +1,89 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-01-11 15:46:04.271335",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "period",
+  "company",
+  "b2b_count",
+  "b2c_count",
+  "column_break_7",
+  "request_id",
+  "ret_save_response",
+  "ret_status_response"
+ ],
+ "fields": [
+  {
+   "fieldname": "period",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "period",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "company",
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "b2b_count",
+   "fieldtype": "Int",
+   "label": "B2B Count"
+  },
+  {
+   "fieldname": "b2c_count",
+   "fieldtype": "Int",
+   "label": "B2C count"
+  },
+  {
+   "fieldname": "request_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Request Id",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ret_save_response",
+   "fieldtype": "Text",
+   "label": "RET Save Response"
+  },
+  {
+   "fieldname": "ret_status_response",
+   "fieldtype": "Text",
+   "label": "RET Status Response"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-01-18 15:17:23.012515",
+ "modified_by": "Administrator",
+ "module": "EZYGST",
+ "name": "Gstr One Saved Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

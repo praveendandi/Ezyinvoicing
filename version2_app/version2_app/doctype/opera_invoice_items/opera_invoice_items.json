@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-05-31 10:37:07.939526",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "transaction_number",
+  "transaction_code",
+  "transaction_date",
+  "transaction_description",
+  "debit_amount",
+  "credit_amount",
+  "invoice_reconciliations"
+ ],
+ "fields": [
+  {
+   "fieldname": "transaction_number",
+   "fieldtype": "Data",
+   "label": "Transaction Number"
+  },
+  {
+   "fieldname": "transaction_code",
+   "fieldtype": "Data",
+   "label": "Transaction Code"
+  },
+  {
+   "fieldname": "transaction_date",
+   "fieldtype": "Date",
+   "label": "Transaction Date"
+  },
+  {
+   "fieldname": "transaction_description",
+   "fieldtype": "Text",
+   "label": "Transaction Description"
+  },
+  {
+   "fieldname": "debit_amount",
+   "fieldtype": "Float",
+   "label": "Debit Amount"
+  },
+  {
+   "fieldname": "credit_amount",
+   "fieldtype": "Float",
+   "label": "Credit Amount"
+  },
+  {
+   "fieldname": "invoice_reconciliations",
+   "fieldtype": "Link",
+   "label": "Invoice Reconciliations",
+   "options": "Invoice Reconciliations"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-06-01 10:18:31.313013",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Opera Invoice Items",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

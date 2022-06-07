@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "creation": "2022-03-02 10:02:56.076016",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "location",
+  "address",
+  "city",
+  "state",
+  "pin_code",
+  "taxpayer_details",
+  "company",
+  "location_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "taxpayer_details",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Taxpayer Details",
+   "options": "TaxPayerDetail",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "pin_code",
+   "fieldtype": "Data",
+   "label": "Pin Code",
+   "reqd": 1
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "default": "0",
+   "fieldname": "location_status",
+   "fieldtype": "Check",
+   "label": "Location Status"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-05-06 10:35:43.845846",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "Taxpayer Locations",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
