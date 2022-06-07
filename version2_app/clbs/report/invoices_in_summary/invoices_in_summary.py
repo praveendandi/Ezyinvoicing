@@ -14,6 +14,8 @@ def execute(filters=None):
         else:
             filters={'creation': ['Between',(filters['from_date'],filters['to_date'])], "invoice_type": "B2B", "summary":["!=",""]}
         data = frappe.db.get_list('Invoices', filters=filters, fields=["invoice_number","guest_name","confirmation_number","gst_number","room_number","invoice_category","DATE_FORMAT(ack_date, '%d-%m-%Y %H:%i:%S') as ack_date","DATE_FORMAT(invoice_date, '%d-%m-%Y') as checkout_date","DATE_FORMAT(creation, '%d-%m-%Y') as printed_date","summary","sales_amount_after_tax as total_invoice_amount"], order_by="invoice_number")
+        # for each in data:
+        #     pass
         return columns, data
     except Exception as e:
         print(traceback.print_exc())

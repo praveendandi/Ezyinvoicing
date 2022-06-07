@@ -687,6 +687,12 @@ def send_summary_mail(data):
                         attachments=json.dumps(files_summary),
                         send_email=1
                         )
+        emails = json.dumps(data["email"])
+        frappe.db.set_value('Summaries', data["summary"], 'email_sent_status', 1)
+        frappe.db.commit()
+        email_data = {"doctype":'Summary Email Tracking', "emails":emails, "summary": data["summary"]}
+        doc = frappe.get_doc(email_data)
+        doc.insert(ignore_permissions=True)
         return {"success": True, "message": "Mail Send"}
     except Exception as e:
         frappe.log_error(str(e), "send_summary_mail")
