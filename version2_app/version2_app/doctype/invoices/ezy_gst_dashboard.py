@@ -565,13 +565,13 @@ def reconciliation(start_date, end_date):
         # Missing Invoices In Opera
         missing_in_opera = {
             "Invoices Numbers": missing["data"]["missing_in_opera"]}
-        get_missing_in_opera_data = [{"InvoiceNumber":"","InvoiceType":"","InvoiceCategory":"","TaxableValue":"","TotalGstAmount":"","InvoicesAmount":"","OtherCharges":"","IGSTAmount":"","SGSTAmount":"","CGSTAmount":"","CESS":"", "VATAmount":""}]
+        get_missing_in_opera_data = [{"InvoiceNumber":"", "InvoiceDate":"", "InvoiceType":"","InvoiceCategory":"","TaxableValue":"","TotalGstAmount":"","InvoicesAmount":"","OtherCharges":"","IGSTAmount":"","SGSTAmount":"","CGSTAmount":"","CESS":"", "VATAmount":""}]
         if len(missing["data"]["missing_in_opera"]) > 0:
-            get_missing_in_opera_data = frappe.db.get_list("Invoices", filters=[["name","in",missing["data"]["missing_in_opera"]]],fields=['invoice_number as InvoiceNumber', 'invoice_type as InvoiceType', 'invoice_category as InvoiceCategory','pms_invoice_summary_without_gst as TaxableValue', 'total_gst_amount as TotalGstAmount', 'pms_invoice_summary as InvoicesAmount', 'other_charges as OtherCharges', 'igst_amount as IGSTAmount', 'sgst_amount as SGSTAmount', 'cgst_amount as CGSTAmount', '(total_central_cess_amount+total_state_cess_amount) as CESS','total_vat_amount as VATAmount'], order_by='name')
+            get_missing_in_opera_data = frappe.db.get_list("Invoices", filters=[["name","in",missing["data"]["missing_in_opera"]]],fields=['invoice_number as InvoiceNumber', 'invoice_date as InvoiceDate','invoice_type as InvoiceType', 'invoice_category as InvoiceCategory','pms_invoice_summary_without_gst as TaxableValue', 'total_gst_amount as TotalGstAmount', 'pms_invoice_summary as InvoicesAmount', 'other_charges as OtherCharges', 'igst_amount as IGSTAmount', 'sgst_amount as SGSTAmount', 'cgst_amount as CGSTAmount', '(total_central_cess_amount+total_state_cess_amount) as CESS','total_vat_amount as VATAmount'], order_by='name')
         df_missing_opera_folios_list = pd.DataFrame.from_records(get_missing_in_opera_data)
         df_missing_opera_folios_list.to_excel(
             writer, sheet_name="Missing In Opera", index=False)
-        for each in ["InvoiceNumber","InvoiceType","InvoiceCategory","TaxableValue","TotalGstAmount","InvoicesAmount","OtherCharges","IGSTAmount","SGSTAmount","CGSTAmount","CESS", "VATAmount"]:
+        for each in ["InvoiceNumber","InvoiceDate","InvoiceType","InvoiceCategory","TaxableValue","TotalGstAmount","InvoicesAmount","OtherCharges","IGSTAmount","SGSTAmount","CGSTAmount","CESS", "VATAmount"]:
             col_idx = df_missing_opera_folios_list.columns.get_loc(each)
             writer.sheets['Missing In Opera'].set_column(col_idx, col_idx, 20)
         # Missing Invoices In Ezyinvoicing
