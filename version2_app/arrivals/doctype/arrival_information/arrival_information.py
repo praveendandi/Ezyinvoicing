@@ -103,10 +103,10 @@ def arrivalActivity(company, file_url, source):
                         "company": company,
                         "cc_exp_date": arival[replace_new[column_indexs["CC_EXP_DATE"]]],
                         "room_number": str(arival[replace_new[column_indexs["room_number"]]]),
-                        "checkin_time": arival[replace_new[column_indexs["checkin_time"]]]
+                        "checkin_time": arival[replace_new[column_indexs["checkin_time"]]].replace("*", "")
                         if arival[replace_new[column_indexs["checkin_time"]]] != ""
                         else "00:00:00",
-                        "checkout_time": arival[replace_new[column_indexs["checkout_time"]]]
+                        "checkout_time": arival[replace_new[column_indexs["checkout_time"]]].replace("*", "")
                         if arival[replace_new[column_indexs["checkout_time"]]] != ""
                         else "00:00:00",
                     }
@@ -299,10 +299,10 @@ def arrivalActivity(company, file_url, source):
                         "company": company,
                         "cc_exp_date": replace_new[column_indexs["CC_EXP_DATE"]],
                         "room_number": str(replace_new[column_indexs["room_number"]]),
-                        "checkin_time": replace_new[column_indexs["checkin_time"]]
+                        "checkin_time": replace_new[column_indexs["checkin_time"]].replace("*", "")
                         if replace_new[column_indexs["checkin_time"]] != ""
                         else "00:00:00",
-                        "checkout_time": replace_new[column_indexs["checkout_time"]]
+                        "checkout_time": replace_new[column_indexs["checkout_time"]].replace("*", "")
                         if replace_new[column_indexs["checkout_time"]] != ""
                         else "00:00:00",
                     }
