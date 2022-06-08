@@ -262,14 +262,11 @@ def login_cform():
                     each_data["passport_valid_till"] = each_data[
                         "passport_valid_till"
                     ].strftime("%d%m%Y")
+                print(each_data["visa_date_of_issue"], type(each_data["visa_date_of_issue"]),)
                 if each_data["visa_date_of_issue"]:
-                    each_data["visa_date_of_issue"] = datetime.datetime.strptime(
-                        each_data["visa_date_of_issue"], "%Y-%m-%d"
-                    ).strftime("%d%m%Y")
+                    each_data["visa_date_of_issue"] = each_data["visa_date_of_issue"].strftime("%d%m%Y")
                 if each_data["visa_valid_till"]:
-                    each_data["visa_valid_till"] = datetime.datetime.strptime(
-                        each_data["visa_valid_till"], "%Y-%m-%d"
-                    ).strftime("%d%m%Y")
+                    each_data["visa_valid_till"] = each_data["visa_valid_till"].strftime("%d%m%Y")
                 if each_data["date_of_arrival_in_india"]:
                     each_data["date_of_arrival_in_india"] = each_data[
                         "date_of_arrival_in_india"

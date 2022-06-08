@@ -11,8 +11,10 @@ import json
 # from pydoc import doc
 import re
 import sys
-# import os
+import os
 import traceback
+import pandas as pd
+from frappe.utils import cstr
 
 import frappe
 import requests
@@ -1856,3 +1858,30 @@ def get_guest_details_by_confirmation_number(confirmation_number:str=None,name:s
         )
         return {"success": False, "message": str(e)}
 
+
+# @frappe.whitelist(allow_guest=True)
+# def export_cform(filters=None):
+#     try:
+#         data = frappe.db.get_list("Guest Details",filters=filters,fields=["confirmation_number as ConfirmationNumber","frro_id as FrroID","guest_full_name as GuestName","room_number as RoomNumber","checkin_date as CheckinDate","checkout_date as CheckoutDate"])
+#         if len(data) > 0:
+#             company = frappe.get_last_doc("company")
+#             cwd = os.getcwd()
+#             site_name = cstr(frappe.local.site)
+#             file_path = cwd + "/" + site_name + "/public/files/invoice_export.xlsx"
+#             df = pd.DataFrame.from_records(data)
+#             df.to_csv(file_path, index=False)
+#             files_new = {"file": open(file_path, 'rb')}
+#             payload_new = {'is_private': 1, 'folder': 'Home'}
+#             file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+#                                           data=payload_new, verify=False).json()
+#             if "file_url" in file_response["message"].keys():
+#                 os.remove(file_path)
+#                 return {"success": True, "file_url": file_response["message"]["file_url"]}
+#         return {"success":False, "message":"no data found"}
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error(
+#             "get_guest_details_by_confirmation_number",
+#             "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+#         )
+#         return {"success": False, "message": str(e)}
