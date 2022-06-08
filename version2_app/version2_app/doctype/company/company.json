@@ -270,7 +270,8 @@
   "clbs_section",
   "clbs",
   "ezy_gst_section",
-  "ezy_gst_module"
+  "ezy_gst_module",
+  "arrival_information_file_type"
  ],
  "fields": [
   {
@@ -1734,11 +1735,70 @@
    "fieldname": "country",
    "fieldtype": "Data",
    "label": "Country"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_pending_invoices_in_reports",
+   "fieldtype": "Check",
+   "label": "Show Pending Invoices In Reports"
+  },
+  {
+   "fieldname": "bulkupload_json",
+   "fieldtype": "Attach",
+   "label": "BulkUpload Json"
+  },
+  {
+   "fieldname": "pos_footer",
+   "fieldtype": "Text",
+   "label": "POS Footer"
+  },
+  {
+   "fieldname": "pos_text",
+   "fieldtype": "Text",
+   "label": "POS Text"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_pdf_upload",
+   "fieldtype": "Check",
+   "label": "Enable PDF Upload"
+  },
+  {
+   "default": "1",
+   "fieldname": "vat_reporting",
+   "fieldtype": "Check",
+   "label": "Vat Reporting"
+  },
+  {
+   "fieldname": "summary_header",
+   "fieldtype": "Text",
+   "label": "Summary Header"
+  },
+  {
+   "fieldname": "column_break_248",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "summary_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "Summary Terms and Conditions"
+  },
+  {
+   "fieldname": "summary_footer",
+   "fieldtype": "Text",
+   "label": "Summary Footer"
+  },
+  {
+   "default": "Txt",
+   "fieldname": "arrival_information_file_type",
+   "fieldtype": "Select",
+   "label": "Arrival Information File Type",
+   "options": "Txt\nCsv\nXml"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-27 10:05:17.475725",
+ "modified": "2022-04-14 14:32:24.415240",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

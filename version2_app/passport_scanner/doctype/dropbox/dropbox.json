@@ -128,7 +128,7 @@
    "fieldname": "id_type",
    "fieldtype": "Select",
    "label": "Guest Id Type",
-   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice"
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice\nnrc\nzambiaPassport"
   },
   {
    "default": "0",
@@ -144,7 +144,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-06 11:10:41.043632",
+ "modified": "2022-05-12 15:29:50.262341",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Dropbox",
