@@ -104,10 +104,10 @@ def arrivalActivity(company, file_url, source):
                         "cc_exp_date": arival[replace_new[column_indexs["CC_EXP_DATE"]]],
                         "room_number": str(arival[replace_new[column_indexs["room_number"]]]),
                         "checkin_time": arival[replace_new[column_indexs["checkin_time"]]].replace("*", "")
-                        if arival[replace_new[column_indexs["checkin_time"]]] != "" and not arival[replace_new[column_indexs["checkin_time"]]]
+                        if arival[replace_new[column_indexs["checkin_time"]]] != None
                         else "00:00:00",
                         "checkout_time": arival[replace_new[column_indexs["checkout_time"]]].replace("*", "")
-                        if arival[replace_new[column_indexs["checkout_time"]]] != "" and not arival[replace_new[column_indexs["checkin_time"]]]
+                        if arival[replace_new[column_indexs["checkout_time"]]] != None
                         else "00:00:00",
                     }
                 for key in reservation.keys():
@@ -253,7 +253,6 @@ def arrivalActivity(company, file_url, source):
                     else:
                         confirmation_number = replace_new[column_indexs["CONFIRMATION_NO"]]
                         IS_GROUP_CODE = "No"
-                    
                     reservation = {
                         "guest_title": replace_new[column_indexs["GUEST_TITLE"]],
                         "guest_first_name": replace_new[column_indexs["GUEST_FIRST_NAME"]],
@@ -300,10 +299,10 @@ def arrivalActivity(company, file_url, source):
                         "cc_exp_date": replace_new[column_indexs["CC_EXP_DATE"]],
                         "room_number": str(replace_new[column_indexs["room_number"]]),
                         "checkin_time": replace_new[column_indexs["checkin_time"]].replace("*", "")
-                        if replace_new[column_indexs["checkin_time"]] != "" and not arival[replace_new[column_indexs["checkin_time"]]]
+                        if replace_new[column_indexs["checkin_time"]] != ""
                         else "00:00:00",
                         "checkout_time": replace_new[column_indexs["checkout_time"]].replace("*", "")
-                        if replace_new[column_indexs["checkout_time"]] != "" and not arival[replace_new[column_indexs["checkin_time"]]]
+                        if replace_new[column_indexs["checkout_time"]] != ""
                         else "00:00:00",
                     }
                     arrival_date = datetime.datetime.strptime(
