@@ -2268,6 +2268,7 @@ def calulate_items(data):
                 else:
                     final_item["vat_amount"] = 0
                 final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
+            print(item["check_number"],"../..,,.,..")
             total_items.append({
                 'doctype':
                 'Items',
@@ -2331,7 +2332,8 @@ def calulate_items(data):
                 "is_service_charge_item": "No",
                 "sac_index": sac_code_based_gst_rates.sac_index,
                 "line_edit_net":net_value,
-                "item_reference":item["item_reference"] if "item_reference" in item else ""
+                "item_reference":item["item_reference"] if "item_reference" in item else "",
+                "check_number":item["check_number"] if "check_number" in item else ""
             })
         total_items.extend(second_list)	
         return {"success": True, "data": total_items}
