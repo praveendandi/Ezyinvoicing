@@ -2,7 +2,7 @@ from re import T
 from webbrowser import get
 import datetime
 from attr import fields
-from cv2 import sort
+# from cv2 import sort
 import frappe
 import json
 import requests
