@@ -2268,7 +2268,6 @@ def calulate_items(data):
                 else:
                     final_item["vat_amount"] = 0
                 final_item['item_value_after_gst'] = final_item['item_value_after_gst']+final_item['cess_amount']+final_item['vat_amount']+final_item["state_cess_amount"]
-            print(item["check_number"],"../..,,.,..")
             total_items.append({
                 'doctype':
                 'Items',
