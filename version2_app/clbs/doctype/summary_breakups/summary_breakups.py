@@ -202,13 +202,14 @@ def combine_pdf(files, filename, name):
         # ordered_files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
-        merger = PdfFileMerger()
+        # merger = PdfFileMerger(strict=False)
+        result = fitz.open()
         for each in order_files:
             file_path = cwd + "/" + site_name + each
-            merger.append(file_path)
+            with fitz.open(file_path) as mfile:
+                result.insertPDF(mfile)
         file_path = cwd + "/" + site_name + "/public/files/" + name + '.pdf'
-        merger.write(file_path)
-        merger.close()
+        result.save(file_path)
         files_new = {"file": open(file_path, 'rb')}
         payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
                        'docname': name, 'fieldname': filename}
