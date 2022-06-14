@@ -22,7 +22,8 @@
   "contacts",
   "status",
   "reference",
-  "po_number"
+  "po_number",
+  "email_sent_status"
  ],
  "fields": [
   {
@@ -123,11 +124,17 @@
    "fieldname": "po_number",
    "fieldtype": "Data",
    "label": "PO Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "email_sent_status",
+   "fieldtype": "Check",
+   "label": "Email Sent Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-21 14:54:12.015780",
+ "modified": "2022-06-07 14:07:46.596137",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",

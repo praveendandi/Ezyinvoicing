@@ -27,4 +27,4 @@ paytmchecksum
 fitz
 PyMuPDF==1.18.14
 pyHanko
-attrs
+# attrs
