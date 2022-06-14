@@ -684,10 +684,16 @@ def send_summary_mail(data):
                         content=data["response"],
                         doctype=None,
                         name=None,
-                        cc=cc_emails,
+                        cc=cc_emails if cc_emails else "",
                         attachments=json.dumps(files_summary),
                         send_email=1
                         )
+        if cc_emails:
+            if "," in cc_emails:
+                cc_emails_split = cc_emails.split(",")
+                data["email"].extend(cc_emails_split)
+            else:
+                data["email"].append(cc_emails)
         emails = json.dumps(data["email"])
         frappe.db.set_value('Summaries', data["summary"], 'email_sent_status', 1)
         frappe.db.commit()
