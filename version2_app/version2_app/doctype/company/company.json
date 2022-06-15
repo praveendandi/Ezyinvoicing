@@ -149,7 +149,10 @@
   "application_reference_number",
   "data_filing",
   "sezwp_terms_and_conditions",
-  "sezwop_terms_and_conditions"
+  "sezwop_terms_and_conditions",
+  "enable_slab_for_room_service_charge",
+  "sc_slab_12_starting_range",
+  "sc_slab_12_end_range"
  ],
  "fields": [
   {
@@ -964,11 +967,27 @@
    "fieldname": "sezwop_terms_and_conditions",
    "fieldtype": "Text",
    "label": "SEZWOP Terms and Conditions"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_slab_for_room_service_charge",
+   "fieldtype": "Check",
+   "label": "Enable Slab For Room Service Charge"
+  },
+  {
+   "fieldname": "sc_slab_12_starting_range",
+   "fieldtype": "Int",
+   "label": "SC Slab 12% Starting Range"
+  },
+  {
+   "fieldname": "sc_slab_12_end_range",
+   "fieldtype": "Int",
+   "label": "SC Slab 12% End Range"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-30 14:39:23.384423",
+ "modified": "2022-06-15 11:17:30.317547",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
