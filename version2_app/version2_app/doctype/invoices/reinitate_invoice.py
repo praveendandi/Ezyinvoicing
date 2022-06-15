@@ -12,7 +12,7 @@ import time
 import pandas as pd
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages, update_document_bin
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn,calulate_items,insert_invoice,calulate_net_yes
-from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
+from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages, SCCheckRatePercentages
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
 # 
@@ -657,7 +657,10 @@ def reprocess_calulate_items(data):
             else:
                 return{"success":False,"message":"SAC Code "+ item_description+" not found"}
             if sac_code_based_gst_rates.code == '996311' or sac_code_based_gst_rates.code == '997321':
-                percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+                if sac_code_based_gst_rates.is_service_charge_item == 1 and companyDetails.enable_slab_for_room_service_charge == 1:
+                    percentage_gst = SCCheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+                else:
+                    percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
                 if percentage_gst["success"] == True:
                     acc_gst_percentage = percentage_gst["gst_percentage"]
                     acc_igst_percentage = percentage_gst["igst_percentage"]
