@@ -25,7 +25,7 @@ from PyPDF2 import PdfFileMerger
 
 
 from version2_app.clbs.doctype.summaries.summaries import get_summary
-from version2_app.e_signature.e_signature import add_signature
+from version2_app.e_signature.e_signature import send_files
 
 
 class SummaryBreakups(Document):
@@ -195,7 +195,7 @@ def combine_pdf(files, filename, name, user_name=None, add_signature=False):
             elif "summary" == key:
                 order_files.extend(files)
                 if add_signature:
-                    add_signature(files, user_name)
+                    send_files(files, user_name)
             else:
                 bills = frappe.db.get_list("Summary Documents",
                                             filters={"summary": ["=", name],
@@ -252,6 +252,8 @@ def download_pdf(name, add_signature=False, user_name=None):
                 if add_signature == False:
                     combine = combine_pdf(file_urls, "summary", name)
                 else:
+                    if clbs_settings_doc.digital_signature == 0:
+                        return {"success": False, "message": "Please Enable Digital Signature"}
                     combine = combine_pdf(file_urls, "summary", name, user_name, add_signature)
                 if not combine:
                     return combine

@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 import frappe
+import requests
+import os
 from frappe.utils import cstr
 from frappe.model.document import Document
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
@@ -19,6 +21,8 @@ class UserSignature(Document):
 @frappe.whitelist(allow_guest=True)
 def add_signature(invoice=None, pfx_signature=None, secret=b'123', X1=400, Y1=10, X2=590, Y2=70):
     try:
+        if secret:
+            secret = bytes(secret, 'utf-8')
         site_name = cstr(frappe.local.site)
         folder_path = frappe.utils.get_bench_path()
         invoice_file = (
@@ -42,20 +46,52 @@ def add_signature(invoice=None, pfx_signature=None, secret=b'123', X1=400, Y1=10
                 # background=images.PdfImage('')
             ),
         )
+        file_name = os.path.basename(invoice)
+        output_file_path = invoice_file+"/public/files/"+file_name
+        print(output_file_path,"../../.././/...//..//./")
         with open(invoice_file+invoice, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
             fields.append_signature_field(
                 w, sig_field_spec=fields.SigFieldSpec(
-                    'Signature', box=(X1, Y1, X2, Y2)
+                    'Signature', box=(X1, Y1, X2, Y2), on_page=-1
                 ),
                 # appearance_text_params={'url': 'https://caratred.com'}
             )
-            with open('/home/caratred/output.pdf', 'wb') as outf:
+            with open(output_file_path, 'wb') as outf:
                 pdf_signer.sign_pdf(
                     w,
                     output=outf,
                     # appearance_text_params={'url': 'https://caratred.com'}
                 )
+        files = {"file": open(output_file_path, 'rb')}
+        payload = {
+            "is_private": 1,
+            "folder": "Home"
+        }
+        site = frappe.utils.get_url()
+        upload_qr_image = requests.post(site + "/api/method/upload_file",
+                                        files=files,
+                                        data=payload)
+        # print(upload_qr_image)
+        response = upload_qr_image.json()
+        if 'message' in response:
+            return {"success": True, "file": response['message']['file_url']}
     except Exception as e:
         frappe.log_error(str(e), "add_signature")
+        return{"success": False, "message": str(e)}
+
+
+def send_files(files, user_name):
+    try:
+        if user_name:
+            print("//....////..")
+            if frappe.db.exists("User Signature", user_name):
+                get_doc = frappe.get_doc("User Signature", user_name)
+                for each in files:
+                    add_signature(each, get_doc.signature_pfx,
+                                  get_doc.pfx_password, X1=400, Y1=10, X2=590, Y2=70)
+            return {"success": False, "message": "User Not Found"}
+        return {"success": False, "message": "User Name not given"}
+    except Exception as e:
+        frappe.log_error(str(e), "send_files")
         return{"success": False, "message": str(e)}

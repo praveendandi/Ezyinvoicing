@@ -17,7 +17,8 @@
   "summary_header",
   "summary_terms_and_conditions",
   "summary_footer",
-  "threshhold"
+  "threshhold",
+  "digital_signature"
  ],
  "fields": [
   {
@@ -83,11 +84,17 @@
    "fieldname": "document_sequence",
    "fieldtype": "Small Text",
    "label": "Document Sequence"
+  },
+  {
+   "default": "0",
+   "fieldname": "digital_signature",
+   "fieldtype": "Check",
+   "label": "Digital Signature"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-28 11:46:18.744483",
+ "modified": "2022-06-16 15:01:29.476845",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "CLBS Settings",
