@@ -164,7 +164,7 @@ def html_to_pdf(html_data, filename, name, etax=False):
         return {"success": False, "message": str(e)}
 
 
-def combine_pdf(files, filename, name, user_name=None, add_signature=False):
+def combine_pdf(files, filename, name, user_name=None, add_signature=False, type=None):
     try:
         company = frappe.get_last_doc('company')
         if not frappe.db.exists("CLBS Settings", company.name):
@@ -191,15 +191,32 @@ def combine_pdf(files, filename, name, user_name=None, add_signature=False):
         order_files = []
         for key, value in document_sequence.items():
             if "e_tax" == key:
-                order_files.extend(qr_files)
-            elif "summary" == key:
-                order_files.extend(files)
                 if add_signature:
-                    send_files(files, user_name)
+                    if not type:
+                        return {"success": False, "message": "Signature type not defined"}
+                    add_sig = send_files(qr_files, user_name)
+                    if not add_sig["success"]:
+                        return add_sig
+                    order_files.extend(add_sig["files"])
+                else:
+                    order_files.extend(qr_files)
+            elif "summary" == key:
+                if add_signature:
+                    if not type:
+                        return {"success": False, "message": "Signature type not defined"}
+                    if type == "pfx":
+                        addsig = send_files(files, user_name)
+                    else:
+                        addsig = add_signature_images(files, user_name)
+                    if not addsig["success"]:
+                        return addsig
+                    order_files.extend(addsig["files"])
+                else:
+                    order_files.extend(files)
             else:
                 bills = frappe.db.get_list("Summary Documents",
-                                            filters={"summary": ["=", name],
-                                            "document_type": ["=", key]}, pluck="document")
+                                           filters={"summary": ["=", name],
+                                                    "document_type": ["=", key]}, pluck="document")
                 if len(bills) > 0:
                     order_files.extend(bills)
         # ordered_files = files + qr_files + invoices + bills
@@ -229,7 +246,7 @@ def combine_pdf(files, filename, name, user_name=None, add_signature=False):
 
 
 @frappe.whitelist(allow_guest=True)
-def download_pdf(name, add_signature=False, user_name=None):
+def download_pdf(name, add_signature=False, user_name=None, type=None):
     try:
         summary_format = summary_print_formats(name)
         if not summary_format["success"]:
@@ -254,7 +271,8 @@ def download_pdf(name, add_signature=False, user_name=None):
                 else:
                     if clbs_settings_doc.digital_signature == 0:
                         return {"success": False, "message": "Please Enable Digital Signature"}
-                    combine = combine_pdf(file_urls, "summary", name, user_name, add_signature)
+                    combine = combine_pdf(
+                        file_urls, "summary", name, user_name, add_signature, type)
                 if not combine:
                     return combine
                 files_to_delete = [
@@ -319,7 +337,7 @@ def extract_summary_breakups(filters, summary):
              'invoice_number': 'first', "sac_code": list})
         data.rename(columns={'Date_string': 'date', 'service_type': 'category',
                     'invoice_category': 'invoice_type',
-                    'item_value_after_gst': 'amount'}, inplace=True)
+                             'item_value_after_gst': 'amount'}, inplace=True)
         data = data.to_dict('records')
         for each in data:
             if len(each["sac_code"]) > 0:
@@ -336,12 +354,12 @@ def extract_summary_breakups(filters, summary):
 def extract_summary_breakup_details(df, summaries):
     try:
         summary_breakup_details = df[(df['service_type'] == summaries["category"]) &
-                                    (df["invoice_number"] == summaries["invoice_number"])]
+                                     (df["invoice_number"] == summaries["invoice_number"])]
         filter_food_columns = summary_breakup_details[
             ["date", "parent", "sac_code", "item_value_after_gst",
-            "item_taxable_value", "cgst_amount", "sgst_amount",
-            "igst_amount", "gst_rate", "service_type",
-            "description", "invoice_file", "qr_code_image"]]
+             "item_taxable_value", "cgst_amount", "sgst_amount",
+             "igst_amount", "gst_rate", "service_type",
+             "description", "invoice_file", "qr_code_image"]]
         filter_food_columns.rename(columns={'parent': 'invoice_no',
                                             'item_value_after_gst': 'amount',
                                             'cgst_amount': 'cgst', "sgst_amount": "sgst",
@@ -402,7 +420,7 @@ def create_breakup_details(doc, details_data, summary):
             frappe.db.commit()
             if frappe.db.exists({"doctype": "Invoices", "clbs_summary_generated": False,
                                 "invoice_number": child_items["invoice_no"],
-                                "company": get_company.name}):
+                                 "company": get_company.name}):
                 invoice_doc = frappe.get_doc(
                     "Invoices", child_items["invoice_no"])
                 invoice_doc.clbs_summary_generated = 1
@@ -533,8 +551,8 @@ def get_summary_breakup(summary=None):
                 breakups_names = frappe.db.get_list("Summary Breakups", filters=[
                                                     ["summaries", "=", summary]], pluck="name")
                 breakups_categories = frappe.db.get_list("Summary Breakups", filters=[
-                                                        ["summaries", "=", summary]],
-                                                        pluck="category")
+                    ["summaries", "=", summary]],
+                    pluck="category")
                 if len(breakups_categories) > 0:
                     breakups_categories = list(set(breakups_categories))
                     details = {}
@@ -618,11 +636,11 @@ def submit_summary(summary):
         if frappe.db.exists({"doctype": "Summaries", "name": summary}):
             if frappe.db.exists({"doctype": "Summary Breakups", "summaries": summary}):
                 # get_summary_breakups = frappe.db.get_list("Summary Breakups", filters={
-                #                                           "summaries": summary, 
-                #                                           "category": ["!=", "Rooms"]}, 
+                #                                           "summaries": summary,
+                #                                           "category": ["!=", "Rooms"]},
                 #                                           pluck="name")
                 # check_billno = frappe.db.get_list("Summary Breakup Details", filters={
-                    # "parent": ["in", get_summary_breakups], "bill_no": ["=", ""]})
+                # "parent": ["in", get_summary_breakups], "bill_no": ["=", ""]})
                 # if len(check_billno) > 0:
                 #     return {"success": False, "message": "	Bill No. are mandatory"}
                 if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
@@ -766,8 +784,8 @@ def get_all_summary_files(summary=None):
 def add_qr_to_pdf(data):
     try:
         company = frappe.get_last_doc("company")
-        qr_coordinates = frappe.db.get_value('CLBS Settings', company.name, 
-                        ['qr_rect_x0', 'qr_rect_x1', 'qr_rect_y0', 'qr_rect_y1'], as_dict=1)
+        qr_coordinates = frappe.db.get_value('CLBS Settings', company.name,
+                                             ['qr_rect_x0', 'qr_rect_x1', 'qr_rect_y0', 'qr_rect_y1'], as_dict=1)
         if not qr_coordinates:
             return {"success": False, "message": "please add coordinates in clbs settings"}
         folder_path = frappe.utils.get_bench_path()
@@ -780,34 +798,12 @@ def add_qr_to_pdf(data):
                 each["invoice_number"] + 'withQr.pdf'
             img_filename = path + each["qr_code_image"]
             # img_rect = fitz.Rect(190, 90, 350, 220)
-            img_rect = fitz.Rect(
-                                int(qr_coordinates["qr_rect_x0"]),
-                                int(qr_coordinates["qr_rect_x1"]),
-                                int(qr_coordinates["qr_rect_y0"]),
-                                int(qr_coordinates["qr_rect_y1"])
-                                )
-            document = fitz.open(src_pdf_filename)
-            page = document[0]
-            im = open(img_filename, "rb").read()
-            page.insertImage(img_rect, stream=im)
-            document.save(dst_pdf_filename)
-            document.close()
-            files = {"file": open(dst_pdf_filename, 'rb')}
-            payload = {
-                "is_private": 1,
-                "folder": "Home"
-            }
-            site = company.host
-            upload_qr_image = requests.post(site + "api/method/upload_file",
-                                            files=files,
-                                            data=payload)
-            # print(upload_qr_image)
-            response = upload_qr_image.json()
-            if 'message' in response:
-                files_urls.append(response['message']['file_url'])
+            add_image = add_image_to_pdf(qr_coordinates["qr_rect_x0"], qr_coordinates["qr_rect_x1"], qr_coordinates["qr_rect_y0"],
+                                         qr_coordinates["qr_rect_y1"], src_pdf_filename, img_filename, dst_pdf_filename)
+            if add_image["success"]:
                 frappe.db.set_value(
                     'Summary Documents', each["name"],
-                    'qr_attached_document', response['message']['file_url'])
+                    'qr_attached_document', add_image["file"])
                 frappe.db.commit()
             else:
                 return {"success": False, "message": "something went wrong"}
@@ -816,6 +812,61 @@ def add_qr_to_pdf(data):
         frappe.log_error(str(e), "add_qr_to_pdf")
         return{"success": False, "message": str(e)}
 
+
+def add_image_to_pdf(qr_rect_x0=None, qr_rect_x1=None, qr_rect_y0=None, qr_rect_y1=None, input_file=None, image=None, output_file=None):
+    try:
+        company = frappe.get_last_doc("company")
+        img_rect = fitz.Rect(
+            int(qr_rect_x0),
+            int(qr_rect_x1),
+            int(qr_rect_y0),
+            int(qr_rect_y1)
+        )
+        document = fitz.open(input_file)
+        page = document[0]
+        im = open(image, "rb").read()
+        page.insertImage(img_rect, stream=im)
+        document.save(output_file)
+        document.close()
+        files = {"file": open(output_file, 'rb')}
+        payload = {
+            "is_private": 1,
+            "folder": "Home"
+        }
+        site = company.host
+        upload_qr_image = requests.post(site + "api/method/upload_file",
+                                        files=files,
+                                        data=payload)
+        # print(upload_qr_image)
+        response = upload_qr_image.json()
+        if 'message' in response:
+            return {"success": True, "file": (response['message']['file_url'])}
+        return {"success": False, "message": "some error occurred"}
+    except Exception as e:
+        frappe.log_error(str(e), "add_image_to_pdf")
+        return{"success": False, "message": str(e)}
+
+
+def add_signature_images(files, user_name):
+    try:
+        if user_name:
+            if frappe.db.exists("User Signature", user_name):
+                new_files = []
+                clbs_settings = frappe.get_last_doc('CLBS Settings')
+                get_doc = frappe.get_doc("User Signature", user_name)
+                for each in files:
+                    signature = add_image_to_pdf(qr_rect_x0=clbs_settings.x1, 
+                                qr_rect_y0=clbs_settings.y1, qr_rect_x1=clbs_settings.x2, 
+                                qr_rect_y1=clbs_settings.y2,input_file=each,)
+                    if not signature["success"]:
+                        return signature
+                    new_files.append(signature["file"])
+                return {"success" : True, "files": new_files}
+            return {"success": False, "message": "User Not Found"}
+        return {"success": False, "message": "User Name not given"}
+    except Exception as e:
+        frappe.log_error(str(e), "add_signature_images")
+        return{"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
 def etax_invoice_to_pdf(summary):

@@ -48,7 +48,6 @@ def add_signature(invoice=None, pfx_signature=None, secret=b'123', X1=400, Y1=10
         )
         file_name = os.path.basename(invoice)
         output_file_path = invoice_file+"/public/files/"+file_name
-        print(output_file_path,"../../.././/...//..//./")
         with open(invoice_file+invoice, 'rb') as inf:
             w = IncrementalPdfFileWriter(inf)
             fields.append_signature_field(
@@ -84,12 +83,19 @@ def add_signature(invoice=None, pfx_signature=None, secret=b'123', X1=400, Y1=10
 def send_files(files, user_name):
     try:
         if user_name:
-            print("//....////..")
             if frappe.db.exists("User Signature", user_name):
+                new_files = []
+                clbs_settings = frappe.get_last_doc('CLBS Settings')
                 get_doc = frappe.get_doc("User Signature", user_name)
                 for each in files:
-                    add_signature(each, get_doc.signature_pfx,
-                                  get_doc.pfx_password, X1=400, Y1=10, X2=590, Y2=70)
+                    signature = add_signature(each, get_doc.signature_pfx,
+                                get_doc.pfx_password, X1=clbs_settings.x1, 
+                                Y1=clbs_settings.y1, X2=clbs_settings.x2, 
+                                Y2=clbs_settings.y2)
+                    if not signature["success"]:
+                        return signature
+                    new_files.append(signature["file"])
+                return {"success" : True, "files": new_files}
             return {"success": False, "message": "User Not Found"}
         return {"success": False, "message": "User Name not given"}
     except Exception as e:

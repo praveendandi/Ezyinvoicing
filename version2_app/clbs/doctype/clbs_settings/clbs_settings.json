@@ -6,10 +6,6 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "qr_rect_x0",
-  "qr_rect_x1",
-  "qr_rect_y0",
-  "qr_rect_y1",
   "cc_mail_ids_for_clbs_reports",
   "clbs_document_preview",
   "document_sequence",
@@ -18,7 +14,17 @@
   "summary_terms_and_conditions",
   "summary_footer",
   "threshhold",
-  "digital_signature"
+  "digital_signature",
+  "qr_coordinates_section",
+  "qr_rect_x0",
+  "qr_rect_x1",
+  "qr_rect_y0",
+  "qr_rect_y1",
+  "digital_signature_coordinates_section",
+  "x1",
+  "y1",
+  "x2",
+  "y2"
  ],
  "fields": [
   {
@@ -90,11 +96,41 @@
    "fieldname": "digital_signature",
    "fieldtype": "Check",
    "label": "Digital Signature"
+  },
+  {
+   "fieldname": "qr_coordinates_section",
+   "fieldtype": "Section Break",
+   "label": "QR Coordinates"
+  },
+  {
+   "fieldname": "digital_signature_coordinates_section",
+   "fieldtype": "Section Break",
+   "label": "Digital Signature Coordinates"
+  },
+  {
+   "fieldname": "x1",
+   "fieldtype": "Int",
+   "label": "X1"
+  },
+  {
+   "fieldname": "y1",
+   "fieldtype": "Int",
+   "label": "Y1"
+  },
+  {
+   "fieldname": "x2",
+   "fieldtype": "Int",
+   "label": "X2"
+  },
+  {
+   "fieldname": "y2",
+   "fieldtype": "Int",
+   "label": "Y2"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-16 15:01:29.476845",
+ "modified": "2022-06-17 09:45:51.555213",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "CLBS Settings",
