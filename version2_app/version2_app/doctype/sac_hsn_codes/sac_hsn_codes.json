@@ -35,7 +35,8 @@
   "ignore_non_taxable_items",
   "bulk_upload_service_charge",
   "disable_cess_for_sc",
-  "disable_vat_for_sc"
+  "disable_vat_for_sc",
+  "is_service_charge_item"
  ],
  "fields": [
   {
@@ -223,11 +224,17 @@
    "fieldname": "disable_vat_for_sc",
    "fieldtype": "Check",
    "label": "Disable Vat For SC"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_service_charge_item",
+   "fieldtype": "Check",
+   "label": "Is Service Charge Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-11-09 10:26:39.366497",
+ "modified": "2022-06-15 11:18:36.429159",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
