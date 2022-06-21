@@ -43,7 +43,8 @@
   "line_edit_net",
   "item_reference",
   "lut_exempted",
-  "previous_lut_item"
+  "previous_lut_item",
+  "check_number"
  ],
  "fields": [
   {
@@ -274,12 +275,17 @@
    "fieldname": "previous_lut_item",
    "fieldtype": "Check",
    "label": "Previous Lut Item"
+  },
+  {
+   "fieldname": "check_number",
+   "fieldtype": "Data",
+   "label": "Check Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-03-10 18:12:20.234896",
+ "modified": "2022-06-09 15:12:47.369950",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",
