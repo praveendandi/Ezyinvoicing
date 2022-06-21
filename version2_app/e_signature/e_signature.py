@@ -19,7 +19,7 @@ class UserSignature(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def add_signature(invoice=None, pfx_signature=None, secret=b'123', X1=400, Y1=10, X2=590, Y2=70):
+def add_signature(invoice=None, pfx_signature=None, signature_image = None, secret=b'123', X1=400, Y1=10, X2=590, Y2=70):
     try:
         if secret:
             secret = bytes(secret, 'utf-8')
@@ -42,8 +42,8 @@ def add_signature(invoice=None, pfx_signature=None, secret=b'123', X1=400, Y1=10
         pdf_signer = signers.PdfSigner(
             signature_meta, signer=signer, stamp_style=stamp.TextStampStyle(
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
-                stamp_text='This is custom text!\nSigned by: %(signer)s\nTime: %(ts)s',
-                # background=images.PdfImage('')
+                stamp_text='\n\n\n\nTime: %(ts)s',
+                background=images.PdfImage(invoice_file+signature_image,)
             ),
         )
         file_name = os.path.basename(invoice)
@@ -88,7 +88,7 @@ def send_files(files, user_name):
                 clbs_settings = frappe.get_last_doc('CLBS Settings')
                 get_doc = frappe.get_doc("User Signature", user_name)
                 for each in files:
-                    signature = add_signature(each, get_doc.signature_pfx,
+                    signature = add_signature(each, get_doc.signature_pfx, get_doc.signature_image,
                                 get_doc.pfx_password, X1=clbs_settings.x1, 
                                 Y1=clbs_settings.y1, X2=clbs_settings.x2, 
                                 Y2=clbs_settings.y2)

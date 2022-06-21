@@ -23,7 +23,8 @@
   "status",
   "reference",
   "po_number",
-  "email_sent_status"
+  "email_sent_status",
+  "signature_attached"
  ],
  "fields": [
   {
@@ -130,11 +131,17 @@
    "fieldname": "email_sent_status",
    "fieldtype": "Check",
    "label": "Email Sent Status"
+  },
+  {
+   "default": "0",
+   "fieldname": "signature_attached",
+   "fieldtype": "Check",
+   "label": "Signature Attached"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-07 14:07:46.596137",
+ "modified": "2022-06-20 19:27:31.360313",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
