@@ -19,7 +19,9 @@
   "company",
   "mode",
   "no_of_guests",
-  "gcp_file_url"
+  "gcp_file_url",
+  "attachment",
+  "attached_to"
  ],
  "fields": [
   {
@@ -98,11 +100,22 @@
    "fieldname": "gcp_file_url",
    "fieldtype": "Data",
    "label": "GCP File URL"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Attachment"
+  },
+  {
+   "fieldname": "attached_to",
+   "fieldtype": "Link",
+   "label": "Attached to",
+   "options": "Invoices"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-10-22 15:31:27.667668",
+ "modified": "2022-06-21 17:57:02.138468",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Checks",
