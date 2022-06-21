@@ -36,11 +36,8 @@
   "bulk_upload_service_charge",
   "disable_cess_for_sc",
   "disable_vat_for_sc",
-<<<<<<< HEAD
-  "category"
-=======
+  "category",
   "is_service_charge_item"
->>>>>>> 41e2a027f948be7d188d034f59a1af8811d9549c
  ],
  "fields": [
   {
