@@ -30,25 +30,25 @@ from openpyxl.cell import Cell
 def getGSTR1DashboardDetails(year=None, month=None):
     try:
         get_b2b_tax_invoice_summaries = frappe.db.sql(
-            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category='Tax Invoice' and invoice_type='B2B' and sez=0 and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
+            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category='Tax Invoice' and invoice_type='B2B' and sez=0 and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
         get_b2c_tax_invoice_summaries = frappe.db.sql(
-            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category='Tax Invoice' and invoice_type='B2C' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2C', year, month), as_dict=1)
+            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess ,invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category='Tax Invoice' and invoice_type='B2C' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2C', year, month), as_dict=1)
         get_b2b_credit_debit_invoice_summaries = frappe.db.sql(
-            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, 'credit-debit' as invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category in ('Credit Invoice','Debit Invoice') and `tabInvoices`.irn_generated = 'Success' and invoice_type='B2B' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
+            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,'credit-debit' as invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category in ('Credit Invoice','Debit Invoice') and `tabInvoices`.irn_generated = 'Success' and sez=0 and invoice_type='B2B' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
         get_b2c_credit_debit_invoice_summaries = frappe.db.sql(
-            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, 'credit-debit' as invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category in ('Credit Invoice','Debit Invoice')  and invoice_type='B2C' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2C', year, month), as_dict=1)
+            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,'credit-debit' as invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category in ('Credit Invoice','Debit Invoice') and invoice_type='B2C' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2C', year, month), as_dict=1)
         get_hsn_summary = frappe.db.sql(
-            """SELECT count(`tabItems`.parent) as count, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as tax_amount, sum(`tabItems`.item_value_after_gst) as before_gst, sum(`tabItems`.item_taxable_value) as taxable_value, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, 'hsn-summary' as invoice_category, 0 as other_charges from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format(year, month), as_dict=1)
-        nil_rated_supplies = frappe.db.sql("""SELECT count(`tabItems`.name) as count, sum(item_taxable_value) as taxable_value, sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount) as tax_amount, sum(item_value_after_gst) as before_gst, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount,'Nil Rated Supplies' as invoice_type, 0 as other_charges from `tabInvoices` INNER JOIN `tabItems` ON `tabItems`.parent = `tabInvoices`.name where ((`tabItems`.gst_rate = 0 and `tabItems`.taxable = "Yes") or (`tabItems`.taxable = "No") or (`tabInvoices`.sez = 1 and `tabItems`.type = "Excempted")) and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)='{}' and MONTH(invoice_date)='{}'""".format(year, month), as_dict=1)
+            """SELECT count(`tabItems`.parent) as count, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as tax_amount, sum(`tabItems`.item_value_after_gst) as before_gst, sum(`tabItems`.item_taxable_value) as taxable_value, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, 'hsn-summary' as invoice_category, 0 as other_charges,(sum(`tabInvoices`.total_state_cess_amount)+sum(`tabInvoices`.total_central_cess_amount)) as cess from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format(year, month), as_dict=1)
+        nil_rated_supplies = frappe.db.sql("""SELECT count(`tabItems`.name) as count, sum(item_taxable_value) as taxable_value, sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount) as tax_amount, sum(item_value_after_gst) as before_gst, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount,'Nil Rated Supplies' as invoice_type, 0 as other_charges, 0 as cess from `tabInvoices` INNER JOIN `tabItems` ON `tabItems`.parent = `tabInvoices`.name where ((`tabItems`.gst_rate = 0 and `tabItems`.taxable = "Yes") or (`tabItems`.taxable = "No") or (`tabInvoices`.sez = 1 and `tabItems`.type = "Excempted")) and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)='{}' and MONTH(invoice_date)='{}'""".format(year, month), as_dict=1)
         get_sez_SEZWP = frappe.db.sql(
-            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category='Tax Invoice' and sez = 1 and suptyp = 'SEZWP' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
+            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where sez = 1 and invoice_type='B2B' and suptyp = 'SEZWP' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
         get_sez_SEZWOP = frappe.db.sql(
-            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, invoice_category, '{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where invoice_category='Tax Invoice' and sez = 1 and suptyp = 'SEZWOP' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
+            """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, invoice_category, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,'{}' as invoice_type, sum(other_charges) as other_charges from `tabInvoices` where sez = 1 and invoice_type='B2B' and suptyp = 'SEZWOP' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
 
         advance_received = {"count": 0, "tax_amount": 0, "before_gst": 0,
-                            "taxable_value": 0, "igst_amount": 0, "cgst_amount": 0, "sgst_amount": 0, "invoice_category": "advance-received","other_charges":0}
+                            "taxable_value": 0, "igst_amount": 0, "cgst_amount": 0, "sgst_amount": 0, "invoice_category": "advance-received","other_charges":0,"cess":0}
         adjustment_of_advances = {"count": 0, "tax_amount": 0, "before_gst": 0,
-                                  "taxable_value": 0, "igst_amount": 0, "cgst_amount": 0, "sgst_amount": 0, "invoice_category": "adjustment-of-advances","other_charges":0}
+                                  "taxable_value": 0, "igst_amount": 0, "cgst_amount": 0, "sgst_amount": 0, "invoice_category": "adjustment-of-advances","other_charges":0,"cess":0}
         total_data = {"tax_b2b": {k: (0 if v is None else v) for k, v in get_b2b_tax_invoice_summaries[0].items()},
                       "sez_with_payment": {k: (0 if v is None else v) for k, v in get_sez_SEZWP[0].items()},
                       "sez_without_payment": {k: (0 if v is None else v) for k, v in get_sez_SEZWOP[0].items()},
@@ -80,13 +80,13 @@ def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, yea
 
         invoice_summary = frappe.db.get_list("Invoices", filters=filters, fields=['COUNT(DISTINCT(gst_number)) as no_of_suppliers', 'COUNT(DISTINCT(name)) as no_of_invoices', 'SUM(pms_invoice_summary_without_gst) as total_taxable_value',
                                                                                   'SUM(total_gst_amount) as total_gst_amount', 'SUM(pms_invoice_summary) as total_invoices_amount', 'SUM(other_charges) as other_charges', 'SUM(igst_amount) as total_igst', 'SUM(sgst_amount) as total_sgst',
-                                                                                  'SUM(cgst_amount) as total_cgst', 'SUM(total_central_cess_amount+total_state_cess_amount) as cess'])
+                                                                                  'SUM(cgst_amount) as total_cgst', '(sum(total_central_cess_amount+total_state_cess_amount)) as cess'])
         if export == False:
             invoice_data = frappe.db.get_list("Invoices", filters=filters, fields=[
                 '*'], start=int(limit_start), page_length=int(limit_page_length))
         else:
             invoice_data = frappe.db.get_list(
-                "Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'DATE_FORMAT(invoice_date, "%d-%m-%Y") as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt', 'pms_invoice_summary_without_gst as BaseAmt','other_charges as OtherCharges','sgst_amount as SGST', 'cgst_amount as CGST', 'igst_amount as IGST', 'total_gst_amount as TotalGST', 'cess_amount as CESS'])
+                "Invoices", filters=filters, fields=['invoice_number as InvoiceNo', 'DATE_FORMAT(invoice_date, "%d-%m-%Y") as InvoiceDate', 'gst_number as GSTINofSupplier', 'legal_name as LegalName', 'invoice_type as InvoiceType', 'sales_amount_after_tax as InvoiceAmt', 'pms_invoice_summary_without_gst as BaseAmt','other_charges as OtherCharges','sgst_amount as SGST', 'cgst_amount as CGST', 'igst_amount as IGST', 'total_gst_amount as TotalGST', '(total_central_cess_amount+total_state_cess_amount) as CESS'])
         return {"success": True, "data": invoice_data, "summary": invoice_summary[0]}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -142,7 +142,7 @@ def getGSTR1ReconciliationSummaryCount(filters=[], month=None, year=None, compan
 
 
 @frappe.whitelist()
-def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, year=None, export=False):
+def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, year=None, export=False, start_date=None, end_date=None):
     try:
         if isinstance(filters, str):
             filters = json.loads(filters)
@@ -152,8 +152,12 @@ def getHsnSummary(filters=[], limit_page_length=20, limit_start=0, month=None, y
                 (' and '.join("{} {} '{}'".format(
                     value[0], value[1], value[2]) for value in filters))
         if not export:
-            get_hsn_summary = frappe.db.sql(
-                """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.gst_rate as Gst_Rate, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount,sum(`tabItems`.cess_amount) as central_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(year, month, sql_filters), as_dict=1)
+            if start_date and end_date:
+                get_hsn_summary = frappe.db.sql(
+                    """SELECT `tabItems`.sac_code as 'SAC Code', `tabItems`.gst_rate as 'Gst Rate', `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as 'Total Quantity', sum(`tabItems`.cgst_amount) as 'CGST Amount', sum(`tabItems`.sgst_amount) as 'SGST Amount', sum(`tabItems`.igst_amount) as 'IGST Amount', sum(`tabItems`.state_cess_amount) as 'State CESS Amount',sum(`tabItems`.cess_amount) as 'Central CESS Amount', (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as 'Total GST', sum(`tabItems`.item_value) as 'Total Tax Amount', sum(`tabItems`.item_value_after_gst) as 'Total Amount' from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and invoice_date between '{}' and '{}'{} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(start_date, end_date, sql_filters), as_dict=1)
+            else:
+                get_hsn_summary = frappe.db.sql(
+                    """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.gst_rate as Gst_Rate, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount,sum(`tabItems`.cess_amount) as central_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}{} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(year, month, sql_filters), as_dict=1)
         else:
             get_hsn_summary = frappe.db.sql(
                 """SELECT `tabItems`.sac_code as Sac_Code, `tabItems`.gst_rate as Gst_Rate, `tabItems`.unit_of_measurement_description as UQC, `tabItems`.quantity as total_quantity, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.state_cess_amount) as state_cess_amount,sum(`tabItems`.cess_amount) as central_cess_amount, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as total_gst, sum(`tabItems`.item_value) as total_tax_amount, sum(`tabItems`.item_value_after_gst) as total_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={} GROUP BY `tabItems`.sac_code, `tabItems`.gst_rate""".format(year, month), as_dict=1)
@@ -216,13 +220,29 @@ def export_workbook(month=None, year=None):
         if not get_summary["success"]:
             return get_summary
         df = pd.DataFrame(get_summary["data"])
+        print(get_summary["data"],"////////")
         df = df.T
         df1 = df.rename(index={'tax_b2b': 'B2B', 'sez_with_payment': 'B2B-SEZWP', 'sez_without_payment': 'B2B-SEZWOP', 'tax_b2c': 'B2C', 'credit_b2b': 'Credit/ Debit note (Registered)', 'credit_b2c': 'Credit/ Debit note (Unregistered)',
-                               'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances', 'get_hsn_summary': 'HSN Summary of Outward supply'})
-        total = df1.sum()
+                               'nil_rated_supplies': 'Nil Rated Supplies', 'advance_received': 'Advance Received', 'adjustment_of_advances': 'Adjustment of Advances'})
+        update_df = df1.drop('get_hsn_summary')
+        total = update_df.sum()
         total.name = "Total"
-        df1 = df1.append(total.transpose())
-        summary_data = df1.to_dict('index')
+        df1 = update_df.append(total.transpose())
+        df2 = df1.append(pd.Series(get_summary["data"]["get_hsn_summary"], index=df1.columns, name='HSN Summary of Outward supply'))
+        df3 = df2.append(pd.Series(get_summary["data"]["nil_rated_supplies"], index=df2.columns, name='Nil-Rated-Supplies'))
+        df4 = df3[10:12]
+        total2 = df4.sum()
+        total2.name = "Total2"
+        df5 = df3.append(total2.transpose())
+        # df4 = df3[17:][['before_gst', 'taxable_value','igst_amount','cgst_amount','sgst_amount','tax_amount','other_charges']]
+        # total = df4.sum()
+        # total.name = "Total"
+        # df5 = df4.append(total.transpose())
+        # total = df3.iloc['get_hsn_summary','nil_rated_supplies'].sum()
+        # cols = ['before_gst','taxable_value','igst_amount','cgst_amount','sgst_amount','tax_amount','other_charges']
+        # df['sum'] = df.loc[0:3, cols].sum(axis=1)
+        # print(total,"//////")
+        summary_data = df5.to_dict('index')
         get_hsn_summary = getHsnSummary(month=month, year=year, export=True)
         if not get_hsn_summary["success"]:
             return get_hsn_summary
@@ -247,9 +267,9 @@ def export_workbook(month=None, year=None):
         ws.title = "Summary"
         ws.move_range("A1:A5", rows=1, cols=0)
         fields = ['before_gst', 'taxable_value', 'igst_amount',
-                  'cgst_amount', 'sgst_amount', 'tax_amount', 'other_charges']
+                  'cgst_amount', 'sgst_amount', 'tax_amount', 'other_charges', 'cess']
         ws.append(["Particulars", "Invoice value", "Taxable value",
-                   "IGST", "CGST", "SGST", "TOTAL TAX LIABILITY", "Other Charges"])
+                   "IGST", "CGST", "SGST", "TOTAL TAX LIABILITY", "Other Charges", "CESS"])
         for key, value in summary_data.items():
             values = (value[k] for k in fields)
             values = list(values)
@@ -258,7 +278,7 @@ def export_workbook(month=None, year=None):
         # ws.move_range("A6:A17", rows=0, cols=0)
         for i in range(ws.min_row, ws.max_row):
             ws.row_dimensions[i].height = 15
-        for i in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+        for i in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']:
             ws.column_dimensions[i].width = 30
         font = Font(name='Cambria', size=12, bold=True, color='00FFFFFF')
         blueFill = PatternFill(start_color='0B0B45',
@@ -275,24 +295,25 @@ def export_workbook(month=None, year=None):
                 cols.fill = blueFill
                 cols.font = font
                 cols.border = border
-        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I']
         for col in cols:
             cols = ws[f'{col}6']
             cols.fill = blueFill
             cols.font = font
             cols.alignment = alignment
             cols.border = border
-        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I']
         for col in cols:
-            for i in range(7, 18):
+            for i in range(7, 20):
                 cols = ws[f'{col}{i}']
                 cols.number_format = number_format
                 cols.font = Font(name='Cambria', size=12)
                 cols.border = border
-        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I']
         for col in cols:
-            cols = ws[f'{col}17']
-            cols.font = Font(bold=True)
+            for i in [16,19]:
+                cols = ws[f'{col}{i}']
+                cols.font = Font(bold=True)
         ws = wb.worksheets[1]
         ws['A2'] = 'GST Number : '+company.gst_number
         ws['A3'] = 'Name of the client : '+company.legal_name
@@ -538,8 +559,9 @@ def document_sequence(month=None, year=None):
 
 
 @frappe.whitelist(allow_guest=True)
-def reconciliation(start_date, end_date):
+def reconciliation(start_date, end_date, workbook="true"):
     try:
+        print(workbook,"///////")
         # if isinstance(filters, str):
         #     filters = json.loads(filters)
         company = frappe.get_last_doc("company")
@@ -556,10 +578,13 @@ def reconciliation(start_date, end_date):
         if not missing["success"]:
             return missing
         # return missing
+        recon_data = {}
         sequence_data = [{"Ezyinvoicing Count": len(missing["data"]["ezy_invoicing_invoices"]), "Opera Folios Count": len(missing["data"]["opera_folios"]), "Missing In EzyInvoicing": len(missing["data"]["missing_in_ezyinvoicing"]), "Missing In Opera": len(
             missing["data"]["missing_in_opera"]), "Type Missmatch": len(missing["data"]["type_missmatch_for_tax"])+len(missing["data"]["type_missmatch_for_credit"]) if len(missing["data"]["type_missmatch_for_credit"]) > 1 else 0}]
         # Summary of Invoices
         writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
+        seq_data = [{k.replace(' ', '_') : v for k, v in d.items()} for d in sequence_data]
+        recon_data["count"] = seq_data
         df_summary = pd.DataFrame(sequence_data)
         df_summary.to_excel(writer, sheet_name="Count", index=False)
         for each in ["Ezyinvoicing Count", "Opera Folios Count", "Missing In EzyInvoicing", "Missing In Opera", "Type Missmatch"]:
@@ -576,6 +601,8 @@ def reconciliation(start_date, end_date):
             if len(missing_numbers) == 1:
                 missing_numbers = missing_numbers + ('0',)
             get_missing_in_opera_data = frappe.db.sql("""select invoice_number as 'Invoice Number', invoice_date as 'Invoice Date',invoice_type as 'Invoice Type', invoice_category as 'Invoice Category', irn_generated as 'IRN Status', invoice_from as 'EzyInvoice Status', pms_invoice_summary as 'Invoice Amount', pms_invoice_summary_without_gst as 'Taxable Value', igst_amount as 'IGST Amount', sgst_amount as 'SGST Amount', cgst_amount as 'CGST Amount', total_gst_amount as 'Total Gst Amount', other_charges as 'Other Charges', (total_central_cess_amount+total_state_cess_amount) as CESS,total_vat_amount as 'VAT Amount', If(invoice_category!="Credit Invoice",irn_number,credit_irn_number) as 'IRN Number',If(invoice_category!="Credit Invoice",ack_no,credit_ack_no) as 'Acknowledgement No',  If(invoice_category!="Credit Invoice",ack_date,credit_ack_date) as 'Acknowledgement Date' from `tabInvoices` where name in {} ORDER BY name""".format(missing_numbers), as_dict=1)
+        miss_in_opera = [{k.replace(' ', '_') : v for k, v in d.items()} for d in get_missing_in_opera_data]
+        recon_data["Missing_In_Opera"] = miss_in_opera
         df_missing_opera_folios_list = pd.DataFrame.from_records(
             get_missing_in_opera_data)
         df_missing_opera_folios_list.to_excel(
@@ -586,6 +613,8 @@ def reconciliation(start_date, end_date):
         # Missing Invoices In Ezyinvoicing
         missing_in_ezy = {
             "Invoices Numbers": missing["data"]["missing_in_ezyinvoicing"]}
+        missing_in_ezyinvoicing = [{k.replace(' ', '_') : v for k, v in d.items()} for d in get_missing_in_opera_data]
+        recon_data["Missing_In_EzyInvoicing"] = missing_in_ezyinvoicing
         df_missing_ezy_invoicing_list = pd.DataFrame.from_dict(missing_in_ezy)
         df_missing_ezy_invoicing_list.to_excel(
             writer, sheet_name="Missing In EzyInvoicing", index=False)
@@ -596,6 +625,8 @@ def reconciliation(start_date, end_date):
         # Type Missmatch
         type_missmatch = missing["data"]["type_missmatch_for_tax"] + \
             missing["data"]["type_missmatch_for_credit"]
+        type_mismatch = [{k.replace(' ', '_') : v for k, v in d.items()} for d in type_missmatch]
+        recon_data["Invoice_Type_Missmatch"] = type_mismatch
         df_type_missmatch = pd.DataFrame.from_records(type_missmatch)
         # frappe.db.get_list("Invoices", filters=filters, fields=['SUM(pms_invoice_summary_without_gst) as total_taxable_value', 'SUM(total_gst_amount) as total_gst_amount', 'SUM(pms_invoice_summary) as total_invoices_amount', 'SUM(other_charges) as other_charges', 'SUM(igst_amount) as total_igst', 'SUM(sgst_amount) as total_sgst', 'SUM(cgst_amount) as total_cgst', 'SUM(total_central_cess_amount+total_state_cess_amount) as cess'])
         # gst_invoice_list = frappe.db.get_list(
@@ -611,6 +642,8 @@ def reconciliation(start_date, end_date):
         comparing = invoices_summary(start_date, end_date)
         if not comparing["success"]:
             return comparing
+        comparing1 = [{k.replace(' ', '_') : v for k, v in d.items()} for d in comparing["data"]]
+        recon_data["Ezy_Invoicing_Summary"] = comparing1
         df_comparing_totals = pd.DataFrame.from_records(comparing["data"])
         df_comparing_totals.to_excel(
             writer, sheet_name="Ezy Invoicing Summary", index=False)
@@ -621,6 +654,8 @@ def reconciliation(start_date, end_date):
         invoice_comparison = compare_invoice_summary(start_date, end_date)
         if not invoice_comparison["success"]:
             return invoice_comparison
+        comparing_inv = [{k.replace(' ', '_') : v for k, v in d.items()} for d in invoice_comparison["data"]]
+        recon_data["Comparison"] = comparing_inv
         df_invoice_comparison = pd.DataFrame.from_records(
             invoice_comparison["data"])
         df_invoice_comparison = df_invoice_comparison.reindex(columns=["InvoiceNumber", "EzyinvoicingBaseAmount", "OperaBaseAmount", "BaseMissmatchAmount", "BaseAmountStatus", "EzyinvoicingInvoiceAmount",
@@ -630,6 +665,8 @@ def reconciliation(start_date, end_date):
         for each in ["InvoiceNumber", "EzyinvoicingBaseAmount", "OperaBaseAmount", "BaseMissmatchAmount", "BaseAmountStatus", "EzyinvoicingInvoiceAmount", "OperaInvoiceAmount", "InvoiceMissmatchAmount", "InvoiceAmountStatus", "MissingIn", "IRN Status", "IRN Number", "Acknowledgement No", "Acknowledgement Date"]:
             col_idx = df_invoice_comparison.columns.get_loc(each)
             writer.sheets['Comparison'].set_column(col_idx, col_idx, 25)
+        conb2bb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in missing["data"]["converted_b2b_to_b2c"]]
+        recon_data["Converted_B2B_to_B2C"] = conb2bb2c
         df_b2b_to_b2c = pd.DataFrame.from_records(
             missing["data"]["converted_b2b_to_b2c"])
         df_b2b_to_b2c.to_excel(
@@ -638,6 +675,8 @@ def reconciliation(start_date, end_date):
             col_idx = df_b2b_to_b2c.columns.get_loc(each)
             writer.sheets['Converted B2B to B2C'].set_column(
                 col_idx, col_idx, 20)
+        conb2cb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in missing["data"]["converted_b2c_to_b2b"]]
+        recon_data["Converted_B2C_to_B2B"] = conb2cb2b
         df_b2c_to_b2b = pd.DataFrame.from_records(
             missing["data"]["converted_b2c_to_b2b"])
         df_b2c_to_b2b.to_excel(
@@ -646,15 +685,69 @@ def reconciliation(start_date, end_date):
             col_idx = df_b2c_to_b2b.columns.get_loc(each)
             writer.sheets['Converted B2C to B2B'].set_column(
                 col_idx, col_idx, 20)
+        b2b_hsn = getHsnSummary(filters=[["invoice_type","=","B2B"]],  start_date=start_date, end_date=end_date)
+        if not b2b_hsn["success"]:
+            return b2b_hsn
+        hsnb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2b_hsn["data"]]
+        recon_data["B2B_HSN"] = hsnb2b
+        if len(b2b_hsn["data"]) == 0:
+            b2b_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
+        df_b2b_hsn = pd.DataFrame.from_records(b2b_hsn["data"])
+        total = df_b2b_hsn.sum(numeric_only=True, axis=0)
+        total.name = "Total"
+        df_b2b = df_b2b_hsn.append(total.transpose())
+        if len(b2b_hsn["data"]) > 1:
+            df_b2b['SAC Code'] = df_b2b['SAC Code'].replace(
+                        np.nan, "Total")
+            df_b2b['Gst Rate'] = np.where(df_b2b['Gst Rate'] > 25, "", df_b2b["Gst Rate"])
+        df_b2b.to_excel(
+            writer, sheet_name="B2B HSN", index=False)
+        for each in ["SAC Code", "Gst Rate", "UQC", "Total Quantity", "CGST Amount", "SGST Amount", "IGST Amount", "State CESS Amount", "Central CESS Amount", "Total GST", "Total Tax Amount", "Total Amount"]:
+            col_idx = df_b2b.columns.get_loc(each)
+            writer.sheets['B2B HSN'].set_column(col_idx, col_idx, 20)
+        b2c_hsn = getHsnSummary(filters=[["invoice_type","=","B2C"]],  start_date=start_date, end_date=end_date)
+        if not b2c_hsn["success"]:
+            return b2c_hsn
+        hsnb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2c_hsn["data"]]
+        recon_data["B2C_HSN"] = hsnb2c
+        if len(b2c_hsn["data"]) == 0:
+            b2c_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
+        df_b2c_hsn = pd.DataFrame.from_records(b2c_hsn["data"])
+        total_b2c = df_b2c_hsn.sum(numeric_only=True, axis=0)
+        total_b2c.name = "Total"
+        df_b2c = df_b2c_hsn.append(total_b2c.transpose())
+        if len(b2c_hsn["data"]) > 1:
+            df_b2c['SAC Code'] = df_b2c['SAC Code'].replace(
+                        np.nan, "Total")
+            df_b2c['Gst Rate'] = np.where(df_b2c['Gst Rate'] > 25, "", df_b2c["Gst Rate"])
+        df_b2c.to_excel(
+            writer, sheet_name="B2C HSN", index=False)
+        for each in ["SAC Code", "Gst Rate", "UQC", "Total Quantity", "CGST Amount", "SGST Amount", "IGST Amount", "State CESS Amount", "Central CESS Amount", "Total GST", "Total Tax Amount", "Total Amount"]:
+            col_idx = df_b2c.columns.get_loc(each)
+            writer.sheets['B2C HSN'].set_column(col_idx, col_idx, 20)
+        # document = document_sequence(start_date, end_date)
+        # document_seq = [{k.replace(' ', '_') : v for k, v in d.items()} for d in document]
+        # recon_data["Sequence"] = document_seq
+        # document_fields = ["Document","From","To","Success","Cancelled", "Error"]
+        # sequence_count = [{"Document":"Tax Invoice", "From":document_sequence["data"]["tax_invoice_from"], "To":document_sequence["data"]["tax_invoice_to"], "Success":document_sequence["data"]["tax_invoice_success_count"], "Cancelled":document_sequence["data"]["tax_invoice_cancelled_count"], "Error":document_sequence["data"]["tax_invoice_error_count"]},{"Document":"Credit Invoice", "From":document_sequence["data"]["credit_invoice_from"], "To":document_sequence["data"]["credit_invoice_to"], "Success":document_sequence["data"]["credit_invoice_success_count"], "Cancelled":document_sequence["data"]["credit_invoice_cancelled_count"], "Error":document_sequence["data"]["credit_invoice_error_count"]}]
+        # df_b2c.to_excel(
+        #     writer, sheet_name="Sequence", index=False)
+        # for each in ["Document","From","To","Success","Cancelled", "Error"]:
+        #     col_idx = df_b2c.columns.get_loc(each)
+        #     writer.sheets['B2C HSN'].set_column(col_idx, col_idx, 20)
         writer.save()
-        files_new = {"file": open(file_path, 'rb')}
-        payload_new = {'is_private': 1, 'folder': 'Home'}
-        file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                      data=payload_new, verify=False).json()
-        if "file_url" in file_response["message"].keys():
+        if workbook == "true":
+            files_new = {"file": open(file_path, 'rb')}
+            payload_new = {'is_private': 1, 'folder': 'Home'}
+            file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                        data=payload_new, verify=False).json()
+            if "file_url" in file_response["message"].keys():
+                os.remove(file_path)
+                return {"success": True, "file_url": file_response["message"]["file_url"], "file_name": "RECON-"+month_name+"-"+year_object+".xlsx"}
+            return {"success": False, "message": "something went wrong"}
+        else:
             os.remove(file_path)
-            return {"success": True, "file_url": file_response["message"]["file_url"], "file_name": "RECON-"+month_name+"-"+year_object+".xlsx"}
-        return {"success": True}
+            return {"success": True, "data": recon_data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("document_sequence",
