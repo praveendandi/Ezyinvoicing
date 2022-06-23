@@ -8,7 +8,7 @@ from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
-from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages
+from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages, SCCheckRatePercentages
 from version2_app.version2_app.doctype.invoices.referrence_payments_parser import paymentsAndReferences
 import pandas as pd
 import traceback
@@ -1678,16 +1678,28 @@ def calulate_items(data):
                     else:
                         return item_data
                 if item['sac_code'] == '996311' or item['sac_code'] == "997321":
-                    if "adjustment" in data:
-                        acc_gst_percentage = item["cgst"]+item["sgst"]
-                        acc_igst_percentage = item["igst"]
-                    else:
-                        percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
-                        if percentage_gst["success"] == True:
-                            acc_gst_percentage = percentage_gst["gst_percentage"]	
-                            acc_igst_percentage = percentage_gst["igst_percentage"]
+                    if sac_code_based_gst_rates.is_service_charge_item == 1 and companyDetails.enable_slab_for_room_service_charge == 1:
+                        if "adjustment" in data:
+                            acc_gst_percentage = item["cgst"]+item["sgst"]
+                            acc_igst_percentage = item["igst"]
                         else:
-                            {"success": False, "message": "error in slab helper function"}
+                            percentage_gst = SCCheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+                            if percentage_gst["success"] == True:
+                                acc_gst_percentage = percentage_gst["gst_percentage"]	
+                                acc_igst_percentage = percentage_gst["igst_percentage"]
+                            else:
+                                {"success": False, "message": "error in slab helper function"}
+                    else:
+                        if "adjustment" in data:
+                            acc_gst_percentage = item["cgst"]+item["sgst"]
+                            acc_igst_percentage = item["igst"]
+                        else:
+                            percentage_gst = CheckRatePercentages(item, sez, placeofsupply, sac_code_based_gst_rates.exempted, companyDetails.state_code)
+                            if percentage_gst["success"] == True:
+                                acc_gst_percentage = percentage_gst["gst_percentage"]	
+                                acc_igst_percentage = percentage_gst["igst_percentage"]
+                            else:
+                                {"success": False, "message": "error in slab helper function"}
                 service_charge_name = (companyDetails.sc_name)
                 if (service_charge_name != "" and companyDetails.enable_sc_from_folios == 1):
                     gst_value = 0

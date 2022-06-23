@@ -36,7 +36,8 @@
   "bulk_upload_service_charge",
   "disable_cess_for_sc",
   "disable_vat_for_sc",
-  "category"
+  "category",
+  "is_service_charge_item"
  ],
  "fields": [
   {
@@ -230,11 +231,17 @@
    "fieldtype": "Select",
    "label": "Category",
    "options": "Rooms\nFood & beverages\nFood IRD\nBanquet\nBanquet-ODC\nBanquet Hall hire\nOther banquet Misc\nBanquet AV\nLaundry\nSpa and Health Clubs\nConcierge service\nShared Services\nTobacco\nLiquor"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_service_charge_item",
+   "fieldtype": "Check",
+   "label": "Is Service Charge Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-13 15:00:16.393947",
+ "modified": "2022-06-15 11:18:36.429159",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",
