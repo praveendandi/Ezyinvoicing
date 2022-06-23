@@ -8,6 +8,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
+from webbrowser import get
 
 import frappe
 import fitz
@@ -48,10 +49,8 @@ def convert_image_to_base64(image):
         return {"success": True, "data": encoded_str}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error(
-            "Scan-Guest Details Opera",
-            str(e),
-        )
+        frappe.log_error("convert_image_to_base64",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -103,22 +102,15 @@ def summary_print_formats(name):
             return {"success": False, "message": "summary breakups not found"}
         return {"success": False, "message": "data not found"}
     except Exception as e:
-        frappe.log_error("Error in summary_print_formats: ",
-                         frappe.get_traceback())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("summary_print_formats",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
 def get_file_size(summary, files=[], combine=False):
     try:
-        if len(files) > 0 and not combine:
-            files = [value for each in files for key, value in each.items()]
-        if not combine:
-            summary_files = get_all_summary_files(summary)
-            if not summary_files["success"]:
-                return summary_files
-            documents = files + summary_files["files"]
-        else:
-            documents = files
+        documents = files
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
         filesize = 0
@@ -134,8 +126,9 @@ def get_file_size(summary, files=[], combine=False):
         else:
             return {"success": False, "size": 0}
     except Exception as e:
-        frappe.log_error("Error in summary_print_formats: ",
-                         frappe.get_traceback())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("get_file_size",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -153,18 +146,20 @@ def html_to_pdf(html_data, filename, name, etax=False):
         payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
                        'docname': name, 'fieldname': filename}
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                      data=payload_new, verify=False).json()
+                                      data=payload_new).json()
         if "file_url" in file_response["message"].keys():
             os.remove(file_path)
         else:
             return {"success": False, "message": "something went wrong"}
         return {"success": True, "file_url": file_response["message"]["file_url"]}
     except Exception as e:
-        frappe.log_error("Error in html_to_pdf: ", frappe.get_traceback())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("html_to_pdf",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
-def combine_pdf(files, filename, name):
+def combine_pdf(files, filename, name, add_signature=False):
     try:
         company = frappe.get_last_doc('company')
         if not frappe.db.exists("CLBS Settings", company.name):
@@ -183,11 +178,15 @@ def combine_pdf(files, filename, name):
                 files.insert(0, each)
             else:
                 files.append(each)
-        summaryfile = get_all_summary_files(name)
+        if add_signature == True and frappe.session.user != "Administrator":
+            summaryfile = get_all_summary_files(
+                name, True, frappe.session.user)
+        else:
+            summaryfile = get_all_summary_files(name)
         if not summaryfile["success"]:
             return summaryfile
         qr_files = [each for each in summaryfile["files"]
-                    if "E Tax Invoice-" in each]
+                    if "ETax-Invoice-" in each]
         order_files = []
         for key, value in document_sequence.items():
             if "e_tax" == key:
@@ -215,19 +214,23 @@ def combine_pdf(files, filename, name):
         payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
                        'docname': name, 'fieldname': filename}
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                      data=payload_new, verify=False).json()
+                                      data=payload_new).json()
         if "file_url" in file_response["message"].keys():
             os.remove(file_path)
         else:
             return {"success": False, "message": "something went wrong"}
+        frappe.db.delete("File", {"file_url": ["in", qr_files]})
+        frappe.db.commit()
         return {"success": True, "file_url": file_response["message"]["file_url"]}
     except Exception as e:
-        frappe.log_error(str(e), "combine_pdf")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("combine_pdf",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
 @frappe.whitelist(allow_guest=True)
-def download_pdf(name, add_signature=False, user_name=None):
+def download_pdf(name, add_signature=False, email=False):
     try:
         summary_format = summary_print_formats(name)
         if not summary_format["success"]:
@@ -239,21 +242,31 @@ def download_pdf(name, add_signature=False, user_name=None):
                 return {"success": False, "message": "No data found in clbs settings"}
             clbs_settings_doc = frappe.get_doc("CLBS Settings", company.name)
             frappe.db.delete("File", {"attached_to_name": name})
+            # frappe.db.sql("""DELETE FROM `tabFile` where`tabFile`.attached_to_name in {}""".format(tuple(name)))
             frappe.db.commit()
+            summary_doc = frappe.get_doc("Summaries", name)
+            files_for_size = []
+            files = []
             for each in summary_format["html"]:
                 get_pdf = html_to_pdf(
                     each[each["category"]], each["category"], name)
                 if not get_pdf["success"]:
                     return get_pdf
-                if add_signature and clbs_settings_doc.digital_signature == 1:
-                    add_sig = send_files([get_pdf["file_url"]], user_name)
+                if ((add_signature and clbs_settings_doc.digital_signature == 1) or (clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1)) and frappe.session.user != "Administrator":
+                    add_sig = send_files(
+                        [get_pdf["file_url"]], frappe.session.user, name)
                     if not add_sig["success"]:
                         return add_sig
                     file_urls.append({each["category"]: add_sig["files"][0]})
+                    files_for_size.append(add_sig["files"][0])
                 else:
                     file_urls.append({each["category"]: get_pdf["file_url"]})
+                    files_for_size.append(get_pdf["file_url"])
             if clbs_settings_doc.clbs_document_preview == "COMBINED":
-                combine = combine_pdf(file_urls, "summary", name)
+                if ((add_signature and clbs_settings_doc.digital_signature == 1) or (clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1)) and frappe.session.user != "Administrator":
+                    combine = combine_pdf(file_urls, "summary", name, True)
+                else:
+                    combine = combine_pdf(file_urls, "summary", name)
                 if not combine["success"]:
                     return combine
                 files_to_delete = [
@@ -262,23 +275,38 @@ def download_pdf(name, add_signature=False, user_name=None):
                 frappe.db.commit()
                 file_urls = []
                 file_urls.append({"Summary": combine["file_url"]})
-            files = []
+                files_for_size = []
+                files_for_size.append(combine["file_url"])
+            else:
+                if not email:
+                    if ((add_signature and clbs_settings_doc.digital_signature == 1) or (clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1)) and frappe.session.user != "Administrator":
+                        get_all_files = get_all_summary_files(
+                            name, True, frappe.session.user)
+                    else:
+                        get_all_files = get_all_summary_files(name)
+                    if not get_all_files["success"]:
+                        return get_all_files
+                    remaining_files = get_all_files["files"]
+                    files_for_size.extend(remaining_files)
             for each in file_urls:
                 if "Summary" in each.keys():
                     files.insert(0, each)
                 else:
                     files.append(each)
             filesize = 0
-            if len(files) > 0:
-                file_size = get_file_size(name, files)
+            if len(files_for_size) > 0:
+                file_size = get_file_size(name, files_for_size)
                 if file_size["success"]:
                     filesize = file_size["size"]
-            frappe.db.set_value("Summaries", name, "signature_attached", 1)
-            frappe.db.commit()
+            if add_signature:
+                frappe.db.set_value("Summaries", name, "signature_attached", 1)
+                frappe.db.commit()
             return {"success": True, "files": files, "size": filesize}
         return {"success": False, "message": "no data found"}
     except Exception as e:
-        frappe.log_error(str(e), "download_pdf")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("download_pdf",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -330,7 +358,9 @@ def extract_summary_breakups(filters, summary):
                 each["sac_codes"] = None
         return {"success": True, "data": data, "df": df}
     except Exception as e:
-        frappe.log_error(str(e), "extract_summary_breakups")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("extract_summary_breakups",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -361,7 +391,9 @@ def extract_summary_breakup_details(df, summaries):
         food_data = filter_food_columns.to_dict('records')
         return {"success": True, "data": food_data}
     except Exception as e:
-        frappe.log_error(str(e), "extract_summary_breakup_details")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("extract_summary_breakup_details",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -385,7 +417,9 @@ def create_summary_breakups(summaries, summary):
             frappe.db.commit()
         return {"success": True, "doc": doc}
     except Exception as e:
-        frappe.log_error(str(e), "create_summary_breakups")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("create_summary_breakups",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -424,7 +458,7 @@ def create_breakup_details(doc, details_data, summary):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("create_breakup_details",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -457,7 +491,9 @@ def create_summary_breakup(filters=[], summary=None):
             return {"success": True, "message": "summary created"}
         return {"success": False}
     except Exception as e:
-        frappe.log_error(str(e), "create_summary_breakup")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("create_summary_breakup",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -468,7 +504,9 @@ def update_invoices(invoices=[], data={}):
             frappe.db.commit()
         return {"success": True}
     except Exception as e:
-        frappe.log_error(str(e), "update_invoices")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_invoices",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -500,7 +538,9 @@ def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
         else:
             return {"success": False, "message": "something went wrong"}
     except Exception as e:
-        frappe.log_error(str(e), "delete_invoice_summary_breakup")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("delete_invoice_summary_breakup",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -516,7 +556,9 @@ def update_summary_breakup(data):
             frappe.db.commit()
         return {"success": True, "message": "data updated successfully"}
     except Exception as e:
-        frappe.log_error(str(e), "update_summary_breakup")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_summary_breakup",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -563,7 +605,9 @@ def get_summary_breakup(summary=None):
         else:
             return {"success": False, "message": "summary not found"}
     except Exception as e:
-        frappe.log_error(str(e), "get_summary_breakup")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("get_summary_breakup",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -585,7 +629,9 @@ def get_gst_summary(summaries):
             return {"success": True, "data": get_breakup_details}
         return {"success": False, "message": "no data found"}
     except Exception as e:
-        frappe.log_error(str(e), "get_gst_summary")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("get_gst_summary",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -611,7 +657,9 @@ def update_summary(data, name):
         frappe.db.commit()
         return {"success": True, "message": "updated successfully"}
     except Exception as e:
-        frappe.log_error(str(e), "update_summary")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_summary",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -651,7 +699,9 @@ def submit_summary(summary):
             return {"success": False, "message": "no data found in summary breakups"}
         return {"success": False, "message": "no data found in summaries"}
     except Exception as e:
-        frappe.log_error(str(e), "submit_summary")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("submit_summary",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
 
@@ -665,37 +715,42 @@ def send_summary_mail(data):
         clbs_settings_doc = frappe.get_doc("CLBS Settings", company.name)
         if clbs_settings_doc.cc_mail_ids_for_clbs_reports and clbs_settings_doc.cc_mail_ids_for_clbs_reports != "":
             cc_emails = clbs_settings_doc.cc_mail_ids_for_clbs_reports
-        printformat_files = frappe.db.get_list(
-            'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='name')
+        # printformat_files = frappe.db.get_list(
+        #     'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='name')
         if not frappe.db.exists("CLBS Settings", company.name):
             return {"success": False, "message": "No data found in clbs settings"}
         summary_doc = frappe.get_doc("Summaries", data["summary"])
         if clbs_settings_doc.clbs_document_preview != "COMBINED":
-            if clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1:
-                downloadpdf = download_pdf(data["summary"], True, frappe.session.user)
+            if clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1 and frappe.session.user != "Administrator":
+                downloadpdf = download_pdf(data["summary"], True, email=True)
             else:
-                downloadpdf = download_pdf(data["summary"])
+                downloadpdf = download_pdf(data["summary"], False, email=True)
             if not downloadpdf["success"]:
                 return downloadpdf
-            summary_files = [value for each in downloadpdf["files"] for key, value in each.items()]
-            get_summary_files = get_all_summary_files(data["summary"],True, frappe.session.user)
+            summary_files = [value for each in downloadpdf["files"]
+                             for key, value in each.items()]
+            if clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1 and frappe.session.user != "Administrator":
+                get_summary_files = get_all_summary_files(
+                    data["summary"], True, frappe.session.user)
+            else:
+                get_summary_files = get_all_summary_files(data["summary"])
             if not get_summary_files["success"]:
                 return get_summary_files
             summary_files.extend(get_summary_files["files"])
         else:
             if clbs_settings_doc.digital_signature == 1 and summary_doc.signature_attached == 1:
-                downloadpdf = download_pdf(data["summary"], True, frappe.session.user)
+                combined_files = download_pdf(data["summary"], True)
             else:
                 combined_files = download_pdf(data["summary"])
             if not combined_files["success"]:
                 return combined_files
             if len(combined_files["files"]) > 0:
-                summary_files = combined_files["files"][0]["Summary"]
+                summary_files = [combined_files["files"][0]["Summary"]]
             else:
                 summary_files = []
             # summary_files = frappe.db.get_list(
             #     'File', filters={'attached_to_name': ['=', data["summary"]]}, pluck='file_url')
-        if len(printformat_files) == 0:
+        if len(summary_files) == 0:
             return {"success": False, "message": "Templets Not Found"}
             generate_pdf = download_pdf(data["summary"])
             if generate_pdf["success"] == False:
@@ -708,9 +763,10 @@ def send_summary_mail(data):
                 filesize = file_size["size"]
         if filesize > 25:
             return {"success": False, "message": "File size is more than 25MB"}
-
+        print(summary_files, "..........................................")
         files_summary = frappe.db.get_list("File", filters={"file_url": [
-                                           "in", summary_files]}, group_by='file_url', pluck='name')
+                                           "in", summary_files]}, group_by="file_url", pluck='name')
+        print(files_summary, ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
         response = make(recipients=data["email"],
                         subject=data["subject"],
                         content=data["response"],
@@ -738,7 +794,7 @@ def send_summary_mail(data):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("send_summary_mail",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
 
 
@@ -748,8 +804,9 @@ def get_all_summary_files(summary=None, add_signature=False, user=None):
             etax_tax = etax_invoice_to_pdf(summary)
             if not etax_tax["success"]:
                 return etax_tax
-            if add_signature == True:
-                add_sig = send_files(etax_tax["file_urls"], user)
+            if add_signature == True and user != "Administrator":
+                print("..///........,,,,,")
+                add_sig = send_files(etax_tax["file_urls"], user, summary)
                 if not add_sig["success"]:
                     return add_sig
                 summary_files = add_sig["files"]
@@ -759,13 +816,13 @@ def get_all_summary_files(summary=None, add_signature=False, user=None):
                 "=", summary]}, pluck="document")
             # printformat_files = frappe.db.get_list(
             #     'File', filters={'attached_to_name': ['=', summary]}, pluck='file_url')
-            summary_files = summary_files + remaining_bills
+            summary_files.extend(remaining_bills)
             return {"success": True, "files": summary_files}
         return {"summary": False, "message": "Summary name is mandatory"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("get_all_summary_files",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
 
 
@@ -799,7 +856,7 @@ def add_qr_to_pdf(data):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("add_qr_to_pdf",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
 
 
@@ -810,7 +867,7 @@ def add_image_to_pdf(qr_rect_x0=None, qr_rect_x1=None, qr_rect_y0=None, qr_rect_
         input_file = cwd + "/" + site_name + input_file
         image = cwd + "/" + site_name + image
         file_name = os.path.basename(input_file)
-        output_file = cwd + "/" + site_name +"/public/files/"+file_name
+        output_file = cwd + "/" + site_name + "/public/files/"+file_name
         company = frappe.get_last_doc("company")
         img_rect = fitz.Rect(
             int(qr_rect_x0),
@@ -841,7 +898,7 @@ def add_image_to_pdf(qr_rect_x0=None, qr_rect_x1=None, qr_rect_y0=None, qr_rect_
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("add_image_to_pdf",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
 
 
@@ -853,20 +910,21 @@ def add_signature_images(files, user_name):
                 clbs_settings = frappe.get_last_doc('CLBS Settings')
                 sig_doc = frappe.get_doc("User Signature", user_name)
                 for each in files:
-                    signature = add_image_to_pdf(qr_rect_x0=clbs_settings.x1, 
-                                qr_rect_y0=clbs_settings.y1, qr_rect_x1=clbs_settings.x2, 
-                                qr_rect_y1=clbs_settings.y2,input_file=each,image=sig_doc.signature_image)
+                    signature = add_image_to_pdf(qr_rect_x0=clbs_settings.x1,
+                                                 qr_rect_y0=clbs_settings.y1, qr_rect_x1=clbs_settings.x2,
+                                                 qr_rect_y1=clbs_settings.y2, input_file=each, image=sig_doc.signature_image)
                     if not signature["success"]:
                         return signature
                     new_files.append(signature["file"])
-                return {"success" : True, "files": new_files}
+                return {"success": True, "files": new_files}
             return {"success": False, "message": "User Not Found"}
         return {"success": False, "message": "User Name not given"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("add_signature_images",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
+
 
 @frappe.whitelist(allow_guest=True)
 def etax_invoice_to_pdf(summary):
@@ -902,7 +960,7 @@ def etax_invoice_to_pdf(summary):
                     data["company_logo_base"] = company_logo_base
                     html_data = frappe.render_template(templates, data)
                     convert_html_to_pdf = html_to_pdf(
-                        html_data, "E Tax Invoice-", each)
+                        html_data, "ETax-Invoice-", summary)
                     if not convert_html_to_pdf["success"]:
                         return convert_html_to_pdf
                     frappe.db.set_value('Summary Documents',
@@ -914,5 +972,5 @@ def etax_invoice_to_pdf(summary):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("etax_invoice_to_pdf",
-                        "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}

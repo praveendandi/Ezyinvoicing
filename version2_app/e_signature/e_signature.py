@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import frappe
 import requests
 import os
+import sys
 from frappe.utils import cstr
 from frappe.model.document import Document
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
@@ -19,7 +20,7 @@ class UserSignature(Document):
 
 
 @frappe.whitelist(allow_guest=True)
-def add_signature(invoice=None, pfx_signature=None, signature_image = None, secret=b'123', X1=400, Y1=10, X2=590, Y2=70):
+def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=b'123', X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
     try:
         if secret:
             secret = bytes(secret, 'utf-8')
@@ -43,7 +44,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image = None, secr
             signature_meta, signer=signer, stamp_style=stamp.TextStampStyle(
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
                 stamp_text='\n\n\n\nTime: %(ts)s',
-                background=images.PdfImage(invoice_file+signature_image,)
+                background=images.PdfImage(invoice_file+signature_image)
             ),
         )
         file_name = os.path.basename(invoice)
@@ -63,39 +64,47 @@ def add_signature(invoice=None, pfx_signature=None, signature_image = None, secr
                     # appearance_text_params={'url': 'https://caratred.com'}
                 )
         files = {"file": open(output_file_path, 'rb')}
-        payload = {
-            "is_private": 1,
-            "folder": "Home"
-        }
-        site = frappe.utils.get_url()
+        payload = {'is_private': 1, 'folder': 'Home',
+                   'doctype': 'Summaries', 'docname': summary}
+        if company:
+            site = company.host.rstrip('/')
+        else:
+            site = frappe.utils.get_url()
         upload_qr_image = requests.post(site + "/api/method/upload_file",
                                         files=files,
                                         data=payload)
-        # print(upload_qr_image)
         response = upload_qr_image.json()
         if 'message' in response:
+            frappe.db.sql(
+                """DELETE FROM `tabFile` where`tabFile`.file_url = '{}'""".format(invoice))
+            frappe.db.commit()
             return {"success": True, "file": response['message']['file_url']}
     except Exception as e:
-        frappe.log_error(str(e), "add_signature")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("add_signature",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
 
 
-def send_files(files, user_name):
+def send_files(files, user_name, summary):
     try:
         if user_name:
             if frappe.db.exists("User Signature", user_name):
                 new_files = []
+                company_doc = frappe.get_last_doc("company")
                 clbs_settings = frappe.get_last_doc('CLBS Settings')
                 get_doc = frappe.get_doc("User Signature", user_name)
+                if not get_doc.signature_pfx and not get_doc.signature_image and not get_doc.pfx_password:
+                    return {"success": False, "message": "Missing user signature details."}
                 for each in files:
                     signature = add_signature(each, get_doc.signature_pfx, get_doc.signature_image,
-                                get_doc.pfx_password, X1=clbs_settings.x1, 
-                                Y1=clbs_settings.y1, X2=clbs_settings.x2, 
-                                Y2=clbs_settings.y2)
+                                              get_doc.pfx_password, X1=clbs_settings.x1,
+                                              Y1=clbs_settings.y1, X2=clbs_settings.x2,
+                                              Y2=clbs_settings.y2, company=company_doc, summary=summary)
                     if not signature["success"]:
                         return signature
                     new_files.append(signature["file"])
-                return {"success" : True, "files": new_files}
+                return {"success": True, "files": new_files}
             return {"success": False, "message": "User Not Found"}
         return {"success": False, "message": "User Name not given"}
     except Exception as e:
