@@ -26,7 +26,8 @@
   "address_street",
   "block_status",
   "status",
-  "disable_auto_irn"
+  "disable_auto_irn",
+  "company_portals"
  ],
  "fields": [
   {
@@ -139,11 +140,17 @@
    "fieldname": "disable_auto_irn",
    "fieldtype": "Check",
    "label": "Disable Auto IRN"
+  },
+  {
+   "fieldname": "company_portals",
+   "fieldtype": "Link",
+   "label": "Company Portals",
+   "options": "Company Portals"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-16 10:44:02.024180",
+ "modified": "2022-06-24 10:25:08.096644",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "TaxPayerDetail",
