@@ -17,7 +17,8 @@
   "summary_header",
   "summary_terms_and_conditions",
   "summary_footer",
-  "threshhold"
+  "threshhold",
+  "portal_automation"
  ],
  "fields": [
   {
@@ -83,11 +84,17 @@
    "fieldname": "document_sequence",
    "fieldtype": "Small Text",
    "label": "Document Sequence"
+  },
+  {
+   "default": "0",
+   "fieldname": "portal_automation",
+   "fieldtype": "Check",
+   "label": "Portal Automation"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-28 11:46:18.744483",
+ "modified": "2022-06-24 10:11:42.271508",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "CLBS Settings",
