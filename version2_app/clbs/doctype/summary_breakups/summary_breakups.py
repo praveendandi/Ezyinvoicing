@@ -232,6 +232,8 @@ def combine_pdf(files, filename, name, add_signature=False):
 @frappe.whitelist(allow_guest=True)
 def download_pdf(name, add_signature=False, email=False):
     try:
+        if add_signature == "true":
+            add_signature = True
         summary_format = summary_print_formats(name)
         if not summary_format["success"]:
             return summary_format
