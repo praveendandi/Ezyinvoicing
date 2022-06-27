@@ -175,6 +175,11 @@ doc_events = {
     "Summaries": {
         "after_insert":"version2_app.events.summaries_insert",
         "on_update": "version2_app.events.summaries_insert"
+    },
+    "Summary Payments" : {
+        "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_update": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     }
 	
 

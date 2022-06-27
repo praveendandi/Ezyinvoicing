@@ -8,7 +8,8 @@
  "field_order": [
   "users",
   "signature_image",
-  "signature_pfx"
+  "signature_pfx",
+  "pfx_password"
  ],
  "fields": [
   {
@@ -27,11 +28,16 @@
    "fieldname": "signature_pfx",
    "fieldtype": "Attach",
    "label": "Signature PFX"
+  },
+  {
+   "fieldname": "pfx_password",
+   "fieldtype": "Data",
+   "label": "PFX Password"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-14 14:36:06.294977",
+ "modified": "2022-06-16 15:04:48.594220",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "User Signature",
