@@ -202,13 +202,14 @@ def combine_pdf(files, filename, name):
         # ordered_files = files + qr_files + invoices + bills
         cwd = os.getcwd()
         site_name = cstr(frappe.local.site)
-        merger = PdfFileMerger()
+        # merger = PdfFileMerger(strict=False)
+        result = fitz.open()
         for each in order_files:
             file_path = cwd + "/" + site_name + each
-            merger.append(file_path)
+            with fitz.open(file_path) as mfile:
+                result.insertPDF(mfile)
         file_path = cwd + "/" + site_name + "/public/files/" + name + '.pdf'
-        merger.write(file_path)
-        merger.close()
+        result.save(file_path)
         files_new = {"file": open(file_path, 'rb')}
         payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
                        'docname': name, 'fieldname': filename}
@@ -683,10 +684,22 @@ def send_summary_mail(data):
                         content=data["response"],
                         doctype=None,
                         name=None,
-                        cc=cc_emails,
+                        cc=cc_emails if cc_emails else "",
                         attachments=json.dumps(files_summary),
                         send_email=1
                         )
+        if cc_emails:
+            if "," in cc_emails:
+                cc_emails_split = cc_emails.split(",")
+                data["email"].extend(cc_emails_split)
+            else:
+                data["email"].append(cc_emails)
+        emails = json.dumps(data["email"])
+        frappe.db.set_value('Summaries', data["summary"], 'email_sent_status', 1)
+        frappe.db.commit()
+        email_data = {"doctype":'Summary Email Tracking', "emails":emails, "summary": data["summary"]}
+        doc = frappe.get_doc(email_data)
+        doc.insert(ignore_permissions=True)
         return {"success": True, "message": "Mail Send"}
     except Exception as e:
         frappe.log_error(str(e), "send_summary_mail")
