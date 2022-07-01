@@ -29,6 +29,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.voter_utility import (
 )
 # from version2_app.events import guest_attachments
 
+
 class Dropbox(Document):
     pass
 
@@ -40,6 +41,7 @@ def create_doc_using_base_files(
     image_2: str = None,
     image_3: str = None,
     guest_name: str = "Guest",
+    now_job: bool = False
 ):
     """
     create dropbox based on base64 file using fijtsu scanner
@@ -139,7 +141,7 @@ def create_doc_using_base_files(
             reservation_doc.arrival_date = datetime.datetime.today()
             reservation_doc.checkin_time = current_time
             reservation_doc.number_of_guests = 1
-            reservation_doc.guest_first_name ='Guest'
+            reservation_doc.guest_first_name = 'Guest'
             reservation_doc.insert()
             frappe.db.commit()
 
@@ -151,21 +153,21 @@ def create_doc_using_base_files(
         new_dropbox.reservation_found = 1
 
         # if reseravtions_data:
-            # if dropbox_exist:
-            #     last_drop_box = frappe.get_last_doc('Dropbox', reservation_number)
-            #     if 'Guest' in last_drop_box.guest_name:
-            #         new_dropbox.guest_name = 'Guest' + str(int(last_drop_box.guest_name.split('Guest')[1])+1)
-            #     else:
-            #         new_dropbox.guest_name = 'Guest-1'
+        # if dropbox_exist:
+        #     last_drop_box = frappe.get_last_doc('Dropbox', reservation_number)
+        #     if 'Guest' in last_drop_box.guest_name:
+        #         new_dropbox.guest_name = 'Guest' + str(int(last_drop_box.guest_name.split('Guest')[1])+1)
+        #     else:
+        #         new_dropbox.guest_name = 'Guest-1'
 
-            #     new_dropbox.room = reseravtions_data['room_no']
-            #     new_dropbox.no_of_guests = reseravtions_data['no_of_adults'] + \
-            #         reseravtions_data['no_of_children']
-            # else:
-            #     new_dropbox.guest_name = reseravtions_data['guest_first_name']
-            #     new_dropbox.room = reseravtions_data['room_no']
-            #     new_dropbox.no_of_guests = reseravtions_data['no_of_adults'] + \
-            #         reseravtions_data['no_of_children']
+        #     new_dropbox.room = reseravtions_data['room_no']
+        #     new_dropbox.no_of_guests = reseravtions_data['no_of_adults'] + \
+        #         reseravtions_data['no_of_children']
+        # else:
+        #     new_dropbox.guest_name = reseravtions_data['guest_first_name']
+        #     new_dropbox.room = reseravtions_data['room_no']
+        #     new_dropbox.no_of_guests = reseravtions_data['no_of_adults'] + \
+        #         reseravtions_data['no_of_children']
         #     new_dropbox.reservation_found = 1
         # else:
         #     new_dropbox.reservation_found = 0
@@ -174,7 +176,8 @@ def create_doc_using_base_files(
         if front != "":
             ts = time.time()
             image_1_url = convert_base64_to_image(
-                front, reservation_number + id_type + str(ts), site_folder_path, company
+                front, reservation_number + id_type +
+                str(ts), site_folder_path, company
             )
             if "message" in image_1_url:
                 new_precheckin.image_1 = image_1_url["message"]["file_url"]
@@ -184,7 +187,8 @@ def create_doc_using_base_files(
         if back != "":
             ts = time.time()
             image_2_url = convert_base64_to_image(
-                back, reservation_number + id_type + str(ts), site_folder_path, company
+                back, reservation_number + id_type +
+                str(ts), site_folder_path, company
             )
             if "message" in image_2_url:
                 new_precheckin.image_2 = image_2_url["message"]["file_url"]
@@ -202,22 +206,20 @@ def create_doc_using_base_files(
         current_time = now.strftime("%H:%M:%S")
         new_dropbox.processing_time = str(current_time)
         # new_dropbox.insert(ignore_permissions=True)
-        arrival_info = frappe.get_doc("Arrival Information", reservation_number)
+        arrival_info = frappe.get_doc(
+            "Arrival Information", reservation_number)
         arrival_info.status = "Scanned"
         arrival_info.virtual_checkin_status = "Yes"
         arrival_info.save(ignore_permissions=True)
         new_dropbox.insert(ignore_permissions=True, ignore_links=True)
         frappe.db.commit()
 
-
-       
-
         enqueue(
             extract_id_details,
             queue="default",
             timeout=800000,
             event="data_extraction",
-            now=False,
+            now=now_job,
             data={
                 "image_1": image_1,
                 "image_2": image_2,
@@ -329,7 +331,7 @@ def extract_text(data: dict):
 
             except ValueError:
                 raise
-        print(data,"/////////")
+        print(data, "/////////")
         if "merged_to" in data.keys():
             data["dropbox"].reservation_no = data["merged_to"]
 
@@ -341,7 +343,8 @@ def extract_text(data: dict):
             create_guest_update_precheckin_details(details, data["dropbox"])
 
         elif data["id_type"] == "indianpassport":
-            create_passport_guest_update_precheckin_details(details, data["dropbox"])
+            create_passport_guest_update_precheckin_details(
+                details, data["dropbox"])
 
         elif data["id_type"] == "indianpassport":
             create_passport_guest_update_precheckin_details(
@@ -364,7 +367,7 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         main_guest = True
         if "Guest" not in dropbox.guest_name:
             main_guest = False
-        print(dropbox.reservation_no,"////////",dropbox.__dict__)
+        print(dropbox.reservation_no, "////////", dropbox.__dict__)
         guest_details = {
             "doctype": "Guest Details",
             "confirmation_number": dropbox.reservation_no,
@@ -414,7 +417,8 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         new_guest_details = frappe.get_doc(guest_details)
         new_guest_details.insert()
 
-        arrival_info = frappe.get_doc("Arrival Information", dropbox.reservation_no)
+        arrival_info = frappe.get_doc(
+            "Arrival Information", dropbox.reservation_no)
         arrival_info.status = "Scanned"
         arrival_info.virtual_checkin_status = "Yes"
 
@@ -499,7 +503,8 @@ def create_guest_update_precheckin_details(details, dropbox):
         new_guest_details.insert()
 
         # arrival_info = frappe.get_doc({'doctype': 'Arrival Information',"confirmation_number":dropbox.reservation_no})
-        arrival_info = frappe.get_doc("Arrival Information", dropbox.reservation_no)
+        arrival_info = frappe.get_doc(
+            "Arrival Information", dropbox.reservation_no)
 
         arrival_info.status = "Scanned"
         arrival_info.virtual_checkin_status = "Yes"
@@ -522,7 +527,8 @@ def check_drop_exist(reservation_number: str, guest_name: str):
     """
     try:
         dropbox_exist = frappe.db.exists(
-            "Dropbox", {"reservation_no": reservation_number, "guest_name": guest_name}
+            "Dropbox", {"reservation_no": reservation_number,
+                        "guest_name": guest_name}
         )
         if dropbox_exist:
             return {"success": True, "found": True, "message": "Dropbox already exist"}
@@ -657,7 +663,8 @@ def merge_guest_to_guest_details(name: str):
         )
         now = datetime.datetime.now()
         current_time = now.strftime("%H:%M:%S")
-        frappe.db.set_value('Dropbox', name, {'processing': 1,'processing_time': str(current_time)})
+        frappe.db.set_value(
+            'Dropbox', name, {'processing': 1, 'processing_time': str(current_time)})
         frappe.db.commit()
         reseravtions_data = get_reservation_details(doc.merged_to)
         if reseravtions_data:
@@ -683,80 +690,168 @@ def create_guest_using_base_files(
     image_2: str = None,
     image_3: str = None,
     guest_name: str = "Guest",
+    now_job=False
+
 ):
     try:
         company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        site_folder_path = folder_path + "/sites/" + company.site_name
         id_type_image1 = ""
         id_type_image2 = ""
         id_type_image3 = ""
         id_type = ""
+        front = ""
+        back = ""
+        front_doc_type = ""
         if image_1:
             image_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
             )
             if image_response.status_code == 200:
                 image_response = image_response.json()
+                front_doc_type = image_response["doc_type"]
                 if "success" in image_response:
                     return image_response
+                
+
                 id_type_image1 = image_response["doc_type"]
+                doc_type = detect_front_back(image_response["doc_type"])
+                if doc_type == "" or doc_type == "Front":
+                    front = image_1
+
+                else:
+                    back = image_1
         if image_2:
             image_2_response = requests.post(
                 company.classfiy_api, json={"base": image_2}, verify=False
             )
             if image_2_response.status_code == 200:
                 image_2_response = image_2_response.json()
+                if front_doc_type == "":
+                    front_doc_type = image_2_response["doc_type"]
                 if "success" in image_2_response:
                     return image_2_response
                 id_type_image2 = image_2_response["doc_type"]
+                doc_type = detect_front_back(image_2_response["doc_type"])
+                if back == "" or doc_type == "Back":
+                    back = image_2
+                else:
+                    front = image_2
         if image_3:
             image_3_response = requests.post(
                 company.classfiy_api, json={"base": image_3}, verify=False
             )
             if image_3_response.status_code == 200:
                 image_3_response = image_3_response.json()
-                if "success" in image_3_response:
-                    return image_3_response
+                # if "success" in image_3_response:
+                #     return image_3_response
                 id_type_image3 = image_3_response["doc_type"]
-        if (id_type_image1 or id_type_image2) in [
-            "aadhar_front",
-            "aadhar_back",
-            "businessCard",
-        ]:
+
+
+        # if (id_type_image1 or id_type_image2) in [
+        #     "aadhar_front",
+        #     "aadhar_back",
+        #     "businessCard",
+        # ]:
+        #     id_type = "aadhaar"
+        # elif (id_type_image1 or id_type_image2) in [
+        #     "passport_front",
+        #     "printed_visa",
+        #     "passport_back",
+        #     "written_visa",
+        # ]:
+        #     id_type = "Passport"
+        # elif (id_type_image1 or id_type_image2) in ["voter_back", "voter_front"]:
+        #     id_type = "voterid"
+        # elif (id_type_image1 or id_type_image2) in ["invoice"]:
+        #     id_type = "invoice"
+        # elif (id_type_image1 or id_type_image2) in ["driving_back", "driving_front"]:
+        #     id_type = "driving"
+        # elif (id_type_image1 or id_type_image2) in ["panFront"]:
+        #     id_type = "pan"
+        # elif (id_type_image1 or id_type_image2 or id_type_image3) in ["oci"]:
+        #     id_type = "oci"
+        # else:
+        #     id_type = "others"
+        if "voter_back" in front_doc_type or "voter_front" in front_doc_type:
+            id_type = "voterId"
+        elif "businessCard" in front_doc_type:
             id_type = "aadhaar"
-        elif (id_type_image1 or id_type_image2) in [
-            "passport_front",
-            "printed_visa",
-            "passport_back",
-            "written_visa",
-        ]:
-            id_type = "Passport"
-        elif (id_type_image1 or id_type_image2) in ["voter_back", "voter_front"]:
-            id_type = "voterid"
-        elif (id_type_image1 or id_type_image2) in ["invoice"]:
-            id_type = "invoice"
-        elif (id_type_image1 or id_type_image2) in ["driving_back", "driving_front"]:
+        elif "invoice" in front_doc_type:
+            id_type = "Invoice"
+        elif "driving_back" in front_doc_type or "driving_front" in front_doc_type:
             id_type = "driving"
-        elif (id_type_image1 or id_type_image2) in ["panFront"]:
-            id_type = "pan"
-        elif (id_type_image1 or id_type_image2 or id_type_image3) in ["oci"]:
-            id_type = "oci"
+        elif "panFront" in front_doc_type:
+            id_type = "Pan Card"
+        elif "passport_back" in front_doc_type or "passport_front" in front_doc_type:
+            id_type = "indianPassport"
+        elif "printed_visa" in front_doc_type or "written_visa" in front_doc_type:
+            id_type = "indianPassport"
+        elif "oci" in front_doc_type:
+            id_type = "OCI"
+        elif "aadhar_front" in front_doc_type or "aadhar_back" in front_doc_type:
+            id_type = "aadhaar"
         else:
-            id_type = "others"
-        enqueue(
-            extract_id_details,
-            queue="default",
-            timeout=800000,
-            event="data_extraction",
-            now=False,
-            data={
-                "image_1": image_1,
-                "image_2": image_2,
-                "id_type": id_type,
-                "reservation_number": reservation_number,
-            },
-            is_async=True,
-        )
-        return {"success": True, "data": "Created"}
+            id_type = "other"
+
+            
+        if now_job == False:
+            enqueue(
+                extract_id_details,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=now_job,
+                data={
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": id_type,
+                    "reservation_number": reservation_number,
+                },
+                is_async=True,
+            )
+            return {"success": True, "data": "Created"}
+        else:
+            details = extract_id_details(
+                data={
+                    "image_1": image_1,
+                    "image_2": image_2,
+                    "id_type": id_type,
+                    "reservation_number": reservation_number,
+
+                },
+            )
+            print(details['data']['guest_details'].name,"sdgjdgsfhjdgsfhjdgsfhjg")
+            if front != "":
+                ts = time.time()
+                image_1_url = convert_base64_to_image(
+                    front, reservation_number + id_type +
+                    str(ts), site_folder_path, company
+                )
+                if "message" in image_1_url:
+                    image_1 = image_1_url["message"]["file_url"]
+                    # frappe.db.set_value('Guest Details', details['data']['guest_details'].name, {
+                    #     'id_image1': image_1,
+                    # })
+                    details['data']['guest_details'].db_set("id_image1",image_1,update_modified=False)
+                    # details['data']['guest_details'].save(update_modified=False)
+            if back != "":
+                ts = time.time()
+                image_2_url = convert_base64_to_image(
+                    back, reservation_number + id_type +
+                    str(ts), site_folder_path, company
+                )
+                if "message" in image_2_url:
+                    image_2 = image_2_url["message"]["file_url"]
+                    details['data']['guest_details'].db_set("id_image2",image_2,update_modified=False)
+                    # frappe.db.set_value('Guest Details', details['data']['guest_details'].name, {
+                    #     'id_image2': image_2,
+                    # })
+                    # details['data']['guest_details'].id_image2 = image_2
+            # details['data']['guest_details'] = frappe.
+            print(details)
+            return {"success": True, "data": details, "message": "scanned details"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -772,29 +867,34 @@ def extract_id_details(data={}):
         print(data['id_type'])
         if data["id_type"] == "aadhaar":
             if data["image_1"]:
-                aadhaar_front_details = fetch_aadhaar_details(data["image_1"], None)
+                aadhaar_front_details = fetch_aadhaar_details(
+                    data["image_1"], None)
                 if aadhaar_front_details["success"]:
                     # return aadhaar_front_details
                     details.update(aadhaar_front_details["data"])
             if data["image_2"]:
-                aadhaar_back_details = fetch_aadhaar_details(None,data["image_2"])
+                aadhaar_back_details = fetch_aadhaar_details(
+                    None, data["image_2"])
                 if aadhaar_back_details["success"]:
                     # return aadhaar_back_details
                     details.update(aadhaar_back_details["data"])
-        elif data["id_type"] == "indianPassport" or data['id_type'] == 'Foreigner':
+        elif data["id_type"] == "indianPassport" or data['id_type'] == 'Foreigner' or data['id_type'] == 'Passport':
             if data["image_1"]:
-                passport_front_details = fetch_passport_details(data["image_1"], None)
+                passport_front_details = fetch_passport_details(
+                    data["image_1"], None)
                 if passport_front_details["success"]:
                     # return passport_front_details
                     details.update(passport_front_details["data"])
             if data["image_2"]:
-                passport_back_details = fetch_passport_details(None, data["image_2"])
+                passport_back_details = fetch_passport_details(
+                    None, data["image_2"])
                 if passport_back_details["success"]:
                     # return passport_back_details
                     details.update(passport_back_details["data"])
         elif data["id_type"] == "voterId":
             if data["image_1"]:
-                voter_front_details = fetch_voter_details(data["image_1"], None)
+                voter_front_details = fetch_voter_details(
+                    data["image_1"], None)
                 if voter_front_details["success"]:
                     details.update(voter_front_details["data"])
             if data["image_2"]:
@@ -805,12 +905,14 @@ def extract_id_details(data={}):
             pass
         elif data["id_type"] == "driving":
             if data["image_1"]:
-                driving_front_details = fetch_driving_details(data["image_1"], None)
+                driving_front_details = fetch_driving_details(
+                    data["image_1"], None)
                 if driving_front_details["success"]:
                     # return driving_front_details
                     details.update(driving_front_details["data"])
             if data["image_2"]:
-                driving_back_details = fetch_driving_details(None, data["image_2"])
+                driving_back_details = fetch_driving_details(
+                    None, data["image_2"])
                 if driving_back_details["success"]:
                     # return driving_back_details
                     details.update(driving_back_details["data"])
@@ -818,11 +920,12 @@ def extract_id_details(data={}):
             pass
         else:
             pass
-        
+        print(details,"*******")
         if "guest_details_name" in data:
             # details["doctype"] = "Guest Details"
             # details["name"] = data["guest_details_name"]
-            guest_details = create_guest_details(details,data["guest_details_name"],True)
+            guest_details = create_guest_details(
+                details, data["guest_details_name"], True)
         else:
             if "id_image1" in data:
                 details["id_image1"] = data["id_image1"]
@@ -843,14 +946,18 @@ def extract_id_details(data={}):
                     return guest_details
                 if "dropbox" in data:
                     if data["dropbox"] or data["dropbox"] != "":
-                        dropbox_doc = frappe.get_doc('Dropbox', data["dropbox"])
+                        dropbox_doc = frappe.get_doc(
+                            'Dropbox', data["dropbox"])
                         dropbox_doc.processing = 0
                         started_time = str(dropbox_doc.processing_time)
                         now = datetime.datetime.now()
                         current_time = now.strftime("%H:%M:%S")
-                        dropbox_doc.processing_time = datetime.datetime.strptime(current_time, '%H:%M:%S') - datetime.datetime.strptime(started_time, '%H:%M:%S')
-                        dropbox_doc.save(ignore_permissions=True, ignore_version=True)
+                        dropbox_doc.processing_time = datetime.datetime.strptime(
+                            current_time, '%H:%M:%S') - datetime.datetime.strptime(started_time, '%H:%M:%S')
+                        dropbox_doc.save(
+                            ignore_permissions=True, ignore_version=True)
                         frappe.db.commit()
+                details['guest_details'] = guest_details["data"]
                 return {"success": True, "data": details}
             else:
                 return {"success": False, "message": "Something went wrong"}
@@ -862,8 +969,9 @@ def extract_id_details(data={}):
         )
         return {"success": False, "message": str(e)}
 
+
 @frappe.whitelist(allow_guest=True)
-def create_guest_details(data,name=None,update=False):
+def create_guest_details(data, name=None, update=False):
     try:
         if update == False:
             if not bool(data):
@@ -887,7 +995,7 @@ def create_guest_details(data,name=None,update=False):
                 update_modified=False
             )
             frappe.db.commit()
-            return {"success": True, "message": "Guest Created"}
+            return {"success": True, "message": "Guest Created", "data": doc}
         else:
             if not bool(data):
                 return {"success": False, "message": "data is empty"}
@@ -896,10 +1004,8 @@ def create_guest_details(data,name=None,update=False):
             if "guest_dob" in data:
                 if data["guest_dob"] == "" or data["guest_dob"] is None:
                     del data["guest_dob"]
-            print(data)
-            print(name)
 
-            frappe.db.set_value('Guest Details',name,data)
+            frappe.db.set_value('Guest Details', name, data)
             # frappe.db.commit()
             # doc.insert(ignore_permissions=True)
             # guest_attachments(doc, method="Manula")
@@ -913,7 +1019,7 @@ def create_guest_details(data,name=None,update=False):
                 update_modified=False
             )
             frappe.db.commit()
-            return {"success": True, "message": "Guest Updated successfully"}
+            return {"success": True, "message": "Guest Updated successfully", "data": doc}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -923,11 +1029,8 @@ def create_guest_details(data,name=None,update=False):
         return {"success": False, "message": str(e)}
 
 
-
-
-
 @frappe.whitelist()
-def reprocess_images(name:str,now=False):
+def reprocess_images(name: str, now=False):
     '''
     reprocess images if not detected correctly
 
@@ -940,41 +1043,41 @@ def reprocess_images(name:str,now=False):
         folder_path = frappe.utils.get_bench_path()
         site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
         private_folder_path = folder_path + "/sites/" + company.site_name
-        guest_details = frappe.get_doc('Guest Details',name)
+        guest_details = frappe.get_doc('Guest Details', name)
         print(site_folder_path+guest_details.id_image1)
 
         with open(site_folder_path+guest_details.id_image1, "rb") as image_file:
             encoded_string_image_1 = base64.b64encode(image_file.read())
             image_1 = encoded_string_image_1.decode("utf-8")
-        
+
         with open(site_folder_path+guest_details.id_image2, "rb") as image_file:
             encoded_string_image_2 = base64.b64encode(image_file.read())
             image_2 = encoded_string_image_2.decode("utf-8")
         enqueue(
-                extract_id_details,
-                queue="default",
-                timeout=800000,
-                event="data_extraction",
-                now=True,
-                data={
-                    "image_1": image_1,
-                    "image_2": image_2,
-                    "id_type": guest_details.guest_id_type,
-                    "reservation_number": guest_details.confirmation_number,
-                    "guest_details_name":name
-                },
-                is_async=True,
-            )
-        
+            extract_id_details,
+            queue="default",
+            timeout=800000,
+            event="data_extraction",
+            now=True,
+            data={
+                "image_1": image_1,
+                "image_2": image_2,
+                "id_type": guest_details.guest_id_type,
+                "reservation_number": guest_details.confirmation_number,
+                "guest_details_name": name
+            },
+            is_async=True,
+        )
+
         return {
-            "success":True,
-            "message":"Reprocess Done sucessfully"
+            "success": True,
+            "message": "Reprocess Done sucessfully"
         }
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "create_doc_using_base_files",
-            "line No:{}\n{}".format(exc_tb.tb_lineno,str(e)),
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         print(e)
         return {
