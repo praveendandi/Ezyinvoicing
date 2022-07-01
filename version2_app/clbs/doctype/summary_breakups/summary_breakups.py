@@ -680,7 +680,7 @@ def submit_summary(summary):
                 #     return {"success": False, "message": "	Bill No. are mandatory"}
                 if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
                     frappe.db.set_value("Summaries", summary, {
-                                        "status": "Submitted"})
+                                        "status": "Submitted", "docstatus": 1})
                     frappe.db.commit()
                     get_invoices = frappe.db.get_list(
                         "Invoices", filters=[["summary", "=", summary]], pluck="name")
@@ -974,5 +974,89 @@ def etax_invoice_to_pdf(summary):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("etax_invoice_to_pdf",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return{"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def summary_amendment(summary):
+    try:
+        if frappe.db.exists("Summaries", {"name": summary}):
+            get_invoice_list = frappe.db.get_list(
+                "Invoices", filters=[["summary", "=", summary]], pluck="name")
+            invoice_list = get_invoice_list
+            frappe.db.set_value("Summaries", summary, {
+                                "status": "Cancelled", "docstatus": 2})
+            frappe.db.sql(
+                """update `tabSummary Breakups` set docstatus=2 where summaries='{}'""".format(summary))
+            frappe.db.sql(
+                """update `tabSummary Payments` set docstatus=2 where summary = '{}'""".format(summary))
+            if len(get_invoice_list) == 1:
+                get_invoice_list = get_invoice_list+["0"]
+            if len(get_invoice_list) > 0:
+                frappe.db.sql("""update `tabInvoices` set summary="",clbs_summary_generated=0,invoice_submitted_in_clbs=0 where name in {}""".format(
+                    tuple(get_invoice_list)))
+                frappe.db.commit()
+            summary_data = frappe.db.get_value("Summaries", summary, ["summary_title", "from_date", "to_date", "event_type", "tax_payer_details", "between_dates",
+                                               "phone_number", "land_line_number", "location", "legal_name", "header", "footer", "terms_and_conditions", "contacts", "reference", "po_number", "sequence"], as_dict=1)
+            summary_data["amended_from"] = summary
+            summary_data["doctype"] = "Summaries"
+            summary_data["sequence"] = summary_data["sequence"] + 1
+            summary_doc = frappe.get_doc(summary_data)
+            summary_doc.insert()
+            frappe.db.commit()
+            create_summary = create_summary_breakup(
+                filters=[["parent", "in", invoice_list]], summary=summary_doc.name)
+            if not create_summary["success"]:
+                return create_summary
+            get_summary_payments = frappe.db.get_list("Summary Payments", filters=[
+                                                      ["summary", "=", summary]], fields=["payment_description", "amount"])
+            if len(get_summary_payments) > 0:
+                summary_payment = add_summary_payment(
+                    get_summary_payments, summary_doc.name)
+                if not summary_payment["success"]:
+                    return summary_payment
+            get_summary_document = frappe.db.get_list("Summary Documents", filters=[["summary", "=", summary], [
+                                                      "document_type", "not in", ["invoices", "Invoices"]]], fields=["document_type", "document", "company"])
+            if len(get_summary_document) > 0:
+                summary_document = add_summary_documents(get_summary_document, summary_doc.name)
+                if not summary_document["success"]:
+                    return summary_document
+            return {"success":True, "message": "Amendment done"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("summary_amendment",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return{"success": False, "message": str(e)}
+
+
+def add_summary_payment(data=None, summary=None):
+    try:
+        for each in data:
+            each["doctype"] = "Summary Payments"
+            each["summary"] = summary
+            pay_doc = frappe.get_doc(each)
+            pay_doc.insert()
+            frappe.db.commit()
+        return {"success": True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("add_summary_payment",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return{"success": False, "message": str(e)}
+
+
+def add_summary_documents(data=None, summary=None):
+    try:
+        for each in data:
+            each["doctype"] = "Summary Documents"
+            each["summary"] = summary
+            pay_doc = frappe.get_doc(each)
+            pay_doc.insert()
+            frappe.db.commit()
+        return {"success": True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("add_summary_documents",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}

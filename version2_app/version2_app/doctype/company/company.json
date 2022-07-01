@@ -156,7 +156,8 @@
   "sezwop_terms_and_conditions",
   "enable_slab_for_room_service_charge",
   "sc_slab_12_starting_range",
-  "sc_slab_12_end_range"
+  "sc_slab_12_end_range",
+  "items_per_page"
  ],
  "fields": [
   {
@@ -998,11 +999,18 @@
    "fieldname": "sc_slab_12_end_range",
    "fieldtype": "Int",
    "label": "SC Slab 12% End Range"
+  },
+  {
+   "default": "100",
+   "fieldname": "items_per_page",
+   "fieldtype": "Select",
+   "label": "Items Per Page",
+   "options": "20\n50\n100\n150\n500"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-15 11:17:30.317547",
+ "modified": "2022-06-30 16:15:55.454721",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
