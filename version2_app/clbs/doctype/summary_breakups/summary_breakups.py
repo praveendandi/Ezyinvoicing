@@ -1022,7 +1022,7 @@ def summary_amendment(summary):
                 summary_document = add_summary_documents(get_summary_document, summary_doc.name)
                 if not summary_document["success"]:
                     return summary_document
-            return {"success":True, "message": "Amendment done"}
+            return {"success":True, "message": "Amendment done", "summary": summary_doc.name}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("summary_amendment",
