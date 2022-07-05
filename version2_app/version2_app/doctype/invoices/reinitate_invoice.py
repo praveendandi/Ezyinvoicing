@@ -329,7 +329,7 @@ def Reinitiate_invoice(data):
         if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
                 doc.invoice_object_from_file = data['invoice_object_from_file']
-        doc.save()
+        doc.save(ignore_permissions=True, ignore_version=True)
         
         print(doc.as_dict(),"========")
         items = data['items_data']
