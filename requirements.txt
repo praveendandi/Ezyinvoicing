@@ -19,3 +19,4 @@ pytesseract
 pdf2image
 paytmchecksum
 # opencv-python
+typing_extensions
