@@ -6,6 +6,7 @@ import datetime
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
+from version2_app.version2_app.doctype.invoices.invoice_helpers import calulate_b2c_items
 
 # @frappe.whitelist(allow_guest=True)
 def bulkupload(data):
@@ -221,7 +222,7 @@ def bulkupload(data):
                         calulateItemsApiResponse = calulate_items(each_item)
                         if calulateItemsApiResponse['success'] == True:
                             if reupload==False:
-                                insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]}})
+                                insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload":True})
                                 if insertInvoiceApiResponse['success']== True:
                                     
                                     B2B = "B2B"
@@ -304,14 +305,18 @@ def bulkupload(data):
                 taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
                 calulateItemsApiResponse = calulate_items(each_item)
                 if calulateItemsApiResponse['success'] == True:
+                    get_invoice_amount = calulate_b2c_items(calulateItemsApiResponse['data'])
+                    if not get_invoice_amount["success"]:
+                        return get_invoice_amount
+                    each_item['total_invoice_amount'] = get_invoice_amount["total_invoice_amount"]
                     if reupload==False:
-                        insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]}})
+                        insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload":True})
                         if insertInvoiceApiResponse['success']== True:
                             B2B=np.nan
                             B2C = "B2C"	 
                             if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                            elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
+                            elif insertInvoiceApiResponse['data'].irn_generated == ["Pending","On Hold"]:
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             else:
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})

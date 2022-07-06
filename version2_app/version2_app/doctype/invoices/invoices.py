@@ -1167,7 +1167,11 @@ def insert_invoice(data):
         if "invoice_from" in data['guest_data']:
             invoice_from = data['guest_data']['invoice_from']
         else:
-            invoice_from = "Pms"	
+            invoice_from = "Pms"
+        if "B2C_bulk_upload" in data:
+            if data["B2C_bulk_upload"]:
+                if data['guest_data']['invoice_type'] == "B2B":
+                    irn_generated = "On Hold"
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1324,7 +1328,7 @@ def insert_invoice(data):
             
             return {"success": True,"data":invoice}
         else:
-            if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+            if v.irn_generated in ["Pending","On Hold"] and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
                 tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
                 if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or v.sez==1:
                     pass
