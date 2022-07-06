@@ -1169,6 +1169,7 @@ def auto_adjustment(data):
                 positive_data = sorted(positive_data, key=itemgetter('item_value'), reverse=True)
             negative_total = [items for items in negative_data if items["item_value"] != 0]
             if (negative_total != [] and positive_data != []):
+                net_yes = False
                 for each_item in negative_data:
                     for items in positive_data:
                         if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0 and each_item["service_charge"] == items["service_charge"]:
@@ -1178,13 +1179,17 @@ def auto_adjustment(data):
                                 if each_item["net"] == "No":
                                     each_item["item_value"] = each_item["item_value_after_gst"]
                                 value = items["item_value"] - abs(each_item["item_value"])
+                                net_yes = True
                             else:
                                 value = items["item_value"] - abs(each_item["item_value"])
                             if value == 0:
                                 positive_data.remove(items)
                                 each_item["item_value"] = 0
                             elif value < 0:
-                                each_item["item_value"] = value
+                                if net_yes:
+                                    each_item["item_value_after_gst"] = value
+                                else:
+                                    each_item["item_value"] = value
                                 items["item_value"] = 0
                             else:
                                 each_item["item_value"] = 0
