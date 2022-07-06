@@ -20,8 +20,10 @@
   "mode",
   "no_of_guests",
   "gcp_file_url",
-  "attachment",
-  "attached_to"
+  "attached_to",
+  "pos_check_reference_number",
+  "check_date",
+  "sync"
  ],
  "fields": [
   {
@@ -102,20 +104,32 @@
    "label": "GCP File URL"
   },
   {
-   "fieldname": "attachment",
-   "fieldtype": "Attach",
-   "label": "Attachment"
-  },
-  {
    "fieldname": "attached_to",
    "fieldtype": "Link",
    "label": "Attached to",
    "options": "Invoices"
+  },
+  {
+   "fieldname": "pos_check_reference_number",
+   "fieldtype": "Data",
+   "label": "POS Check Reference Number"
+  },
+  {
+   "fieldname": "check_date",
+   "fieldtype": "Date",
+   "label": "POS Check Date"
+  },
+  {
+   "default": "No",
+   "fieldname": "sync",
+   "fieldtype": "Select",
+   "label": "Sync",
+   "options": "Yes\nNo"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-21 17:57:02.138468",
+ "modified": "2022-06-27 15:21:28.081631",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Checks",

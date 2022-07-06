@@ -659,10 +659,10 @@ def reconciliation(start_date, end_date, workbook="true"):
         df_invoice_comparison = pd.DataFrame.from_records(
             invoice_comparison["data"])
         df_invoice_comparison = df_invoice_comparison.reindex(columns=["InvoiceNumber", "EzyinvoicingBaseAmount", "OperaBaseAmount", "BaseMissmatchAmount", "BaseAmountStatus", "EzyinvoicingInvoiceAmount",
-                                                              "OperaInvoiceAmount", "InvoiceMissmatchAmount", "InvoiceAmountStatus", "MissingIn", "IRN Status", "IRN Number", "Acknowledgement No", "Acknowledgement Date"])
+                                                              "OperaInvoiceAmount", "InvoiceMissmatchAmount", "InvoiceAmountStatus", "MissingIn", "IRNStatus", "IRNNumber", "AcknowledgementNo", "AcknowledgementDate"])
         df_invoice_comparison.to_excel(
             writer, sheet_name="Comparison", index=False)
-        for each in ["InvoiceNumber", "EzyinvoicingBaseAmount", "OperaBaseAmount", "BaseMissmatchAmount", "BaseAmountStatus", "EzyinvoicingInvoiceAmount", "OperaInvoiceAmount", "InvoiceMissmatchAmount", "InvoiceAmountStatus", "MissingIn", "IRN Status", "IRN Number", "Acknowledgement No", "Acknowledgement Date"]:
+        for each in ["InvoiceNumber", "EzyinvoicingBaseAmount", "OperaBaseAmount", "BaseMissmatchAmount", "BaseAmountStatus", "EzyinvoicingInvoiceAmount", "OperaInvoiceAmount", "InvoiceMissmatchAmount", "InvoiceAmountStatus", "MissingIn", "IRNStatus", "IRNNumber", "AcknowledgementNo", "AcknowledgementDate"]:
             col_idx = df_invoice_comparison.columns.get_loc(each)
             writer.sheets['Comparison'].set_column(col_idx, col_idx, 25)
         conb2bb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in missing["data"]["converted_b2b_to_b2c"]]
@@ -688,10 +688,11 @@ def reconciliation(start_date, end_date, workbook="true"):
         b2b_hsn = getHsnSummary(filters=[["invoice_type","=","B2B"]],  start_date=start_date, end_date=end_date)
         if not b2b_hsn["success"]:
             return b2b_hsn
+        if len(b2b_hsn["data"]) == 0:
+            print(len(b2b_hsn["data"]),"??????????/")
+            b2b_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
         hsnb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2b_hsn["data"]]
         recon_data["B2B_HSN"] = hsnb2b
-        if len(b2b_hsn["data"]) == 0:
-            b2b_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
         df_b2b_hsn = pd.DataFrame.from_records(b2b_hsn["data"])
         total = df_b2b_hsn.sum(numeric_only=True, axis=0)
         total.name = "Total"
@@ -708,10 +709,10 @@ def reconciliation(start_date, end_date, workbook="true"):
         b2c_hsn = getHsnSummary(filters=[["invoice_type","=","B2C"]],  start_date=start_date, end_date=end_date)
         if not b2c_hsn["success"]:
             return b2c_hsn
-        hsnb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2c_hsn["data"]]
-        recon_data["B2C_HSN"] = hsnb2c
         if len(b2c_hsn["data"]) == 0:
             b2c_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
+        hsnb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2c_hsn["data"]]
+        recon_data["B2C_HSN"] = hsnb2c
         df_b2c_hsn = pd.DataFrame.from_records(b2c_hsn["data"])
         total_b2c = df_b2c_hsn.sum(numeric_only=True, axis=0)
         total_b2c.name = "Total"
@@ -1038,7 +1039,8 @@ def compare_invoice_summary(month=None, year=None):
     try:
         start_date = year+'-'+month+"-01"
         end_date = date_util.get_last_day(start_date)
-        get_invoices = frappe.db.get_list('Invoices', filters=[["invoice_date", 'between', [start_date, end_date]]], fields=["name as InvoiceNumber","sales_amount_before_tax as EzyinvoicingBaseAmount","sales_amount_after_tax as EzyinvoicingInvoiceAmount"], order_by='name')
+        get_invoices = frappe.db.get_list('Invoices', filters=[["invoice_date", 'between', [start_date, end_date]]], fields=["name as InvoiceNumber","sales_amount_before_tax as EzyinvoicingBaseAmount","sales_amount_after_tax as EzyinvoicingInvoiceAmount", "irn_generated as IRNStatus", "irn_number as IRNNumber", "ack_no as AcknowledgementNo", "ack_date as AcknowledgementDate"], order_by='name')
+        print(get_invoices,"////////////")
         get_payments = frappe.db.get_list("Payment Types",pluck="name")
         if len(get_invoices)>0:
             for each in get_invoices:
@@ -1062,10 +1064,10 @@ def compare_invoice_summary(month=None, year=None):
                         each["OperaBaseAmount"] = 0
                     each["MissingIn"]=""
                 else:
-                    each.update({"OperaInvoiceAmount":0,"InvoiceMissmatchAmount":0,"InvoiceAmountStatus":"","OperaBaseAmount":0,"BaseMissmatchAmount":0,"BaseAmountStatus":"","MissingIn":"Opera"})
+                    each.update({"OperaInvoiceAmount":0,"InvoiceMissmatchAmount":0,"InvoiceAmountStatus":"","OperaBaseAmount":0,"BaseMissmatchAmount":0,"BaseAmountStatus":"","MissingIn":"Opera", "IRNStatus":"", "IRNNumber":"", "AcknowledgementNo":"", "AcknowledgementDate":""})
             return {"success":True, "data":get_invoices}    
         else:
-            data = [{"InvoiceNumber":"","EzyinvoicingBaseAmount":"","EzyinvoicingInvoiceAmount":"","OperaInvoiceAmount":"","InvoiceMissmatchAmount":"","InvoiceAmountStatus":"","OperaBaseAmount":"","BaseMissmatchAmount":"","BaseAmountStatus":"","MissingIn":""}]
+            data = [{"InvoiceNumber":"","EzyinvoicingBaseAmount":"","EzyinvoicingInvoiceAmount":"","OperaInvoiceAmount":"","InvoiceMissmatchAmount":"","InvoiceAmountStatus":"","OperaBaseAmount":"","BaseMissmatchAmount":"","BaseAmountStatus":"","MissingIn":"","IRNStatus":"", "IRNNumber":"", "AcknowledgementNo":"", "AcknowledgementDate":""}]
             return {"success":True, "data":data}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

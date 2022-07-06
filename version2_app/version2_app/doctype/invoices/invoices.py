@@ -31,7 +31,8 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
+import fitz
+from frappe.utils import cstr
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -1417,6 +1418,12 @@ def insert_items(items, invoice_number):
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
+                if "check_number" in item and "reference_check_number" in item:
+                    poss_check = frappe.db.get_value('POS Checks', {'pos_check_reference_number': item['reference_check_number']}, ["name"])
+                    if poss_check:
+                        item["pos_check"] = poss_check
+                        frappe.db.sql("""update `tabPOS Checks` set attached_to='{}', sync = 'Yes' where name='{}'""".format(invoice_number, poss_check))
+                        frappe.db.commit()
                 # if item['sac_code'].isdigit():
                 if "-" in str(item['item_value']):
                     item['is_credit_item'] = "Yes"
@@ -1432,6 +1439,39 @@ def insert_items(items, invoice_number):
             
         return {"sucess": True, "data": 'doc'}
         # print(doc)
+    except Exception as e:
+        print(traceback.print_exc(),"**********  insert itemns api")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing insert_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def combine_pos_checks_with_invoice(invoice_number):
+    try:
+        company = frappe.get_last_doc("company")
+        items = frappe.db.get_list('POS Checks', filters={'attached_to': invoice_number}, pluck="pos_bill")
+        if len(items)>0:
+            cwd = os.getcwd()
+            site_name = cstr(frappe.local.site)
+            result = fitz.open()
+            for each in items:
+                file_path = cwd + "/" + site_name + each
+                with fitz.open(file_path) as mfile:
+                    result.insertPDF(mfile)
+            file_path = cwd + "/" + site_name + "/public/files/" + invoice_number + '-POS.pdf'
+            result.save(file_path)
+            files_new = {"file": open(file_path, 'rb')}
+            payload_new = {'is_private': 1, 'folder': 'Home'}
+            file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                        data=payload_new, verify=False).json()
+            print(file_response,"???????")
+            if "file_url" in file_response["message"].keys():
+                os.remove(file_path)
+            else:
+                return {"success": False, "message": "something went wrong"}
+            return {"success": True, "file_url": file_response["message"]["file_url"]}
+        else:
+            return {"success": False, "message": "No data found"}
     except Exception as e:
         print(traceback.print_exc(),"**********  insert itemns api")
         exc_type, exc_obj, exc_tb = sys.exc_info()

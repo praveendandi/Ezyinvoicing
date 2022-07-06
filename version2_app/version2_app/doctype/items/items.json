@@ -45,7 +45,8 @@
   "lut_exempted",
   "previous_lut_item",
   "check_number",
-  "reference_check_number"
+  "reference_check_number",
+  "pos_check"
  ],
  "fields": [
   {
@@ -286,12 +287,18 @@
    "fieldname": "reference_check_number",
    "fieldtype": "Data",
    "label": "Reference Check Number"
+  },
+  {
+   "fieldname": "pos_check",
+   "fieldtype": "Link",
+   "label": "Pos Check",
+   "options": "POS Checks"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-21 18:07:32.443354",
+ "modified": "2022-06-29 14:38:49.981323",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",

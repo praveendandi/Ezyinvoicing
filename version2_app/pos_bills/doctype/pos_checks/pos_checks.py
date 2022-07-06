@@ -16,6 +16,8 @@ import razorpay
 from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
+from version2_app.passport_scanner.doctype.ml_utilities.common_utility import format_date
+from datetime import date
 
 class POSChecks(Document):
     pass
@@ -184,7 +186,7 @@ def extract_data(payload,company_doc):
                 if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
-                    check_no_regex = re.findall("\d+",check_string)
+                    check_no_regex = re.findall("\w+\d+",check_string)
                     data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     table_regex = re.findall(company_doc.table_number_regex, line.strip())
@@ -199,6 +201,19 @@ def extract_data(payload,company_doc):
                     guest_string = guestno_regex[0] if len(guestno_regex)>0 else ""
                     guest_no_regex = re.findall("\d+",guest_string)
                     data["no_of_guests"] = guest_no_regex[0] if len(guest_no_regex) > 0 else ""
+                if company_doc.pos_date_reference:
+                    if company_doc.pos_date_reference in line:
+                        check_date = re.findall(company_doc.pos_date_regex,line)
+                        checkdate = check_date[0] if len(check_date) > 0 else ""
+                        data["check_date"] = datetime.strptime(checkdate,'%d.%m.%Y').strftime('%Y-%m-%d')
+                        # data["check_date"] = format_date(
+                        #     checkdate,
+                        #     "yyyy-mm-dd",
+                        # )
+                        # today = date.today()
+                        # print("Today date is: ", today)
+                        # if today > data["check_date"]:
+                        #     pass
         data["total_amount"] = str(total_amount)
         return {"success":True, "data":data}
     except Exception as e:

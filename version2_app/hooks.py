@@ -158,7 +158,6 @@ doc_events = {
         "after_insert": "version2_app.events.information_folio_created",
     },
 	"File":{
-		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
 	},
 	"Update Logs":{

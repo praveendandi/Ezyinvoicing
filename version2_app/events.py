@@ -1,4 +1,5 @@
 import base64
+import datefinder
 import datetime
 import glob
 from heapq import merge
@@ -19,9 +20,10 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
+from version2_app.clbs.doctype.summary_breakups.summary_breakups import convert_image_to_base64
 from frappe.utils.background_jobs import enqueue
 from subprocess import PIPE, STDOUT, Popen
-
+from version2_app.pos_bills.doctype.pos_checks.pos_checks import extract_data
 # from requests.sessions import _Data
 import frappe
 import pdfplumber
@@ -448,6 +450,18 @@ def fileCreated(doc, method=None):
                     module.file_parsing(doc.file_url)
                     frappe.log_error(traceback.print_exc())
                     logger.error(f"fileCreated,   {traceback.print_exc()}")
+        elif "POS-" in doc.file_name:
+            enqueue(
+                extract_data_from_pos_check,
+                queue="default",
+                timeout=800000,
+                event="data_extraction",
+                now=True,
+                data={
+                    "pos_bill": doc.file_url
+                },
+                is_async=True,
+            )
         else:
             if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
                 company = frappe.get_last_doc("company")
@@ -882,8 +896,98 @@ def create_pos_bill(doc, method=None):
             "custom_socket", {"message": "Pos Bills Created", "data": doc.__dict__}
         )
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("create_pos_bill","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
+
+# def create_pos_checks(doc, method=None):
+#     try:
+#         if doc.pos_bill:
+#             enqueue(
+#                 extract_data_from_pos_check,
+#                 queue="default",
+#                 timeout=800000,
+#                 event="data_extraction",
+#                 now=True,
+#                 data={
+#                     "pos_bill": doc.pos_bill
+#                 },
+#                 is_async=True,
+#             )
+#         frappe.publish_realtime(
+#             "custom_socket", {"message": "Pos Bills Created", "data": doc.__dict__}
+#         )
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error("create_pos_checks","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+#         return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def extract_data_from_pos_check(data={}):
+    try:
+        if isinstance(data,str):
+            data = json.loads(data)
+        company = frappe.get_last_doc("company")
+        image_to_base = convert_image_to_base64(data["pos_bill"])
+        if not image_to_base["success"]:
+            return image_to_base
+        with open('/home/caratred/Music/readme.txt', 'w') as f:
+            f.write(image_to_base["data"])
+        post_data = {
+            "base": image_to_base["data"]
+        }
+        image_response = requests.post(company.pos_bill_domain,
+            json=post_data,
+        )
+        if image_response.status_code == 200:
+            image_response = image_response.json()
+            extract = extract_data(image_response["data"],company)
+            total_data = {}
+            if not extract["success"]:
+                pass
+            else:
+                total_data.update(extract["data"])
+                # pos_date = datetime.datetime.strptime(extract["data"]["check_date"],'%Y-%m-%d').strftime('%d-%m-%Y')
+                if "check_date" in extract["data"] and "check_no" in extract["data"]:
+                    total_data["pos_check_reference_number"] = extract["data"]["check_date"]+"-"+extract["data"]["check_no"]
+                    print(total_data["pos_check_reference_number"],"??::?:?:?:?:?:?:?:")
+                    # if frappe.db.exists("POS Checks",{"pos_check_reference_number": total_data["pos_check_reference_number"]}):
+                    #     return {"message": "Duplicate POS Check","success": False}
+                    invoice_number = frappe.db.get_value('Items', {'reference_check_number': total_data["pos_check_reference_number"]}, ["parent"])
+                    if invoice_number:
+                        total_data["sync"] = "Yes"
+                        total_data["attached_to"] = invoice_number
+            total_data["company"] = company.name
+            total_data["payload"] = image_response["data"]
+            total_data["doctype"] = "POS Checks"
+            total_data["pos_bill"] = data["pos_bill"]
+            # if data["pos_bill"].count("@#") >= 2:
+            #     extract_outlet = re.search("@#(.*)@#", data["pos_bill"])
+            #     total_data["outlet"] = extract_outlet.group(1)
+            #     print(total_data["outlet"],"///..")
+            get_doc = frappe.get_doc(total_data)
+            get_doc.insert()
+            frappe.db.commit()
+            if "pos_check_reference_number" in total_data:
+                print(".////...")
+                frappe.db.sql("""update `tabItems` set pos_check='{}' where reference_check_number='{}'""".format(get_doc.name, total_data["pos_check_reference_number"]))
+                frappe.db.commit()
+            return True
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("extract_data_from_pos_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+# @frappe.whitelist(allow_guest=True)
+# def extract_data_from_invoice(data={}):
+#     try:
+#         check_num = frappe.db.get_value('POS Checks',{'pos_check_reference_number': "reference_check_number"}, ["parent"])
+#         print(check_num,";;;;;;;;;;;;")
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error("extract_data_from_invoice","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+#         return {"success":False,"message":str(e)}
 
 def deleteemailfilesdaily():
     try:
