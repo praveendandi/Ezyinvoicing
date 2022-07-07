@@ -456,7 +456,7 @@ def fileCreated(doc, method=None):
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=True,
+                now=False,
                 data={
                     "pos_bill": doc.file_url
                 },
@@ -932,8 +932,8 @@ def extract_data_from_pos_check(data={}):
         image_to_base = convert_image_to_base64(data["pos_bill"])
         if not image_to_base["success"]:
             return image_to_base
-        with open('/home/caratred/Music/readme.txt', 'w') as f:
-            f.write(image_to_base["data"])
+        # with open('/home/caratred/Music/readme.txt', 'w') as f:
+        #     f.write(image_to_base["data"])
         post_data = {
             "base": image_to_base["data"]
         }
@@ -951,7 +951,6 @@ def extract_data_from_pos_check(data={}):
                 # pos_date = datetime.datetime.strptime(extract["data"]["check_date"],'%Y-%m-%d').strftime('%d-%m-%Y')
                 if "check_date" in extract["data"] and "check_no" in extract["data"]:
                     total_data["pos_check_reference_number"] = extract["data"]["check_date"]+"-"+extract["data"]["check_no"]
-                    print(total_data["pos_check_reference_number"],"??::?:?:?:?:?:?:?:")
                     # if frappe.db.exists("POS Checks",{"pos_check_reference_number": total_data["pos_check_reference_number"]}):
                     #     return {"message": "Duplicate POS Check","success": False}
                     invoice_number = frappe.db.get_value('Items', {'reference_check_number': total_data["pos_check_reference_number"]}, ["parent"])
