@@ -9,6 +9,7 @@ import traceback,os,sys
 import string,math
 from frappe.utils import get_site_name
 import time
+from operator import itemgetter
 import pandas as pd
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError, CheckRatePercentages, update_document_bin
 from version2_app.version2_app.doctype.invoices.invoices import insert_items,insert_hsn_code_based_taxes,send_invoicedata_to_gcb,TaxSummariesInsert,generateIrn,calulate_items,insert_invoice,calulate_net_yes
@@ -331,7 +332,6 @@ def Reinitiate_invoice(data):
                 doc.invoice_object_from_file = data['invoice_object_from_file']
         doc.save(ignore_permissions=True, ignore_version=True)
         
-        print(doc.as_dict(),"========")
         items = data['items_data']
         # items = [x for x in items if x['sac_code']!="Liquor"]
 
@@ -1149,6 +1149,9 @@ def auto_adjustment(data):
                     sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
                 if sac_code_based_gst_rates.net == "Yes":
                     item_each["item_value"] = item_each["item_value_after_gst"]
+                    item_each["net"] = "Yes"
+                else:
+                    item_each["net"] = "No"
                 item_each["service_charge"] = "Yes" if sac_code_based_gst_rates.service_charge == "Yes" else "No"
             negative_data = [items for items in item_data if items["item_value"]<0]
             positive_data = [items for items in item_data if items["item_value"]>0]
@@ -1162,18 +1165,31 @@ def auto_adjustment(data):
                         value = item['item_value'] - abs(each["item_value"])
                         positive_data.remove(item)
                         each["item_value"] = value
-
+            if len(positive_data) > 0:
+                positive_data = sorted(positive_data, key=itemgetter('item_value'), reverse=True)
             negative_total = [items for items in negative_data if items["item_value"] != 0]
             if (negative_total != [] and positive_data != []):
+                net_yes = False
                 for each_item in negative_data:
                     for items in positive_data:
                         if each_item["sac_code"] == items["sac_code"] and each_item["gst_rate"] == items["gst_rate"] and each_item["type"] == items["type"] and each_item["taxable"] == items["taxable"] and items["item_value"] != 0 and each_item["item_value"] != 0 and each_item["service_charge"] == items["service_charge"]:
-                            value = items["item_value"] - abs(each_item["item_value"])
+                            if (items["net"] == "Yes" and each_item["net"] == "No") or (items["net"] == "No" and each_item["net"] == "Yes"):
+                                if items["net"] == "No":
+                                    items["item_value"] = items["item_value_after_gst"]
+                                if each_item["net"] == "No":
+                                    each_item["item_value"] = each_item["item_value_after_gst"]
+                                value = items["item_value"] - abs(each_item["item_value"])
+                                net_yes = True
+                            else:
+                                value = items["item_value"] - abs(each_item["item_value"])
                             if value == 0:
                                 positive_data.remove(items)
                                 each_item["item_value"] = 0
                             elif value < 0:
-                                each_item["item_value"] = value
+                                if net_yes:
+                                    each_item["item_value_after_gst"] = value
+                                else:
+                                    each_item["item_value"] = value
                                 items["item_value"] = 0
                             else:
                                 each_item["item_value"] = 0
