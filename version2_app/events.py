@@ -948,13 +948,19 @@ def extract_data_from_pos_check(data={}):
             total_data = {}
             extract_outlet = get_outlet_from_check(image_response["data"])
             total_data["payload"] = image_response["data"]
+            # outlet_short_cut = None
             if extract_outlet["success"]:
                 total_data["outlet"] = extract_outlet["outlet"]
+                # outlet_short_cut = extract_outlet["outlet_short_name"]
             if extract["success"]:
                 total_data.update(extract["data"])
                 # pos_date = datetime.datetime.strptime(extract["data"]["check_date"],'%Y-%m-%d').strftime('%d-%m-%Y')
                 if "check_date" in extract["data"] and "check_no" in extract["data"]:
                     total_data["pos_check_reference_number"] = extract["data"]["check_date"]+"-"+extract["data"]["check_no"]
+                    # if outlet_short_cut:
+                    #     total_data["pos_check_reference"] = extract["data"]["check_date"]+"-"+outlet_short_cut+"-"+extract["data"]["check_no"]
+                    # else:
+                    #     frappe.log_error("outlet_short_name","Please provide the outlet short name")
                     if frappe.db.exists("POS Checks",{"pos_check_reference_number": total_data["pos_check_reference_number"]}):
                         cwd = os.getcwd()
                         site_name = cstr(frappe.local.site)

@@ -499,10 +499,45 @@ def get_outlet_from_check(payload):
                 if each["name"] in payload:
                     data = each
                     break
-            return {"success": True, "outlet": each["name"]}
+            return {"success": True, "outlet": each["name"], "outlet_short_name": each["outlet_short_name"]}
         else:
             return {"success": False, "outlet": "No outlet found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing get_outlet_from_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def update_check_in_items(invoice_number=None, check_name=None):
+    try:
+        if invoice_number and check_name:
+            frappe.db.set_value("POS Checks", check_name, {"attached_to": invoice_number, "sync": "Yes"})
+            get_check_details = frappe.db.get_value("POS Checks",check_name, "pos_check_reference_number")
+            if get_check_details:
+                if not frappe.db.exists("Items",{"parent":invoice_number, "reference_check_number": get_check_details}):
+                    return {"success": False, "message": "Check not found in this invoice"}
+                get_check_details = frappe.db.get_value("Items",{"parent":invoice_number, "reference_check_number": get_check_details}, "name")
+                if get_check_details:
+                    frappe.db.set_value("Items",get_check_details,{"pos_check":check_name})
+            frappe.db.commit()
+            return {"success": True, "message": "POS Check Updated"}
+        return {"success": False, "message": "invoice number and check_name is mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing update_check_in_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+
+def update_pos_check(doc, method=None):
+    try:
+        if doc.check_no and doc.check_date:
+            ref = doc.check_date+"-"+doc.check_no
+            get_doc = frappe.get_doc("POS Checks", doc.name)
+            get_doc.pos_check_reference_number = ref
+            get_doc.save()
+        return True
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing update_check_in_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
