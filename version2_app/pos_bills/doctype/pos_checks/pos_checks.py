@@ -498,6 +498,7 @@ def get_outlet_from_check(payload):
             for each in get_outlets:
                 if each["name"] in payload:
                     data = each
+                    break
             return {"success": True, "outlet": each["name"]}
         else:
             return {"success": False, "outlet": "No outlet found"}
