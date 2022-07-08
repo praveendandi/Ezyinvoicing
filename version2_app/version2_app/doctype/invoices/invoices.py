@@ -1424,6 +1424,7 @@ def insert_items(items, invoice_number):
                         item["pos_check"] = poss_check
                         frappe.db.sql("""update `tabPOS Checks` set attached_to='{}', sync = 'Yes' where name='{}'""".format(invoice_number, poss_check))
                         frappe.db.commit()
+                        item["pos_check"] = poss_check
                 # if item['sac_code'].isdigit():
                 if "-" in str(item['item_value']):
                     item['is_credit_item'] = "Yes"
