@@ -488,3 +488,20 @@ def send_pos_bills_gcb(company,b2c_data):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing send pos bills gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+
+def get_outlet_from_check(payload):
+    try:
+        get_outlets = frappe.db.get_list("Outlets",fields=["name", "outlet_short_name"])
+        if len(get_outlets) > 0:
+            data = {}
+            for each in get_outlets:
+                if each["name"] in payload:
+                    data = each
+            return {"success": True, "outlet": each["name"]}
+        else:
+            return {"success": False, "outlet": "No outlet found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing get_outlet_from_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}

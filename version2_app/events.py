@@ -12,6 +12,7 @@ import shlex
 import shutil
 import sys
 import time
+import fitz
 import traceback
 from datetime import date, datetime, timedelta
 import datetime
@@ -23,7 +24,7 @@ from io import BytesIO
 from version2_app.clbs.doctype.summary_breakups.summary_breakups import convert_image_to_base64
 from frappe.utils.background_jobs import enqueue
 from subprocess import PIPE, STDOUT, Popen
-from version2_app.pos_bills.doctype.pos_checks.pos_checks import extract_data
+from version2_app.pos_bills.doctype.pos_checks.pos_checks import extract_data, get_outlet_from_check
 # from requests.sessions import _Data
 import frappe
 import pdfplumber
@@ -462,6 +463,7 @@ def fileCreated(doc, method=None):
                 },
                 is_async=True,
             )
+            return True
         else:
             if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
                 company = frappe.get_last_doc("company")
@@ -944,32 +946,50 @@ def extract_data_from_pos_check(data={}):
             image_response = image_response.json()
             extract = extract_data(image_response["data"],company)
             total_data = {}
-            if not extract["success"]:
-                pass
-            else:
+            extract_outlet = get_outlet_from_check(image_response["data"])
+            total_data["payload"] = image_response["data"]
+            if extract_outlet["success"]:
+                total_data["outlet"] = extract_outlet["outlet"]
+            if extract["success"]:
                 total_data.update(extract["data"])
                 # pos_date = datetime.datetime.strptime(extract["data"]["check_date"],'%Y-%m-%d').strftime('%d-%m-%Y')
                 if "check_date" in extract["data"] and "check_no" in extract["data"]:
                     total_data["pos_check_reference_number"] = extract["data"]["check_date"]+"-"+extract["data"]["check_no"]
-                    # if frappe.db.exists("POS Checks",{"pos_check_reference_number": total_data["pos_check_reference_number"]}):
-                    #     return {"message": "Duplicate POS Check","success": False}
+                    if frappe.db.exists("POS Checks",{"pos_check_reference_number": total_data["pos_check_reference_number"]}):
+                        cwd = os.getcwd()
+                        site_name = cstr(frappe.local.site)
+                        get_files = frappe.db.get_list("POS Checks", filters ={"pos_check_reference_number": total_data["pos_check_reference_number"]}, pluck="pos_bill")
+                        get_files.append(data["pos_bill"])
+                        result = fitz.open()
+                        for each in get_files:
+                            file_path = cwd + "/" + site_name + each
+                            with fitz.open(file_path) as mfile:
+                                result.insertPDF(mfile)
+                        file_path = cwd + "/" + site_name + "/public/files/" + total_data["pos_check_reference_number"] + '.pdf'
+                        result.save(file_path)
+                        files_new = {"file": open(file_path, 'rb')}
+                        payload_new = {'is_private': 1, 'folder': 'Home'}
+                        file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                                    data=payload_new, verify=False).json()
+                        if "file_url" in file_response["message"].keys():
+                            os.remove(file_path)
+                        else:
+                            return False
+                        frappe.db.sql("""update `tabPOS Checks` set pos_bill='{}' where pos_check_reference_number = '{}'""".format(file_response["message"]["file_url"],total_data["pos_check_reference_number"]))
+                        frappe.db.commit()
+                        return True
                     invoice_number = frappe.db.get_value('Items', {'reference_check_number': total_data["pos_check_reference_number"]}, ["parent"])
                     if invoice_number:
                         total_data["sync"] = "Yes"
                         total_data["attached_to"] = invoice_number
             total_data["company"] = company.name
-            total_data["payload"] = image_response["data"]
             total_data["doctype"] = "POS Checks"
             total_data["pos_bill"] = data["pos_bill"]
-            # if data["pos_bill"].count("@#") >= 2:
-            #     extract_outlet = re.search("@#(.*)@#", data["pos_bill"])
-            #     total_data["outlet"] = extract_outlet.group(1)
-            #     print(total_data["outlet"],"///..")
+            total_data["check_type"] = "Check Closed"
             get_doc = frappe.get_doc(total_data)
             get_doc.insert()
             frappe.db.commit()
             if "pos_check_reference_number" in total_data:
-                print(".////...")
                 frappe.db.sql("""update `tabItems` set pos_check='{}' where reference_check_number='{}'""".format(get_doc.name, total_data["pos_check_reference_number"]))
                 frappe.db.commit()
             return True
