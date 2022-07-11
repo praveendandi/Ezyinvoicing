@@ -281,6 +281,7 @@ def Reinitiate_invoice(data):
         doc.mode = company.mode
         doc.allowance_invoice = allowance_invoice
         doc.debit_invoice = debit_invoice
+        doc.arn_number = company.application_reference_number if company.application_reference_number else ""
         
 
         doc.irn_generated=irn_generated
