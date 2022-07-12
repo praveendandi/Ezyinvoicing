@@ -186,13 +186,16 @@ doc_events = {
     },
     "Summaries": {
         "after_insert":"version2_app.events.summaries_insert",
-        # "on_update": "version2_app.events.summaries_insert"
+        "on_update": "version2_app.events.summaries_insert"
     },
     "Dropbox":{
         # 'on_update':'version2_app.passport_scanner.doctype.dropbox.dropbox.merge_guest_to_guest_details'
     },
     "POS Checks": {
         "on_update": "version2_app.pos_bills.doctype.pos_checks.pos_checks.update_pos_check"
+    },
+    "Summary Payments" : {
+        "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     }
 }
 
