@@ -3,7 +3,10 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from operator import ge
+from pickle import NONE
 from typing_extensions import final
+from webbrowser import get
 import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
@@ -16,6 +19,8 @@ import razorpay
 from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
+from version2_app.passport_scanner.doctype.ml_utilities.common_utility import format_date
+from datetime import date
 
 class POSChecks(Document):
     pass
@@ -184,7 +189,7 @@ def extract_data(payload,company_doc):
                 if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
-                    check_no_regex = re.findall("\d+",check_string)
+                    check_no_regex = re.findall("\w+\d+",check_string)
                     data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     table_regex = re.findall(company_doc.table_number_regex, line.strip())
@@ -199,6 +204,19 @@ def extract_data(payload,company_doc):
                     guest_string = guestno_regex[0] if len(guestno_regex)>0 else ""
                     guest_no_regex = re.findall("\d+",guest_string)
                     data["no_of_guests"] = guest_no_regex[0] if len(guest_no_regex) > 0 else ""
+                if company_doc.pos_date_reference:
+                    if company_doc.pos_date_reference in line:
+                        check_date = re.findall(company_doc.pos_date_regex,line)
+                        checkdate = check_date[0] if len(check_date) > 0 else ""
+                        data["check_date"] = datetime.strptime(checkdate,'%d.%m.%Y').strftime('%Y-%m-%d')
+                        # data["check_date"] = format_date(
+                        #     checkdate,
+                        #     "yyyy-mm-dd",
+                        # )
+                        # today = date.today()
+                        # print("Today date is: ", today)
+                        # if today > data["check_date"]:
+                        #     pass
         data["total_amount"] = str(total_amount)
         return {"success":True, "data":data}
     except Exception as e:
@@ -472,4 +490,74 @@ def send_pos_bills_gcb(company,b2c_data):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing send pos bills gcb","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+
+def get_outlet_from_check(payload):
+    try:
+        get_outlets = frappe.db.get_list("Outlets",fields=["name", "outlet_short_name"])
+        if len(get_outlets) > 0:
+            data = {}
+            for each in get_outlets:
+                if each["name"] in payload:
+                    data = each
+                    break
+            return {"success": True, "outlet": each["name"], "outlet_short_name": each["outlet_short_name"]}
+        else:
+            return {"success": False, "outlet": "No outlet found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing get_outlet_from_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def update_check_in_items(invoice_number=None, check_name=None):
+    try:
+        if invoice_number and check_name:
+            frappe.db.set_value("POS Checks", check_name, {"attached_to": invoice_number, "sync": "Yes"})
+            get_check_details = frappe.db.get_value("POS Checks",check_name, "pos_check_reference_number")
+            if get_check_details:
+                if not frappe.db.exists("Items",{"parent":invoice_number, "reference_check_number": get_check_details}):
+                    return {"success": False, "message": "Check not found in this invoice"}
+                get_check_details = frappe.db.get_value("Items",{"parent":invoice_number, "reference_check_number": get_check_details}, "name")
+                if get_check_details:
+                    frappe.db.set_value("Items",get_check_details,{"pos_check":check_name})
+            frappe.db.commit()
+            return {"success": True, "message": "POS Check Updated"}
+        return {"success": False, "message": "invoice number and check_name is mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing update_check_in_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+
+def update_pos_check(doc, method=None):
+    try:
+        if doc.check_no and doc.check_date:
+            ref = doc.check_date+"-"+doc.check_no
+            get_doc = frappe.get_doc("POS Checks", doc.name)
+            get_doc.pos_check_reference_number = ref
+            get_doc.save()
+        return True
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing update_check_in_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+@frappe.whitelist(allow_guest=True)   
+def get_pos_checks_clbs(summary=None):
+    try:
+        if summary:
+            get_invoices = frappe.db.get_list("Invoices",filters={"summary":summary},pluck="name")
+            if len(get_invoices) > 0:
+                get_pos_checks = frappe.db.get_list("POS Checks",filters=[["attached_to","in",get_invoices]],fields=["pos_bill as document","check_no as name"])
+                if len(get_pos_checks) > 0:
+                    return {"success": True, "checks": get_pos_checks}
+                return {"success": False, "message": "No checks found"}
+            return {"success": False, "message": "No invoices found"}
+        return {"success": False, "message": "summary name is mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing get_pos_checks_clbs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}

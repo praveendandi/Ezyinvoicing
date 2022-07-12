@@ -63,3 +63,14 @@ def invoice_items(filters=[]):
         frappe.log_error("export_invoices", "line No:{}\n{}".format(
             exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
+
+
+
+@frappe.whitelist(allow_guest=True)
+def get_items_for_pos_checks(name):
+    try:
+        itemdoc = frappe.db.get_list("Items",filters=[["pos_check","=",name]],fields=['*'])
+        return {"success": True, "data": itemdoc}
+    except Exception as e:
+        print(str(e))
+        return {"success":False,"message":str(e)}

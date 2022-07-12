@@ -29,7 +29,6 @@
   "b2c_qr_url",
   "column_break_15",
   "location",
-  "country",
   "pincode",
   "state",
   "city",
@@ -279,7 +278,11 @@
   "sezwop_terms_and_conditions",
   "enable_slab_for_room_service_charge",
   "sc_slab_12_starting_range",
-  "sc_slab_12_end_range"
+  "sc_slab_12_end_range",
+  "pos_date_reference",
+  "pos_date_regex",
+  "pos_bill_domain",
+  "pos_check_date_format"
  ],
  "fields": [
   {
@@ -1787,11 +1790,31 @@
    "fieldname": "sc_slab_12_end_range",
    "fieldtype": "Int",
    "label": "SC Slab 12% End Range"
+  },
+  {
+   "fieldname": "pos_date_reference",
+   "fieldtype": "Data",
+   "label": "POS Date Reference"
+  },
+  {
+   "fieldname": "pos_date_regex",
+   "fieldtype": "Data",
+   "label": "POS Date Regex"
+  },
+  {
+   "fieldname": "pos_bill_domain",
+   "fieldtype": "Long Text",
+   "label": "POS Bill Domain"
+  },
+  {
+   "fieldname": "pos_check_date_format",
+   "fieldtype": "Long Text",
+   "label": "POS Check Date Format"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-15 11:17:30.317547",
+ "modified": "2022-07-04 15:40:35.886653",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

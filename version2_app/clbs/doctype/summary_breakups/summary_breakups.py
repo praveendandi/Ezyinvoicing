@@ -188,12 +188,16 @@ def combine_pdf(files, filename, name):
             return summaryfile
         qr_files = [each for each in summaryfile["files"]
                     if "E Tax Invoice-" in each]
+        pos = [each for each in summaryfile["files"]
+                    if "POS-" in each]
         order_files = []
         for key, value in document_sequence.items():
             if "e_tax" == key:
                 order_files.extend(qr_files)
             elif "summary" == key:
                 order_files.extend(files)
+            elif "POS Checks" == key:
+                order_files.extend(pos)
             else:
                 bills = frappe.db.get_list("Summary Documents", filters={"summary": [
                                            "=", name], "document_type": ["=", key]}, pluck="document")
@@ -388,7 +392,7 @@ def create_breakup_details(doc, details_data, summary):
                 invoice_doc.save(
                     ignore_permissions=True, ignore_version=True)
                 if invoice_file.strip() != "":
-                    document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
+                    document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Tax Invoices", "summary": summary,
                                                    "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
                     document_doc.insert()
                     frappe.db.commit()
@@ -717,7 +721,11 @@ def get_all_summary_files(summary=None):
                 "=", summary]}, pluck="document")
             printformat_files = frappe.db.get_list(
                 'File', filters={'attached_to_name': ['=', summary]}, pluck='file_url')
+            get_invoice_list = frappe.db.get_list("Invoices", filters = {"summary": summary}, pluck = "name")
             summary_files = summary_files + remaining_bills + printformat_files
+            if len(get_invoice_list) > 0:
+                get_pos_checks = frappe.db.get_list("POS Checks", filters=[["attached_to","in",get_invoice_list],["POS Checks","pos_bill","is","set"]],pluck="pos_bill")
+                summary_files = summary_files + get_pos_checks
             return {"success": True, "files": summary_files}
         else:
             return {"summary": False, "message": "Summary name is mandatory"}
