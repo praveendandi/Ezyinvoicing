@@ -561,7 +561,6 @@ def document_sequence(month=None, year=None):
 @frappe.whitelist(allow_guest=True)
 def reconciliation(start_date, end_date, workbook="true"):
     try:
-        print(workbook,"///////")
         # if isinstance(filters, str):
         #     filters = json.loads(filters)
         company = frappe.get_last_doc("company")
@@ -625,7 +624,7 @@ def reconciliation(start_date, end_date, workbook="true"):
             if len(get_missing_in_opera)>0:
                 get_missing_in_opera_data = get_missing_in_opera
         miss_in_opera = [{k.replace(' ', '_') : v for k, v in d.items()} for d in get_missing_in_opera_data]
-        recon_data["Missing_In_Opera"] = miss_in_opera
+        recon_data["Zero_Invoices"] = miss_in_opera
         df_missing_opera_folios_list = pd.DataFrame.from_records(
             get_missing_in_opera_data)
         df_missing_opera_folios_list.to_excel(
@@ -669,6 +668,35 @@ def reconciliation(start_date, end_date, workbook="true"):
         comparing1 = [{k.replace(' ', '_') : v for k, v in d.items()} for d in comparing["data"]]
         recon_data["Ezy_Invoicing_Summary"] = comparing1
         df_comparing_totals = pd.DataFrame.from_records(comparing["data"])
+        # df1 = df_comparing_totals
+        # hsn = getHsnSummary(start_date=start_date, end_date=end_date)
+        # if not hsn["success"]:
+        #     return hsn
+        # hsnb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in hsn["data"]]
+        # recon_data["HSN"] = hsnb2b
+        # if len(hsn["data"]) == 0:
+        #     hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "VAT": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
+        # df_b2b_hsn = pd.DataFrame.from_records(hsn["data"])
+        # total = df_b2b_hsn.sum(numeric_only=True, axis=0)
+        # total.name = "Total"
+        # df_b2b = df_b2b_hsn.append(total.transpose())
+        # if len(hsn["data"]) > 1:
+        #     df_b2b['SAC Code'] = df_b2b['SAC Code'].replace(
+        #                 np.nan, "Total")
+        #     df_b2b['Gst Rate'] = np .where(df_b2b['Gst Rate'] > 25, "", df_b2b["Gst Rate"])
+        # df2 = df_b2b
+        # # df2 = pd.DataFrame({
+        # # "A": ["A4", "A5", "A6", "A7","A8", "A9", "A10", "A11", "A12", "A13"],},
+        # # index=[4,5,6,7,8,9,10,11,12,13],)
+        # # result = pd.concat([df1, df2], ignore_index=True, sort=False)
+        # pieces = {"x": df1, "y": df2}
+        # result = pd.concat(pieces)
+        # print(result, ";;;;;;;;;;;..............,,,,,,,,,,,,,,,,,,>>><<<<")
+        # result.to_excel(
+        #     writer, sheet_name="Ezy Invoicing Summary", index=False)
+        # for each in ["SAC Code", "Gst Rate", "UQC", "Total Quantity", "CGST Amount", "SGST Amount", "IGST Amount", "State CESS Amount", "Central CESS Amount", "VAT", "Total GST", "Total Tax Amount", "Total Amount"]:
+        #     col_idx = df_b2b.columns.get_loc(each)
+        #     writer.sheets['Ezy Invoicing Summary'].set_column(col_idx, col_idx, 20)
         df_comparing_totals.to_excel(
             writer, sheet_name="Ezy Invoicing Summary", index=False)
         for each in ["BeforeTax", "CGST", "SGST", "IGST", "TotalInvoiceAmount"]:
@@ -709,18 +737,46 @@ def reconciliation(start_date, end_date, workbook="true"):
             col_idx = df_b2c_to_b2b.columns.get_loc(each)
             writer.sheets['Converted B2C to B2B'].set_column(
                 col_idx, col_idx, 20)
-        b2b_hsn = getHsnSummary(filters=[["invoice_type","=","B2B"]],  start_date=start_date, end_date=end_date)
-        if not b2b_hsn["success"]:
-            return b2b_hsn
-        hsnb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2b_hsn["data"]]
-        recon_data["B2B_HSN"] = hsnb2b
-        if len(b2b_hsn["data"]) == 0:
-            b2b_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "VAT": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
-        df_b2b_hsn = pd.DataFrame.from_records(b2b_hsn["data"])
+        hsn = getHsnSummary(start_date=start_date, end_date=end_date)
+        if not hsn["success"]:
+            return hsn
+        if len(hsn["data"]) == 0:
+            hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "VAT": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
+        df_hsn = pd.DataFrame.from_records(hsn["data"])
+        total = df_hsn.sum(numeric_only=True, axis=0)
+        total.name = "Total"
+        hsn_total= []
+        if bool(dict(total.transpose())):
+            hsn_total = [dict(total.transpose())]
+        hsn_summary_data = hsn["data"]+hsn_total
+        hsnb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in hsn_summary_data]
+        recon_data["HSN"] = hsnb2b
+        df_b2bc = df_hsn.append(total.transpose())
+        if len(hsn["data"]) > 1:
+            df_b2bc['SAC Code'] = df_b2bc['SAC Code'].replace(
+                        np.nan, "Total")
+            df_b2bc['Gst Rate'] = np .where(df_b2bc['Gst Rate'] > 25, "", df_b2bc["Gst Rate"])
+        df_b2bc.to_excel(
+            writer, sheet_name="HSN", index=False)
+        for each in ["SAC Code", "Gst Rate", "UQC", "Total Quantity", "CGST Amount", "SGST Amount", "IGST Amount", "State CESS Amount", "Central CESS Amount", "VAT", "Total GST", "Total Tax Amount", "Total Amount"]:
+            col_idx = df_b2bc.columns.get_loc(each)
+            writer.sheets['HSN'].set_column(col_idx, col_idx, 20)
+        hsn = getHsnSummary(filters=[["invoice_type","=","B2B"]],  start_date=start_date, end_date=end_date)
+        if not hsn["success"]:
+            return hsn
+        if len(hsn["data"]) == 0:
+            hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "VAT": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
+        df_b2b_hsn = pd.DataFrame.from_records(hsn["data"])
         total = df_b2b_hsn.sum(numeric_only=True, axis=0)
         total.name = "Total"
+        b2b_hsn_total= []
+        if bool(dict(total.transpose())):
+            b2b_hsn_total = [dict(total.transpose())]
+        b2b_hsn_summary_data = hsn["data"]+b2b_hsn_total
+        hsnb2b = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2b_hsn_summary_data]
+        recon_data["B2B HSN"] = hsnb2b
         df_b2b = df_b2b_hsn.append(total.transpose())
-        if len(b2b_hsn["data"]) > 1:
+        if len(hsn["data"]) > 1:
             df_b2b['SAC Code'] = df_b2b['SAC Code'].replace(
                         np.nan, "Total")
             df_b2b['Gst Rate'] = np.where(df_b2b['Gst Rate'] > 25, "", df_b2b["Gst Rate"])
@@ -732,13 +788,17 @@ def reconciliation(start_date, end_date, workbook="true"):
         b2c_hsn = getHsnSummary(filters=[["invoice_type","=","B2C"]],  start_date=start_date, end_date=end_date)
         if not b2c_hsn["success"]:
             return b2c_hsn
-        hsnb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2c_hsn["data"]]
-        recon_data["B2C_HSN"] = hsnb2c
         if len(b2c_hsn["data"]) == 0:
             b2c_hsn["data"] = [{"SAC Code": "", "Gst Rate": "", "UQC": "", "Total Quantity": "", "CGST Amount": "", "SGST Amount": "", "IGST Amount": "", "State CESS Amount": "", "Central CESS Amount": "", "VAT": "", "Total GST": "", "Total Tax Amount": "", "Total Amount": ""}]
         df_b2c_hsn = pd.DataFrame.from_records(b2c_hsn["data"])
         total_b2c = df_b2c_hsn.sum(numeric_only=True, axis=0)
         total_b2c.name = "Total"
+        b2c_hsn_total= []
+        if bool(dict(total.transpose())):
+            b2c_hsn_total = [dict(total.transpose())]
+        b2c_hsn_summary_data = b2c_hsn["data"]+b2c_hsn_total
+        hsnb2c = [{k.replace(' ', '_') : v for k, v in d.items()} for d in b2c_hsn_summary_data]
+        recon_data["B2C_HSN"] = hsnb2c
         df_b2c = df_b2c_hsn.append(total_b2c.transpose())
         if len(b2c_hsn["data"]) > 1:
             df_b2c['SAC Code'] = df_b2c['SAC Code'].replace(
@@ -749,6 +809,18 @@ def reconciliation(start_date, end_date, workbook="true"):
         for each in ["SAC Code", "Gst Rate", "UQC", "Total Quantity", "CGST Amount", "SGST Amount", "IGST Amount", "State CESS Amount", "Central CESS Amount", "VAT", "Total GST", "Total Tax Amount", "Total Amount"]:
             col_idx = df_b2c.columns.get_loc(each)
             writer.sheets['B2C HSN'].set_column(col_idx, col_idx, 20)
+        no_sac_query = frappe.db.sql("""SELECT `tabItems`.parent as InvoiceNumber, `tabItems`.description as ItemDescription, `tabItems`.item_value_after_gst as BeforeGST, `tabItems`.item_taxable_value as TaxableValue, `tabInvoices`.irn_generated as IRNstatus from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabItems`.sac_code = "No Sac" and invoice_date between '{}' and '{}'""".format(start_date,end_date), as_dict=1)
+        # print(no_sac_query,"//////.....")
+        # invoices_no_sac = frappe.db.get_list('Items', filters=[["date", 'between', [start_date, end_date]],["sac_code","=","No Sac"]], fields=["`tabItems`.parent as InvoiceNumber", "`tabItems`.description as ItemDescription", "`tabItems`.item_value as BeforeGST", "`tabItems`.item_value_after_gst as AfterGST", "`tabInvoices`.irn_generated as IRNstatus"])
+        no_sac = [{k.replace(' ', '_') : v for k, v in d.items()} for d in no_sac_query]
+        recon_data["No_Sac"] = no_sac
+        sac_no = pd.DataFrame.from_dict(no_sac)
+        sac_no.to_excel(
+            writer, sheet_name="No Sac", index=False)
+        for each in ["InvoiceNumber", "ItemDescription", "BeforeGST", "TaxableValue", "IRNstatus"]:
+            col_idx = sac_no.columns.get_loc(each)
+            writer.sheets['No Sac'].set_column(
+                col_idx, col_idx, 20)
         # document = document_sequence(start_date, end_date)
         # document_seq = [{k.replace(' ', '_') : v for k, v in d.items()} for d in document]
         # recon_data["Sequence"] = document_seq
@@ -947,3 +1019,43 @@ def compare_invoice_summary(start_date, end_date):
         frappe.log_error("compare_invoice_summary",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
+
+
+# @frappe.whitelist(allow_guest=True)
+# def count(start_date, end_date, export=False):
+#     try:
+#         company = frappe.get_last_doc("company")
+#         cwd = os.getcwd()
+#         site_name = cstr(frappe.local.site)
+#         month_name = datetime.datetime.strptime(
+#             start_date, "%Y-%m-%d").strftime("%b")
+#         year_object = datetime.datetime.strptime(
+#             start_date, "%Y-%m-%d").strftime("%Y")
+#         file_path = cwd + "/" + site_name + \
+#             "/public/files/Count-"+month_name+"-"+year_object+".xlsx"
+#         missing = get_missing_invoices(start_date, end_date)
+#         if not missing["success"]:
+#             return missing
+#         # return missing
+#         recon_data = {}
+#         if export == False:
+#             sequence_data = [{"Ezyinvoicing Count": len(missing["data"]["ezy_invoicing_invoices"]), "Opera Folios Count": len(missing["data"]["opera_folios"]), "Missing In EzyInvoicing": len(missing["data"]["missing_in_ezyinvoicing"]), "Missing In Opera": len(
+#             missing["data"]["missing_in_opera"]), "Type Missmatch": len(missing["data"]["type_missmatch_for_tax"])+len(missing["data"]["type_missmatch_for_credit"]) if len(missing["data"]["type_missmatch_for_credit"]) > 1 else 0}]
+#         else:
+#         # Summary of Invoices
+#         print(sequence_data,".........///////.....")
+#         writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
+#         seq_data = [{k.replace(' ', '_') : v for k, v in d.items()} for d in sequence_data]
+#         recon_data["count"] = seq_data
+#         df_summary = pd.DataFrame(sequence_data)
+#         print(df_summary,";;;;;;;;;;;:::::::::;")
+#         df_summary.to_excel(writer, sheet_name="Count", index=False)
+#         for each in ["Ezyinvoicing Count", "Opera Folios Count", "Missing In EzyInvoicing", "Missing In Opera", "Type Missmatch"]:
+#             col_idx = df_summary.columns.get_loc(each)
+#             writer.sheets['Count'].set_column(col_idx, col_idx, 20)
+
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error("compare_invoice_summary",
+#                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+#         return {"success": False, "message": str(e)}
