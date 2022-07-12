@@ -62,6 +62,8 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
         if bool(data):
             df = pd.json_normalize(data, sep="_")
             data = df.to_dict(orient="records")[0]
+            print(data,"//////////////////////////////////////////////////")
+            # print(data,"this is from data changes")
             if "Passport_Face_Image_base_64" in data or "Visa_Image_base_64" in data:
                 folder_path = frappe.utils.get_bench_path()
                 site_folder_path = folder_path + "/sites/" + company.site_name
@@ -180,7 +182,8 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                         passport_details["guest_id_type"] = "indianPassport"
                     else:
                         passport_details["status"] = "Pending Review"
-                        passport_details["guest_id_type"] = "Foreigner" 
+                        passport_details["guest_id_type"] = "Foreigner"
+            print(passport_details,"..........................................................")
             if image_2:
                 if "visa_details_visa_details_birth_date" in data:
                     try:
@@ -255,6 +258,7 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                                 if (data["passport_back_address_passport_back_address_STATE"]).upper() == each["name"]:
                                     data["guest_state"] = each["value"]
         passport_details = {k: v for k, v in passport_details.items() if v}
+        print(passport_details,"helllooooooooooooooooooooooooooooo")
         return {"success": True, "data": passport_details}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

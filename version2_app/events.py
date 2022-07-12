@@ -428,6 +428,7 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
+        print(".........",doc.file_name)
         if "job-" in doc.file_name:
             if not frappe.db.exists(
                 {"doctype": "Document Bin", "invoice_file": doc.file_url}

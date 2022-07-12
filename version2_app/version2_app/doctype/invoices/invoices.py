@@ -1715,7 +1715,6 @@ def calulate_items(data):
                     item_data = calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
                     if item_data["success"] == True:
                         item = item_data["data"]
-                        print(item,"/./....//.//.//./")
                     else:
                         return item_data
                 if item['sac_code'] == '996311' or item['sac_code'] == "997321":
