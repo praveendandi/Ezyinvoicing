@@ -392,7 +392,7 @@ def create_breakup_details(doc, details_data, summary):
                 invoice_doc.save(
                     ignore_permissions=True, ignore_version=True)
                 if invoice_file.strip() != "":
-                    document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Invoices", "summary": summary,
+                    document_doc = frappe.get_doc({"doctype": "Summary Documents", "document_type": "Tax Invoices", "summary": summary,
                                                    "document": invoice_file, "company": get_company.name, "invoice_number": child_items["invoice_no"], "qr_code_image": qr_code_image})
                     document_doc.insert()
                     frappe.db.commit()

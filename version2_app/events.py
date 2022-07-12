@@ -451,13 +451,13 @@ def fileCreated(doc, method=None):
                     module.file_parsing(doc.file_url)
                     frappe.log_error(traceback.print_exc())
                     logger.error(f"fileCreated,   {traceback.print_exc()}")
-        elif "POS-" in doc.file_name:
+        elif "POS-" in doc.file_name or "pos-" in doc.file_name:
             enqueue(
                 extract_data_from_pos_check,
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=False,
+                now=True,
                 data={
                     "pos_bill": doc.file_url
                 },
@@ -471,6 +471,7 @@ def fileCreated(doc, method=None):
                     return {"success": False, "message": "Print has been Blocked"}
                 if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                     update_documentbin(doc.file_url, "")
+        return True
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
         logger.error(f"fileCreated,   {traceback.print_exc()}")
@@ -928,6 +929,7 @@ def create_pos_bill(doc, method=None):
 @frappe.whitelist(allow_guest=True)
 def extract_data_from_pos_check(data={}):
     try:
+        print("////////////////////////////////////")
         if isinstance(data,str):
             data = json.loads(data)
         company = frappe.get_last_doc("company")
@@ -999,6 +1001,7 @@ def extract_data_from_pos_check(data={}):
                 frappe.db.sql("""update `tabItems` set pos_check='{}' where reference_check_number='{}'""".format(get_doc.name, total_data["pos_check_reference_number"]))
                 frappe.db.commit()
             return True
+        return True
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("extract_data_from_pos_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))

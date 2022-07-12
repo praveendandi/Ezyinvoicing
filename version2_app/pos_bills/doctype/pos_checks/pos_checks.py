@@ -3,7 +3,10 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from operator import ge
+from pickle import NONE
 from typing_extensions import final
+from webbrowser import get
 import frappe
 from frappe.model.document import Document
 from frappe.utils import logger
@@ -540,4 +543,21 @@ def update_pos_check(doc, method=None):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing update_check_in_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+@frappe.whitelist(allow_guest=True)   
+def get_pos_checks_clbs(summary=None):
+    try:
+        if summary:
+            get_invoices = frappe.db.get_list("Invoices",filters={"summary":summary},pluck="name")
+            if len(get_invoices) > 0:
+                get_pos_checks = frappe.db.get_list("POS Checks",filters=[["attached_to","in",get_invoices]],fields=["pos_bill as document","check_no as name"])
+                if len(get_pos_checks) > 0:
+                    return {"success": True, "checks": get_pos_checks}
+                return {"success": False, "message": "No checks found"}
+            return {"success": False, "message": "No invoices found"}
+        return {"success": False, "message": "summary name is mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing get_pos_checks_clbs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
