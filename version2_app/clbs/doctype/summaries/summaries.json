@@ -24,7 +24,10 @@
   "reference",
   "po_number",
   "email_sent_status",
-  "signature_attached"
+  "signature_attached",
+  "amended_from",
+  "sequence",
+  "reason_for_amendment"
  ],
  "fields": [
   {
@@ -114,7 +117,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nSubmitted\nDeleted\nVoid"
+   "options": "Draft\nSubmitted\nDeleted\nVoid\nCancelled"
   },
   {
    "fieldname": "reference",
@@ -137,11 +140,28 @@
    "fieldname": "signature_attached",
    "fieldtype": "Check",
    "label": "Signature Attached"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Summaries"
+  },
+  {
+   "default": "0",
+   "fieldname": "sequence",
+   "fieldtype": "Int",
+   "label": "Summary Sequence"
+  },
+  {
+   "fieldname": "reason_for_amendment",
+   "fieldtype": "Small Text",
+   "label": "Reason For Amendment"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-20 19:27:31.360313",
+ "modified": "2022-07-01 10:05:41.609656",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",

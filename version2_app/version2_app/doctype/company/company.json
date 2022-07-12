@@ -282,7 +282,8 @@
   "pos_date_reference",
   "pos_date_regex",
   "pos_bill_domain",
-  "pos_check_date_format"
+  "pos_check_date_format",
+  "items_per_page"
  ],
  "fields": [
   {
@@ -1810,11 +1811,18 @@
    "fieldname": "pos_check_date_format",
    "fieldtype": "Long Text",
    "label": "POS Check Date Format"
+  },
+  {
+   "default": "100",
+   "fieldname": "items_per_page",
+   "fieldtype": "Select",
+   "label": "Items Per Page",
+   "options": "20\n50\n100\n150\n500"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-04 15:40:35.886653",
+ "modified": "2022-06-30 16:15:55.454721",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

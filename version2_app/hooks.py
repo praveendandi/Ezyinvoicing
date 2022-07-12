@@ -195,7 +195,9 @@ doc_events = {
         "on_update": "version2_app.pos_bills.doctype.pos_checks.pos_checks.update_pos_check"
     },
     "Summary Payments" : {
-        "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
+        "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_update": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     }
 }
 
