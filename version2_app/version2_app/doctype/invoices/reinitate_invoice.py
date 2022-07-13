@@ -281,9 +281,8 @@ def Reinitiate_invoice(data):
         doc.mode = company.mode
         doc.allowance_invoice = allowance_invoice
         doc.debit_invoice = debit_invoice
-        doc.arn_number = company.application_reference_number if company.application_reference_number else ""
         
-
+        doc.arn_number = company.application_reference_number if company.application_reference_number and doc.sez==1 else ""
         doc.irn_generated=irn_generated
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" and invoice_from != "Web" and doc.lut == 0:

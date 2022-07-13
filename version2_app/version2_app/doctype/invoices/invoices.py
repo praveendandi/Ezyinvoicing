@@ -1282,9 +1282,10 @@ def insert_invoice(data):
             "debit_invoice":debit_invoice,
             "folioid":data["folioid"] if "folioid" in data else "",
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
-            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
-            "arn_number": company.application_reference_number if company.application_reference_number else ""
+            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else ""
         })
+        if "sez" in data:
+            invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
             invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
                 # filters={
@@ -3534,7 +3535,7 @@ def Error_Insert_invoice(data):
                 "invoice_from":invoice_from,
                 "folioid":data["folioid"] if "folioid" in data else "",
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
-                "arn_number": company.application_reference_number if company.application_reference_number else ""
+                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else ""
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
