@@ -1,0 +1,157 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 11:40:32.588118",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "invoice_date",
+  "invoice_type",
+  "invoice_category",
+  "irn_status",
+  "ezyinvoice_status",
+  "invoice_amount",
+  "taxable_value",
+  "igst_amount",
+  "sgst_amount",
+  "cgst_amount",
+  "total_gst_amount",
+  "other_charges",
+  "cess",
+  "vat_amount",
+  "irn_number",
+  "acknowledgement_no",
+  "acknowledgement_date",
+  "recon_id",
+  "is_zero_invoice"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  },
+  {
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "label": "Invoice Date"
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Data",
+   "label": "Invoice Type"
+  },
+  {
+   "fieldname": "invoice_category",
+   "fieldtype": "Data",
+   "label": "Invoice Category"
+  },
+  {
+   "fieldname": "irn_status",
+   "fieldtype": "Data",
+   "label": "IRN Status"
+  },
+  {
+   "fieldname": "ezyinvoice_status",
+   "fieldtype": "Data",
+   "label": "EzyInvoice Status"
+  },
+  {
+   "fieldname": "invoice_amount",
+   "fieldtype": "Float",
+   "label": "Invoice Amount"
+  },
+  {
+   "fieldname": "taxable_value",
+   "fieldtype": "Float",
+   "label": "Taxable Value"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "label": "IGST Amount"
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Float",
+   "label": "SGST Amount"
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Float",
+   "label": "CGST Amount"
+  },
+  {
+   "fieldname": "total_gst_amount",
+   "fieldtype": "Float",
+   "label": "Total Gst Amount"
+  },
+  {
+   "fieldname": "other_charges",
+   "fieldtype": "Float",
+   "label": "Other Charges"
+  },
+  {
+   "fieldname": "cess",
+   "fieldtype": "Float",
+   "label": "CESS"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Float",
+   "label": "VAT Amount"
+  },
+  {
+   "fieldname": "irn_number",
+   "fieldtype": "Data",
+   "label": "IRN Number"
+  },
+  {
+   "fieldname": "acknowledgement_no",
+   "fieldtype": "Data",
+   "label": "Acknowledgement No"
+  },
+  {
+   "fieldname": "acknowledgement_date",
+   "fieldtype": "Date",
+   "label": "Acknowledgement Date"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_zero_invoice",
+   "fieldtype": "Check",
+   "label": "Zero Invoice"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-13 12:09:34.718161",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Missing in Opera",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
