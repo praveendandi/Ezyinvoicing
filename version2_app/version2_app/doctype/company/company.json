@@ -29,7 +29,6 @@
   "b2c_qr_url",
   "column_break_15",
   "location",
-  "country",
   "pincode",
   "state",
   "city",
@@ -277,9 +276,7 @@
   "data_filing",
   "sezwp_terms_and_conditions",
   "sezwop_terms_and_conditions",
-  "enable_slab_for_room_service_charge",
-  "sc_slab_12_starting_range",
-  "sc_slab_12_end_range"
+  "opera_scan_button"
  ],
  "fields": [
   {
@@ -1774,27 +1771,18 @@
   },
   {
    "default": "0",
-   "fieldname": "enable_slab_for_room_service_charge",
+   "fieldname": "opera_scan_button",
    "fieldtype": "Check",
-   "label": "Enable Slab For Room Service Charge"
-  },
-  {
-   "fieldname": "sc_slab_12_starting_range",
-   "fieldtype": "Int",
-   "label": "SC Slab 12% Starting Range"
-  },
-  {
-   "fieldname": "sc_slab_12_end_range",
-   "fieldtype": "Int",
-   "label": "SC Slab 12% End Range"
+   "label": "Opera Scan Button"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-15 11:17:30.317547",
+ "modified": "2022-07-07 18:59:02.663358",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
