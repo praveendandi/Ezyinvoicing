@@ -1520,8 +1520,8 @@ def guest_attachments(doc, method=None):
                 arrival_doc.no_of_adults = guest_count + 1
                 arrival_doc.booking_status = "CHECKED IN"
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
-            if arrival_doc.room_number:
-                doc.room_number = arrival_doc.room_number
+            # if arrival_doc.room_number:
+            #     doc.room_number = arrival_doc.room_number
             if arrival_doc.checkin_time:
                 doc.checkin_time = arrival_doc.checkin_time
             if arrival_doc.checkout_time:
@@ -1603,8 +1603,8 @@ def guest_update_attachment_logs(doc, method=None):
                 arrival_doc.no_of_adults = guest_count + 1
                 arrival_doc.booking_status = "CHECKED IN"
             arrival_doc.save(ignore_permissions=True, ignore_version=True)
-            if arrival_doc.room_number:
-                data["room_number"] = arrival_doc.room_number
+            # if arrival_doc.room_number != None:
+            #     data["room_number"] = arrival_doc.room_number
             if arrival_doc.checkin_time:
                 data["checkin_time"] = arrival_doc.checkin_time
             if arrival_doc.checkout_time:
