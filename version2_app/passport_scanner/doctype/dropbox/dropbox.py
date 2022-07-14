@@ -705,6 +705,7 @@ def create_guest_using_base_files(
         back = ""
         front_doc_type = ""
         if image_1:
+            print("*****************",image_1,"*****************")
             image_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
             )
