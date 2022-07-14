@@ -33,4 +33,4 @@ fitz
 PyMuPDF==1.16.14
 pgeocode
 pyHanko
-# attrs
+typing_extensions

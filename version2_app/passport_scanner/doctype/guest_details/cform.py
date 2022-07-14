@@ -30,7 +30,7 @@ data = {
     # "surname": "Ankireddypalli",
     # "given_name": "sumanth",
     # "gender": "M",
-    # "date_of_birth": "29/07/1992",
+    # "guest_dob": "29/07/1992",
     # "applicantSplCategory": "3",
     # "nationality": "EGY",
     # "address": "madhapur",
@@ -202,14 +202,14 @@ def login_cform():
                     each,
                     [
                         "surname",
-                        "given_name",
+                        "guest_first_name",
                         "gender",
-                        "date_of_birth",
+                        "guest_dob",
                         "select_category",
-                        "nationality",
-                        "address",
+                        "guest_nationality",
+                        "address1",
                         "city",
-                        "country",
+                        "guest_country",
                         "passport_number",
                         "passport_place_of_issued_city",
                         "passport_place_of_issued_country",
@@ -250,8 +250,8 @@ def login_cform():
                 each_data["hote_state"] = company.state
                 each_data["hotel_city"] = company.city
                 each_data["hotel_pincode"] = company.pincode
-                if each_data["date_of_birth"]:
-                    each_data["date_of_birth"] = each_data["date_of_birth"].strftime(
+                if each_data["guest_dob"]:  #------
+                    each_data["guest_dob"] = each_data["guest_dob"].strftime(
                         "%d/%m/%Y"
                     )
                 if each_data["passport_date_of_issue"]:
@@ -475,7 +475,7 @@ def checkin_cform():
         applicant_surname.send_keys(data["surname"])
 
         applicant_givenname = driver.find_element_by_id("applicant_givenname")
-        applicant_givenname.send_keys(data["given_name"])
+        applicant_givenname.send_keys(data["guest_first_name"])  #------
 
         applicant_sex = Select(driver.find_element_by_id("applicant_sex"))
         applicant_sex.select_by_value(data["gender"])
@@ -484,7 +484,7 @@ def checkin_cform():
         dobformat.select_by_value("DY")
 
         applicant_dob = driver.find_element_by_id("applicant_dob")
-        applicant_dob.send_keys(data["date_of_birth"])
+        applicant_dob.send_keys(data["guest_dob"])  #------
 
         applicant_special_category = Select(
             driver.find_element_by_id("applicant_special_category")
@@ -494,10 +494,10 @@ def checkin_cform():
         applicant_nationality = Select(
             driver.find_element_by_id("applicant_nationality")
         )
-        applicant_nationality.select_by_value(data["nationality"])
+        applicant_nationality.select_by_value(data["guest_nationality"])  #------
 
         applicant_permaddr = driver.find_element_by_id("applicant_permaddr")
-        applicant_permaddr.send_keys(data["address"])
+        applicant_permaddr.send_keys(data["address1"])  #------
 
         applicant_permcity = driver.find_element_by_id("applicant_permcity")
         applicant_permcity.send_keys(data["city"])
@@ -505,7 +505,7 @@ def checkin_cform():
         applicant_permcountry = Select(
             driver.find_element_by_id("applicant_permcountry")
         )
-        applicant_permcountry.select_by_value(data["country"])
+        applicant_permcountry.select_by_value(data["guest_country"]) #------
 
         applicant_refaddr = driver.find_element_by_id("applicant_refaddr")
         applicant_refaddr.send_keys(data["hotelAddress"])
