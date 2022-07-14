@@ -2,7 +2,6 @@
 # For license information, please see license.txt
 
 import base64
-from copyreg import constructor
 import datetime
 import re
 import sys
