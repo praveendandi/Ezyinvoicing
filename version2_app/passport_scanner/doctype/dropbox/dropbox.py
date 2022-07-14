@@ -708,7 +708,7 @@ def create_guest_using_base_files(
             image_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
             )
-            print(image_response.json())
+            print(image_response.text)
             if image_response.status_code == 200:
                 image_response = image_response.json()
                 front_doc_type = image_response["doc_type"]
