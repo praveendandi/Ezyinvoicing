@@ -186,9 +186,9 @@ def combine_pdf(files, filename, name, add_signature=False):
         if not summaryfile["success"]:
             return summaryfile
         qr_files = [each for each in summaryfile["files"]
-                    if "E Tax Invoice-" in each]
-        pos = [each for each in summaryfile["files"]
                     if "ETax-Invoice-" in each]
+        pos = [each for each in summaryfile["files"]
+                    if "pos-" in each or "POS-" in each]
         order_files = []
         for key, value in document_sequence.items():
             if "e_tax" == key:
@@ -196,6 +196,8 @@ def combine_pdf(files, filename, name, add_signature=False):
             elif "summary" == key:
                 order_files.extend(files)
             elif "POS Checks" == key:
+                if len(pos) > 0:
+                    pos = list(set(pos))
                 order_files.extend(pos)
             else:
                 bills = frappe.db.get_list("Summary Documents",
@@ -444,15 +446,17 @@ def create_breakup_details(doc, details_data, summary):
             if frappe.db.exists({"doctype": "Invoices", "clbs_summary_generated": False,
                                 "invoice_number": child_items["invoice_no"],
                                  "company": get_company.name}):
-                invoice_doc = frappe.get_doc(
-                    "Invoices", child_items["invoice_no"])
-                invoice_doc.clbs_summary_generated = 1
-                invoice_doc.summary = summary
-                invoice_doc.save(
-                    ignore_permissions=True, ignore_version=True)
+                # invoice_doc = frappe.get_doc(
+                #     "Invoices", child_items["invoice_no"])
+                frappe.db.sql("""update `tabInvoices` set clbs_summary_generated = 1, summary = '{}' where name='{}'""".format(summary,child_items["invoice_no"]))
+                frappe.db.commit()
+                # invoice_doc.clbs_summary_generated = 1
+                # invoice_doc.summary = summary
+                # invoice_doc.save(
+                #     ignore_permissions=True, ignore_version=True)
                 if invoice_file.strip() != "":
                     document_doc = frappe.get_doc({"doctype": "Summary Documents",
-                                                   "document_type": "Invoices",
+                                                   "document_type": "Tax Invoices",
                                                    "summary": summary,
                                                    "document": invoice_file,
                                                    "company": get_company.name,

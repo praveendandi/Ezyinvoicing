@@ -458,7 +458,7 @@ def fileCreated(doc, method=None):
                 queue="default",
                 timeout=800000,
                 event="data_extraction",
-                now=True,
+                now=False,
                 data={
                     "pos_bill": doc.file_url
                 },
@@ -968,6 +968,10 @@ def extract_data_from_pos_check(data={}):
                         cwd = os.getcwd()
                         site_name = cstr(frappe.local.site)
                         get_files = frappe.db.get_list("POS Checks", filters ={"pos_check_reference_number": total_data["pos_check_reference_number"]}, pluck="pos_bill")
+                        if data["pos_bill"] in get_files:
+                            frappe.db.sql("""update `tabPOS Checks` set pos_bill='{}' where pos_check_reference_number = '{}'""".format(data["pos_bill"],total_data["pos_check_reference_number"]))
+                            frappe.db.commit()
+                            return True
                         get_files.append(data["pos_bill"])
                         result = fitz.open()
                         for each in get_files:
