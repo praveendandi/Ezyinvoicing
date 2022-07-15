@@ -428,7 +428,6 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
-        print(".........",doc.file_name)
         if "job-" in doc.file_name:
             if not frappe.db.exists(
                 {"doctype": "Document Bin", "invoice_file": doc.file_url}
@@ -453,18 +452,19 @@ def fileCreated(doc, method=None):
                     frappe.log_error(traceback.print_exc())
                     logger.error(f"fileCreated,   {traceback.print_exc()}")
         elif "POS-" in doc.file_name or "pos-" in doc.file_name:
-            enqueue(
-                extract_data_from_pos_check,
-                queue="default",
-                timeout=800000,
-                event="data_extraction",
-                now=False,
-                data={
-                    "pos_bill": doc.file_url
-                },
-                is_async=True,
-            )
-            return True
+            if not frappe.db.exists("POS Checks",{"pos_bill": doc.file_url}):
+                enqueue(
+                    extract_data_from_pos_check,
+                    queue="default",
+                    timeout=800000,
+                    event="data_extraction",
+                    now=False,
+                    data={
+                        "pos_bill": doc.file_url
+                    },
+                    is_async=True,
+                )
+                return True
         else:
             if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
                 company = frappe.get_last_doc("company")
