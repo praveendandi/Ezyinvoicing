@@ -46,7 +46,7 @@ from frappe.core.doctype.communication.email import make
 from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 
-user_name = frappe.session.user
+# user_name = frappe.session.user
 
 
 @frappe.whitelist(allow_guest=True)
@@ -1880,6 +1880,7 @@ def send_email(confirmation_number, company):
 @frappe.whitelist(allow_guest=True)
 def pre_mail():
     try:
+        user_name = frappe.session.user
         company = frappe.get_last_doc("company")
         if not company.site_domain:
             return {
@@ -2111,6 +2112,7 @@ def pre_mail():
 
 @frappe.whitelist(allow_guest=True)
 def manual_mail(data):
+    user_name = frappe.session.user
     date_time = datetime.datetime.now()
     conf_number = data["confirmation_number"]
     email_address = data["guest_email_address"]
@@ -2327,6 +2329,7 @@ def check_hotelCode(data):
 
 @frappe.whitelist(allow_guest=True)
 def precheckins():
+    user_name = frappe.session.user
     data = json.loads(frappe.request.data)
     company = frappe.get_last_doc("company")
     date_time = datetime.datetime.now()
