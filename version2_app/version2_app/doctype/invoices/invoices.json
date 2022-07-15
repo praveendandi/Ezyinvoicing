@@ -144,7 +144,8 @@
   "summary",
   "clbs_summary_generated",
   "invoice_submitted_in_clbs",
-  "lut"
+  "lut",
+  "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"
  ],
  "fields": [
   {
@@ -943,12 +944,18 @@
    "fieldname": "invoice_submitted_in_clbs",
    "fieldtype": "Check",
    "label": "Invoice Submitted in CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
+   "fieldtype": "Check",
+   "label": "Invoice Mismatch While Bulkupload Auto B2C Success GSTR1"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-05 15:37:08.513592",
+ "modified": "2022-07-15 17:56:00.783803",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -156,7 +156,8 @@
   "sezwop_terms_and_conditions",
   "enable_slab_for_room_service_charge",
   "sc_slab_12_starting_range",
-  "sc_slab_12_end_range"
+  "sc_slab_12_end_range",
+  "auto_b2c_success_for_gstr"
  ],
  "fields": [
   {
@@ -998,11 +999,17 @@
    "fieldname": "sc_slab_12_end_range",
    "fieldtype": "Int",
    "label": "SC Slab 12% End Range"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_b2c_success_for_gstr",
+   "fieldtype": "Check",
+   "label": "Auto B2C Success for GSTR"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-15 11:17:30.317547",
+ "modified": "2022-07-15 17:23:46.544694",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
