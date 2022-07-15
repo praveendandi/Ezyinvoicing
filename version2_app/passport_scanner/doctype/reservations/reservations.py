@@ -2038,9 +2038,9 @@ def passportvisadetails():
         header = frappe.local.form_dict.get("scan_type")
         pass_details = pass_detect_text(base)
         if pass_details is None:
-            return {"success": False, "message": "unable to scan your ID", "file_rul": pass_visa_image}
+            return {"success": False, "message": "unable to scan your ID", "file_url": pass_visa_image}
         if not pass_details["success"]:
-            pass_details["file_rul"] = pass_visa_image
+            pass_details["file_url"] = pass_visa_image
             return pass_details
         details = pass_details["data"]
         # startlog.info(details)
@@ -2114,7 +2114,7 @@ def passportvisadetails():
             "message": "Unable to scan your id, please try again",
             "error": str(e),
             "success": False,
-            "file_rul": pass_visa_image
+            "file_url": pass_visa_image
         }
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2126,7 +2126,7 @@ def passportvisadetails():
             "message": "Unable to scan your id, please try again",
             "error": str(e),
             "success": False,
-            "file_rul": pass_visa_image
+            "file_url": pass_visa_image
         }
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2138,7 +2138,7 @@ def passportvisadetails():
             "success": False,
             "error": str(e),
             "message": "Unable to scan your id, please try again",
-            "file_rul": pass_visa_image
+            "file_url": pass_visa_image
         }
 
 

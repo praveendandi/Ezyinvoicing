@@ -254,7 +254,7 @@ def intiate_pathik(obj,pathik_guest_details):
         options = Options()
         options.add_argument("--headless")
         frappe.log_error("CForm-intiate_pathik",folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
-        driver = webdriver.Chrome(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver')
+        driver = webdriver.Chrome(folder_path+'/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver',chrome_options=options)
         driver.get(pathik_url)
         myElem = WebDriverWait(driver, global_delay).until(
             EC.presence_of_element_located((By.ID, 'kt_login_signin_submit')))
