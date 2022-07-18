@@ -9,9 +9,9 @@
   "invoicenumber",
   "itemdescription",
   "beforegst",
-  "cgst_amount",
-  "sgst_amount",
-  "igst_amount",
+  "cgstamount",
+  "sgstamount",
+  "igstamount",
   "taxablevalue",
   "irnstatus",
   "recon_id"
@@ -33,21 +33,6 @@
    "label": "BeforeGST"
   },
   {
-   "fieldname": "cgst_amount",
-   "fieldtype": "Float",
-   "label": "cgst_amount"
-  },
-  {
-   "fieldname": "sgst_amount",
-   "fieldtype": "Float",
-   "label": "sgst_amount"
-  },
-  {
-   "fieldname": "igst_amount",
-   "fieldtype": "Float",
-   "label": "igst_amount"
-  },
-  {
    "fieldname": "taxablevalue",
    "fieldtype": "Float",
    "label": "TaxableValue"
@@ -62,11 +47,26 @@
    "fieldtype": "Link",
    "label": "Recon ID",
    "options": "Recon Details"
+  },
+  {
+   "fieldname": "cgstamount",
+   "fieldtype": "Float",
+   "label": "CGSTAmount"
+  },
+  {
+   "fieldname": "sgstamount",
+   "fieldtype": "Float",
+   "label": "SGSTAmount"
+  },
+  {
+   "fieldname": "igstamount",
+   "fieldtype": "Float",
+   "label": "IGSTAmount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 12:14:43.037216",
+ "modified": "2022-07-13 12:33:50.969506",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "No Sac",

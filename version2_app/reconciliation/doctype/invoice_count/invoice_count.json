@@ -16,27 +16,27 @@
  "fields": [
   {
    "fieldname": "ezyinvoicing_count",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Ezyinvoicing Count"
   },
   {
    "fieldname": "opera_folios_count",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Opera Folios Count"
   },
   {
    "fieldname": "missing_in_ezyinvoicing",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Missing In EzyInvoicing"
   },
   {
    "fieldname": "missing_in_opera",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Missing In Opera"
   },
   {
    "fieldname": "type_missmatch",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Type Missmatch"
   },
   {
@@ -48,7 +48,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 11:32:13.103124",
+ "modified": "2022-07-13 15:16:53.736918",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Invoice Count",
