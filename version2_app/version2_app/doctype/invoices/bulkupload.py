@@ -32,7 +32,7 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01"]:
+            if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01","LAAB-01"]:
                 if "," in item[0]:
                     item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
@@ -68,8 +68,9 @@ def bulkupload(data):
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
                 else:
-                    data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
-                # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
+                    data["invoice_number"] =data["invoice_number"]
+                    # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
+                # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
             print(data["invoice_number"],"=================")
             items = []
             items_pdf = []
@@ -128,7 +129,8 @@ def bulkupload(data):
             refobj = data.copy()
             del refobj['items']
             refobj['items'] = items_pdf
-            invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
+            invoice_referrence_objects[each['BILL_NO']] = refobj
+            # invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
             input_data.append(data)
         # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
