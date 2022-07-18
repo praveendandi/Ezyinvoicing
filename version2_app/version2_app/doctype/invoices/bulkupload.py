@@ -36,6 +36,8 @@ def bulkupload(data):
                 item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
+                if companyData.name == "ABCBP-01":
+                    item[bulk_meta_data["Gst_details"]["invoice_number"]] = item[bulk_meta_data["Gst_details"]["invoice_number"]][4:]
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
             # else:
             #     gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
@@ -48,8 +50,10 @@ def bulkupload(data):
         for each in items_dataframe[bulk_meta_data["detail_folio"]["folio"]][bulk_meta_data["detail_folio"]["invoice_list"]][bulk_meta_data["detail_folio"]["invoice_data"]]:
             if each[bulk_meta_data["detail_folio"]['sum_val']]==None:
                 each[bulk_meta_data["detail_folio"]['sum_val']]=0
+            if companyData.name == "ABCBP-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
+            print(each[bulk_meta_data["detail_folio"]["invoice_number"]],".............................")
             if str(each[bulk_meta_data["detail_folio"]["invoice_number"]]) in gst_data.keys():
-                print("+++++++++++++++++++++++++++++::::::::::::::::::::")
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
                             'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
