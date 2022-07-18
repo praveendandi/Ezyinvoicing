@@ -1246,6 +1246,7 @@ def create_reconciliation(start_date, end_date):
                 no_sac = insert_records(each)
                 if not no_sac["success"]:
                     return no_sac
+        return {"success": True, "message": "Reconciliation created"}
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
