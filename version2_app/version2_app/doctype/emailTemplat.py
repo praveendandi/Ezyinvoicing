@@ -132,7 +132,7 @@ def send_mail_files(data):
         files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
         att = [files[0]["name"]]
         if "signatured_file" in data:
-            sig_files=frappe.db.get_list('File',filters={'file_url': ['=',data["signatured_file"]]}, pluck='name')
+            sig_files=frappe.db.get_list('File',filters={'file_url': ['=',data["signatured_file"]]},fields=['name'])
             att.extend(sig_files)
         obj["attachments"] = att
         return {"success": True, "obj":obj}
