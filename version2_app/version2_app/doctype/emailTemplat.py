@@ -2,6 +2,7 @@ import random
 import datetime,os,sys,traceback
 import json
 import requests
+import re
 import frappe
 from frappe.core.doctype.communication.email import make
 
@@ -128,6 +129,8 @@ def send_mail_files(data):
         get_email_sender = get_email_sender[0]
         b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
         obj["val"] = b2csuccess
+        if b2csuccess.response:
+            obj["content"] = re.compile(r'<[^>]+>').sub('', b2csuccess.response)
         obj["sender"] = get_email_sender["email_id"]
         files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
         att = [files[0]["name"]]
