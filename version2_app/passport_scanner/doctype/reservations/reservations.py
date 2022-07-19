@@ -30,6 +30,7 @@ import numpy as np
 import requests
 from frappe.model.document import Document
 from scipy import ndimage
+from version2_app.passport_scanner.doctype.ml_utilities.common_utility import convert_base64_to_image
 
 date = str(date.today())
 home = expanduser("~")
@@ -1681,11 +1682,10 @@ def pass_detect_text(image_file):
         two_lines_mrz.append(line_first)
         line_second = re.sub(r"\s+", "", str(exact_length[0]))
         two_lines_mrz.append(line_second)
-
         first = two_lines_mrz[0]
         second = two_lines_mrz[1]
 
-        if first[0] == "P":
+        if first[0] == "P" or second[0] == "P":
 
             passport_type = "\n".join(tuple(loss))
 
@@ -1799,7 +1799,7 @@ def pass_detect_text(image_file):
             #     f"time elapsed for text parse is{time.time()-req_time}")
             data["expired"] = False
             return {"success": True, "data": data, "expired": False}
-        elif first[0] == "V":
+        elif first[0] == "V" or second[0] == "V":
             visa_type = "\n".join(tuple(loss))
 
             type = first[0]
@@ -2023,6 +2023,7 @@ def rotate(imagepath, number):
 
 @frappe.whitelist(allow_guest=True)
 def passportvisadetails():
+    pass_visa_image = ""
     try:
         company = frappe.get_last_doc("company")
         # api_time = time.time()
@@ -2030,11 +2031,16 @@ def passportvisadetails():
         # file = request.form
         base = frappe.local.form_dict.get("Passport_Image")
         imgdata = base64.b64decode(base)
+        convert_image = convert_base64_to_image(base, "passport_visa", basedir + company.site_name, company)
+        if "success" in convert_image:
+            return convert_image
+        pass_visa_image = convert_image["message"]["file_url"]
         header = frappe.local.form_dict.get("scan_type")
         pass_details = pass_detect_text(base)
         if pass_details is None:
-            return {"success": False, "message": "unable to scan your ID"}
+            return {"success": False, "message": "unable to scan your ID", "file_url": pass_visa_image}
         if not pass_details["success"]:
+            pass_details["file_url"] = pass_visa_image
             return pass_details
         details = pass_details["data"]
         # startlog.info(details)
@@ -2045,6 +2051,10 @@ def passportvisadetails():
         elif details["type"] == "VISA":
             no = details["Visa_Number"]
             unique_no = no[5:]
+        convert_image = convert_base64_to_image(base, "passport_visa", basedir + company.site_name, company)
+        if "success" in convert_image:
+            return convert_image
+        pass_visa_image = convert_image["message"]["file_url"]
         #  elif details['type']=='partial data':
         #      rand_int=random.randint(0,10000)
         #      unique_no = rand_int
@@ -2089,6 +2099,7 @@ def passportvisadetails():
         details["fullimage_size"] = fullimage_size
         details["faceimage_size"] = faceimage_size
         details["base64_string"] = base
+        details["file_url"] = pass_visa_image
         # logger.info(
         #     f"time elapsed for api request is{time.time()-api_time}")
         details["success"] = True
@@ -2103,6 +2114,7 @@ def passportvisadetails():
             "message": "Unable to scan your id, please try again",
             "error": str(e),
             "success": False,
+            "file_url": pass_visa_image
         }
     except IndexError as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2114,6 +2126,7 @@ def passportvisadetails():
             "message": "Unable to scan your id, please try again",
             "error": str(e),
             "success": False,
+            "file_url": pass_visa_image
         }
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2125,6 +2138,7 @@ def passportvisadetails():
             "success": False,
             "error": str(e),
             "message": "Unable to scan your id, please try again",
+            "file_url": pass_visa_image
         }
 
 
@@ -2197,6 +2211,7 @@ def passport_address_detect_text(image_file):
             },
         }
     except Exception as e:
+        print(str(e),"..........................................")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "SignEzy passport_address_detect_text",
@@ -2210,7 +2225,9 @@ def passport_address_detect_text(image_file):
 
 @frappe.whitelist(allow_guest=True)
 def passport_address():
+    file_url = ""
     try:
+        company = frappe.get_last_doc("company")
         # api_time = time.time()
         # logger.info(f"request get from client")
         base = frappe.local.form_dict.get("Passport_Image")
@@ -2219,6 +2236,11 @@ def passport_address():
         if not add_details["success"]:
             return add_details
         details = add_details["data"]
+        convert_image = convert_base64_to_image(base, "passport_visa", basedir + company.site_name, company)
+        if "success" in convert_image:
+            return convert_image
+        file_url = convert_image["message"]["file_url"]
+        details["file_url"] = convert_image["message"]["file_url"]
         details["base64_string"] = base
         # logger.info(f"extracted address is {details}")
         # logger.info(
@@ -2235,6 +2257,7 @@ def passport_address():
             "success": False,
             "error": str(e),
             "message": "Unable to scan your id, please try again",
+            "file_url": file_url
         }
 
 

@@ -134,16 +134,9 @@ def create_doc_using_base_files(
         #     {"doctype": "Dropbox", "reservation_no": reservation_number}
         # )
         if reseravtions_data == None:
-            current_time = now.strftime("%H:%M:%S")
-            reservation_doc = frappe.new_doc('Arrival Information')
-            reservation_doc.confirmation_number = reservation_number
-            reservation_doc.checkin_date = datetime.datetime.today()
-            reservation_doc.arrival_date = datetime.datetime.today()
-            reservation_doc.checkin_time = current_time
-            reservation_doc.number_of_guests = 1
-            reservation_doc.guest_first_name = 'Guest'
-            reservation_doc.insert()
-            frappe.db.commit()
+            create_reservation = create_arrival_information(reservation_number)
+            if not create_reservation["success"]:
+                return create_reservation
 
         new_dropbox = frappe.new_doc("Dropbox")
         new_dropbox.reservation_no = reservation_number
@@ -331,7 +324,6 @@ def extract_text(data: dict):
 
             except ValueError:
                 raise
-        print(data, "/////////")
         if "merged_to" in data.keys():
             data["dropbox"].reservation_no = data["merged_to"]
 
@@ -367,7 +359,6 @@ def create_passport_guest_update_precheckin_details(details, dropbox):
         main_guest = True
         if "Guest" not in dropbox.guest_name:
             main_guest = False
-        print(dropbox.reservation_no, "////////", dropbox.__dict__)
         guest_details = {
             "doctype": "Guest Details",
             "confirmation_number": dropbox.reservation_no,
@@ -455,7 +446,6 @@ def create_guest_update_precheckin_details(details, dropbox):
             "whether_employed_in_india": "N",
             "status": "In House",
         }
-        print(dropbox.guest_name)
 
         aadhar_details["given_name"] = dropbox.guest_name
         for key in details:
@@ -575,7 +565,6 @@ def get_reservation_details(reseravtion: str):
             ["guest_first_name", "no_of_adults", "no_of_children", "room_number"],
             as_dict=1,
         )
-        # print(pre_arrival_details)
         if pre_arrival_details:
             return pre_arrival_details
         else:
@@ -704,12 +693,11 @@ def create_guest_using_base_files(
         front = ""
         back = ""
         front_doc_type = ""
+        now = datetime.datetime.now()
         if image_1:
-            print("*****************",image_1,"*****************")
             image_response = requests.post(
                 company.classfiy_api, json={"base": image_1}, verify=False
             )
-            print(image_response.text)
             if image_response.status_code == 200:
                 image_response = image_response.json()
                 front_doc_type = image_response["doc_type"]
@@ -796,8 +784,14 @@ def create_guest_using_base_files(
             id_type = "aadhaar"
         else:
             id_type = "other"
-
-            
+        reseravtions_data = get_reservation_details(reservation_number)
+        # dropbox_exist = frappe.db.exists(
+        #     {"doctype": "Dropbox", "reservation_no": reservation_number}
+        # )
+        if reseravtions_data == None:
+            create_reservation = create_arrival_information(reservation_number)
+            if not create_reservation["success"]:
+                return create_reservation
         if now_job == False:
             enqueue(
                 extract_id_details,
@@ -824,7 +818,6 @@ def create_guest_using_base_files(
 
                 },
             )
-            print(details['data']['guest_details'].name,"sdgjdgsfhjdgsfhjdgsfhjg")
             if front != "":
                 ts = time.time()
                 image_1_url = convert_base64_to_image(
@@ -852,7 +845,6 @@ def create_guest_using_base_files(
                     # })
                     # details['data']['guest_details'].id_image2 = image_2
             # details['data']['guest_details'] = frappe.
-            print(details)
             return {"success": True, "data": details, "message": "scanned details"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -866,7 +858,6 @@ def create_guest_using_base_files(
 def extract_id_details(data={}):
     try:
         details = {}
-        print(data['id_type'])
         if data["id_type"] == "aadhaar":
             if data["image_1"]:
                 aadhaar_front_details = fetch_aadhaar_details(
@@ -922,7 +913,6 @@ def extract_id_details(data={}):
             pass
         else:
             pass
-        print(details,"*******")
         if "guest_details_name" in data:
             # details["doctype"] = "Guest Details"
             # details["name"] = data["guest_details_name"]
@@ -978,6 +968,11 @@ def create_guest_details(data, name=None, update=False):
         if update == False:
             if not bool(data):
                 return {"success": False, "message": "data is empty"}
+            reseravtions_data = get_reservation_details(data["confirmation_number"])
+            if reseravtions_data == None:
+                create_reservation = create_arrival_information(data["confirmation_number"])
+                if not create_reservation["success"]:
+                    return create_reservation
             if "guest_first_name" not in data:
                 data["guest_first_name"] = "Guest"
             if "guest_dob" in data:
@@ -1046,7 +1041,6 @@ def reprocess_images(name: str, now=False):
         site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
         private_folder_path = folder_path + "/sites/" + company.site_name
         guest_details = frappe.get_doc('Guest Details', name)
-        print(site_folder_path+guest_details.id_image1)
 
         with open(site_folder_path+guest_details.id_image1, "rb") as image_file:
             encoded_string_image_1 = base64.b64encode(image_file.read())
@@ -1079,6 +1073,34 @@ def reprocess_images(name: str, now=False):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
             "create_doc_using_base_files",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
+        )
+        print(e)
+        return {
+            "success": False,
+            "Message": "Error While reporcess images",
+        }
+
+
+def create_arrival_information(reservation_number):
+    try:
+        now = datetime.datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        reservation_doc = frappe.new_doc('Arrival Information')
+        reservation_doc.confirmation_number = reservation_number
+        reservation_doc.checkin_date = datetime.datetime.today()
+        reservation_doc.arrival_date = datetime.datetime.today()
+        reservation_doc.checkin_time = current_time
+        reservation_doc.number_of_guests = 1
+        reservation_doc.no_of_adults = 1
+        reservation_doc.guest_first_name = 'Guest'
+        reservation_doc.insert()
+        frappe.db.commit()
+        return {"success": True}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "create_arrival_information",
             "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         print(e)
