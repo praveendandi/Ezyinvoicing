@@ -503,7 +503,9 @@ def get_outlet_from_check(payload):
                 if each["name"] in payload:
                     data = each
                     break
-            return {"success": True, "outlet": each["name"], "outlet_short_name": each["outlet_short_name"]}
+            if bool(data):
+                return {"success": True, "outlet": data["name"], "outlet_short_name": data["outlet_short_name"]}
+            return {"success": False}
         else:
             return {"success": False, "outlet": "No outlet found"}
     except Exception as e:
@@ -540,10 +542,15 @@ def update_pos_check(doc, method=None):
             get_doc = frappe.get_doc("POS Checks", doc.name)
             get_doc.pos_check_reference_number = ref
             get_doc.save()
+            if frappe.db.exists("Items", {"reference_check_number":ref}):
+                invoice_number = frappe.db.get_value("Items", {"reference_check_number":ref}, ["parent"])
+                frappe.db.sql("""update `tabItems` set pos_check='{}' where reference_check_number='{}'""".format(doc.name, ref))
+                frappe.db.sql("""update `tabPOS Checks` set attached_to='{}', sync='Yes' where name='{}'""".format(invoice_number, doc.name))
+                frappe.db.commit()
         return True
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("Ezy-invoicing update_check_in_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.log_error("Ezy-invoicing update_pos_check","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success":False,"message":str(e)}
     
 @frappe.whitelist(allow_guest=True)   
