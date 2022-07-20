@@ -930,7 +930,11 @@ def create_pos_bill(doc, method=None):
 @frappe.whitelist(allow_guest=True)
 def extract_data_from_pos_check(data={}):
     try:
-        print("////////////////////////////////////")
+        pos_date = ""
+        if data["pos_bill"].count("@") == 2:
+            date_extract = re.search("@(.*)@", data["pos_bill"])
+            if date_extract:
+                pos_date = date_extract.group(1)
         if isinstance(data,str):
             data = json.loads(data)
         company = frappe.get_last_doc("company")
@@ -956,6 +960,9 @@ def extract_data_from_pos_check(data={}):
                 total_data["outlet"] = extract_outlet["outlet"]
                 # outlet_short_cut = extract_outlet["outlet_short_name"]
             if extract["success"]:
+                if "check_date" not in extract["data"]:
+                    if pos_date != "":
+                        total_data["check_date"] = pos_date
                 total_data.update(extract["data"])
                 # pos_date = datetime.datetime.strptime(extract["data"]["check_date"],'%Y-%m-%d').strftime('%d-%m-%Y')
                 if "check_date" in extract["data"] and "check_no" in extract["data"]:
@@ -1005,6 +1012,7 @@ def extract_data_from_pos_check(data={}):
             if "pos_check_reference_number" in total_data:
                 frappe.db.sql("""update `tabItems` set pos_check='{}' where reference_check_number='{}'""".format(get_doc.name, total_data["pos_check_reference_number"]))
                 frappe.db.commit()
+            frappe.publish_realtime("custom_socket", {"message": "POS Checks", "data": get_doc.as_dict()})
             return True
         return True
     except Exception as e:

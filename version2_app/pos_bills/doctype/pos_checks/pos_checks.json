@@ -23,7 +23,8 @@
   "attached_to",
   "pos_check_reference_number",
   "check_date",
-  "sync"
+  "sync",
+  "status"
  ],
  "fields": [
   {
@@ -125,11 +126,18 @@
    "fieldtype": "Select",
    "label": "Sync",
    "options": "Yes\nNo"
+  },
+  {
+   "default": "Pending Review",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending Review\nReviewed"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-08 16:02:58.434207",
+ "modified": "2022-07-19 18:32:52.875220",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Checks",

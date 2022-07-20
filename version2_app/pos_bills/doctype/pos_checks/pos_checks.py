@@ -521,11 +521,12 @@ def update_check_in_items(invoice_number=None, check_name=None):
             frappe.db.set_value("POS Checks", check_name, {"attached_to": invoice_number, "sync": "Yes"})
             get_check_details = frappe.db.get_value("POS Checks",check_name, "pos_check_reference_number")
             if get_check_details:
-                if not frappe.db.exists("Items",{"parent":invoice_number, "reference_check_number": get_check_details}):
-                    return {"success": False, "message": "Check not found in this invoice"}
-                get_check_details = frappe.db.get_value("Items",{"parent":invoice_number, "reference_check_number": get_check_details}, "name")
-                if get_check_details:
-                    frappe.db.set_value("Items",get_check_details,{"pos_check":check_name})
+                if not frappe.db.exists("Invoices", {"invoice_from": "File"}):
+                    if not frappe.db.exists("Items",{"parent":invoice_number, "reference_check_number": get_check_details}):
+                        return {"success": False, "message": "Check not found in this invoice"}
+                    get_check_details = frappe.db.get_value("Items",{"parent":invoice_number, "reference_check_number": get_check_details}, "name")
+                    if get_check_details:
+                        frappe.db.set_value("Items",get_check_details,{"pos_check":check_name})
             frappe.db.commit()
             return {"success": True, "message": "POS Check Updated"}
         return {"success": False, "message": "invoice number and check_name is mandatory"}
