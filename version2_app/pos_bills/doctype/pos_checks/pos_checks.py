@@ -209,7 +209,7 @@ def extract_data(payload,company_doc):
                         check_date = re.findall(company_doc.pos_date_regex,line)
                         checkdate = check_date[0] if len(check_date) > 0 else ""
                         if checkdate != "":
-                            data["check_date"] = datetime.strptime(checkdate,'%d.%m.%Y').strftime('%Y-%m-%d')
+                            data["check_date"] = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%Y-%m-%d')
                         # data["check_date"] = format_date(
                         #     checkdate,
                         #     "yyyy-mm-dd",
