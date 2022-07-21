@@ -141,6 +141,16 @@ def send_mail_files(data):
             sig_files=frappe.db.get_list('File',filters={'file_url': ['=',data["signatured_file"]]},fields=['name'])
             att.extend([sig_files[0]["name"]])
         obj["attachments"] = att
+        if "receiver_email" in data:
+            response = make(recipients = data["receiver_email"],
+            subject = b2csuccess.subject,
+            content = b2csuccess.response,
+            doctype = data["doctype"],
+            name = data["name"],
+            attachments = obj["attachments"],
+            send_email=1
+            )
+            return {"success":True,"message":"Mail Send"}
         return {"success": True, "obj":obj}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
