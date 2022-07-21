@@ -5,6 +5,7 @@ import requests
 import re
 import frappe
 from frappe.core.doctype.communication.email import make
+from frappe.email.doctype.email_queue.email_queue import send_now
 
 @frappe.whitelist(allow_guest=True)
 def emailTemplate():
@@ -151,7 +152,10 @@ def send_mail_files(data):
                             attachments = obj["attachments"],
                             send_email=1
                             )
-            print(response,"..................................")
+            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",response["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
+            print(email_queue,"...........................")
+            if len(email_queue) > 0:
+                send_now(email_queue[0]["name"])
             return {"success":True,"message":"Mail Send"}
         return {"success": True, "obj":obj}
     except Exception as e:
