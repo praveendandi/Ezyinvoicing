@@ -118,9 +118,9 @@ def send_email():
 @frappe.whitelist(allow_guest=True)
 def send_mail_files(data):
     try:
-        print(type(data),"...............", data)
         if isinstance(data, str):
             data = json.loads(data)
+        print(type(data),"...............", data)
         obj = {"email":""}
         get_doc = frappe.get_doc(data["doctype"],data["name"])
         if data["doctype"] == "Invoices":
