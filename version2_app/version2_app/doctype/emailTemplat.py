@@ -171,7 +171,7 @@ def signezy_email_logs():
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist()    
+@frappe.whitelist(allow_guest=True)    
 def email_push_tab():
     try:
         data = json.loads(frappe.request.data)
