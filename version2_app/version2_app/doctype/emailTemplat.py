@@ -143,13 +143,15 @@ def send_mail_files(data):
         obj["attachments"] = att
         if "receiver_email" in data:
             response = make(recipients = data["receiver_email"],
-            subject = b2csuccess.subject,
-            content = b2csuccess.response,
-            doctype = data["doctype"],
-            name = data["name"],
-            attachments = obj["attachments"],
-            send_email=1
-            )
+                            sender = obj["sender"],
+                            subject = b2csuccess.subject,
+                            content = b2csuccess.response,
+                            doctype = data["doctype"],
+                            name = data["name"],
+                            attachments = obj["attachments"],
+                            send_email=1
+                            )
+            print(response,"..................................")
             return {"success":True,"message":"Mail Send"}
         return {"success": True, "obj":obj}
     except Exception as e:
