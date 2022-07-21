@@ -118,6 +118,7 @@ def send_email():
 @frappe.whitelist(allow_guest=True)
 def send_mail_files(data):
     try:
+        print(type(data),"...............", data)
         if isinstance(data, str):
             data = json.loads(data)
         obj = {"email":""}
