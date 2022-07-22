@@ -1007,8 +1007,9 @@ def extract_data_from_pos_check(data={}):
             total_data["company"] = company.name
             total_data["doctype"] = "POS Checks"
             total_data["pos_bill"] = data["pos_bill"]
-            total_data["detected_check_number"] = total_data["check_no"]
-            del total_data["check_no"] # delete check Number
+            if "check_no" in total_data:
+                total_data["detected_check_number"] = total_data["check_no"]
+                del total_data["check_no"] # delete check Number
             total_data["check_type"] = "Check Closed"
             get_doc = frappe.get_doc(total_data)
             get_doc.insert()
