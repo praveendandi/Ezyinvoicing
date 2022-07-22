@@ -1,9 +1,11 @@
 import base64
+# import cv2
 import datetime
 import sys
 import traceback
 import json
 import os
+
 
 import babel.dates
 import frappe
@@ -92,11 +94,13 @@ def format_date(string_date=None, format_string=None):
     format_string = format_string.replace("mm", "MM")
     try:
         formatted_date = babel.dates.format_date(
-            date, format_string, locale=(frappe.local.lang or "").replace("-", "_")
+            date, format_string, locale=(
+                frappe.local.lang or "").replace("-", "_")
         )
     except UnknownLocaleError:
         format_string = (
-            format_string.replace("MM", "%m").replace("dd", "%d").replace("yyyy", "%Y")
+            format_string.replace("MM", "%m").replace(
+                "dd", "%d").replace("yyyy", "%Y")
         )
         formatted_date = date.strftime(format_string)
     return formatted_date
@@ -197,3 +201,67 @@ def _get_time_zone():
     )  # Default to India ?!
 
 # till here are date formatter methods
+
+
+@frappe.whitelist(allow_guest=True)
+def split_image(base=None):
+    try:
+        if base:
+            company = frappe.get_last_doc("company")
+            folder_path = frappe.utils.get_bench_path()
+            site_folder_path = folder_path + "/sites/" + company.site_name
+            imagetosplit = convert_base64_to_image(
+                base,
+                "imagetosplit",
+                site_folder_path,
+                company,
+            )
+            if "success" not in imagetosplit:
+                image = imagetosplit["message"]["file_url"]
+                filename, file_extension = os.path.splitext(image)
+                img = cv2.imread(site_folder_path+image)
+                h, w, channels = img.shape
+                half = w//2
+                left_part = img[:, :half]
+                right_part = img[:, half:]
+                half2 = h//2
+                top = img[:half2, :]
+                bottom = img[half2:, :]
+                top_image = site_folder_path+"/public/files/top_image"+file_extension
+                bottom_image = site_folder_path+"/public/files/bottom_image"+file_extension
+                cv2.imwrite(top_image, top)
+                cv2.imwrite(bottom_image, bottom)
+                uploadtop = frappe_upload_file_api(top_image, company)
+                if not uploadtop["success"]:
+                    return uploadtop
+                uploadbottom = frappe_upload_file_api(bottom_image, company)
+                if not uploadbottom["success"]:
+                    return uploadbottom
+                os.remove(top_image)
+                os.remove(bottom_image)
+                return {"success":True, "image1":uploadtop["file"], "image2":uploadbottom["file"]}
+            return imagetosplit
+        return {'success': False, 'message': "base64 is mandatory"}
+    except Exception as e:
+        print("split_image", str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get company",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+
+
+def frappe_upload_file_api(file,company):
+    try:
+        files = {"file": open(file, "rb")}
+        payload = {"is_private": 1, "folder": "Home"}
+        site = company.host
+        upload_qr_image = requests.post(
+            site + "api/method/upload_file", files=files, data=payload
+        )
+        response = upload_qr_image.json()
+        if "message" in response:
+            image = response["message"]["file_url"]
+            return {"success": True, "file": image}
+        else:
+            return {"success": False, "message": "something went wrong"}
+    except Exception as e:
+        pass
