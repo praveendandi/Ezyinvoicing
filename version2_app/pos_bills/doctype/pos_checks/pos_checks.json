@@ -24,7 +24,9 @@
   "pos_check_reference_number",
   "check_date",
   "sync",
-  "status"
+  "status",
+  "detected_check_number",
+  "detected_check_date"
  ],
  "fields": [
   {
@@ -133,11 +135,21 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Pending Review\nReviewed"
+  },
+  {
+   "fieldname": "detected_check_number",
+   "fieldtype": "Data",
+   "label": "Detected Check Number"
+  },
+  {
+   "fieldname": "detected_check_date",
+   "fieldtype": "Data",
+   "label": "Detected Check Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-19 18:32:52.875220",
+ "modified": "2022-07-22 11:51:09.112050",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Checks",
