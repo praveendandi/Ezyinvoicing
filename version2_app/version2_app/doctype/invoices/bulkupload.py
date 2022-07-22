@@ -6,6 +6,7 @@ import datetime
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
+import re
 
 # @frappe.whitelist(allow_guest=True)
 def bulkupload(data):
@@ -67,7 +68,7 @@ def bulkupload(data):
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
                 else:
-                    data["invoice_number"] =data["invoice_number"]
+                    data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
             print(data["invoice_number"],"=================")
             items = []
@@ -127,7 +128,7 @@ def bulkupload(data):
             refobj = data.copy()
             del refobj['items']
             refobj['items'] = items_pdf
-            invoice_referrence_objects[each['BILL_NO']] = refobj
+            invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
             input_data.append(data)
         # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
@@ -135,6 +136,7 @@ def bulkupload(data):
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})
         countIn = 1
         for each_item in input_data:
+            print(each_item,"++++++++")
             if "invoice_number" in each:
                 each["gstNumber"]=gst_data[each["invoice_number"]]
             if each_item['invoice_category'] == "CREDIT TAX INVOICE":

@@ -1,6 +1,6 @@
 frappe
 pdfplumber
-# pandas
+pandas
 qrcode
 google-cloud-storage
 XlsxWriter
@@ -30,7 +30,11 @@ typing-extensions
 paytmchecksum
 opencv-python
 fitz
-PyMuPDF==1.16.14
 pgeocode
-pyHanko
+datefinder
 typing_extensions
+PyMuPDF==1.18.16
+pyHanko
+uharfbuzz
+fontTools
+# attrs

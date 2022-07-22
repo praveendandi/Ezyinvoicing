@@ -83,7 +83,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-13 15:45:06.499530",
+ "modified": "2022-07-15 10:16:38.877728",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summary Breakups",
@@ -110,6 +110,18 @@
    "read": 1,
    "report": 1,
    "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
    "share": 1,
    "write": 1
   }

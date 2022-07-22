@@ -1,4 +1,5 @@
 import base64
+import datefinder
 import datetime
 import glob
 from heapq import merge
@@ -11,6 +12,7 @@ import shlex
 import shutil
 import sys
 import time
+import fitz
 import traceback
 from datetime import date, datetime, timedelta
 import datetime
@@ -19,9 +21,10 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
+from version2_app.clbs.doctype.summary_breakups.summary_breakups import convert_image_to_base64
 from frappe.utils.background_jobs import enqueue
 from subprocess import PIPE, STDOUT, Popen
-
+from version2_app.pos_bills.doctype.pos_checks.pos_checks import extract_data, get_outlet_from_check
 # from requests.sessions import _Data
 import frappe
 import pdfplumber
@@ -43,7 +46,7 @@ from frappe.core.doctype.communication.email import make
 from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 
-user_name = frappe.session.user
+# user_name = frappe.session.user
 
 
 @frappe.whitelist(allow_guest=True)
@@ -425,7 +428,6 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
-        print(".........",doc.file_name)
         if "job-" in doc.file_name:
             if not frappe.db.exists(
                 {"doctype": "Document Bin", "invoice_file": doc.file_url}
@@ -449,6 +451,20 @@ def fileCreated(doc, method=None):
                     module.file_parsing(doc.file_url)
                     frappe.log_error(traceback.print_exc())
                     logger.error(f"fileCreated,   {traceback.print_exc()}")
+        elif "POS-" in doc.file_name or "pos-" in doc.file_name:
+            if not frappe.db.exists("POS Checks",{"pos_bill": doc.file_url}):
+                enqueue(
+                    extract_data_from_pos_check,
+                    queue="default",
+                    timeout=800000,
+                    event="data_extraction",
+                    now=False,
+                    data={
+                        "pos_bill": doc.file_url
+                    },
+                    is_async=True,
+                )
+                return True
         else:
             if "company" not in doc.file_name and "GSP_API" not in doc.file_name:
                 company = frappe.get_last_doc("company")
@@ -456,6 +472,7 @@ def fileCreated(doc, method=None):
                     return {"success": False, "message": "Print has been Blocked"}
                 if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
                     update_documentbin(doc.file_url, "")
+        return True
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
         logger.error(f"fileCreated,   {traceback.print_exc()}")
@@ -883,8 +900,140 @@ def create_pos_bill(doc, method=None):
             "custom_socket", {"message": "Pos Bills Created", "data": doc.__dict__}
         )
     except Exception as e:
-        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("create_pos_bill","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
 
+
+# def create_pos_checks(doc, method=None):
+#     try:
+#         if doc.pos_bill:
+#             enqueue(
+#                 extract_data_from_pos_check,
+#                 queue="default",
+#                 timeout=800000,
+#                 event="data_extraction",
+#                 now=True,
+#                 data={
+#                     "pos_bill": doc.pos_bill
+#                 },
+#                 is_async=True,
+#             )
+#         frappe.publish_realtime(
+#             "custom_socket", {"message": "Pos Bills Created", "data": doc.__dict__}
+#         )
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error("create_pos_checks","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+#         return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def extract_data_from_pos_check(data={}):
+    try:
+        pos_date = ""
+        if data["pos_bill"].count("@") == 2:
+            date_extract = re.search("@(.*)@", data["pos_bill"])
+            if date_extract:
+                pos_date = date_extract.group(1)
+        if isinstance(data,str):
+            data = json.loads(data)
+        company = frappe.get_last_doc("company")
+        image_to_base = convert_image_to_base64(data["pos_bill"])
+        if not image_to_base["success"]:
+            return image_to_base
+        # with open('/home/caratred/Music/readme.txt', 'w') as f:
+        #     f.write(image_to_base["data"])
+        post_data = {
+            "base": image_to_base["data"]
+        }
+        image_response = requests.post(company.pos_bill_domain,
+            json=post_data,
+        )
+        if image_response.status_code == 200:
+            image_response = image_response.json()
+            extract = extract_data(image_response["data"],company)
+            total_data = {}
+            extract_outlet = get_outlet_from_check(image_response["data"])
+            total_data["payload"] = image_response["data"]
+            # outlet_short_cut = None
+            if extract_outlet["success"]:
+                total_data["outlet"] = extract_outlet["outlet"]
+                # outlet_short_cut = extract_outlet["outlet_short_name"]
+            if extract["success"]:
+                if "check_date" in extract["data"]:
+                    total_data["detected_check_date"] = extract["data"]["check_date"]
+                    del extract["data"]["check_date"] # delete check Date
+                if pos_date != "":
+                    total_data["check_date"] = pos_date
+                total_data.update(extract["data"])
+                # pos_date = datetime.datetime.strptime(extract["data"]["check_date"],'%Y-%m-%d').strftime('%d-%m-%Y')
+                if "check_date" in extract["data"] and "check_no" in extract["data"]:
+                    total_data["pos_check_reference_number"] = extract["data"]["check_date"]+"-"+extract["data"]["check_no"]
+                    # if outlet_short_cut:
+                    #     total_data["pos_check_reference"] = extract["data"]["check_date"]+"-"+outlet_short_cut+"-"+extract["data"]["check_no"]
+                    # else:
+                    #     frappe.log_error("outlet_short_name","Please provide the outlet short name")
+                    if frappe.db.exists("POS Checks",{"pos_check_reference_number": total_data["pos_check_reference_number"]}):
+                        cwd = os.getcwd()
+                        site_name = cstr(frappe.local.site)
+                        get_files = frappe.db.get_list("POS Checks", filters ={"pos_check_reference_number": total_data["pos_check_reference_number"]}, pluck="pos_bill")
+                        if data["pos_bill"] in get_files:
+                            frappe.db.sql("""update `tabPOS Checks` set pos_bill='{}' where pos_check_reference_number = '{}'""".format(data["pos_bill"],total_data["pos_check_reference_number"]))
+                            frappe.db.commit()
+                            return True
+                        get_files.append(data["pos_bill"])
+                        result = fitz.open()
+                        for each in get_files:
+                            file_path = cwd + "/" + site_name + each
+                            with fitz.open(file_path) as mfile:
+                                result.insertPDF(mfile)
+                        file_path = cwd + "/" + site_name + "/public/files/" + total_data["pos_check_reference_number"] + '.pdf'
+                        result.save(file_path)
+                        files_new = {"file": open(file_path, 'rb')}
+                        payload_new = {'is_private': 1, 'folder': 'Home'}
+                        file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                                    data=payload_new, verify=False).json()
+                        if "file_url" in file_response["message"].keys():
+                            os.remove(file_path)
+                        else:
+                            return False
+                        frappe.db.sql("""update `tabPOS Checks` set pos_bill='{}' where pos_check_reference_number = '{}'""".format(file_response["message"]["file_url"],total_data["pos_check_reference_number"]))
+                        frappe.db.commit()
+                        return True
+                    invoice_number = frappe.db.get_value('Items', {'reference_check_number': total_data["pos_check_reference_number"]}, ["parent"])
+                    if invoice_number:
+                        total_data["sync"] = "Yes"
+                        total_data["attached_to"] = invoice_number
+            total_data["company"] = company.name
+            total_data["doctype"] = "POS Checks"
+            total_data["pos_bill"] = data["pos_bill"]
+            if "check_no" in total_data:
+                total_data["detected_check_number"] = total_data["check_no"]
+                del total_data["check_no"] # delete check Number
+            total_data["check_type"] = "Check Closed"
+            get_doc = frappe.get_doc(total_data)
+            get_doc.insert()
+            frappe.db.commit()
+            if "pos_check_reference_number" in total_data:
+                frappe.db.sql("""update `tabItems` set pos_check='{}' where reference_check_number='{}'""".format(get_doc.name, total_data["pos_check_reference_number"]))
+                frappe.db.commit()
+            frappe.publish_realtime("custom_socket", {"message": "POS Checks", "data": get_doc.as_dict()})
+            return True
+        return True
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("extract_data_from_pos_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+# @frappe.whitelist(allow_guest=True)
+# def extract_data_from_invoice(data={}):
+#     try:
+#         check_num = frappe.db.get_value('POS Checks',{'pos_check_reference_number': "reference_check_number"}, ["parent"])
+#         print(check_num,";;;;;;;;;;;;")
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error("extract_data_from_invoice","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+#         return {"success":False,"message":str(e)}
 
 def deleteemailfilesdaily():
     try:
@@ -1744,6 +1893,7 @@ def send_email(confirmation_number, company):
 @frappe.whitelist(allow_guest=True)
 def pre_mail():
     try:
+        user_name = frappe.session.user
         company = frappe.get_last_doc("company")
         if not company.site_domain:
             return {
@@ -1975,6 +2125,7 @@ def pre_mail():
 
 @frappe.whitelist(allow_guest=True)
 def manual_mail(data):
+    user_name = frappe.session.user
     date_time = datetime.datetime.now()
     conf_number = data["confirmation_number"]
     email_address = data["guest_email_address"]
@@ -2191,6 +2342,7 @@ def check_hotelCode(data):
 
 @frappe.whitelist(allow_guest=True)
 def precheckins():
+    user_name = frappe.session.user
     data = json.loads(frappe.request.data)
     company = frappe.get_last_doc("company")
     date_time = datetime.datetime.now()

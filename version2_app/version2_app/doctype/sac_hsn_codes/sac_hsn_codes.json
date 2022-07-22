@@ -37,8 +37,7 @@
   "disable_cess_for_sc",
   "disable_vat_for_sc",
   "category",
-  "is_service_charge_item",
-  "data_33"
+  "is_service_charge_item"
  ],
  "fields": [
   {
@@ -238,10 +237,6 @@
    "fieldname": "is_service_charge_item",
    "fieldtype": "Check",
    "label": "Is Service Charge Item"
-  },
-  {
-   "fieldname": "data_33",
-   "fieldtype": "Data"
   }
  ],
  "index_web_pages_for_search": 1,

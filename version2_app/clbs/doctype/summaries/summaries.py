@@ -105,6 +105,14 @@ def summary_activity_log(summary=None):
                                     contact_list[index] =  json.dumps(contacts)
                     log["changed"][0] = contact_list
                     each["data"] = json.dumps(log)
+            # get_summary_breakups = frappe.db.get_list("Summary Breakups", filters=[["summaries","=",summary]], pluck="name")
+            # if len(get_summary_breakups)>0:
+            #     get_summary_breakups = frappe.db.get_list("Version", filters=[["docname","in",get_summary_breakups]], fields=['*'])
+            #     get_summary_log.extend(get_summary_breakups)
+            # get_summary_documents = frappe.db.get_list("Summary Documents", filters=[["Summary","=",summary]], pluck="name")
+            # if len(get_summary_documents)>0:
+            #     get_summary_documents = frappe.db.get_list("Version", filters=[["docname","in",get_summary_documents]], fields=['*'])
+            #     get_summary_log.extend(get_summary_documents)
             get_payments_names = frappe.db.get_list("Summary Payments", filters=[["summary","=",summary]], pluck="name")
             if get_payments_names or len(get_payments_names) > 0:
                 get_payment_log = frappe.db.get_list("Version", filters=[["docname","in",get_payments_names]], fields=['*'])

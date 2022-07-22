@@ -276,7 +276,15 @@
   "data_filing",
   "sezwp_terms_and_conditions",
   "sezwop_terms_and_conditions",
-  "opera_scan_button"
+  "opera_scan_button",
+  "enable_slab_for_room_service_charge",
+  "sc_slab_12_starting_range",
+  "sc_slab_12_end_range",
+  "pos_date_reference",
+  "pos_date_regex",
+  "pos_bill_domain",
+  "pos_check_date_format",
+  "items_per_page"
  ],
  "fields": [
   {
@@ -1774,6 +1782,49 @@
    "fieldname": "opera_scan_button",
    "fieldtype": "Check",
    "label": "Opera Scan Button"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_slab_for_room_service_charge",
+   "fieldtype": "Check",
+   "label": "Enable Slab For Room Service Charge"
+  },
+  {
+   "fieldname": "sc_slab_12_starting_range",
+   "fieldtype": "Int",
+   "label": "SC Slab 12% Starting Range"
+  },
+  {
+   "fieldname": "sc_slab_12_end_range",
+   "fieldtype": "Int",
+   "label": "SC Slab 12% End Range"
+  },
+  {
+   "fieldname": "pos_date_reference",
+   "fieldtype": "Data",
+   "label": "POS Date Reference"
+  },
+  {
+   "fieldname": "pos_date_regex",
+   "fieldtype": "Data",
+   "label": "POS Date Regex"
+  },
+  {
+   "fieldname": "pos_bill_domain",
+   "fieldtype": "Long Text",
+   "label": "POS Bill Domain"
+  },
+  {
+   "fieldname": "pos_check_date_format",
+   "fieldtype": "Long Text",
+   "label": "POS Check Date Format"
+  },
+  {
+   "default": "100",
+   "fieldname": "items_per_page",
+   "fieldtype": "Select",
+   "label": "Items Per Page",
+   "options": "20\n50\n100\n150\n500"
   }
  ],
  "index_web_pages_for_search": 1,

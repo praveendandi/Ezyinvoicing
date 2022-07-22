@@ -23,7 +23,11 @@
   "status",
   "reference",
   "po_number",
-  "email_sent_status"
+  "email_sent_status",
+  "signature_attached",
+  "amended_from",
+  "sequence",
+  "reason_for_amendment"
  ],
  "fields": [
   {
@@ -113,7 +117,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nSubmitted\nDeleted\nVoid"
+   "options": "Draft\nSubmitted\nDeleted\nVoid\nCancelled"
   },
   {
    "fieldname": "reference",
@@ -130,11 +134,34 @@
    "fieldname": "email_sent_status",
    "fieldtype": "Check",
    "label": "Email Sent Status"
+  },
+  {
+   "default": "0",
+   "fieldname": "signature_attached",
+   "fieldtype": "Check",
+   "label": "Signature Attached"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Summaries"
+  },
+  {
+   "default": "0",
+   "fieldname": "sequence",
+   "fieldtype": "Int",
+   "label": "Summary Sequence"
+  },
+  {
+   "fieldname": "reason_for_amendment",
+   "fieldtype": "Small Text",
+   "label": "Reason For Amendment"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-07 14:07:46.596137",
+ "modified": "2022-07-15 10:17:42.530774",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",
@@ -149,6 +176,18 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
    "share": 1,
    "write": 1
   }
