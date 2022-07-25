@@ -1820,6 +1820,7 @@
    "label": "POS Check Date Format"
   },
   {
+   "default": "100",
    "fieldname": "items_per_page",
    "fieldtype": "Select",
    "label": "Items Per Page",
@@ -1828,7 +1829,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-25 19:55:15.697886",
+ "modified": "2022-07-25 19:57:23.899354",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
