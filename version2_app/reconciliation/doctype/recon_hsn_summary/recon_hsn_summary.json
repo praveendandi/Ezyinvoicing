@@ -15,10 +15,10 @@
   "igst_amount",
   "state_cess_amount",
   "central_cess_amount",
-  "vat",
-  "total_gst",
+  "vat_amount",
+  "total_gst_amount",
   "total_tax_amount",
-  "total_amount",
+  "total_invoice_amount",
   "recon_id",
   "type"
  ],
@@ -69,24 +69,9 @@
    "label": "Central CESS Amount"
   },
   {
-   "fieldname": "vat",
-   "fieldtype": "Float",
-   "label": "VAT"
-  },
-  {
-   "fieldname": "total_gst",
-   "fieldtype": "Float",
-   "label": "Total GST"
-  },
-  {
    "fieldname": "total_tax_amount",
    "fieldtype": "Float",
    "label": "Total Tax Amount"
-  },
-  {
-   "fieldname": "total_amount",
-   "fieldtype": "Float",
-   "label": "Total Amount"
   },
   {
    "fieldname": "recon_id",
@@ -99,11 +84,26 @@
    "fieldtype": "Select",
    "label": "Type",
    "options": "ALL\nB2B\nB2C"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Float",
+   "label": "VAT Amount"
+  },
+  {
+   "fieldname": "total_invoice_amount",
+   "fieldtype": "Float",
+   "label": "Total Invoice Amount"
+  },
+  {
+   "fieldname": "total_gst_amount",
+   "fieldtype": "Float",
+   "label": "Total GST Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 12:07:18.525674",
+ "modified": "2022-07-22 13:42:37.622233",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Recon HSN Summary",

@@ -88,8 +88,13 @@ def execute(filters=None):
 		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
 		# print(mergedDf,"===========")
 		mergedDf = mergedDf[columns]
-		data = mergedDf.values.tolist()
-		
+		if "export" in filters:
+			if filters["export"]:
+				data = mergedDf.to_dict('records')
+			else:
+				data = mergedDf.values.tolist()
+		else:
+			data = mergedDf.values.tolist()
 		return columns, data
 	except Exception as e:
 		# print(str(e))

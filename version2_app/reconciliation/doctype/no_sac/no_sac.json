@@ -8,13 +8,14 @@
  "field_order": [
   "invoicenumber",
   "itemdescription",
-  "beforegst",
-  "cgstamount",
-  "sgstamount",
-  "igstamount",
-  "taxablevalue",
+  "before_gst",
+  "cgst_amount",
+  "sgst_amount",
+  "igst_amount",
+  "total_tax_amount",
   "irnstatus",
-  "recon_id"
+  "recon_id",
+  "vat_amount"
  ],
  "fields": [
   {
@@ -28,16 +29,6 @@
    "label": "ItemDescription"
   },
   {
-   "fieldname": "beforegst",
-   "fieldtype": "Float",
-   "label": "BeforeGST"
-  },
-  {
-   "fieldname": "taxablevalue",
-   "fieldtype": "Float",
-   "label": "TaxableValue"
-  },
-  {
    "fieldname": "irnstatus",
    "fieldtype": "Data",
    "label": "IRNstatus"
@@ -49,24 +40,39 @@
    "options": "Recon Details"
   },
   {
-   "fieldname": "cgstamount",
+   "fieldname": "total_tax_amount",
    "fieldtype": "Float",
-   "label": "CGSTAmount"
+   "label": "Total Tax Amount"
   },
   {
-   "fieldname": "sgstamount",
-   "fieldtype": "Float",
-   "label": "SGSTAmount"
+   "fieldname": "vat_amount",
+   "fieldtype": "Data",
+   "label": "Vat Amount"
   },
   {
-   "fieldname": "igstamount",
+   "fieldname": "before_gst",
    "fieldtype": "Float",
-   "label": "IGSTAmount"
+   "label": "Before GST"
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Float",
+   "label": "CGST Amount"
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Float",
+   "label": "SGST Amount"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "label": "IGST Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 12:33:50.969506",
+ "modified": "2022-07-22 14:27:58.269343",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "No Sac",

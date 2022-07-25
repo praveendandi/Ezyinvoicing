@@ -6,7 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "invoice_numbers",
+  "invoice_number",
   "recon_id"
  ],
  "fields": [
@@ -17,14 +17,14 @@
    "options": "Recon Details"
   },
   {
-   "fieldname": "invoice_numbers",
+   "fieldname": "invoice_number",
    "fieldtype": "Data",
-   "label": "Invoice Numbers"
+   "label": "Invoice Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 16:54:56.842173",
+ "modified": "2022-07-19 11:33:06.654129",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Missing in EzyInvoicing",

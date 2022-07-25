@@ -13,7 +13,7 @@
   "irn_status",
   "ezyinvoice_status",
   "invoice_amount",
-  "taxable_value",
+  "total_tax_amount",
   "igst_amount",
   "sgst_amount",
   "cgst_amount",
@@ -62,11 +62,6 @@
    "fieldname": "invoice_amount",
    "fieldtype": "Float",
    "label": "Invoice Amount"
-  },
-  {
-   "fieldname": "taxable_value",
-   "fieldtype": "Float",
-   "label": "Taxable Value"
   },
   {
    "fieldname": "igst_amount",
@@ -129,11 +124,16 @@
    "fieldname": "is_zero_invoice",
    "fieldtype": "Check",
    "label": "Zero Invoice"
+  },
+  {
+   "fieldname": "total_tax_amount",
+   "fieldtype": "Float",
+   "label": "Total Tax Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 12:09:34.718161",
+ "modified": "2022-07-22 13:44:44.091391",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Missing in Opera",

@@ -1,5 +1,6 @@
 from pydoc import doc
 from re import T
+from venv import create
 from webbrowser import get
 import datetime
 # from attr import fields
@@ -19,13 +20,14 @@ import xlsxwriter
 import openpyxl
 from openpyxl import Workbook
 from openpyxl import load_workbook
+from frappe.utils.background_jobs import enqueue
 from openpyxl.styles import Color, PatternFill, Font, Fill, colors, Alignment, Border, Side
 from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.cell import Cell
 # from UliPlot.XLSX import auto_adjust_xlsx_column_width
 # from invoice_reconciliations import invoicereconciliationcount
 # from xlsxwriter import add_worksheet
-
+from version2_app.version2_app.report.outward_supplies.outward_supplies import execute
 
 @frappe.whitelist(allow_guest=True)
 def getGSTR1DashboardDetails(year=None, month=None):
@@ -375,7 +377,7 @@ def export_workbook(month=None, year=None):
             ws.append(values)
         for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
             cell.font = Font(bold=True)
-        hsn_fields = ['Sac_Code', "Gst_Rate", "UQC", "total_quantity", "cgst_amount", "sgst_amount", "igst_amount",
+        hsn_fields = ['sac_code', "gst_rate", "uqc", "total_quantity", "cgst_amount", "sgst_amount", "igst_amount",
                       "state_cess_amount", "central_cess_amount", "total_gst", "total_tax_amount", "total_amount"]
         ws = wb.create_sheet("HSN_Summary")
         ws.title = "HSN_Summary"
@@ -388,6 +390,7 @@ def export_workbook(month=None, year=None):
         total.name = "Total"
         hsn_summary_df = hsn_summary_df.append(total.transpose())
         print(len(hsn_summary_df))
+        
         # hsn_summary_df['Sac_Code'] = hsn_summary_df['Sac_Code'].replace(
         #     np.nan, "Total")
         # invoices_df['InvoiceNo'] = invoices_df['InvoiceNo'].replace(
@@ -399,6 +402,29 @@ def export_workbook(month=None, year=None):
         for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
             cell.font = Font(bold=True)
         if len(hsn_summary_df) > 1:
+            ws.cell(row=ws.max_row, column=2).value = ""
+            ws.cell(row=ws.max_row, column=1).value = "Total"
+        outward = outward_supply(month=month, year=year)
+        if "success" in outward:
+            return outward
+        outward_fields = outward[0]
+        outward_data = outward[1]
+        ws = wb.create_sheet("OutWard Supply")
+        ws.title = "OutWard_Supply"
+        for i in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L','M','N','O','P','Q','R','S','T','U','V','W','X','Z']:
+            ws.column_dimensions[i].width = 15
+        ws.append(outward_fields)
+        outward_df = pd.DataFrame.from_records(outward_data)
+        total = outward_df.sum(numeric_only=True, axis=0)
+        total.name = "Total"
+        outward_supply_df = outward_df.append(total.transpose())
+        outwards_supply = outward_supply_df.to_dict('records')
+        for each in outwards_supply:
+            values = (each[k] for k in outward_fields)
+            ws.append(values)
+        for cell in ws[str(ws.max_row)+":"+str(ws.max_row)]:
+            cell.font = Font(bold=True)
+        if len(outward_supply_df) > 1:
             ws.cell(row=ws.max_row, column=2).value = ""
             ws.cell(row=ws.max_row, column=1).value = "Total"
         # ws = wb.create_sheet("Sequence")
@@ -1086,14 +1112,46 @@ def compare_invoice_summary(start_date, end_date):
 #         return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def create_reconciliation(start_date, end_date):
+def create_reconciliation(start_date=None, end_date=None, redo=False, recon_id=None):
     try:
         # Getting recon ID
-        insert_recon_data = insert_records(
-            {"doctype": "Recon Details", "start_date": start_date, "end_date": end_date, "user_id": frappe.session.user})
-        if not insert_recon_data["success"]:
-            return insert_recon_data
-        recon_doc = insert_recon_data["doc"]
+        if (start_date and end_date) or (redo and recon_id):
+            enqueue(
+                    create_recon,
+                    queue="default",
+                    timeout=800000,
+                    event="create_recon",
+                    now=False,
+                    data={"start_date": start_date, "end_date": end_date, "redo": False, "recon_id": recon_id},
+                    is_async=True,
+                )
+            return {"success": True, "message": "Reconciliation created"}
+        return {"success": False, "message": "something went wrong"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("document_sequence",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+    
+def create_recon(data):
+    try:
+        start_date=data["start_date"]
+        end_date=data["end_date"]
+        redo=data["redo"]
+        recon_id=data["recon_id"]
+        if not redo:
+            insert_recon_data = insert_records(
+                {"doctype": "Recon Details", "start_date": start_date, "end_date": end_date, "user_id": frappe.session.user})
+            if not insert_recon_data["success"]:
+                return insert_recon_data
+            frappe.publish_realtime("custom_socket", {"message": "Recon Processing"})
+            recon_doc = insert_recon_data["doc"]
+        else:
+            if not recon_id:
+                return {"success": True, "message": "reconID is mandatory"}
+            recon_doc = frappe.get_doc("Recon Details", recon_id)
+            start_date = recon_doc.start_date
+            end_date = recon_doc.end_date
         missing = get_missing_invoices(start_date, end_date)
         if not missing["success"]:
             return missing
@@ -1136,7 +1194,7 @@ def create_reconciliation(start_date, end_date):
                     each["recon_id"] = recon_doc.name
                     each["is_zero_invoice"] = 1
                     zero_invoices = insert_records(each)
-                    print(zero_invoices,"////////")
+                    print(zero_invoices, "////////")
                     if not zero_invoices["success"]:
                         return zero_invoices
 
@@ -1144,7 +1202,7 @@ def create_reconciliation(start_date, end_date):
         if len(missing["data"]["missing_in_ezyinvoicing"]) > 0:
             for each in missing["data"]["missing_in_ezyinvoicing"]:
                 missing_in_ezy = {"doctype": "Missing in EzyInvoicing",
-                                  "invoice_numbers": each, "recon_id": recon_doc.name}
+                                  "invoice_number": each, "recon_id": recon_doc.name}
                 missing_in_ezyinvoicing = insert_records(missing_in_ezy)
                 if not missing_in_ezyinvoicing["success"]:
                     return missing_in_ezyinvoicing
@@ -1238,7 +1296,8 @@ def create_reconciliation(start_date, end_date):
                     return hsnsumb2c
 
         # No SAC
-        no_sac_query = frappe.db.sql("""SELECT `tabItems`.parent as invoicenumber, `tabItems`.description as itemdescription, `tabItems`.item_value_after_gst as beforegst, `tabItems`.cgst_amount as cgstamount, `tabItems`.sgst_amount as sgstamount, `tabItems`.igst_amount as igstamount,`tabItems`.item_taxable_value as taxablevalue, `tabInvoices`.irn_generated as irnstatus from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabItems`.sac_code = "No Sac" and invoice_date between '{}' and '{}'""".format(start_date, end_date), as_dict=1)
+        no_sac_query = frappe.db.sql("""SELECT `tabItems`.parent as invoicenumber, `tabItems`.description as itemdescription, `tabItems`.item_value_after_gst as before_gst, `tabItems`.cgst_amount as cgst_amount, `tabItems`.sgst_amount as sgst_amount, `tabItems`.igst_amount as igst_amount,`tabItems`.item_taxable_value as total_tax_amount, `tabItems`.vat_amount as vat_amount, `tabInvoices`.irn_generated as irnstatus from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabItems`.sac_code = "No Sac" and invoice_date between '{}' and '{}'""".format(start_date, end_date), as_dict=1)
+        print("......;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;..")
         if len(no_sac_query) > 0:
             for each in no_sac_query:
                 each["doctype"] = "No Sac"
@@ -1246,11 +1305,11 @@ def create_reconciliation(start_date, end_date):
                 no_sac = insert_records(each)
                 if not no_sac["success"]:
                     return no_sac
-        return {"success": True, "message": "Reconciliation created"}
-
+        frappe.publish_realtime("custom_socket", {"message": "Create Recon"})
+        return {'success': True, "message": "created recon"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("document_sequence",
+        frappe.log_error("create_recon",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
@@ -1269,24 +1328,29 @@ def insert_records(data):
 
 
 @frappe.whitelist(allow_guest=True)
-def export_recon(doctype=None, reconID=None, export="False"):
+def export_recon(doctype=None, reconID=None, export="False", filter={}):
     try:
+        doc_name = doctype
+        if isinstance(filter, str):
+            filter = json.loads(filter)
+        # filter.extend(["invoice_type", "=", "B2C"])
         filters = {"recon_id": reconID}
+        filters.update(filter)
         if doctype == "Invoice Count":
             fields = ["ezyinvoicing_count", "opera_folios_count",
                       "missing_in_ezyinvoicing", "missing_in_opera", "type_missmatch"]
             fields1 = ["ezyinvoicing_count as 'Ezyinvoicing Count'", "opera_folios_count as 'Opera Folio Count'",
-                       "missing_in_ezyinvoicing as 'Missing in Ezyinvoicing'", "missing_in_opera as 'Missing in Opera'", "type_missmatch as 'Type Mismatch'"]
+                       "missing_in_ezyinvoicing as 'Missing in Ezyinvoicing'", "missing_in_opera as 'Missing in Opera'", "type_missmatch as 'Type Missmatch'"]
         elif doctype in ["Missing in Opera", "Zero Invoice"]:
             filters["is_zero_invoice"] = 1 if doctype == "Zero Invoice" else 0
-            fields = ["invoice_number", "invoice_date", "invoice_type", "invoice_category", "irn_status", "ezyinvoice_status", "invoice_amount", "taxable_value", "igst_amount",
+            fields = ["invoice_number", "invoice_date", "invoice_type", "invoice_category", "irn_status", "ezyinvoice_status", "invoice_amount", "total_tax_amount", "igst_amount",
                       "sgst_amount", "cgst_amount", "total_gst_amount", "other_charges", "cess", "vat_amount", "irn_number", "acknowledgement_no", "acknowledgement_date"]
-            fields1 = ["invoice_number as 'Invoice Number'", "invoice_date as 'Invoice Date'", "invoice_type as 'Invoice Type'", "invoice_category as 'Invoice Category'", "irn_status as 'IRN Status'", "ezyinvoice_status as 'Ezyinvoice Status'", "invoice_amount as 'Invoice Amount'", "taxable_value as 'Taxable Amount'", "igst_amount as 'IGST Amount'",
+            fields1 = ["invoice_number as 'Invoice Number'", "invoice_date as 'Invoice Date'", "invoice_type as 'Invoice Type'", "invoice_category as 'Invoice Category'", "irn_status as 'IRN Status'", "ezyinvoice_status as 'Ezyinvoice Status'", "invoice_amount as 'Invoice Amount'", "total_tax_amount as 'Taxable Amount'", "igst_amount as 'IGST Amount'",
                        "sgst_amount as 'SGST Amount'", "cgst_amount as 'CGST Amount'", "total_gst_amount as 'Total GST Amount'", "other_charges as 'Other Charges'", "cess as 'CESS'", "vat_amount as 'VAT Amount'", "irn_number as 'IRN Number'", "acknowledgement_no as 'Acknowledge Number'", "acknowledgement_date as 'Acknowledge Date'"]
             doctype = "Missing in Opera"
         elif doctype == "Missing in EzyInvoicing":
-            fields = ["invoice_numbers"]
-            fields1 = ["invoice_numbers as 'Invoice Numbers'"]
+            fields = ["invoice_number"]
+            fields1 = ["invoice_number as 'Invoice Number'"]
         elif doctype == "Invoice Type Missmatch":
             fields = ["invoicenumber", "ezyinvoicing", "opera"]
             fields1 = ["invoicenumber as 'Invoice Number'",
@@ -1299,8 +1363,8 @@ def export_recon(doctype=None, reconID=None, export="False"):
         elif doctype == "Recon Opera Comparison":
             fields = ["invoicenumber", "ezyinvoicingbaseamount", "operabaseamount", "basemissmatchamount", "baseamountstatus", "ezyinvoicinginvoiceamount",
                       "operainvoiceamount", "invoicemissmatchamount", "invoiceamountstatus", "irn_status", "irn_number", "acknowledgement_no", "acknowledgement_date"]
-            fields1 = ["invoicenumber as 'Invoice Number'", "ezyinvoicingbaseamount as 'Ezyinvoicing Base Amount'", "operabaseamount as 'Opera Base Amount'", "basemissmatchamount as 'Base Mismatch Amount'", "baseamountstatus as 'Base Amount Status'", "ezyinvoicinginvoiceamount as 'Ezyinvoicing Invoice Amount'",
-                       "operainvoiceamount as 'Opera Invoice Amount'", "invoicemissmatchamount as 'Invoice Mismatch Amount'", "invoiceamountstatus as 'Invoice Amount Status'", "irn_status as 'IRN Status'", "irn_number as 'IRN Number'", "acknowledgement_no as 'Acknowledge Number'", "acknowledgement_date as 'Acknowledge Date'"]
+            fields1 = ["invoicenumber as 'Invoice Number'", "ezyinvoicingbaseamount as 'Ezyinvoicing Base Amount'", "operabaseamount as 'Opera Base Amount'", "basemissmatchamount as 'Base Amount Difference'", "baseamountstatus as 'Base Amount Status'", "ezyinvoicinginvoiceamount as 'Ezyinvoicing Invoice Amount'",
+                       "operainvoiceamount as 'Opera Invoice Amount'", "invoicemissmatchamount as 'Invoice Amount Difference'", "invoiceamountstatus as 'Invoice Amount Status'", "irn_status as 'IRN Status'", "irn_number as 'IRN Number'", "acknowledgement_no as 'Acknowledge Number'", "acknowledgement_date as 'Acknowledge Date'"]
         elif doctype == "Converted B2B to B2C":
             fields = ["invoicenumber", "invoiceuploadtype",
                       "printeddate", "converteddate"]
@@ -1315,82 +1379,87 @@ def export_recon(doctype=None, reconID=None, export="False"):
             filters["type"] = "ALL" if doctype == "Recon HSN Summary" else (
                 "B2B" if doctype == "B2B HSN Summary" else "B2C")
             fields = ["sac_code", "gst_rate", "uqc", "total_quantity", "cgst_amount", "sgst_amount", "igst_amount",
-                      "state_cess_amount", "central_cess_amount", "vat", "total_gst", "total_tax_amount", "total_amount"]
+                      "state_cess_amount", "central_cess_amount", "vat_amount", "total_gst_amount", "total_tax_amount", "total_invoice_amount"]
             fields1 = ["sac_code as 'Sac Code'", "gst_rate 'GST Rate'", "uqc as 'UQC'", "total_quantity as 'Total Quantity'", "cgst_amount as 'CGST Amount'", "sgst_amount as 'SGST Amount'", "igst_amount as 'IGST Amount'",
-                       "state_cess_amount as 'State Cess Amount'", "central_cess_amount as 'Central Cess Amount'", "vat as 'VAT'", "total_gst as 'Total GST'", "total_tax_amount as 'Total Tax Amount'", "total_amount as 'Total Amount'"]
+                       "state_cess_amount as 'State Cess Amount'", "central_cess_amount as 'Central Cess Amount'", "vat_amount as 'VAT Amount'", "total_gst_amount as 'Total GST Amount'", "total_tax_amount as 'Total Tax Amount'", "total_invoice_amount as 'Total Invoice Amount'"]
             doctype = "Recon HSN Summary"
         elif doctype == "No Sac":
-            fields = ["invoicenumber", "itemdescription", "beforegst",
-                      "cgstamount", "sgstamount", "igstamount", "taxablevalue", "irnstatus"]
-            fields1 = ["invoicenumber as 'Invoice Number'", "itemdescription as 'Item Description'", "beforegst as 'Before GST'", "cgstamount as 'CGST Amount'",
-                       "sgstamount as 'SGST Amount'", "igstamount as 'IGST Amount'", "taxablevalue as 'Taxable Value'", "irnstatus as 'IRN Status'"]
+            fields = ["invoicenumber", "itemdescription", "before_gst",
+                      "cgst_amount", "sgst_amount", "igst_amount", "total_tax_amount", "vat_amount", "irnstatus"]
+            fields1 = ["invoicenumber as 'Invoice Number'", "itemdescription as 'Item Description'", "before_gst as 'Before GST'", "cgst_amount as 'CGST Amount'",
+                       "sgst_amount as 'SGST Amount'", "igst_amount as 'IGST Amount'", "total_tax_amount as 'Taxable Value'", "vat_amount as 'VAT Amount'", "irnstatus as 'IRN Status'"]
         else:
             return {"success": False, "message": "something went wrong"}
         # fields.append("recon_id")
         if export == "True":
             doctype = "tab"+doctype
-            sql_filters = " " + (' and '.join("{} {} '{}'".format(key, "=", value) for key, value in filters.items()))
-            get_list = frappe.db.sql("""select {} from `{}` where {}""".format(", ".join(fields1),doctype,sql_filters), as_dict=1)
+            sql_filters = " " + \
+                (' and '.join("{} {} '{}'".format(key, "=", value)
+                 for key, value in filters.items()))
+            get_list = frappe.db.sql("""select {} from `{}` where {}""".format(
+                ", ".join(fields1), doctype, sql_filters), as_dict=1)
             if len(get_list) > 0:
                 company = frappe.get_last_doc("company")
                 cwd = os.getcwd()
                 site_name = cstr(frappe.local.site)
-                sheet = doctype.replace("tab", "")
                 file_path = cwd + "/" + site_name + "/public/files/recon_export.xlsx"
                 df = pd.DataFrame.from_records(get_list)
+                
                 writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
-
-                # writer = pd.ExcelWriter('/path/to/output/file.xlsx')
-                df.to_excel(writer, sheet_name=sheet, index=False, na_rep='NaN')
+                total = df.sum(numeric_only=True, axis=0)
+                total.name = "Total"
+                df = df.append(total.transpose())
+                field_list = list(get_list[0].keys())
+                df[field_list[0]] = df[field_list[0]].replace(np.nan, "Total")
+                df.to_excel(writer, sheet_name=doc_name, index=False)
 
                 for column in df:
-                    column_length = max(df[column].astype(str).map(len).max(), len(column))
+                    column_length = max(df[column].astype(
+                        str).map(len).max(), len(column))
                     col_idx = df.columns.get_loc(column)
-                    writer.sheets[sheet].set_column(col_idx, col_idx, column_length)
-
-                writer.save()
-
-                # for sheet, df in df.items():
-                #     df.to_excel(writer, sheet_name=sheet)
-                #     worksheet = writer.sheets[sheet]
-                #     for idx, col in enumerate(df):
-                #         series = df[col]
-                #         max_len = max((series.astype(str).map(len).max(),len(str(series.name)))) + 1
-                #         worksheet.set_column(idx, idx, max_len)
-                # writer.save()
-
-                # df.to_excel(writer, index=False, sheet_name= sheet)
-                # # excel  = writer.book
-                # excel1 = writer.sheets[sheet]
-                # excel1.set_column('A:B', 25)
-                # excel1.set_column('A:B', 25)
-                # excel1.set_column('C:D', 25)
-                # excel1.set_column('E:F', 25)
-                # excel1.set_column('G:H', 25)
-                # excel1.set_column('I:J', 25)
-                # excel1.set_column('K:L', 25)
-                # excel1.set_column('M:N', 25)
-                # excel1.set_column('O:P', 25)
-                # excel1.set_column('Q:R', 25)
+                    writer.sheets[doc_name].set_column(
+                        col_idx, col_idx, column_length)
                 writer.save()
                 files_new = {"file": open(file_path, 'rb')}
                 payload_new = {'is_private': 1, 'folder': 'Home'}
                 file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                            data=payload_new, verify=False).json()
+                                              data=payload_new, verify=False).json()
                 if "file_url" in file_response["message"].keys():
                     os.remove(file_path)
-                    return {"success": True, "file_url": file_response["message"]["file_url"]}
+                    return {"success": True, "file_url": file_response["message"]["file_url"], "file_name": reconID+doc_name+".xlsx"}
                 return {"success": False, "message": "something went wrong"}
             else:
                 return {"success": False, "message": "no data found"}
         else:
-            get_list = frappe.db.get_list(doctype, filters=filters, fields=fields)
+            get_list = frappe.db.get_list(
+                doctype, filters=filters, fields=fields)
+            counts = {"count":len(get_list)}
+            if doctype in ["Missing in Opera", "Zero Invoice", "Recon Opera Comparison", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]:
+                df = pd.DataFrame.from_records(get_list)
+                total = df.sum(numeric_only=True, axis=0)
+                total.name = "Total"
+                df = df.append(total.transpose())
+                h_total = []
+                if bool(dict(total.transpose())):
+                    h_total = [dict(total.transpose())]
+                    get_list.extend(h_total)
+                if doctype == "Recon Opera Comparison":
+                    counts_base = df['baseamountstatus'].value_counts()
+                    # counts_invoice = df['invoiceamountstatus'].value_counts()
+                    # counts_invoice.rename(columns = {'Match':'Inv_Match','MisMatch':'Inv_MisMatch','Missing in Opera':'Missing_in_Opera'}, inplace = True)
+                    # print(counts_invoice,"..............")
+                    count_base = counts_base.to_dict()
+                    counts.update(count_base)
+                    # counts_invoice = df['invoiceamountstatus'].value_counts()
             if len(get_list) > 0:
-                return {"success": True, "data": get_list, "fields":fields}
+                return {"success": True, "data": get_list, "fields": fields, "counts": counts}
+            else:
+                get_list = [{i: "" for i in fields}]
+                return {"success": True, "data": get_list, "fields": fields, "counts": {"count":0}}
         return {"success": False, "message": "no data found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("export",
+        frappe.log_error("export_recon",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
@@ -1398,7 +1467,8 @@ def export_recon(doctype=None, reconID=None, export="False"):
 @frappe.whitelist(allow_guest=True)
 def export_workbook_recon(reconID=None):
     try:
-        doctypes = ["Invoice Count", "Missing in Opera", "Zero Invoice", "Missing in EzyInvoicing", "Invoice Type Missmatch", "Ezy Invoicing Summary", "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]
+        doctypes = ["Invoice Count", "Missing in Opera", "Zero Invoice", "Missing in EzyInvoicing", "Invoice Type Missmatch", "Ezy Invoicing Summary",
+                    "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]
         wb = Workbook()
         ws = wb.active
         Sheet = wb['Sheet']
@@ -1407,24 +1477,24 @@ def export_workbook_recon(reconID=None):
             data = export_recon(doctype=each, reconID=reconID, export="False")
             if not data["success"]:
                 return data
-            if each in ["Missing in Opera", "Zero Invoice","Recon Opera Comparison", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]:
+            if each in ["Missing in Opera", "Zero Invoice", "Recon Opera Comparison", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]:
                 recon_data = pd.DataFrame.from_records(data["data"])
-                total = recon_data.sum(numeric_only=True, axis=0)
-                total.name = "Total"
-                recon_data = recon_data.append(total.transpose())
-                recon_data[data["fields"][0]] = recon_data[data["fields"][0]].replace(
-                    np.nan, "Total")
-                # font = Font(name='Cambria', size=12, bold=True, color='00FFFFFF')
-                if each in ["Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary"]:
-                    recon_data['gst_rate'] = np .where(recon_data['gst_rate'] > 25, "", recon_data["gst_rate"])
-                    recon_data['total_quantity'] = np .where(recon_data['total_quantity'] > 1, "", recon_data["total_quantity"])
-                data["data"] = recon_data.to_dict('records')
+                if len(recon_data) > 0:
+                    recon_data[data["fields"][0]] = recon_data[data["fields"][0]].replace(
+                        np.nan, "Total")
+                    if each in ["Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary"]:
+                        recon_data['gst_rate'] = np .where(
+                            recon_data['gst_rate'] > 25, "", recon_data["gst_rate"])
+                        recon_data['total_quantity'] = np .where(
+                            recon_data['total_quantity'] > 1, "", recon_data["total_quantity"])
+                    data["data"] = recon_data.to_dict('records')
             # export_recon.doctypes()
             ws = wb.create_sheet(each)
             ws.title = each
             for i in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']:
                 ws.column_dimensions[i].width = 20
-            fields = [(each.replace("_"," ")).title() for each in data["fields"]]
+            fields = [(each.replace("_", " ")).title()
+                      for each in data["fields"]]
             ws.append(fields)
             for product in data["data"]:
                 values = (product[k] for k in data["fields"])
@@ -1438,13 +1508,125 @@ def export_workbook_recon(reconID=None):
         payload_new = {'is_private': 1, 'folder': 'Home'}
         company = frappe.get_last_doc("company")
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                    data=payload_new, verify=False).json()
+                                      data=payload_new, verify=False).json()
         if "file_url" in file_response["message"].keys():
             os.remove(file_path)
-            return {"success": True, "file_url": file_response["message"]["file_url"]}
+            return {"success": True, "file_url": file_response["message"]["file_url"], "file_name": reconID+".xlsx"}
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("export",
+        frappe.log_error("export_workbook_recon",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def delete_recon_file(name=[]):
+    try:
+        if not isinstance(name, list):
+            name = json.loads(name)
+        if len(name) > 0:
+            enqueue(
+                delete_recon,
+                queue="default",
+                timeout=800000,
+                event="data_import",
+                now=False,
+                data={"recon_ids": name, "redo": False},
+                is_async=True,
+            )
+            return {"success": True, "message": "Recon Deleted"}
+        return {"success": False, "message": "reconID's is mandatory"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("delete_recon_file",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
+def delete_recon(data):
+    try:
+        for ids in data["recon_ids"]:
+            if frappe.db.exists("Recon Details", ids):
+                doctypes = ["Invoice Count", "Missing in Opera", "Missing in EzyInvoicing", "Invoice Type Missmatch", "Ezy Invoicing Summary",
+                            "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "No Sac"]
+                for each in doctypes:
+                    frappe.db.delete(each, {"recon_id": ids})
+                if not data["redo"]:
+                    frappe.db.delete("Recon Details", ids)
+                    frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Delete Recon"})
+        return {"success": True, "message": "recon deleted"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("delete_recon",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist(allow_guest=True)
+def Redo_recon(name=None):
+    try:
+        delete_reconcilation = delete_recon(
+            {"recon_ids": [name], "redo": True})
+        if not delete_reconcilation["success"]:
+            return delete_reconcilation
+        create_recon = create_reconciliation(redo=True, recon_id=name)
+        if not create_recon["success"]:
+            return create_recon
+        return {"success": True, "message": "Recon Recreated"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Redo_recon",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def outward_supply(month=None, year=None):
+    try:
+        start_date = year+'-'+month+"-01"
+        end_date = str(date_util.get_last_day(start_date))
+        outward = execute({"from_date": start_date, "to_date": end_date, "export": True})
+        return outward
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("outward_supply",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def last_recon_update():
+    try:
+        outward = frappe.db.sql("""SELECT `tabRecon Details`.creation as Creation from `tabRecon Details` order by creation desc LIMIT  1""")
+        print(outward, "////////")
+        return outward
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("last_recon_update",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def dashborad_recon(recon_id=None):
+    try:
+        invoice_count = frappe.db.sql("""SELECT ezyinvoicing_count as 'ezyinvoicing_count', missing_in_ezyinvoicing as 'missing_in_ezyinvoicing', opera_folios_count as 'opera_folio_count', missing_in_opera as 'missing_in_opera', (ezyinvoicing_count-opera_folios_count) as 'ezy_opera_variance' from `tabInvoice Count` where recon_id='{}'""".format(recon_id), as_dict=1)
+        ezy_opera_comparison = frappe.db.sql("""SELECT round(sum(ezyinvoicingbaseamount),2) as 'ezy_total_base_amount', round(sum(ezyinvoicinginvoiceamount),2) as 'ezy_total_invoice_amount', round(sum(operabaseamount),2) as 'opera_total_base_amount', round(sum(operainvoiceamount),2) as 'opera_total_invoice_amount' from `tabRecon Opera Comparison` where recon_id = '{}'""".format(recon_id), as_dict=1)
+        con_b2c_b2b = frappe.db.sql("""SELECT count(invoicenumber) as 'count_of_b2c_to_b2b' from `tabConverted B2C to B2B` where recon_id = '{}'""".format(recon_id), as_dict=1)
+        con_b2b_b2c = frappe.db.sql("""SELECT count(invoicenumber) as 'count_of_b2b_to_b2c' from `tabConverted B2B to B2C` where recon_id = '{}'""".format(recon_id), as_dict=1)
+        opera_tax_credit = frappe.db.sql("""SELECT count(opera) as 'opera_count_tax_to_credit' from `tabInvoice Type Missmatch` where `tabInvoice Type Missmatch`.opera = "Tax Invoice" and recon_id = '{}'""".format(recon_id), as_dict=1)
+        opera_credit_tax = frappe.db.sql("""SELECT count(opera) as 'opera_count_tax_to_credit' from `tabInvoice Type Missmatch` where `tabInvoice Type Missmatch`.opera = "Credit Invoice" and recon_id = '{}'""".format(recon_id), as_dict=1)
+        # return opera_credit_tax
+        total_data = {"invoice_count": {k: (0 if v is None else v) for k, v in invoice_count[0].items()},
+                      "ezy_opera_comparison": {k: (0 if v is None else v) for k, v in ezy_opera_comparison[0].items()},
+                      "con_b2c_b2b": {k: (0 if v is None else v) for k, v in con_b2c_b2b[0].items()},
+                      "con_b2b_b2c": {k: (0 if v is None else v) for k, v in con_b2b_b2c[0].items()},
+                      "opera_tax_credit": {k: (0 if v is None else v) for k, v in opera_tax_credit[0].items()},
+                      "opera_credit_tax": {k: (0 if v is None else v) for k, v in opera_credit_tax[0].items()}}
+        return {"success": True, "data": total_data}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("last_recon_update",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
