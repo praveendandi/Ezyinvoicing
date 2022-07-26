@@ -7,6 +7,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.invoice_helpers import calulate_b2c_items
+import re
 
 # @frappe.whitelist(allow_guest=True)
 def bulkupload(data):
@@ -32,15 +33,15 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
+            # if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01"]:
             if "," in item[0]:
                 item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 if companyData.name == "ABCBP-01":
                     item[bulk_meta_data["Gst_details"]["invoice_number"]] = item[bulk_meta_data["Gst_details"]["invoice_number"]][4:]
+                    print("..................",item[bulk_meta_data["Gst_details"]["gst_number"]],item[bulk_meta_data["Gst_details"]["invoice_number"]])
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
-            # else:
-            #     gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
         # print(gst_data,"+++++++++++++++")
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
@@ -71,7 +72,7 @@ def bulkupload(data):
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
                 else:
-                    data["invoice_number"] =data["invoice_number"]
+                    data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
             print(data["invoice_number"],"=================")
             items = []
@@ -131,7 +132,7 @@ def bulkupload(data):
             refobj = data.copy()
             del refobj['items']
             refobj['items'] = items_pdf
-            invoice_referrence_objects[each['BILL_NO']] = refobj
+            invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
             input_data.append(data)
         # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
@@ -139,6 +140,7 @@ def bulkupload(data):
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})
         countIn = 1
         for each_item in input_data:
+            print(each_item,"++++++++")
             if "invoice_number" in each:
                 each["gstNumber"]=gst_data[each["invoice_number"]]
             if each_item['invoice_category'] == "CREDIT TAX INVOICE":
@@ -314,8 +316,10 @@ def bulkupload(data):
                         get_invoice_amount = calulate_b2c_items(calulateItemsApiResponse['data'])
                         if not get_invoice_amount["success"]:
                             return get_invoice_amount
-                        if get_invoice_amount["total_invoice_amount"] != each_item['total_invoice_amount']:
-                            invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1 = 1
+                        round_off_amount = abs(each_item['total_invoice_amount']) - abs(get_invoice_amount["total_invoice_amount"])
+                        if abs(round_off_amount) > 6:
+                            if get_invoice_amount["total_invoice_amount"] != each_item['total_invoice_amount']:
+                                invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1 = 1
                         each_item['total_invoice_amount'] = get_invoice_amount["total_invoice_amount"]
                     if reupload==False:
                         insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False, "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1})

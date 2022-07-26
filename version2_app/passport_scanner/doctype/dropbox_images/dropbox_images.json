@@ -1,0 +1,68 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-02-16 22:07:05.583580",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "image_path",
+  "frontback",
+  "id_type",
+  "merged",
+  "image_full_path",
+  "filename",
+  "merged_to"
+ ],
+ "fields": [
+  {
+   "fieldname": "image_path",
+   "fieldtype": "Attach",
+   "label": "Image Path"
+  },
+  {
+   "fieldname": "frontback",
+   "fieldtype": "Select",
+   "label": "Front/Back",
+   "options": "Front\nBack"
+  },
+  {
+   "fieldname": "id_type",
+   "fieldtype": "Select",
+   "label": "Id type",
+   "options": "aadhaar\nvoterid\nindianpassport\ndriving\nothers\noci\ninvoice\npan"
+  },
+  {
+   "default": "0",
+   "fieldname": "merged",
+   "fieldtype": "Check",
+   "label": "Merged"
+  },
+  {
+   "fieldname": "image_full_path",
+   "fieldtype": "Data",
+   "label": "Image Full Path"
+  },
+  {
+   "fieldname": "filename",
+   "fieldtype": "Data",
+   "label": "Filename"
+  },
+  {
+   "fieldname": "merged_to",
+   "fieldtype": "Data",
+   "label": "Merged To"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-02-23 15:58:59.090253",
+ "modified_by": "Administrator",
+ "module": "Passport Scanner",
+ "name": "Dropbox Images",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

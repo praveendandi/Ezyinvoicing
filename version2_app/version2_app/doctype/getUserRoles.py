@@ -52,7 +52,7 @@ def getUserRoles():
                     "parenttype": "User",
                     "role": i,
                     })
-                doc.save()
+                doc.save(ignore_permissions=True, ignore_version=True)
                 frappe.db.commit()
             return {"success":True}
     except Exception as e:

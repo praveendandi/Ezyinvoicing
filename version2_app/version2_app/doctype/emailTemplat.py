@@ -2,7 +2,11 @@ import random
 import datetime,os,sys,traceback
 import json
 import requests
+import re
 import frappe
+from frappe.core.doctype.communication.email import make
+from frappe.email.doctype.email_queue.email_queue import send_now
+
 @frappe.whitelist(allow_guest=True)
 def emailTemplate():
     try:
@@ -110,4 +114,101 @@ def send_email():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing send_email","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def send_mail_files(data):
+    try:
+        if isinstance(data, str):
+            data = json.loads(data)
+        print(type(data),"...............", data)
+        obj = {"email":""}
+        get_doc = frappe.get_doc(data["doctype"],data["name"])
+        if data["doctype"] == "Invoices":
+            if get_doc.confirmation_number != "":
+                obj["email"] = frappe.db.get_value("Arrival Information",get_doc.confirmation_number,["guest_email_address"])
+        get_email_sender = frappe.db.get_list("Email Account",filters=[["default_outgoing","=",1]],fields=["email_id"])
+        if len(get_email_sender) == 0:
+            return{"success":False,"message":"Make one smtp as a defalut outgoing"}
+        get_email_sender = get_email_sender[0]
+        b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
+        obj["val"] = b2csuccess
+        if b2csuccess.response:
+            obj["content"] = re.compile(r'<[^>]+>').sub('', b2csuccess.response)
+        obj["sender"] = get_email_sender["email_id"]
+        files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
+        att = [files[0]["name"]]
+        if "signatured_file" in data:
+            sig_files=frappe.db.get_list('File',filters={'file_url': ['=',data["signatured_file"]]},fields=['name'])
+            att.extend([sig_files[0]["name"]])
+        obj["attachments"] = att
+        if "receiver_email" in data:
+            response = make(recipients = data["receiver_email"],
+                            sender = obj["sender"],
+                            subject = b2csuccess.subject,
+                            content = b2csuccess.response,
+                            doctype = data["doctype"],
+                            name = data["name"],
+                            attachments = obj["attachments"],
+                            send_email=1
+                            )
+            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",response["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
+            if len(email_queue) > 0:
+                send_now(email_queue[0]["name"])
+            return {"success":True,"message":"Mail Send"}
+        return {"success": True, "obj":obj}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing send_email_files","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)    
+def email_logs():
+    try:
+        data = frappe.db.get_all("Email Queue",fields=["sender","status","name","creation"])
+        for each in data:
+            each["recipient"]=frappe.db.get_value("Email Queue Recipient",{"parent":each["name"]},"recipient")
+        return {"success": True, "data":data}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)    
+def signezy_email_logs():
+    try:
+        data = frappe.db.get_all("Email Queue",filters={"reference_doctype":"Invoices"},fields=["sender","status","name","creation"])
+        for each in data:
+            each["recipient"]=frappe.db.get_value("Email Queue Recipient",{"parent":each["name"]},"recipient")
+        return {"success": True, "data":data}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-signezy_email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        print(str(e))
+        return{"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)    
+def email_push_tab():
+    try:
+        data = json.loads(frappe.request.data)
+        data = data["data"]
+        get_doc = frappe.get_doc(data["doctype"],data["name"])
+        b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
+        files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
+        attachments = [d['name'] for d in files]
+        response = make(recipients = data["email"],
+            # cc = '',
+            subject = b2csuccess.subject,
+            content = b2csuccess.response,
+            doctype = data["doctype"],
+            name = data["name"],
+            attachments = attachments,
+            send_email=1
+        )
+        return {"success":True,"message":"Mail Send"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing email_logs","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return{"success":False,"message":str(e)}

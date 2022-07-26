@@ -19,7 +19,14 @@
   "company",
   "mode",
   "no_of_guests",
-  "gcp_file_url"
+  "gcp_file_url",
+  "attached_to",
+  "pos_check_reference_number",
+  "check_date",
+  "sync",
+  "status",
+  "detected_check_number",
+  "detected_check_date"
  ],
  "fields": [
   {
@@ -98,11 +105,51 @@
    "fieldname": "gcp_file_url",
    "fieldtype": "Data",
    "label": "GCP File URL"
+  },
+  {
+   "fieldname": "attached_to",
+   "fieldtype": "Link",
+   "label": "Attached to",
+   "options": "Invoices"
+  },
+  {
+   "fieldname": "pos_check_reference_number",
+   "fieldtype": "Data",
+   "label": "POS Check Reference Number"
+  },
+  {
+   "fieldname": "check_date",
+   "fieldtype": "Date",
+   "label": "POS Check Date"
+  },
+  {
+   "default": "No",
+   "fieldname": "sync",
+   "fieldtype": "Select",
+   "label": "Sync",
+   "options": "Yes\nNo"
+  },
+  {
+   "default": "Pending Review",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending Review\nReviewed"
+  },
+  {
+   "fieldname": "detected_check_number",
+   "fieldtype": "Data",
+   "label": "Detected Check Number"
+  },
+  {
+   "fieldname": "detected_check_date",
+   "fieldtype": "Data",
+   "label": "Detected Check Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-19 18:38:01.600023",
+ "modified": "2022-07-22 11:51:09.112050",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "POS Checks",
@@ -117,6 +164,42 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
    "share": 1,
    "write": 1
   }

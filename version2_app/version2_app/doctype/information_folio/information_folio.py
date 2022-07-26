@@ -111,7 +111,7 @@ def insert_information_folio(data):
 @frappe.whitelist(allow_guest=True)
 def update_signature(name=None, signature=None, work_station=None, tab=None, doctype=None):
     doc = frappe.db.set_value(doctype, name,
-                              'signature', signature, update_modified=False)
+                              'signature', signature)
 
     frappe.db.commit()
     data = {
