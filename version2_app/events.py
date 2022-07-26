@@ -946,9 +946,28 @@ def extract_data_from_pos_check(data={}):
         post_data = {
             "base": image_to_base["data"]
         }
-        image_response = requests.post(company.pos_bill_domain,
-            json=post_data,
-        )
+        # image_response = requests.post(company.pos_bill_domain,
+        #     json=post_data,
+        # )
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+        if company.proxy == 0:
+            if company.skip_ssl_verify == 0:
+                image_response = requests.post(
+                    company.pos_bill_domain,
+                    json=post_data,verify=False)
+            else:
+                image_response = requests.post(
+                    company.pos_bill_domain,
+                    json=post_data,verify=False)
+            
+        else:
+            image_response = requests.post(
+                company.pos_bill_domain,
+                json=post_data,
+                proxies=proxies,verify=False)
         if image_response.status_code == 200:
             image_response = image_response.json()
             extract = extract_data(image_response["data"],company)
