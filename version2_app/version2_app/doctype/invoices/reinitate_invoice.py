@@ -325,7 +325,7 @@ def Reinitiate_invoice(data):
             invoice_round_off_amount = 0
         get_items = frappe.db.get_list("Items", {'parent': data['guest_data']['invoice_number']}, pluck="name")
         if len(get_items) > 0:
-            frappe.db.sql("""update `tabItems` set pos_check="" where parent={}""".format(data['guest_data']['invoice_number']))
+            frappe.db.sql("""update `tabItems` set pos_check="" where parent='{}'""".format(data['guest_data']['invoice_number']))
             frappe.db.commit()
         doc.total_invoice_amount = data["total_invoice_amount"]
         doc.place_of_supply = place_of_supply
