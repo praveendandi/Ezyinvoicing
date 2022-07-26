@@ -53,7 +53,6 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]['sum_val']]=0
             if companyData.name == "ABCBP-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
-            print(each[bulk_meta_data["detail_folio"]["invoice_number"]],".............................")
             if str(each[bulk_meta_data["detail_folio"]["invoice_number"]]) in gst_data.keys():
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
@@ -72,8 +71,9 @@ def bulkupload(data):
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
                 else:
-                    data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
-                # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
+                    data["invoice_number"] =data["invoice_number"]
+                    # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
+                # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
             print(data["invoice_number"],"=================")
             items = []
             items_pdf = []
@@ -132,7 +132,8 @@ def bulkupload(data):
             refobj = data.copy()
             del refobj['items']
             refobj['items'] = items_pdf
-            invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
+            invoice_referrence_objects[each['BILL_NO']] = refobj
+            # invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
             input_data.append(data)
         # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
