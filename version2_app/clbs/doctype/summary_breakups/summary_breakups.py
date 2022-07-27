@@ -435,6 +435,7 @@ def create_breakup_details(doc, details_data, summary):
     try:
         get_company = frappe.get_last_doc("company")
         for child_items in details_data:
+            child_items["date"] = str(child_items["date"])
             print(child_items,".........................................")
             child_items["parent"] = doc.name
             invoice_file = child_items["invoice_file"]
