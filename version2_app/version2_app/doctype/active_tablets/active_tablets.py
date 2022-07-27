@@ -102,6 +102,7 @@ def resetworkstation_tablet(data):
             work_doc.status = "In Active"
             work_doc.mode = "Not Connected"
             work_doc.save(ignore_permissions=True,ignore_version=True)
+            data["uuid"] = doc.tablet
             frappe.publish_realtime("custom_socket", {'message':'Reset Workstation Tablet','type':"document_bin_insert","data":data})
             return {"success":True}
         else:

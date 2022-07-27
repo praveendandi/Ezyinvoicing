@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "outlet_name",
+  "outlet_short_name",
   "static_payment_qr_code",
   "outlet_logo",
   "payment_mode",
@@ -138,11 +139,16 @@
    "fieldtype": "Select",
    "label": "Payment gateway",
    "options": "Razorpay\nPaytm\nCCAvenue"
+  },
+  {
+   "fieldname": "outlet_short_name",
+   "fieldtype": "Data",
+   "label": "Outlet Short Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-01-06 14:15:43.391280",
+ "modified": "2022-07-07 14:26:21.793370",
  "modified_by": "Administrator",
  "module": "POS Bills",
  "name": "Outlets",

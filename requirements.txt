@@ -1,6 +1,6 @@
 frappe
 pdfplumber
-# pandas
+pandas
 qrcode
 google-cloud-storage
 XlsxWriter
@@ -9,22 +9,32 @@ watchdog
 ippserver
 xmltodict
 python-escpos==2.2.0
-# Pillow
+Pillow
 dateparser
 pyzbar
 text-to-image
-# Pillow
 scipy
 pytesseract
 pdf2image
+opencv-python
+email-to
+pyshorteners
+tensorflow
+razorpay
+selenium
 pytesseract
 WeasyPrint==52
 html2text
 # opencv-python
 typing-extensions
 paytmchecksum
-# opencv-python
+opencv-python
 fitz
+pgeocode
+datefinder
+typing_extensions
 PyMuPDF==1.18.16
 pyHanko
+uharfbuzz
+fontTools
 # attrs

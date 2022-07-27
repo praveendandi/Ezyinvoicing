@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "autoname": "field:id_name",
+ "creation": "2022-05-02 11:52:58.854021",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "id_name",
+  "id_status",
+  "id_type",
+  "value"
+ ],
+ "fields": [
+  {
+   "fieldname": "id_name",
+   "fieldtype": "Data",
+   "label": "Id Name",
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "id_status",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Id Status"
+  },
+  {
+   "fieldname": "id_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Id Type",
+   "options": "local\nforeign"
+  },
+  {
+   "fieldname": "value",
+   "fieldtype": "Select",
+   "label": " Value",
+   "options": "aadhaar\npassport\ndriving\nvoterId\nindianPassport\nzambiaPassport\nnrc"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-05-10 10:17:05.209126",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Nationality Ids",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
