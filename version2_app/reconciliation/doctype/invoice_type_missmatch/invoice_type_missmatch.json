@@ -6,17 +6,12 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "invoicenumber",
+  "invoice_number",
   "ezyinvoicing",
   "opera",
   "recon_id"
  ],
  "fields": [
-  {
-   "fieldname": "invoicenumber",
-   "fieldtype": "Data",
-   "label": "InvoiceNumber"
-  },
   {
    "fieldname": "ezyinvoicing",
    "fieldtype": "Data",
@@ -32,11 +27,16 @@
    "fieldtype": "Link",
    "label": "Recon ID",
    "options": "Recon Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 11:49:09.163253",
+ "modified": "2022-07-27 09:56:55.794089",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Invoice Type Missmatch",

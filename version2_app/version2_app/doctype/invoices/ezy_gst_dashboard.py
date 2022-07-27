@@ -1595,11 +1595,16 @@ def outward_supply(month=None, year=None):
         return {"success": False, "message": str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def last_recon_update():
+def last_recon_update(month=None, year=None):
     try:
-        outward = frappe.db.sql("""SELECT `tabRecon Details`.creation as Creation from `tabRecon Details` order by creation desc LIMIT  1""")
-        print(outward, "////////")
-        return outward
+        # if not month or not year:
+        #     return {"success": False, "message": "month or year is mandatory"}
+        recondate = ""
+        # outward = frappe.db.sql("""SELECT `tabRecon Details`.creation as Creation from `tabRecon Details` where MONTH(`tabRecon Details`.start_date) = {} and YEAR(`tabRecon Details`.start_date) = {} order by creation desc LIMIT  1""".format(month, year), as_dict=1)
+        outward = frappe.db.sql("""SELECT `tabRecon Details`.creation as Creation from `tabRecon Details` order by creation desc LIMIT  1""", as_dict=1)
+        if len(outward) > 0:
+            recondate = outward[0]["Creation"]
+        return {"success": True, "date": recondate}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("last_recon_update",

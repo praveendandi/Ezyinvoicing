@@ -6,7 +6,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "invoicenumber",
+  "invoice_number",
   "ezyinvoicingbaseamount",
   "operabaseamount",
   "basemissmatchamount",
@@ -22,11 +22,6 @@
   "recon_id"
  ],
  "fields": [
-  {
-   "fieldname": "invoicenumber",
-   "fieldtype": "Data",
-   "label": "InvoiceNumber"
-  },
   {
    "fieldname": "ezyinvoicingbaseamount",
    "fieldtype": "Float",
@@ -92,11 +87,16 @@
    "fieldtype": "Link",
    "label": "Recon ID",
    "options": "Recon Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-13 11:54:04.914782",
+ "modified": "2022-07-27 09:58:27.479052",
  "modified_by": "Administrator",
  "module": "Reconciliation",
  "name": "Recon Opera Comparison",

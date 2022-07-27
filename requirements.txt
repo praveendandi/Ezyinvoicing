@@ -25,6 +25,6 @@ typing-extensions
 paytmchecksum
 # opencv-python
 fitz
-PyMuPDF==1.18.14
+PyMuPDF==1.18.16
 pyHanko
 # attrs
