@@ -8,7 +8,7 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 import re
 
-# @frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)
 def bulkupload(data):
     try:
         invoice_data=data
@@ -32,7 +32,7 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01","LAAB-01"]:
+            if companyData.name in ["LAAB-01"]:
                 if "," in item[0]:
                     item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
