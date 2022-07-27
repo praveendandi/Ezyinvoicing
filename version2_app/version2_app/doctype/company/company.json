@@ -285,7 +285,8 @@
   "pos_date_regex",
   "pos_bill_domain",
   "pos_check_date_format",
-  "items_per_page"
+  "items_per_page",
+  "skip_pos_check_data_extraction"
  ],
  "fields": [
   {
@@ -1832,11 +1833,17 @@
    "fieldtype": "Select",
    "label": "Items Per Page",
    "options": "20\n50\n100\n150\n500"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_pos_check_data_extraction",
+   "fieldtype": "Check",
+   "label": "Skip POS Check Data Extraction"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-25 19:57:23.899354",
+ "modified": "2022-07-26 15:42:30.848483",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
