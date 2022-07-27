@@ -146,7 +146,8 @@
   "clbs_summary_generated",
   "invoice_submitted_in_clbs",
   "lut",
-  "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"
+  "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
+  "non_revenue_amount"
  ],
  "fields": [
   {
@@ -957,12 +958,17 @@
    "fieldname": "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
    "fieldtype": "Check",
    "label": "Invoice Mismatch While Bulkupload Auto B2C Success GSTR1"
+  },
+  {
+   "fieldname": "non_revenue_amount",
+   "fieldtype": "Float",
+   "label": "Non Revenue Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-06-27 16:33:18.996954",
+ "modified": "2022-07-26 17:33:15.439490",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -67,6 +67,7 @@ def Reinitiate_invoice(data):
         cgst_amount = 0
         sgst_amount = 0
         igst_amount = 0
+        non_revenue_amount = 0
         # cess_amount = 0
         total_central_cess_amount = 0
         total_state_cess_amount = 0
@@ -95,6 +96,8 @@ def Reinitiate_invoice(data):
                     print(item["taxable"],"---------------",item['item_value_after_gst'])
                     other_charges_before_tax += float(item['item_value'])
                     total_vat_amount += float(item['vat_amount'])
+                    if frappe.db.exists("SAC HSN CODES", {"sac_index":item["sac_index"], "ignore_non_taxable_items": 1}):
+                        non_revenue_amount += float(item['item_value_after_gst'])
                 elif item['taxable']=="No" and item['item_type']=="Discount":
                     discountAmount += item['item_value_after_gst'] 
                 elif item['sac_code']!= None:
@@ -264,7 +267,7 @@ def Reinitiate_invoice(data):
         doc.sgst_amount=round(sgst_amount,2)
         doc.igst_amount=round(igst_amount,2)
         doc.total_gst_amount = round(cgst_amount,2) + round(sgst_amount,2) + round(igst_amount,2)
-        
+        doc.non_revenue_amount = non_revenue_amount
         doc.irn_cancelled='No'
         doc.qr_code_generated='Pending'
         doc.signed_invoice_generated='No'
