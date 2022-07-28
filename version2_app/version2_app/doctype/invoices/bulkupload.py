@@ -32,10 +32,12 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
+            print(item)
             if companyData.name in ["HYA-01"]:
                 if "," in item[0]:
                     item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
+            print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
             # else:
@@ -88,7 +90,7 @@ def bulkupload(data):
                         # else:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
                         # continue
-                    elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'Service Charge' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
+                    elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
                         # if "%" in x[bulk_meta_data["detail_folio"]['transaction_description']:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac'}
                     # if x[bulk_meta_data["detail_folio"]["item_value"] is None:
