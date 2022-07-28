@@ -1040,14 +1040,14 @@ def amend_summary(summary):
             summary_doc = frappe.get_doc(summary_data)
             summary_doc.insert()
             frappe.db.commit()
-            frappe.publish_realtime("custom_socket", {"message": "Summary Created", "summary": summary_doc.name})
+            frappe.publish_realtime("custom_socket", {"message": "Summary Created", "summary": summary_doc.name, "percentage": 10})
             create_summary = create_summary_breakup(
                 filters=[["parent", "in", invoice_list]], summary=summary_doc.name)
             if not create_summary["success"]:
                 return create_summary
             summary_doc.amend_percentage = 70
             summary_doc.save()
-            frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name})
+            frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name, "percentage": 70})
             get_summary_payments = frappe.db.get_list("Summary Payments", filters=[
                                                       ["summary", "=", summary]], fields=["payment_description", "amount"])
             if len(get_summary_payments) > 0:
@@ -1057,7 +1057,7 @@ def amend_summary(summary):
                     return summary_payment
                 summary_doc.amend_percentage = 80
                 summary_doc.save()
-                frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name})
+                frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name, "percentage": 80})
             get_summary_document = frappe.db.get_list("Summary Documents", filters=[["summary", "=", summary], [
                                                       "document_type", "not in", ["invoices", "Invoices"]]], fields=["document_type", "document", "company"])
             if len(get_summary_document) > 0:
@@ -1066,7 +1066,7 @@ def amend_summary(summary):
                     return summary_document
                 summary_doc.amend_percentage = 90
                 summary_doc.save()
-                frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name})
+                frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name, "percentage": 90})
             
             get_dispatch_details = frappe.db.get_value("Dispatch Details", {"summaries": summary},["dispatch_date", "courier_service", "tracking_id"], as_dict=1)
             if bool(get_dispatch_details):
@@ -1077,7 +1077,8 @@ def amend_summary(summary):
                 frappe.db.commit()
             summary_doc.amend_percentage = 100
             summary_doc.save()
-            frappe.publish_realtime("custom_socket", {"message": "Amendment Completed", "summary": summary_doc.name})
+            frappe.db.commit()
+            frappe.publish_realtime("custom_socket", {"message": "Amendment Completed", "summary": summary_doc.name, "percentage": 100})
             return {"success":True, "message": "Amendment done", "summary": summary_doc.name}
         else:
             return {"success":False, "message": "Summary not found"}
