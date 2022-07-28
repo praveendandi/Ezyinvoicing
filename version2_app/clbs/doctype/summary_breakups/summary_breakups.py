@@ -1040,7 +1040,7 @@ def amend_summary(summary):
             summary_doc = frappe.get_doc(summary_data)
             summary_doc.insert()
             frappe.db.commit()
-            frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name})
+            frappe.publish_realtime("custom_socket", {"message": "Summary Created", "summary": summary_doc.name})
             create_summary = create_summary_breakup(
                 filters=[["parent", "in", invoice_list]], summary=summary_doc.name)
             if not create_summary["success"]:
