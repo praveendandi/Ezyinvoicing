@@ -1247,6 +1247,7 @@ def create_recon(data):
             for each in missing["data"]["converted_b2b_to_b2c"]:
                 each["doctype"] = "Converted B2B to B2C"
                 each["recon_id"] = recon_doc.name
+                each['invoice_number'] = each["invoicenumber"]
                 conb2b2c = insert_records(each)
                 if not conb2b2c["success"]:
                     return conb2b2c
@@ -1256,6 +1257,9 @@ def create_recon(data):
             for each in missing["data"]["converted_b2c_to_b2b"]:
                 each["doctype"] = "Converted B2C to B2B"
                 each["recon_id"] = recon_doc.name
+                each['invoice_number'] = each["invoicenumber"]
+                
+                missing_in_ezyinvoicing = insert_records(missing_in_ezy)
                 conb2cb2b = insert_records(each)
                 if not conb2cb2b["success"]:
                     return conb2cb2b
@@ -1301,6 +1305,7 @@ def create_recon(data):
             for each in no_sac_query:
                 each["doctype"] = "No Sac"
                 each["recon_id"] = recon_doc.name
+                each['invoice_number'] = each["invoicenumber"]
                 no_sac = insert_records(each)
                 if not no_sac["success"]:
                     return no_sac
@@ -1360,19 +1365,19 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
             fields1 = ["beforetax as 'Before Tax'", "cgst as 'CGST Amount'", "sgst as 'SGST Amount'",
                        "igst as 'IGST Amount'", "totalinvoiceamount as 'Total Invoice Amount'"]
         elif doctype == "Recon Opera Comparison":
-            fields = ["invoice_number", "ezyinvoicingbaseamount", "operabaseamount", "basemissmatchamount", "baseamountstatus", "ezyinvoicinginvoiceamount",
-                      "operainvoiceamount", "invoicemissmatchamount", "invoiceamountstatus", "irn_status", "irn_number", "acknowledgement_no", "acknowledgement_date"]
+            fields = ["invoice_number", "ezyinvoicingbaseamount", "operabaseamount", "basemissmatchamount", "ezyinvoicinginvoiceamount",
+                      "baseamountstatus","operainvoiceamount", "invoicemissmatchamount", "invoiceamountstatus", "irn_status", "irn_number", "acknowledgement_no", "acknowledgement_date"]
             fields1 = ["invoice_number as 'Invoice Number'", "ezyinvoicingbaseamount as 'Ezyinvoicing Base Amount'", "operabaseamount as 'Opera Base Amount'", "basemissmatchamount as 'Base Amount Difference'", "baseamountstatus as 'Base Amount Status'", "ezyinvoicinginvoiceamount as 'Ezyinvoicing Invoice Amount'",
                        "operainvoiceamount as 'Opera Invoice Amount'", "invoicemissmatchamount as 'Invoice Amount Difference'", "invoiceamountstatus as 'Invoice Amount Status'", "irn_status as 'IRN Status'", "irn_number as 'IRN Number'", "acknowledgement_no as 'Acknowledge Number'", "acknowledgement_date as 'Acknowledge Date'"]
         elif doctype == "Converted B2B to B2C":
-            fields = ["invoicenumber", "invoiceuploadtype",
+            fields = ["invoice_number", "invoiceuploadtype",
                       "printeddate", "converteddate"]
-            fields1 = ["invoicenumber as 'Invoice Number'", "invoiceuploadtype as 'Invoice Upload Type'",
+            fields1 = ["invoice_number as 'Invoice Number'", "invoiceuploadtype as 'Invoice Upload Type'",
                        "printeddate as 'Printed Date'", "converteddate as 'Converted Date'"]
         elif doctype == "Converted B2C to B2B":
-            fields = ["invoicenumber", "invoiceuploadtype",
+            fields = ["invoice_number", "invoiceuploadtype",
                       "printeddate", "converteddate"]
-            fields1 = ["invoicenumber as 'Invoice Number'", "invoiceuploadtype as 'Invoice Upload Type'",
+            fields1 = ["invoice_number as 'Invoice Number'", "invoiceuploadtype as 'Invoice Upload Type'",
                        "printeddate as 'Printed Date'", "converteddate as 'Converted Date'"]
         elif doctype in ["Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary"]:
             filters["type"] = "ALL" if doctype == "Recon HSN Summary" else (
@@ -1383,18 +1388,20 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
                        "state_cess_amount as 'State Cess Amount'", "central_cess_amount as 'Central Cess Amount'", "vat_amount as 'VAT Amount'", "total_gst_amount as 'Total GST Amount'", "total_tax_amount as 'Total Tax Amount'", "total_invoice_amount as 'Total Invoice Amount'"]
             doctype = "Recon HSN Summary"
         elif doctype == "No Sac":
-            fields = ["invoicenumber", "itemdescription", "before_gst",
+            fields = ["invoice_number", "itemdescription", "before_gst",
                       "cgst_amount", "sgst_amount", "igst_amount", "total_tax_amount", "vat_amount", "irnstatus"]
-            fields1 = ["invoicenumber as 'Invoice Number'", "itemdescription as 'Item Description'", "before_gst as 'Before GST'", "cgst_amount as 'CGST Amount'",
+            fields1 = ["invoice_number as 'Invoice Number'", "itemdescription as 'Item Description'", "before_gst as 'Before GST'", "cgst_amount as 'CGST Amount'",
                        "sgst_amount as 'SGST Amount'", "igst_amount as 'IGST Amount'", "total_tax_amount as 'Taxable Value'", "vat_amount as 'VAT Amount'", "irnstatus as 'IRN Status'"]
         else:
             return {"success": False, "message": "something went wrong"}
         # fields.append("recon_id")
         if export == "True":
             doctype = "tab"+doctype
+            
             sql_filters = (' and '.join("{} {} {}".format(key, value[0], tuple(value[1])+("0",)) if isinstance(value, list) and value[0] == "in" else "{} {} '{}'".format(key, value[0], value[1]) if isinstance(value, list) and value[0] == "like" else "{} {} {}".format(key, "=", value)  if isinstance(value, int) else "{} {} '{}'".format(key, "=", value) for key, value in filters.items()))
             get_list = frappe.db.sql("""select {} from `{}` where {}""".format(
                 ", ".join(fields1), doctype, sql_filters), as_dict=1)
+            
             if len(get_list) > 0:
                 company = frappe.get_last_doc("company")
                 cwd = os.getcwd()
@@ -1428,11 +1435,11 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
             else:
                 return {"success": False, "message": "no data found"}
         else:
-            print(filters,".....................")
+            print(filters,fields,".....................")
             get_list = frappe.db.get_list(
                 doctype, filters=filters, fields=fields)
             counts = {"count":len(get_list)}
-            if doctype in ["Missing in Opera", "Zero Invoice", "Recon Opera Comparison", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]:
+            if doctype in ["Missing in Opera", "Zero Invoice", "Recon Opera Comparison", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac",'Converted B2B to B2C','Converted B2C to B2B']:
                 df = pd.DataFrame.from_records(get_list)
                 total = df.sum(numeric_only=True, axis=0)
                 total.name = "Total"
@@ -1441,7 +1448,7 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
                 if bool(dict(total.transpose())):
                     h_total = [dict(total.transpose())]
                     get_list.extend(h_total)
-                if doctype == "Recon Opera Comparison":
+                if doctype == "Recon Opera Comparison" and len(get_list)>0:
                     counts_base = df['baseamountstatus'].value_counts()
                     # counts_invoice = df['invoiceamountstatus'].value_counts()
                     # counts_invoice.rename(columns = {'Match':'Inv_Match','MisMatch':'Inv_MisMatch','Missing in Opera':'Missing_in_Opera'}, inplace = True)
