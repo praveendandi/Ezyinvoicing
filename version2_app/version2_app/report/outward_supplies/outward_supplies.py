@@ -47,7 +47,12 @@ def execute(filters=None):
         
         items_fields = ['parent',"taxable",'sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount','unit_of_measurement_description','quantity']
         items_columns = ['invoice_number',"taxable",'sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount','unit_of_measurement_description','quantity']
-        items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names]},fields =items_fields ,as_list=True)
+        item_filter = {'parent':['in',invoice_names]}
+        get_sac_hsn_desc = frappe.db.get_list("SAC HSN CODES", filters=[["ignore_non_taxable_items","=",1]],pluck="sac_index")
+        if "export" in filters:
+            if filters["export"]:
+                item_filter = {'parent':['in',invoice_names],"sac_index":["not in",get_sac_hsn_desc]}
+        items_doc = frappe.db.get_list('Items',filters=item_filter,fields =items_fields ,as_list=True)
         items_df = pd.DataFrame(items_doc,columns=items_columns)
         items_df = items_df.round(2)
         items_df['quantity'] = items_df['quantity'].astype(int)
@@ -66,10 +71,7 @@ def execute(filters=None):
         
         latest_invoice = frappe.get_last_doc('Invoices')
 
-        company = frappe.get_doc('company',latest_invoice.company)
-
-        
-        
+        company = frappe.get_doc('company',latest_invoice.company) 
         mergedDf = pd.merge(invoice_df, grouped_df)
         mergedDf["Transaction type"] = "Sales"
         mergedDf['Transaction Subtype'] = "Domestic Sales"
