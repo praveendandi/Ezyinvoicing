@@ -1031,7 +1031,7 @@ def extract_data_from_pos_check(data={}):
         total_data["doctype"] = "POS Checks"
         if "check_no" in total_data:
             total_data["detected_check_number"] = total_data["check_no"]
-            del total_data["check_no"] # delete check Number
+            # del total_data["check_no"] # delete check Number
         total_data["check_type"] = "Check Closed"
         get_doc = frappe.get_doc(total_data)
         get_doc.insert()
@@ -2766,7 +2766,8 @@ def summaries_insert(doc, method=None):
                 doc.reference = doc.tax_payer_details+"-"+today_date
         else:
             doc.reference = doc.tax_payer_details+"-"+today_date
-        doc.save(ignore_permissions=True, ignore_version=True)
+        if method == "after_insert":
+            doc.save(ignore_permissions=True, ignore_version=True)
     except Exception as e:
         frappe.log_error(str(e), "summaries_insert")
         return {"Success":False,"message":str(e)}

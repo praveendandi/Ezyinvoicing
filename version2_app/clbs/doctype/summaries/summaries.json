@@ -27,7 +27,8 @@
   "signature_attached",
   "amended_from",
   "sequence",
-  "reason_for_amendment"
+  "reason_for_amendment",
+  "amend_percentage"
  ],
  "fields": [
   {
@@ -157,11 +158,16 @@
    "fieldname": "reason_for_amendment",
    "fieldtype": "Small Text",
    "label": "Reason For Amendment"
+  },
+  {
+   "fieldname": "amend_percentage",
+   "fieldtype": "Int",
+   "label": "Amend Percentage"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-21 17:12:11.077222",
+ "modified": "2022-07-25 16:18:17.111675",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Summaries",

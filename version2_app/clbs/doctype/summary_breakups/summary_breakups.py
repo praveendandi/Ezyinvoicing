@@ -23,6 +23,7 @@ from frappe.model.document import Document
 from frappe.utils import cstr
 from weasyprint import HTML
 from PyPDF2 import PdfFileMerger
+from frappe.utils.background_jobs import enqueue
 
 
 from version2_app.clbs.doctype.summaries.summaries import get_summary
@@ -435,6 +436,8 @@ def create_breakup_details(doc, details_data, summary):
     try:
         get_company = frappe.get_last_doc("company")
         for child_items in details_data:
+            child_items["date"] = str(child_items["date"])
+            print(child_items,".........................................")
             child_items["parent"] = doc.name
             invoice_file = child_items["invoice_file"]
             del child_items["invoice_file"]
@@ -689,6 +692,8 @@ def submit_summary(summary):
                 if frappe.db.exists({"doctype": "Invoices", "summary": summary}):
                     frappe.db.set_value("Summaries", summary, {
                                         "status": "Submitted", "docstatus": 1})
+                    frappe.db.sql("""update `tabSummary Breakups` set docstatus=1 where summaries='{}'""".format(summary))
+                    frappe.db.sql("""update `tabSummary Documents` set docstatus=1 where summary='{}'""".format(summary))
                     frappe.db.commit()
                     get_invoices = frappe.db.get_list(
                         "Invoices", filters=[["summary", "=", summary]], pluck="name")
@@ -994,16 +999,34 @@ def etax_invoice_to_pdf(summary):
 @frappe.whitelist(allow_guest=True)
 def summary_amendment(summary):
     try:
+        enqueue(
+            amend_summary,
+            queue="default",
+            timeout=800000,
+            event="data_amendment",
+            now=False,
+            summary=summary,
+            is_async=True,
+        )
+        return {"success": True, "message": "Amendment done"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("summary_amendment",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return{"success": False, "message": str(e)}
+
+
+def amend_summary(summary):
+    try:
         if frappe.db.exists("Summaries", {"name": summary}):
             get_invoice_list = frappe.db.get_list(
                 "Invoices", filters=[["summary", "=", summary]], pluck="name")
             invoice_list = get_invoice_list
             frappe.db.set_value("Summaries", summary, {
                                 "status": "Cancelled", "docstatus": 2})
-            frappe.db.sql(
-                """update `tabSummary Breakups` set docstatus=2 where summaries='{}'""".format(summary))
-            frappe.db.sql(
-                """update `tabSummary Payments` set docstatus=2 where summary = '{}'""".format(summary))
+            frappe.db.sql("""update `tabSummary Breakups` set docstatus=2 where summaries='{}'""".format(summary))
+            frappe.db.sql("""update `tabSummary Documents` set docstatus=2 where summary='{}'""".format(summary))
+            frappe.db.sql("""update `tabSummary Payments` set docstatus=2 where summary = '{}'""".format(summary))
             if len(get_invoice_list) == 1:
                 get_invoice_list = get_invoice_list+["0"]
             if len(get_invoice_list) > 0:
@@ -1015,13 +1038,18 @@ def summary_amendment(summary):
             summary_data["amended_from"] = summary
             summary_data["doctype"] = "Summaries"
             summary_data["sequence"] = summary_data["sequence"] + 1
+            summary_data["amend_percentage"] = 10
             summary_doc = frappe.get_doc(summary_data)
             summary_doc.insert()
             frappe.db.commit()
+            frappe.publish_realtime("custom_socket", {"message": "Summary Created", "summary": summary_doc.name, "percentage": 10})
             create_summary = create_summary_breakup(
                 filters=[["parent", "in", invoice_list]], summary=summary_doc.name)
             if not create_summary["success"]:
                 return create_summary
+            summary_doc.amend_percentage = 70
+            summary_doc.save()
+            frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name, "percentage": 70})
             get_summary_payments = frappe.db.get_list("Summary Payments", filters=[
                                                       ["summary", "=", summary]], fields=["payment_description", "amount"])
             if len(get_summary_payments) > 0:
@@ -1029,19 +1057,38 @@ def summary_amendment(summary):
                     get_summary_payments, summary_doc.name)
                 if not summary_payment["success"]:
                     return summary_payment
+                summary_doc.amend_percentage = 80
+                summary_doc.save()
+                frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name, "percentage": 80})
             get_summary_document = frappe.db.get_list("Summary Documents", filters=[["summary", "=", summary], [
                                                       "document_type", "not in", ["invoices", "Invoices"]]], fields=["document_type", "document", "company"])
             if len(get_summary_document) > 0:
                 summary_document = add_summary_documents(get_summary_document, summary_doc.name)
                 if not summary_document["success"]:
                     return summary_document
+                summary_doc.amend_percentage = 90
+                summary_doc.save()
+                frappe.publish_realtime("custom_socket", {"message": "Amendment Processing", "summary": summary_doc.name, "percentage": 90})
+            
+            get_dispatch_details = frappe.db.get_value("Dispatch Details", {"summaries": summary},["dispatch_date", "courier_service", "tracking_id"], as_dict=1)
+            if bool(get_dispatch_details):
+                get_dispatch_details["doctype"] = "Dispatch Details"
+                get_dispatch_details["summaries"] = summary
+                dispatch_doc = frappe.get_doc(get_dispatch_details)
+                dispatch_doc.insert()
+                frappe.db.commit()
+            summary_doc.amend_percentage = 100
+            summary_doc.save()
+            frappe.db.commit()
+            frappe.publish_realtime("custom_socket", {"message": "Amendment Completed", "summary": summary_doc.name, "percentage": 100})
             return {"success":True, "message": "Amendment done", "summary": summary_doc.name}
+        else:
+            return {"success":False, "message": "Summary not found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("summary_amendment",
+        frappe.log_error("amend_summary",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return{"success": False, "message": str(e)}
-
 
 def add_summary_payment(data=None, summary=None):
     try:
