@@ -990,6 +990,7 @@ def insert_invoice(data):
         total_credit_central_cess_amount = 0
         total_credit_state_cess_amount = 0
         total_credit_vat_amount =0
+        non_revenue_amount = 0
         has_discount_items = "No"
         has_credit_items = "No"
         irn_generated = "Pending"
@@ -1005,6 +1006,8 @@ def insert_invoice(data):
                         total_vat_amount += float(item['vat_amount'])
                     else:
                         total_credit_vat_amount += float(item['vat_amount'])
+                    if frappe.db.exists("SAC HSN CODES", {"sac_index":item["sac_index"], "ignore_non_taxable_items": 1}):
+                        non_revenue_amount += float(item['item_value_after_gst'])
                 elif item['taxable']=="No" and item['item_type']=="Discount":
                     discountAmount += item['item_value_after_gst'] 
                 elif item['sac_code'].isdigit():
@@ -1168,7 +1171,11 @@ def insert_invoice(data):
         if "invoice_from" in data['guest_data']:
             invoice_from = data['guest_data']['invoice_from']
         else:
-            invoice_from = "Pms"	
+            invoice_from = "Pms"
+        if "B2C_bulk_upload" in data:
+            if data["B2C_bulk_upload"]:
+                if data['guest_data']['invoice_type'] == "B2B":
+                    irn_generated = "On Hold"
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1279,7 +1286,9 @@ def insert_invoice(data):
             "debit_invoice":debit_invoice,
             "folioid":data["folioid"] if "folioid" in data else "",
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
-            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else ""
+            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
+            "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
+            "non_revenue_amount": non_revenue_amount
         })
         if data['amened'] == 'Yes':
             invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
@@ -1325,7 +1334,7 @@ def insert_invoice(data):
             
             return {"success": True,"data":invoice}
         else:
-            if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+            if v.irn_generated in ["Pending","On Hold"] and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
                 tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
                 if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or v.sez==1:
                     pass
@@ -3849,7 +3858,25 @@ def get_taxpayerdetails(data):
         frappe.log_error("Ezy-invoicing get_taxpayerdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": e}   
 
- 
+
+@frappe.whitelist(allow_guest=True)
+def update_non_revenue_amount():
+    try:
+        get_non_revenue_list = frappe.db.get_list("SAC HSN CODES", filters = {"ignore_non_taxable_items": 1}, pluck="sac_index")
+        if len(get_non_revenue_list) > 0:
+            get_items = frappe.db.get_list("Items", filters = {"sac_index":["in",get_non_revenue_list]}, fields=["sum(item_value_after_gst) as item_value_after_gst", "parent"], group_by="parent")
+            if len(get_items) > 0:
+                for each in get_items:
+                    invoice_doc = frappe.get_doc("Invoices",each["parent"])
+                    invoice_doc.non_revenue_amount = each["item_value_after_gst"]
+                    invoice_doc.save()
+                    frappe.db.commit()
+                return {"success": True}
+        return {"success": False, "message": "No data found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        return {"success": False, "message": e}  
 # @frappe.whitelist(allow_guest=True)
 # def b2b_success_to_credit_note(data):
 # 	try:

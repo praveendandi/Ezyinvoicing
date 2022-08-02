@@ -6,6 +6,7 @@ import datetime
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
+from version2_app.version2_app.doctype.invoices.invoice_helpers import calulate_b2c_items
 import re
 
 # @frappe.whitelist(allow_guest=True)
@@ -32,14 +33,15 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01"]:
-                if "," in item[0]:
-                    item = item[0].split(",")
+            # if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01"]:
+            if "," in item[0]:
+                item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
+                if companyData.name == "ABCBP-01":
+                    item[bulk_meta_data["Gst_details"]["invoice_number"]] = item[bulk_meta_data["Gst_details"]["invoice_number"]][4:]
+                    print("..................",item[bulk_meta_data["Gst_details"]["gst_number"]],item[bulk_meta_data["Gst_details"]["invoice_number"]])
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
-            # else:
-            #     gst_data[str(item["DOC_NO"])]=item["IGST_AMT"]
         # print(gst_data,"+++++++++++++++")
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
@@ -49,8 +51,9 @@ def bulkupload(data):
         for each in items_dataframe[bulk_meta_data["detail_folio"]["folio"]][bulk_meta_data["detail_folio"]["invoice_list"]][bulk_meta_data["detail_folio"]["invoice_data"]]:
             if each[bulk_meta_data["detail_folio"]['sum_val']]==None:
                 each[bulk_meta_data["detail_folio"]['sum_val']]=0
+            if companyData.name == "ABCBP-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if str(each[bulk_meta_data["detail_folio"]["invoice_number"]]) in gst_data.keys():
-                print("+++++++++++++++++++++++++++++::::::::::::::::::::")
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
                             'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
@@ -68,8 +71,9 @@ def bulkupload(data):
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
                 else:
-                    data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
-                # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
+                    data["invoice_number"] =data["invoice_number"]
+                    # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
+                # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
             print(data["invoice_number"],"=================")
             items = []
             items_pdf = []
@@ -128,7 +132,8 @@ def bulkupload(data):
             refobj = data.copy()
             del refobj['items']
             refobj['items'] = items_pdf
-            invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
+            invoice_referrence_objects[each['BILL_NO']] = refobj
+            # invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
             input_data.append(data)
         # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
@@ -155,7 +160,7 @@ def bulkupload(data):
             #     each['invoice_type'] = "B2B"
             if check_invoice['success']==True:
                 inv_data = check_invoice['data']
-                if inv_data.docstatus!=2 and inv_data.irn_generated!="Success" and inv_data.invoice_type=="B2B":
+                if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "On Hold"] and inv_data.invoice_type=="B2B":
                     reupload = True
                 elif inv_data.invoice_type == "B2C":
                     reupload = True
@@ -224,7 +229,7 @@ def bulkupload(data):
                         calulateItemsApiResponse = calulate_items(each_item)
                         if calulateItemsApiResponse['success'] == True:
                             if reupload==False:
-                                insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]}})
+                                insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False})
                                 if insertInvoiceApiResponse['success']== True:
                                     
                                     B2B = "B2B"
@@ -232,7 +237,7 @@ def bulkupload(data):
                                         
                                     if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                                    elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
+                                    elif insertInvoiceApiResponse['data'].irn_generated == "Pending" or insertInvoiceApiResponse['data'].irn_generated == "On Hold":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -307,14 +312,24 @@ def bulkupload(data):
                 taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
                 calulateItemsApiResponse = calulate_items(each_item)
                 if calulateItemsApiResponse['success'] == True:
+                    invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1 = 0
+                    if companyData.auto_b2c_success_for_gstr == 1:
+                        get_invoice_amount = calulate_b2c_items(calulateItemsApiResponse['data'])
+                        if not get_invoice_amount["success"]:
+                            return get_invoice_amount
+                        round_off_amount = abs(each_item['total_invoice_amount']) - abs(get_invoice_amount["total_invoice_amount"])
+                        if abs(round_off_amount) > 6:
+                            if get_invoice_amount["total_invoice_amount"] != each_item['total_invoice_amount']:
+                                invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1 = 1
+                        each_item['total_invoice_amount'] = get_invoice_amount["total_invoice_amount"]
                     if reupload==False:
-                        insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]}})
+                        insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False, "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1})
                         if insertInvoiceApiResponse['success']== True:
                             B2B=np.nan
                             B2C = "B2C"	 
                             if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                            elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
+                            elif insertInvoiceApiResponse['data'].irn_generated == ["Pending","On Hold"]:
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             else:
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
