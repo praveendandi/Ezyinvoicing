@@ -1620,8 +1620,8 @@ def dashborad_recon(recon_id=None):
     try:
         invoice_count = frappe.db.sql("""SELECT ezyinvoicing_count as 'ezyinvoicing_count', missing_in_ezyinvoicing as 'missing_in_ezyinvoicing', opera_folios_count as 'opera_folio_count', missing_in_opera as 'missing_in_opera', (ezyinvoicing_count-opera_folios_count) as 'ezy_opera_variance' from `tabInvoice Count` where recon_id='{}'""".format(recon_id), as_dict=1)
         ezy_opera_comparison = frappe.db.sql("""SELECT round(sum(ezyinvoicingbaseamount),2) as 'ezy_total_base_amount', round(sum(ezyinvoicinginvoiceamount),2) as 'ezy_total_invoice_amount', round(sum(operabaseamount),2) as 'opera_total_base_amount', round(sum(operainvoiceamount),2) as 'opera_total_invoice_amount' from `tabRecon Opera Comparison` where recon_id = '{}'""".format(recon_id), as_dict=1)
-        con_b2c_b2b = frappe.db.sql("""SELECT count(invoicenumber) as 'count_of_b2c_to_b2b' from `tabConverted B2C to B2B` where recon_id = '{}'""".format(recon_id), as_dict=1)
-        con_b2b_b2c = frappe.db.sql("""SELECT count(invoicenumber) as 'count_of_b2b_to_b2c' from `tabConverted B2B to B2C` where recon_id = '{}'""".format(recon_id), as_dict=1)
+        con_b2c_b2b = frappe.db.sql("""SELECT count(invoice_number) as 'count_of_b2c_to_b2b' from `tabConverted B2C to B2B` where recon_id = '{}'""".format(recon_id), as_dict=1)
+        con_b2b_b2c = frappe.db.sql("""SELECT count(invoice_number) as 'count_of_b2b_to_b2c' from `tabConverted B2B to B2C` where recon_id = '{}'""".format(recon_id), as_dict=1)
         opera_tax_credit = frappe.db.sql("""SELECT count(opera) as 'opera_count_tax_to_credit' from `tabInvoice Type Missmatch` where `tabInvoice Type Missmatch`.opera = "Tax Invoice" and recon_id = '{}'""".format(recon_id), as_dict=1)
         opera_credit_tax = frappe.db.sql("""SELECT count(opera) as 'opera_count_tax_to_credit' from `tabInvoice Type Missmatch` where `tabInvoice Type Missmatch`.opera = "Credit Invoice" and recon_id = '{}'""".format(recon_id), as_dict=1)
         # return opera_credit_tax
