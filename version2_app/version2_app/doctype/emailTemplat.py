@@ -121,7 +121,6 @@ def send_mail_files(data):
     try:
         if isinstance(data, str):
             data = json.loads(data)
-        print(type(data),"...............", data)
         obj = {"email":""}
         get_doc = frappe.get_doc(data["doctype"],data["name"])
         if data["doctype"] == "Invoices":
@@ -152,7 +151,7 @@ def send_mail_files(data):
                             attachments = obj["attachments"],
                             send_email=1
                             )
-            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",response["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
+            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
             if len(email_queue) > 0:
                 send_now(email_queue[0]["name"])
             return {"success":True,"message":"Mail Send", "response":response}
