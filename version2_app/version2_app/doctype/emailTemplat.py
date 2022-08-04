@@ -4,6 +4,7 @@ import json
 import requests
 import re
 import frappe
+import time
 from frappe.core.doctype.communication.email import make
 from frappe.email.doctype.email_queue.email_queue import send_now
 
@@ -151,6 +152,7 @@ def send_mail_files(data):
                             attachments = obj["attachments"],
                             send_email=1
                             )
+            time.sleep(10)
             email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
             if len(email_queue) > 0:
                 send_now(email_queue[0]["name"])
