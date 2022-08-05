@@ -142,7 +142,8 @@
   "signature",
   "amount_in_word",
   "lut",
-  "arn_number"
+  "arn_number",
+  "etax_invoice_created"
  ],
  "fields": [
   {
@@ -928,12 +929,18 @@
    "fieldname": "arn_number",
    "fieldtype": "Data",
    "label": "ARN Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "etax_invoice_created",
+   "fieldtype": "Check",
+   "label": "ETax Invoice Created"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-11 17:06:47.100691",
+ "modified": "2022-08-04 17:56:44.796052",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
