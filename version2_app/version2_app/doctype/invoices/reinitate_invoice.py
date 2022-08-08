@@ -259,7 +259,7 @@ def Reinitiate_invoice(data):
         doc.ready_to_generate_irn = ready_to_generate_irn
         doc.invoice_category = data['guest_data']['invoice_category'] if "invoice_category" in data['guest_data'] else doc.invoice_category
         # doc.place_of_supply = place_of_supply
-        # doc.sez = data["sez"] if "sez" in data else doc.sez
+        doc.sez = data["sez"] if "sez" in data else doc.sez
         doc.cgst_amount=round(cgst_amount,2)
         doc.sgst_amount=round(sgst_amount,2)
         doc.igst_amount=round(igst_amount,2)
