@@ -4,6 +4,7 @@ import json
 import requests
 import re
 import frappe
+import time
 from frappe.core.doctype.communication.email import make
 from frappe.email.doctype.email_queue.email_queue import send_now
 
@@ -121,7 +122,6 @@ def send_mail_files(data):
     try:
         if isinstance(data, str):
             data = json.loads(data)
-        print(type(data),"...............", data)
         obj = {"email":""}
         get_doc = frappe.get_doc(data["doctype"],data["name"])
         if data["doctype"] == "Invoices":
@@ -152,10 +152,11 @@ def send_mail_files(data):
                             attachments = obj["attachments"],
                             send_email=1
                             )
-            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",response["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
+            time.sleep(10)
+            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
             if len(email_queue) > 0:
                 send_now(email_queue[0]["name"])
-            return {"success":True,"message":"Mail Send"}
+            return {"success":True,"message":"Mail Send", "response":response}
         return {"success": True, "obj":obj}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
