@@ -35,6 +35,7 @@ def bulkupload(data):
         for item in to_dict_data:
             if "," in item[0]:
                 item = item[0].split(",")
+            print(item)
             # if invoice_data["company"]=="GHM-01":
             print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
