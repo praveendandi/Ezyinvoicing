@@ -33,9 +33,9 @@ def bulkupload(data):
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
             print(item)
-            if companyData.name in ['MARRIOTINDORE-01','TLND-01']:
-                if "," in item[0]:
-                    item = item[0].split(",")
+            # if companyData.name in ['MARRIOTINDORE-01','TLND-01','LAAB-01']:
+            if "," in item[0]:
+                item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
             print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
