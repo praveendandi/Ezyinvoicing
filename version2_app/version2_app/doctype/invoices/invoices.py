@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 from logging import exception
-from typing_extensions import Self
+# from typing_extensions import Self
 from unittest import expectedFailure
 import frappe
 from frappe import database
