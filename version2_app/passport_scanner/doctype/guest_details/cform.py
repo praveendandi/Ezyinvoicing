@@ -86,7 +86,7 @@ def intiate():
         driver = webdriver.Chrome(
             folder_path
             + "/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver",
-            # chrome_options=options,
+            chrome_options=options,
         )
         driver.get("https://indianfrro.gov.in/frro/FormC")
         WebDriverWait(driver, global_delay).until(
