@@ -1655,6 +1655,8 @@ def get_data_vision_api(image1=None, image2=None, name=None, document_type=None,
 @frappe.whitelist(allow_guest=True)
 def guest_details_update(data={},name=None):
     try:
+        if isinstance(data,str):
+            data = json.loads(data)
         if name and bool(data):
             # empty_details = empty_guest_details(name)
             # if not empty_details["success"]:
