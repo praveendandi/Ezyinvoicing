@@ -596,7 +596,8 @@ def checkin_cform():
         applicant_timeoarrivalhotel.send_keys(data["checkin_time"])
 
         applicant_intnddurhotel = driver.find_element_by_id("applicant_intnddurhotel")
-        driver.implicitly_wait(10)
+        # driver.implicitly_wait(10)
+        time.sleep(20)
         applicant_intnddurhotel.send_keys(data["no_of_nights"])
 
         # # employed
