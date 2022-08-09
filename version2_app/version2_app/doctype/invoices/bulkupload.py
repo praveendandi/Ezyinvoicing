@@ -40,7 +40,6 @@ def bulkupload(data):
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 if companyData.name == "ABCBP-01":
                     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
-                    print("..................",item[bulk_meta_data["Gst_details"]["gst_number"]],item[bulk_meta_data["Gst_details"]["invoice_number"]])
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
         # print(gst_data,"+++++++++++++++")
         paymentTypes = GetPaymentTypes()

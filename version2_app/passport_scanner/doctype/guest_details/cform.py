@@ -689,7 +689,8 @@ def checkin_cform():
             get_count.frro_failure_count = str(0 + 1)
         get_count.save(ignore_permissions=True, ignore_version=True)
         frappe.db.commit()
-        frappe.log_error("save temp success", str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("save temp success", "line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
