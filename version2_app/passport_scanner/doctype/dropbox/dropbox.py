@@ -913,6 +913,8 @@ def extract_id_details(data={}):
             pass
         else:
             pass
+        if  "reservation_number" in data: 
+            details["confirmation_number"] = data["reservation_number"]
         if "guest_details_name" in data:
             # details["doctype"] = "Guest Details"
             # details["name"] = data["guest_details_name"]
@@ -926,7 +928,6 @@ def extract_id_details(data={}):
             if "guest_id_type" not in details:
                 details["guest_id_type"] = data["id_type"]
             details["doctype"] = "Guest Details"
-            details["confirmation_number"] = data["reservation_number"]
             if "merged_to" in data:
                 if data["merged_to"] != "" or data["merged_to"] is not None:
                     details["confirmation_number"] = data["merged_to"]
@@ -1001,9 +1002,7 @@ def create_guest_details(data, name=None, update=False):
             if "guest_dob" in data:
                 if data["guest_dob"] == "" or data["guest_dob"] is None:
                     del data["guest_dob"]
-
             frappe.db.set_value('Guest Details', name, data)
-            # frappe.db.commit()
             # doc.insert(ignore_permissions=True)
             # guest_attachments(doc, method="Manula")
             frappe.db.set_value(
@@ -1016,7 +1015,7 @@ def create_guest_details(data, name=None, update=False):
                 update_modified=False
             )
             frappe.db.commit()
-            return {"success": True, "message": "Guest Updated successfully", "data": doc}
+            return {"success": True, "message": "Guest Updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
@@ -1038,10 +1037,12 @@ def reprocess_images(name: str, now=False):
         # site_folder_path = folder_path + "/sites/" + company.site_name
         company = frappe.get_last_doc("company")
         folder_path = frappe.utils.get_bench_path()
-        site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
-        private_folder_path = folder_path + "/sites/" + company.site_name
         guest_details = frappe.get_doc('Guest Details', name)
-
+        if "private" not in guest_details.id_image1 or "private" not in guest_details.id_image2:
+            site_folder_path = folder_path + "/sites/" + company.site_name + "/public"
+        else:
+            site_folder_path = folder_path + "/sites/" + company.site_name
+        # private_folder_path = folder_path + "/sites/" + company.site_name
         with open(site_folder_path+guest_details.id_image1, "rb") as image_file:
             encoded_string_image_1 = base64.b64encode(image_file.read())
             image_1 = encoded_string_image_1.decode("utf-8")
@@ -1072,7 +1073,7 @@ def reprocess_images(name: str, now=False):
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error(
-            "create_doc_using_base_files",
+            "reprocess_images",
             "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)),
         )
         print(e)
