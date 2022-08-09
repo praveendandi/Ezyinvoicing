@@ -54,6 +54,7 @@ from datetime import datetime
 # @frappe.whitelist(allow_guest=True)
 def passport_data_changes(data={}, image_1=None, image_2=None):
     try:
+        print(image_1)
         file_path = os.path.dirname(os.path.abspath(__file__))
         with open(file_path + "/visa-types.json", "r") as myfile:
             visa_types = json.loads(myfile.read())
@@ -62,7 +63,6 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
         if bool(data):
             df = pd.json_normalize(data, sep="_")
             data = df.to_dict(orient="records")[0]
-            print(data,"//////////////////////////////////////////////////")
             # print(data,"this is from data changes")
             if "Passport_Face_Image_base_64" in data or "Visa_Image_base_64" in data:
                 folder_path = frappe.utils.get_bench_path()
@@ -77,7 +77,7 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                 )
                 if "success" not in face_image:
                     if "Visa_Image_base_64" in data:
-                        passport_details["visa_face_image"] = face_image["message"][
+                        passport_details["face_image"] = face_image["message"][
                             "file_url"
                         ]
                     else:
@@ -183,11 +183,10 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                     else:
                         passport_details["status"] = "Pending Review"
                         passport_details["guest_id_type"] = "Foreigner"
-            print(passport_details,"..........................................................")
             if image_2:
                 if "visa_details_visa_details_birth_date" in data:
                     try:
-                        passport_details["visa_guest_dob"] = format_date(
+                        passport_details["guest_dob"] = format_date(
                             data["visa_details_visa_details_birth_date"].strip(),
                             "yyyy-mm-dd",
                         )
@@ -229,11 +228,11 @@ def passport_data_changes(data={}, image_1=None, image_2=None):
                                     passport_details["visa_type"] = each["value"]
                                     break
                 if "visa_details_visa_details_surname" in data:
-                    passport_details["visa_last_name"] = data[
+                    passport_details["guest_last_name"] = data[
                         "visa_details_visa_details_surname"
                     ]
                 if "visa_details_visa_details_name" in data:
-                    passport_details["visa_first_name"] = data[
+                    passport_details["guest_first_name"] = data[
                         "visa_details_visa_details_name"
                     ]
                 if "passport_back_address_passport_back_address_ADRESS" in data:

@@ -208,7 +208,7 @@ def login_cform():
                         "select_category",
                         "guest_nationality",
                         "address1",
-                        "city",
+                        "guest_city",
                         "guest_country",
                         "passport_number",
                         "passport_place_of_issued_city",
@@ -257,7 +257,7 @@ def login_cform():
                 if each_data["passport_date_of_issue"]:
                     each_data["passport_date_of_issue"] = each_data[
                         "passport_date_of_issue"
-                    ].strftime("%d%m%Y")
+                    ].strftime("%d/%m/%Y")
                 if each_data["passport_valid_till"]:
                     each_data["passport_valid_till"] = each_data[
                         "passport_valid_till"
@@ -500,7 +500,7 @@ def checkin_cform():
         applicant_permaddr.send_keys(data["address1"])  #------
 
         applicant_permcity = driver.find_element_by_id("applicant_permcity")
-        applicant_permcity.send_keys(data["city"])
+        applicant_permcity.send_keys(data["guest_city"])
 
         applicant_permcountry = Select(
             driver.find_element_by_id("applicant_permcountry")
@@ -534,8 +534,10 @@ def checkin_cform():
         passport_issue_country.select_by_value(data["passport_place_of_issued_country"])
 
         applicant_passpdoissue = driver.find_element_by_id("applicant_passpdoissue")
-        applicant_passpdoissue.click()
-        applicant_passpdoissue.send_keys(data["passport_date_of_issue"])
+        # applicant_passpdoissue.click()
+        # applicant_passpdoissue.send_keys(data["passport_date_of_issue"])
+        driver.execute_script("document.getElementById('applicant_passpdoissue').value='"+data['passport_date_of_issue']+"'")
+        time.sleep(10)
 
         applicant_passpvalidtill = driver.find_element_by_id("applicant_passpvalidtill")
         applicant_passpvalidtill.click()
