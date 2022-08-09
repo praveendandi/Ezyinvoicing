@@ -1,8 +1,10 @@
+from telnetlib import EC
 from requests.exceptions import RetryError
 import frappe, requests, json
 
 from version2_app.parsers import *
 import json
+import base64
 import shlex
 import time
 import re
@@ -19,6 +21,9 @@ from datetime import date, timedelta
 import shutil
 from frappe.utils import logger
 from frappe.utils.data import money_in_words
+from weasyprint import HTML
+
+
 
 
 @frappe.whitelist(allow_guest=True)
@@ -35,6 +40,11 @@ def num_to_words(num):
 
 def invoice_update(doc,method=None):
     try:
+        company = frappe.get_last_doc("company")
+        if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
+            etax = html_to_pdf(doc.name)
+            if etax["success"]:
+                doc.etax_invoice_created
         if doc.sales_amount_after_tax:
             total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
@@ -47,6 +57,12 @@ def invoice_update(doc,method=None):
 
 def invoice_created(doc, method=None):
     try:
+        company = frappe.get_last_doc("company")
+        if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
+            etax = html_to_pdf(doc.name)
+            if etax["success"]:
+                frappe.db.set_value("Invoices",doc.name,"etax_invoice_created",1)
+                frappe.db.commit()
         if doc.sales_amount_after_tax:
             total_amount_in_words=num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
@@ -729,4 +745,84 @@ def fetch_invoice_details(filters=[]):
             return {"success":False, "message":"filters not be empty"}
     except Exception as e:
         return {"Success":False,"message":str(e)}
-       
+
+
+@frappe.whitelist(allow_guest=True)
+def convert_image_to_base64(image):
+    try:
+        company = frappe.get_last_doc("company")
+        folder_path = frappe.utils.get_bench_path()
+        file_path1 = (
+            folder_path
+            + "/sites/"
+            + company.site_name
+            + image
+        )
+        with open(file_path1, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+        encoded_str = encoded_string.decode("utf-8")
+        return {"success": True, "data": encoded_str}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("convert_image_to_base64",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
+
+def create_pdf_each_invoice(doc):
+    try:
+        site_name = cstr(frappe.local.site)
+        company = frappe.get_last_doc('company')
+        if not company.host:
+            return {'success': False, 'message': "please specify host in company"}
+        cwd = os.getcwd()
+        templates = frappe.db.get_value("Print Format", "Manual E-Tax Invoice","html")
+        # doc = doc.as_dict()
+        if company.company_logo:
+            convimgtobase = convert_image_to_base64(company.company_logo)
+            if not convimgtobase["success"]:
+                return convimgtobase
+            base = "data:image/png;base64,"+convimgtobase["data"]
+        else:
+            base= ""
+        qr_image_base = ""
+        if doc.qr_code_image or doc.credit_qr_code_image:
+            convimgtobase = convert_image_to_base64(doc.qr_code_image if doc.invoice_category != "Credit Invoice" else doc.credit_qr_code_image)
+            if not convimgtobase["success"]:
+                return convimgtobase
+            qr_image_base = "data:image/png;base64," + \
+                convimgtobase["data"]
+        invoice_doc = doc.as_dict()
+        invoice_doc["base"] = base
+        invoice_doc["qr_image_base"] = qr_image_base           
+        html_data = frappe.render_template(templates,invoice_doc)
+        site_name = cstr(frappe.local.site)
+        htmldoc = HTML(string=html_data, base_url="")
+        file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
+        htmldoc.write_pdf(file_path)
+        return {"success": True}
+    except Exception as e:
+        pass
+
+@frappe.whitelist(allow_guest=True)
+def html_to_pdf(invoice_number=None,month=None):
+    try:
+        if invoice_number:
+            doc = frappe.get_doc("Invoices",invoice_number)
+            create_pdf_each_invoice(doc)
+        elif month:
+            docs = frappe.db.get_list("""SELECT name from  `tabInvoices` WHERE month(creation) ="""+int(month) )
+            for invoice_number in docs:
+                doc = frappe.get_doc("Invoices",invoice_number)
+                create_pdf_each_invoice(doc)   
+        else:
+            return {"message":"Please check the filter","success":False}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("html_to_pdf",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
+

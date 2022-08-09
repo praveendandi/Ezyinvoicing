@@ -3,7 +3,11 @@
 # # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from logging import exception
+from typing_extensions import Self
+from unittest import expectedFailure
 import frappe
+from frappe import database
 from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
@@ -1280,6 +1284,8 @@ def insert_invoice(data):
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else ""
         })
+        if "sez" in data:
+            invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
             invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
                 # filters={
@@ -3528,7 +3534,8 @@ def Error_Insert_invoice(data):
                 "sez":sez,
                 "invoice_from":invoice_from,
                 "folioid":data["folioid"] if "folioid" in data else "",
-                "invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+                "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
+                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else ""
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
@@ -3806,7 +3813,7 @@ def get_taxpayerdetails(data):
         frappe.log_error("Ezy-invoicing get_taxpayerdetails","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": e}   
 
- 
+
 # @frappe.whitelist(allow_guest=True)
 # def b2b_success_to_credit_note(data):
 # 	try:
@@ -3853,4 +3860,4 @@ def get_taxpayerdetails(data):
 # 	except Exception as e:
 # 		print(e, "attach b2c qrcode")
 # 		return {"success": False, "message": str(e)}
-    
+
