@@ -86,7 +86,7 @@ def intiate():
         driver = webdriver.Chrome(
             folder_path
             + "/apps/version2_app/version2_app/passport_scanner/doctype/guest_details/chromedriver",
-            chrome_options=options,
+            # chrome_options=options,
         )
         driver.get("https://indianfrro.gov.in/frro/FormC")
         WebDriverWait(driver, global_delay).until(
@@ -277,7 +277,7 @@ def login_cform():
                     )
                 if each_data["checkin_time"]:
                     time = str(each_data["checkin_time"]).split(":")
-                    each_data["checkin_time"] = time[0]+":"+time[1]
+                    each_data["checkin_time"] = time[0]+":"+time[1] if len(time[0]) == 2 else "0"+time[0]+":"+time[1]
                     
                 each_data = {k: "" if not v else v for k, v in each_data.items()}
                 data = each_data
@@ -591,7 +591,7 @@ def checkin_cform():
             + data["checkin_date"]
             + '"'
         )
-
+        print(data["checkin_time"],"/////////////////////////")
         applicant_timeoarrivalhotel = driver.find_element_by_id(
             "applicant_timeoarrivalhotel"
         )
