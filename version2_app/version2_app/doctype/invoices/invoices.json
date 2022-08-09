@@ -147,7 +147,9 @@
   "invoice_submitted_in_clbs",
   "lut",
   "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
-  "non_revenue_amount"
+  "non_revenue_amount",
+  "arn_number",
+  "etax_invoice_created"
  ],
  "fields": [
   {
@@ -963,12 +965,23 @@
    "fieldname": "non_revenue_amount",
    "fieldtype": "Float",
    "label": "Non Revenue Amount"
+  },
+  {
+   "fieldname": "arn_number",
+   "fieldtype": "Data",
+   "label": "ARN Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "etax_invoice_created",
+   "fieldtype": "Check",
+   "label": "ETax Invoice Created"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-07-26 17:33:15.439490",
+ "modified": "2022-08-04 17:56:44.796052",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
