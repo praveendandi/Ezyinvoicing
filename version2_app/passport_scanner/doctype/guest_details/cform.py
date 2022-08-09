@@ -276,7 +276,9 @@ def login_cform():
                         "%d/%m/%Y"
                     )
                 if each_data["checkin_time"]:
-                    each_data["checkin_time"] = str(each_data["checkin_time"])
+                    time = str(each_data["checkin_time"]).split(":")
+                    each_data["checkin_time"] = time[0]+":"+time[1]
+                    
                 each_data = {k: "" if not v else v for k, v in each_data.items()}
                 data = each_data
                 if index == 0:
