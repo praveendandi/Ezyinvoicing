@@ -55,6 +55,7 @@ def BulkUploadReprocess(data):
             sort_order = 1
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
+            payment_Types = list(map(lambda x: x.lower(), paymentTypes))
             if invoice_data.change_gst_number=="Yes" and invoice_data.converted_from_b2c=="No":
                 if line_items['data'][0]['taxid'] == "empty" or line_items['data'][0]['taxid'] == "":
                     gstNumber == ""
@@ -67,7 +68,7 @@ def BulkUploadReprocess(data):
 
             for each in line_items['data']:
                 each = each
-                if each['goods_desc'] not in payment_Types:
+                if each['goods_desc'].lower() not in payment_Types:
                     item_dict = {}
                     if "00:00:00" in each['invoicedate']:
                         date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(company.invoice_item_date_format)
@@ -89,6 +90,7 @@ def BulkUploadReprocess(data):
             sort_order = 1
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
+            payment_Types = list(map(lambda x: x.lower(), paymentTypes))
             if invoice_data.change_gst_number=="No" and invoice_data.converted_from_b2c=="No":
                 if not invoice_data.converted_from_b2b == "Yes":
                     if line_items['data'][0]['taxid'] == "empty":
@@ -104,7 +106,7 @@ def BulkUploadReprocess(data):
                     invoiceType = "B2C"
             for each in line_items['data']['items']:
 
-                if each['name'] not in payment_Types:
+                if each['name'].lower() not in payment_Types:
                     if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"]:
                         continue
                     item_dict = {}
@@ -129,6 +131,7 @@ def BulkUploadReprocess(data):
             sort_order = 1
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
+            payment_Types = list(map(lambda x: x.lower(), paymentTypes))
             if invoice_data.change_gst_number=="No" and invoice_data.converted_from_b2c=="No":
                 if line_items['data']['gstNumber'] == "" or line_items['data']['gstNumber'].strip() == "0" or len(line_items['data']['gstNumber']) != 15:
                     print("----===================")
@@ -141,7 +144,7 @@ def BulkUploadReprocess(data):
                     error_data['gst_number'] = gstNumber
                     error_data['invoice_type'] = "B2B"
             for each in line_items['data']['items']:
-                if each['name'] not in payment_Types:
+                if each['name'].lower() not in payment_Types:
                     if  "CGST" in each["name"] or "SGST" in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
                     item_dict = {}
@@ -167,8 +170,9 @@ def BulkUploadReprocess(data):
             sort_order = 1
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
+            payment_Types = list(map(lambda x: x.lower(), paymentTypes))
             for each in line_items['data']:
-                if each['goods_desc'] not in payment_Types:
+                if each['goods_desc'].lower() not in payment_Types:
                     item_dict = {}
                     if "00:00:00" in each['invoicedate']:
                         date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%d/%m/%Y %H:%M:%S').strftime(company.invoice_item_date_format)
@@ -190,8 +194,9 @@ def BulkUploadReprocess(data):
             sort_order = 1
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
+            payment_Types = list(map(lambda x: x.lower(), paymentTypes))
             for each in line_items['data']:
-                if each['goods_desc'] not in payment_Types:
+                if each['goods_desc'].lower() not in payment_Types:
                     item_dict = {}
                     if "00:00:00" in each['invoicedate']:
                         date_time_obj = datetime.datetime.strptime(each['invoicedate'],'%d-%b-%Y %H:%M:%S').strftime(company.invoice_item_date_format)
