@@ -769,6 +769,30 @@ def convert_image_to_base64(image):
         return {"success": False, "message": str(e)}
 
 
+@frappe.whitelist(allow_guest=True)
+def html_to_pdf(invoice_number=None,month=None):
+    try:
+        print(invoice_number,month)
+        if invoice_number:
+            doc = frappe.get_doc("Invoices",invoice_number)
+            create_pdf_each_invoice(doc)
+        elif month:
+            print("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month))
+            docs = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month),as_dict=1)
+            print(docs)
+            for invoice_number in docs:
+                doc = frappe.get_doc("Invoices",invoice_number['name'])
+                create_pdf_each_invoice(doc)   
+        else:
+            return {"message":"Please check the filter","success":False}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("html_to_pdf",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}
+
+
+
 
 def create_pdf_each_invoice(doc):
     try:
@@ -799,30 +823,14 @@ def create_pdf_each_invoice(doc):
         html_data = frappe.render_template(templates,invoice_doc)
         site_name = cstr(frappe.local.site)
         htmldoc = HTML(string=html_data, base_url="")
-        file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
+        folder=company.save_etax_invoice_folder
+        file_path=folder +  doc.name  + '.pdf'
+        # file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
         htmldoc.write_pdf(file_path)
         return {"success": True}
     except Exception as e:
         pass
 
-@frappe.whitelist(allow_guest=True)
-def html_to_pdf(invoice_number=None,month=None):
-    try:
-        if invoice_number:
-            doc = frappe.get_doc("Invoices",invoice_number)
-            create_pdf_each_invoice(doc)
-        elif month:
-            docs = frappe.db.get_list("""SELECT name from  `tabInvoices` WHERE month(creation) ="""+int(month) )
-            for invoice_number in docs:
-                doc = frappe.get_doc("Invoices",invoice_number)
-                create_pdf_each_invoice(doc)   
-        else:
-            return {"message":"Please check the filter","success":False}
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("html_to_pdf",
-                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
-        return {"success": False, "message": str(e)}
 
 
 

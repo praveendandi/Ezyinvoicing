@@ -153,7 +153,8 @@
   "enable_slab_for_room_service_charge",
   "sc_slab_12_starting_range",
   "sc_slab_12_end_range",
-  "create_etax_invoices_in_separate_folder"
+  "create_etax_invoices_in_separate_folder",
+  "save_etax_invoice_folder"
  ],
  "fields": [
   {
@@ -990,11 +991,17 @@
    "fieldname": "create_etax_invoices_in_separate_folder",
    "fieldtype": "Check",
    "label": "Create ETax Invoices in Separate Folder "
+  },
+  {
+   "default": "0",
+   "fieldname": "save_etax_invoice_folder",
+   "fieldtype": "Data",
+   "label": "Save ETax Invoice Folder"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-04 17:55:51.993230",
+ "modified": "2022-08-10 10:35:51.771171",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
