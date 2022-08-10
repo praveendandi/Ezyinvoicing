@@ -823,7 +823,9 @@ def create_pdf_each_invoice(doc):
         html_data = frappe.render_template(templates,invoice_doc)
         site_name = cstr(frappe.local.site)
         htmldoc = HTML(string=html_data, base_url="")
-        file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
+        folder=company.save_etax_invoice_folder
+        file_path=folder +  doc.name  + '.pdf'
+        # file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
         htmldoc.write_pdf(file_path)
         return {"success": True}
     except Exception as e:
