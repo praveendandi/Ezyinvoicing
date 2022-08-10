@@ -24,8 +24,8 @@ def check_company_exist_for_Irn(code):
         print(e,"check company exist")
         return {"success":False,"message":e}
 
-
-def attach_qr_code(invoice_number, gsp,code):
+@frappe.whitelist(allow_guest=True)
+def attach_qr_code(invoice_number):
     try:
         invoice = frappe.get_doc('Invoices', invoice_number)
         company = frappe.get_doc('company',invoice.company)
@@ -36,8 +36,20 @@ def attach_qr_code(invoice_number, gsp,code):
         src_pdf_filename = path + invoice.invoice_file
         dst_pdf_filename = path + "/private/files/" + invoice_number + 'withCreditQr.pdf'
         # attaching qr code
-        img_filename = path + invoice.credit_qr_code_image
-        # img_rect = fitz.Rect(250, 200, 340, 270)
+        img_filename = path + invoice.qr_code_image
+        # if "invoice_category" == "Credit Invoice":
+        #     img_filename = path + invoice.credit_qr_code_image
+        #     ackdate = invoice.credit_ack_date
+        #     ack_no = invoice.credit_ack_no
+        #     irn_number = invoice.irn_number
+        #     ack_date = ackdate.split(" ")
+        # else:
+        #     img_filename = path + invoice.qr_code_image
+        #     ackdate = invoice.ack_date
+        #     ack_no = invoice.ack_no
+        #     irn_number = invoice.irn_number
+        #     ack_date = ackdate.split(" ")
+        # img_rect = fitz.Rect(200, 180, 300, 270)
         img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1, company.qr_rect_y0, company.qr_rect_y1)
         document = fitz.open(src_pdf_filename)
         page = document[0]
@@ -49,6 +61,7 @@ def attach_qr_code(invoice_number, gsp,code):
         dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withCreditQrIrn.pdf'
         doc = fitz.open(dst_pdf_filename)
         # text = "IRN: " + invoice.credit_irn_number + "      " + "ACK NO: " + invoice.credit_ack_no + "\n" + "ACK DATE: " + invoice.credit_ack_date
+        # text = "IRN: " + irn_number +"          "+ "ACK NO: " + ack_no + "       " + "ACK DATE: " + ack_date[0]
         ackdate = invoice.credit_ack_date
         ack_date = ackdate.split(" ")
         text = "IRN: " + invoice.credit_irn_number +"          "+ "ACK NO: " + invoice.credit_ack_no + "       " + "ACK DATE: " + ack_date[0]
@@ -58,6 +71,7 @@ def attach_qr_code(invoice_number, gsp,code):
             page = doc[-1]
         # page = doc[0]
         where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+        # where = fitz.Point(100,50)
         page.insertText(
             where,
             text,
@@ -87,7 +101,7 @@ def attach_qr_code(invoice_number, gsp,code):
         if 'message' in response:
             invoice.invoice_with_credit_gst_details = response['message']['file_url']
             invoice.save()
-        return
+        return response['message']['file_url']
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing attach_qr_code Credit Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))

@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 from operator import ge
 from pickle import NONE
-from typing_extensions import final
+# from typing_extensions import final
 from webbrowser import get
 import frappe
 from frappe.model.document import Document

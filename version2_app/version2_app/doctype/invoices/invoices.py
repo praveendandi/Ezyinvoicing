@@ -3,7 +3,11 @@
 # # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from logging import exception
+# from typing_extensions import Self
+from unittest import expectedFailure
 import frappe
+from frappe import database
 from frappe.model.document import Document
 import requests
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
@@ -1290,6 +1294,8 @@ def insert_invoice(data):
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
             "non_revenue_amount": non_revenue_amount
         })
+        if "sez" in data:
+            invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
             invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
                 # filters={
@@ -3580,7 +3586,8 @@ def Error_Insert_invoice(data):
                 "invoice_from":invoice_from,
                 "folioid":data["folioid"] if "folioid" in data else "",
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
-                "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else ""
+                "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
+                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else ""
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
@@ -3923,4 +3930,4 @@ def update_non_revenue_amount():
 # 	except Exception as e:
 # 		print(e, "attach b2c qrcode")
 # 		return {"success": False, "message": str(e)}
-    
+

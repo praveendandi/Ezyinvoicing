@@ -262,7 +262,7 @@ def Reinitiate_invoice(data):
         doc.ready_to_generate_irn = ready_to_generate_irn
         doc.invoice_category = data['guest_data']['invoice_category'] if "invoice_category" in data['guest_data'] else doc.invoice_category
         # doc.place_of_supply = place_of_supply
-        # doc.sez = data["sez"] if "sez" in data else doc.sez
+        doc.sez = data["sez"] if "sez" in data else doc.sez
         doc.cgst_amount=round(cgst_amount,2)
         doc.sgst_amount=round(sgst_amount,2)
         doc.igst_amount=round(igst_amount,2)
@@ -285,7 +285,7 @@ def Reinitiate_invoice(data):
         doc.allowance_invoice = allowance_invoice
         doc.debit_invoice = debit_invoice
         
-
+        doc.arn_number = company.application_reference_number if company.application_reference_number and doc.sez==1 else ""
         doc.irn_generated=irn_generated
         invoice_round_off_amount =  float(data['total_invoice_amount']) - float((pms_invoice_summary+other_charges))
         if converted_from_tax_invoices_to_manual_tax_invoices == "No" and invoice_from != "Web" and doc.lut == 0:

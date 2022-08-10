@@ -9,7 +9,7 @@ from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats imp
 from version2_app.version2_app.doctype.invoices.invoice_helpers import calulate_b2c_items
 import re
 
-# @frappe.whitelist(allow_guest=True)
+@frappe.whitelist(allow_guest=True)
 def bulkupload(data):
     try:
         invoice_data=data
@@ -33,18 +33,18 @@ def bulkupload(data):
         # gst_df=gst_df.iloc[0]
         to_dict_data=gst_df.to_dict(orient="records")
         for item in to_dict_data:
-            # if companyData.name in ["CBMBHOPAL-01","LAJA-01","TLND-01","TLAU-01","MJH-01"]:
             if "," in item[0]:
                 item = item[0].split(",")
             # if invoice_data["company"]=="GHM-01":
+            print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 if companyData.name == "ABCBP-01":
-                    item[bulk_meta_data["Gst_details"]["invoice_number"]] = item[bulk_meta_data["Gst_details"]["invoice_number"]][4:]
-                    print("..................",item[bulk_meta_data["Gst_details"]["gst_number"]],item[bulk_meta_data["Gst_details"]["invoice_number"]])
+                    item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
         # print(gst_data,"+++++++++++++++")
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
+        paymentTypes = list(map(lambda x: x.lower(), paymentTypes))
         input_data = []
         invoice_referrence_objects = {}
         invoice_number_list = [bulk_meta_data["detail_folio"]["invoice_number"] for x in items_dataframe[bulk_meta_data["detail_folio"]["folio"]][bulk_meta_data["detail_folio"]["invoice_list"]][bulk_meta_data["detail_folio"]["invoice_data"]]]
@@ -74,7 +74,6 @@ def bulkupload(data):
                     data["invoice_number"] =data["invoice_number"]
                     # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
-            print(data["invoice_number"],"=================")
             items = []
             items_pdf = []
             sac_description=frappe.db.get_list("SAC HSN CODES")
@@ -83,7 +82,7 @@ def bulkupload(data):
                     items_pdf_dict={}
                     item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                     # for sac_items in sac_description:
-                    if x[bulk_meta_data["detail_folio"]['transaction_description']] in paymentTypes:# 
+                    if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# 
                         if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
                             x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                         # if x[bulk_meta_data["detail_folio"]['transaction_description']] in sac_items["name"]:
@@ -91,7 +90,7 @@ def bulkupload(data):
                         # else:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
                         # continue
-                    elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'Service Charge' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
+                    elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
                         # if "%" in x[bulk_meta_data["detail_folio"]['transaction_description']:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac'}
                     # if x[bulk_meta_data["detail_folio"]["item_value"] is None:
@@ -110,7 +109,7 @@ def bulkupload(data):
                 x = dict(each[bulk_meta_data["detail_folio"]["list_items"]][bulk_meta_data["detail_folio"]["item_data"]])
                 item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                 # for sac_items in sac_description:
-                if x[bulk_meta_data["detail_folio"]['transaction_description']] in paymentTypes:# or "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']]:
+                if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# or "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']]:
                     if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
                         x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                     

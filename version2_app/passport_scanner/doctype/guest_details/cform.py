@@ -276,7 +276,9 @@ def login_cform():
                         "%d/%m/%Y"
                     )
                 if each_data["checkin_time"]:
-                    each_data["checkin_time"] = str(each_data["checkin_time"])
+                    time = str(each_data["checkin_time"]).split(":")
+                    each_data["checkin_time"] = time[0]+":"+time[1] if len(time[0]) == 2 else "0"+time[0]+":"+time[1]
+                    
                 each_data = {k: "" if not v else v for k, v in each_data.items()}
                 data = each_data
                 if index == 0:
@@ -589,14 +591,21 @@ def checkin_cform():
             + data["checkin_date"]
             + '"'
         )
-
+        print(data["checkin_time"],"/////////////////////////")
         applicant_timeoarrivalhotel = driver.find_element_by_id(
             "applicant_timeoarrivalhotel"
         )
         applicant_timeoarrivalhotel.send_keys(data["checkin_time"])
 
-        applicant_intnddurhotel = driver.find_element_by_id("applicant_intnddurhotel")
-        applicant_intnddurhotel.send_keys(data["no_of_nights"])
+        # applicant_intnddurhotel = driver.find_element_by_id("applicant_intnddurhotel")
+        # driver.implicitly_wait(10)
+        # time.sleep(20)
+        # applicant_intnddurhotel.send_keys(str(data["no_of_nights"]))
+        driver.execute_script(
+            'document.getElementById("applicant_intnddurhotel").value ="'
+            + data["no_of_nights"]
+            + '"'
+        )
 
         # # employed
         applicant_purpovisit = Select(driver.find_element_by_id("applicant_purpovisit"))
@@ -689,7 +698,8 @@ def checkin_cform():
             get_count.frro_failure_count = str(0 + 1)
         get_count.save(ignore_permissions=True, ignore_version=True)
         frappe.db.commit()
-        frappe.log_error("save temp success", str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("save temp success", "line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
 
