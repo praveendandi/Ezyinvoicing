@@ -162,7 +162,10 @@ def bulkupload(data):
                 if inv_data.docstatus!=2 and inv_data.irn_generated!="Success" and inv_data.invoice_type=="B2B":
                     reupload = True
                 elif inv_data.invoice_type == "B2C":
-                    reupload = True
+                    if inv_data.irn_generated=="Success" and company.company_code in ['LAAB-01','LAAB-01','LAKOL-01','LAMU-01','LGPS-01','LTVK-01','LABE-01','LAGO-01','LAJA-01','LAMAN-01','TLND-01','TALU-01']:
+                        reupload = False
+                    else:
+                        reupload = True
                 else:
                     reupload = False
             else:
