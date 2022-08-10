@@ -1025,7 +1025,7 @@ def create_guest_details(data, name=None, update=False):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def reprocess_images(name: str, now=False):
     '''
     reprocess images if not detected correctly
