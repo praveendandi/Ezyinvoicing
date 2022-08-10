@@ -276,6 +276,7 @@
    "label": "Room Number"
   },
   {
+   "default": "1",
    "fieldname": "no_of_nights",
    "fieldtype": "Int",
    "label": "No of Nights"
@@ -511,7 +512,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-05-10 09:54:16.278843",
+ "modified": "2022-08-10 11:27:48.184394",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
