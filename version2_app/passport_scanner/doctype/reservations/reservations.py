@@ -1684,7 +1684,7 @@ def pass_detect_text(image_file):
         two_lines_mrz.append(line_second)
         first = two_lines_mrz[0]
         second = two_lines_mrz[1]
-
+        Date_of_issue = ''
         if first[0] == "P" or second[0] == "P":
 
             passport_type = "\n".join(tuple(loss))
