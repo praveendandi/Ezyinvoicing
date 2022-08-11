@@ -1802,6 +1802,7 @@ def pass_detect_text(image_file):
         elif first[0] == "V" or second[0] == "V":
             visa_type = "\n".join(tuple(loss))
             Date_of_issue = ""
+            type_of_visa = ''
             type = first[0]
             issuingcountry = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
             if first[1].isalpha():
