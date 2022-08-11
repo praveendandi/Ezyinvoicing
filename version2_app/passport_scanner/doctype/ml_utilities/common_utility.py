@@ -1,5 +1,5 @@
 import base64
-# import cv2
+import cv2
 import datetime
 import sys
 import traceback
