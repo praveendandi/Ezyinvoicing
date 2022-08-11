@@ -2096,6 +2096,13 @@ def passportvisadetails():
             os.remove(face)
 
         # logger.info("Data added successfully to passport")
+        details["face_image"] = ""
+        if image_string != "":
+            convert_face_image = convert_base64_to_image(image_string, "face_image", basedir + company.site_name, company)
+            if "success" in convert_face_image:
+                return convert_face_image
+            face_image = convert_face_image["message"]["file_url"]
+            details["face_image"] = face_image
         details["face"] = image_string
         details["fullimage_size"] = fullimage_size
         details["faceimage_size"] = faceimage_size
