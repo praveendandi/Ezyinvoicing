@@ -1451,7 +1451,7 @@ def block_irn():
             company.ezy_checkins_module = json_property["data"]["ezycheckins"]
             company.pos_bills_module = (
                 "Enable"
-                if json_property["data"]["POS Bills Module"] == 1
+                if json_property["data"]["pos_bills"] == 1
                 else "Disable"
             )
             company.save(ignore_permissions=True)
