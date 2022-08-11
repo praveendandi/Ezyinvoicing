@@ -14,6 +14,7 @@ def bulkupload(data):
     try:
         invoice_data=data
         company =invoice_data['company']
+        print(company,"/////////////////")
         start_time = datetime.datetime.now()
         items=[]
         companyData = frappe.get_doc('company',company)#data['company'])
@@ -83,6 +84,7 @@ def bulkupload(data):
                     item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                     # for sac_items in sac_description:
                     if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# 
+                        print(x[bulk_meta_data["detail_folio"]['transaction_description']].lower(),"..............................////////////////////////////////////", paymentTypes)
                         if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
                             x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                         # if x[bulk_meta_data["detail_folio"]['transaction_description']] in sac_items["name"]:
@@ -110,6 +112,7 @@ def bulkupload(data):
                 item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                 # for sac_items in sac_description:
                 if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# or "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']]:
+                    print(x[bulk_meta_data["detail_folio"]['transaction_description']].lower(),"..............................////////////////////////////////////", paymentTypes)
                     if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
                         x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                     
@@ -162,7 +165,10 @@ def bulkupload(data):
                 if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "On Hold"] and inv_data.invoice_type=="B2B":
                     reupload = True
                 elif inv_data.invoice_type == "B2C":
-                    reupload = True
+                    if inv_data.irn_generated=="Success" and company in ['LAAB-01','LAAB-01','LAKOL-01','LAMU-01','LGPS-01','LTVK-01','LABE-01','LAGO-01','LAJA-01','LAMAN-01','TLND-01','TALU-01']:
+                        reupload = False
+                    else:
+                        reupload = True
                 else:
                     reupload = False
             else:
@@ -371,14 +377,14 @@ def bulkupload(data):
                     
                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each_item['invoice_number']),"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each_item['invoice_number']),"company":company, "count":len(invoice_number_list), "invoice_count":countIn})
             countIn+=1
         df = pd.DataFrame(output_date)
         df = df.groupby('date').count().reset_index()
         output_data = df.to_dict('records')
         # data['UserName'] = "Ganesh"
         InsertExcelUploadStats({"data":output_data,"uploaded_by":invoice_data['username'],"start_time":str(start_time),"referrence_file":invoice_data['invoice_file'],"gst_file":invoice_data['gst_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Completed','type':"Bulk_upload_data","data":output_data,"company":company})
         # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:

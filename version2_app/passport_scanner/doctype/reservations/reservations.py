@@ -1684,7 +1684,7 @@ def pass_detect_text(image_file):
         two_lines_mrz.append(line_second)
         first = two_lines_mrz[0]
         second = two_lines_mrz[1]
-
+        Date_of_issue = ''
         if first[0] == "P" or second[0] == "P":
 
             passport_type = "\n".join(tuple(loss))
@@ -1770,8 +1770,13 @@ def pass_detect_text(image_file):
                 date_of_expiry = str((parsed_expiry).date())
             if Date_of_issue == date_of_expiry or Date_of_issue == date_of_birth:
                 Date_of_issue = " "
+            if country_code != "IND":
+                guest_id_type = "Foreigner"
+            else:
+                guest_id_type = "indianPassport"
             data = {
                 "Document_Type": type,
+                "guest_id_type":  guest_id_type,
                 "country_code": country_code,
                 "FamilyName": surname,
                 "Given_Name": givenname,
@@ -1801,7 +1806,8 @@ def pass_detect_text(image_file):
             return {"success": True, "data": data, "expired": False}
         elif first[0] == "V" or second[0] == "V":
             visa_type = "\n".join(tuple(loss))
-
+            Date_of_issue = ""
+            type_of_visa = ''
             type = first[0]
             issuingcountry = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
             if first[1].isalpha():
@@ -2095,6 +2101,13 @@ def passportvisadetails():
             os.remove(face)
 
         # logger.info("Data added successfully to passport")
+        details["face_image"] = ""
+        if image_string != "":
+            convert_face_image = convert_base64_to_image(image_string, "face_image", basedir + company.site_name, company)
+            if "success" in convert_face_image:
+                return convert_face_image
+            face_image = convert_face_image["message"]["file_url"]
+            details["face_image"] = face_image
         details["face"] = image_string
         details["fullimage_size"] = fullimage_size
         details["faceimage_size"] = faceimage_size
