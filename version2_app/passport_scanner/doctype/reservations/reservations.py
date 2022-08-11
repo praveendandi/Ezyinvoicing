@@ -1770,8 +1770,13 @@ def pass_detect_text(image_file):
                 date_of_expiry = str((parsed_expiry).date())
             if Date_of_issue == date_of_expiry or Date_of_issue == date_of_birth:
                 Date_of_issue = " "
+            if country_code != "IND":
+                guest_id_type = "Foreigner"
+            else:
+                guest_id_type = "indianPassport"
             data = {
                 "Document_Type": type,
+                "guest_id_type":  guest_id_type,
                 "country_code": country_code,
                 "FamilyName": surname,
                 "Given_Name": givenname,
