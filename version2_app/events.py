@@ -839,6 +839,8 @@ def create_pdf_each_invoice(doc):
             print("directory '%s' created successfully" %month_year_folder)
         except OSError as error:
                 print("directory '%s' cant be created " %month_year_folder)       
+        file_path=folder +  doc.name  + '.pdf'
+        # file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
         htmldoc.write_pdf(file_path)
         return {"success": True}
     except Exception as e:
