@@ -831,16 +831,14 @@ def create_pdf_each_invoice(doc):
         folder=company.save_etax_invoice_folder
         get_inv_date=doc.invoice_date
         print(get_inv_date,"creation")
-        month_year_folder = get_inv_date.strftime("%Y_%m")
-        path=os.path.join(folder,month_year_folder)
+        create_month_year_folder = get_inv_date.strftime("%Y_%m")
+        path=os.path.join(folder,create_month_year_folder)
         file_path=path +"/"+  doc.name  + '.pdf'
         try:
             os.makedirs(path,exist_ok=True)
-            print("directory '%s' created successfully" %month_year_folder)
+            print("directory '%s' created successfully" %create_month_year_folder)
         except OSError as error:
-                print("directory '%s' cant be created " %month_year_folder)       
-        file_path=folder +  doc.name  + '.pdf'
-        # file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
+                print("directory '%s' cant be created " %create_month_year_folder)       
         htmldoc.write_pdf(file_path)
         return {"success": True}
     except Exception as e:
