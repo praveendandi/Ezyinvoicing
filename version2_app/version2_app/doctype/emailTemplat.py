@@ -153,9 +153,11 @@ def send_mail_files(data):
                             send_email=1
                             )
             time.sleep(10)
+            print(data, obj)
             email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
             if len(email_queue) > 0:
                 send_now(email_queue[0]["name"])
+                print("...............................................")
             return {"success":True,"message":"Mail Send", "response":response}
         return {"success": True, "obj":obj}
     except Exception as e:
