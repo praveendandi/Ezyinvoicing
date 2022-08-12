@@ -22,7 +22,7 @@ import shutil
 from frappe.utils import logger
 from frappe.utils.data import money_in_words
 from weasyprint import HTML
-
+import pandas as pd
 
 
 
@@ -770,7 +770,7 @@ def convert_image_to_base64(image):
 
 
 @frappe.whitelist(allow_guest=True)
-def html_to_pdf(invoice_number=None,month=None):
+def html_to_pdf(invoice_number=None,month=None,year=None):
     try:
         print(invoice_number,month)
         if invoice_number:
@@ -779,10 +779,15 @@ def html_to_pdf(invoice_number=None,month=None):
         elif month:
             print("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month))
             docs = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month),as_dict=1)
-            print(docs)
             for invoice_number in docs:
                 doc = frappe.get_doc("Invoices",invoice_number['name'])
                 create_pdf_each_invoice(doc)   
+        elif year:
+            print("""SELECT name from  `tabInvoices` WHERE year(creation)={0};""".format(year))
+            year_doc = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE year(creation)={0};""".format(year),as_dict=1)
+            for invoice_number in year_doc:
+                docs = frappe.get_doc("Invoices",invoice_number['name'])
+                create_pdf_each_invoice(docs)        
         else:
             return {"message":"Please check the filter","success":False}
     except Exception as e:
@@ -823,7 +828,17 @@ def create_pdf_each_invoice(doc):
         html_data = frappe.render_template(templates,invoice_doc)
         site_name = cstr(frappe.local.site)
         htmldoc = HTML(string=html_data, base_url="")
-        file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
+        folder=company.save_etax_invoice_folder
+        get_inv_date=doc.invoice_date
+        print(get_inv_date,"creation")
+        month_year_folder = get_inv_date.strftime("%Y_%m")
+        path=os.path.join(folder,month_year_folder)
+        file_path=path +"/"+  doc.name  + '.pdf'
+        try:
+            os.makedirs(path,exist_ok=True)
+            print("directory '%s' created successfully" %month_year_folder)
+        except OSError as error:
+                print("directory '%s' cant be created " %month_year_folder)       
         htmldoc.write_pdf(file_path)
         return {"success": True}
     except Exception as e:
