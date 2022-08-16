@@ -159,7 +159,7 @@ def send_mail_files(data):
             response = requests.post(
                 "http://localhost:8000/api/method/frappe.core.doctype.communication.email.make",
                  data=json_data)
-            print(response.txt)
+            print(response.text)
             # response = make(recipients = data["receiver_email"],
             #                 sender = obj["sender"],
             #                 subject = b2csuccess.subject,
