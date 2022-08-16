@@ -158,7 +158,7 @@ def send_mail_files(data):
                         "read_receipt":0}
             response = requests.post(
                 "http://localhost:8000/api/method/frappe.core.doctype.communication.email.make",
-                 json=json_data)
+                 data=json_data)
             print(response.txt)
             # response = make(recipients = data["receiver_email"],
             #                 sender = obj["sender"],
