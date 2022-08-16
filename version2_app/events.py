@@ -777,17 +777,17 @@ def html_to_pdf(invoice_number=None,month=None,year=None):
             doc = frappe.get_doc("Invoices",invoice_number)
             create_pdf_each_invoice(doc)
         elif month:
-            print("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month))
-            docs = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month),as_dict=1)
+            print("""SELECT name from  `tabInvoices` WHERE month(invoice_date)={0};""".format(month))
+            docs = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={};""".format(month,year),as_dict=1)
             for invoice_number in docs:
                 doc = frappe.get_doc("Invoices",invoice_number['name'])
                 create_pdf_each_invoice(doc)   
-        elif year:
-            print("""SELECT name from  `tabInvoices` WHERE year(creation)={0};""".format(year))
-            year_doc = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE year(creation)={0};""".format(year),as_dict=1)
-            for invoice_number in year_doc:
-                docs = frappe.get_doc("Invoices",invoice_number['name'])
-                create_pdf_each_invoice(docs)        
+        # elif year:
+        #     print("""SELECT name from  `tabInvoices` WHERE year(invoice_date)={0};""".format(year))
+        #     year_doc = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE year(invoice_date)={0};""".format(year),as_dict=1)
+        #     for invoice_number in year_doc:
+        #         docs = frappe.get_doc("Invoices",invoice_number['name'])
+        #         create_pdf_each_invoice(docs)        
         else:
             return {"message":"Please check the filter","success":False}
     except Exception as e:
