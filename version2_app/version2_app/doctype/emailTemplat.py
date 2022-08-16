@@ -156,9 +156,12 @@ def send_mail_files(data):
                         "attachments" : obj["attachments"],
                         "send_me_a_copy":0,
                         "read_receipt":0}
+            company = frappe.get_last_doc("company")
+            headers = {'content-type': 'application/json'}
+
             response = requests.post(
-                "http://localhost:8000/api/method/frappe.core.doctype.communication.email.make",
-                 data=json_data)
+                company.host+"api/method/frappe.core.doctype.communication.email.make",
+                data=json_data,headers=headers,verify=False)
             print(response.text)
             # response = make(recipients = data["receiver_email"],
             #                 sender = obj["sender"],
