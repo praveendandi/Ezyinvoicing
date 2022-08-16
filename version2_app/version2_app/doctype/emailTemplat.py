@@ -157,7 +157,10 @@ def send_mail_files(data):
                         "send_me_a_copy":0,
                         "read_receipt":0}
             company = frappe.get_last_doc("company")
-            headers = {'content-type': 'multipart/form-data;'}
+            headers = {  
+                'content-type': "multipart/form-data; boundary=REQUEST_FORM_DATA_BOUNDARY",
+                'Content-Type': "",
+                'cache-control': "no-cache"}
 
             response = requests.post(
                 company.host+"api/method/frappe.core.doctype.communication.email.make",
