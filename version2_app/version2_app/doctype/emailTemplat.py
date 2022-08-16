@@ -161,10 +161,11 @@ def send_mail_files(data):
                 'content-type': "multipart/form-data; boundary=REQUEST_FORM_DATA_BOUNDARY",
                 'Content-Type': "",
                 'cache-control': "no-cache"}
-
+            s = requests.Session()
+            print(s,"Headers")
             response = requests.post(
                 company.host+"api/method/frappe.core.doctype.communication.email.make",
-                data=json_data,headers=headers,verify=False)
+                data=json_data,headers=s.headers,verify=False)
             print(response.text)
             # response = make(recipients = data["receiver_email"],
             #                 sender = obj["sender"],
