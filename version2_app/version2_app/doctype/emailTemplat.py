@@ -144,18 +144,34 @@ def send_mail_files(data):
         obj["attachments"] = att
         print(data,"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         if "receiver_email" in data:
-            response = make(recipients = data["receiver_email"],
-                            sender = obj["sender"],
-                            subject = b2csuccess.subject,
-                            content = b2csuccess.response,
-                            doctype = data["doctype"],
-                            name = data["name"],
-                            attachments = obj["attachments"],
-                            send_email=1,
-                            now=True,
-                            read_receipt=0,
-                            send_me_a_copy=0
-                            )
+            json_data = {
+                        "sender":obj["sender"],
+                        "subject":b2csuccess.subject,
+                        "recipients":data["receiver_email"],
+                        "send_email":1,
+                        "content":b2csuccess.response,
+                        "doctype":data["doctype"],
+                        "name":data["name"],
+                        "now":True,
+                        "attachments" : obj["attachments"],
+                        "send_me_a_copy":0,
+                        "read_receipt":0}
+            response = requests.post(
+                "http://localhost:8000/api/method/frappe.core.doctype.communication.email.make",
+                 json=json_data)
+            print(response.txt)
+            # response = make(recipients = data["receiver_email"],
+            #                 sender = obj["sender"],
+            #                 subject = b2csuccess.subject,
+            #                 content = b2csuccess.response,
+            #                 doctype = data["doctype"],
+            #                 name = data["name"],
+            #                 attachments = obj["attachments"],
+            #                 send_email=1,
+            #                 now=True,
+            #                 read_receipt=0,
+            #                 send_me_a_copy=0,
+            #                 )
             time.sleep(10)
             print(data, obj,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
