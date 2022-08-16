@@ -142,6 +142,7 @@ def send_mail_files(data):
             sig_files=frappe.db.get_list('File',filters={'file_url': ['=',data["signatured_file"]]},fields=['name'])
             att.extend([sig_files[0]["name"]])
         obj["attachments"] = att
+        print(data,"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
         if "receiver_email" in data:
             response = make(recipients = data["receiver_email"],
                             sender = obj["sender"],
