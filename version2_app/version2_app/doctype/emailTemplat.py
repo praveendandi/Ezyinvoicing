@@ -151,10 +151,13 @@ def send_mail_files(data):
                             doctype = data["doctype"],
                             name = data["name"],
                             attachments = obj["attachments"],
-                            send_email=1
+                            send_email=1,
+                            now=True,
+                            read_receipt=0,
+                            send_me_a_copy=0
                             )
             time.sleep(10)
-            print(data, obj)
+            print(data, obj,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
             if len(email_queue) > 0:
                 send_now(email_queue[0]["name"])
