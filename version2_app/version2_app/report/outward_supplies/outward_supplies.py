@@ -44,7 +44,6 @@ def execute(filters=None):
             return columns,data
         doc_list = [list(x) for x in doc]
         invoice_names = [x[0] for x in doc_list]
-        
         items_fields = ['parent',"taxable",'sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount','unit_of_measurement_description','quantity']
         items_columns = ['invoice_number',"taxable",'sac_code','item_value','item_value_after_gst','gst_rate','igst','igst_amount','cgst','cgst_amount','sgst','sgst_amount','state_cess','state_cess_amount','cess','cess_amount','unit_of_measurement_description','quantity']
         item_filter = {'parent':['in',invoice_names]}
