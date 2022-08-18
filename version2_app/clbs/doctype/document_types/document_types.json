@@ -8,9 +8,7 @@
  "field_order": [
   "document_type",
   "company",
-  "doc_active_status",
-  "sequence",
-  "is_editable"
+  "doc_delete_status"
  ],
  "fields": [
   {
@@ -26,26 +24,15 @@
    "options": "company"
   },
   {
-   "fieldname": "sequence",
-   "fieldtype": "Int",
-   "label": "Sequence"
-  },
-  {
    "default": "0",
-   "fieldname": "is_editable",
+   "fieldname": "doc_delete_status",
    "fieldtype": "Check",
-   "label": "Is Editable"
-  },
-  {
-   "default": "1",
-   "fieldname": "doc_active_status",
-   "fieldtype": "Check",
-   "label": "Doc Active Status"
+   "label": "Doc Delete Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-10 15:28:21.896394",
+ "modified": "2022-08-04 10:05:49.093173",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Document Types",

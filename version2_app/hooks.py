@@ -198,9 +198,6 @@ doc_events = {
         "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
         "on_update": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
         "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
-    },
-    "Document Types": {
-        "before_insert": "version2_app.clbs.doctype.document_types.document_types.add_document_sequence",
     }
 }
 
