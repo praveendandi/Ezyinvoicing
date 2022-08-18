@@ -3945,12 +3945,16 @@ def update_non_taxable(month,year,sac_index):
             get_items = frappe.db.get_list("Items", filters=[["taxable","=","No"],["parent","=",each]], fields=["sum(item_value) as item_value", "sum(item_value_after_gst) as item_value_after_gst","parent"])
             invoice_doc = frappe.get_doc("Invoices", each)
             if len(get_items)>0:
-                invoice_doc.other_charges = get_items[0]["item_value_after_gst"]
-                invoice_doc.other_charges_before_tax = get_items[0]["item_value"]
+                if get_items[0]["item_value_after_gst"] and get_items[0]["item_value"]:
+                    invoice_doc.other_charges = get_items[0]["item_value_after_gst"]
+                    invoice_doc.other_charges_before_tax = get_items[0]["item_value"]
                 change_base_value = frappe.db.get_list("Items", filters=[["taxable","=","Yes"],["parent","=",each]], fields=["sum(item_value) as item_value", "sum(item_value_after_gst) as item_value_after_gst","parent"])
                 if len(change_base_value) > 0:
-                    invoice_doc.amount_before_gst = change_base_value[0]["item_value"]
-                    invoice_doc.amount_after_gst = change_base_value[0]["item_value_after_gst"]
+                    if change_base_value[0]["item_value"] and change_base_value[0]["item_value_after_gst"]:
+                        invoice_doc.amount_before_gst = change_base_value[0]["item_value"]
+                        invoice_doc.pms_invoice_summary_without_gst = change_base_value[0]["item_value"]
+                        invoice_doc.amount_after_gst = change_base_value[0]["item_value_after_gst"]
+                        invoice_doc.pms_invoice_summary = change_base_value[0]["item_value_after_gst"]
                 invoice_doc.save()
                 # frappe.db.set_value("Items", {"sac_index": sac_index,"taxable": "Yes", "parent": each}, "taxable", "No")
                 frappe.db.commit()
