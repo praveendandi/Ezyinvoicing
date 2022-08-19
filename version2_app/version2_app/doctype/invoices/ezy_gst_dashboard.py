@@ -40,6 +40,9 @@ def getGSTR1DashboardDetails(year=None, month=None):
             """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,'credit-debit' as invoice_category, '{}' as invoice_type, (sum(other_charges)-sum(non_revenue_amount)) as other_charges, sum(non_revenue_amount) as non_revenue_amount from `tabInvoices` where invoice_category in ('Credit Invoice','Debit Invoice') and `tabInvoices`.irn_generated = 'Success' and sez=0 and invoice_type='B2B' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2B', year, month), as_dict=1)
         get_b2c_credit_debit_invoice_summaries = frappe.db.sql(
             """SELECT count(name) as count, round(sum(total_gst_amount),2) as tax_amount, round(sum(pms_invoice_summary_without_gst),2) as taxable_value, round(sum(sales_amount_after_tax),2) as before_gst, round(sum(igst_amount),2) as igst_amount, round(sum(cgst_amount),2) as cgst_amount, round(sum(sgst_amount),2) as sgst_amount, round((sum(total_central_cess_amount)+sum(total_state_cess_amount)),2) as cess,'credit-debit' as invoice_category, '{}' as invoice_type, (sum(other_charges)-sum(non_revenue_amount)) as other_charges, sum(non_revenue_amount) as non_revenue_amount from `tabInvoices` where invoice_category in ('Credit Invoice','Debit Invoice') and invoice_type='B2C' and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format('B2C', year, month), as_dict=1)
+        # get_hsn_summary = frappe.db.sql(
+        #     """SELECT count(`tabItems`.parent) as count, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as tax_amount, sum(`tabItems`.item_value_after_gst) as before_gst,sum(CASE WHEN taxable = "Yes" and `tabInvoices`.sez != 1 and `tabItems`.type != "Excempted"  THEN `tabItems`.item_taxable_value ELSE 0 END) as taxable_value, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, 'hsn-summary' as invoice_category, sum(CASE WHEN taxable = "No" THEN `tabItems`.item_taxable_value ELSE 0 END) as other_charges,(sum(`tabInvoices`.total_state_cess_amount)+sum(`tabInvoices`.total_central_cess_amount)) as cess, 0 as non_revenue_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format(year, month), as_dict=1)
+        # nil_rated_supplies = frappe.db.sql("""SELECT count(`tabItems`.name) as count, sum(item_taxable_value) as taxable_value, sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount) as tax_amount, sum(item_value_after_gst) as before_gst, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount,'Nil Rated Supplies' as invoice_type, 0 as other_charges, 0 as cess, 0 as non_revenue_amount from `tabInvoices` INNER JOIN `tabItems` ON `tabItems`.parent = `tabInvoices`.name where ((`tabItems`.gst_rate = 0 and `tabItems`.taxable = "Yes") or (`tabInvoices`.sez = 1 and `tabItems`.type = "Excempted")) and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)='{}' and MONTH(invoice_date)='{}'""".format(year, month), as_dict=1)
         get_hsn_summary = frappe.db.sql(
             """SELECT count(`tabItems`.parent) as count, (sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount)) as tax_amount, sum(`tabItems`.item_value_after_gst) as before_gst,sum(`tabItems`.item_taxable_value) as taxable_value, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount, 'hsn-summary' as invoice_category, 0 as other_charges,(sum(`tabInvoices`.total_state_cess_amount)+sum(`tabInvoices`.total_central_cess_amount)) as cess, 0 as non_revenue_amount from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)={} and MONTH(invoice_date)={}""".format(year, month), as_dict=1)
         nil_rated_supplies = frappe.db.sql("""SELECT count(`tabItems`.name) as count, sum(item_taxable_value) as taxable_value, sum(`tabItems`.cgst_amount)+sum(`tabItems`.sgst_amount)+sum(`tabItems`.igst_amount) as tax_amount, sum(item_value_after_gst) as before_gst, sum(`tabItems`.igst_amount) as igst_amount, sum(`tabItems`.cgst_amount) as cgst_amount, sum(`tabItems`.sgst_amount) as sgst_amount,'Nil Rated Supplies' as invoice_type, 0 as other_charges, 0 as cess, 0 as non_revenue_amount from `tabInvoices` INNER JOIN `tabItems` ON `tabItems`.parent = `tabInvoices`.name where ((`tabItems`.gst_rate = 0 and `tabItems`.taxable = "Yes") or (`tabItems`.taxable = "No") or (`tabInvoices`.sez = 1 and `tabItems`.type = "Excempted")) and `tabInvoices`.irn_generated = 'Success' and YEAR(invoice_date)='{}' and MONTH(invoice_date)='{}'""".format(year, month), as_dict=1)
@@ -1114,18 +1117,19 @@ def create_reconciliation(start_date=None, end_date=None, redo=False, recon_id=N
     try:
         # Getting recon ID
         if (start_date and end_date) or (redo and recon_id):
-            if frappe.db.exists("Invoices", {"invoice_date": ["between", start_date, end_date]}):
-                enqueue(
-                        create_recon,
-                        queue="default",
-                        timeout=800000,
-                        event="create_recon",
-                        now=False,
-                        data={"start_date": start_date, "end_date": end_date, "redo": False, "recon_id": recon_id},
-                        is_async=True,
-                    )
-                return {"success": True, "message": "Reconciliation created"}
-            return {"success": False, "message": "Invoices not found"}
+            if not redo and not recon_id:
+                if not frappe.db.exists("Invoices", {"invoice_date": ["between", start_date, end_date]}):
+                    return {"success": False, "message": "Invoices not found"}
+            enqueue(
+                    create_recon,
+                    queue="default",
+                    timeout=800000,
+                    event="create_recon",
+                    now=False,
+                    data={"start_date": start_date, "end_date": end_date, "redo": redo, "recon_id": recon_id},
+                    is_async=True,
+                )
+            return {"success": True, "message": "Reconciliation created"}  
         return {"success": False, "message": "something went wrong"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -1135,6 +1139,7 @@ def create_reconciliation(start_date=None, end_date=None, redo=False, recon_id=N
     
 def create_recon(data):
     try:
+        frappe.publish_realtime("custom_socket", {"message": "Recon Started"})
         start_date=data["start_date"]
         end_date=data["end_date"]
         redo=data["redo"]
@@ -1144,12 +1149,17 @@ def create_recon(data):
                 {"doctype": "Recon Details", "start_date": start_date, "end_date": end_date, "user_id": frappe.session.user})
             if not insert_recon_data["success"]:
                 return insert_recon_data
-            frappe.publish_realtime("custom_socket", {"message": "Recon Processing"})
             recon_doc = insert_recon_data["doc"]
+            frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 0})
         else:
             if not recon_id:
                 return {"success": True, "message": "reconID is mandatory"}
             recon_doc = frappe.get_doc("Recon Details", recon_id)
+            recon_doc.processing = "Pending"
+            recon_doc.percentage = 0
+            recon_doc.save()
+            frappe.db.commit()
+            frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_id, "percentage": 0})
             start_date = recon_doc.start_date
             end_date = recon_doc.end_date
         missing = get_missing_invoices(start_date, end_date)
@@ -1173,6 +1183,9 @@ def create_recon(data):
                     if not missing_in_opera["success"]:
                         return missing_in_opera
                     count_missing_in_opera += 1
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 8)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 8})
 
         # Zero Invoices
         missing_in_opera = {
@@ -1192,6 +1205,9 @@ def create_recon(data):
                     zero_invoices = insert_records(each)
                     if not zero_invoices["success"]:
                         return zero_invoices
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 16)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 16})
 
         # Missing Invoices In Ezyinvoicing
         if len(missing["data"]["missing_in_ezyinvoicing"]) > 0:
@@ -1201,6 +1217,9 @@ def create_recon(data):
                 missing_in_ezyinvoicing = insert_records(missing_in_ezy)
                 if not missing_in_ezyinvoicing["success"]:
                     return missing_in_ezyinvoicing
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 21)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 21})
 
         # Type Missmatch
         type_missmatch = missing["data"]["type_missmatch_for_tax"] + \
@@ -1209,11 +1228,17 @@ def create_recon(data):
             for each in type_missmatch:
                 each["doctype"] = "Invoice Type Missmatch"
                 each["recon_id"] = recon_doc.name
-                each["invoice_number"] = each["invoicenumber"]
+                if "InvoiceNumber" in each:
+                    each["invoice_number"] = each["InvoiceNumber"]
+                else:
+                    each["invoice_number"] = each["invoicenumber"]
                 type_mismatch = insert_records(each)
                 if not type_mismatch["success"]:
                     return type_mismatch
-
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 30)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 30})
+        
         # Ezy Invoicing Summary
         ezy_invoicing_invoices = frappe.db.get_list('Invoices', filters=[["invoice_date", 'between', [start_date, end_date]]], fields=[
                                                     "sum(sales_amount_before_tax) as beforetax", "sum(cgst_amount) as sgst", "sum(sgst_amount) as cgst", "sum(igst_amount) as igst", "sum(sales_amount_after_tax) as totalinvoiceamount"], order_by='name')
@@ -1224,6 +1249,9 @@ def create_recon(data):
                 compare = insert_records(each)
                 if not compare["success"]:
                     return compare
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 40)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 40})
 
         # Comparison
         invoice_comparison = compare_invoice_summary(start_date, end_date)
@@ -1235,6 +1263,9 @@ def create_recon(data):
                 comparsion = insert_records(each)
                 if not comparsion["success"]:
                     return comparsion
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 50)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 50})
 
         # Converted b2b to b2c
         if len(missing["data"]["converted_b2b_to_b2c"]) > 0:
@@ -1246,6 +1277,9 @@ def create_recon(data):
                     conb2b2c = insert_records(each)
                     if not conb2b2c["success"]:
                         return conb2b2c
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 52)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 52})
 
         # Converted b2c to b2b
         if len(missing["data"]["converted_b2c_to_b2b"]) > 0:
@@ -1257,6 +1291,9 @@ def create_recon(data):
                     conb2cb2b = insert_records(each)
                     if not conb2cb2b["success"]:
                         return conb2cb2b
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 55)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 55})
 
         # HSN SUmmary
         hsn = getHsnSummary(start_date=start_date, end_date=end_date)
@@ -1268,6 +1305,9 @@ def create_recon(data):
                 hsnsum = insert_records(each)
                 if not hsnsum["success"]:
                     return hsnsum
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 66)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 66})
 
          # B2B HSN Summary
         hsnb2b = getHsnSummary(
@@ -1281,7 +1321,10 @@ def create_recon(data):
                 hsnsumb2b = insert_records(each)
                 if not hsnsumb2b["success"]:
                     return hsnsumb2b
-
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 81)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 81})
+        
         # B2C HSN Summary
         hsnb2c = getHsnSummary(
             filters=[["invoice_type", "=", "B2C"]],  start_date=start_date, end_date=end_date)
@@ -1293,6 +1336,9 @@ def create_recon(data):
                 hsnsumb2c = insert_records(each)
                 if not hsnsumb2c["success"]:
                     return hsnsumb2c
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 96)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 96})
 
         # No SAC
         no_sac_query = frappe.db.sql("""SELECT `tabItems`.parent as invoice_number, `tabItems`.description as itemdescription, `tabItems`.item_value_after_gst as before_gst, `tabItems`.cgst_amount as cgst_amount, `tabItems`.sgst_amount as sgst_amount, `tabItems`.igst_amount as igst_amount,`tabItems`.item_taxable_value as total_tax_amount, `tabItems`.vat_amount as vat_amount, `tabInvoices`.irn_generated as irnstatus from `tabItems` INNER JOIN `tabInvoices` ON `tabItems`.parent = `tabInvoices`.invoice_number where `tabItems`.sac_code = "No Sac" and invoice_date between '{}' and '{}'""".format(start_date, end_date), as_dict=1)
@@ -1303,6 +1349,9 @@ def create_recon(data):
                 no_sac = insert_records(each)
                 if not no_sac["success"]:
                     return no_sac
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 98)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 98})
         
         # Inserting Recon ID into Invoice Count
         invoice_count_data = {"doctype": "Invoice Count", "ezyinvoicing_count": len(missing["data"]["ezy_invoicing_invoices"]), "opera_folios_count": len(missing["data"]["opera_folios"]), "missing_in_ezyinvoicing": len(missing["data"]["missing_in_ezyinvoicing"]), "missing_in_opera": count_missing_in_opera, "type_missmatch": len(missing["data"]["type_missmatch_for_tax"])+len(missing["data"]["type_missmatch_for_credit"]) if len(missing["data"]["type_missmatch_for_credit"]) > 1 else 0, "recon_id": recon_doc.name}
@@ -1310,7 +1359,12 @@ def create_recon(data):
         if not insert_invoice_count["success"]:
             return insert_invoice_count
 
-        frappe.publish_realtime("custom_socket", {"message": "Create Recon"})
+        recon_doc = frappe.get_doc("Recon Details", recon_doc.name)
+        recon_doc.processing = "Completed"
+        recon_doc.percentage = 100
+        recon_doc.save()
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Create Recon", "name": recon_doc.name, "percentage": 100})
         return {'success': True, "message": "created recon"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -1575,6 +1629,7 @@ def delete_recon(data):
 @frappe.whitelist(allow_guest=True)
 def Redo_recon(name=None):
     try:
+        print(name,"...........................")
         delete_reconcilation = delete_recon(
             {"recon_ids": [name], "redo": True})
         if not delete_reconcilation["success"]:

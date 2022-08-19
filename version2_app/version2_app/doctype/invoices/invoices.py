@@ -10,6 +10,7 @@ import frappe
 from frappe import database
 from frappe.model.document import Document
 import requests
+from frappe.utils import data as date_util
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages, SCCheckRatePercentages
@@ -3930,3 +3931,36 @@ def update_non_revenue_amount():
 # 		print(e, "attach b2c qrcode")
 # 		return {"success": False, "message": str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def update_non_taxable(month,year,sac_index):
+    try:
+        start_date = year+'-'+month+"-01"
+        end_date = str(date_util.get_last_day(start_date))
+        frappe.db.set_value("Items", {"sac_index": sac_index,"taxable": "Yes"}, "taxable", "No")
+        frappe.db.commit()
+        get_invoice_list = frappe.db.get_list("Invoices", filters=[["invoice_date","between",[start_date, end_date]]], pluck="name")
+        get_invoice_list = set(get_invoice_list)
+        for each in get_invoice_list:
+            get_items = frappe.db.get_list("Items", filters=[["taxable","=","No"],["parent","=",each]], fields=["sum(item_value) as item_value", "sum(item_value_after_gst) as item_value_after_gst","parent"])
+            invoice_doc = frappe.get_doc("Invoices", each)
+            if len(get_items)>0:
+                if get_items[0]["item_value_after_gst"] and get_items[0]["item_value"]:
+                    invoice_doc.other_charges = get_items[0]["item_value_after_gst"]
+                    invoice_doc.other_charges_before_tax = get_items[0]["item_value"]
+                change_base_value = frappe.db.get_list("Items", filters=[["taxable","=","Yes"],["parent","=",each]], fields=["sum(item_value) as item_value", "sum(item_value_after_gst) as item_value_after_gst","parent"])
+                if len(change_base_value) > 0:
+                    if change_base_value[0]["item_value"] and change_base_value[0]["item_value_after_gst"]:
+                        invoice_doc.amount_before_gst = change_base_value[0]["item_value"]
+                        invoice_doc.pms_invoice_summary_without_gst = change_base_value[0]["item_value"]
+                        invoice_doc.amount_after_gst = change_base_value[0]["item_value_after_gst"]
+                        invoice_doc.pms_invoice_summary = change_base_value[0]["item_value_after_gst"]
+                invoice_doc.save()
+                # frappe.db.set_value("Items", {"sac_index": sac_index,"taxable": "Yes", "parent": each}, "taxable", "No")
+                frappe.db.commit()
+            else:
+                return False
+        return True
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_non_taxable","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        return {"success": False, "message": str(e)}
