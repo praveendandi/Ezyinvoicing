@@ -34,14 +34,12 @@ from frappe.utils import cstr, get_site_name, logger, random_string
 from frappe.utils.data import money_in_words
 from PIL import Image
 from weasyprint import HTML
-from frappe.core.doctype.communication.email import make
 from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
 import datetime
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
-
 # user_name = frappe.session.user
 
 
@@ -2803,19 +2801,24 @@ def convert_image_to_base64(image):
 
 
 @frappe.whitelist(allow_guest=True)
-def html_to_pdf(invoice_number=None,month=None):
+def html_to_pdf(invoice_number=None,month=None,year=None):
     try:
         print(invoice_number,month)
         if invoice_number:
             doc = frappe.get_doc("Invoices",invoice_number)
             create_pdf_each_invoice(doc)
         elif month:
-            print("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month))
-            docs = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE month(creation)={0};""".format(month),as_dict=1)
-            print(docs)
+            print("""SELECT name from  `tabInvoices` WHERE month(invoice_date)={0};""".format(month))
+            docs = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={};""".format(month,year),as_dict=1)
             for invoice_number in docs:
                 doc = frappe.get_doc("Invoices",invoice_number['name'])
                 create_pdf_each_invoice(doc)   
+        # elif year:
+        #     print("""SELECT name from  `tabInvoices` WHERE year(invoice_date)={0};""".format(year))
+        #     year_doc = frappe.db.sql("""SELECT name from  `tabInvoices` WHERE year(invoice_date)={0};""".format(year),as_dict=1)
+        #     for invoice_number in year_doc:
+        #         docs = frappe.get_doc("Invoices",invoice_number['name'])
+        #         create_pdf_each_invoice(docs)        
         else:
             return {"message":"Please check the filter","success":False}
     except Exception as e:
@@ -2857,8 +2860,16 @@ def create_pdf_each_invoice(doc):
         site_name = cstr(frappe.local.site)
         htmldoc = HTML(string=html_data, base_url="")
         folder=company.save_etax_invoice_folder
-        file_path=folder +  doc.name  + '.pdf'
-        # file_path = cwd + "/" + site_name + "/public/files/" + doc.name  + '.pdf'
+        get_inv_date=doc.invoice_date
+        print(get_inv_date,"creation")
+        create_month_year_folder = get_inv_date.strftime("%Y_%m")
+        path=os.path.join(folder,create_month_year_folder)
+        file_path=path +"/"+  doc.name  + '.pdf'
+        try:
+            os.makedirs(path,exist_ok=True)
+            print("directory '%s' created successfully" %create_month_year_folder)
+        except OSError as error:
+                print("directory '%s' cant be created " %create_month_year_folder)       
         htmldoc.write_pdf(file_path)
         return {"success": True}
     except Exception as e:
