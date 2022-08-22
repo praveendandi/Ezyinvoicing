@@ -1,0 +1,175 @@
+{
+ "actions": [],
+ "autoname": "field:company",
+ "creation": "2022-05-04 10:01:08.305571",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "cc_mail_ids_for_clbs_reports",
+  "clbs_document_preview",
+  "document_sequence",
+  "company",
+  "summary_header",
+  "summary_terms_and_conditions",
+  "summary_footer",
+  "threshhold",
+  "portal_automation",
+  "digital_signature",
+  "qr_coordinates_section",
+  "qr_rect_x0",
+  "qr_rect_x1",
+  "qr_rect_y0",
+  "qr_rect_y1",
+  "digital_signature_coordinates_section",
+  "x1",
+  "y1",
+  "x2",
+  "y2"
+ ],
+ "fields": [
+  {
+   "fieldname": "qr_rect_x0",
+   "fieldtype": "Data",
+   "label": "QR Rect X0"
+  },
+  {
+   "fieldname": "qr_rect_x1",
+   "fieldtype": "Data",
+   "label": "QR Rect X1"
+  },
+  {
+   "fieldname": "qr_rect_y0",
+   "fieldtype": "Data",
+   "label": "QR Rect Y0"
+  },
+  {
+   "fieldname": "qr_rect_y1",
+   "fieldtype": "Data",
+   "label": "QR Rect Y1"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company",
+   "unique": 1
+  },
+  {
+   "fieldname": "cc_mail_ids_for_clbs_reports",
+   "fieldtype": "Small Text",
+   "label": "CC Mail IDs For CLBS Reports"
+  },
+  {
+   "default": "INDIVIDUAL",
+   "fieldname": "clbs_document_preview",
+   "fieldtype": "Select",
+   "label": "CLBS Document Preview",
+   "options": "INDIVIDUAL\nCOMBINED"
+  },
+  {
+   "fieldname": "summary_header",
+   "fieldtype": "Small Text",
+   "label": "Summary Header"
+  },
+  {
+   "fieldname": "summary_terms_and_conditions",
+   "fieldtype": "Small Text",
+   "label": "Summary Terms and Conditions"
+  },
+  {
+   "fieldname": "summary_footer",
+   "fieldtype": "Small Text",
+   "label": "Summary Footer"
+  },
+  {
+   "fieldname": "threshhold",
+   "fieldtype": "Float",
+   "label": "Threshhold"
+  },
+  {
+   "fieldname": "document_sequence",
+   "fieldtype": "Small Text",
+   "label": "Document Sequence"
+  },
+  {
+   "default": "0",
+   "fieldname": "portal_automation",
+   "fieldtype": "Check",
+   "label": "Portal Automation"
+  },
+  {
+   "default": "0",
+   "fieldname": "digital_signature",
+   "fieldtype": "Check",
+   "label": "Digital Signature"
+  },
+  {
+   "fieldname": "qr_coordinates_section",
+   "fieldtype": "Section Break",
+   "label": "QR Coordinates"
+  },
+  {
+   "fieldname": "digital_signature_coordinates_section",
+   "fieldtype": "Section Break",
+   "label": "Digital Signature Coordinates"
+  },
+  {
+   "fieldname": "x1",
+   "fieldtype": "Int",
+   "label": "X1"
+  },
+  {
+   "fieldname": "y1",
+   "fieldtype": "Int",
+   "label": "Y1"
+  },
+  {
+   "fieldname": "x2",
+   "fieldtype": "Int",
+   "label": "X2"
+  },
+  {
+   "fieldname": "y2",
+   "fieldtype": "Int",
+   "label": "Y2"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-21 17:10:22.578426",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "CLBS Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -3,11 +3,10 @@ import threading
 import requests
 import glob
 import os
-import frappe
 from os import path
 import time,json
 
-config_json_path="/home/caratred/Desktop/greenpark/apps/version2_app/config.json"
+config_json_path="config.json"
 headers = {'Content-Type': 'application/json'}
 with open(config_json_path) as f:
    config_json = json.load(f)
@@ -34,8 +33,10 @@ def getprearrivals_file():
                     file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
                 else:
                     file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
+            print(file_response)
             if file_response.status_code==200:
                 file_data = file_response.json()
+                print(file_data)
                 if config_json["proxy"] == 1:
                     proxyhost = config_json["proxy_url"]
                     proxyhost = proxyhost.replace("http://","@")

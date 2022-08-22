@@ -4,11 +4,13 @@
 
 from __future__ import unicode_literals
 from logging import exception
+# from typing_extensions import Self
 from unittest import expectedFailure
 import frappe
 from frappe import database
 from frappe.model.document import Document
 import requests
+from frappe.utils import data as date_util
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
 from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages, SCCheckRatePercentages
@@ -34,7 +36,8 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
+import fitz
+from frappe.utils import cstr
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -642,7 +645,6 @@ def send_invoicedata_to_gcb(invoice_number):
                 box_size=3,
                 border=4
             )
-            print(response['data'],"/////////")
             qrurl = company.b2c_qr_url + response['data']
             qr.add_data(qrurl)
             qr.make(fit=True)
@@ -992,6 +994,7 @@ def insert_invoice(data):
         total_credit_central_cess_amount = 0
         total_credit_state_cess_amount = 0
         total_credit_vat_amount =0
+        non_revenue_amount = 0
         has_discount_items = "No"
         has_credit_items = "No"
         irn_generated = "Pending"
@@ -1007,6 +1010,8 @@ def insert_invoice(data):
                         total_vat_amount += float(item['vat_amount'])
                     else:
                         total_credit_vat_amount += float(item['vat_amount'])
+                    if frappe.db.exists("SAC HSN CODES", {"sac_index":item["sac_index"], "ignore_non_taxable_items": 1}):
+                        non_revenue_amount += float(item['item_value_after_gst'])
                 elif item['taxable']=="No" and item['item_type']=="Discount":
                     discountAmount += item['item_value_after_gst'] 
                 elif item['sac_code'].isdigit():
@@ -1170,7 +1175,11 @@ def insert_invoice(data):
         if "invoice_from" in data['guest_data']:
             invoice_from = data['guest_data']['invoice_from']
         else:
-            invoice_from = "Pms"	
+            invoice_from = "Pms"
+        if "B2C_bulk_upload" in data:
+            if data["B2C_bulk_upload"]:
+                if data['guest_data']['invoice_type'] == "B2B":
+                    irn_generated = "On Hold"
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1281,7 +1290,9 @@ def insert_invoice(data):
             "debit_invoice":debit_invoice,
             "folioid":data["folioid"] if "folioid" in data else "",
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
-            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else ""
+            "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
+            "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
+            "non_revenue_amount": non_revenue_amount
         })
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
@@ -1329,7 +1340,7 @@ def insert_invoice(data):
             
             return {"success": True,"data":invoice}
         else:
-            if v.irn_generated == "Pending" and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+            if v.irn_generated in ["Pending","On Hold"] and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
                 tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
                 if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or v.sez==1:
                     pass
@@ -1422,6 +1433,13 @@ def insert_items(items, invoice_number):
                 item['item_value'] = round(item['item_value'],2)
                 item['item_value_after_gst'] = round(item['item_value_after_gst'],2)
                 item['parent'] = invoice_number
+                if "check_number" in item and "reference_check_number" in item:
+                    poss_check = frappe.db.get_value('POS Checks', {'pos_check_reference_number': item['reference_check_number']}, ["name"])
+                    if poss_check:
+                        item["pos_check"] = poss_check
+                        frappe.db.sql("""update `tabPOS Checks` set attached_to='{}', sync = 'Yes' where name='{}'""".format(invoice_number, poss_check))
+                        frappe.db.commit()
+                        item["pos_check"] = poss_check
                 # if item['sac_code'].isdigit():
                 if "-" in str(item['item_value']):
                     item['is_credit_item'] = "Yes"
@@ -1437,6 +1455,39 @@ def insert_items(items, invoice_number):
             
         return {"sucess": True, "data": 'doc'}
         # print(doc)
+    except Exception as e:
+        print(traceback.print_exc(),"**********  insert itemns api")
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing insert_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+
+@frappe.whitelist(allow_guest=True)
+def combine_pos_checks_with_invoice(invoice_number):
+    try:
+        company = frappe.get_last_doc("company")
+        items = frappe.db.get_list('POS Checks', filters={'attached_to': invoice_number}, pluck="pos_bill")
+        if len(items)>0:
+            cwd = os.getcwd()
+            site_name = cstr(frappe.local.site)
+            result = fitz.open()
+            for each in items:
+                file_path = cwd + "/" + site_name + each
+                with fitz.open(file_path) as mfile:
+                    result.insertPDF(mfile)
+            file_path = cwd + "/" + site_name + "/public/files/" + invoice_number + '-POS.pdf'
+            result.save(file_path)
+            files_new = {"file": open(file_path, 'rb')}
+            payload_new = {'is_private': 1, 'folder': 'Home'}
+            file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
+                                        data=payload_new, verify=False).json()
+            print(file_response,"???????")
+            if "file_url" in file_response["message"].keys():
+                os.remove(file_path)
+            else:
+                return {"success": False, "message": "something went wrong"}
+            return {"success": True, "file_url": file_response["message"]["file_url"]}
+        else:
+            return {"success": False, "message": "No data found"}
     except Exception as e:
         print(traceback.print_exc(),"**********  insert itemns api")
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2348,7 +2399,8 @@ def calulate_items(data):
                 "sac_index": sac_code_based_gst_rates.sac_index,
                 "line_edit_net":net_value,
                 "item_reference":item["item_reference"] if "item_reference" in item else "",
-                "check_number":item["check_number"] if "check_number" in item else ""
+                "check_number":item["check_number"] if "check_number" in item else "",
+                "reference_check_number":item["reference_check_number"] if "reference_check_number" in item else ""
             })
         total_items.extend(second_list)	
         return {"success": True, "data": total_items}
@@ -3534,6 +3586,7 @@ def Error_Insert_invoice(data):
                 "invoice_from":invoice_from,
                 "folioid":data["folioid"] if "folioid" in data else "",
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
+                "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else ""
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
@@ -3813,6 +3866,24 @@ def get_taxpayerdetails(data):
         return {"success": False, "message": e}   
 
 
+@frappe.whitelist(allow_guest=True)
+def update_non_revenue_amount():
+    try:
+        get_non_revenue_list = frappe.db.get_list("SAC HSN CODES", filters = {"ignore_non_taxable_items": 1}, pluck="sac_index")
+        if len(get_non_revenue_list) > 0:
+            get_items = frappe.db.get_list("Items", filters = {"sac_index":["in",get_non_revenue_list]}, fields=["sum(item_value_after_gst) as item_value_after_gst", "parent"], group_by="parent")
+            if len(get_items) > 0:
+                for each in get_items:
+                    invoice_doc = frappe.get_doc("Invoices",each["parent"])
+                    invoice_doc.non_revenue_amount = each["item_value_after_gst"]
+                    invoice_doc.save()
+                    frappe.db.commit()
+                return {"success": True}
+        return {"success": False, "message": "No data found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        return {"success": False, "message": e}  
 # @frappe.whitelist(allow_guest=True)
 # def b2b_success_to_credit_note(data):
 # 	try:
@@ -3860,3 +3931,36 @@ def get_taxpayerdetails(data):
 # 		print(e, "attach b2c qrcode")
 # 		return {"success": False, "message": str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def update_non_taxable(month,year,sac_index):
+    try:
+        start_date = year+'-'+month+"-01"
+        end_date = str(date_util.get_last_day(start_date))
+        frappe.db.set_value("Items", {"sac_index": sac_index,"taxable": "Yes"}, "taxable", "No")
+        frappe.db.commit()
+        get_invoice_list = frappe.db.get_list("Invoices", filters=[["invoice_date","between",[start_date, end_date]]], pluck="name")
+        get_invoice_list = set(get_invoice_list)
+        for each in get_invoice_list:
+            get_items = frappe.db.get_list("Items", filters=[["taxable","=","No"],["parent","=",each]], fields=["sum(item_value) as item_value", "sum(item_value_after_gst) as item_value_after_gst","parent"])
+            invoice_doc = frappe.get_doc("Invoices", each)
+            if len(get_items)>0:
+                if get_items[0]["item_value_after_gst"] and get_items[0]["item_value"]:
+                    invoice_doc.other_charges = get_items[0]["item_value_after_gst"]
+                    invoice_doc.other_charges_before_tax = get_items[0]["item_value"]
+                change_base_value = frappe.db.get_list("Items", filters=[["taxable","=","Yes"],["parent","=",each]], fields=["sum(item_value) as item_value", "sum(item_value_after_gst) as item_value_after_gst","parent"])
+                if len(change_base_value) > 0:
+                    if change_base_value[0]["item_value"] and change_base_value[0]["item_value_after_gst"]:
+                        invoice_doc.amount_before_gst = change_base_value[0]["item_value"]
+                        invoice_doc.pms_invoice_summary_without_gst = change_base_value[0]["item_value"]
+                        invoice_doc.amount_after_gst = change_base_value[0]["item_value_after_gst"]
+                        invoice_doc.pms_invoice_summary = change_base_value[0]["item_value_after_gst"]
+                invoice_doc.save()
+                # frappe.db.set_value("Items", {"sac_index": sac_index,"taxable": "Yes", "parent": each}, "taxable", "No")
+                frappe.db.commit()
+            else:
+                return False
+        return True
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_non_taxable","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        return {"success": False, "message": str(e)}

@@ -1,0 +1,120 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 11:54:04.914782",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "ezyinvoicingbaseamount",
+  "operabaseamount",
+  "basemissmatchamount",
+  "baseamountstatus",
+  "ezyinvoicinginvoiceamount",
+  "operainvoiceamount",
+  "invoicemissmatchamount",
+  "invoiceamountstatus",
+  "irn_status",
+  "irn_number",
+  "acknowledgement_no",
+  "acknowledgement_date",
+  "recon_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "ezyinvoicingbaseamount",
+   "fieldtype": "Float",
+   "label": "EzyinvoicingBaseAmount"
+  },
+  {
+   "fieldname": "operabaseamount",
+   "fieldtype": "Float",
+   "label": "OperaBaseAmount"
+  },
+  {
+   "fieldname": "basemissmatchamount",
+   "fieldtype": "Float",
+   "label": "BaseMissmatchAmount"
+  },
+  {
+   "fieldname": "baseamountstatus",
+   "fieldtype": "Data",
+   "label": "BaseAmountStatus"
+  },
+  {
+   "fieldname": "ezyinvoicinginvoiceamount",
+   "fieldtype": "Float",
+   "label": "EzyinvoicingInvoiceAmount"
+  },
+  {
+   "fieldname": "operainvoiceamount",
+   "fieldtype": "Float",
+   "label": "OperaInvoiceAmount"
+  },
+  {
+   "fieldname": "invoicemissmatchamount",
+   "fieldtype": "Float",
+   "label": "InvoiceMissmatchAmount"
+  },
+  {
+   "fieldname": "invoiceamountstatus",
+   "fieldtype": "Data",
+   "label": "InvoiceAmountStatus"
+  },
+  {
+   "fieldname": "irn_status",
+   "fieldtype": "Data",
+   "label": "IRN Status"
+  },
+  {
+   "fieldname": "irn_number",
+   "fieldtype": "Data",
+   "label": "IRN Number"
+  },
+  {
+   "fieldname": "acknowledgement_no",
+   "fieldtype": "Data",
+   "label": "Acknowledgement No"
+  },
+  {
+   "fieldname": "acknowledgement_date",
+   "fieldtype": "Date",
+   "label": "Acknowledgement Date"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-27 09:58:27.479052",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Recon Opera Comparison",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
