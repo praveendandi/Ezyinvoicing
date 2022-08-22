@@ -140,8 +140,14 @@
   "credit_note_raised",
   "suptyp",
   "signature",
+  "agree",
   "amount_in_word",
+  "summary",
+  "clbs_summary_generated",
+  "invoice_submitted_in_clbs",
   "lut",
+  "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
+  "non_revenue_amount",
   "arn_number",
   "etax_invoice_created"
  ],
@@ -167,7 +173,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled\nError\nNA\nZero Invoice\nDraft",
+   "options": "Pending\nSuccess\nCancelled\nError\nNA\nZero Invoice\nDraft\nOn Hold",
    "read_only": 1
   },
   {
@@ -915,15 +921,50 @@
    "label": "Folioid"
   },
   {
+   "default": "0",
+   "fieldname": "agree",
+   "fieldtype": "Check",
+   "label": "Agree"
+  },
+  {
    "fieldname": "amount_in_word",
    "fieldtype": "Data",
    "label": "Amount In Word"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Link",
+   "label": "Summary",
+   "options": "Summaries"
   },
   {
    "default": "0",
    "fieldname": "lut",
    "fieldtype": "Check",
    "label": "Lut"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs_summary_generated",
+   "fieldtype": "Check",
+   "label": "CLBS Summary Generated"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_submitted_in_clbs",
+   "fieldtype": "Check",
+   "label": "Invoice Submitted in CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
+   "fieldtype": "Check",
+   "label": "Invoice Mismatch While Bulkupload Auto B2C Success GSTR1"
+  },
+  {
+   "fieldname": "non_revenue_amount",
+   "fieldtype": "Float",
+   "label": "Non Revenue Amount"
   },
   {
    "fieldname": "arn_number",
@@ -961,6 +1002,7 @@
   },
   {
    "cancel": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

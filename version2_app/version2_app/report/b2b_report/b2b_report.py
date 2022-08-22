@@ -24,20 +24,17 @@ def execute(filters=None):
 		
 		items_fields = ['parent','taxable','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
 		items_columns = ['invoice_number',"taxable",'sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
-		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names],'item_mode':['!=',"Credit"]},fields =items_fields ,as_list=True)
+		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names]},fields =items_fields ,as_list=True)
 		items_df = pd.DataFrame(items_doc,columns=items_columns)
 		items_df = items_df.round(2)
 		
 		
 		
 		grouped_df = items_df.groupby(["invoice_number","taxable","gst_rate"],as_index=False).sum().round(2)
-		# print(grouped_df.head())
 		# grouped_df = items_df.groupby(["invoice_number","taxable","sac_code", "gst_rate","igst","cgst","sgst","unit_of_measurement_description"],as_index=False).sum().round(2)
 		grouped_df["tax_value"] = grouped_df.apply(lambda x:x['item_value'] if x['taxable'] == "Yes" else 0, axis=1)
 		grouped_df['non_tax_value']= grouped_df.apply(lambda x:x['item_value'] if x['taxable'] == "No" is "No" else 0, axis=1)
-		print(grouped_df.head())
 		invoice_df = pd.DataFrame(doc,columns=fields)
-		# print(invoice_df.head())
 		latest_invoice = frappe.get_last_doc('Invoices')
 
 		company = frappe.get_doc('company',latest_invoice.company)
@@ -60,8 +57,10 @@ def execute(filters=None):
 		# mergedDf.loc[(mergedDf.invoice_type=="B2C"),'Gst Check'] = ' '
 		mergedDf.rename(columns={"other_charges":"Other Charges",'invoice_number': 'Invoice Number', 'invoice_date': 'Invoice Date','gst_number':'Receiver GSTIN / UIN','trade_name':'Receiver Name','total_invoice_amount':'Invoice Value','place_of_supply':'Place Of Supply','gst_rate':'Tax Rate','tax_value':'Taxable Value','non_tax_value':'Non Taxable Value','igst_amount':'Integrated Tax Amount','cgst_amount':'Central Tax Amount','sgst_amount':'State / UT Tax Amount','state_cess_amount':'State Cess Amount','cess_amount':"Central Cess Amount","irn_generated":"Irn Generated","irn_number":"Irn Number","ack_no":"Ack No","ack_date":"Ack Date"}, inplace=True)
 		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
+		print(mergedDf,"...........")
 		mergedDf = mergedDf[columns]
 		data = mergedDf.values.tolist()
+		print(data,":::::::::::")
 		
 		return columns, data
 	except Exception as e:

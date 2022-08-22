@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 11:32:13.103124",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ezyinvoicing_count",
+  "opera_folios_count",
+  "missing_in_ezyinvoicing",
+  "missing_in_opera",
+  "type_missmatch",
+  "recon_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "ezyinvoicing_count",
+   "fieldtype": "Int",
+   "label": "Ezyinvoicing Count"
+  },
+  {
+   "fieldname": "opera_folios_count",
+   "fieldtype": "Int",
+   "label": "Opera Folios Count"
+  },
+  {
+   "fieldname": "missing_in_ezyinvoicing",
+   "fieldtype": "Int",
+   "label": "Missing In EzyInvoicing"
+  },
+  {
+   "fieldname": "missing_in_opera",
+   "fieldtype": "Int",
+   "label": "Missing In Opera"
+  },
+  {
+   "fieldname": "type_missmatch",
+   "fieldtype": "Int",
+   "label": "Type Missmatch"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-13 15:16:53.736918",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Invoice Count",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

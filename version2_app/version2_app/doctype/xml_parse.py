@@ -1,4 +1,5 @@
 import json
+from regex import D
 import xmltodict
 import frappe
 import os,traceback,sys
@@ -68,9 +69,16 @@ def extract_xml(file_list):
                             bill_doc.invoice_found="Yes"
                             bill_doc.save()
                 else:  
-                    doc=frappe.get_doc({"doctype":"Invoice Reconciliations","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"]})   
+                    doc=frappe.get_doc({"doctype":"Invoice Reconciliations","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"],"total_invoice_amount":each["SUMFT_DEBITPERBILL_NO"]})   
                     doc.insert(ignore_permissions=True)
                     frappe.db.commit()
+                    d110_data = json.loads(json.dumps(each))
+                    for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
+                        if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
+                            txn_date = datetime.datetime.strptime(txr_data["TRX_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
+                            doc=frappe.get_doc({"doctype":"Opera Invoice Items","transaction_number":txr_data["TRX_NO"],"transaction_code":txr_data["TRX_CODE"],"transaction_date":txn_date,"debit_amount":txr_data["FT_DEBIT"],"credit_amount":txr_data["FT_CREDIT"],"transaction_description":txr_data["TRANSACTION_DESCRIPTION"],"invoice_reconciliations":each["BILL_NO"]})
+                            doc.insert(ignore_permissions=True)
+                            frappe.db.commit()
                 if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                     if frappe.db.exists('Invoices',each["BILL_NO"]):
                         invoice_doc = frappe.get_doc('Invoices',each["BILL_NO"])
@@ -93,7 +101,7 @@ def extract_xml(file_list):
                 each["BILL_NO"] = each["BILL_NO"].lstrip("0")
             if company_doc.change_invoice_reconciliation_invoice_number == 1:
                 each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
-            print(each['BILL_NO'])
+            # print(each['BILL_NO'])
             if "-" in each["BILL_GENERATION_DATE"]:
                 convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
             elif "." in each["BILL_GENERATION_DATE"]:
@@ -115,9 +123,16 @@ def extract_xml(file_list):
                         bill_doc.invoice_found="Yes"
                         bill_doc.save()
             else:
-                doc=frappe.get_doc({"doctype":"Invoice Reconciliations","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"]})   
+                doc=frappe.get_doc({"doctype":"Invoice Reconciliations","bill_generation_date":convert_bill_generation_date,"folio_type":each["FOLIO_TYPE"],"bill_number":each["BILL_NO"],"bill_generation_date_char":convert_bill_generation_date_char,"fiscal_bill_number":each["FISCAL_BILL_NO"],"status":each["STATUS"],"display_name":each["DISPLAY_NAME"],"room":each["ROOM"],"total_invoice_amount":each["SUMFT_DEBITPERBILL_NO"]})   
                 doc.insert(ignore_permissions=True)
                 frappe.db.commit()
+                d110_data = json.loads(json.dumps(each))
+                for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
+                    if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
+                        txn_date = datetime.datetime.strptime(txr_data["TRX_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
+                        doc=frappe.get_doc({"doctype":"Opera Invoice Items","transaction_number":txr_data["TRX_NO"],"transaction_code":txr_data["TRX_CODE"],"transaction_date":txn_date,"debit_amount":txr_data["FT_DEBIT"],"credit_amount":txr_data["FT_CREDIT"],"transaction_description":txr_data["TRANSACTION_DESCRIPTION"],"invoice_reconciliations":each["BILL_NO"]})
+                        doc.insert(ignore_permissions=True)
+                        frappe.db.commit()
             if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                 if frappe.db.exists('Invoices',each["BILL_NO"]):
                     invoice_doc = frappe.get_doc('Invoices',each["BILL_NO"])
@@ -146,15 +161,15 @@ def invoice_check(data):
         invoice=frappe.db.get_values('Invoices',{"docstatus":0},"name")
         invoice=list(sum(invoice, ()))
         filte=list(sum(filte, ()))
-        print(invoice)
-        print(filte)
+        # print(invoice)
+        # print(filte)
         data=[]
         for each in filte:
             if each in invoice:
                 data.append({"Invoice Number":each, "Invoice Found":"Yes"})
             else:
                 data.append({"Invoice Number":each, "Invoice Found":"No"})
-        print(data)
+        # print(data)
         return data
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()

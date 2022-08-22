@@ -8,13 +8,15 @@
   "confirmation_number",
   "frro_id",
   "room_number",
-  "surname",
-  "given_name",
+  "guest_full_name",
+  "guest_first_name",
+  "middle_name",
+  "guest_last_name",
   "gender",
-  "date_of_birth",
-  "age",
+  "guest_dob",
+  "guest_age",
   "category",
-  "nationality",
+  "guest_nationality",
   "passport_number",
   "passport_place_of_issued_country",
   "passport_place_of_issued_city",
@@ -27,9 +29,12 @@
   "visa_valid_till",
   "visa_type",
   "visa_sub_type",
-  "address",
-  "city",
-  "country",
+  "address1",
+  "address2",
+  "guest_city",
+  "guest_state",
+  "guest_country",
+  "zip_code",
   "arrival_from_country",
   "arrival_from_city",
   "arrival_place",
@@ -39,6 +44,8 @@
   "next_destination",
   "next_destination_country",
   "next_destination_city",
+  "next_destination_state",
+  "next_destination_district",
   "next_destination_place",
   "contact_phone_no",
   "contact_mobile_no",
@@ -49,33 +56,37 @@
   "id_image3",
   "face_image",
   "status",
-  "email",
-  "id_type",
+  "guest_email_address",
+  "guest_id_type",
   "local_id_number",
   "checkin_date",
   "checkin_time",
   "checkout_date",
+  "checkout_time",
   "no_of_nights",
   "uploaded_to_frro",
   "frro_failure_count",
   "frro_checkout",
   "frro_checkout_message",
-  "frro_checkout_date"
+  "frro_checkout_date",
+  "remarks",
+  "select_category",
+  "main_guest",
+  "pathik_image",
+  "no_of_children",
+  "no_of_adults",
+  "pathik_country",
+  "pathik_state",
+  "pathik_district",
+  "vehicle_type",
+  "vehicle_number",
+  "pathik_status",
+  "pending_pathik",
+  "pathik_locality",
+  "guest_company_name",
+  "uploaded_to_opera"
  ],
  "fields": [
-  {
-   "fieldname": "surname",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Surname"
-  },
-  {
-   "fieldname": "given_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Given Name",
-   "reqd": 1
-  },
   {
    "fieldname": "gender",
    "fieldtype": "Data",
@@ -83,26 +94,10 @@
    "label": "Gender"
   },
   {
-   "fieldname": "date_of_birth",
-   "fieldtype": "Date",
-   "label": "Date of Birth"
-  },
-  {
-   "fieldname": "age",
-   "fieldtype": "Int",
-   "label": "Age"
-  },
-  {
    "fieldname": "category",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Category"
-  },
-  {
-   "fieldname": "nationality",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Nationality"
   },
   {
    "fieldname": "passport_number",
@@ -147,12 +142,12 @@
   },
   {
    "fieldname": "visa_date_of_issue",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Visa Date of Issue"
   },
   {
    "fieldname": "visa_valid_till",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Visa Valid Till"
   },
   {
@@ -164,21 +159,6 @@
    "fieldname": "visa_sub_type",
    "fieldtype": "Data",
    "label": "Visa Sub Type"
-  },
-  {
-   "fieldname": "address",
-   "fieldtype": "Long Text",
-   "label": "Address"
-  },
-  {
-   "fieldname": "city",
-   "fieldtype": "Data",
-   "label": "City"
-  },
-  {
-   "fieldname": "country",
-   "fieldtype": "Data",
-   "label": "Country"
   },
   {
    "fieldname": "arrival_from_country",
@@ -264,18 +244,9 @@
   },
   {
    "fieldname": "status",
-   "fieldtype": "Data",
-   "label": "Status"
-  },
-  {
-   "fieldname": "email",
-   "fieldtype": "Data",
-   "label": "Email"
-  },
-  {
-   "fieldname": "id_type",
-   "fieldtype": "Data",
-   "label": "Id Type"
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "In House\nPending Review\nPending Frro"
   },
   {
    "fieldname": "local_id_number",
@@ -284,8 +255,9 @@
   },
   {
    "fieldname": "confirmation_number",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Confirmation Number",
+   "options": "Arrival Information",
    "reqd": 1
   },
   {
@@ -304,6 +276,7 @@
    "label": "Room Number"
   },
   {
+   "default": "1",
    "fieldname": "no_of_nights",
    "fieldtype": "Int",
    "label": "No of Nights"
@@ -335,6 +308,7 @@
    "label": "Uploaded to Frro"
   },
   {
+   "default": "0",
    "fieldname": "frro_failure_count",
    "fieldtype": "Data",
    "label": "Frro Failure Count"
@@ -354,11 +328,191 @@
    "fieldname": "frro_checkout_date",
    "fieldtype": "Data",
    "label": "Frro Checkout Date"
+  },
+  {
+   "fieldname": "next_destination_state",
+   "fieldtype": "Data",
+   "label": "Next Destination State"
+  },
+  {
+   "fieldname": "next_destination_district",
+   "fieldtype": "Data",
+   "label": "Next Destination District"
+  },
+  {
+   "fieldname": "guest_full_name",
+   "fieldtype": "Data",
+   "label": "Guest Full Name"
+  },
+  {
+   "fieldname": "address2",
+   "fieldtype": "Small Text",
+   "label": "Address2"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "select_category",
+   "fieldtype": "Data",
+   "label": "Select Category"
+  },
+  {
+   "default": "0",
+   "fieldname": "main_guest",
+   "fieldtype": "Check",
+   "label": "Main Guest"
+  },
+  {
+   "fieldname": "pathik_image",
+   "fieldtype": "Attach Image",
+   "label": "Pathik Image"
+  },
+  {
+   "fieldname": "checkout_time",
+   "fieldtype": "Time",
+   "label": "Checkout Time"
+  },
+  {
+   "fieldname": "no_of_children",
+   "fieldtype": "Int",
+   "label": "No of Children"
+  },
+  {
+   "fieldname": "no_of_adults",
+   "fieldtype": "Int",
+   "label": "No of Adults"
+  },
+  {
+   "fieldname": "pathik_state",
+   "fieldtype": "Data",
+   "label": "Pathik State"
+  },
+  {
+   "fieldname": "vehicle_type",
+   "fieldtype": "Data",
+   "label": "Vehicle Type"
+  },
+  {
+   "fieldname": "vehicle_number",
+   "fieldtype": "Data",
+   "label": "Vehicle Number"
+  },
+  {
+   "fieldname": "pathik_district",
+   "fieldtype": "Data",
+   "label": "Pathik District"
+  },
+  {
+   "default": "Pending Review",
+   "fieldname": "pathik_status",
+   "fieldtype": "Select",
+   "label": "Pathik Status",
+   "options": "Pending Review\nPending Pathik\nIn House"
+  },
+  {
+   "default": "0",
+   "fieldname": "pending_pathik",
+   "fieldtype": "Check",
+   "label": "Pending Pathik"
+  },
+  {
+   "fieldname": "pathik_locality",
+   "fieldtype": "Data",
+   "label": "Pathik Locality"
+  },
+  {
+   "fieldname": "pathik_country",
+   "fieldtype": "Data",
+   "label": "Pathik Country"
+  },
+  {
+   "fieldname": "middle_name",
+   "fieldtype": "Data",
+   "label": "Guest Middle Name"
+  },
+  {
+   "fieldname": "guest_company_name",
+   "fieldtype": "Data",
+   "label": "Guest Company Name"
+  },
+  {
+   "fieldname": "guest_email_address",
+   "fieldtype": "Data",
+   "label": "Guest Email Address"
+  },
+  {
+   "fieldname": "guest_id_type",
+   "fieldtype": "Select",
+   "label": "Guest Id Type",
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice\nnrc\nzambiaPassport"
+  },
+  {
+   "fieldname": "guest_first_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest First Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "guest_last_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest Last Name"
+  },
+  {
+   "fieldname": "guest_nationality",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest Nationality"
+  },
+  {
+   "fieldname": "address1",
+   "fieldtype": "Small Text",
+   "label": "Address1"
+  },
+  {
+   "fieldname": "guest_city",
+   "fieldtype": "Data",
+   "label": "Guest City"
+  },
+  {
+   "fieldname": "guest_country",
+   "fieldtype": "Data",
+   "label": "Guest Country"
+  },
+  {
+   "fieldname": "guest_age",
+   "fieldtype": "Int",
+   "label": "Guest Age"
+  },
+  {
+   "fieldname": "guest_dob",
+   "fieldtype": "Date",
+   "label": "Guest DOB"
+  },
+  {
+   "fieldname": "zip_code",
+   "fieldtype": "Data",
+   "label": "Zip Code"
+  },
+  {
+   "fieldname": "guest_state",
+   "fieldtype": "Data",
+   "label": "Guest State"
+  },
+  {
+   "default": "0",
+   "fieldname": "uploaded_to_opera",
+   "fieldtype": "Check",
+   "label": "Uploaded to Opera"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-20 10:59:23.630301",
+ "modified": "2022-08-10 11:31:58.647280",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Guest Details",
@@ -385,6 +539,54 @@
    "read": 1,
    "report": 1,
    "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-FrontOffice",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-IT",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Inbox",
    "share": 1,
    "write": 1
   }

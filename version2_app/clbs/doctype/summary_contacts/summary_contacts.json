@@ -1,0 +1,69 @@
+{
+ "actions": [],
+ "creation": "2022-03-09 16:49:32.029170",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "summaries",
+  "contacts",
+  "company"
+ ],
+ "fields": [
+  {
+   "fieldname": "summaries",
+   "fieldtype": "Link",
+   "label": "Summaries",
+   "options": "Summaries"
+  },
+  {
+   "fieldname": "contacts",
+   "fieldtype": "Link",
+   "label": "Contacts",
+   "options": "Contacts"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-21 17:12:41.429624",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "Summary Contacts",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

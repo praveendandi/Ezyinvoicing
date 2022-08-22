@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 11:55:52.294800",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "invoiceuploadtype",
+  "printeddate",
+  "converteddate",
+  "recon_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "invoiceuploadtype",
+   "fieldtype": "Data",
+   "label": "InvoiceUploadType"
+  },
+  {
+   "fieldname": "printeddate",
+   "fieldtype": "Date",
+   "label": "PrintedDate"
+  },
+  {
+   "fieldname": "converteddate",
+   "fieldtype": "Date",
+   "label": "ConvertedDate"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "InvoiceNumber"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-08-01 11:46:34.805967",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Converted B2B to B2C",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

@@ -108,9 +108,17 @@ doc_events = {
 		# "on_cancel": "method",
 		# "on_trash": "method"
 	},
+    "Arrival Information": {
+        "after_insert": "version2_app.events.arrival_information",
+        # "on_update": "version2_app.events.send_invoice_mail"
+    },
+    "Guest Details": {
+        "after_insert": "version2_app.events.guest_attachments",
+        "on_update": "version2_app.events.guest_update_attachment_logs"
+    },
     "Tablet Config": {
         "after_insert": "version2_app.events.tablet_mapping",
-        "on_trash": "version2_app.events.remove_mapping",
+        # "on_trash": "version2_app.events.remove_mapping",
     },
     "Redg Card": {
         "after_insert": "version2_app.events.create_redg_card",
@@ -138,18 +146,18 @@ doc_events = {
     },
     "Active Tablets": {
         "after_insert": "version2_app.events.tablet_connected",
-        "on_trash": "version2_app.events.tablet_disconnected",
+        # "on_trash": "version2_app.events.tablet_disconnected",
         "on_update": "version2_app.events.update_tablet_status",
     },
     "Active Work Stations": {
         "on_trash": "version2_app.events.workstation_disconnected",
+        "before_save": "version2_app.events.before_update_ws",
+        # "on_update": "version2_app.events.update_workstations_status",
     },
     "Information Folio": {
         "after_insert": "version2_app.events.information_folio_created",
-        "on_update": "version2_app.events.information_folio_created",
     },
 	"File":{
-		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
 	},
 	"Update Logs":{
@@ -171,6 +179,25 @@ doc_events = {
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
+    },
+    'Precheckins':{
+        # 'after_insert':"version2_app.events.precheckinsdocuments",
+        # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
+    },
+    "Summaries": {
+        "after_insert":"version2_app.events.summaries_insert",
+        "on_update": "version2_app.events.summaries_insert"
+    },
+    "Dropbox":{
+        # 'on_update':'version2_app.passport_scanner.doctype.dropbox.dropbox.merge_guest_to_guest_details'
+    },
+    "POS Checks": {
+        "on_update": "version2_app.pos_bills.doctype.pos_checks.pos_checks.update_pos_check"
+    },
+    "Summary Payments" : {
+        "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_update": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     }
 }
 
@@ -190,23 +217,26 @@ doc_events = {
 
 
 scheduler_events = {
-    "all": [
-        "version2_app.version2_app.doctype.emailTemplat.sampleFun"
-    ],
+    # "all": [
+    #     "version2_app.version2_app.doctype.emailTemplat.sampleFun"
+    # ],
     "cron": {
+        "1-59 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
         # "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
         # "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
         "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
-        "0 11 * * *":["version2_app.events.block_irn"],
-        "1-59 * * * *": [
-            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
-        ],
-        "09 11 * * * *": [
-            "version2_app.version2_app.doctype.emailTemplat.sampleFun"
-        ]},
+        "0 12 * * *":["version2_app.events.block_irn"],
+        "0 2 * * *":["version2_app.events.delete_arrival_activity"],
+        "* * * * *":["version2_app.events.pre_mail"],
+        # "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
+        # "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
+        "10 00 * * *":["version2_app.events.delete_error_logs"],
+        "20 00 * * *":["version2_app.events.delete_email_queue"]},
+        
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
-        "version2_app.events.deleteemailfilesdaily"
+        "version2_app.events.deleteemailfilesdaily",
+        "version2_app.events.delete_arrival_activity"
     ]
 }
 # scheduler_events = {

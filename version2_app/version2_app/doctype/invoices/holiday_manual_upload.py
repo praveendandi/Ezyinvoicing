@@ -222,11 +222,10 @@ def holidayinManualupload(data):
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":company})
         countIn = 1
-        print(len(input_data),"count")
         if input_data == [] and len(list_data)>0:
             input_data.append(list_data)
         for each in input_data:
-            each['gstNumber'] = str(each['gstNumber'])
+            each['gstNumber'] = str(each['gstNumber']).strip()
             # each['total_invoice_amount']= 10000
             print(each['invoice_number'],"       invoice Number ",countIn)
             check_invoice = check_invoice_exists(str(each['invoice_number']))
@@ -459,14 +458,14 @@ def holidayinManualupload(data):
                     
                 #     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company, "count":len(input_data), "invoice_count":countIn})
             countIn+=1
         df = pd.DataFrame(output_date)
         if df.empty is False:
             df = df.groupby('date').count().reset_index()
             output_data = df.to_dict('records')
             InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'] if "username" in data else "","start_time":str(start_time),"referrence_file":data['invoice_file']})
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Completed','type':"Bulk_upload_data","data":output_data,"company":company})
             # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
@@ -584,7 +583,7 @@ def holidayinnerrorbulkreprocess(file_path,company):
 
 @frappe.whitelist(allow_guest=True)
 def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
-    # try:
+    try:
         companyData = frappe.get_doc('company',company)
         site_folder_path = companyData.site_name
         folder_path = frappe.utils.get_bench_path()
@@ -636,7 +635,7 @@ def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
                 data=payload_new).json()
             url = upload_report['message']['file_url']
             return url
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return {"success":False,"message":str(e)}   
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}   

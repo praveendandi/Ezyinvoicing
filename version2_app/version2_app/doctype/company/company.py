@@ -777,6 +777,16 @@ def reprocess_zero_invoices():
         frappe.log_error("Ezy-invoicing reprocess_zero_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
+@frappe.whitelist(allow_guest=True)
+def get_company():
+    try:
+        company = frappe.get_last_doc('company')
+        get_company_value = frappe.db.get_value('company',company.name,["name","company_name","company_logo","card_type_detect_api","ome_scanner"], as_dict=1)
+        return {"success":True,"company":get_company_value}
+    except Exception as e:
+        print("reprocess_pending_inoices", str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-get company","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 
 @frappe.whitelist(allow_guest=True)
 def reprocess_b2c_invoices():

@@ -508,3 +508,17 @@ def update_document_bin(print_by,invoice_type,invoiceNumber,error_log,filepath):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing update_document_bin","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+
+
+def calulate_b2c_items(data=None):
+    try:
+        total_invoice_amount = 0
+        for each in data:
+            total_invoice_amount += each["item_value_after_gst"]
+        return {"success":True,"total_invoice_amount":total_invoice_amount}
+    except Exception as e:
+        # frappe.log_error(traceback.print_exc())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing calulate_b2c_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    

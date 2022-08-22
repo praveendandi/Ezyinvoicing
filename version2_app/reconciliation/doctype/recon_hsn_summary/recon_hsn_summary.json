@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 12:06:15.701426",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sac_code",
+  "gst_rate",
+  "uqc",
+  "total_quantity",
+  "cgst_amount",
+  "sgst_amount",
+  "igst_amount",
+  "state_cess_amount",
+  "central_cess_amount",
+  "vat_amount",
+  "total_gst_amount",
+  "total_tax_amount",
+  "total_invoice_amount",
+  "recon_id",
+  "type"
+ ],
+ "fields": [
+  {
+   "fieldname": "sac_code",
+   "fieldtype": "Data",
+   "label": "SAC Code"
+  },
+  {
+   "fieldname": "gst_rate",
+   "fieldtype": "Int",
+   "label": "Gst Rate"
+  },
+  {
+   "fieldname": "uqc",
+   "fieldtype": "Data",
+   "label": "UQC"
+  },
+  {
+   "fieldname": "total_quantity",
+   "fieldtype": "Int",
+   "label": "Total Quantity"
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Float",
+   "label": "CGST Amount"
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Float",
+   "label": "SGST Amount"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "label": "IGST Amount"
+  },
+  {
+   "fieldname": "state_cess_amount",
+   "fieldtype": "Float",
+   "label": "State CESS Amount"
+  },
+  {
+   "fieldname": "central_cess_amount",
+   "fieldtype": "Float",
+   "label": "Central CESS Amount"
+  },
+  {
+   "fieldname": "total_tax_amount",
+   "fieldtype": "Float",
+   "label": "Total Tax Amount"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "ALL\nB2B\nB2C"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Float",
+   "label": "VAT Amount"
+  },
+  {
+   "fieldname": "total_invoice_amount",
+   "fieldtype": "Float",
+   "label": "Total Invoice Amount"
+  },
+  {
+   "fieldname": "total_gst_amount",
+   "fieldtype": "Float",
+   "label": "Total GST Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-22 13:42:37.622233",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Recon HSN Summary",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

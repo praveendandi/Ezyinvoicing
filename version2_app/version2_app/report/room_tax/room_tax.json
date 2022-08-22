@@ -1,0 +1,50 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2022-02-28 15:46:10.230036",
+ "disable_prepared_report": 0,
+ "disabled": 1,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2022-04-21 16:15:41.877623",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Room Tax",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Invoices",
+ "report_name": "Room Tax",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "ezy-IT"
+  },
+  {
+   "role": "ezy-Finance"
+  },
+  {
+   "role": "ezy-FrontOffice"
+  },
+  {
+   "role": "Guest"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "ezy-Inbox"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "All"
+  }
+ ]
+}
