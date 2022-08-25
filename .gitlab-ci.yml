@@ -2,7 +2,7 @@ image:
   name: sonarsource/sonar-scanner-cli:latest
   entrypoint: [""]
 variables:
-  SONAR_TOKEN: "0c7950df40258434c7d56fe4683c0b053ae4b850"
+  SONAR_TOKEN: "f87bb141dc6c181e8c73f2fd3c02f1c236d22388"
   SONAR_HOST_URL: "http://192.46.213.24:7000/"
   GIT_DEPTH: 0
 sonarqube-check:
