@@ -3,7 +3,7 @@ image:
   entrypoint: [""]
 variables:
   SONAR_TOKEN: "0c7950df40258434c7d56fe4683c0b053ae4b850"
-  SONAR_HOST_URL: "http://192.168.1.173:7000"
+  SONAR_HOST_URL: "http://192.46.213.24:7000/"
   GIT_DEPTH: 0
 sonarqube-check:
   stage: test
