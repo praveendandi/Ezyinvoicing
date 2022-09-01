@@ -3508,7 +3508,7 @@ def Error_Insert_invoice(data):
                         return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
 
         company = frappe.get_doc('company',data['company_code'])
-        if not frappe.db.exists('Invoices', data['invoice_number']):
+        if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
             invType = data['invoice_type']
             
             irn_generated = "Error"
