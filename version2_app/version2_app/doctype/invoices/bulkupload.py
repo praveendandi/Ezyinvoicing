@@ -162,6 +162,8 @@ def bulkupload(data):
             #     each['invoice_type'] = "B2B"
             if check_invoice['success']==True:
                 inv_data = check_invoice['data']
+                if inv_data.irn_generated == "Cancelled":
+                    continue
                 if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "On Hold"] and inv_data.invoice_type=="B2B":
                     reupload = True
                 elif inv_data.invoice_type == "B2C":
