@@ -3435,25 +3435,25 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
     try:
         if len(invoice_number)>0:
-            invCount = frappe.get_doc('Invoices',invoice_number)
+            if frappe.db.exists("Invoices", {"invoice_number": invoice_number}):
+                invoice_number = frappe.db.get_value("Invoices", {"invoice_number": invoice_number})
+                invCount = frappe.get_doc('Invoices',invoice_number)
+                if invCount:	
+                    invoice_number = invCount.name
+                    if invCount.docstatus==2:
+                        AmenedinvCount = frappe.db.get_list(
+                        'Invoices',
+                        filters={
+                            'invoice_number':
+                            ['like', invoice_number+'-%']
+                        })
+                        if len(AmenedinvCount)>0:
+                            invoice_number = AmenedinvCount[0]['name']
 
-            if invCount:	
-                invoice_number = invCount.name
-                if invCount.docstatus==2:
-                    AmenedinvCount = frappe.db.get_list(
-                    'Invoices',
-                    filters={
-                        'invoice_number':
-                        ['like', invoice_number+'-%']
-                    })
-                    if len(AmenedinvCount)>0:
-                        invoice_number = AmenedinvCount[0]['name']
-                    
-            
-            invoiceExists = frappe.get_doc('Invoices', invoice_number)
-            if invoiceExists:
+                invoiceExists = frappe.get_doc('Invoices', invoice_number)
+                if invoiceExists:
 
-                return {"success": True, "data": invoiceExists}
+                    return {"success": True, "data": invoiceExists}
             return {"success": False}
         return {"success":False}	
     except Exception as e:
