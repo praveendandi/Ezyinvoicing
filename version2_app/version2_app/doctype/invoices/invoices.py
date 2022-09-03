@@ -1532,13 +1532,16 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
                         gst_percentage = item_gst_percentage
                         igst_percentage = item_igst_percentage
                 else:
-                    if sac_code_obj.accommodation_slab == "Yes":
+                    if sac_code_obj.accommodation_slab == 1:
                         calulateslab = (companyDetails.slab_12_ending_range*12)/100
                         slab_amount = calulateslab+companyDetails.slab_12_ending_range
+                        starting_range = (companyDetails.slab_12_starting_range*12)/100
+                        acc_starting_range = starting_range+companyDetails.slab_12_starting_range
+                        print(slab_amount, acc_starting_range,"...............................")
                         if float(abs(data["item_value"])) > slab_amount:
                             gst_percentage = 18
                             igst_percentage = 18
-                        elif float(abs(data["item_value"]))>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
+                        elif float(abs(data["item_value"]))>=acc_starting_range and float(data["item_value"]) <= slab_amount:
                             gst_percentage = 12
                             igst_percentage = 12
                         else:
