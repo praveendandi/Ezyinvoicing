@@ -1532,13 +1532,16 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
                         gst_percentage = item_gst_percentage
                         igst_percentage = item_igst_percentage
                 else:
-                    if sac_code_obj.accommodation_slab == "Yes":
+                    if sac_code_obj.accommodation_slab == 1:
                         calulateslab = (companyDetails.slab_12_ending_range*12)/100
                         slab_amount = calulateslab+companyDetails.slab_12_ending_range
+                        starting_range = (companyDetails.slab_12_starting_range*12)/100
+                        acc_starting_range = starting_range+companyDetails.slab_12_starting_range
+                        print(slab_amount, acc_starting_range,"...............................")
                         if float(abs(data["item_value"])) > slab_amount:
                             gst_percentage = 18
                             igst_percentage = 18
-                        elif float(abs(data["item_value"]))>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
+                        elif float(abs(data["item_value"]))>=acc_starting_range and float(data["item_value"]) <= slab_amount:
                             gst_percentage = 12
                             igst_percentage = 12
                         else:
@@ -3435,25 +3438,25 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
     try:
         if len(invoice_number)>0:
-            invCount = frappe.get_doc('Invoices',invoice_number)
+            if frappe.db.exists("Invoices", {"invoice_number": invoice_number}):
+                invoice_number = frappe.db.get_value("Invoices", {"invoice_number": invoice_number})
+                invCount = frappe.get_doc('Invoices',invoice_number)
+                if invCount:	
+                    invoice_number = invCount.name
+                    if invCount.docstatus==2:
+                        AmenedinvCount = frappe.db.get_list(
+                        'Invoices',
+                        filters={
+                            'invoice_number':
+                            ['like', invoice_number+'-%']
+                        })
+                        if len(AmenedinvCount)>0:
+                            invoice_number = AmenedinvCount[0]['name']
 
-            if invCount:	
-                invoice_number = invCount.name
-                if invCount.docstatus==2:
-                    AmenedinvCount = frappe.db.get_list(
-                    'Invoices',
-                    filters={
-                        'invoice_number':
-                        ['like', invoice_number+'-%']
-                    })
-                    if len(AmenedinvCount)>0:
-                        invoice_number = AmenedinvCount[0]['name']
-                    
-            
-            invoiceExists = frappe.get_doc('Invoices', invoice_number)
-            if invoiceExists:
+                invoiceExists = frappe.get_doc('Invoices', invoice_number)
+                if invoiceExists:
 
-                return {"success": True, "data": invoiceExists}
+                    return {"success": True, "data": invoiceExists}
             return {"success": False}
         return {"success":False}	
     except Exception as e:
@@ -3508,7 +3511,7 @@ def Error_Insert_invoice(data):
                         return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
 
         company = frappe.get_doc('company',data['company_code'])
-        if not frappe.db.exists('Invoices', data['invoice_number']):
+        if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
             invType = data['invoice_type']
             
             irn_generated = "Error"
