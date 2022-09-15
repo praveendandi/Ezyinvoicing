@@ -151,7 +151,6 @@ def generateIrn(data):
     try:
         company = frappe.get_last_doc("company")
         invoice_number = data['invoice_number']
-
         generation_type = data['generation_type']
         # get invoice detail
         start_time = datetime.datetime.utcnow()
@@ -175,6 +174,7 @@ def generateIrn(data):
             get_is_credit_items = frappe.db.get_list("Items", filters=[["parent","=",data['invoice_number']]], pluck="is_credit_item")
             if "Yes" in get_is_credit_items:
                 abs_path = os.path.dirname(os.getcwd())
+                print(abs_path,"////")
                 file_path = abs_path + '/apps/version2_app/version2_app/version2_app/doctype/invoices/reinitate_invoice.py'
                 module_name = 'auto_adjustment'
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -286,7 +286,10 @@ def generateIrn(data):
         ass_value = 0
         items_data = sorted(invoice.items, key = lambda i: i.sort_order)
         for index, item in enumerate(items_data):
-            # print(item.sac_code,"HsnCD")
+        # print(item.sac_code,"HsnCD")
+            if item.sac_code == "996339" and item.taxable == "Yes" :
+                logger.error(f"{invoice_number},     generateIrn")
+                return{"success": False, "message": "for liquor item given taxable yes"}
             if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
                 total_igst_value += item.igst_amount
                 total_sgst_value += item.sgst_amount
@@ -2126,7 +2129,6 @@ def calulate_items(data):
                             final_item['sgst_amount'] = gst_amount_value/2
                             final_item['igst'] = 0
                             final_item['igst_amount'] = 0
-                            final_item['gst_rate'] = gst_tax_percentage						
                         else:
                             # if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
                             # 	calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
