@@ -288,7 +288,6 @@ def generateIrn(data):
         for index, item in enumerate(items_data):
         # print(item.sac_code,"HsnCD")
             if item.sac_code == "996339" and item.taxable == "Yes" :
-                logger.error(f"{invoice_number},     generateIrn")
                 return{"success": False, "message": "for liquor item given taxable yes"}
             if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
                 total_igst_value += item.igst_amount
