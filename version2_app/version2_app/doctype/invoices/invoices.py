@@ -2126,7 +2126,8 @@ def calulate_items(data):
                             final_item['sgst_amount'] = gst_amount_value/2
                             final_item['igst'] = 0
                             final_item['igst_amount'] = 0
-                            final_item['gst_rate'] = gst_tax_percentage						
+                            final_item['gst_rate'] = gst_tax_percentage
+                            final_item['revenue_item'] = "Non-Revenue"
                         else:
                             # if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
                             # 	calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
@@ -2390,6 +2391,7 @@ def calulate_items(data):
                 final_item['type'],
                 'other_charges':
                 final_item['other_charges'],
+                
                 'taxable':
                 final_item['taxable'],
                 'item_mode':final_item['item_mode'],
@@ -2403,9 +2405,11 @@ def calulate_items(data):
                 "line_edit_net":net_value,
                 "item_reference":item["item_reference"] if "item_reference" in item else "",
                 "check_number":item["check_number"] if "check_number" in item else "",
-                "reference_check_number":item["reference_check_number"] if "reference_check_number" in item else ""
+                "reference_check_number":item["reference_check_number"] if "reference_check_number" in item else "",
+                "revenue_item": final_item['revenue_item'] if "revenue_item" in final_item else "Revenue"
             })
         total_items.extend(second_list)	
+        print(total_items,".........]]]]]]]]]]][[[,,,,,,,,,,,,,,")
         return {"success": True, "data": total_items}
     except Exception as e:
         print(traceback.print_exc())
