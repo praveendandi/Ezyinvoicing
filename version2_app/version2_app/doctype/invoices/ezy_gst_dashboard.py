@@ -1002,9 +1002,7 @@ def get_missing_invoices(start_date, end_date):
         if len(data["converted_b2c_to_b2b"]) == 0:
             data["converted_b2c_to_b2b"] = [
                 {"InvoiceNumber": "", "InvoiceUploadType": "", "PrintedDate": "", "ConvertedDate": ""}]
-        d = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-        first_day = d.replace(day=1)
-        data["amendment"] = frappe.db.sql("""select name as invoicenumber, invoice_from as invoiceuploadtype, Date(invoice_date) as printeddate, Date(converted_from_b2c_time) as converteddate from `tabInvoices` where Date(converted_from_b2c_time) between '{}' and '{}' and invoice_date < '{}' and converted_from_b2c = 'Yes'""".format(start_date, end_date, str(first_day)), as_dict=1)
+        data["amendment"] = frappe.db.sql("""select name as invoicenumber, invoice_from as invoiceuploadtype, Date(invoice_date) as printeddate, Date(converted_from_b2c_time) as converteddate from `tabInvoices` where Date(converted_from_b2c_time) between '{}' and '{}' and invoice_date < '{}' and converted_from_b2c = 'Yes'""".format(start_date, end_date, start_date), as_dict=1)
         if len(data["amendment"]) == 0:
             data["amendment"] = [
                 {"InvoiceNumber": "", "InvoiceUploadType": "", "PrintedDate": "", "ConvertedDate": ""}]
@@ -1233,15 +1231,16 @@ def create_recon(data):
             missing["data"]["type_missmatch_for_credit"]
         if len(type_missmatch) > 0:
             for each in type_missmatch:
-                each["doctype"] = "Invoice Type Missmatch"
-                each["recon_id"] = recon_doc.name
-                if "InvoiceNumber" in each:
-                    each["invoice_number"] = each["InvoiceNumber"]
-                else:
-                    each["invoice_number"] = each["invoicenumber"]
-                type_mismatch = insert_records(each)
-                if not type_mismatch["success"]:
-                    return type_mismatch
+                if each["InvoiceNumber"] != "":
+                    each["doctype"] = "Invoice Type Missmatch"
+                    each["recon_id"] = recon_doc.name
+                    if "InvoiceNumber" in each:
+                        each["invoice_number"] = each["InvoiceNumber"]
+                    else:
+                        each["invoice_number"] = each["invoicenumber"]
+                    type_mismatch = insert_records(each)
+                    if not type_mismatch["success"]:
+                        return type_mismatch
         frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 30)
         frappe.db.commit()
         frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 30})
@@ -1636,7 +1635,7 @@ def delete_recon(data):
         for ids in data["recon_ids"]:
             if frappe.db.exists("Recon Details", ids):
                 doctypes = ["Invoice Count", "Missing in Opera", "Missing in EzyInvoicing", "Invoice Type Missmatch", "Ezy Invoicing Summary",
-                            "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "No Sac"]
+                            "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "Amendments", "No Sac"]
                 for each in doctypes:
                     frappe.db.delete(each, {"recon_id": ids})
                     frappe.db.commit()
