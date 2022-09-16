@@ -43,6 +43,8 @@ def bulkupload(data):
             if invoice_data["company"]=="HRK-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "HRK" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
 
+            # print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
+            item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 if companyData.name == "ABCBP-01":
                     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
