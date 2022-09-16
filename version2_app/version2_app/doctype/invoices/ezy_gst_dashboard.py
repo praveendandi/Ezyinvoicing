@@ -3,6 +3,7 @@ from re import T
 from venv import create
 from webbrowser import get
 import datetime
+import dateutil.relativedelta
 # from attr import fields
 # from cv2 import sort
 import frappe
@@ -992,14 +993,20 @@ def get_missing_invoices(start_date, end_date):
         data["missing_in_ezyinvoicing"] = list(
             set(data["opera_folios"]) - set(data["ezy_invoicing_invoices"]))
         data["converted_b2b_to_b2c"] = frappe.db.get_list('Invoices', filters=[["invoice_date", 'between', [start_date, end_date]], [
-                                                          "converted_from_b2b", "=", "Yes"]], fields=['name as invoicenumber', "invoice_from as invoiceuploadtype", "ack_date as printeddate", "converted_from_b2b_time as converteddate"], order_by='name')
+                                                          "converted_from_b2b", "=", "Yes"]], fields=['name as invoicenumber', "invoice_from as invoiceuploadtype", "Date(ack_date) as printeddate", "Date(converted_from_b2b_time) as converteddate"], order_by='name')
         if len(data["converted_b2b_to_b2c"]) == 0:
             data["converted_b2b_to_b2c"] = [
                 {"InvoiceNumber": "", "InvoiceUploadType": "", "PrintedDate": "", "ConvertedDate": ""}]
         data["converted_b2c_to_b2b"] = frappe.db.get_list('Invoices', filters=[["invoice_date", 'between', [start_date, end_date]], [
-                                                          "converted_from_b2c", "=", "Yes"]], fields=['name as invoicenumber', "invoice_from as invoiceuploadtype", "ack_date as printeddate", "converted_from_b2c_time as converteddate"], order_by='name')
+                                                          "converted_from_b2c", "=", "Yes"]], fields=['name as invoicenumber', "invoice_from as invoiceuploadtype", "Date(ack_date) as printeddate", "Date(converted_from_b2c_time) as converteddate"], order_by='name')
         if len(data["converted_b2c_to_b2b"]) == 0:
             data["converted_b2c_to_b2b"] = [
+                {"InvoiceNumber": "", "InvoiceUploadType": "", "PrintedDate": "", "ConvertedDate": ""}]
+        d = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+        first_day = d.replace(day=1)
+        data["amendment"] = frappe.db.sql("""select name as invoicenumber, invoice_from as invoiceuploadtype, Date(invoice_date) as printeddate, Date(converted_from_b2c_time) as converteddate from `tabInvoices` where Date(converted_from_b2c_time) between '{}' and '{}' and invoice_date < '{}' and converted_from_b2c = 'Yes'""".format(start_date, end_date, str(first_day)), as_dict=1)
+        if len(data["amendment"]) == 0:
+            data["amendment"] = [
                 {"InvoiceNumber": "", "InvoiceUploadType": "", "PrintedDate": "", "ConvertedDate": ""}]
         return {"success": True, "data": data}
     except Exception as e:
@@ -1125,7 +1132,7 @@ def create_reconciliation(start_date=None, end_date=None, redo=False, recon_id=N
                     queue="default",
                     timeout=800000,
                     event="create_recon",
-                    now=False,
+                    now=True,
                     data={"start_date": start_date, "end_date": end_date, "redo": redo, "recon_id": recon_id},
                     is_async=True,
                 )
@@ -1295,6 +1302,20 @@ def create_recon(data):
         frappe.db.commit()
         frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 55})
 
+        # Converted b2c to b2b
+        if len(missing["data"]["amendment"]) > 0:
+            for each in missing["data"]["amendment"]:
+                if "InvoiceNumber" not in each:
+                    each["doctype"] = "Amendments"
+                    each["recon_id"] = recon_doc.name
+                    each['invoice_number'] = each["invoicenumber"]
+                    amend = insert_records(each)
+                    if not amend["success"]:
+                        return amend
+        frappe.db.set_value("Recon Details", recon_doc.name, "percentage", 55)
+        frappe.db.commit()
+        frappe.publish_realtime("custom_socket", {"message": "Recon Processing", "name": recon_doc.name, "percentage": 58})
+        
         # HSN SUmmary
         hsn = getHsnSummary(start_date=start_date, end_date=end_date)
         if len(hsn["data"]) > 0:
@@ -1429,6 +1450,11 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
                       "printeddate", "converteddate"]
             fields1 = ["invoice_number as 'Invoice Number'", "invoiceuploadtype as 'Invoice Upload Type'",
                        "printeddate as 'Printed Date'", "converteddate as 'Converted Date'"]
+        elif doctype == "Amendments":
+            fields = ["invoice_number", "invoiceuploadtype",
+                      "printeddate", "converteddate"]
+            fields1 = ["invoice_number as 'Invoice Number'", "invoiceuploadtype as 'Invoice Upload Type'",
+                       "printeddate as 'Printed Date'", "converteddate as 'Converted Date'"]
         elif doctype == "Converted B2C to B2B":
             fields = ["invoice_number", "invoiceuploadtype",
                       "printeddate", "converteddate"]
@@ -1528,7 +1554,7 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
 def export_workbook_recon(reconID=None):
     try:
         doctypes = ["Invoice Count", "Missing in Opera", "Zero Invoice", "Missing in EzyInvoicing", "Invoice Type Missmatch", "Ezy Invoicing Summary",
-                    "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "No Sac"]
+                    "Recon Opera Comparison", "Converted B2B to B2C", "Converted B2C to B2B", "Recon HSN Summary", "B2B HSN Summary", "B2C HSN Summary", "Amendments","No Sac"]
         wb = Workbook()
         ws = wb.active
         Sheet = wb['Sheet']
