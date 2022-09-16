@@ -54,6 +54,7 @@ def create_pos_bills(data):
                 text = add_extra_text_while_print(data["check_no"],data["outlet"],company_doc)
                 if text["success"] == False:
                     return text
+                print(text["invoice_number"],"////////////////////////////////........................")
                 added_text = (text["string"]).encode('utf-8')
                 invoice_number = (text["invoice_number"]).encode('utf-8')
             if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
@@ -130,6 +131,7 @@ def create_pos_bills(data):
                 data["gcp_file_url"] = pos_bills['data']
                 data["printed"] = 1
             doc = frappe.get_doc(data)
+            print(data,"dataaaaaaaaaaaaa")
             doc.insert(ignore_permissions=True,ignore_links=True)
     except Exception as e:
         print(str(e))
@@ -214,6 +216,7 @@ def extract_data(payload,company_doc):
                         if checkdate != "":
                             data["check_date"] = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%Y-%m-%d')
                         check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%d%m%y').strip("0")
+                        check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%y%m%d')
                         # data["check_date"] = format_date(
                         #     checkdate,
                         #     "yyyy-mm-dd",
