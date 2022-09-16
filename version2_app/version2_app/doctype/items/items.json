@@ -46,7 +46,8 @@
   "previous_lut_item",
   "check_number",
   "reference_check_number",
-  "pos_check"
+  "pos_check",
+  "revenue_item"
  ],
  "fields": [
   {
@@ -293,12 +294,18 @@
    "fieldtype": "Link",
    "label": "Pos Check",
    "options": "POS Checks"
+  },
+  {
+   "fieldname": "revenue_item",
+   "fieldtype": "Select",
+   "label": "Revenue Item",
+   "options": "Revenue\nNon-Revenue"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-06-29 14:38:49.981323",
+ "modified": "2022-09-15 18:20:51.204922",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Items",

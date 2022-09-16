@@ -149,7 +149,8 @@
   "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
   "non_revenue_amount",
   "arn_number",
-  "etax_invoice_created"
+  "etax_invoice_created",
+  "pos_checks"
  ],
  "fields": [
   {
@@ -976,12 +977,18 @@
    "fieldname": "etax_invoice_created",
    "fieldtype": "Check",
    "label": "ETax Invoice Created"
+  },
+  {
+   "default": "0",
+   "fieldname": "pos_checks",
+   "fieldtype": "Check",
+   "label": "Pos Checks"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-08-04 17:56:44.796052",
+ "modified": "2022-09-16 16:33:19.046219",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
