@@ -29,6 +29,12 @@ def TotalMismatchError(data,calculated_data):
             allowance_invoice = "Yes"
         else:
             allowance_invoice = "No"
+        # print(jhasdjkasjdh)
+        if 'pos_checks' not in data['guest_data']:
+            pos_checks = 0
+        else:
+            pos_checks = data['guest_data']['pos_checks']
+        
         invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',

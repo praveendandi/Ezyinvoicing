@@ -969,7 +969,6 @@ def insert_invoice(data):
     # insert invoice data     data, company_code, taxpayer,items_data
     # '''
     try:
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:
@@ -1182,6 +1181,12 @@ def insert_invoice(data):
             if data["B2C_bulk_upload"]:
                 if data['guest_data']['invoice_type'] == "B2B":
                     irn_generated = "On Hold"
+
+        if 'pos_checks' not in data['guest_data']:
+            pos_checks = 0
+        else:
+            pos_checks = data['guest_data']['pos_checks']
+
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1294,7 +1299,8 @@ def insert_invoice(data):
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
-            "non_revenue_amount": non_revenue_amount
+            "non_revenue_amount": non_revenue_amount,
+            "pos_checks": pos_checks
         })
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
@@ -3514,7 +3520,8 @@ def Error_Insert_invoice(data):
                         invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
                         if invoice_bin.invoice_from=="Pms":
                             socket = invoiceCreated(invoice_bin)
-                        return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
+                        return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin}
+
 
         company = frappe.get_doc('company',data['company_code'])
         if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
@@ -3527,7 +3534,6 @@ def Error_Insert_invoice(data):
                 data['invoice_type'] ="B2B"
             if "gst_number" not in data or "gstNumber" not in data:
                 data['gst_number'] = ""
-            print(data["guest_name"],"======================")
             if data["guest_name"]=="":
                 data["guest_name"]="NA"
             invoice = frappe.get_doc({
@@ -3596,7 +3602,8 @@ def Error_Insert_invoice(data):
                 "folioid":data["folioid"] if "folioid" in data else "",
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
                 "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
-                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else ""
+                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
+                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             

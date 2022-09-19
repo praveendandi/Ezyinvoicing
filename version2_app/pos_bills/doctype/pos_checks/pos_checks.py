@@ -54,7 +54,6 @@ def create_pos_bills(data):
                 text = add_extra_text_while_print(data["check_no"],data["outlet"],company_doc)
                 if text["success"] == False:
                     return text
-                print(text["invoice_number"],"////////////////////////////////........................")
                 added_text = (text["string"]).encode('utf-8')
                 invoice_number = (text["invoice_number"]).encode('utf-8')
             if outlet_doc.print == "Yes" and data["check_type"] == "Normal Check":
