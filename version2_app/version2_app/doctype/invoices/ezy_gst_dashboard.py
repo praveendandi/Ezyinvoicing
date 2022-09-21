@@ -1231,13 +1231,13 @@ def create_recon(data):
             missing["data"]["type_missmatch_for_credit"]
         if len(type_missmatch) > 0:
             for each in type_missmatch:
-                if each["InvoiceNumber"] != "":
-                    each["doctype"] = "Invoice Type Missmatch"
-                    each["recon_id"] = recon_doc.name
-                    if "InvoiceNumber" in each:
-                        each["invoice_number"] = each["InvoiceNumber"]
-                    else:
-                        each["invoice_number"] = each["invoicenumber"]
+                each["doctype"] = "Invoice Type Missmatch"
+                each["recon_id"] = recon_doc.name
+                if "InvoiceNumber" in each:
+                    each["invoice_number"] = each["InvoiceNumber"]
+                else:
+                    each["invoice_number"] = each["invoicenumber"]
+                if each["invoice_number"] != "":
                     type_mismatch = insert_records(each)
                     if not type_mismatch["success"]:
                         return type_mismatch
