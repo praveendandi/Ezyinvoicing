@@ -3832,24 +3832,24 @@ def get_taxpayerdetails(data):
                     if details['Status'] == "ACT":
                         tax_payer.status = 'Active'
                         if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
-                            doc = tax_payer.save(ignore_permissions=True, ignore_version=True)
+                            tax_payer.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                             invoice_doc.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                         else:
-                            doc = tax_payer.insert(ignore_permissions=True)
+                            tax_payer.insert(ignore_permissions=True)
                             frappe.db.commit()
-                        return {"success": True, "data": doc}
+                        return {"success": True, "data": tax_payer}
                     
                     else:
                         tax_payer.status = 'In-Active'
                         if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
-                            doc = tax_payer.save(ignore_permissions=True, ignore_version=True)
+                            tax_payer.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                             invoice_doc.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                         else:
-                            doc = tax_payer.insert(ignore_permissions=True)
+                            tax_payer.insert(ignore_permissions=True)
                             frappe.db.commit()
                         return {
                             "success": False,
