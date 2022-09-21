@@ -215,7 +215,7 @@ def extract_data(payload,company_doc):
                         if checkdate != "":
                             data["check_date"] = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%Y-%m-%d')
                         check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%d%m%y').strip("0")
-                        check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%y%m%d')
+                        # check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%y%m%d')
                         # data["check_date"] = format_date(
                         #     checkdate,
                         #     "yyyy-mm-dd",
