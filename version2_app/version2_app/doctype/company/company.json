@@ -288,7 +288,8 @@
   "items_per_page",
   "skip_pos_check_data_extraction",
   "create_etax_invoices_in_separate_folder",
-  "save_etax_invoice_folder"
+  "save_etax_invoice_folder",
+  "minutes_until_auto_logout"
  ],
  "fields": [
   {
@@ -1853,11 +1854,17 @@
    "fieldname": "save_etax_invoice_folder",
    "fieldtype": "Data",
    "label": "Save ETax Invoice Folder"
+  },
+  {
+   "default": "30",
+   "fieldname": "minutes_until_auto_logout",
+   "fieldtype": "Int",
+   "label": "Minutes Until Auto Logout"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-27 15:31:09.021610",
+ "modified": "2022-09-20 17:00:00.062656",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

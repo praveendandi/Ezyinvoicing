@@ -145,7 +145,7 @@ def extract_xml(file_list):
                     reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     reconciliations_doc.invoice_found = "No"
                     reconciliations_doc.save()
-        return True
+        return {"success": True, "message": "file upload"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing extract_xml Reconciliation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))

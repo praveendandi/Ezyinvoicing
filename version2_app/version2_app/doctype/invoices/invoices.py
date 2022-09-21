@@ -151,7 +151,6 @@ def generateIrn(data):
     try:
         company = frappe.get_last_doc("company")
         invoice_number = data['invoice_number']
-
         generation_type = data['generation_type']
         # get invoice detail
         start_time = datetime.datetime.utcnow()
@@ -175,6 +174,7 @@ def generateIrn(data):
             get_is_credit_items = frappe.db.get_list("Items", filters=[["parent","=",data['invoice_number']]], pluck="is_credit_item")
             if "Yes" in get_is_credit_items:
                 abs_path = os.path.dirname(os.getcwd())
+                print(abs_path,"////")
                 file_path = abs_path + '/apps/version2_app/version2_app/version2_app/doctype/invoices/reinitate_invoice.py'
                 module_name = 'auto_adjustment'
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -286,7 +286,9 @@ def generateIrn(data):
         ass_value = 0
         items_data = sorted(invoice.items, key = lambda i: i.sort_order)
         for index, item in enumerate(items_data):
-            # print(item.sac_code,"HsnCD")
+        # print(item.sac_code,"HsnCD")
+            if item.sac_code == "996339" and item.taxable == "Yes" :
+                return{"success": False, "message": "for liquor item given taxable yes"}
             if item.is_credit_item == "No" and item.taxable == "Yes" and item.type != "Non-Gst":
                 total_igst_value += item.igst_amount
                 total_sgst_value += item.sgst_amount
@@ -967,7 +969,6 @@ def insert_invoice(data):
     # insert invoice data     data, company_code, taxpayer,items_data
     # '''
     try:
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:
@@ -1180,6 +1181,12 @@ def insert_invoice(data):
             if data["B2C_bulk_upload"]:
                 if data['guest_data']['invoice_type'] == "B2B":
                     irn_generated = "On Hold"
+
+        if 'pos_checks' not in data['guest_data']:
+            pos_checks = 0
+        else:
+            pos_checks = data['guest_data']['pos_checks']
+
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1292,7 +1299,8 @@ def insert_invoice(data):
             "tax_invoice_referrence_number": data["tax_invoice_referrence_number"] if "tax_invoice_referrence_number" in data else "",
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
-            "non_revenue_amount": non_revenue_amount
+            "non_revenue_amount": non_revenue_amount,
+            "pos_checks": pos_checks
         })
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
@@ -1532,13 +1540,16 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
                         gst_percentage = item_gst_percentage
                         igst_percentage = item_igst_percentage
                 else:
-                    if sac_code_obj.accommodation_slab == "Yes":
+                    if sac_code_obj.accommodation_slab == 1:
                         calulateslab = (companyDetails.slab_12_ending_range*12)/100
                         slab_amount = calulateslab+companyDetails.slab_12_ending_range
+                        starting_range = (companyDetails.slab_12_starting_range*12)/100
+                        acc_starting_range = starting_range+companyDetails.slab_12_starting_range
+                        print(slab_amount, acc_starting_range,"...............................")
                         if float(abs(data["item_value"])) > slab_amount:
                             gst_percentage = 18
                             igst_percentage = 18
-                        elif float(abs(data["item_value"]))>=companyDetails.slab_12_starting_range and float(data["item_value"]) <= slab_amount:
+                        elif float(abs(data["item_value"]))>=acc_starting_range and float(data["item_value"]) <= slab_amount:
                             gst_percentage = 12
                             igst_percentage = 12
                         else:
@@ -2123,7 +2134,8 @@ def calulate_items(data):
                             final_item['sgst_amount'] = gst_amount_value/2
                             final_item['igst'] = 0
                             final_item['igst_amount'] = 0
-                            final_item['gst_rate'] = gst_tax_percentage						
+                            final_item['gst_rate'] = gst_tax_percentage
+                            final_item['revenue_item'] = "Non-Revenue"
                         else:
                             # if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
                             # 	calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
@@ -2387,6 +2399,7 @@ def calulate_items(data):
                 final_item['type'],
                 'other_charges':
                 final_item['other_charges'],
+                
                 'taxable':
                 final_item['taxable'],
                 'item_mode':final_item['item_mode'],
@@ -2400,9 +2413,11 @@ def calulate_items(data):
                 "line_edit_net":net_value,
                 "item_reference":item["item_reference"] if "item_reference" in item else "",
                 "check_number":item["check_number"] if "check_number" in item else "",
-                "reference_check_number":item["reference_check_number"] if "reference_check_number" in item else ""
+                "reference_check_number":item["reference_check_number"] if "reference_check_number" in item else "",
+                "revenue_item": final_item['revenue_item'] if "revenue_item" in final_item else "Revenue"
             })
         total_items.extend(second_list)	
+        print(total_items,".........]]]]]]]]]]][[[,,,,,,,,,,,,,,")
         return {"success": True, "data": total_items}
     except Exception as e:
         print(traceback.print_exc())
@@ -3435,25 +3450,25 @@ def check_invoice_file_exists(data):
 def check_invoice_exists(invoice_number):
     try:
         if len(invoice_number)>0:
-            invCount = frappe.get_doc('Invoices',invoice_number)
+            if frappe.db.exists("Invoices", {"invoice_number": invoice_number}):
+                invoice_number = frappe.db.get_value("Invoices", {"invoice_number": invoice_number})
+                invCount = frappe.get_doc('Invoices',invoice_number)
+                if invCount:	
+                    invoice_number = invCount.name
+                    if invCount.docstatus==2:
+                        AmenedinvCount = frappe.db.get_list(
+                        'Invoices',
+                        filters={
+                            'invoice_number':
+                            ['like', invoice_number+'-%']
+                        })
+                        if len(AmenedinvCount)>0:
+                            invoice_number = AmenedinvCount[0]['name']
 
-            if invCount:	
-                invoice_number = invCount.name
-                if invCount.docstatus==2:
-                    AmenedinvCount = frappe.db.get_list(
-                    'Invoices',
-                    filters={
-                        'invoice_number':
-                        ['like', invoice_number+'-%']
-                    })
-                    if len(AmenedinvCount)>0:
-                        invoice_number = AmenedinvCount[0]['name']
-                    
-            
-            invoiceExists = frappe.get_doc('Invoices', invoice_number)
-            if invoiceExists:
+                invoiceExists = frappe.get_doc('Invoices', invoice_number)
+                if invoiceExists:
 
-                return {"success": True, "data": invoiceExists}
+                    return {"success": True, "data": invoiceExists}
             return {"success": False}
         return {"success":False}	
     except Exception as e:
@@ -3505,10 +3520,11 @@ def Error_Insert_invoice(data):
                         invoice_bin = frappe.get_doc("Invoices", data['invoice_number'])
                         if invoice_bin.invoice_from=="Pms":
                             socket = invoiceCreated(invoice_bin)
-                        return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin} 
+                        return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin}
+
 
         company = frappe.get_doc('company',data['company_code'])
-        if not frappe.db.exists('Invoices', data['invoice_number']):
+        if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
             invType = data['invoice_type']
             
             irn_generated = "Error"
@@ -3518,7 +3534,6 @@ def Error_Insert_invoice(data):
                 data['invoice_type'] ="B2B"
             if "gst_number" not in data or "gstNumber" not in data:
                 data['gst_number'] = ""
-            print(data["guest_name"],"======================")
             if data["guest_name"]=="":
                 data["guest_name"]="NA"
             invoice = frappe.get_doc({
@@ -3587,7 +3602,8 @@ def Error_Insert_invoice(data):
                 "folioid":data["folioid"] if "folioid" in data else "",
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
                 "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
-                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else ""
+                "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
+                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
             })
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
@@ -3816,24 +3832,24 @@ def get_taxpayerdetails(data):
                     if details['Status'] == "ACT":
                         tax_payer.status = 'Active'
                         if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
-                            doc = tax_payer.save(ignore_permissions=True, ignore_version=True)
+                            tax_payer.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                             invoice_doc.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                         else:
-                            doc = tax_payer.insert(ignore_permissions=True)
+                            tax_payer.insert(ignore_permissions=True)
                             frappe.db.commit()
-                        return {"success": True, "data": doc}
+                        return {"success": True, "data": tax_payer}
                     
                     else:
                         tax_payer.status = 'In-Active'
                         if frappe.db.exists('TaxPayerDetail', data["gstNumber"]):
-                            doc = tax_payer.save(ignore_permissions=True, ignore_version=True)
+                            tax_payer.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                             invoice_doc.save(ignore_permissions=True, ignore_version=True)
                             frappe.db.commit()
                         else:
-                            doc = tax_payer.insert(ignore_permissions=True)
+                            tax_payer.insert(ignore_permissions=True)
                             frappe.db.commit()
                         return {
                             "success": False,

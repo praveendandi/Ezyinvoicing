@@ -1004,6 +1004,7 @@ def reprocess_calulate_items(data):
                     final_item['item_value'] = item['item_value']
                     final_item['taxable'] = sac_code_based_gst_rates.taxble
                     final_item['type'] = "Non-Gst"
+                    final_item['revenue_item'] = "Non-Revenue"
                     # final_item['item_mode'] = "Debit"
                     if "-" in str(item['item_value']):
                         final_item['item_mode'] = ItemMode
@@ -1113,11 +1114,13 @@ def reprocess_calulate_items(data):
                 'unit_of_measurement_description': item["unit_of_measurement_description"],
                 "discount_value" : item["discount_value"],
                 "line_edit_net": item["net"],
-                "lut_exempted": item["lut_exempted"]
+                "lut_exempted": item["lut_exempted"],
+                "revenue_item": final_item['revenue_item'] if "revenue_item" in final_item else "Revenue"
             }
             # data_details["previous_lut_item"] = item["previous_lut_item"]
             total_items.append(data_details)
         total_items.extend(second_list)
+        print(total_items,"/////////////////{???????????????????????/")
         for xyz in total_items:
             xyz["date"] = datetime.datetime.strptime(xyz["date"],"%d-%m-%y").strftime('%Y-%m-%d %H:%M:%S')
         final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply,"lut":lut})

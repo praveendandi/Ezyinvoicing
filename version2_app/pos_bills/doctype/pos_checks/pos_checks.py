@@ -130,6 +130,7 @@ def create_pos_bills(data):
                 data["gcp_file_url"] = pos_bills['data']
                 data["printed"] = 1
             doc = frappe.get_doc(data)
+            print(data,"dataaaaaaaaaaaaa")
             doc.insert(ignore_permissions=True,ignore_links=True)
     except Exception as e:
         print(str(e))
@@ -143,6 +144,8 @@ def extract_data(payload,company_doc):
         data={}
         raw_data = payload.split("\n")
         total_amount = ""
+        check_date = ""
+        check_number = ""
         for line in raw_data:
             if company_doc.closed_check_reference in payload and company_doc.void_check_reference not in payload:
                 data["check_type"] = "Check Closed"
@@ -189,8 +192,9 @@ def extract_data(payload,company_doc):
                 if company_doc.check_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
-                    check_no_regex = re.findall("\w+\d+",check_string)
+                    check_no_regex = re.findall("\w+\d+|\d+",check_string)
                     data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
+                    check_number = check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     table_regex = re.findall(company_doc.table_number_regex, line.strip())
                     table_string = table_regex[0] if len(table_regex)>0 else ""
@@ -210,6 +214,8 @@ def extract_data(payload,company_doc):
                         checkdate = check_date[0] if len(check_date) > 0 else ""
                         if checkdate != "":
                             data["check_date"] = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%Y-%m-%d')
+                        check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%d%m%y').strip("0")
+                        check_date = datetime.strptime(checkdate,company_doc.pos_check_date_format).strftime('%y%m%d')
                         # data["check_date"] = format_date(
                         #     checkdate,
                         #     "yyyy-mm-dd",
@@ -218,6 +224,9 @@ def extract_data(payload,company_doc):
                         # print("Today date is: ", today)
                         # if today > data["check_date"]:
                         #     pass
+        if company_doc.name == "ZBPK-01":
+            if check_date != "" and check_number != "":
+                data["check_no"] = check_date+check_number
         data["total_amount"] = str(total_amount)
         return {"success":True, "data":data}
     except Exception as e:
