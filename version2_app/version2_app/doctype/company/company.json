@@ -1816,7 +1816,7 @@
   },
   {
    "fieldname": "pos_date_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "POS Date Regex"
   },
   {
@@ -1857,7 +1857,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-08-10 10:35:51.771171",
+ "modified": "2022-08-27 15:31:09.021610",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -67,7 +67,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-07-21 17:12:52.632670",
+ "modified": "2022-08-27 12:15:31.611900",
  "modified_by": "Administrator",
  "module": "CLBS",
  "name": "Taxpayer Locations",
@@ -94,6 +94,18 @@
    "read": 1,
    "report": 1,
    "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
    "share": 1,
    "write": 1
   }
