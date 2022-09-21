@@ -1130,7 +1130,7 @@ def create_reconciliation(start_date=None, end_date=None, redo=False, recon_id=N
                     queue="default",
                     timeout=800000,
                     event="create_recon",
-                    now=True,
+                    now=False,
                     data={"start_date": start_date, "end_date": end_date, "redo": redo, "recon_id": recon_id},
                     is_async=True,
                 )
