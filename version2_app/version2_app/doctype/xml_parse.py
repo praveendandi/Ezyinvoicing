@@ -82,8 +82,9 @@ def extract_xml(file_list):
                 if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                     if frappe.db.exists('Invoices',each["BILL_NO"]):
                         invoice_doc = frappe.get_doc('Invoices',each["BILL_NO"])
-                        invoice_doc.invoice_check = "Yes"
-                        invoice_doc.save()
+                        if invoice_doc.docstatus != 2:
+                            invoice_doc.invoice_check = "Yes"
+                            invoice_doc.save()
                         reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                         reconciliations_doc.invoice_found = "Yes"
                         reconciliations_doc.save()
@@ -136,8 +137,9 @@ def extract_xml(file_list):
             if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                 if frappe.db.exists('Invoices',each["BILL_NO"]):
                     invoice_doc = frappe.get_doc('Invoices',each["BILL_NO"])
-                    invoice_doc.invoice_check = "Yes"
-                    invoice_doc.save()
+                    if invoice_doc.docstatus != 2:
+                        invoice_doc.invoice_check = "Yes"
+                        invoice_doc.save()
                     reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     reconciliations_doc.invoice_found = "Yes"
                     reconciliations_doc.save()
