@@ -465,7 +465,8 @@ def fileCreated(doc, method=None):
                     event="data_extraction",
                     now=False,
                     data={
-                        "pos_bill": doc.file_url
+                        "pos_bill": doc.file_url,
+                        "file_name": doc.file_name 
                     },
                     is_async=True,
                 )
@@ -937,7 +938,7 @@ def extract_data_from_pos_check(data={}):
     try:
         pos_date = ""
         if data["pos_bill"].count("@") == 2:
-            date_extract = re.search("@(.*)@", data["pos_bill"])
+            date_extract = re.search("@(.*)@", data["file_name"])
             if date_extract:
                 pos_date = date_extract.group(1)
         if isinstance(data,str):
