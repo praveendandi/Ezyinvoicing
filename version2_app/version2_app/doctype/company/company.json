@@ -289,7 +289,9 @@
   "skip_pos_check_data_extraction",
   "create_etax_invoices_in_separate_folder",
   "save_etax_invoice_folder",
-  "minutes_until_auto_logout"
+  "minutes_until_auto_logout",
+  "erp_company_name",
+  "abbr"
  ],
  "fields": [
   {
@@ -1860,11 +1862,21 @@
    "fieldname": "minutes_until_auto_logout",
    "fieldtype": "Int",
    "label": "Minutes Until Auto Logout"
+  },
+  {
+   "fieldname": "erp_company_name",
+   "fieldtype": "Data",
+   "label": "ERP Company Name"
+  },
+  {
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "ABBR"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-09-19 14:52:12.174909",
+ "modified": "2022-09-29 16:35:27.940527",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

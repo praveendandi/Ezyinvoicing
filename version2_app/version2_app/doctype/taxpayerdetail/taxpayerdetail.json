@@ -27,7 +27,9 @@
   "block_status",
   "status",
   "disable_auto_irn",
-  "company_portals"
+  "company_portals",
+  "synced_date",
+  "synced_to_erp"
  ],
  "fields": [
   {
@@ -146,11 +148,22 @@
    "fieldtype": "Link",
    "label": "Company Portals",
    "options": "Company Portals"
+  },
+  {
+   "fieldname": "synced_date",
+   "fieldtype": "Date",
+   "label": "Synced Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "synced_to_erp",
+   "fieldtype": "Check",
+   "label": "Synced to ERP"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-06-24 10:25:08.096644",
+ "modified": "2022-09-29 16:39:18.556963",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "TaxPayerDetail",
