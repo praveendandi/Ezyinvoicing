@@ -14,7 +14,6 @@ import glob
 import json 
 
 
-subject = False
 @frappe.whitelist(allow_guest=True)
 def mailreader():
     try:
