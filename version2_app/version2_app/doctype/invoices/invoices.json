@@ -150,7 +150,9 @@
   "non_revenue_amount",
   "arn_number",
   "etax_invoice_created",
-  "pos_checks"
+  "pos_checks",
+  "synced_to_erp",
+  "synced_date"
  ],
  "fields": [
   {
@@ -983,12 +985,23 @@
    "fieldname": "pos_checks",
    "fieldtype": "Check",
    "label": "Pos Checks"
+  },
+  {
+   "default": "0",
+   "fieldname": "synced_to_erp",
+   "fieldtype": "Check",
+   "label": "Synced to ERP"
+  },
+  {
+   "fieldname": "synced_date",
+   "fieldtype": "Date",
+   "label": "Synced Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-16 16:33:19.046219",
+ "modified": "2022-09-29 16:37:44.318530",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

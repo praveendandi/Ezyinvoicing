@@ -300,7 +300,9 @@
   "qr_b2c_rect_x0",
   "qr_b2c_rect_x1",
   "qr_b2c_rect_y0",
-  "qr_b2c_rect_y1"
+  "qr_b2c_rect_y1",
+  "erp_company_name",
+  "abbr"
  ],
  "fields": [
   {
@@ -1828,7 +1830,7 @@
   },
   {
    "fieldname": "pos_date_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "POS Date Regex"
   },
   {
@@ -1927,6 +1929,16 @@
    "fieldname": "pos_qr",
    "fieldtype": "Check",
    "label": "POS QR"
+  },
+  {
+   "fieldname": "erp_company_name",
+   "fieldtype": "Data",
+   "label": "ERP Company Name"
+  },
+  {
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "ABBR"
   }
  ],
  "index_web_pages_for_search": 1,
