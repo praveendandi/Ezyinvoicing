@@ -19,8 +19,8 @@ class UserSignature(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
-def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=b'123', X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
+@frappe.whitelist()
+def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=None, X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
     try:
         if secret:
             secret = bytes(secret, 'utf-8')
@@ -109,4 +109,29 @@ def send_files(files, user_name, summary):
         return {"success": False, "message": "User Name not given"}
     except Exception as e:
         frappe.log_error(str(e), "send_files")
+        return{"success": False, "message": str(e)}
+
+
+@frappe.whitelist()
+def add_esignature_to_invoice(invoice_number=None, based_on="user"):
+    try:
+        company = frappe.get_last_doc("company")
+        get_value = frappe.db.get_value("Invoices", invoice_number, ["invoice_file"])
+        if not frappe.db.exists("CLBS Settings", company.name):
+            return {"success": False, "message": "Add signature coordinates in settings"}
+        if company.e_signature == "User":
+            user_name = frappe.session.user
+            if not frappe.db.exists("User Signature", user_name):
+                return {"success": False, "message": "add your signature in user settings"}
+            coordinates = frappe.db.get_value("CLBS Settings", company.name, ["X1", "Y1", "X2", "Y2"], as_dict=True)
+            user_signature = frappe.db.get_value("User Signature", user_name, ["signature_image","signature_pfx","pfx_password"],as_dict=True)
+            print(user_signature)
+            add_sig = add_signature(invoice=get_value, pfx_signature=user_signature["signature_pfx"], signature_image=user_signature["signature_image"], secret=user_signature["pfx_password"], X1=coordinates["X1"], Y1=coordinates["Y1"], X2=coordinates["X2"], Y2=coordinates["Y2"], company=company, summary=invoice_number)
+            return add_sig
+        if company.e_signature == "Organization":
+            coordinates = frappe.db.get_value("CLBS Settings", company.name, ["X1", "Y1", "X2", "Y2"], as_dict=True)
+            add_sig = add_signature(invoice=get_value, pfx_signature=company.signature_pfx, signature_image=company.signature_image, secret=company.pfx_password, X1=coordinates["X1"], Y1=coordinates["Y1"], X2=coordinates["X2"], Y2=coordinates["Y2"], company=company, summary=invoice_number)
+            return add_sig
+    except Exception as e:
+        frappe.log_error(str(e), "add_esignature_to_invoice")
         return{"success": False, "message": str(e)}
