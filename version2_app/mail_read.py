@@ -1,4 +1,5 @@
 import os
+from time import sleep
 from traceback import print_tb
 from webbrowser import get
 from xmlrpc.client import TRANSPORT_ERROR
@@ -17,16 +18,17 @@ import json
 @frappe.whitelist(allow_guest=True)
 def mailreader():
     try:
-        imap_server = "imap-mail.outlook.com"
-        mail = imaplib.IMAP4_SSL(imap_server)
         cwd = os.getcwd() 
         site_name = cstr(frappe.local.site)
         site = cwd+"/"+site_name
         mail_data = frappe.db.get_list('Email Credentials',fields=["username","password","subject"])
         print(mail_data,"/////////")
+        get_mail = frappe.get_last_doc('Email Credentials')
+        select_mail = get_mail.gmail_server
+        mail = imaplib.IMAP4_SSL(select_mail)
         mail.login(mail_data[0]["username"], mail_data[0]["password"])
         mail.select()
-        cwd = os.getcwd()
+        cwd = os.getcwd()       
         type, data = mail.search(None, '(UNSEEN)')
         mail_ids = data[0]
         id_list = mail_ids.split()
@@ -38,6 +40,7 @@ def mailreader():
             email_message = email.message_from_string(raw_email_string)
             mail_parse = mailparser.parse_from_bytes(raw_email)
             get_sub = mail_parse.subject
+            print(get_sub,".....")
             if mail_data[0]['subject'] == get_sub:
                 for part in email_message.walk():
                     if part.get_content_maintype() == 'multipart':
@@ -53,8 +56,9 @@ def mailreader():
                             fp = open(filepath, 'wb')
                             fp.write(part.get_payload(decode=True))
                             fp.close()
+                            print(fp,"/////////")
                         print(filepath)
-                        headers = {'Content-Type': 'application/form-data'}
+                        # headers = {'Content-Type': 'application/form-data'}
                         files_new = {"file": open(filepath, 'rb')}
                         company = frappe.get_last_doc("company")
                         payload = {
@@ -63,9 +67,9 @@ def mailreader():
                                     'doctype': 'invoices',
                                     'docname': company.name,
                                     'fieldname': 'invoice'
-                                  }
+                                }
                         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                                    data=payload, verify=False)                            
+                                            data=payload, verify=False)                            
                         print(file_response.json())
     except Exception as e:
         print(str(e))
