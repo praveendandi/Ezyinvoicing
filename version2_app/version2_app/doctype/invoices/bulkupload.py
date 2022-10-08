@@ -47,7 +47,7 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "4000-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="SGBW-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
-                print("////////////////////////////",str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:])
+                print(str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:],"////////////////////////////")
 
             # print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
             item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
@@ -111,7 +111,6 @@ def bulkupload(data):
                     item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                     # for sac_items in sac_description:
                     if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# 
-                        print(x[bulk_meta_data["detail_folio"]['transaction_description']].lower(),"..............................////////////////////////////////////", paymentTypes)
                         if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
                             x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                         # if x[bulk_meta_data["detail_folio"]['transaction_description']] in sac_items["name"]:
@@ -139,7 +138,6 @@ def bulkupload(data):
                 item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                 # for sac_items in sac_description:
                 if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# or "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']]:
-                    print(x[bulk_meta_data["detail_folio"]['transaction_description']].lower(),"..............................////////////////////////////////////", paymentTypes)
                     if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
                         x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                     
@@ -170,7 +168,6 @@ def bulkupload(data):
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})
         countIn = 1
         for each_item in input_data:
-            print(each_item,"++++++++")
             if "invoice_number" in each:
                 each["gstNumber"]=gst_data[each["invoice_number"]]
             if each_item['invoice_category'] == "CREDIT TAX INVOICE":
