@@ -15,7 +15,6 @@ def bulkupload(data):
     try:
         invoice_data=data
         company =invoice_data['company']
-        print(company,"/////////////////")
         start_time = datetime.datetime.now()
         items=[]
         companyData = frappe.get_doc('company',company)#data['company'])
@@ -47,7 +46,6 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "4000-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="SGBW-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
-                print(str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:],"////////////////////////////")
 
             # print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
             item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
@@ -56,6 +54,7 @@ def bulkupload(data):
                     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
                 # if companyData.name == "SGBW-01":
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
+                print(item[bulk_meta_data["Gst_details"]["gst_number"]].strip(),"////////////////////////////")
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
@@ -79,8 +78,8 @@ def bulkupload(data):
             if companyData.name == "ABCBP-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if companyData.name == "SGBW-01":
-                each[bulk_meta_data["detail_folio"]["invoice_number"]] = str(each[bulk_meta_data["detail_folio"]["invoice_number"]]).lstrip("0")[1:]
-                print("/////////////////////////////////",str(each[bulk_meta_data["detail_folio"]["invoice_number"]]).lstrip("0")[1:])
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = str(each[bulk_meta_data["detail_folio"]["invoice_number"]])[1:]
+                print("/////////////////////////////////",each[bulk_meta_data["detail_folio"]["invoice_number"]])
             if str(each[bulk_meta_data["detail_folio"]["invoice_number"]]) in gst_data.keys():
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
