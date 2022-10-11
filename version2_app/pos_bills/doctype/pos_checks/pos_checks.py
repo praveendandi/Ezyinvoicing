@@ -73,9 +73,11 @@ def create_pos_bills(data):
                                 elif count == 2:
                                     added_text1 = "Finance Copy\n".encode("utf-8")
                                 if company_doc.enable_pos_extra_text == 1:
-                                    added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    # added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                     if count != 1:
-                                        added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                        added_text = added_text1+added_text.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    else:
+                                        added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                 else:
                                     added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                     added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
@@ -90,10 +92,11 @@ def create_pos_bills(data):
                                 added_text1 = "Merchant Copy\n".encode("utf-8")
                             elif count == 2:
                                 added_text1 = "Finance Copy\n".encode("utf-8")
-                            if company_doc.enable_pos_extra_text == 1:
-                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            if company_doc.enable_pos_extra_text == 1: 
                                 if count != 1:
-                                    added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    added_text = added_text1+added_text.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                else:
+                                    added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             else:
                                 added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                 added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
@@ -114,9 +117,11 @@ def create_pos_bills(data):
                         elif count == 2:
                             added_text1 = "Finance Copy\n".encode("utf-8")
                         if company_doc.enable_pos_extra_text == 1:
-                            added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            # added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             if count != 1:
-                                added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                added_text = added_text1+added_text.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            else:
+                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                         else:
                             added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
@@ -237,50 +242,51 @@ def extract_data(payload,company_doc):
 
 def give_print(text, ip, logo_path, qr_path,port,company_doc,added_text="",invoice_number="",short_url='',extra_text_after_qr=None):
     try:
-        kitchen = Network(ip,int(port))  # Printer IP Address
-        # kitchen = Network(ip)
-        kitchen.set("CENTER", "A", "B")
-        kitchen.image(img_source=logo_path)
-        kitchen.hw('INIT')
-        if company_doc.enable_pos_extra_text == 1:
-            kitchen.set("CENTER", "A")
-            kitchen.text('\n')
-            kitchen._raw(added_text)
-            kitchen.set("CENTER", "A","B")
-            kitchen._raw(invoice_number)
-            kitchen.set("CENTER", "A")
-        else:
-            kitchen.set("CENTER", "A","B")
-            kitchen.text('\n')
-        b = (text).encode('utf-8')
-        split_amount = [each for each in text.split("\n") if re.match(company_doc.normal_check_total_amt_regex,each.strip())]
-        if len(split_amount) == 1:
-            split_string = text.split(split_amount[0])
-            if len(split_string) == 2:
-                kitchen.set("CENTER", "A")
-                kitchen._raw(split_string[0].encode('utf-8'))
-                kitchen.set("CENTER", "A","B",1,2)
-                kitchen._raw(split_amount[0].encode('utf-8'))
-                kitchen.set("CENTER", "A")
-                kitchen._raw(split_string[1].encode('utf-8'))
-            else:
-                kitchen._raw(b)
-        else:
-            kitchen._raw(b)
-        kitchen.hw('INIT')
-        kitchen.set("CENTER", "A", "B")
-        if short_url!='':
-            kitchen.qr(short_url,size=7)
-            kitchen.hw('INIT')
-        else:
-            kitchen.image(qr_path)
-            kitchen.hw('INIT')
-        if extra_text_after_qr:
-            kitchen.set("CENTER", "A")
-            kitchen.text('\n')
-            kitchen._raw(extra_text_after_qr.encode('utf-8'))    
-        kitchen.cut()
-        kitchen.hw('INIT')
+        pass
+        # kitchen = Network(ip,int(port))  # Printer IP Address
+        # # kitchen = Network(ip)
+        # kitchen.set("CENTER", "A", "B")
+        # kitchen.image(img_source=logo_path)
+        # kitchen.hw('INIT')
+        # if company_doc.enable_pos_extra_text == 1:
+        #     kitchen.set("CENTER", "A")
+        #     kitchen.text('\n')
+        #     kitchen._raw(added_text)
+        #     kitchen.set("CENTER", "A","B")
+        #     kitchen._raw(invoice_number)
+        #     kitchen.set("CENTER", "A")
+        # else:
+        #     kitchen.set("CENTER", "A","B")
+        #     kitchen.text('\n')
+        # b = (text).encode('utf-8')
+        # split_amount = [each for each in text.split("\n") if re.match(company_doc.normal_check_total_amt_regex,each.strip())]
+        # if len(split_amount) == 1:
+        #     split_string = text.split(split_amount[0])
+        #     if len(split_string) == 2:
+        #         kitchen.set("CENTER", "A")
+        #         kitchen._raw(split_string[0].encode('utf-8'))
+        #         kitchen.set("CENTER", "A","B",1,2)
+        #         kitchen._raw(split_amount[0].encode('utf-8'))
+        #         kitchen.set("CENTER", "A")
+        #         kitchen._raw(split_string[1].encode('utf-8'))
+        #     else:
+        #         kitchen._raw(b)
+        # else:
+        #     kitchen._raw(b)
+        # kitchen.hw('INIT')
+        # kitchen.set("CENTER", "A", "B")
+        # if short_url!='':
+        #     kitchen.qr(short_url,size=7)
+        #     kitchen.hw('INIT')
+        # else:
+        #     kitchen.image(qr_path)
+        #     kitchen.hw('INIT')
+        # if extra_text_after_qr:
+        #     kitchen.set("CENTER", "A")
+        #     kitchen.text('\n')
+        #     kitchen._raw(extra_text_after_qr.encode('utf-8'))    
+        # kitchen.cut()
+        # kitchen.hw('INIT')
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing give print","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
