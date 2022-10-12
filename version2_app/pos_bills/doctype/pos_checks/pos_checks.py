@@ -73,9 +73,11 @@ def create_pos_bills(data):
                                 elif count == 2:
                                     added_text1 = "Finance Copy\n".encode("utf-8")
                                 if company_doc.enable_pos_extra_text == 1:
-                                    added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    # added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                     if count != 1:
-                                        added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                        added_text = added_text1+added_text.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    else:
+                                        added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                 else:
                                     added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                     added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
@@ -90,10 +92,11 @@ def create_pos_bills(data):
                                 added_text1 = "Merchant Copy\n".encode("utf-8")
                             elif count == 2:
                                 added_text1 = "Finance Copy\n".encode("utf-8")
-                            if company_doc.enable_pos_extra_text == 1:
-                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            if company_doc.enable_pos_extra_text == 1: 
                                 if count != 1:
-                                    added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                    added_text = added_text1+added_text.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                else:
+                                    added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             else:
                                 added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                                 added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
@@ -114,9 +117,11 @@ def create_pos_bills(data):
                         elif count == 2:
                             added_text1 = "Finance Copy\n".encode("utf-8")
                         if company_doc.enable_pos_extra_text == 1:
-                            added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            # added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             if count != 1:
-                                added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                                added_text = added_text1+added_text.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
+                            else:
+                                added_text = added_text1+added_text.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                         else:
                             added_text = added_text1.replace("Guest Copy\n".encode("utf-8"),"".encode("utf-8"))
                             added_text = added_text1.replace("Merchant Copy\n".encode("utf-8"),"".encode("utf-8"))
