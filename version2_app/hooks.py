@@ -175,15 +175,15 @@ doc_events = {
 	},
 	"TaxPayerDetail":{
 		'after_insert':"version2_app.events.taxpayerhook",
-        'on_update':"version2_app.auto_sync_ezygst.taxpayerdetail"
+        # 'on_update':"version2_app.auto_sync_ezygst.taxpayerdetail"
 	},
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
     },
-    "SAC HSN CODES":{
-        'on_update':"version2_app.auto_sync_ezygst.sac_hsn_code"
-    },
+    # "SAC HSN CODES":{
+    #     'on_update':"version2_app.auto_sync_ezygst.sac_hsn_code"
+    # },
     'Precheckins':{
         # 'after_insert':"version2_app.events.precheckinsdocuments",
         # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
