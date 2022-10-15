@@ -25,7 +25,7 @@ from weasyprint import HTML
 from PyPDF2 import PdfFileMerger
 from frappe.utils.background_jobs import enqueue
 
-
+from version2_app.utils import html_to_pdf
 from version2_app.clbs.doctype.summaries.summaries import get_summary
 from version2_app.e_signature.e_signature import send_files
 
@@ -133,31 +133,6 @@ def get_file_size(summary, files=[], combine=False):
         return {"success": False, "message": str(e)}
 
 
-def html_to_pdf(html_data, filename, name, etax=False):
-    try:
-        company = frappe.get_last_doc('company')
-        if not company.host:
-            return {'success': False, 'message': "please specify host in company"}
-        cwd = os.getcwd()
-        site_name = cstr(frappe.local.site)
-        htmldoc = HTML(string=html_data, base_url="")
-        file_path = cwd + "/" + site_name + "/public/files/" + filename + name + '.pdf'
-        htmldoc.write_pdf(file_path)
-        files_new = {"file": open(file_path, 'rb')}
-        payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
-                       'docname': name, 'fieldname': filename}
-        file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
-                                      data=payload_new).json()
-        if "file_url" in file_response["message"].keys():
-            os.remove(file_path)
-        else:
-            return {"success": False, "message": "something went wrong"}
-        return {"success": True, "file_url": file_response["message"]["file_url"]}
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("html_to_pdf",
-                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
-        return {"success": False, "message": str(e)}
 
 
 def combine_pdf(files, filename, name, add_signature=False):
