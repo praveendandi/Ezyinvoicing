@@ -459,13 +459,14 @@ def print_pos_bill(data):
         frappe.log_error("Ezy-invoicing give print","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
     
-
 def send_pos_bills_gcb(company,b2c_data):
     try:
         # b2c_data = json.dumps(data)
+        check_date = datetime.now()
+        current_date = ("{}{}".format(check_date.year,check_date.month))
         if company.pms_property_url:
             b2c_data["file_url"]= company.pms_property_url
-        b2c_data["invoice_number"] = b2c_data["check_no"]
+        b2c_data["invoice_number"] = current_date + b2c_data["check_no"]
         b2c_data["pos"] = True
         if company.proxy == 1:
             proxyhost = company.proxy_url
