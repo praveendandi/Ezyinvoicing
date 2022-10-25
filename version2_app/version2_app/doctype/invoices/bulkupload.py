@@ -189,7 +189,7 @@ def bulkupload(data):
                 inv_data = check_invoice['data']
                 if inv_data.irn_generated == "Cancelled":
                     continue
-                if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "On Hold"] and inv_data.invoice_type=="B2B":
+                if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "Pending"] and inv_data.invoice_type=="B2B":
                     reupload = True
                 elif inv_data.invoice_type == "B2C":
                     if inv_data.irn_generated=="Success":
@@ -271,7 +271,7 @@ def bulkupload(data):
                                         
                                     if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                                    elif insertInvoiceApiResponse['data'].irn_generated == "Pending" or insertInvoiceApiResponse['data'].irn_generated == "On Hold":
+                                    elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -366,7 +366,7 @@ def bulkupload(data):
                                     inv_data = {"invoice_number":each_item['invoice_number']}
                                     auto_adjustment(inv_data)
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                            elif insertInvoiceApiResponse['data'].irn_generated in ["Pending","On Hold"]:
+                            elif insertInvoiceApiResponse['data'].irn_generated in ["Pending"]:
                                 if each_item['invoice_category'] == "Tax Invoice" and insertInvoiceApiResponse["data"].has_credit_items == "Yes":
                                     inv_data = {"invoice_number":each_item['invoice_number']}
                                     auto_adjustment(inv_data)
