@@ -44,6 +44,8 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "HRK" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="KMH-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "4000-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="JWMP-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "3926" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="SGBW-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
 
@@ -71,6 +73,8 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "HRK" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="KMH-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "4000-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="JWMP-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "3926" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if invoice_data["company"]=="SGBW-01":
             #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
 
