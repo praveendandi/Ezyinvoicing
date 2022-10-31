@@ -1822,7 +1822,7 @@
   },
   {
    "fieldname": "pos_date_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Long Text",
    "label": "POS Date Regex"
   },
   {
