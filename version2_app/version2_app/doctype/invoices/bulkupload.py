@@ -44,6 +44,8 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "HRK" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="KMH-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "4000-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="JWMP-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "3926" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="SGBW-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
 
@@ -71,6 +73,8 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "HRK" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="KMH-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "4000-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="JWMP-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "3926" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if invoice_data["company"]=="SGBW-01":
             #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
 
@@ -181,14 +185,19 @@ def bulkupload(data):
             #     each['gstNumber']=""
             # else:
             #     each['invoice_type'] = "B2B"
+            
             if check_invoice['success']==True:
                 inv_data = check_invoice['data']
+                # print(inv_data.irn_generated,inv_data.docstatus,inv_data.invoice_type,";;;;;;;;;.........////////")
                 if inv_data.irn_generated == "Cancelled":
                     continue
-                if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "On Hold"] and inv_data.invoice_type=="B2B":
+                if inv_data.docstatus!=2 and  inv_data.irn_generated in ["Success"] and inv_data.invoice_type=="B2B":
+                    continue
+                if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "Pending"] and inv_data.invoice_type=="B2B":
                     reupload = True
                 elif inv_data.invoice_type == "B2C":
                     if inv_data.irn_generated=="Success":
+                        # print(inv_data.irn_generated=="Success","//////////////////")
                         # reupload = False
                         # if company in ['LAAB-01','LAAB-01','LAKOL-01','LAMU-01','LGPS-01','LTVK-01','LABE-01','LAGO-01','LAJA-01','LAMAN-01','TLND-01','TALU-01']:
                         continue
@@ -198,6 +207,11 @@ def bulkupload(data):
                     reupload = False
             else:
                 reupload = False	
+            # if check_invoice['data'].name in ["4000-219618"]:
+            #     print(reupload,"This is reupload fflag////////[[[[[[[[[[[[[")
+            #     kjsfgakjsfgksgfksdgfkhsdgfkhsdg
+            #     break
+
             if each_item['invoice_category'] == "empty":
                 each_item['invoice_category'] = "Tax Invoice"
             each_item['invoice_from'] = "File"
@@ -267,7 +281,7 @@ def bulkupload(data):
                                         
                                     if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                                    elif insertInvoiceApiResponse['data'].irn_generated == "Pending" or insertInvoiceApiResponse['data'].irn_generated == "On Hold":
+                                    elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -362,7 +376,7 @@ def bulkupload(data):
                                     inv_data = {"invoice_number":each_item['invoice_number']}
                                     auto_adjustment(inv_data)
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
-                            elif insertInvoiceApiResponse['data'].irn_generated in ["Pending","On Hold"]:
+                            elif insertInvoiceApiResponse['data'].irn_generated in ["Pending"]:
                                 if each_item['invoice_category'] == "Tax Invoice" and insertInvoiceApiResponse["data"].has_credit_items == "Yes":
                                     inv_data = {"invoice_number":each_item['invoice_number']}
                                     auto_adjustment(inv_data)

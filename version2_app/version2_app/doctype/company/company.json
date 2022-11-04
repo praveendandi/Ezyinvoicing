@@ -290,19 +290,11 @@
   "create_etax_invoices_in_separate_folder",
   "save_etax_invoice_folder",
   "minutes_until_auto_logout",
-  "pos_qr",
-  "pos_b2b_qr_section",
-  "qr_b2b_rect_x0",
-  "qr_b2b_rect_x1",
-  "qr_b2b_rect_y0",
-  "qr_b2b_rect_y1",
-  "pos_b2c_qr_section",
-  "qr_b2c_rect_x0",
-  "qr_b2c_rect_x1",
-  "qr_b2c_rect_y0",
-  "qr_b2c_rect_y1",
   "erp_company_name",
-  "abbr"
+  "abbr",
+  "signature_image",
+  "signature_pfx",
+  "pfx_password"
  ],
  "fields": [
   {
@@ -1079,11 +1071,11 @@
    "label": "Pre Checkins"
   },
   {
-   "default": "No",
+   "default": "Disable",
    "fieldname": "e_signature",
    "fieldtype": "Select",
    "label": "E signature",
-   "options": "Yes\nNo"
+   "options": "Disable\nUser\nOrganization"
   },
   {
    "default": "No",
@@ -1830,7 +1822,7 @@
   },
   {
    "fieldname": "pos_date_regex",
-   "fieldtype": "Small Text",
+   "fieldtype": "Long Text",
    "label": "POS Date Regex"
   },
   {
@@ -1875,62 +1867,6 @@
    "label": "Minutes Until Auto Logout"
   },
   {
-   "fieldname": "pos_b2b_qr_section",
-   "fieldtype": "Section Break",
-   "label": "POS B2B QR"
-  },
-  {
-   "fieldname": "qr_b2b_rect_x0",
-   "fieldtype": "Int",
-   "label": "QR B2B Rect X0"
-  },
-  {
-   "fieldname": "qr_b2b_rect_x1",
-   "fieldtype": "Int",
-   "label": "QR B2B Rect X1"
-  },
-  {
-   "fieldname": "qr_b2b_rect_y0",
-   "fieldtype": "Int",
-   "label": "QR B2B Rect Y0"
-  },
-  {
-   "fieldname": "qr_b2b_rect_y1",
-   "fieldtype": "Int",
-   "label": "QR B2B Rect Y1"
-  },
-  {
-   "fieldname": "pos_b2c_qr_section",
-   "fieldtype": "Section Break",
-   "label": "POS B2C QR"
-  },
-  {
-   "fieldname": "qr_b2c_rect_x0",
-   "fieldtype": "Int",
-   "label": "QR B2C Rect X0"
-  },
-  {
-   "fieldname": "qr_b2c_rect_x1",
-   "fieldtype": "Int",
-   "label": "QR B2C Rect X1"
-  },
-  {
-   "fieldname": "qr_b2c_rect_y0",
-   "fieldtype": "Int",
-   "label": "QR B2C Rect Y0"
-  },
-  {
-   "fieldname": "qr_b2c_rect_y1",
-   "fieldtype": "Int",
-   "label": "QR B2C Rect Y1"
-  },
-  {
-   "default": "0",
-   "fieldname": "pos_qr",
-   "fieldtype": "Check",
-   "label": "POS QR"
-  },
-  {
    "fieldname": "erp_company_name",
    "fieldtype": "Data",
    "label": "ERP Company Name"
@@ -1939,11 +1875,26 @@
    "fieldname": "abbr",
    "fieldtype": "Data",
    "label": "ABBR"
+  },
+  {
+   "fieldname": "signature_image",
+   "fieldtype": "Attach",
+   "label": "Signature Image"
+  },
+  {
+   "fieldname": "signature_pfx",
+   "fieldtype": "Attach",
+   "label": "Signature PFX"
+  },
+  {
+   "fieldname": "pfx_password",
+   "fieldtype": "Data",
+   "label": "PFX Password"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-01 14:23:58.395013",
+ "modified": "2022-10-06 14:17:01.049920",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
