@@ -23,7 +23,7 @@ class UserSignature(Document):
 @frappe.whitelist()
 def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=None, X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
     try:
-        company_data = frappe.get_doc('company')
+        company_data = frappe.get_last_doc('Company')
         print(company_data,'////////////')
         if secret:
             secret = bytes(secret, 'utf-8')
@@ -34,7 +34,6 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
             + "/sites/"
             + site_name
         )
-        company_data = frappe.get_doc('company')
         signer = signers.SimpleSigner.load_pkcs12(
             # pfx_file='/home/caratred/Desktop/projects/pyhanko/sign.pfx', passphrase=b'secret'
             pfx_file=invoice_file+pfx_signature, passphrase=secret
