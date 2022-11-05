@@ -1684,7 +1684,7 @@ def pass_detect_text(image_file):
         two_lines_mrz.append(line_second)
         first = two_lines_mrz[0]
         second = two_lines_mrz[1]
-        Date_of_issue = ''
+        Date_of_issue = None
         if first[0] == "P" or second[0] == "P":
 
             passport_type = "\n".join(tuple(loss))
@@ -1696,7 +1696,7 @@ def pass_detect_text(image_file):
             )
             static = [" ", ".", "/", "-"]
             dates = []
-            Date_of_issue = " "
+            Date_of_issue = None
             try:
                 for x in date_issue:
                     for y in static:
@@ -1708,12 +1708,12 @@ def pass_detect_text(image_file):
                 [res.append(x) for x in dates if x not in res]
                 parsed_issue = dateparser.parse(res[1], settings={"DATE_ORDER": "DMY"})
                 if parsed_issue is None:
-                    Date_of_issue = " "
+                    Date_of_issue = None
                 else:
                     issue_join = str((parsed_issue).date())
                     Date_of_issue = issue_join
             except:
-                Date_of_issue = " "
+                Date_of_issue = None
 
             country_code = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
 
@@ -1765,11 +1765,11 @@ def pass_detect_text(image_file):
                 expiry_joindate, settings={"DATE_ORDER": "YMD"}
             )
             if parsed_expiry is None:
-                date_of_expiry = " "
+                date_of_expiry = None
             else:
                 date_of_expiry = str((parsed_expiry).date())
             if Date_of_issue == date_of_expiry or Date_of_issue == date_of_birth:
-                Date_of_issue = " "
+                Date_of_issue = None
             if country_code != "IND":
                 guest_id_type = "Foreigner"
             else:
@@ -1789,7 +1789,7 @@ def pass_detect_text(image_file):
                 "type": "PASSPORT"
             }
             # details = {"type": "PASSPORT", "data": data}
-            if date_of_expiry != " ":
+            if date_of_expiry != None:
                 expiry = datetime.strptime(date_of_expiry, "%Y-%m-%d").date()
                 today_date = datetime.now().date()
                 if expiry <= today_date:
@@ -1806,7 +1806,7 @@ def pass_detect_text(image_file):
             return {"success": True, "data": data, "expired": False}
         elif first[0] == "V" or second[0] == "V":
             visa_type = "\n".join(tuple(loss))
-            Date_of_issue = ""
+            Date_of_issue = None
             type_of_visa = ''
             type = first[0]
             issuingcountry = re.sub(r"\ |\?|\.|\!|\/|\;|\:|\<", " ", first[2:5])
@@ -1826,7 +1826,7 @@ def pass_detect_text(image_file):
                 issue_date = []
                 [issue_date.append(x) for x in dates if x not in issue_date]
                 type_of_visa = first[1]
-                Date_of_issue = " "
+                Date_of_issue = None
                 try:
                     min_year = issue_date[0][6:10]
                     if len(issue_date) > 1:
@@ -1840,12 +1840,12 @@ def pass_detect_text(image_file):
                                 Date, settings={"DATE_ORDER": "DMY"}
                             )
                             if parsed_issue is None:
-                                Date_of_issue = " "
+                                Date_of_issue = None
                             else:
                                 issue_join = str((parsed_issue).date())
                                 Date_of_issue = issue_join
                 except:
-                    Date_of_issue = " "
+                    Date_of_issue = None
             elif first[1] == "<":
                 date_issue = re.findall(
                     r"\s([0-9][0-9] [a-zA-Z]+ \d{4}|\d{2}/\d{2}/\d{4}|\d{2}.\d{2}.\d{4}|\d{2} \w+/\w+ \d{4}|\d{2} \d{2} \d{4}|\d{2}-d{2}-d{4}|\d{2} \w+ /\w+ \d{2}|\d{2} \w+/\w+ \d{4} \w+|\d{2}-\w+-\d{4})",
@@ -1861,7 +1861,7 @@ def pass_detect_text(image_file):
 
                 issue_date = []
                 type_of_visa = " "
-                Date_of_issue = " "
+                Date_of_issue = None
                 try:
                     [issue_date.append(x)
                      for x in dates if x not in issue_date]
@@ -1873,7 +1873,7 @@ def pass_detect_text(image_file):
                             Date, settings={"DATE_ORDER": "DMY"}
                         )
                         if parsed_issue is None:
-                            Date_of_issue = " "
+                            Date_of_issue = None
                         else:
                             issue_join = str((parsed_issue).date())
                             Date_of_issue = issue_join
@@ -1884,12 +1884,12 @@ def pass_detect_text(image_file):
                             Date, settings={"DATE_ORDER": "DMY"}
                         )
                         if parsed_issue is None:
-                            Date_of_issue = " "
+                            Date_of_issue = None
                         else:
                             issue_join = str((parsed_issue).date())
                             Date_of_issue = issue_join
                 except:
-                    Date_of_issue = " "
+                    Date_of_issue = None
 
             entries = ["MULTIPLE", "SINGLE", "DOUBLE"]
             entry = " "
@@ -1936,11 +1936,11 @@ def pass_detect_text(image_file):
                 expiry_joindate, settings={"DATE_ORDER": "YMD"}
             )
             if parsed_expiry:
-                date_of_expiry = " "
+                date_of_expiry = None
             else:
                 date_of_expiry = str((parsed_expiry).date())
             if Date_of_issue == date_of_expiry or Date_of_issue == date_of_birth:
-                Date_of_issue = " "
+                Date_of_issue = None
             optional_data = second[28:]
             data = {
                 "Document_Type": type,
@@ -1957,7 +1957,7 @@ def pass_detect_text(image_file):
                 "Visa_Expiry_Date": date_of_expiry,
                 "type": "VISA"
             }
-            if date_of_expiry != " ":
+            if date_of_expiry != None:
                 expiry = datetime.strptime(date_of_expiry, "%Y-%m-%d").date()
                 today_date = datetime.now().date()
                 if expiry <= today_date:
