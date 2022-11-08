@@ -23,6 +23,7 @@ class UserSignature(Document):
 @frappe.whitelist()
 def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=None, X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
     try:
+        company_data = frappe.get_last_doc('company')
         if secret:
             secret = bytes(secret, 'utf-8')
         site_name = cstr(frappe.local.site)
@@ -44,10 +45,21 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
         pdf_signer = signers.PdfSigner(
             signature_meta, signer=signer, stamp_style=stamp.TextStampStyle(
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
-                stamp_text='\n\n\n\nTime: %(ts)s',
-                background=images.PdfImage(invoice_file+signature_image)
+                # stamp_text='\n\n\nTime: %(ts)s',
+                # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
+                stamp_text='Signed by: '+company_data.company_name+'\nHotel Name: '+company_data.legal_name+'\nLocation: '+company_data.location+'\nTime: %(ts)s',
+                # background=images.PdfImage(
+                #     stamp_image_path),
+                # border_width=1,
+                text_box_style=text.TextBoxStyle(
+                    border_width=0
+                    # font=opentype.GlyphAccumulatorFactory('path/to/NotoSans-Regular.ttf')
+                ),
+                # box=None
             ),
         )
+        # return pdf_signer
+
         file_name = os.path.basename(invoice)
         output_file_path = invoice_file+"/public/files/"+file_name
         with open(invoice_file+invoice, 'rb') as inf:

@@ -102,7 +102,7 @@ app_license = "MIT"
 doc_events = {
 	"Invoices": {
         "after_insert":"version2_app.events.invoice_created",
-        "on_update":"version2_app.events.invoice_update",
+        "on_update":["version2_app.events.invoice_update","invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_invoices"],
 		"after_delete":"version2_app.events.invoice_deleted",
 		# "on_update": "version2_app.events.invoiceUpdate",
 		# "on_cancel": "method",
@@ -174,11 +174,15 @@ doc_events = {
 		'after_insert':"version2_app.events.gspmeteringhook"
 	},
 	"TaxPayerDetail":{
-		'after_insert':"version2_app.events.taxpayerhook"
+		'after_insert':"version2_app.events.taxpayerhook",
+        'on_update':"invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_taxpayer_details"
 	},
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
+    },
+    "SAC HSN CODES":{
+        'on_update':"invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_items"
     },
     'Precheckins':{
         # 'after_insert':"version2_app.events.precheckinsdocuments",
