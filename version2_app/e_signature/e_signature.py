@@ -51,7 +51,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
                 # stamp_text='\n\n\nTime: %(ts)s',
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
-                stamp_text='Digitally Signed by: '+signer+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                stamp_text='Digitally Signed by: '+str(signer)+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
