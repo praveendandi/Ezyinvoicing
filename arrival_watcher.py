@@ -33,8 +33,10 @@ def getprearrivals_file():
                     file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
                 else:
                     file_response = requests.post(config_json["host"]+"api/method/upload_file",files=invoicefile, data=payload, verify=False)
+            print(file_response)
             if file_response.status_code==200:
                 file_data = file_response.json()
+                print(file_data)
                 if config_json["proxy"] == 1:
                     proxyhost = config_json["proxy_url"]
                     proxyhost = proxyhost.replace("http://","@")

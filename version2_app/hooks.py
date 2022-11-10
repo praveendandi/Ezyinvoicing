@@ -102,6 +102,7 @@ app_license = "MIT"
 doc_events = {
 	"Invoices": {
         "after_insert":"version2_app.events.invoice_created",
+        "on_update":["version2_app.events.invoice_update","invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_invoices"],
 		"after_delete":"version2_app.events.invoice_deleted",
 		# "on_update": "version2_app.events.invoiceUpdate",
 		# "on_cancel": "method",
@@ -157,7 +158,6 @@ doc_events = {
         "after_insert": "version2_app.events.information_folio_created",
     },
 	"File":{
-		# 'after_save':"version2_app.events.fileCreated",
 		'after_insert':"version2_app.events.fileCreated"
 	},
 	"Update Logs":{
@@ -174,19 +174,34 @@ doc_events = {
 		'after_insert':"version2_app.events.gspmeteringhook"
 	},
 	"TaxPayerDetail":{
-		'after_insert':"version2_app.events.taxpayerhook"
+		'after_insert':"version2_app.events.taxpayerhook",
+        'on_update':"invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_taxpayer_details"
 	},
     "Promotions":{
         'after_insert':"version2_app.events.promotionsSocket",
         "on_trash": "version2_app.events.deletePromotionsSocket",       
     },
+    "SAC HSN CODES":{
+        'on_update':"invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_items"
+    },
     'Precheckins':{
-        'after_insert':"version2_app.events.precheckinsdocuments",
+        # 'after_insert':"version2_app.events.precheckinsdocuments",
         # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
-        # 'on_update':'version2_app.passport_scanner.doctype.temp_doc_details.temp_doc_details.update_document_details'
+    },
+    "Summaries": {
+        "after_insert":"version2_app.events.summaries_insert",
+        "on_update": "version2_app.events.summaries_insert"
     },
     "Dropbox":{
         # 'on_update':'version2_app.passport_scanner.doctype.dropbox.dropbox.merge_guest_to_guest_details'
+    },
+    "POS Checks": {
+        "on_update": "version2_app.pos_bills.doctype.pos_checks.pos_checks.update_pos_check"
+    },
+    "Summary Payments" : {
+        "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_update": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
+        "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     }
 }
 
@@ -201,8 +216,7 @@ doc_events = {
 # 	"corn":{"0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
 # 			"10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
 # 			"20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
-# 			"0 12 * * *":["version2_app.events.block_irn"],
-#             "* * * * *":["version2_app.events.pre_mail"]}	
+# 			"0 11 * * *":["version2_app.events.block_irn"]}	
 # }	
 
 
@@ -211,15 +225,15 @@ scheduler_events = {
     #     "version2_app.version2_app.doctype.emailTemplat.sampleFun"
     # ],
     "cron": {
-        # "1-59 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
-        "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
-        "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
-        # "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
+        "1-59 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
+        # "0 1 * * *":["version2_app.events.dailyDeletedocumentBin"],
+        # "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
+        "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
         "0 12 * * *":["version2_app.events.block_irn"],
         "0 2 * * *":["version2_app.events.delete_arrival_activity"],
         "* * * * *":["version2_app.events.pre_mail"],
         # "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
-        "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
+        # "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
         "10 00 * * *":["version2_app.events.delete_error_logs"],
         "30 * * * *":["version2_app.mail_read.mailreader"],
         "20 00 * * *":["version2_app.events.delete_email_queue"]},

@@ -1,0 +1,125 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-05-31 10:37:07.939526",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "folio_type",
+  "bill_number",
+  "bill_generation_date",
+  "bill_generation_date_char",
+  "fiscal_bill_number",
+  "status",
+  "room",
+  "display_name",
+  "total_invoice_amount",
+  "transaction_number",
+  "transaction_code",
+  "transaction_date",
+  "debit_amount",
+  "credit_amount",
+  "transaction_description"
+ ],
+ "fields": [
+  {
+   "fieldname": "folio_type",
+   "fieldtype": "Data",
+   "label": "Folio Type"
+  },
+  {
+   "fieldname": "bill_number",
+   "fieldtype": "Data",
+   "label": "Bill Number"
+  },
+  {
+   "fieldname": "bill_generation_date",
+   "fieldtype": "Date",
+   "label": "Bill Generation Date"
+  },
+  {
+   "fieldname": "bill_generation_date_char",
+   "fieldtype": "Date",
+   "label": "Bill Generation Date Char"
+  },
+  {
+   "fieldname": "fiscal_bill_number",
+   "fieldtype": "Data",
+   "label": "Fiscal Bill Number"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "room",
+   "fieldtype": "Data",
+   "label": "Room"
+  },
+  {
+   "fieldname": "display_name",
+   "fieldtype": "Data",
+   "label": "Display Name"
+  },
+  {
+   "fieldname": "transaction_number",
+   "fieldtype": "Data",
+   "label": "Transaction Number"
+  },
+  {
+   "fieldname": "transaction_code",
+   "fieldtype": "Data",
+   "label": "Transaction Code"
+  },
+  {
+   "fieldname": "transaction_date",
+   "fieldtype": "Date",
+   "label": "Transaction Date"
+  },
+  {
+   "fieldname": "transaction_description",
+   "fieldtype": "Text",
+   "label": "Transaction Description"
+  },
+  {
+   "fieldname": "debit_amount",
+   "fieldtype": "Data",
+   "label": "Debit Amount"
+  },
+  {
+   "fieldname": "credit_amount",
+   "fieldtype": "Data",
+   "label": "Credit Amount"
+  },
+  {
+   "fieldname": "total_invoice_amount",
+   "fieldtype": "Data",
+   "label": "Total Invoice Amount"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-05-31 10:46:11.091661",
+ "modified_by": "Administrator",
+ "module": "EZYGST",
+ "name": "Opera Folio Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

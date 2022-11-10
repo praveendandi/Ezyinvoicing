@@ -15,6 +15,8 @@
   "merged_to",
   "merged_on",
   "merged",
+  "processing",
+  "processing_time",
   "files_section",
   "front",
   "id_type",
@@ -109,12 +111,6 @@
    "label": "Oci"
   },
   {
-   "fieldname": "id_type",
-   "fieldtype": "Select",
-   "label": "Id Type",
-   "options": "aadhaar\nvoterid\nindianpassport\ndriving\nothers\noci\ninvoice\npan"
-  },
-  {
    "fieldname": "column_break_14",
    "fieldtype": "Column Break"
   },
@@ -127,11 +123,28 @@
    "fieldtype": "Select",
    "label": "ocr process status",
    "options": "Pending\nFailed\nSuccess"
+  },
+  {
+   "fieldname": "id_type",
+   "fieldtype": "Select",
+   "label": "Guest Id Type",
+   "options": "aadhaar\nvoterId\nPanCard\ndriving\nindianPassport\nForeigner\nother\nOCI\nInvoice\nnrc\nzambiaPassport"
+  },
+  {
+   "default": "0",
+   "fieldname": "processing",
+   "fieldtype": "Check",
+   "label": "Processing"
+  },
+  {
+   "fieldname": "processing_time",
+   "fieldtype": "Time",
+   "label": "Processing Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-12 18:09:30.971109",
+ "modified": "2022-05-12 15:29:50.262341",
  "modified_by": "Administrator",
  "module": "Passport Scanner",
  "name": "Dropbox",

@@ -13,10 +13,6 @@ import traceback,os,sys
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api")
-
-
 def check_company_exist_for_Irn(code):
     try:
         company = frappe.get_doc('company', code)
@@ -28,8 +24,8 @@ def check_company_exist_for_Irn(code):
         print(e,"check company exist")
         return {"success":False,"message":e}
 
-
-def attach_qr_code(invoice_number, gsp,code):
+@frappe.whitelist(allow_guest=True)
+def attach_qr_code(invoice_number):
     try:
         invoice = frappe.get_doc('Invoices', invoice_number)
         company = frappe.get_doc('company',invoice.company)
@@ -40,8 +36,20 @@ def attach_qr_code(invoice_number, gsp,code):
         src_pdf_filename = path + invoice.invoice_file
         dst_pdf_filename = path + "/private/files/" + invoice_number + 'withCreditQr.pdf'
         # attaching qr code
-        img_filename = path + invoice.credit_qr_code_image
-        # img_rect = fitz.Rect(250, 200, 340, 270)
+        img_filename = path + invoice.qr_code_image
+        # if "invoice_category" == "Credit Invoice":
+        #     img_filename = path + invoice.credit_qr_code_image
+        #     ackdate = invoice.credit_ack_date
+        #     ack_no = invoice.credit_ack_no
+        #     irn_number = invoice.irn_number
+        #     ack_date = ackdate.split(" ")
+        # else:
+        #     img_filename = path + invoice.qr_code_image
+        #     ackdate = invoice.ack_date
+        #     ack_no = invoice.ack_no
+        #     irn_number = invoice.irn_number
+        #     ack_date = ackdate.split(" ")
+        # img_rect = fitz.Rect(200, 180, 300, 270)
         img_rect = fitz.Rect(company.qr_rect_x0, company.qr_rect_x1, company.qr_rect_y0, company.qr_rect_y1)
         document = fitz.open(src_pdf_filename)
         page = document[0]
@@ -53,6 +61,7 @@ def attach_qr_code(invoice_number, gsp,code):
         dst_pdf_text_filename = path + "/private/files/" + invoice_number + 'withCreditQrIrn.pdf'
         doc = fitz.open(dst_pdf_filename)
         # text = "IRN: " + invoice.credit_irn_number + "      " + "ACK NO: " + invoice.credit_ack_no + "\n" + "ACK DATE: " + invoice.credit_ack_date
+        # text = "IRN: " + irn_number +"          "+ "ACK NO: " + ack_no + "       " + "ACK DATE: " + ack_date[0]
         ackdate = invoice.credit_ack_date
         ack_date = ackdate.split(" ")
         text = "IRN: " + invoice.credit_irn_number +"          "+ "ACK NO: " + invoice.credit_ack_no + "       " + "ACK DATE: " + ack_date[0]
@@ -62,6 +71,7 @@ def attach_qr_code(invoice_number, gsp,code):
             page = doc[-1]
         # page = doc[0]
         where = fitz.Point(company.irn_text_point1, company.irn_text_point2)
+        # where = fitz.Point(100,50)
         page.insertText(
             where,
             text,
@@ -91,7 +101,7 @@ def attach_qr_code(invoice_number, gsp,code):
         if 'message' in response:
             invoice.invoice_with_credit_gst_details = response['message']['file_url']
             invoice.save()
-        return
+        return response['message']['file_url']
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing attach_qr_code Credit Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -517,9 +527,10 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
         total_cess_calue = 0
         total_state_cess_value = 0
         ass_value = 0
-        for index, item in enumerate(invoice.items):
+        items_data = sorted(invoice.items, key = lambda i: i.sort_order)
+        for index, item in enumerate(items_data):
             # print(item.sac_code,"HsnCD")
-            if item.item_mode == "Credit" and item.type!="Non-Gst":
+            if item.item_mode == "Credit" and item.taxable == "Yes" and item.type!="Non-Gst":
                 credit_items.append(item.__dict__)
                 total_igst_value += abs(item.igst_amount)
                 total_sgst_value += abs(item.sgst_amount)
@@ -584,12 +595,15 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
             "CesVal": round(total_cess_calue,2),
             "StCesVal": round(total_state_cess_value,2),
             "Discount": 0,
-            "OthChrg": 0,
+            "OthChrg": abs(round(invoice.other_charges,2)) if company_details['data'].vat_reporting==1 else abs(round(invoice.other_charges_before_tax,2)),
             "RndOffAmt": 0,
-            "TotInvVal": abs(round(invoice.credit_value_after_gst, 2)),
+            "TotInvVal": abs(round(invoice.sales_amount_after_tax, 2)) if company_details["data"].vat_reporting == 1 else round(abs(invoice.sales_amount_after_tax)-abs(invoice.total_vat_amount),2),
             "TotInvValFc": abs(round(invoice.credit_value_after_gst, 2))
         }
-        
+        if company.name == "FMBW-01":
+            if invoice.name == "BLRFK-23334":
+                gst_data["TranDtls"]["IgstOnIntra"] = "Y"
+                gst_data["TranDtls"]["RegRev"] = "Y"
         response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
         if response['success']==True:
             irnobj.allowance_irn_request_object = json.dumps({"data": gst_data})
@@ -654,7 +668,6 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
     except Exception as e:
         print(str(e), "Credit generate Irn")
         # frappe.log_error(frappe.get_traceback(),invoice_number)
-        logger.error(f"{invoice_number},     Credit Generate Irn,   {str(e)}")
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing CreditgenerateIrn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
@@ -697,7 +710,6 @@ def postIrn(gst_data, gsp,company,invoice_number):
             insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company['data'].name})
             insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
             response_error_message = str(irn_response.text)
-            logger.error(f"{invoice_number},     Credit Post Irn,   {response_error_message}")
             frappe.log_error(frappe.get_traceback(),invoice_number)
             return {"success": False, 'message': irn_response.text}
         # print(irn_response.text)
@@ -706,6 +718,5 @@ def postIrn(gst_data, gsp,company,invoice_number):
         # frappe.log_error(frappe.get_traceback(),invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing postIrn Credit","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        logger.error(f"{invoice_number},     Credit Generate Irn,   {str(e)}")
         return {"success": False, 'message':str(e)}
 

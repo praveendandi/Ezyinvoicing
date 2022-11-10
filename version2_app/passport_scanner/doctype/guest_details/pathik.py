@@ -1,6 +1,7 @@
 import time
 from urllib.request import urlretrieve
-
+import sys
+import traceback
 import frappe
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
@@ -67,9 +68,10 @@ def add_guest(driver):
             if frappe.db.exists('Guest Details',each):
                 data = frappe.db.get_value("Guest Details",each,["given_name as first_name","middle_name","given_name as last_name","guest_company_name as company_name","address","address2 as house_flat_no",
                                                                  "pathik_locality as locality", "city","pathik_district as district","pathik_country as country","postal_code as zip_code","pathik_state as state","date_of_birth as dob","permanent_mobile_no as mobile_no",
-                                                                 "permanent_phone_no as phone_no","email","arrival_from_city as coming_from","next_destination_place as going_to","id_type as doc_type","passport_number","local_id_number","room_number as room_no",
+                                                                 "permanent_phone_no as phone_no","email","arrival_from_city as coming_from","next_destination_place as going_to","guest_id_type as doc_type","passport_number","local_id_number","room_number as room_no",
                                                                  "checkin_date","checkin_time","checkout_date","checkout_time","no_of_children as child","no_of_adults as adult","vehicle_type","vehicle_number as vehicle_registration_no","confirmation_number"], as_dict=1) 
                 data = { k: ('' if v is None else v) for k, v in data.items() }
+                print(data,"****************************88")
                 if data["doc_type"] == "Foreigner" or data["doc_type"] == "indianPassport":
                     data["doc_no"] = data["passport_number"]
                 else:
@@ -88,6 +90,7 @@ def add_guest(driver):
                 data["checkout_date"] = data["checkout_date"].strftime("%b-%m-%Y")
                 data["checkin_time"] = str(data["checkin_time"])
                 data["checkout_time"] = str(data["checkout_time"])
+                # data["dob"] = data["dob"].strftime("%b-%m-%Y")
         
                 first_name = driver.find_elements_by_name("first_name")
                 first_name[0].send_keys(data['first_name'])
@@ -148,6 +151,8 @@ def add_guest(driver):
                 going_to[0].send_keys(data['going_to'])
 
                 doc_type = driver.find_elements_by_name("doc_type")
+                time.sleep(1)
+                print(doc_type[0],data['doc_type'])
                 select_doc_type = Select(doc_type[0])
                 select_doc_type.select_by_visible_text(data['doc_type'])
 
@@ -206,7 +211,10 @@ def add_guest(driver):
                 frappe.publish_realtime("custom_socket", {'message': 'Pathik Upload', 'data': each})
         return {"success":True,"message":"Data uploaded successfully"}
     except Exception as e:
-        frappe.log_error("CForm-intiate_pathik",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "CForm-intiate_pathik")
         return {"success":False,"message":str(e)}
 
 
@@ -225,9 +233,13 @@ def login(data, driver):
         add_guest_status = add_guest(driver)
         return add_guest_status
     except TimeoutException:
+        
         return {"success":False,"message":"Unable to login"}
     except Exception as e:
-        frappe.log_error("CForm-intiate_pathik",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "CForm-intiate_pathik")
         return {"success":False,"message":str(e)}
 
 
@@ -252,7 +264,10 @@ def intiate_pathik(obj,pathik_guest_details):
     except TimeoutException:
         return {"success":False,"message":"Time exceed"}
     except Exception as e:
-        frappe.log_error("CForm-intiate_pathik",str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+            "CForm-intiate_pathik")
         return {"success":False,"message":str(e)}
 
 

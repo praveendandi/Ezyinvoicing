@@ -22,3 +22,18 @@ pyshorteners
 tensorflow
 razorpay
 selenium
+pytesseract
+WeasyPrint==52
+html2text
+# opencv-python
+typing-extensions
+paytmchecksum
+opencv-python
+fitz
+pgeocode
+datefinder
+PyMuPDF==1.16.16
+pyHanko
+uharfbuzz
+fontTools
+# attrs

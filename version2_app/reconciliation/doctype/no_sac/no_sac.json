@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 12:14:43.037216",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_number",
+  "itemdescription",
+  "before_gst",
+  "cgst_amount",
+  "sgst_amount",
+  "igst_amount",
+  "total_tax_amount",
+  "irnstatus",
+  "recon_id",
+  "vat_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "itemdescription",
+   "fieldtype": "Data",
+   "label": "ItemDescription"
+  },
+  {
+   "fieldname": "irnstatus",
+   "fieldtype": "Data",
+   "label": "IRNstatus"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  },
+  {
+   "fieldname": "total_tax_amount",
+   "fieldtype": "Float",
+   "label": "Total Tax Amount"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Data",
+   "label": "Vat Amount"
+  },
+  {
+   "fieldname": "before_gst",
+   "fieldtype": "Float",
+   "label": "Before GST"
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Float",
+   "label": "CGST Amount"
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Float",
+   "label": "SGST Amount"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Float",
+   "label": "IGST Amount"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-26 15:32:41.757717",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "No Sac",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

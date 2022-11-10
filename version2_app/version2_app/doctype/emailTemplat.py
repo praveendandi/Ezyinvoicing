@@ -2,8 +2,11 @@ import random
 import datetime,os,sys,traceback
 import json
 import requests
+import re
 import frappe
+import time
 from frappe.core.doctype.communication.email import make
+from frappe.email.doctype.email_queue.email_queue import send_now
 
 @frappe.whitelist(allow_guest=True)
 def emailTemplate():
@@ -117,6 +120,8 @@ def send_email():
 @frappe.whitelist(allow_guest=True)
 def send_mail_files(data):
     try:
+        if isinstance(data, str):
+            data = json.loads(data)
         obj = {"email":""}
         get_doc = frappe.get_doc(data["doctype"],data["name"])
         if data["doctype"] == "Invoices":
@@ -128,9 +133,59 @@ def send_mail_files(data):
         get_email_sender = get_email_sender[0]
         b2csuccess = frappe.get_doc('Email Template',"Scan Ezy")
         obj["val"] = b2csuccess
+        if b2csuccess.response:
+            obj["content"] = re.compile(r'<[^>]+>').sub('', b2csuccess.response)
         obj["sender"] = get_email_sender["email_id"]
         files=frappe.db.get_list('File',filters={'file_url': ['=',data["attachments"]]},fields=['name'])
-        obj["attachments"] = [files[0]["name"]]
+        att = [files[0]["name"]]
+        if "signatured_file" in data:
+            sig_files=frappe.db.get_list('File',filters={'file_url': ['=',data["signatured_file"]]},fields=['name'])
+            att.extend([sig_files[0]["name"]])
+        obj["attachments"] = att
+        print(data,"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        if "receiver_email" in data:
+            json_data = {
+                        "sender":obj["sender"],
+                        "subject":b2csuccess.subject,
+                        "recipients":data["receiver_email"],
+                        "send_email":1,
+                        "content":b2csuccess.response,
+                        "doctype":data["doctype"],
+                        "name":data["name"],
+                        "now":True,
+                        "attachments" : obj["attachments"],
+                        "send_me_a_copy":0,
+                        "read_receipt":0}
+            company = frappe.get_last_doc("company")
+            headers = {  
+                'content-type': "multipart/form-data; boundary=REQUEST_FORM_DATA_BOUNDARY",
+                'Content-Type': "",
+                'cache-control': "no-cache"}
+            s = requests.Session()
+            print(s,"Headers")
+            response = requests.post(
+                company.host+"api/method/frappe.core.doctype.communication.email.make",
+                data=json_data,headers=s.headers,verify=False)
+            print(response.text)
+            # response = make(recipients = data["receiver_email"],
+            #                 sender = obj["sender"],
+            #                 subject = b2csuccess.subject,
+            #                 content = b2csuccess.response,
+            #                 doctype = data["doctype"],
+            #                 name = data["name"],
+            #                 attachments = obj["attachments"],
+            #                 send_email=1,
+            #                 now=True,
+            #                 read_receipt=0,
+            #                 send_me_a_copy=0,
+            #                 )
+            time.sleep(10)
+            print(data, obj,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+            email_queue = frappe.db.get_list("Email Queue", filters=[["reference_name","=",data["name"]], ["status","!=",'Sent']], fields=['reference_name', 'name', 'status'])
+            if len(email_queue) > 0:
+                send_now(email_queue[0]["name"])
+                print("...............................................")
+            return {"success":True,"message":"Mail Send", "response":response}
         return {"success": True, "obj":obj}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -164,7 +219,7 @@ def signezy_email_logs():
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist()    
+@frappe.whitelist(allow_guest=True)    
 def email_push_tab():
     try:
         data = json.loads(frappe.request.data)

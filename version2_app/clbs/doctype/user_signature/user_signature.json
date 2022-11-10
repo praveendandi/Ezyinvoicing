@@ -1,0 +1,75 @@
+{
+ "actions": [],
+ "autoname": "field:users",
+ "creation": "2022-05-28 16:03:21.562229",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "users",
+  "signature_image",
+  "signature_pfx",
+  "pfx_password"
+ ],
+ "fields": [
+  {
+   "fieldname": "users",
+   "fieldtype": "Link",
+   "label": "Users",
+   "options": "User",
+   "unique": 1
+  },
+  {
+   "fieldname": "signature_image",
+   "fieldtype": "Attach",
+   "label": "Signature Image"
+  },
+  {
+   "fieldname": "signature_pfx",
+   "fieldtype": "Attach",
+   "label": "Signature PFX"
+  },
+  {
+   "fieldname": "pfx_password",
+   "fieldtype": "Data",
+   "label": "PFX Password"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-21 17:10:50.823782",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "User Signature",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-07-13 11:50:46.101675",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "beforetax",
+  "cgst",
+  "sgst",
+  "igst",
+  "totalinvoiceamount",
+  "recon_id"
+ ],
+ "fields": [
+  {
+   "fieldname": "beforetax",
+   "fieldtype": "Float",
+   "label": "BeforeTax"
+  },
+  {
+   "fieldname": "cgst",
+   "fieldtype": "Float",
+   "label": "CGST"
+  },
+  {
+   "fieldname": "sgst",
+   "fieldtype": "Float",
+   "label": "SGST"
+  },
+  {
+   "fieldname": "igst",
+   "fieldtype": "Float",
+   "label": "IGST"
+  },
+  {
+   "fieldname": "totalinvoiceamount",
+   "fieldtype": "Float",
+   "label": "TotalInvoiceAmount"
+  },
+  {
+   "fieldname": "recon_id",
+   "fieldtype": "Link",
+   "label": "Recon ID",
+   "options": "Recon Details"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-07-13 11:50:46.101675",
+ "modified_by": "Administrator",
+ "module": "Reconciliation",
+ "name": "Ezy Invoicing Summary",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
