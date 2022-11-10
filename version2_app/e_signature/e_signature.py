@@ -12,7 +12,9 @@ from pyhanko_certvalidator import ValidationContext
 from pyhanko.sign import signers, fields, timestamps
 from pyhanko import stamp
 from pyhanko.pdf_utils.font import opentype
+from datetime import datetime
 from pyhanko.pdf_utils import text, images
+from dateutil.tz import tzutc, tzlocal
 from version2_app.utils import html_to_pdf, convert_image_to_base64
 
 
@@ -42,12 +44,14 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
             subfilter=SigSeedSubFilter.PADES,
             use_pades_lta=True
         )
+        utc = datetime.now(tzutc())
+        local = utc.astimezone(tzlocal())
         pdf_signer = signers.PdfSigner(
             signature_meta, signer=signer, stamp_style=stamp.TextStampStyle(
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
                 # stamp_text='\n\n\nTime: %(ts)s',
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
-                stamp_text='Signed by: '+company_data.company_name+'\nHotel Name: '+company_data.legal_name+'\nLocation: '+company_data.location+'\nTime: %(ts)s',
+                stamp_text='Digitally Signed by: %(signer)s\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: %(local)s',
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
