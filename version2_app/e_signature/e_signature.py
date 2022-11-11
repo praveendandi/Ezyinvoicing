@@ -40,7 +40,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
             pfx_file=invoice_file+pfx_signature, passphrase=secret
 
         )
-        signer = signer.strip('CN=DS')
+        # signer = signer.strip('CN=DS')
         signature_meta = signers.PdfSignatureMetadata(
             field_name='Signature', md_algorithm='sha256',
             subfilter=SigSeedSubFilter.PADES,
