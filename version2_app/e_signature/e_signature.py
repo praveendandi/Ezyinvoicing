@@ -38,7 +38,9 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
         signer = signers.SimpleSigner.load_pkcs12(
             # pfx_file='/home/caratred/Desktop/projects/pyhanko/sign.pfx', passphrase=b'secret'
             pfx_file=invoice_file+pfx_signature, passphrase=secret
+
         )
+        # signer = signer.strip('CN=DS')
         signature_meta = signers.PdfSignatureMetadata(
             field_name='Signature', md_algorithm='sha256',
             subfilter=SigSeedSubFilter.PADES,
@@ -51,7 +53,9 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
                 # stamp_text='\n\n\nTime: %(ts)s',
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
-                stamp_text='Digitally Signed by: %(signer)s\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+
+                # stamp_text='Digitally Signed by: %(signes\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
