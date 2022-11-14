@@ -38,6 +38,8 @@ def hyatt_mumbai(data):
         invoice_referrence_objects = {}
         invoice_number_list = [x['BILL_NO'] for x in items_dataframe["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]]
         for each in items_dataframe["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
+            if not each['FOLIO_TYPE']:
+                continue
             if each['SUMFT_DEBITPERBILL_NO']==None:
                 each['SUMFT_DEBITPERBILL_NO']=0
             if each['BILL_NO'] in gst_data.keys():

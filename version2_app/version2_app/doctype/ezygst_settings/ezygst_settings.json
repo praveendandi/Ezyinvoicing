@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "sync_schedule_time",
-  "amendments_based_on_filing_date"
+  "amendments_based_on_filing_date",
+  "filing_end_day"
  ],
  "fields": [
   {
@@ -21,12 +22,17 @@
    "fieldtype": "Select",
    "label": "Amendments Based on Filing Date",
    "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "filing_end_day",
+   "fieldtype": "Data",
+   "label": "Filing End Day"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-10-31 11:46:07.637829",
+ "modified": "2022-11-09 11:22:06.267961",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "EzyGST Settings",
