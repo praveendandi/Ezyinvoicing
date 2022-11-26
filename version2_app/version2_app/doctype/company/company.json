@@ -294,7 +294,8 @@
   "abbr",
   "signature_image",
   "signature_pfx",
-  "pfx_password"
+  "pfx_password",
+  "chalet_etax"
  ],
  "fields": [
   {
@@ -1890,11 +1891,17 @@
    "fieldname": "pfx_password",
    "fieldtype": "Data",
    "label": "PFX Password"
+  },
+  {
+   "default": "0",
+   "fieldname": "chalet_etax",
+   "fieldtype": "Check",
+   "label": "Chalet Etax"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-06 14:17:01.049920",
+ "modified": "2022-11-25 10:35:31.953551",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

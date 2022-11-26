@@ -177,16 +177,19 @@ def add_signature_on_etax(invoice_number=None):
                 return convimgtobase
             company_logo_base = "data:image/png;base64,"+convimgtobase["data"]
         qr_code_image = doc.qr_code_image
+        credit_qr_code_image = doc.credit_qr_code_image
         if doc.invoice_type == "B2C":
             qr_code_image = doc.b2c_qrimage
-        if qr_code_image:
-            convimgtobase = convert_image_to_base64(
-                qr_code_image)
+        if qr_code_image or credit_qr_code_image:
+            convimgtobase = convert_image_to_base64(doc.qr_code_image if doc.invoice_category != "Credit Invoice" else doc.credit_qr_code_image)
             if not convimgtobase["success"]:
                 return convimgtobase
             qr_image_base = "data:image/png;base64," + \
                 convimgtobase["data"]
-        templates = frappe.db.get_value("Print Format", {"name": "E-Tax Invoice"}, ["html"])
+        if company.chalet_etax == 1:
+            templates = frappe.db.get_value("Print Format", {"name": "Chalet E tax invoice"}, ["html"])
+        else:
+            templates = frappe.db.get_value("Print Format", {"name": "E-Tax Invoice"}, ["html"])
         if not templates:
             return {"success": False, ",message": "please add print formats"}
         data = doc.as_dict()
