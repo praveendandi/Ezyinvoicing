@@ -181,7 +181,7 @@ def add_signature_on_etax(invoice_number=None):
         if doc.invoice_type == "B2C":
             qr_code_image = doc.b2c_qrimage
         if qr_code_image or credit_qr_code_image:
-            convimgtobase = convert_image_to_base64(doc.qr_code_image if doc.invoice_category != "Credit Invoice" else doc.credit_qr_code_image)
+            convimgtobase = convert_image_to_base64(qr_code_image if doc.invoice_category != "Credit Invoice" else credit_qr_code_image)
             if not convimgtobase["success"]:
                 return convimgtobase
             qr_image_base = "data:image/png;base64," + \
