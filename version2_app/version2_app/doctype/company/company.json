@@ -294,7 +294,18 @@
   "abbr",
   "signature_image",
   "signature_pfx",
-  "pfx_password"
+  "pfx_password",
+  "pos_qr",
+  "pos_b2b_qr_section",
+  "qr_b2b_rect_x0",
+  "qr_b2b_rect_x1",
+  "qr_b2b_rect_y0",
+  "qr_b2b_rect_y1",
+  "pos_b2c_qr_section",
+  "qr_b2c_rect_x0",
+  "qr_b2c_rect_x1",
+  "qr_b2c_rect_y0",
+  "qr_b2c_rect_y1"
  ],
  "fields": [
   {
@@ -1890,11 +1901,68 @@
    "fieldname": "pfx_password",
    "fieldtype": "Data",
    "label": "PFX Password"
+  },
+  {
+   "default": "0",
+   "fieldname": "pos_qr",
+   "fieldtype": "Check",
+   "label": "POS QR"
+  },
+  {
+   "fieldname": "pos_b2b_qr_section",
+   "fieldtype": "Section Break",
+   "label": "POS B2B QR"
+  },
+  {
+   "depends_on": "eval:doc.email =='pos_qr'",
+   "fieldname": "qr_b2b_rect_x0",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect X0"
+  },
+  {
+   "fieldname": "qr_b2b_rect_x1",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect X1"
+  },
+  {
+   "fieldname": "qr_b2b_rect_y0",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect Y0"
+  },
+  {
+   "fieldname": "qr_b2b_rect_y1",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect Y1"
+  },
+  {
+   "fieldname": "pos_b2c_qr_section",
+   "fieldtype": "Section Break",
+   "label": "POS B2C QR"
+  },
+  {
+   "fieldname": "qr_b2c_rect_x0",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect X0"
+  },
+  {
+   "fieldname": "qr_b2c_rect_x1",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect X1"
+  },
+  {
+   "fieldname": "qr_b2c_rect_y0",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect Y0"
+  },
+  {
+   "fieldname": "qr_b2c_rect_y1",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect Y1"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-06 14:17:01.049920",
+ "modified": "2022-12-01 11:26:40.612043",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
