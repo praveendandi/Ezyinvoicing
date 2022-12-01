@@ -295,7 +295,7 @@
   "signature_image",
   "signature_pfx",
   "pfx_password",
-  "chalet_etax"
+  "e_tax_format"
  ],
  "fields": [
   {
@@ -1893,15 +1893,16 @@
    "label": "PFX Password"
   },
   {
-   "default": "0",
-   "fieldname": "chalet_etax",
-   "fieldtype": "Check",
-   "label": "Chalet Etax"
+   "default": "Portrait",
+   "fieldname": "e_tax_format",
+   "fieldtype": "Select",
+   "label": "E-Tax Format",
+   "options": "Portrait\nLandscape"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-11-25 10:35:31.953551",
+ "modified": "2022-12-01 15:49:18.539069",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
