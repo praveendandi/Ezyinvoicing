@@ -1312,16 +1312,14 @@ def insert_invoice(data):
                 #     ['like', data['guest_data']['invoice_number'] + '-%']
                 # })
             invoice.amended_from = invCount.name
-            if "-" in invCount.name[-4:]:
+            if "-" in invCount.name[-4:] and "CANC" not in data['guest_data']['invoice_number']:
                 amenedindex = invCount.name.rfind("-")
                 ameneddigit = int(invCount.name[amenedindex+1:])
                 ameneddigit = ameneddigit+1 
                 invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
                 # pass
             else:
-                
                 invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
-
         # print(invoice.allowance_invoice)			
         v = invoice.insert(ignore_permissions=True, ignore_links=True)
         data['invoice_number'] = v.name
@@ -1489,7 +1487,6 @@ def combine_pos_checks_with_invoice(invoice_number):
             payload_new = {'is_private': 1, 'folder': 'Home'}
             file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
                                         data=payload_new, verify=False).json()
-            print(file_response,"???????")
             if "file_url" in file_response["message"].keys():
                 os.remove(file_path)
             else:
@@ -1665,7 +1662,7 @@ def calulate_items(data):
         elif invoice_category == "Credit Invoice":
             ItemMode = "Credit"
         else:
-            pass	
+            pass 
         data['invoice_item_date_format'] = companyDetails.invoice_item_date_format
         # companyDetails = frappe.get_doc('company', data['company_code'])
         if "sez" in data:
