@@ -295,6 +295,7 @@
   "signature_image",
   "signature_pfx",
   "pfx_password",
+  "e_tax_format",
   "pos_qr",
   "pos_b2b_qr_section",
   "qr_b2b_rect_x0",
@@ -1903,6 +1904,13 @@
    "label": "PFX Password"
   },
   {
+   "default": "Portrait",
+   "fieldname": "e_tax_format",
+   "fieldtype": "Select",
+   "label": "E-Tax Format",
+   "options": "Portrait\nLandscape"
+  },
+  {
    "default": "0",
    "fieldname": "pos_qr",
    "fieldtype": "Check",
@@ -1962,7 +1970,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-01 11:26:40.612043",
+ "modified": "2022-12-01 15:49:18.539069",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
