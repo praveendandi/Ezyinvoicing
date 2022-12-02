@@ -1128,7 +1128,6 @@ def insert_invoice(data):
                     # other_charges_before_tax = data["total_invoice_amount"]
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
-                print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
                 if abs(roundoff_amount)>6:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                         
@@ -1306,15 +1305,15 @@ def insert_invoice(data):
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
-            invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+            invCount = frappe.db.get_value('Invoices',{"invoice_number": data['guest_data']['invoice_number']},["invoice_number"], as_dict=1)
                 # filters={
                 #     'invoice_number':
                 #     ['like', data['guest_data']['invoice_number'] + '-%']
                 # })
-            invoice.amended_from = invCount.name
-            if "-" in invCount.name[-4:] and "CANC" not in data['guest_data']['invoice_number']:
-                amenedindex = invCount.name.rfind("-")
-                ameneddigit = int(invCount.name[amenedindex+1:])
+            invoice.amended_from = invCount.invoice_number
+            if "-" in invCount.invoice_number[-4:]:
+                amenedindex = invCount.invoice_number.rfind("-")
+                ameneddigit = int(invCount.invoice_number[amenedindex+1:])
                 ameneddigit = ameneddigit+1 
                 invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
                 # pass
@@ -2415,7 +2414,6 @@ def calulate_items(data):
                 "revenue_item": final_item['revenue_item'] if "revenue_item" in final_item else "Revenue"
             })
         total_items.extend(second_list)	
-        print(total_items,".........]]]]]]]]]]][[[,,,,,,,,,,,,,,")
         return {"success": True, "data": total_items}
     except Exception as e:
         print(traceback.print_exc())
