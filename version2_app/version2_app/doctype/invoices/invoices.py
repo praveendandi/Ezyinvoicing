@@ -1319,8 +1319,10 @@ def insert_invoice(data):
                 # pass
             else:
                 invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
-        # print(invoice.allowance_invoice)			
+        # print(invoice.allowance_invoice)
+        frappe.log_error(invoice.invoice_number, "invoice_number")		
         v = invoice.insert(ignore_permissions=True, ignore_links=True)
+        frappe.log_error(v.name, "check invoice number")
         data['invoice_number'] = v.name
         data['guest_data']['invoice_number'] = v.name
         # # insert items
