@@ -3453,7 +3453,7 @@ def check_invoice_exists(invoice_number):
                 invCount = frappe.get_doc('Invoices',invoice_number)
                 if invCount:	
                     invoice_number = invCount.name
-                    if invCount.docstatus==2:
+                    if invCount.docstatus==2 or invCount.credit_note_raised == "Yes":
                         AmenedinvCount = frappe.db.get_list(
                         'Invoices',
                         filters={
