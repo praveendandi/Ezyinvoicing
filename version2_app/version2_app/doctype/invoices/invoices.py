@@ -1128,7 +1128,6 @@ def insert_invoice(data):
                     # other_charges_before_tax = data["total_invoice_amount"]
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
-                print(roundoff_amount,"/a/a/a/a/a/a",data['total_invoice_amount']," ",pms_invoice_summary," ",other_charges)
                 if abs(roundoff_amount)>6:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                         
@@ -1306,24 +1305,24 @@ def insert_invoice(data):
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
-            invCount = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
+            invCount = frappe.db.get_value('Invoices',{"invoice_number": data['guest_data']['invoice_number']},["invoice_number"], as_dict=1)
                 # filters={
                 #     'invoice_number':
                 #     ['like', data['guest_data']['invoice_number'] + '-%']
                 # })
-            invoice.amended_from = invCount.name
-            if "-" in invCount.name[-4:]:
-                amenedindex = invCount.name.rfind("-")
-                ameneddigit = int(invCount.name[amenedindex+1:])
+            invoice.amended_from = invCount.invoice_number
+            if "-" in invCount.invoice_number[-4:]:
+                amenedindex = invCount.invoice_number.rfind("-")
+                ameneddigit = int(invCount.invoice_number[amenedindex+1:])
                 ameneddigit = ameneddigit+1 
                 invoice.invoice_number = data['guest_data']['invoice_number'] + "-"+str(ameneddigit)
                 # pass
             else:
-                
                 invoice.invoice_number = data['guest_data']['invoice_number'] + "-1"
-
-        # print(invoice.allowance_invoice)			
+        # print(invoice.allowance_invoice)
+        frappe.log_error(invoice.invoice_number, "invoice_number")		
         v = invoice.insert(ignore_permissions=True, ignore_links=True)
+        frappe.log_error(v.name, "check invoice number")
         data['invoice_number'] = v.name
         data['guest_data']['invoice_number'] = v.name
         # # insert items
@@ -1489,7 +1488,6 @@ def combine_pos_checks_with_invoice(invoice_number):
             payload_new = {'is_private': 1, 'folder': 'Home'}
             file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
                                         data=payload_new, verify=False).json()
-            print(file_response,"???????")
             if "file_url" in file_response["message"].keys():
                 os.remove(file_path)
             else:
@@ -1665,7 +1663,7 @@ def calulate_items(data):
         elif invoice_category == "Credit Invoice":
             ItemMode = "Credit"
         else:
-            pass	
+            pass 
         data['invoice_item_date_format'] = companyDetails.invoice_item_date_format
         # companyDetails = frappe.get_doc('company', data['company_code'])
         if "sez" in data:
@@ -2418,7 +2416,6 @@ def calulate_items(data):
                 "revenue_item": final_item['revenue_item'] if "revenue_item" in final_item else "Revenue"
             })
         total_items.extend(second_list)	
-        print(total_items,".........]]]]]]]]]]][[[,,,,,,,,,,,,,,")
         return {"success": True, "data": total_items}
     except Exception as e:
         print(traceback.print_exc())
@@ -3456,7 +3453,7 @@ def check_invoice_exists(invoice_number):
                 invCount = frappe.get_doc('Invoices',invoice_number)
                 if invCount:	
                     invoice_number = invCount.name
-                    if invCount.docstatus==2:
+                    if invCount.docstatus==2 or invCount.credit_note_raised == "Yes":
                         AmenedinvCount = frappe.db.get_list(
                         'Invoices',
                         filters={

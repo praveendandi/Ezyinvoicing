@@ -150,14 +150,13 @@ def TotalMismatchError(data,calculated_data):
                     ['like', '%' + data['guest_data']['invoice_number'] + '%']
                 })
             invoice.amended_from = invCount[0]['name']
-            invoice.invoice_number = "Amened" + data['guest_data'][
-                'invoice_number']
+            invoice.invoice_number = data['guest_data'][
+                'invoice_number'] + "-1"
         v = invoice.insert(ignore_permissions=True, ignore_links=True)
         invName = v.name
         if data['amened'] == 'Yes':
             getInvoiceNUmber = frappe.db.get_value('Invoices', {
-                'invoice_number':
-                "Amened" + data['guest_data']['invoice_number']
+                'invoice_number': data['guest_data']['invoice_number'] + "-1"
             })
             # print(getInvoiceNUmber)
             updateInvoi = frappe.get_doc('Invoices', getInvoiceNUmber)
