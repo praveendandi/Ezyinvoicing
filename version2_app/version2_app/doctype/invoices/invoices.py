@@ -146,7 +146,7 @@ class Invoices(Document):
         taxPayerDeatilsData.save()
         return True
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def generateIrn(data):
     try:
         company = frappe.get_last_doc("company")
@@ -3980,6 +3980,6 @@ def update_non_taxable(month,year,sac_index):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def generate_irn(data):
     return generateIrn(data)
