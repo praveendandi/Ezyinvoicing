@@ -55,7 +55,8 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
                 # stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
 
-                stamp_text='Digitally Signed by: %(signes\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                stamp_text='Digitally Signed by: %(signer)s\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                # stamp_text='Digitally Signed by: '%(signer)s'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
@@ -63,6 +64,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                     border_width=0
                     # font=opentype.GlyphAccumulatorFactory('path/to/NotoSans-Regular.ttf')
                 ),
+                
                 # box=None
             ),
         )
