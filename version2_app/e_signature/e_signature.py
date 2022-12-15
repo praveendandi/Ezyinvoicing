@@ -53,9 +53,9 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
                 # stamp_text='\n\n\nTime: %(ts)s',
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
-                stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                # stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
 
-                # stamp_text='Digitally Signed by: %(signes\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                stamp_text='Digitally Signed by: %(signes\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
@@ -162,7 +162,7 @@ def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, t
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def add_signature_on_etax(invoice_number=None):
     try:
         company = frappe.get_last_doc("company")
