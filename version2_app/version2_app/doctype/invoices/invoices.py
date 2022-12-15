@@ -3978,3 +3978,10 @@ def update_non_taxable(month,year,sac_index):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("update_non_taxable","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": str(e)}
+
+
+@frappe.whitelist()
+def generate_irn(data):
+    data = json.loads(data)
+    print("........")
+    return generateIrn(data)
