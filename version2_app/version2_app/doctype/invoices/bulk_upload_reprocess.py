@@ -107,7 +107,7 @@ def BulkUploadReprocess(data):
             for each in line_items['data']['items']:
 
                 if each['name'].lower() not in payment_Types:
-                    if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"]:
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or "UTGST" in each["name"]:
                         continue
                     item_dict = {}
                     date_time_obj = datetime.datetime.strptime(each['date'],'%d-%m-%y').strftime(company.invoice_item_date_format)
@@ -146,7 +146,7 @@ def BulkUploadReprocess(data):
             for each in line_items['data']['items']:
                 print(each["name"], payment_Types)
                 if each['name'].lower() not in payment_Types:
-                    if  "CGST" in each["name"] or "SGST" in each["name"] or "VAT" in each["name"] or "Vat" in each["name"] or "vat" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "VAT" in each["name"] or "Vat" in each["name"] or "vat" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or "UTGST" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
                     item_dict = {}
                     if company.name=="TGND-01":
