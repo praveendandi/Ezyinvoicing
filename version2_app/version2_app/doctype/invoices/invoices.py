@@ -146,7 +146,7 @@ class Invoices(Document):
         taxPayerDeatilsData.save()
         return True
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def generateIrn(data):
     try:
         company = frappe.get_last_doc("company")
@@ -395,6 +395,7 @@ def generateIrn(data):
                     IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
                     
                     IRNObjectdoc.save()
+                    frappe.db.commit()
                     # print(IRNObjectdoc.name,"/a/a/a/")
                     invoice = frappe.get_doc('Invoices', invoice_number)
                     invoice.ack_no = response['result']['AckNo']
@@ -412,6 +413,7 @@ def generateIrn(data):
                     invoice.irn_process_time = datetime.datetime.utcnow(
                     ) - start_time
                     invoice.save(ignore_permissions=True, ignore_version=True)
+                    frappe.db.commit()
                     create_qr = create_qr_image(invoice_number,
                                                 GSP_details['data'])
                     if create_qr['success'] == True and company_details['data'].allowance_type=="Credit":
@@ -423,6 +425,7 @@ def generateIrn(data):
                             ) - start_time
                             invoice.save(ignore_permissions=True,
                                             ignore_version=True)
+                            frappe.db.commit()                
                     return response
                 else:
                     if "result" in list(response.keys()):
@@ -441,6 +444,7 @@ def generateIrn(data):
                             # invoice.qr_code_image = ""
                             # invoice.qr_code_generated = "Success"
                             invoice.save(ignore_permissions=True, ignore_version=True)
+                            frappe.db.commit()
                         
                         irn_error_message = response["message"]
                         frappe.log_error(frappe.get_traceback(),invoice_number)
@@ -875,6 +879,7 @@ def create_qr_image(invoice_number, gsp):
         if 'message' in response:
             invoice.qr_code_image = response['message']['file_url']
             invoice.save()
+            frappe.db.commit()
             # attach_qr_code(invoice_number, gsp, invoice.company)
             return {"success": True,"message":"Qr Generated Successfully"}
         return {"success": True,"message":"Qr Generated Successfully"}
@@ -1469,7 +1474,7 @@ def insert_items(items, invoice_number):
         frappe.log_error("Ezy-invoicing insert_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def combine_pos_checks_with_invoice(invoice_number):
     try:
         company = frappe.get_last_doc("company")
@@ -1628,7 +1633,7 @@ def calulate_net_yes(data,sac_code_obj,companyDetails,sez,placeofsupply):
         frappe.log_error("Ezy-invoicing calulate_net_yes","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def calulate_items(data):
     # items, invoice_number,company_code
     try:
@@ -3739,7 +3744,7 @@ def attach_b2c_qrcode(data):
         frappe.log_error("Ezy-invoicing attach_b2c_qrcode","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": e}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_taxpayerdetails(data):
     try:
         company = frappe.get_last_doc("company")
@@ -3880,7 +3885,7 @@ def get_taxpayerdetails(data):
         return {"success": False, "message": e}   
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_non_revenue_amount():
     try:
         get_non_revenue_list = frappe.db.get_list("SAC HSN CODES", filters = {"ignore_non_taxable_items": 1}, pluck="sac_index")
@@ -3898,7 +3903,7 @@ def update_non_revenue_amount():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": e}  
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def b2b_success_to_credit_note(data):
 # 	try:
 # 		invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
@@ -3945,7 +3950,7 @@ def update_non_revenue_amount():
 # 		print(e, "attach b2c qrcode")
 # 		return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_non_taxable(month,year,sac_index):
     try:
         start_date = year+'-'+month+"-01"
@@ -3983,5 +3988,5 @@ def update_non_taxable(month,year,sac_index):
 @frappe.whitelist()
 def generate_irn(data):
     data = json.loads(data)
-    print("........")
-    return generateIrn(data)
+    var = generateIrn(data)
+    return var
