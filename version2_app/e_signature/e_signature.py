@@ -55,7 +55,8 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
                 # stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
 
-                stamp_text='Digitally Signed by: %(signes\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                stamp_text='Digitally Signed by: %(signer)s\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                # stamp_text='Digitally Signed by: '%(signer)s'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
@@ -63,6 +64,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                     border_width=0
                     # font=opentype.GlyphAccumulatorFactory('path/to/NotoSans-Regular.ttf')
                 ),
+                
                 # box=None
             ),
         )
@@ -163,7 +165,7 @@ def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, t
 
 
 @frappe.whitelist()
-def add_signature_on_etax(invoice_number=None):
+def add_signature_on_etax(invoice_number=None,e_tax_format=None):
     try:
         company = frappe.get_last_doc("company")
         if not frappe.db.exists("Invoices", invoice_number):
@@ -186,10 +188,11 @@ def add_signature_on_etax(invoice_number=None):
                 return convimgtobase
             qr_image_base = "data:image/png;base64," + \
                 convimgtobase["data"]
-        print(company.e_tax_format,".....")        
-        if company.e_tax_format == 'Landscape':
+        if not e_tax_format:
+            e_tax_format = company.e_tax_format     
+        if e_tax_format == 'Landscape':
             templates = frappe.db.get_value("Print Format", {"name": "Chalet E tax invoice"}, ["html"])
-        elif  company.e_tax_format == 'Portrait':
+        if  e_tax_format == 'Portrait':
             templates = frappe.db.get_value("Print Format", {"name": "E-Tax Invoice"}, ["html"])
         if not templates:
             return {"success": False, ",message": "please add print formats"}
