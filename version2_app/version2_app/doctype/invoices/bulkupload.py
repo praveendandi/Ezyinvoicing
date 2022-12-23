@@ -10,14 +10,15 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 from version2_app.version2_app.doctype.invoices.invoice_helpers import calulate_b2c_items
 import re
+import copy
 
 @frappe.whitelist()
 def bulkupload(data):
     try:
         invoice_data=data
+        invoice_object = {}
         company =invoice_data['company']
         start_time = datetime.datetime.now()
-        items=[]
         companyData = frappe.get_doc('company',company)#data['company'])
         items_data_file = invoice_data['invoice_file']
         folder_path = frappe.utils.get_bench_path()
@@ -166,18 +167,20 @@ def bulkupload(data):
             else:
                 data["invoice_number"] =data["invoice_number"]
             data['items'] = items
+            input_data.append(data)
             refobj = data.copy()
             del refobj['items']
             refobj['items'] = items_pdf
             invoice_referrence_objects[each['BILL_NO']] = refobj
             # invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
-            input_data.append(data)
         # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})
         countIn = 1
         for each_item in input_data:
+            raw_line_items = invoice_referrence_objects[each_item["invoice_number"]]
+            invoice_object = copy.deepcopy(raw_line_items)
             if "invoice_number" in each:
                 each["gstNumber"]=gst_data[each["invoice_number"]]
             if each_item['invoice_category'] == "CREDIT TAX INVOICE":
@@ -247,7 +250,7 @@ def bulkupload(data):
             error_data['state_code'] =  " "
             error_data['room_number'] = each_item['room_number']
             # invoice_referrence_objects[each_item['invoice_number']][0]['gstNumber'] = each_item['gstNumber']
-            error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+            error_data['invoice_object_from_file'] = {"data": invoice_object}
             error_data['pincode'] = ""
             error_data['total_invoice_amount'] = each_item['total_invoice_amount']
             error_data['sez'] = 0
@@ -282,7 +285,7 @@ def bulkupload(data):
                         calulateItemsApiResponse = calulate_items(each_item)
                         if calulateItemsApiResponse['success'] == True:
                             if reupload==False:
-                                insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False})
+                                insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False})
                                 if insertInvoiceApiResponse['success']== True:
                                     
                                     B2B = "B2B"
@@ -296,7 +299,7 @@ def bulkupload(data):
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 else:
                                     error_data['error_message'] = insertInvoiceApiResponse['message']
-                                    error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+                                    error_data['invoice_object_from_file'] = {"data": invoice_object}
                                     errorInvoice = Error_Insert_invoice(error_data)
                                     B2B = "B2B"
                                     B2C = np.nan
@@ -304,7 +307,7 @@ def bulkupload(data):
                                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                             else:
-                                insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]}})
+                                insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object}})
                                 if insertInvoiceApiResponse['success']== True:
                                     
                                     B2B = "B2B"
@@ -318,7 +321,7 @@ def bulkupload(data):
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 else:
                                     error_data['error_message'] = insertInvoiceApiResponse['message']
-                                    error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+                                    error_data['invoice_object_from_file'] = {"data": invoice_object}
                                     errorInvoice = Error_Insert_invoice(error_data)
                                     B2B = "B2B"
                                     B2C = np.nan
@@ -328,7 +331,7 @@ def bulkupload(data):
                         else:
                         
                             error_data['error_message'] = calulateItemsApiResponse['message']
-                            error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+                            error_data['invoice_object_from_file'] = {"data": invoice_object}
                             errorInvoice = Error_Insert_invoice(error_data)
                             B2B = "B2B"
                             B2C = np.nan
@@ -376,7 +379,7 @@ def bulkupload(data):
                                 invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1 = 1
                         each_item['total_invoice_amount'] = get_invoice_amount["total_invoice_amount"]
                     if reupload==False:
-                        insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False, "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1})
+                        insertInvoiceApiResponse = insert_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":each_item['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object},"B2C_bulk_upload": True if companyData.auto_b2c_success_for_gstr == 1 else False, "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1})
                         if insertInvoiceApiResponse['success']== True:
                             B2B=np.nan
                             B2C = "B2C"	 
@@ -394,7 +397,7 @@ def bulkupload(data):
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                         else:
                             error_data['error_message'] = insertInvoiceApiResponse['message']
-                            error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+                            error_data['invoice_object_from_file'] = {"data": invoice_object}
                             errorInvoice = Error_Insert_invoice(error_data)
 
                             B2B=np.nan
@@ -402,7 +405,7 @@ def bulkupload(data):
                             output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                     else:
-                        insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each_item['invoice_number']]}})
+                        insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object}})
                         if insertInvoiceApiResponse['success']== True:
                             B2B=np.nan
                             B2C = "B2C" 
@@ -420,7 +423,7 @@ def bulkupload(data):
                                 output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                         else:
                             error_data['error_message'] = insertInvoiceApiResponse['message']
-                            error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+                            error_data['invoice_object_from_file'] = {"data": invoice_object}
                             errorInvoice = Error_Insert_invoice(error_data)
                             
                             B2B=np.nan
@@ -430,7 +433,7 @@ def bulkupload(data):
                 else:
                         
                     error_data['error_message'] = calulateItemsApiResponse['message']
-                    error_data['invoice_object_from_file'] = {"data":invoice_referrence_objects[each_item['invoice_number']]}
+                    error_data['invoice_object_from_file'] = {"data": invoice_object}
                     errorInvoice = Error_Insert_invoice(error_data)
                     B2C = "B2C"
                     B2B = np.nan
