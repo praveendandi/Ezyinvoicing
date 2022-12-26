@@ -307,11 +307,11 @@ def qr_generatedtoirn_generated():
 
 
 @frappe.whitelist(allow_guest=True)
-def errorInvoicesList():
+def errorInvoicesList(from_date=None, to_date=None):
     try:
         doc = frappe.db.get_list('company',fields=['name'])
        
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","guest_name","irn_generated"])
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']], 'invoice_date': ["between", [from_date, to_date]]},fields=["name","invoice_number","guest_name","irn_generated"])
         if len(data)>0:
             return {"success":True,"data":data}
         else:
