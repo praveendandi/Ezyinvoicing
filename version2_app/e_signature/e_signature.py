@@ -53,9 +53,10 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                 # the 'signer' and 'ts' parameters will be interpolated by pyHanko, if present
                 # stamp_text='\n\n\nTime: %(ts)s',
                 # stamp_text='Signed by: %(signer)s\nTime: %(ts)s',
-                stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                # stamp_text='Digitally Signed by: '+company_data.legal_name+'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
 
-                # stamp_text='Digitally Signed by: %(signes\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                stamp_text='Digitally Signed by: %(signer)s\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
+                # stamp_text='Digitally Signed by: '%(signer)s'\nHotel Name: '+company_data.company_name+'\nLocation: '+company_data.location+'\nTime: '+str(local),
                 # background=images.PdfImage(
                 #     stamp_image_path),
                 # border_width=1,
@@ -63,6 +64,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
                     border_width=0
                     # font=opentype.GlyphAccumulatorFactory('path/to/NotoSans-Regular.ttf')
                 ),
+                
                 # box=None
             ),
         )
@@ -162,8 +164,8 @@ def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, t
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
-def add_signature_on_etax(invoice_number=None):
+@frappe.whitelist()
+def add_signature_on_etax(invoice_number=None,e_tax_format=None):
     try:
         company = frappe.get_last_doc("company")
         if not frappe.db.exists("Invoices", invoice_number):
@@ -177,16 +179,21 @@ def add_signature_on_etax(invoice_number=None):
                 return convimgtobase
             company_logo_base = "data:image/png;base64,"+convimgtobase["data"]
         qr_code_image = doc.qr_code_image
+        credit_qr_code_image = doc.credit_qr_code_image
         if doc.invoice_type == "B2C":
             qr_code_image = doc.b2c_qrimage
-        if qr_code_image:
-            convimgtobase = convert_image_to_base64(
-                qr_code_image)
+        if qr_code_image or credit_qr_code_image:
+            convimgtobase = convert_image_to_base64(qr_code_image if doc.invoice_category != "Credit Invoice" else credit_qr_code_image)
             if not convimgtobase["success"]:
                 return convimgtobase
             qr_image_base = "data:image/png;base64," + \
                 convimgtobase["data"]
-        templates = frappe.db.get_value("Print Format", {"name": "E-Tax Invoice"}, ["html"])
+        if not e_tax_format:
+            e_tax_format = company.e_tax_format     
+        if e_tax_format == 'Landscape':
+            templates = frappe.db.get_value("Print Format", {"name": "Chalet E tax invoice"}, ["html"])
+        if  e_tax_format == 'Portrait':
+            templates = frappe.db.get_value("Print Format", {"name": "E-Tax Invoice"}, ["html"])
         if not templates:
             return {"success": False, ",message": "please add print formats"}
         data = doc.as_dict()

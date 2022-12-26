@@ -24,7 +24,7 @@ def check_company_exist_for_Irn(code):
         print(e,"check company exist")
         return {"success":False,"message":e}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def attach_qr_code(invoice_number):
     try:
         invoice = frappe.get_doc('Invoices', invoice_number)
@@ -179,6 +179,7 @@ def create_credit_qr_image(invoice_number, gsp):
         if 'message' in response:
             invoice.credit_qr_code_image = response['message']['file_url']
             invoice.save()
+            frappe.db.commit()
             # attach_qr_code(invoice_number, gsp,invoice.company)
 
         return {"succes":True,"message":"QR Generated Successfully"}

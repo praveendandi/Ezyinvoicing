@@ -54,7 +54,7 @@ def execute(filters=None):
         items_doc = frappe.db.get_list('Items',filters=item_filter,fields =items_fields ,as_list=True)
         items_df = pd.DataFrame(items_doc,columns=items_columns)
         items_df = items_df.round(2)
-        items_df['quantity'] = items_df['quantity'].astype(int)
+        items_df['quantity'] = (items_df['quantity'].replace(r'^\s*$', '1', regex=True)).astype(int)
         items_df["gst_cess_rate"] = items_df['cess'] + items_df['state_cess']
         items_df["gst_cess_amount"] = items_df['cess_amount'] + items_df['state_cess_amount']
         del items_df['cess']

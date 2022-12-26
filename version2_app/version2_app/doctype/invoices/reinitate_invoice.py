@@ -43,17 +43,17 @@ def Reinitiate_invoice(data):
                     place_of_supply = company.state_code
             else:
                 place_of_supply = company.state_code
-        if "invoice_object_from_file" in data.keys():
-            if isinstance(data["invoice_object_from_file"],list):
-                data["invoice_object_from_file"] = ""
-            if isinstance(data["invoice_object_from_file"],str):
-                if not isinstance(data["invoice_object_from_file"],dict):
-                    data["invoice_object_from_file"] = data["invoice_object_from_file"].replace('\" \"',"")
-            if data["invoice_object_from_file"] != "":
-                if "data" not in data['invoice_object_from_file']:
-                    data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
-                else:
-                    data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
+        # if "invoice_object_from_file" in data.keys():
+        #     if isinstance(data["invoice_object_from_file"],list):
+        #         data["invoice_object_from_file"] = ""
+        #     if isinstance(data["invoice_object_from_file"],str):
+        #         if not isinstance(data["invoice_object_from_file"],dict):
+        #             data["invoice_object_from_file"] = data["invoice_object_from_file"].replace('\" \"',"")
+        #     if data["invoice_object_from_file"] != "":
+        #         if "data" not in data['invoice_object_from_file']:
+        #             data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
+        #         else:
+        #             data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
         # if "raise_credit" in data['guest_data']:
 
         sales_amount_before_tax = 0
@@ -218,7 +218,7 @@ def Reinitiate_invoice(data):
         # 	invoice_category = "Debit Invoice"
         # else:
         # 	invoice_category = doc.invoice_category	
-        invoice_from = doc.invoice_from
+        invoice_from = doc.invoice_from if "invoice_from" not in data.keys() else data["invoice_from"]
         
         converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
         doc.total_inovice_amount = total_invoice_amount
@@ -336,6 +336,7 @@ def Reinitiate_invoice(data):
         if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
                 doc.invoice_object_from_file = data['invoice_object_from_file']
+        doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         
         items = data['items_data']

@@ -2839,7 +2839,6 @@ def create_pdf_each_invoice(doc):
             return {'success': False, 'message': "please specify host in company"}
         cwd = os.getcwd()
         templates = frappe.db.get_value("Print Format", "Manual E-Tax Invoice","html")
-        # doc = doc.as_dict()
         if company.company_logo:
             convimgtobase = convert_image_to_base64(company.company_logo)
             if not convimgtobase["success"]:
@@ -2862,7 +2861,6 @@ def create_pdf_each_invoice(doc):
         htmldoc = HTML(string=html_data, base_url="")
         folder=company.save_etax_invoice_folder
         get_inv_date=doc.invoice_date
-        print(get_inv_date,"creation")
         create_month_year_folder = get_inv_date.strftime("%Y_%m")
         path=os.path.join(folder,create_month_year_folder)
         file_path=path +"/"+  doc.name  + '.pdf'

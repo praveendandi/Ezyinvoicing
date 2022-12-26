@@ -307,11 +307,11 @@ def qr_generatedtoirn_generated():
 
 
 @frappe.whitelist(allow_guest=True)
-def errorInvoicesList():
+def errorInvoicesList(from_date=None, to_date=None):
     try:
         doc = frappe.db.get_list('company',fields=['name'])
        
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","guest_name","irn_generated"])
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']], 'invoice_date': ["between", [from_date, to_date]]},fields=["name","invoice_number","guest_name","irn_generated"])
         if len(data)>0:
             return {"success":True,"data":data}
         else:
@@ -322,7 +322,7 @@ def errorInvoicesList():
         return {"success":False,"mesasge":str(e)}
 
 @frappe.whitelist(allow_guest=True)
-def reprocess_error_inoices():
+def reprocess_error_inoices(from_date=None, to_date=None):
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
         if doc[0]["new_parsers"] == 0:
@@ -332,7 +332,7 @@ def reprocess_error_inoices():
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file","invoice_from"])
+        data = frappe.db.get_list('Invoices',filters={'irn_generated': 'Error', 'invoice_from':["in",['Pms','File']], 'invoice_date': ["between", [from_date, to_date]]},fields=["name","invoice_number","invoice_file","invoice_from"])
         if len(data)>0:
             # frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name})
             for each in data:
