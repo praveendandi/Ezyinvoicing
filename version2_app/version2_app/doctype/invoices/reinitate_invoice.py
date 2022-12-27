@@ -55,7 +55,6 @@ def Reinitiate_invoice(data):
         #         else:
         #             data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
         # if "raise_credit" in data['guest_data']:
-
         sales_amount_before_tax = 0
         sales_amount_after_tax = 0
         value_before_gst = 0
@@ -335,7 +334,8 @@ def Reinitiate_invoice(data):
         doc.invoice_round_off_amount = invoice_round_off_amount
         if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
-                doc.invoice_object_from_file = data['invoice_object_from_file']
+                if data["invoice_object_from_file"] != []:
+                    doc.invoice_object_from_file = data['invoice_object_from_file']
         doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         
