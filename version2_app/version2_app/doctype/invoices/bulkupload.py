@@ -122,12 +122,15 @@ def bulkupload(data):
                     item_date = datetime.datetime.strptime(x[bulk_meta_data["detail_folio"]['transaction_date']],'%d-%b-%y').strftime(companyData.invoice_item_date_format)
                     # for sac_items in sac_description:
                     if x[bulk_meta_data["detail_folio"]['transaction_description']].lower() in paymentTypes:# 
-                        if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is None:
-                            x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
+                        items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac'}
+                        if x[bulk_meta_data["detail_folio"]["item_valu_credit"]] is not None:
+                            items_pdf_dict["FT_CREDIT"] = float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])
+                        else:
+                            items_pdf_dict["item_value"] = float(x[bulk_meta_data["detail_folio"]["item_value"]])
                         # if x[bulk_meta_data["detail_folio"]['transaction_description']] in sac_items["name"]:
                         #     items_pdf_dict = {'date':item_date,'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":sac_items["code"],"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"])}
                         # else:
-                        items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
+                        # items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
                         # continue
                     elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'Vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UTGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
                         # if "%" in x[bulk_meta_data["detail_folio"]['transaction_description']:
@@ -135,9 +138,12 @@ def bulkupload(data):
                     # if x[bulk_meta_data["detail_folio"]["item_value"] is None:
                     #     x[bulk_meta_data["detail_folio"]["item_value"] = x[bulk_meta_data["detail_folio"]["item_valu_credit"]
                     else:
-                        if x[bulk_meta_data["detail_folio"]["item_value"]] is None:
-                            x[bulk_meta_data["detail_folio"]["item_value"]]= x[bulk_meta_data["detail_folio"]["item_valu_credit"]]
-                        items_dict = {'date':item_date,"goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"taxcode_dsc":"No Sac",'sort_order':int(y)+1,"sac_code":'No Sac'}
+                        items_dict = {'date':item_date,"goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"taxcode_dsc":"No Sac",'sort_order':int(y)+1,"sac_code":'No Sac'}
+                        if x[bulk_meta_data["detail_folio"]["item_value"]] is not None:
+                            items_dict["item_value"]= float(x[bulk_meta_data["detail_folio"]["item_value"]])
+                        else:
+                            items_dict["FT_CREDIT"] = float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])
+                        # items_dict = {'date':item_date,"goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"taxcode_dsc":"No Sac",'sort_order':int(y)+1,"sac_code":'No Sac'}
                         # print(dict(x))
                         items.append(items_dict)
                         items_pdf.append(items_dict)
