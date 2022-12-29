@@ -27,7 +27,7 @@ def getTaxPayerDetails(data):
                     # filters={
                     # 	'Status': data['status']
                     # },
-                    fields=['gst_number','legal_name','trade_name','creation','status'],
+                    fields=['gst_number','legal_name','trade_name','creation','status', 'synced_date', 'synced_to_erp'],
                     order_by=data['sortKey'],
                     start=data['start'],
                     page_length=data['end'],
@@ -38,7 +38,7 @@ def getTaxPayerDetails(data):
                     filters={
                         'Status': data['status']
                     },
-                    fields=['gst_number','legal_name','trade_name','creation','status'],
+                    fields=['gst_number','legal_name','trade_name','creation','status', 'synced_date', 'synced_to_erp'],
                     order_by=data['sortKey'],
                     start=data['start'],
                     page_length=data['end'],
@@ -50,7 +50,7 @@ def getTaxPayerDetails(data):
             filters={
                 data['key']: ['like', '%'+data['value']+'%']
             },
-            fields=['gst_number','legal_name','trade_name','creation','status'],
+            fields=['gst_number','legal_name','trade_name','creation','status', 'synced_date', 'synced_to_erp'],
             order_by=data['sortKey'],
             start=data['start'],
             page_length=data['end'],
@@ -68,6 +68,8 @@ def getTaxPayerDetails(data):
             listData['legal_name'] = each[1]
             listData['creation'] = each[3]
             listData['status'] = each[4]
+            listData["synced_date"] = each[5]
+            listData["synced_to_erp"] = each[6]
             invoiceData = frappe.db.get_list('Invoices',filters={'gst_number':each[0]},fields=['has_credit_items','name','invoice_number'],as_list=True)
             # listData['']
             listData['invoice_count'] = len(list(invoiceData))
