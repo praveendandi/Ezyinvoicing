@@ -390,6 +390,7 @@ def generateIrn(data):
                 # IRNObjects = {"invoice_number":invoice_number,"irn_request_object":gst_data,"irn_response_object":response}				
                 # IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,'irn_request_object':str(gst_data),'irn_response_object':str(response)})
                 # IRNObjectdoc.insert(ignore_permissions=True, ignore_links=True)
+                # print(response,"Kudos its working")
                 if response['success']:
                     # json.dumps(data['invoice_object_from_file']
                     IRNObjectdoc = frappe.get_doc({'doctype':'IRN Objects','invoice_number':invoice_number,"invoice_category":invoice.invoice_category,"irn_request_object":json.dumps({"data":gst_data}),"irn_response_object":json.dumps({"data":response})})
@@ -453,7 +454,8 @@ def generateIrn(data):
                     irn_error_message = response["message"]
                     frappe.log_error(frappe.get_traceback(),invoice_number)
                     logger.error(f"{invoice_number},     postIrn,   {irn_error_message}")
-                    return response	
+                    return response
+            
             except Exception as e:
                 print(str(e), "generate Irn")
                 # frappe.log_error(frappe.get_traceback(), invoice_number)
@@ -461,6 +463,7 @@ def generateIrn(data):
                 frappe.log_error("Ezy-invoicing generateIrn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
                 logger.error(f"{invoice_number},     generateIrn,   {str(e)}")
                 return {"success": False, "message": str(e)}
+        
     except Exception as e:
         print(str(e), "generate Irn")
         print(traceback.print_exc())
@@ -805,10 +808,11 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
 
 
 
-
+from version2_app.version2_app.doctype.ey_intigration.redo_qr import create_ey_qr_code
 
 def create_qr_image(invoice_number, gsp):
     try:
+        
         invoice = frappe.get_doc('Invoices', invoice_number)
 
         folder_path = frappe.utils.get_bench_path()
@@ -816,73 +820,75 @@ def create_qr_image(invoice_number, gsp):
         site_folder_path = company.site_name
         path = folder_path + '/sites/' + site_folder_path + "/private/files/"
         # print(path)
-
-        headers = {
-            "user_name": gsp['username'],
-            "password": gsp['password'],
-            "gstin": gsp['gst'],
-            "requestid": str(random.randint(0, 1000000000000000000)),
-            "Authorization": "Bearer " + gsp['token'],
-            "Irn": invoice.irn_number
-        }
-        if company.irn_qr_size == "Small":
-                # "height":"150",
-            # "width":"150"
-            headers['height'] = "150"
-            headers['width'] = "150"
-        if company.proxy == 0:
-            if company.skip_ssl_verify == 0:
-                qr_response = requests.get(gsp['generate_qr_code'],
-                                        headers=headers,
-                                        stream=True,verify=False)
+        if company.provider!='ey':
+            headers = {
+                "user_name": gsp['username'],
+                "password": gsp['password'],
+                "gstin": gsp['gst'],
+                "requestid": str(random.randint(0, 1000000000000000000)),
+                "Authorization": "Bearer " + gsp['token'],
+                "Irn": invoice.irn_number
+            }
+            if company.irn_qr_size == "Small":
+                    # "height":"150",
+                # "width":"150"
+                headers['height'] = "150"
+                headers['width'] = "150"
+            if company.proxy == 0:
+                if company.skip_ssl_verify == 0:
+                    qr_response = requests.get(gsp['generate_qr_code'],
+                                            headers=headers,
+                                            stream=True,verify=False)
+                else:
+                    qr_response = requests.get(gsp['generate_qr_code'],
+                                            headers=headers,
+                                            stream=True,verify=False)							
             else:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://", "@")
+                proxies = {
+                    'https':
+                    'https://' + company.proxy_username + ":" +
+                    company.proxy_password + proxyhost}
+                print(proxies, "     proxy console")
                 qr_response = requests.get(gsp['generate_qr_code'],
                                         headers=headers,
-                                        stream=True,verify=False)							
-        else:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://", "@")
-            proxies = {
-                'https':
-                'https://' + company.proxy_username + ":" +
-                company.proxy_password + proxyhost}
-            print(proxies, "     proxy console")
-            qr_response = requests.get(gsp['generate_qr_code'],
-                                       headers=headers,
-                                       stream=True,
-                                       proxies=proxies,verify=False)	
-        if qr_response.status_code==200:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-        else:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)								   					   
-        file_name = invoice_number + "qr.png"
-        full_file_path = path + file_name
-        with open(full_file_path, "wb") as f:
-            for chunk in qr_response.iter_content(1024):
-                f.write(chunk)
+                                        stream=True,
+                                        proxies=proxies,verify=False)	
+            if qr_response.status_code==200:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+            else:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)								   					   
+            file_name = invoice_number + "qr.png"
+            full_file_path = path + file_name
+            with open(full_file_path, "wb") as f:
+                for chunk in qr_response.iter_content(1024):
+                    f.write(chunk)
 
-        files = {"file": open(full_file_path, 'rb')}
-        payload = {
-            "is_private": 1,
-            "folder": "Home",
-            "doctype": "Invoices",
-            "docname": invoice_number,
-            'fieldname': 'qr_code_image'
-        }
-        site = company.host
-        upload_qr_image = requests.post(site + "api/method/upload_file",
-                                        files=files,
-                                        data=payload)
-        response = upload_qr_image.json()
-        if 'message' in response:
-            invoice.qr_code_image = response['message']['file_url']
-            invoice.save()
-            frappe.db.commit()
-            # attach_qr_code(invoice_number, gsp, invoice.company)
+            files = {"file": open(full_file_path, 'rb')}
+            payload = {
+                "is_private": 1,
+                "folder": "Home",
+                "doctype": "Invoices",
+                "docname": invoice_number,
+                'fieldname': 'qr_code_image'
+            }
+            site = company.host
+            upload_qr_image = requests.post(site + "api/method/upload_file",
+                                            files=files,
+                                            data=payload)
+            response = upload_qr_image.json()
+            if 'message' in response:
+                invoice.qr_code_image = response['message']['file_url']
+                invoice.save()
+                frappe.db.commit()
+                # attach_qr_code(invoice_number, gsp, invoice.company)
+                return {"success": True,"message":"Qr Generated Successfully"}
             return {"success": True,"message":"Qr Generated Successfully"}
-        return {"success": True,"message":"Qr Generated Successfully"}
+        else:
+            create_ey_qr_code(invoice_number,{})
     except Exception as e:
         print(e, "qr image")
         # frappe.log_error(frappe.get_traceback(),invoice_number)
@@ -891,51 +897,60 @@ def create_qr_image(invoice_number, gsp):
         logger.error(f"{invoice_number},     create_qr_image,   {str(e)}")
         return {"success": False, "message": str(e)}
 
+from version2_app.version2_app.doctype.ey_intigration.irngeneration import ey_generate_einvoice
+
 def postIrn(gst_data, gsp, company, invoice_number):
     try:
         # print(gst_data)
-        headers = {
-            "user_name": gsp['username'],
-            "password": gsp['password'],
-            "gstin": gsp['gst'],
-            "requestid": str(random.randint(0, 1000000000000000000)),
-            "Authorization": "Bearer " + gsp['token']
-        }
-        if company.proxy == 0:
-            if company.skip_ssl_verify == 0:
-                irn_response = requests.post(gsp['generate_irn'],
-                                            headers=headers,
-                                            json=gst_data,verify=False)
+        if company.provider != 'ey':
+            headers = {
+                "user_name": gsp['username'],
+                "password": gsp['password'],
+                "gstin": gsp['gst'],
+                "requestid": str(random.randint(0, 1000000000000000000)),
+                "Authorization": "Bearer " + gsp['token']
+            }
+            if company.proxy == 0:
+                if company.skip_ssl_verify == 0:
+                    irn_response = requests.post(gsp['generate_irn'],
+                                                headers=headers,
+                                                json=gst_data,verify=False)
+                else:
+                    irn_response = requests.post(gsp['generate_irn'],
+                                                headers=headers,
+                                                json=gst_data,verify=False)
+
             else:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://", "@")
+                proxies = {
+                    'https':
+                    'https://' + company.proxy_username + ":" +
+                    company.proxy_password + proxyhost}
+                print(proxies, "     proxy console")
                 irn_response = requests.post(gsp['generate_irn'],
                                             headers=headers,
-                                            json=gst_data,verify=False)
+                                            json=gst_data,
+                                            proxies=proxies,verify=False)
 
+            # print(irn_response.text)
+            if irn_response.status_code == 200:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company.name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                return irn_response.json()
+            else:
+                message_error = str(irn_response.text)
+                logger.error(f"{invoice_number},     postIrn,   {message_error}")
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company.name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                return {"success": False, 'message': irn_response.text}
+            # print(irn_response.text)
         else:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://", "@")
-            proxies = {
-                'https':
-                'https://' + company.proxy_username + ":" +
-                company.proxy_password + proxyhost}
-            print(proxies, "     proxy console")
-            irn_response = requests.post(gsp['generate_irn'],
-                                         headers=headers,
-                                         json=gst_data,
-                                         proxies=proxies,verify=False)
+            resp = ey_generate_einvoice(gst_data, gsp, company, invoice_number)
+            print(resp,"*********************")
+            return resp
+            # return {"success": False, 'message': resp}
 
-        # print(irn_response.text)
-        if irn_response.status_code == 200:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company.name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            return irn_response.json()
-        else:
-            message_error = str(irn_response.text)
-            logger.error(f"{invoice_number},     postIrn,   {message_error}")
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company.name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            return {"success": False, 'message': irn_response.text}
-        # print(irn_response.text)
     except Exception as e:
         print(e, "post irn")
         # frappe.log_error(frappe.get_traceback(), invoice_number)
@@ -3105,41 +3120,85 @@ def check_token_is_valid(data):
         return {"success": False, "message": str(e)}
 
 
+from version2_app.version2_app.doctype.ey_intigration.api_urls import test_login,prod_login
+import base64
+
+
 def login_gsp(code,mode):
     try:
-        gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
-            'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
-            'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
-        ],
-                                  as_dict=1)
-        # company = frappe.get_doc('company',code)						  
-        if mode == 'Testing':
-            headers = {
-                "gspappid": gsp["gsp_test_app_id"],
-                "gspappsecret": gsp["gsp_test_app_secret"],
-            }
-            login_response = request_post(gsp['auth_test'], code, headers)
-            print("***********88")
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
-            gsp_update.gsp_test_token_expired_on = login_response['expires_in']
-            gsp_update.gsp_test_token = login_response['access_token']
-            gsp_update.save(ignore_permissions=True)
+        company = frappe.get_doc('company',code)
+        gsp = frappe.db.get_value('GSP APIS', {"company": code,"provider":company.provider}, [
+                'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
+                'gsp_prod_app_secret', 'gsp_test_app_secret', 'name',
+                'gst__test_username','gst_test_password','gst__prod_username','gst_prod_password'
+        ],as_dict=1)
+        if company.provider != 'ey':
+            # company = frappe.get_doc('company',code)						  
+            if mode == 'Testing':
+                headers = {
+                    "gspappid": gsp["gsp_test_app_id"],
+                    "gspappsecret": gsp["gsp_test_app_secret"],
+                }
+                login_response = request_post(gsp['auth_test'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_test_token_expired_on = login_response['expires_in']
+                gsp_update.gsp_test_token = login_response['access_token']
+                gsp_update.save(ignore_permissions=True)
+                return True
+            elif mode == 'Production':
+                headers = {
+                    "gspappid": gsp["gsp_prod_app_id"],
+                    "gspappsecret": gsp["gsp_prod_app_secret"]
+                }
+                login_response = request_post(gsp['auth_prod'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
+                gsp_update.gsp_prod_token = login_response['access_token']
+                gsp_update.save(ignore_permissions=True)
             return True
-        elif mode == 'Production':
-            headers = {
-                "gspappid": gsp["gsp_prod_app_id"],
-                "gspappsecret": gsp["gsp_prod_app_secret"]
-            }
-            login_response = request_post(gsp['auth_prod'], code, headers)
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
-            gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
-            gsp_update.gsp_prod_token = login_response['access_token']
-            gsp_update.save(ignore_permissions=True)
-            return True
+        else:
+            
+            if mode == 'Testing':
+                enocded_password = base64.b64encode(bytes(gsp["gst_test_password"], 'utf-8')) # bytes
+                # base64_str = b.decode('utf-8') # convert bytes to string
+
+                headers = {
+                    'username':gsp["gst__test_username"],
+                    'password':enocded_password.decode("utf-8") ,
+                    "apiaccesskey": gsp["gsp_test_app_id"],
+                }
+                login_response = request_post(gsp['auth_test'], code, headers,ey=True)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_test_token_expired_on = login_response['expiry']
+                gsp_update.gsp_test_token = login_response['accessToken']
+                gsp_update.test_refresh_token = login_response['refreshToken']
+                gsp_update.save(ignore_permissions=True)
+                frappe.db.commit()
+                return True
+            elif mode == 'Production':
+                enocded_password = base64.b64encode(bytes(gsp["gst_prod_password"], 'utf-8')) # bytes
+                headers = {
+                    'username':gsp["gst__prod_username"],
+                    'password':enocded_password.decode("utf-8") ,
+                    "apiaccesskey": gsp["gsp_prod_app_id"],
+                }
+                login_response = request_post(gsp['auth_prod'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_prod_token_expired_on = login_response['expiry']
+                gsp_update.gsp_prod_token = login_response['accessToken']
+                gsp_update.prod_refresh_token = login_response['refreshToken']
+                gsp_update.save(ignore_permissions=True)
+                frappe.db.commit()
+                return True
+            
     except Exception as e:
         insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
         insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
@@ -3148,44 +3207,83 @@ def login_gsp(code,mode):
         print(e, "login gsp")
 
 @frappe.whitelist()
-def updatelogin_gsp(data):
+def updatelogin_gsp(data,ey=False):
     try:
-        code = data['code']
-        mode = data['mode']
-        # print("********** scheduler")
-        gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
-            'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
-            'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
-        ],
-                                  as_dict=1)
-        if mode == 'Testing':
-            headers = {
-                "gspappid": gsp["gsp_test_app_id"],
-                "gspappsecret": gsp["gsp_test_app_secret"],
-            }
-            login_response = request_post(gsp['auth_test'], code, headers)
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
-            gsp_update.gsp_test_token_expired_on = login_response['expires_in']
-            gsp_update.gsp_test_token = login_response['access_token']
-            gsp_update.test_token_generated_on = datetime.datetime.now()
-            gsp_update.save(ignore_permissions=True)
-            return True
-        elif mode == 'Production':
-            headers = {
-                "gspappid": gsp["gsp_prod_app_id"],
-                "gspappsecret": gsp["gsp_prod_app_secret"]
-            }
-            login_response = request_post(gsp['auth_prod'], code, headers)
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
-            gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
-            gsp_update.gsp_prod_token = login_response['access_token']
-            gsp_update.prod_token_generated_on = datetime.datetime.now()
-            gsp_update.save(ignore_permissions=True)
-            return True
+        if ey == False:
+            code = data['code']
+            mode = data['mode']
+            # print("********** scheduler")
+            gsp = frappe.db.get_value('GSP APIS', {"company": code,
+                "provider":'Adaequare'}, [
+                'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
+                'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
+            ],as_dict=1)
+            if mode == 'Testing':
+                headers = {
+                    "gspappid": gsp["gsp_test_app_id"],
+                    "gspappsecret": gsp["gsp_test_app_secret"],
+                }
+                # print(gsp['auth_test'], code, headers)
+                login_response = request_post(gsp['auth_test'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_test_token_expired_on = login_response['expires_in']
+                gsp_update.gsp_test_token = login_response['access_token']
+                gsp_update.test_token_generated_on = datetime.datetime.now()
+                gsp_update.save(ignore_permissions=True)
+                return True
+            elif mode == 'Production':
+                headers = {
+                    "gspappid": gsp["gsp_prod_app_id"],
+                    "gspappsecret": gsp["gsp_prod_app_secret"]
+                }
+                login_response = request_post(gsp['auth_prod'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
+                gsp_update.gsp_prod_token = login_response['access_token']
+                gsp_update.prod_token_generated_on = datetime.datetime.now()
+                gsp_update.save(ignore_permissions=True)
+                return True
+        else:
+            code = data['code']
+            mode = data['mode']
+            # print("********** scheduler")
+            gsp = frappe.db.get_value('GSP APIS', {"company": code}, [
+                'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
+                'gsp_prod_app_secret', 'gsp_test_app_secret', 'name'
+            ],
+                                    as_dict=1)
+            if mode == 'Testing':
+                headers = {
+                    "gspappid": gsp["gsp_test_app_id"],
+                    "gspappsecret": gsp["gsp_test_app_secret"],
+                }
+                login_response = request_post(gsp['auth_test'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_test_token_expired_on = login_response['expires_in']
+                gsp_update.gsp_test_token = login_response['access_token']
+                gsp_update.test_token_generated_on = datetime.datetime.now()
+                gsp_update.save(ignore_permissions=True)
+                return True
+            elif mode == 'Production':
+                headers = {
+                    "gspappid": gsp["gsp_prod_app_id"],
+                    "gspappsecret": gsp["gsp_prod_app_secret"]
+                }
+                login_response = request_post(gsp['auth_prod'], code, headers)
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
+                gsp_update.gsp_prod_token_expired_on = login_response['expires_in']
+                gsp_update.gsp_prod_token = login_response['access_token']
+                gsp_update.prod_token_generated_on = datetime.datetime.now()
+                gsp_update.save(ignore_permissions=True)
+                return True
     except Exception as e:
         insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Failed","company":code})
         insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
@@ -3194,12 +3292,13 @@ def updatelogin_gsp(data):
         print(e, "login gsp")
 
 @frappe.whitelist()
-def gsp_api_data(data):
+def gsp_api_data(data,ey=False):
     try:
+        provider = 'Adaequare' if ey==False else 'ey'
         mode = data['mode']
         gsp_apis = frappe.db.get_value('GSP APIS', {
             "company": data['code'],
-            "name": data['provider'],
+            "name": provider,
         }, [
             'auth_test', 'cancel_test_irn', 'extract_prod_qr_code',
             'extract_test_qr_code', 'extract_test_signed_invoice',
@@ -3349,7 +3448,7 @@ def gsp_api_data_for_irn(data):
         return {"success": False, "message": str(e)}
 
 
-def request_post(url, code, headers=None):
+def request_post(url, code, headers=None,ey=False):
     try:
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
@@ -3368,10 +3467,16 @@ def request_post(url, code, headers=None):
             data = requests.post(url, headers=headers, proxies=proxies,verify=False)
         if data.status_code == 200:
             response_data = data.json()
-            if 'access_token' in response_data:
-                return response_data
+            if ey:
+                if 'accessToken' in response_data:
+                    return response_data
+                else:
+                    return {}
             else:
-                print(response_data)
+                if 'access_token' in response_data:
+                    return response_data
+                else:
+                    print(response_data)
         else:
             print(data)
     except Exception as e:

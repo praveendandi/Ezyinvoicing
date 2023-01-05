@@ -32,7 +32,7 @@ opencv-python
 fitz
 pgeocode
 datefinder
-PyMuPDF==1.16.16
+PyMuPDF==1.18.16
 pyHanko
 uharfbuzz
 fontTools
