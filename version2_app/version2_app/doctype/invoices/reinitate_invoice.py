@@ -44,7 +44,7 @@ def Reinitiate_invoice(data):
             else:
                 place_of_supply = company.state_code
         # if "invoice_object_from_file" in data.keys():
-        #     if isinstance(data["invoice_object_from_file"],list):
+        #     if isinstance(data["invoice_object_from_file"],dict):
         #         data["invoice_object_from_file"] = ""
         #     if isinstance(data["invoice_object_from_file"],str):
         #         if not isinstance(data["invoice_object_from_file"],dict):
@@ -332,10 +332,10 @@ def Reinitiate_invoice(data):
         doc.total_invoice_amount = data["total_invoice_amount"]
         doc.place_of_supply = place_of_supply
         doc.invoice_round_off_amount = invoice_round_off_amount
-        if "invoice_object_from_file" in data.keys():
-            if data["invoice_object_from_file"] != "":
-                if data["invoice_object_from_file"] != []:
-                    doc.invoice_object_from_file = data['invoice_object_from_file']
+        # if "invoice_object_from_file" in data.keys():
+        #     if data["invoice_object_from_file"] != "":
+        #         if data["invoice_object_from_file"] != []:
+        #             doc.invoice_object_from_file = data['invoice_object_from_file']
         doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         
