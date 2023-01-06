@@ -59,10 +59,12 @@ def invoice_update(doc, method=None):
     try:
         company = frappe.get_last_doc("company")
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
+            print("//////////////////////////")
             etax = html_to_pdf(doc.name)
             if etax["success"]:
                 doc.etax_invoice_created
         if doc.sales_amount_after_tax:
+            print("...........................")
             total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
@@ -74,6 +76,7 @@ def invoice_update(doc, method=None):
 
 def invoice_created(doc, method=None):
     try:
+        print("/.................../........///////////.")
         company = frappe.get_last_doc("company")
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
             etax = html_to_pdf(doc.name)
