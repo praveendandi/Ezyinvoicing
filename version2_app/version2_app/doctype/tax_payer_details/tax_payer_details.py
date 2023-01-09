@@ -12,6 +12,7 @@ class TaxPayerDetails(Document):
     pass
 import requests,random
 import frappe
+import json
 Headers = {
     'Content-Type': 'application/json'
 } 
@@ -131,6 +132,8 @@ def TaxPayerDetails(data):
     get TaxPayerDetail from gsp   gstNumber, code, apidata
     '''
     try:
+        if isinstance(data,str):
+            data = json.loads(data)
         fields = ['gst_number','name','legal_name','address_1','address_2','location','pincode','gst_status','tax_type','trade_name','phone_number','state_code','status','block_status','company']
         tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'],fields,as_dict=1)
         if tay_payer_details is None:
