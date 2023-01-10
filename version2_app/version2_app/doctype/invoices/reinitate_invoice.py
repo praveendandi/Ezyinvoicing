@@ -295,7 +295,11 @@ def Reinitiate_invoice(data):
                 generateb2cQr = False
             else:
                 if company.only_b2c == "No":
-                    if abs(invoice_round_off_amount)>6:
+                    if company.name == "SMBKC-01":
+                        round_amount = 2
+                    else:
+                        round_amount = 6
+                    if abs(invoice_round_off_amount)>round_amount:
                         if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                             generateb2cQr = False
                             doc.error_message = " Invoice Total Mismatch"
