@@ -1133,20 +1133,21 @@ def insert_invoice(data):
                     # other_charges_before_tax = data["total_invoice_amount"]
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
-                if company.name == "SMBKC-01":
-                    round_amount = 2
-                else:
-                    round_amount = 6
-                if abs(roundoff_amount)>round_amount:
-                    if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
-                        
-                        calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
-                                "value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,
-                                "credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,
-                                "total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
-                                "total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
-                                "credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
-                                "pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
+                if abs(roundoff_amount)>6:
+                # if company.name == "SMBKC-01":
+                #     round_amount = 2
+                # else:
+                #     round_amount = 6
+                    if abs(roundoff_amount)>round_amount:
+                        if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
+                            
+                            calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
+                                    "value_before_gst":value_before_gst,"value_after_gst":value_after_gst,"other_charges":other_charges,"credit_value_after_gst":credit_value_after_gst,
+                                    "credit_value_before_gst":credit_value_before_gst,"irn_generated":"Error","cgst_amount":cgst_amount,"sgst_amount":sgst_amount,"igst_amount":igst_amount,
+                                    "total_central_cess_amount":total_central_cess_amount,"total_state_cess_amount":total_state_cess_amount,"total_vat_amount":total_vat_amount,
+                                    "total_credit_state_cess_amount":total_credit_state_cess_amount,"total_credit_central_cess_amount":total_credit_central_cess_amount,"total_credit_vat_amount":total_credit_vat_amount,
+                                    "credit_cgst_amount":credit_cgst_amount,"credit_igst_amount":credit_igst_amount,"credit_sgst_amount":credit_sgst_amount,"pms_invoice_summary":pms_invoice_summary,
+                                    "pms_invoice_summary_without_gst":pms_invoice_summary_without_gst,"company":company}
                         
                         
                         TotalMismatchErrorAPI = TotalMismatchError(data,calculated_data)
