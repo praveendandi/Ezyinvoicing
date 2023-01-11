@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2020-12-07 18:09:31.735809",
  "disable_prepared_report": 0,
@@ -9,7 +9,7 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2021-02-09 14:31:21.303756",
+ "modified": "2023-01-11 09:42:41.599937",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Outward Supplies",
