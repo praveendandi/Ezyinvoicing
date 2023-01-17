@@ -210,26 +210,22 @@ def bulkupload(data):
             #     each['gstNumber']=""
             # else:
             #     each['invoice_type'] = "B2B"
-            
             if check_invoice['success']==True:
                 inv_data = check_invoice['data']
                 # print(inv_data.irn_generated,inv_data.docstatus,inv_data.invoice_type,";;;;;;;;;.........////////")
                 if inv_data.irn_generated == "Cancelled":
                     continue
-                if inv_data.docstatus!=2 and  inv_data.irn_generated in ["Success"] and inv_data.invoice_type=="B2B":
+                if inv_data.docstatus!=2 and  inv_data.irn_generated in ["Success", "Pending", "Cancelled"] and inv_data.invoice_type=="B2B":
                     continue
-                if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "Pending"] and inv_data.invoice_type=="B2B":
-                    reupload = True
+                # if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "Pending", "Cancelled"] and inv_data.invoice_type=="B2B":
+                #     reupload = True
                 elif inv_data.invoice_type == "B2C":
                     if inv_data.irn_generated=="Success":
-                        # print(inv_data.irn_generated=="Success","//////////////////")
-                        # reupload = False
-                        # if company in ['LAAB-01','LAAB-01','LAKOL-01','LAMU-01','LGPS-01','LTVK-01','LABE-01','LAGO-01','LAJA-01','LAMAN-01','TLND-01','TALU-01']:
                         continue
                     else:
                         reupload = True
                 else:
-                    reupload = False
+                    reupload = True
             else:
                 reupload = False	
             # if check_invoice['data'].name in ["4000-219618"]:
