@@ -1134,6 +1134,11 @@ def insert_invoice(data):
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
                 if abs(roundoff_amount)>6:
+                # if company.name == "SMBKC-01":
+                #     round_amount = 2
+                # else:
+                #     round_amount = 6
+                    # if abs(roundoff_amount)>round_amount:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                         
                         calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
