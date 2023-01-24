@@ -7,6 +7,8 @@ from version2_app.version2_app.doctype.ey_intigration.api_urls import test_irn,p
 from version2_app.version2_app.doctype.ey_intigration.api_urls import test_redo_qr,prod_redo_qr
 import base64
 import traceback
+import qrcode
+
 
 
 
@@ -19,9 +21,9 @@ def create_ey_qr_code(invoice_number,data ={}):
         company = frappe.get_doc('company', invoice.company)
         site_folder_path = company.site_name
         path = folder_path + '/sites/' + site_folder_path + "/private/files/"						   					   
-        file_name = "ttttttttttttttt" + "qr.png"
+        file_name = invoice.name+"b2b" + "qr.png"
         full_file_path = path + file_name
-        print(full_file_path)
+        # print(full_file_path)
         if len(data.keys())>0:
             if invoice.invoice_category == "Tax Invoice":
                 category = "INV"
@@ -108,7 +110,7 @@ def create_ey_qr_code(invoice_number,data ={}):
                                             # stream=True,
                                             json=payload,
                                             proxies=proxies,verify=False)
-
+            # print(qr_response.text)
             if qr_response.status_code==200:
                 insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
                 insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
@@ -116,16 +118,26 @@ def create_ey_qr_code(invoice_number,data ={}):
                 insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
                 insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 
-            print(qr_response.text)
-            print(qr_response.json)
+            # print(qr_response.text)
+            # print(qr_response.json)
         else:
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=3,
+                border=4
+            )
+            qr.add_data(invoice.qr_code)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+            img.save(full_file_path)
             
-            print(invoice.qr_code)
-            imgdata = base64.b64decode(invoice.qr_code)
-            print(imgdata,"7777777777777777777")
-            # filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
-            with open(full_file_path, 'wb') as f:
-                f.write(imgdata)	
+            # print(invoice.qr_code)
+            # # imgdata = base64.b64decode(invoice.qr_code)
+            # # print(imgdata,"7777777777777777777")
+            # # filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
+            # with open(full_file_path, 'wb') as f:
+            #     f.write(invoice.qr_code)	
         		   					   
         
 

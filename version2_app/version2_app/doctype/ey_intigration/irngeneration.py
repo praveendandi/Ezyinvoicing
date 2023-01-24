@@ -2,7 +2,8 @@ import frappe
 import requests
 import sys
 import random
-from frappe.utils import logger
+import traceback
+# from frappe.utils import logger
 from version2_app.version2_app.doctype.ey_intigration.api_urls import test_irn,prod_irn
 
 
@@ -135,6 +136,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "accessToken": gsp.gsp_test_token,
                 "Content-Type": 'application/json',
             }
+            print(headers)
             # print(req)
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
@@ -208,14 +210,14 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
         # frappe.log_error(frappe.get_traceback(), invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing ey_generate_einvoice ","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        logger.error(f"{invoice_number},     postIrn,   {str(e)}")
+        # logger.error(f"{invoice_number},     postIrn,   {str(e)}")
         return {"success": False, "message": str(e)}
 
 
 
 def format_response(invoice_number,data,request_obj):
     try:
-        # print(data,"**************")
+        print(data,"**************")
         response_obj = {
             "success":True,
             "result":{
@@ -240,7 +242,7 @@ def format_response(invoice_number,data,request_obj):
         # frappe.log_error(frappe.get_traceback(), invoice_number)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing format_response Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        logger.error(f"{invoice_number},     postIrn,   {str(e)}")
+        # logger.error(f"{invoice_number},     postIrn,   {str(e)}")
         return {"success": False, "message": str(e)}
 
 

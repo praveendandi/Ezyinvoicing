@@ -426,7 +426,7 @@ def generateIrn(data):
                             ) - start_time
                             invoice.save(ignore_permissions=True,
                                             ignore_version=True)
-                            frappe.db.commit()                
+                            frappe.db.commit()              
                     return response
                 else:
                     if "result" in list(response.keys()):
@@ -888,7 +888,7 @@ def create_qr_image(invoice_number, gsp):
                 return {"success": True,"message":"Qr Generated Successfully"}
             return {"success": True,"message":"Qr Generated Successfully"}
         else:
-            create_ey_qr_code(invoice_number,{})
+            return create_ey_qr_code(invoice_number,{})
     except Exception as e:
         print(e, "qr image")
         # frappe.log_error(frappe.get_traceback(),invoice_number)
@@ -3171,11 +3171,13 @@ def login_gsp(code,mode):
                     'password':enocded_password.decode("utf-8") ,
                     "apiaccesskey": gsp["gsp_test_app_id"],
                 }
+                print(headers)
                 login_response = request_post(gsp['auth_test'], code, headers,ey=True)
+                print(login_response,"*************************")
                 insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
                 insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
                 gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
-                gsp_update.gsp_test_token_expired_on = login_response['expiry']
+                # gsp_update.gsp_test_token_expired_on = login_response['expiry']
                 gsp_update.gsp_test_token = login_response['accessToken']
                 gsp_update.test_refresh_token = login_response['refreshToken']
                 gsp_update.save(ignore_permissions=True)
@@ -3295,6 +3297,7 @@ def updatelogin_gsp(data,ey=False):
 def gsp_api_data(data,ey=False):
     try:
         provider = 'Adaequare' if ey==False else 'ey'
+        print(provider,"*******",ey)
         mode = data['mode']
         gsp_apis = frappe.db.get_value('GSP APIS', {
             "company": data['code'],
@@ -3351,6 +3354,7 @@ def gsp_api_data(data,ey=False):
         api_details['gst'] = gsp_apis[
             'gst_test_number'] if mode == 'Testing' else gsp_apis[
                 'gst_prod_number']
+        print(api_details)
         return {"success":True,"data":api_details}
     except Exception as e:
         print(e,"gsp api details")
@@ -3450,6 +3454,7 @@ def gsp_api_data_for_irn(data):
 
 def request_post(url, code, headers=None,ey=False):
     try:
+        print(url,headers)
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
