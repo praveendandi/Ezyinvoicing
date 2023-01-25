@@ -118,7 +118,7 @@ def create_ey_qr_code(invoice_number,data ={}):
                 insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
                 insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 
-            # print(qr_response.text)
+            # print(qr_response.text,"****************************** qrresponse",)
             # print(qr_response.json)
         else:
             qr = qrcode.QRCode(
@@ -127,7 +127,13 @@ def create_ey_qr_code(invoice_number,data ={}):
                 box_size=3,
                 border=4
             )
-            qr.add_data(invoice.qr_code)
+            print(invoice.credit_qr_code, "from eerugerjher")
+            if invoice.invoice_category == "Tax Invoice":
+                qr.add_data(invoice.qr_code)
+            elif invoice.invoice_category == "Debit Invoice":
+                qr.add_data(invoice.qr_code)
+            else:
+                qr.add_data(invoice.credit_qr_code)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
             img.save(full_file_path)
@@ -161,7 +167,12 @@ def create_ey_qr_code(invoice_number,data ={}):
         response = upload_qr_image.json()
         
         if 'message' in response:
-            invoice.qr_code_image = response['message']['file_url']
+            if invoice.invoice_category == "Tax Invoice":
+                invoice.qr_code_image = response['message']['file_url']
+            elif invoice.invoice_category == "Debit Invoice":	
+                invoice.qr_code_image = response['message']['file_url']
+            else:
+                invoice.credit_qr_code_image = response['message']['file_url']  
             invoice.save()
             frappe.db.commit()
             # attach_qr_code(invoice_number, gsp, invoice.company)

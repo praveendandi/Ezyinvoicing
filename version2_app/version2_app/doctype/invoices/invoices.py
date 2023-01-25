@@ -947,7 +947,7 @@ def postIrn(gst_data, gsp, company, invoice_number):
             # print(irn_response.text)
         else:
             resp = ey_generate_einvoice(gst_data, gsp, company, invoice_number)
-            print(resp,"*********************")
+            # print(resp,"*********************")
             return resp
             # return {"success": False, 'message': resp}
 

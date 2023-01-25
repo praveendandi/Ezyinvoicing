@@ -16,18 +16,26 @@ def get_return_period_from_invoice_date(inv_date):
 def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
     try:
         # print(gst_data)
+        if gst_data['DocDtls']['Typ'] == 'INV':
+            doc_type = 'INV'
+        elif gst_data['DocDtls']['Typ'] == 'DBN':
+            doc_type = 'DR'
+        elif gst_data['DocDtls']['Typ'] == 'CRN':
+            doc_type = 'CR'
+        print(gst_data['BuyerDtls'])
         req=[
         {
             "returnPeriod": get_return_period_from_invoice_date(gst_data['DocDtls']['Dt']),
             "suppGstin": company.gst_number,
-            "docType": gst_data['DocDtls']['Typ']  ,
+            "docType": doc_type,
             "docNo": invoice_number,
             "docDate": gst_data['DocDtls']['Dt'].replace('/','-'),
             "custGstin": gst_data['BuyerDtls']['Gstin'],
             "custOrSupName": gst_data['BuyerDtls']['LglNm'],
             "custOrSupAddr1":  gst_data['BuyerDtls']['Addr1'],
             "custOrSupAddr4": gst_data['BuyerDtls']['Loc'],
-            "billToState": company.state_code,
+            # "billToState": company.state_code,
+            "billToState": gst_data['BuyerDtls']['Stcd'],
             "shipToState": company.state_code,
             "pos": company.state_code,
             "sec7OfIgstFlag": gst_data['TranDtls']['IgstOnIntra'],
@@ -136,7 +144,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "accessToken": gsp.gsp_test_token,
                 "Content-Type": 'application/json',
             }
-            print(headers)
+            # print(headers)
             # print(req)
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
@@ -217,24 +225,36 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
 
 def format_response(invoice_number,data,request_obj):
     try:
-        print(data,"**************")
-        response_obj = {
-            "success":True,
-            "result":{
-                "AckNo":data['AckNo'],
-                "AckDt":data['AckDt'],
-                "Irn":data['Irn'],
-                "SignedInvoice":data['SignedInvoice'],
-                "SignedQRCode":data['SignedQRCode'],
-                "Status":data['status'],
-                "EwbNo":data['EwbNo'],
-                "EwbDt":data['EwbDt'],
-                "EwbValidTill":data['EwbValidTill'],
-                "Remarks":data['InfoDtls'],
-            },
-            "ey_resp_obj":data,
-            "ey_request_obj":request_obj
-        }
+        # print(data['errorDetails'],"**************")
+        # print(data['errorDetails'] is not None)
+        if data['errorDetails'] is not None:
+            message = ''
+            for m in data['errorDetails']:
+                message = message +' '+m['errorDesc']
+            response_obj = {
+                "success":False,
+                "message":message,
+                # "ey_resp_obj":data,
+                # "ey_request_obj":request_obj
+            }
+        else:
+            response_obj = {
+                "success":True,
+                "result":{
+                    "AckNo":data['AckNo'],
+                    "AckDt":data['AckDt'],
+                    "Irn":data['Irn'],
+                    "SignedInvoice":data['SignedInvoice'],
+                    "SignedQRCode":data['SignedQRCode'],
+                    "Status":data['status'],
+                    "EwbNo":data['EwbNo'],
+                    "EwbDt":data['EwbDt'],
+                    "EwbValidTill":data['EwbValidTill'],
+                    "Remarks":data['InfoDtls'],
+                },
+                "ey_resp_obj":data,
+                "ey_request_obj":request_obj
+            }
         # print(response_obj,"**********************************8")
         return response_obj
     except Exception as e:
