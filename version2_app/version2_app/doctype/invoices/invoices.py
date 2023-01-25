@@ -3915,8 +3915,10 @@ def update_non_revenue_codes():
     try:
         get_non_revenue_list = frappe.db.get_list("SAC HSN CODES", filters = {"ignore_non_taxable_items": 1}, pluck="sac_index")
         if len(get_non_revenue_list) > 0:
+            print(get_non_revenue_list)
             get_items = frappe.db.get_list("Items", filters = {"sac_index":["in",get_non_revenue_list]}, fields=["sum(item_value_after_gst) as item_value_after_gst", "parent", "sac_index", "name"])
             if len(get_items) > 0:
+                print(get_items)
                 for each in get_items:
                     sac_code = frappe.db.get_value("SAC HSN CODES",{"sac_index": each["sac_index"]},["code"])
                     print(sac_code, each, "////////////")
@@ -3925,7 +3927,7 @@ def update_non_revenue_codes():
                     # invoice_doc.non_revenue_amount = each["item_value_after_gst"]
                     # invoice_doc.save()
                     frappe.db.commit()
-                return {"success": True}
+            return {"success": True}
         return {"success": False, "message": "No data found"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
