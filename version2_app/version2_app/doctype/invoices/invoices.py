@@ -3919,7 +3919,8 @@ def update_non_revenue_codes():
             if len(get_items) > 0:
                 for each in get_items:
                     sac_code = frappe.db.get_value("SAC HSN CODES",{"sac_index": each["sac_index"]},["code"])
-                    frappe.db.set_value("Items", each["name"], {"sac_code": sac_code})
+                    print(sac_code, each, "////////////")
+                    frappe.db.sql("""update `tabItems` set sac_code='{}' where name='{}'""".format(sac_code, each["name"]))
                     # invoice_doc = frappe.get_doc("Invoices",each["parent"])
                     # invoice_doc.non_revenue_amount = each["item_value_after_gst"]
                     # invoice_doc.save()
