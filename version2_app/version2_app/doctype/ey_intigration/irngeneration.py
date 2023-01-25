@@ -23,6 +23,8 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
         elif gst_data['DocDtls']['Typ'] == 'CRN':
             doc_type = 'CR'
         print(gst_data['BuyerDtls'])
+        if gst_data['TranDtls']['SupTyp'] == 'B2B':
+            gst_data['TranDtls']['SupTyp'] = 'TAX'
         req=[
         {
             "returnPeriod": get_return_period_from_invoice_date(gst_data['DocDtls']['Dt']),
@@ -43,7 +45,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             "autoPopToRefundFlag": "N",
             "accVoucherNo": gst_data['TranDtls']['TaxSch'],
             "accVoucherDate": "2021-05-05",
-            "taxScheme": gst_data['TranDtls']['TaxSch'],
+            "taxScheme": gst_data['TranDtls']['SupTyp'],
             "docCat": "REG",
             "supTradeName": gst_data['SellerDtls']['TrdNm'],
             "supLegalName": gst_data['SellerDtls']['LglNm'],
@@ -77,7 +79,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             "invStateCessSpecificAmt": gst_data['ValDtls']['StCesVal'],
             # "totalInvValueInWords": " FOUR THOUSAND SEVEN HUNDRED SEVENTY NINE Rupees",
             # "tranType": "O",
-            # "subsupplyType": "TAX",
+            "subsupplyType": gst_data['TranDtls']['SupTyp'],
             # "transporterID": "07AAECG1615N1ZK",
             # "transporterName": "Blue Dart Express Ltd",RndOffAmt
             # "transportMode": "ROAD",
@@ -91,12 +93,14 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             # "salesOrg": "8304",
             "lineItems": []
         }]
+        
         line_items = []
         for item in gst_data['ItemList']:
             line_items.append({
                     "itemNo": item['SlNo'],
                     # "glCodeTaxableVal": "0060011201",
-                    "supplyType": "TAX",
+                    # "supplyType": "TAX",
+                    "supplyType":gst_data['TranDtls']['SupTyp'],
                     "hsnsacCode": item['HsnCd'],
                     "itemDesc": item['PrdDesc'],
                     "itemUqc": item["Unit"],
