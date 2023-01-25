@@ -3908,6 +3908,30 @@ def update_non_revenue_amount():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": e}  
+
+
+@frappe.whitelist()
+def update_non_revenue_codes():
+    try:
+        get_non_revenue_list = frappe.db.get_list("SAC HSN CODES", filters = {"ignore_non_taxable_items": 1}, pluck="sac_index")
+        if len(get_non_revenue_list) > 0:
+            get_items = frappe.db.get_list("Items", filters = {"sac_index":["in",get_non_revenue_list]}, fields=["sum(item_value_after_gst) as item_value_after_gst", "parent", "sac_index", "name"])
+            if len(get_items) > 0:
+                for each in get_items:
+                    sac_code = frappe.db.get_value("SAC HSN CODES",{"sac_index": each["sac_index"]},["code"])
+                    frappe.db.set_value("Items", each["name"], {"sac_code": sac_code})
+                    # invoice_doc = frappe.get_doc("Invoices",each["parent"])
+                    # invoice_doc.non_revenue_amount = each["item_value_after_gst"]
+                    # invoice_doc.save()
+                    frappe.db.commit()
+                return {"success": True}
+        return {"success": False, "message": "No data found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        return {"success": False, "message": e}  
+
+
 # @frappe.whitelist()
 # def b2b_success_to_credit_note(data):
 # 	try:
