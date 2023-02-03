@@ -23,7 +23,7 @@ pd.set_option("display.max_rows", None, "display.max_columns", None)
 from os.path import expanduser
 home = expanduser("~")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def holidayinManualupload(data):
     try:
         # data={"invoice_file":"/private/files/3340 report.xlsx","company":"HIEHH-01"}
@@ -480,7 +480,7 @@ def holidayinManualupload(data):
         return {"success":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def testsample(file_path,company): 
     companyData = frappe.get_doc('company',company)
     site_folder_path = companyData.site_name
@@ -535,7 +535,7 @@ def testsample(file_path,company):
         return {"success": True,"message": "No data found"}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def holidayinnerrorbulkreprocess(file_path,company):
     try:
         companyData = frappe.get_doc('company',company)
@@ -581,7 +581,7 @@ def holidayinnerrorbulkreprocess(file_path,company):
         frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
     try:
         companyData = frappe.get_doc('company',company)

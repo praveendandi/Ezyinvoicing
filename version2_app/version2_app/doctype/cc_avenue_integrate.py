@@ -6,7 +6,7 @@ from datetime import datetime
 import qrcode
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def ccAvenueIntegrate(total_amount,check_no,outlet_name):
 	try:
 		get_outlet = frappe.get_doc('Outlets',outlet_name)

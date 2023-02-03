@@ -11,7 +11,7 @@ class POSPrintSettings(Document):
 	pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def pos_printer_settings(data):
 	try:
 		total_data = []

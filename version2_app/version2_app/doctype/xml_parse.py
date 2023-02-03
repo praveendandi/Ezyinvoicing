@@ -14,7 +14,7 @@ import importlib.util
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def extract_xml(file_list):
     try:
         cwd = os.getcwd() 
@@ -169,7 +169,7 @@ def extract_xml(file_list):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def invoice_check(data):
     try:
         filte=frappe.db.get_values('Invoice Reconciliations',filters={'bill_generation_date':['=', data["date"]]})

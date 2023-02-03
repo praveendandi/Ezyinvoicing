@@ -12,7 +12,7 @@ from frappe.model.document import Document
 class DocumentBin(Document):
     pass
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def deletedocument(filepath):
 	try:
 		docname = frappe.get_list('Document Bin', {'invoice_file': filepath})

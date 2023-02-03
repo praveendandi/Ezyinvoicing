@@ -16,7 +16,7 @@ from version2_app.version2_app.doctype.company.workbook_sheets import *
 from os.path import expanduser
 home = expanduser("~")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Report_Download(data):
     
     try:
@@ -91,7 +91,7 @@ def Report_Download(data):
         return{"success":False,"message":str(e)}   
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Report_Delete(data):
     try:
         folder_path = frappe.utils.get_bench_path()
@@ -107,7 +107,7 @@ def Report_Delete(data):
         return{"success":False,"message":str(e)}    
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gstr1_excel_workbook(data):
     company = frappe.get_doc('company',data['company'])
 
