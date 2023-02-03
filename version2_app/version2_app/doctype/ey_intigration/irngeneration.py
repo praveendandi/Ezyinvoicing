@@ -34,7 +34,9 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             "docDate": gst_data['DocDtls']['Dt'].replace('/','-'),
             "custGstin": gst_data['BuyerDtls']['Gstin'],
             "custOrSupName": gst_data['BuyerDtls']['LglNm'],
+            "custTradeName": gst_data['BuyerDtls']['TrdNm'],
             "custOrSupAddr1":  gst_data['BuyerDtls']['Addr1'],
+            "custOrSupAddr2":  gst_data['BuyerDtls']['Addr2'],
             "custOrSupAddr4": gst_data['BuyerDtls']['Loc'],
             # "billToState": company.state_code,
             "billToState": gst_data['BuyerDtls']['Stcd'],
@@ -91,6 +93,8 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             # "exchangeRt": "1.00000",
             # "companyCode": "8304",
             # "salesOrg": "8304",
+            'division':company.division,
+            "srcIdentifier":company.source_identifier,
             "lineItems": []
         }]
         
