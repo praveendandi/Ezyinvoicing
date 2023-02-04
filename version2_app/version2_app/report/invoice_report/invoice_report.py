@@ -29,7 +29,7 @@ def execute(filters=None):
 			'total_credit_vat_amount','sez','modified']
 
 
-		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])]},fields=fields,as_list=True)
+		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])], 'un_billed_invoice': 0},fields=fields,as_list=True)
 		
 
 		invoice_df = pd.DataFrame(doc,columns=fields)

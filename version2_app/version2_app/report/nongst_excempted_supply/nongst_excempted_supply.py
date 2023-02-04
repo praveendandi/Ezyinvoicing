@@ -15,7 +15,7 @@ def execute(filters=None):
     # columns = ["Original Invoice Number","Transaction type","Debit Note No / Credit Note No.","Debit Note / Credit Note Date","Month","CustomerGSTIN/UIN","Customer Name","Type","SAC / HSN CODE","Invoice value","Base Amount","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount"]
     
     fields = ['invoice_number', 'invoice_date','invoice_type',"place_of_supply"] 
-    invoices_list = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%']},fields=fields,as_list=True)
+    invoices_list = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'], 'un_billed_invoice': 0},fields=fields,as_list=True)
     if len(invoices_list) == 0:
         data = []
         columns = []
