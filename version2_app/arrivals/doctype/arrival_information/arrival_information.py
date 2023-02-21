@@ -23,7 +23,7 @@ class ArrivalInformation(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def arrivalActivity(company, file_url, source):
     try:
         company_doc = frappe.get_doc("company", company)
@@ -460,7 +460,7 @@ def create_arrival_info_based_on_status(reservation):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def updateEmail(confirmation="", mobile="", email=""):
     try:
         if frappe.db.exists("Arrival Information", confirmation):
@@ -483,7 +483,7 @@ def updateEmail(confirmation="", mobile="", email=""):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_arrival_info(confirmation, company):
     try:
         check_confirmation = frappe.db.sql(
@@ -504,7 +504,7 @@ def get_arrival_info(confirmation, company):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def autocomplete_arrival_info(confirmation_number: str, company: str):
     """
     get arrival information by confirmation

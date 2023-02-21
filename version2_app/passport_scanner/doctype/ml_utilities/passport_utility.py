@@ -15,7 +15,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 )
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def fetch_passport_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -51,7 +51,7 @@ def fetch_passport_details(image_1=None, image_2=None):
 
 from datetime import datetime
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def passport_data_changes(data={}, image_1=None, image_2=None):
     try:
         print(image_1)

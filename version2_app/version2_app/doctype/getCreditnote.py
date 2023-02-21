@@ -3,7 +3,7 @@ import frappe
 from frappe.utils import getdate
 import requests, json,sys,os,traceback
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getCreditnote():
     try:
         if frappe.local.request.method=="POST":

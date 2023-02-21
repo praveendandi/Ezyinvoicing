@@ -14,7 +14,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 )
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def fetch_driving_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -47,7 +47,7 @@ def fetch_driving_details(image_1=None, image_2=None):
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def driving_data_changes(message):
     try:
         data = message

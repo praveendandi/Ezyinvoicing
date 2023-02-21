@@ -33,7 +33,7 @@ from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newd
 
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def manual_upload(data):
 # 	# try:
 # 	frappe.enqueue("version2_app.version2_app.doctype.invoices.manual_upload.manualuploadEnqueue",queue='default', timeout=None, event="BulkUpload", is_async=True, job_name="samplefunforqueue", now=True,arg1=data)
@@ -50,13 +50,13 @@ from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newd
 # 	doc.save()
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def manual_upload1(data):
 # 	return await manual_upload1(data).start()
 # 	# return True
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def manual_upload(data):
     enqueue(
             manual_upload_data,
@@ -69,7 +69,7 @@ def manual_upload(data):
             )		
     return True    
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def manual_upload_data(data):
     try:
         print("startt--------------------------",data)
