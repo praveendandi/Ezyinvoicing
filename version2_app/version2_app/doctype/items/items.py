@@ -19,7 +19,7 @@ class Items(Document):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def updateitems(data):
 	try:
 		for each in data['items']:
@@ -66,7 +66,7 @@ def invoice_items(filters=[]):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_items_for_pos_checks(name):
     try:
         itemdoc = frappe.db.get_list("Items",filters=[["pos_check","=",name]],fields=['*'])

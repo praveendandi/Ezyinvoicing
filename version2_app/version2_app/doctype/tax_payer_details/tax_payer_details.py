@@ -19,7 +19,7 @@ Headers = {
 import datetime
 import os,sys,traceback
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getTaxPayerDetails(data):
     try:
         if data['type'] == "All":
@@ -126,7 +126,7 @@ def request_get(api, data,company):
         frappe.log_error("Ezy-invoicing request_get Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e,"request get")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def TaxPayerDetails(data):
     '''
     get TaxPayerDetail from gsp   gstNumber, code, apidata

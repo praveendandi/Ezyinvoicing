@@ -1146,7 +1146,7 @@ def reprocess_calulate_items(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def auto_adjustment(data):
     try:
         invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
@@ -1236,7 +1236,7 @@ def auto_adjustment(data):
         print(e, "auto_adjustment")
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def b2b_success_to_credit_note(data):
     try:
         user = frappe.session.user
@@ -1371,7 +1371,7 @@ def b2b_success_to_credit_note(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def raise_credit_taxinvoice(invoice_number,invdate,taxinvoice_number):
     try:
         doc_details = frappe.get_doc("Invoices",invoice_number)

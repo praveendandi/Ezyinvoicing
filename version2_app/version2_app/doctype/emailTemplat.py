@@ -8,7 +8,7 @@ import time
 from frappe.core.doctype.communication.email import make
 from frappe.email.doctype.email_queue.email_queue import send_now
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def emailTemplate():
     try:
         data = json.loads(frappe.request.data)
@@ -92,7 +92,7 @@ def emailTemplate():
         frappe.log_error("Ezy-invoicing emailTemplate","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return ({"success": False, "message":str(e)})
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def send_email():
     """send email with payment link"""
     try:
@@ -117,7 +117,7 @@ def send_email():
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def send_mail_files(data):
     try:
         if isinstance(data, str):
@@ -193,7 +193,7 @@ def send_mail_files(data):
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)    
+@frappe.whitelist()    
 def email_logs():
     try:
         data = frappe.db.get_all("Email Queue",fields=["sender","status","name","creation"])
@@ -206,7 +206,7 @@ def email_logs():
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)    
+@frappe.whitelist()    
 def signezy_email_logs():
     try:
         data = frappe.db.get_all("Email Queue",filters={"reference_doctype":"Invoices"},fields=["sender","status","name","creation"])
@@ -219,7 +219,7 @@ def signezy_email_logs():
         print(str(e))
         return{"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)    
+@frappe.whitelist()    
 def email_push_tab():
     try:
         data = json.loads(frappe.request.data)

@@ -46,7 +46,7 @@ def convert_base64_to_image(base, name, site_folder_path, company):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def add_pre_checkins():
     try:
         data = json.loads(frappe.request.data)
@@ -283,7 +283,7 @@ def thankyouMail(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_pre_checkins_qr(company_code):
     try:
         company = frappe.get_doc("company", company_code)

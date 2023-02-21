@@ -14,7 +14,7 @@ class Summaries(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_summary(name):
     try:
         if frappe.db.exists("Summaries", name):
@@ -51,7 +51,7 @@ def get_summary(name):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_all_summary(filters=[], limit_start=0, limit_page_length=20):
     try:
         sql_filters = ""
@@ -63,7 +63,7 @@ def get_all_summary(filters=[], limit_start=0, limit_page_length=20):
         frappe.log_error(str(e), "get_summary")
         return {"success": False, "message": str(e)}
     
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def delete_summaries(name=None, status=None):
     try:
         if not status:
@@ -82,7 +82,7 @@ def delete_summaries(name=None, status=None):
         frappe.log_error(str(e), "get_summary")
         return {"success": False, "message": str(e)}
     
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def summary_activity_log(summary=None):
     try:
         if summary:

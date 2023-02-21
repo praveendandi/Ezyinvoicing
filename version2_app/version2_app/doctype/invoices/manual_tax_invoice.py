@@ -24,7 +24,7 @@ import traceback,sys
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Convert_to_manual_tax_invoice(data):
     try:
         from_invoice = frappe.get_doc("Invoices",data["from_invoice_number"])

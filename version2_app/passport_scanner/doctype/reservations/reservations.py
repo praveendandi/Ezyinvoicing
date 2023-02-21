@@ -43,7 +43,7 @@ class Reservations(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def file_parsing():
     try:
         with open("/home/caratred/Downloads/new_ocr.txt") as file:
@@ -553,7 +553,7 @@ def image_processing(image):
 # API to scan aadhar card images
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def scan_aadhar():
     try:
         base = frappe.local.form_dict.get("aadhar_image")
@@ -880,7 +880,7 @@ def license_detect_text(image_file):
 # API to scan driving license images
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def scan_driving_license():
     try:
         company = frappe.get_last_doc("company")
@@ -1094,7 +1094,7 @@ def pan_detect_text(image_file):
 # API to scan pan card images
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def scan_pancard():
     try:
         base = frappe.local.form_dict.get("pancard")
@@ -1495,7 +1495,7 @@ def voter_detect_text(image_file, doc_type):
 # API to scan voter card images
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def scan_votercard():
     try:
         company = frappe.get_last_doc("company")
@@ -2027,7 +2027,7 @@ def rotate(imagepath, number):
 # API to scan passport and visa images
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def passportvisadetails():
     pass_visa_image = ""
     try:
@@ -2236,7 +2236,7 @@ def passport_address_detect_text(image_file):
 # API to passort address images
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def passport_address():
     file_url = ""
     try:
@@ -2615,7 +2615,7 @@ def qr_detect_text(image_file):
 
 
 # API to scan QR-Visa and E-Visa images
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def qrvisa(data):
 #     try:
 #         company = frappe.get_last_doc('company')
@@ -2671,7 +2671,7 @@ def qr_detect_text(image_file):
 
 
 # API to scan other images
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def other_images():
     try:
         company = frappe.get_last_doc("company")

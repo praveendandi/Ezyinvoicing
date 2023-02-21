@@ -57,7 +57,7 @@ class company(Document):
     # 				frappe.throw("file updated Failed")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getUserRoles():
     try:
         if frappe.local.request.method == "GET":
@@ -78,12 +78,12 @@ def getUserRoles():
         frappe.log_error("Ezy-invoicing getUserRoles","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))		
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def createError(title, error):
     frappe.log_error(error)
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getPrinters():
     try:
         raw_printers = os.popen("lpstat -p -d")    
@@ -105,7 +105,7 @@ def getPrinters():
         frappe.log_error("Ezy-invoicing getPrinters","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))    
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def givePrint(invoiceNumber, printer):
     try:
         # get invoice details
@@ -140,7 +140,7 @@ def givePrint(invoiceNumber, printer):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gitCurrentBranchCommit():
     try:
         folder_path = frappe.utils.get_bench_path()
@@ -156,7 +156,7 @@ def gitCurrentBranchCommit():
 
 # angular_project_production_path
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gitUiBranchCommit(company):
     try:
         company = frappe.get_doc('company',company)
@@ -172,7 +172,7 @@ def gitUiBranchCommit(company):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gitpull(data):
     try:
         company = frappe.get_doc('company',data['company'])
@@ -205,7 +205,7 @@ def gitpull(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def b2cstatusupdate():
     try:
         data = frappe.db.get_list('Invoices',
@@ -257,7 +257,7 @@ def b2cstatusupdate():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def addsacindex():
     try:
         data = frappe.db.get_all('SAC HSN CODES',
@@ -281,7 +281,7 @@ def addsacindex():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def qr_generatedtoirn_generated():
     try:
         data = frappe.db.get_list('Invoices',
@@ -306,7 +306,7 @@ def qr_generatedtoirn_generated():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def errorInvoicesList(from_date=None, to_date=None):
     try:
         doc = frappe.db.get_list('company',fields=['name'])
@@ -321,7 +321,7 @@ def errorInvoicesList(from_date=None, to_date=None):
         frappe.log_error("Ezy-invoicing errorInvoicesList","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"mesasge":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_error_inoices(from_date=None, to_date=None):
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
@@ -355,7 +355,7 @@ def reprocess_error_inoices(from_date=None, to_date=None):
         return {"success":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_pending_inoices():
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
@@ -383,7 +383,7 @@ def reprocess_pending_inoices():
         return {"success":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def manual_to_pms():
     try:
         data = frappe.db.get_list('Invoices',
@@ -405,7 +405,7 @@ def manual_to_pms():
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def manulaTax_credit_to_debit():
     try:
         data = frappe.db.get_list('Items',
@@ -431,7 +431,7 @@ import time
 
 
 # from bench_manager.bench_manager.utils import run_command
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def console_command(key=None,
                     caller='bench_update_pull',
                     app_name=None,
@@ -543,7 +543,7 @@ def run_command(commands,
         frappe.db.commit()
         _refresh(doctype=doctype, docname=docname, commands=commands)
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_parsers():
     try:
         # b = os.popen("cd "+company.backend_git_path+ " && git pull origin "+company.backend_git_branch)
@@ -571,7 +571,7 @@ def update_parsers():
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def diskspace():
     try:
         company = frappe.get_last_doc('company')
@@ -584,7 +584,7 @@ def diskspace():
         frappe.log_error("Ezy-invoicing diskspace","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}    
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def bench_migrate():
     try:
         terminal = Popen(shlex.split("bench migrate"),
@@ -637,7 +637,7 @@ def safe_decode(string, encoding='utf-8'):
     return string
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def updateUiProd(company):
     try:
         print("==========")
@@ -667,7 +667,7 @@ def updateUiProd(company):
         print(str(e),"    updateUiProd")
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def updateProxySettings(data):
     try:
 
@@ -698,7 +698,7 @@ def updateProxySettings(data):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_error_documentbin_invoices(docdate):
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
@@ -727,7 +727,7 @@ def reprocess_error_documentbin_invoices(docdate):
         return {"success":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def updateInvoiceSupTyp():
     try:
         data = frappe.db.get_list('Invoices',
@@ -749,7 +749,7 @@ def updateInvoiceSupTyp():
         return {"success":False,"message":str(e)}    
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_zero_invoices():
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
@@ -777,7 +777,7 @@ def reprocess_zero_invoices():
         frappe.log_error("Ezy-invoicing reprocess_zero_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_company():
     try:
         company = frappe.get_last_doc('company')
@@ -788,7 +788,7 @@ def get_company():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-get company","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reprocess_b2c_invoices():
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])

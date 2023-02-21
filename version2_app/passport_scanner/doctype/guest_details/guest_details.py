@@ -1054,7 +1054,7 @@ def add_guest_details():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def process_cform():
     try:
         # data=json.loads(frappe.request.data)
@@ -1078,7 +1078,7 @@ def process_cform():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def process_pathik(guest_details):
     company = frappe.get_last_doc("company")
     try:
@@ -1861,7 +1861,7 @@ def get_guest_details_by_confirmation_number(confirmation_number:str=None,name:s
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def export_cform(filters=None):
 #     try:
 #         data = frappe.db.get_list("Guest Details",filters=filters,fields=["confirmation_number as ConfirmationNumber","frro_id as FrroID","guest_full_name as GuestName","room_number as RoomNumber","checkin_date as CheckinDate","checkout_date as CheckoutDate"])
