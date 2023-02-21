@@ -306,7 +306,8 @@
   "qr_b2c_rect_x0",
   "qr_b2c_rect_x1",
   "qr_b2c_rect_y0",
-  "qr_b2c_rect_y1"
+  "qr_b2c_rect_y1",
+  "website"
  ],
  "fields": [
   {
@@ -1966,11 +1967,16 @@
    "fieldname": "qr_b2c_rect_y1",
    "fieldtype": "Int",
    "label": "QR B2C Rect Y1"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-01 15:49:18.539069",
+ "modified": "2023-02-21 16:53:00.205215",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
