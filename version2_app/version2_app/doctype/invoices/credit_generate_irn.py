@@ -9,6 +9,8 @@ from frappe.utils import logger
 from frappe.utils import get_site_name
 import time
 import traceback,os,sys
+from version2_app.version2_app.doctype.ey_intigration.redo_qr import create_ey_qr_code
+
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
@@ -121,6 +123,7 @@ def create_credit_qr_image(invoice_number, gsp):
         # print(path)
         
         headers = {
+            
             "user_name": gsp['username'],
             "password": gsp['password'],
             "gstin": gsp['gst'],

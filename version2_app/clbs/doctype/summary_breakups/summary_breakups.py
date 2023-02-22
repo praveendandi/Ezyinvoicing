@@ -327,9 +327,9 @@ def extract_summary_breakups(filters, summary):
             total_items.append(each)
         df = pd.DataFrame.from_records(total_items)
         data = df.groupby(['service_type', 'invoice_number'], as_index=False).agg(
-            {"Date_string": 'first', "service_type": 'first', "invoice_category": 'first',
+            {"Date_string": 'first', "invoice_category": 'first',
              "item_value_after_gst": 'sum', "company": 'first', "summaries": 'first',
-             'invoice_number': 'first', "sac_code": list})
+             "sac_code": list})
         data.rename(columns={'Date_string': 'date', 'service_type': 'category',
                     'invoice_category': 'invoice_type',
                              'item_value_after_gst': 'amount'}, inplace=True)

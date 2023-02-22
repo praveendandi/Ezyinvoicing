@@ -44,7 +44,7 @@ def Reinitiate_invoice(data):
             else:
                 place_of_supply = company.state_code
         # if "invoice_object_from_file" in data.keys():
-        #     if isinstance(data["invoice_object_from_file"],list):
+        #     if isinstance(data["invoice_object_from_file"],dict):
         #         data["invoice_object_from_file"] = ""
         #     if isinstance(data["invoice_object_from_file"],str):
         #         if not isinstance(data["invoice_object_from_file"],dict):
@@ -55,7 +55,6 @@ def Reinitiate_invoice(data):
         #         else:
         #             data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
         # if "raise_credit" in data['guest_data']:
-
         sales_amount_before_tax = 0
         sales_amount_after_tax = 0
         value_before_gst = 0
@@ -297,6 +296,11 @@ def Reinitiate_invoice(data):
             else:
                 if company.only_b2c == "No":
                     if abs(invoice_round_off_amount)>6:
+                    # if company.name == "SMBKC-01":
+                    #     round_amount = 2
+                    # else:
+                    #     round_amount = 6
+                        # if abs(invoice_round_off_amount)>round_amount:
                         if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                             generateb2cQr = False
                             doc.error_message = " Invoice Total Mismatch"
@@ -333,9 +337,10 @@ def Reinitiate_invoice(data):
         doc.total_invoice_amount = data["total_invoice_amount"]
         doc.place_of_supply = place_of_supply
         doc.invoice_round_off_amount = invoice_round_off_amount
-        if "invoice_object_from_file" in data.keys():
-            if data["invoice_object_from_file"] != "":
-                doc.invoice_object_from_file = data['invoice_object_from_file']
+        # if "invoice_object_from_file" in data.keys():
+        #     if data["invoice_object_from_file"] != "":
+        #         if data["invoice_object_from_file"] != []:
+        #             doc.invoice_object_from_file = data['invoice_object_from_file']
         doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         

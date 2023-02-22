@@ -13,14 +13,14 @@ def execute(filters=None):
 		# columns = ["Invoice Number","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","Place of Supply (POS)","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","UQC","Quantity","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value"]
 		columns = ['Receiver GSTIN / UIN','Receiver Name','Invoice Type (R / SEZ / DE)','Invoice Number','Invoice Date','Invoice Value','Place Of Supply','Reverse Charge','E-Commerce GSTIN','Applicable % of Tax Rate','Tax Rate','Taxable Value','Non Taxable Value','Integrated Tax Amount','Central Tax Amount','State / UT Tax Amount','State Cess Amount','Central Cess Amount',"Irn Generated","Irn Number","Ack No","Ack Date"]
 		fields = ['invoice_number', 'invoice_date','gst_number','trade_name','place_of_supply','invoice_category','total_invoice_amount','sez',"irn_generated","irn_number","ack_no","ack_date"]
-		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice'],'invoice_type':'B2C'},fields=fields,as_list=True)
+		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice'],'invoice_type':'B2C', 'un_billed_invoice': 0},fields=fields,as_list=True)
 		if len(doc) == 0:
 			data = []
 			columns = []
 			return columns,data
 		doc_list = [list(x) for x in doc]
 		invoice_names = [x[0] for x in doc_list]
-		
+  
 		items_fields = ['parent','taxable','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
 		items_columns = ['invoice_number','taxable','sac_code','item_value','item_value_after_gst','gst_rate','igst_amount','cgst_amount','sgst_amount','state_cess_amount','cess_amount']
 		items_doc = frappe.db.get_list('Items',filters={'parent':['in',invoice_names]},fields =items_fields ,as_list=True)
