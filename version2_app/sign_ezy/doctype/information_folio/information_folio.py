@@ -109,9 +109,11 @@ def insert_information_folio(data):
 
 @frappe.whitelist(allow_guest=True)
 def update_signature(name=None, signature=None, agree=0, work_station=None, tab=None, doctype=None):
+    print(name,signature,agree,work_station,tab,doctype)
     doc = frappe.db.set_value(doctype, name,
                               {'signature':signature,"agree":agree})
-
+    invoice_doc = frappe.db.set_value('Invoices', name,
+                              {'signature':signature,"agree":agree})
     frappe.db.commit()
     data = {
         'name': name,
