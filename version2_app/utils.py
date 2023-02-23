@@ -22,6 +22,7 @@ def html_to_pdf(html_data, filename, name, etax=False):
                        'docname': name, 'fieldname': filename}
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
                                       data=payload_new).json()
+        frappe.log_error(json.dumps(file_response), html_to_pdf)
         if "file_url" in file_response["message"].keys():
             os.remove(file_path)
         else:
