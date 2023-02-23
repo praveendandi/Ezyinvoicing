@@ -1,6 +1,6 @@
 import frappe
 import requests,os,sys,traceback
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def CheckInternetConnection():
     try:
         company = frappe.get_last_doc('company')

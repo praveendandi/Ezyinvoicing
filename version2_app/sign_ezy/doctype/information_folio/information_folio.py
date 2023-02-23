@@ -13,7 +13,7 @@ class InformationFolio(Document):
 	pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def insert_information_folio(data):
     items_data = json.dumps({"data": data['guest_data']['items']})
     company = frappe.get_doc('company', data['company_code'])

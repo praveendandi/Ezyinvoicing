@@ -2,7 +2,7 @@ import frappe
 import traceback,os,sys
 import pandas as pd
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def invoicecategorycount():
     try:
         # data = {"fromdate":"2020-12-31","todate":"2021-04-04"}
@@ -17,7 +17,7 @@ def invoicecategorycount():
         frappe.log_error("Ezy-invoicing invoicecategorycount Dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}   
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def invoicedetailscount(data):
     try:
         # data = {"fromdate":"2020-12-31","todate":"2021-04-04"}
@@ -32,7 +32,7 @@ def invoicedetailscount(data):
         frappe.log_error("Ezy-invoicing invoicedetailscount Dashboard","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"status":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def GSTR1Statistics(data):
     try:
         
@@ -68,7 +68,7 @@ def GSTR1Statistics(data):
         return {"status":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def invoicereconsiliationcount(data):
     try:
         # data = {"fromdate":"2020-12-31","todate":"2021-04-04"}

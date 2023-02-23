@@ -11,7 +11,7 @@ class TabletConfig(Document):
 	pass
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def removeWorkstation(name=None):
 #     # delete tablet config
 #     # print(name, "name")
@@ -20,7 +20,7 @@ class TabletConfig(Document):
 #     return True
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def pushToTab(name=None, confirmation_no=None):
 #     tablet_config_exist = frappe.db.exists('Tablet Config', name)
 #     print(tablet_config_exist, "test")
@@ -44,7 +44,7 @@ class TabletConfig(Document):
 #     else:
 #         return {'success': False, 'message': "No Configuration Found"}
     
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def invoicePushToTab(name=None, invoice=None):
 #     tablet_config_exist = frappe.db.exists('Tablet Config', name)
 #     # print(tablet_config_exist, "test")
@@ -67,7 +67,7 @@ class TabletConfig(Document):
 #         return {'success': False, 'message': "No Configuration Found"}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def redgPushToTab(name=None, redg_name=None):
 #     tablet_config_exist = frappe.db.exists('Tablet Config', name)
 #     print(tablet_config_exist, "test")
@@ -139,7 +139,7 @@ def createTabConfig():
         frappe.log_error("Ezy-invoicing Create Tab Config","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach qr code")
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def deleteTabConfig():
 #     try:
 #         data=json.loads(frappe.request.data)
@@ -199,7 +199,7 @@ def pushToTab(name=None, doc_name=None,doc_type=None):
     else:
         return {'success': False, 'message': "No Configuration Found"}
     
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def removeAllDevices():
 #     frappe.db.delete('Tablet Config', {
 #         'docstatus': 0

@@ -20,7 +20,7 @@ import datetime
 from frappe.utils import get_site_name
 from frappe.utils import logger
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def IrnObject(invoice_number):
     try:
         invoice = frappe.get_doc('Invoices', invoice_number)
@@ -299,7 +299,7 @@ def IrnObject(invoice_number):
 
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def getsuccessirnobject(invoiceNumber):
 # 	get_data = frappe.db.get_list('IRN Objects',filters={'invoice_number': invoiceNumber,'irn_status':'Success'})
 # 	if len(get_data)>0:

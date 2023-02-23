@@ -35,7 +35,7 @@ def html_to_pdf(html_data, filename, name, etax=False):
         return {"success": False, "message": str(e)}
     
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def convert_image_to_base64(image):
     try:
         company = frappe.get_last_doc("company")

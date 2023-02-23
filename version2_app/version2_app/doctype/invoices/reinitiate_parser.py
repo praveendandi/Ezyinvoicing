@@ -20,7 +20,7 @@ folder_path = frappe.utils.get_bench_path()
 # host = "http://localhost:8000/api/method/"
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reinitiateInvoice(data):
 	filepath = data['filepath']
 	reupload_inv_number = data['invoice_number']

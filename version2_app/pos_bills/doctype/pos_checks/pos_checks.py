@@ -557,7 +557,8 @@ def update_check_in_items(invoice_number=None, check_name=None):
 def update_pos_check(doc, method=None):
     try:
         if doc.check_no and doc.check_date:
-            ref = doc.check_date+"-"+doc.check_no
+            check_date = datetime.strptime(doc.check_date,"%Y-%m-%d").strftime('%Y%m')
+            ref = check_date+doc.check_no
             get_doc = frappe.get_doc("POS Checks", doc.name)
             get_doc.pos_check_reference_number = ref
             get_doc.save()

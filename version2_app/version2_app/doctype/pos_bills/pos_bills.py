@@ -18,7 +18,7 @@ class PosBills(Document):
 # ----------------------------- create pos bills ----------------------------------
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_pos_bills(bills):
     try:
         # print(bills['transaction_date'])

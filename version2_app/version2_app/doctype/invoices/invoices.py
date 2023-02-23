@@ -174,7 +174,6 @@ def generateIrn(data):
             get_is_credit_items = frappe.db.get_list("Items", filters=[["parent","=",data['invoice_number']]], pluck="is_credit_item")
             if "Yes" in get_is_credit_items:
                 abs_path = os.path.dirname(os.getcwd())
-                print(abs_path,"////")
                 file_path = abs_path + '/apps/version2_app/version2_app/version2_app/doctype/invoices/reinitate_invoice.py'
                 module_name = 'auto_adjustment'
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -606,7 +605,6 @@ def send_invoicedata_to_gcb(invoice_number):
             if company.pms_property_url:
                 b2c_data["file_url"] = company.pms_property_url
             if company.pms_information_invoice_for_payment_qr == "Yes":
-                print("=====================")
                 payment_list = frappe.db.get_list("Invoice Payments",filters={"invoice_number":doc.invoice_number},fields=["item_value","date","payment","payment_reference"])
                 if len(payment_list)>0:
                     for each in payment_list:
@@ -3475,7 +3473,6 @@ def check_invoice_exists(invoice_number):
 
                 invoiceExists = frappe.get_doc('Invoices', invoice_number)
                 if invoiceExists:
-
                     return {"success": True, "data": invoiceExists}
             return {"success": False}
         return {"success":False}	
@@ -3487,13 +3484,14 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist()
 def Error_Insert_invoice(data):
     try:
+        print(data)
         if "invoice_object_from_file" not in data:
             data['invoice_object_from_file'] = {"data":[]}
         if "invoice_from" in data:
             invoice_from = data['invoice_from']
         else:
             invoice_from = "Pms"
-            data['invoice_from'] = "Pms"	
+            data['invoice_from'] = "Pms" 
         if "sez" in data:
             sez = data["sez"]
         else:
@@ -3613,6 +3611,17 @@ def Error_Insert_invoice(data):
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
                 "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
             })
+            if data['amened'] == 'Yes':
+                invCount = frappe.db.get_value('Invoices',{"invoice_number": data['invoice_number']},["invoice_number"], as_dict=1)
+                invoice.amended_from = invCount.invoice_number
+                if "-" in invCount.invoice_number[-4:]:
+                    amenedindex = invCount.invoice_number.rfind("-")
+                    ameneddigit = int(invCount.invoice_number[amenedindex+1:])
+                    ameneddigit = ameneddigit+1 
+                    invoice.invoice_number = data['invoice_number'] + "-"+str(ameneddigit)
+                    # pass
+                else:
+                    invoice.invoice_number = data['invoice_number'] + "-1"	
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
             if 'items_data' in list(data.keys()):

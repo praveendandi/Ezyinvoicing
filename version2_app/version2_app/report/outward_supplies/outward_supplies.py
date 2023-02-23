@@ -7,7 +7,7 @@ import frappe
 import pandas as pd
 import traceback
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def execute(filters=None):
     try:
         # print(filters,"======")           
