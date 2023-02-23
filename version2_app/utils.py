@@ -3,6 +3,7 @@ import frappe
 import requests
 import os
 import sys
+import json
 from weasyprint import HTML
 from frappe.utils import cstr
 
