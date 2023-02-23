@@ -191,7 +191,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             }
             if company.proxy == 0:
                 print(
-                    prod_irn,'((((((((((((((((()))))))))))))))))'req, '***************', 
+                    prod_irn,'((((((((((((((((()))))))))))))))))',req, '***************', 
                     headers
                 )
                 if company.skip_ssl_verify == 0:
