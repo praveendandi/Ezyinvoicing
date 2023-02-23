@@ -15,7 +15,7 @@ def get_return_period_from_invoice_date(inv_date):
 
 def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
     try:
-        # print(gst_data)
+        print(gsp)
         if gst_data['DocDtls']['Typ'] == 'INV':
             doc_type = 'INV'
         elif gst_data['DocDtls']['Typ'] == 'DBN':
@@ -190,12 +190,16 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "Content-Type": 'application/json',
             }
             if company.proxy == 0:
+                print(
+                    prod_irn,'((((((((((((((((()))))))))))))))))'req, '***************', 
+                    headers
+                )
                 if company.skip_ssl_verify == 0:
                     irn_response = requests.post(prod_irn,
                                                     headers=headers,
                                                     json={"req":req},verify=False)
                 else:
-                    irn_response = requests.post(gsp['generate_irn'],
+                    irn_response = requests.post(prod_irn,
                                                 headers=headers,
                                                 json={"req":req},verify=False)
             else:
