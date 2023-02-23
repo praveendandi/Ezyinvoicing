@@ -3187,7 +3187,8 @@ def login_gsp(code,mode):
                 enocded_password = base64.b64encode(bytes(gsp["gst_prod_password"], 'utf-8')) # bytes
                 headers = {
                     'username':gsp["gst__prod_username"],
-                    'password':enocded_password.decode("utf-8") ,
+                    # 'password':enocded_password.decode("utf-8") ,
+                    'password':gsp["gst_prod_password"],
                     "apiaccesskey": gsp["gsp_prod_app_id"],
                 }
                 login_response = request_post(gsp['auth_prod'], code, headers)
