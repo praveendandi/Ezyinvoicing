@@ -3191,6 +3191,9 @@ def login_gsp(code,mode):
                     "apiaccesskey": gsp["gsp_prod_app_id"],
                 }
                 login_response = request_post(gsp['auth_prod'], code, headers)
+                print('___________________________________')
+                print(login_response)
+                print('_______________________________________')
                 insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","login":'True',"status":"Success","company":code})
                 insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
                 gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
