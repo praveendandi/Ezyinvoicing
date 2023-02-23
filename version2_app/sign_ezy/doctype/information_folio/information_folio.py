@@ -5,9 +5,12 @@
 from __future__ import unicode_literals
 # import frappe
 from frappe.model.document import Document
-import frappe
+import frappe,os
 import datetime
 import json
+import requests,base64,traceback,sys
+from frappe.utils import cstr, get_site_name, logger, random_string
+
 
 class InformationFolio(Document):
 	pass
@@ -109,11 +112,25 @@ def insert_information_folio(data):
 
 @frappe.whitelist(allow_guest=True)
 def update_signature(name=None, signature=None, agree=0, work_station=None, tab=None, doctype=None):
-    print(name,signature,agree,work_station,tab,doctype)
-    doc = frappe.db.set_value(doctype, name,
+    # print(name,signature,agree,work_station,tab,doctype)
+    
+    if len(signature)>10:
+        cwd = os.getcwd()
+        company = frappe.get_last_doc("company")
+        site_name = cstr(frappe.local.site)
+        site_folder_path = f'{cwd}/{site_name}'
+        
+        signature_file_url = convert_base64_to_image(signature,name,site_folder_path,company)
+        print(signature_file_url['message']['file_url'],"******************************8")
+        
+        if signature_file_url != False:                                
+            invoice_doc = frappe.db.set_value('Invoices', name,
+                                    {'signature':signature,"agree":agree,"signature_file":signature_file_url['message']['file_url']})
+            
+    else:
+        doc = frappe.db.set_value(doctype, name,
                               {'signature':signature,"agree":agree})
-    invoice_doc = frappe.db.set_value('Invoices', name,
-                              {'signature':signature,"agree":agree})
+    
     frappe.db.commit()
     data = {
         'name': name,
@@ -128,3 +145,35 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
         "custom_socket", {'message': doctype+' Signature Updated', 'data': data})
 
     return True
+
+
+def convert_base64_to_image(base, name, site_folder_path, company):
+    try:
+        # print(base.split('data:image/png;base64,')[1])
+        file = site_folder_path + "/private/files/" + name + ".png"
+        # res = bytes(base, 'utf-8')
+        with open(file, "wb") as fh:
+            fh.write(base64.b64decode(base.split('data:image/png;base64,')[1]))
+        files = {"file": open(file, "rb")}
+        payload = {
+            "is_private": 0,
+            "folder": "Home"
+            # "doctype": "Precheckins",
+        }
+        site = company.host
+        upload_qr_image = requests.post(
+            site + "api/method/upload_file", files=files, data=payload
+        )
+        response = upload_qr_image.json()
+        if "message" in response:
+            return response
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-Guest Details Opera",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}
