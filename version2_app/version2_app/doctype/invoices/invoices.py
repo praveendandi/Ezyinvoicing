@@ -3191,7 +3191,7 @@ def login_gsp(code,mode):
                     'password':gsp["gst_prod_password"],
                     "apiaccesskey": gsp["gsp_prod_app_id"],
                 }
-                login_response = request_post(gsp['auth_prod'], code, headers)
+                login_response = request_post(gsp['auth_prod'], code, headers,ey=True)
                 print('___________________________________')
                 print(login_response)
                 print('_______________________________________')
