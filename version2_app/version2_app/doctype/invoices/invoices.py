@@ -3458,7 +3458,7 @@ def gsp_api_data_for_irn(data):
 
 def request_post(url, code, headers=None,ey=False):
     try:
-        print(url,headers)
+        print(url,headers,ey)
         company = frappe.get_doc('company', code)
         if company.proxy == 0:
             if company.skip_ssl_verify == 0:
