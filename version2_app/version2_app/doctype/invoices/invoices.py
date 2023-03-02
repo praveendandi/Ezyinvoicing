@@ -3611,6 +3611,7 @@ def Error_Insert_invoice(data):
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
                 "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
             })
+<<<<<<< HEAD
             if data['amened'] == 'Yes':
                 invCount = frappe.db.get_value('Invoices',{"invoice_number": data['invoice_number']},["invoice_number"], as_dict=1)
                 invoice.amended_from = invCount.invoice_number
@@ -3623,6 +3624,20 @@ def Error_Insert_invoice(data):
                     # pass
                 else:
                     invoice.invoice_number = data['invoice_number'] + "-1"	
+=======
+            if 'amened' in data:
+                if data['amened'] == 'Yes':
+                    invCount = frappe.db.get_value('Invoices',{"invoice_number": data['invoice_number']},["invoice_number"], as_dict=1)
+                    invoice.amended_from = invCount.invoice_number
+                    if "-" in invCount.invoice_number[-4:]:
+                        amenedindex = invCount.invoice_number.rfind("-")
+                        ameneddigit = int(invCount.invoice_number[amenedindex+1:])
+                        ameneddigit = ameneddigit+1 
+                        invoice.invoice_number = data['invoice_number'] + "-"+str(ameneddigit)
+                        # pass
+                    else:
+                        invoice.invoice_number = data['invoice_number'] + "-1"	
+>>>>>>> 43f10f21da0f553e72ecc64971887f96fe3d9dfa
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
             if 'items_data' in list(data.keys()):
