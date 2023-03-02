@@ -3614,6 +3614,7 @@ def Error_Insert_invoice(data):
             if data['amened'] == 'Yes':
                 invCount = frappe.db.get_value('Invoices',{"invoice_number": data['invoice_number']},["invoice_number"], as_dict=1)
                 invoice.amended_from = invCount.invoice_number
+                print(invoice.amended_from,"LLLLLLLLLLLLLLLLLL")
                 if "-" in invCount.invoice_number[-4:]:
                     amenedindex = invCount.invoice_number.rfind("-")
                     ameneddigit = int(invCount.invoice_number[amenedindex+1:])
