@@ -38,8 +38,8 @@ def bulkupload(data):
         for item in to_dict_data:
             if "," in item[0]:
                 item = item[0].split(",")
-            # if invoice_data["company"]=="GHM-01":
-            item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
+            if invoice_data["company"]=="GHM-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "GHM"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if invoice_data["company"]=="JWMB-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "BLRJW" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="HRK-01":
@@ -97,6 +97,8 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "3967-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="IBISBHR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "IBHR" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="GHM-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "GHM" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if invoice_data["company"]=="SGBW-01":
             #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
             if invoice_data["company"]=="JMR-01":
