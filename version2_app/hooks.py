@@ -101,8 +101,11 @@ app_license = "MIT"
 # }
 doc_events = {
 	"Invoices": {
-        "after_insert":"version2_app.events.invoice_created",
+        "after_insert":["version2_app.events.invoice_created",
+                        "version2_app.add_signature_bbox.create_bbox"],
+
         "on_update":["version2_app.events.invoice_update",
+                    #  "version2_app.add_signature_bbox.create_bbox"
                     #  "invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_invoices"
                      ],
 		"after_delete":"version2_app.events.invoice_deleted",
