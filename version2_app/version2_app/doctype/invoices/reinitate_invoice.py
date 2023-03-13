@@ -337,10 +337,9 @@ def Reinitiate_invoice(data):
         doc.total_invoice_amount = data["total_invoice_amount"]
         doc.place_of_supply = place_of_supply
         doc.invoice_round_off_amount = invoice_round_off_amount
-        # if "invoice_object_from_file" in data.keys():
-        #     if data["invoice_object_from_file"] != "":
-        #         if data["invoice_object_from_file"] != []:
-        #             doc.invoice_object_from_file = data['invoice_object_from_file']
+        if "invoice_object_from_file" in data.keys():
+            if data["invoice_object_from_file"] != "":
+                doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])
         doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         
@@ -434,13 +433,11 @@ def reprocess_calulate_items(data):
             if sez == 0:
                 if each_item["is_manual_edit"] == "Yes":
                     if "manual_edit" not in each_item:
-                        print("/////////////////")
                         each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                         total_items.append(each_item)
                         continue
                     else:
                         if each_item["manual_edit"] == "No":
-                            print("............")
                             each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                             total_items.append(each_item)
                             continue
@@ -678,7 +675,6 @@ def reprocess_calulate_items(data):
                     acc_igst_percentage = percentage_gst["igst_percentage"]
                     if item["lut_exempted"] == 0 and sez == 1:
                         if "lut_exempted_value" in item:
-                            print(".........")
                             item["igst"] = percentage_gst["igst_percentage"]
                 else:
                     {"success": False, "message": "error in slab helper function"}
@@ -918,7 +914,6 @@ def reprocess_calulate_items(data):
                         final_item['igst'] = 0
                         final_item['type'] = "Excempted"
                     else:
-                        print(".....................", acc_igst_percentage)
                         final_item['cgst'] = acc_gst_percentage/2
                         final_item['sgst'] = acc_gst_percentage/2
                         final_item['igst'] = acc_igst_percentage
@@ -1126,7 +1121,6 @@ def reprocess_calulate_items(data):
             # data_details["previous_lut_item"] = item["previous_lut_item"]
             total_items.append(data_details)
         total_items.extend(second_list)
-        print(total_items,"/////////////////{???????????????????????/")
         for xyz in total_items:
             xyz["date"] = datetime.datetime.strptime(xyz["date"],"%d-%m-%y").strftime('%Y-%m-%d %H:%M:%S')
         final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply,"lut":lut})
