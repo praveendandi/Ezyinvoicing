@@ -1308,11 +1308,7 @@ def insert_invoice(data):
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
             "non_revenue_amount": non_revenue_amount,
-            "pos_checks": pos_checks,
-            'x0': data['x0'],
-            'x1' :data['x1'],
-            'top' : data['top'],
-            'bottom':data['bottom']
+            "pos_checks": pos_checks
 
         })
         if "sez" in data:
