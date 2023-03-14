@@ -101,8 +101,10 @@ app_license = "MIT"
 # }
 doc_events = {
 	"Invoices": {
-        "after_insert":"version2_app.events.invoice_created",
+        "after_insert":["version2_app.events.invoice_created",],
+
         "on_update":["version2_app.events.invoice_update",
+                    #  "version2_app.add_signature_bbox.create_bbox"
                     #  "invoice_sync.invoice_sync.doctype.sync_logs.sync_logs.auto_sync_invoices"
                      ],
 		"after_delete":"version2_app.events.invoice_deleted",
@@ -243,7 +245,8 @@ scheduler_events = {
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
         "version2_app.events.deleteemailfilesdaily",
-        "version2_app.events.delete_arrival_activity"
+        "version2_app.events.delete_arrival_activity",
+        "version2_app.database_utils.remove_unwanted_data_ervery_day.remove_data_from_database_every_day"
     ]
 }
 # scheduler_events = {

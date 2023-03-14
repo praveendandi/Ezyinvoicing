@@ -38,8 +38,8 @@ def bulkupload(data):
         for item in to_dict_data:
             if "," in item[0]:
                 item = item[0].split(",")
-            # if invoice_data["company"]=="GHM-01":
-            item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
+            if invoice_data["company"]=="GHM-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "GHM"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if invoice_data["company"]=="JWMB-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "BLRJW" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="HRK-01":
@@ -60,6 +60,10 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "1-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="FBMC-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "2--" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="GMB-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "GMB-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="IBISHHC-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "IHHC-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="RCP-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("7392","")
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "7392-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
@@ -95,12 +99,18 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "3967-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="IBISBHR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "IBHR" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="GHM-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "GHM" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if invoice_data["company"]=="SGBW-01":
             #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
             if invoice_data["company"]=="JMR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "1-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="GMB-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "GMB-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="FBMC-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "2--" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="IBISHHC-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "IHHC-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="RCP-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("7392","")
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "7392-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
@@ -325,7 +335,7 @@ def bulkupload(data):
                                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                             else:
-                                insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object}})
+                                insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object}, "invoice_from": "File"})
                                 if insertInvoiceApiResponse['success']== True:
                                     
                                     B2B = "B2B"
@@ -423,7 +433,7 @@ def bulkupload(data):
                             output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                             # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
                     else:
-                        insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object}})
+                        insertInvoiceApiResponse = Reinitiate_invoice({"guest_data":each_item,"company_code":company,"items_data":calulateItemsApiResponse['data'],"total_invoice_amount":each_item['total_invoice_amount'],"invoice_number":str(each_item['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data": invoice_object}, "invoice_from": "File"})
                         if insertInvoiceApiResponse['success']== True:
                             B2B=np.nan
                             B2C = "B2C" 

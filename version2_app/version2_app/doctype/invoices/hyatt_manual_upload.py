@@ -21,7 +21,7 @@ from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reiniti
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def hyattbulkupload(data):
     try:
         print("startt--------------------------")

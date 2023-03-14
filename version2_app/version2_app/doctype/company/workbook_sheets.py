@@ -6,7 +6,7 @@ import traceback
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def B2B_Invoices(data):
     try:
         pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -54,7 +54,7 @@ def B2B_Invoices(data):
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def B2CL_Invoices(data):
     latest_invoice = frappe.get_last_doc('Invoices')
     company = frappe.get_doc('company',latest_invoice.company)
@@ -109,7 +109,7 @@ def B2CL_Invoices(data):
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def B2CS_Invoices(data):
     latest_invoice = frappe.get_last_doc('Invoices')
     company = frappe.get_doc('company',latest_invoice.company)
@@ -158,7 +158,7 @@ def B2CS_Invoices(data):
         return {"success":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def HSN_SAC_SUMMARY_REPORT(data):
     try:
         pd.set_option("display.max_rows", None, "display.max_columns", None)
@@ -297,7 +297,7 @@ def DebitCreditNote(data):
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}   
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Excempted(data):
     try:
         pd.set_option("display.max_rows", None, "display.max_columns", None)

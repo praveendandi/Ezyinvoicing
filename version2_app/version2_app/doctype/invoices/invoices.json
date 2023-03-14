@@ -153,7 +153,14 @@
   "pos_checks",
   "synced_to_erp",
   "synced_date",
-  "signature_file"
+  "signature_file",
+  "un_billed_invoice",
+  "ret_period",
+  "guest_signature_cords_column",
+  "x0",
+  "x1",
+  "top",
+  "bottom"
  ],
  "fields": [
   {
@@ -999,15 +1006,45 @@
    "label": "Synced Date"
   },
   {
+   "fieldname": "ret_period",
+   "fieldtype": "Data",
+   "label": "Ret Period"
+  },
+  {
    "fieldname": "signature_file",
    "fieldtype": "Data",
    "label": "Signature File"
+  },
+  {
+   "fieldname": "guest_signature_cords_column",
+   "fieldtype": "Column Break",
+   "label": "Guest Signature cords"
+  },
+  {
+   "fieldname": "x0",
+   "fieldtype": "Data",
+   "label": "x0"
+  },
+  {
+   "fieldname": "x1",
+   "fieldtype": "Data",
+   "label": "x1"
+  },
+  {
+   "fieldname": "top",
+   "fieldtype": "Data",
+   "label": "top"
+  },
+  {
+   "fieldname": "bottom",
+   "fieldtype": "Data",
+   "label": "bottom"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-02-22 13:05:15.132006",
+ "modified": "2023-03-09 10:51:11.051611",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

@@ -16,7 +16,7 @@ from version2_app.version2_app.doctype.invoices.hyatt_bulk import hyatt_bulkuplo
 
  
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def BulkUploadReprocess(data):
     try:
         invoice_number = data['invoice_number']

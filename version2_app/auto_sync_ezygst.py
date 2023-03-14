@@ -2,7 +2,7 @@ import frappe
 from invoice_sync.invoice_sync.doctype.sync_logs.customer_sync_util import check_customer_exist
 from version2_app.events import invoice_created
 from invoice_sync.invoice_sync.doctype.sync_logs.sync_logs import get_company_details
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def taxpayerdetail(doc,method=None):
 #     frappe.db.set_value('TaxPayerDetail',doc.name,{'synced_date':None,'synced_to_erp': 0})
 #     frappe.db.commit()
@@ -31,7 +31,7 @@ api_list = {
 }
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def invoices(doc,method=None):
     taxpayer_details = frappe.db.get_all('TaxPayerDetail', {'synced_to_erp': 0}, ['gst_number', 'legal_name', "email", "address_1", "address_2", "location",
                                                                                      "pincode", "gst_status", "tax_type", "trade_name", "phone_number", "state_code", "address_floor_number", "address_street", "block_status", "synced_to_erp"])

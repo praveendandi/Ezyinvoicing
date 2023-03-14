@@ -10,7 +10,7 @@ class Promotions(Document):
 	pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_promotions(name=None, status=None):
     doc = frappe.db.set_value('Promotions', name,'status', status, update_modified=False)
     frappe.db.commit()

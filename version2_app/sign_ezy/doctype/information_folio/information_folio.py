@@ -16,7 +16,7 @@ class InformationFolio(Document):
 	pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def insert_information_folio(data):
     items_data = json.dumps({"data": data['guest_data']['items']})
     company = frappe.get_doc('company', data['company_code'])
@@ -130,7 +130,7 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
     else:
         doc = frappe.db.set_value(doctype, name,
                               {'signature':signature,"agree":agree})
-    
+    create_bbox(name)
     frappe.db.commit()
     data = {
         'name': name,
@@ -143,8 +143,53 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
         "custom_socket", {'message': 'Signature Updated', 'data': data})
     frappe.publish_realtime(
         "custom_socket", {'message': doctype+' Signature Updated', 'data': data})
+    
+
+    
 
     return True
+
+
+import frappe
+import pdfplumber
+import sys, traceback
+import pdfplumber
+import fitz
+def create_bbox(name):
+    try:
+        doc = frappe.db.get_doc('Invoices',name)
+        if doc.invoice_from in ["Web", "Pms"] and doc.signature_file is not None and doc.signature_file != '':
+            folder_path = frappe.utils.get_bench_path()
+            company = frappe.get_doc('company', doc.company)
+            site_folder_path = company.site_name
+            file_path = folder_path+'/sites/'+site_folder_path+doc.invoice_file
+            signature_file = folder_path+'/sites/'+site_folder_path+doc.signature_file
+            x0,x1,top, bottom = '','','',''
+
+            with pdfplumber.open(file_path) as pdf:
+                count = len(pdf.pages)
+                for index in range(count):
+                    first_page = pdf.pages[index]
+                    words = first_page.extract_words()
+                    for word in words:
+                        if word['text'] in ['SIGNATURE','Signature']:
+                            x0 = word['x0']
+                            x1 = word['x1']
+                            top = word['top']
+                            bottom = word['bottom']
+                            document = fitz.open(file_path)
+                            page = document[index]  # get first page
+                            rect = fitz.Rect(x0+50, top+50, top, bottom)  # define your rectangle here
+                            image_file = signature_file, 'rb'
+                            page.InsertImage(rect, filename=image_file)
+                            # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
+                            document.save(file_path)
+                            
+            # doc.save()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("create_bbox","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success": False, "message": str(e)}
 
 
 def convert_base64_to_image(base, name, site_folder_path, company):
