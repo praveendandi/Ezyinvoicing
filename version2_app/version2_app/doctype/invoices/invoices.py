@@ -592,6 +592,7 @@ def send_invoicedata_to_gcb(invoice_number):
                 "invoice_number": doc.invoice_number,
                 "invoice_type": doc.invoice_type,
                 "invoice_date": str(doc.invoice_date),
+                "checkout_date": str(doc.checkout_date),
                 "pms_invoice_summary": doc.total_invoice_amount,
                 "irn": "N/A",
                 "company_name": company.company_name,
@@ -1219,6 +1220,9 @@ def insert_invoice(data):
             'print_by': data['guest_data']['print_by'],
             'invoice_date':
             datetime.datetime.strptime(data['guest_data']['invoice_date'],
+                                        '%d-%b-%y %H:%M:%S'),
+            'checkout_date':
+            datetime.datetime.strptime(data['guest_data']['checkout_date'],
                                         '%d-%b-%y %H:%M:%S'),
             'legal_name':
             data['taxpayer']['legal_name'],
@@ -3564,6 +3568,9 @@ def Error_Insert_invoice(data):
                 # 'qr_generated':qr_generated,
                 'invoice_date':
                 datetime.datetime.strptime(data['invoice_date'],
+                                        '%d-%b-%y %H:%M:%S'),
+                'checkout_date':
+                datetime.datetime.strptime(data['guest_data']['checkout_date'],
                                         '%d-%b-%y %H:%M:%S'),
                 'legal_name':
                 " ",
