@@ -1223,7 +1223,7 @@ def insert_invoice(data):
                                         '%d-%b-%y %H:%M:%S'),
             'checkout_date':
             datetime.datetime.strptime(data['guest_data']['checkout_date'],
-                                        '%d-%b-%y %H:%M:%S'),
+                                        '%d-%b-%y %H:%M:%S') if "checkout_date" in data['guest_data'] else None,
             'legal_name':
             data['taxpayer']['legal_name'],
             'mode':company.mode,
@@ -1316,7 +1316,6 @@ def insert_invoice(data):
 
 
         })
-        print(invoice,'................')
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
@@ -3510,6 +3509,7 @@ def Error_Insert_invoice(data):
         if "gst_number" in data:
             if data["gst_number"]==None:
                 data["gst_number"]=""
+
         if len(data['gst_number'])<15 and len(data['gst_number'])>0:
             if 'items_data' not in list(data.keys()):
                 data['items_data'] = []
@@ -3545,6 +3545,7 @@ def Error_Insert_invoice(data):
                 data['invoice_type'] ="B2B"
             if "gst_number" not in data or "gstNumber" not in data:
                 data['gst_number'] = ""
+            
             if data["guest_name"]=="":
                 data["guest_name"]="NA"
             invoice = frappe.get_doc({
@@ -3569,9 +3570,8 @@ def Error_Insert_invoice(data):
                 'invoice_date':
                 datetime.datetime.strptime(data['invoice_date'],
                                         '%d-%b-%y %H:%M:%S'),
-                'checkout_date':
-                datetime.datetime.strptime(data['guest_data']['checkout_date'],
-                                        '%d-%b-%y %H:%M:%S'),
+                "checkout_date": datetime.datetime.strptime(data['checkout_date'],
+                                        '%d-%b-%y %H:%M:%S') if "checkout_date" in data else None,
                 'legal_name':
                 " ",
                 'address_1':
