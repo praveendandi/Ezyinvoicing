@@ -592,6 +592,7 @@ def send_invoicedata_to_gcb(invoice_number):
                 "invoice_number": doc.invoice_number,
                 "invoice_type": doc.invoice_type,
                 "invoice_date": str(doc.invoice_date),
+                "checkout_date": str(doc.checkout_date),
                 "pms_invoice_summary": doc.total_invoice_amount,
                 "irn": "N/A",
                 "company_name": company.company_name,
@@ -1220,6 +1221,9 @@ def insert_invoice(data):
             'invoice_date':
             datetime.datetime.strptime(data['guest_data']['invoice_date'],
                                         '%d-%b-%y %H:%M:%S'),
+            'checkout_date':
+            datetime.datetime.strptime(data['guest_data']['checkout_date'],
+                                        '%d-%b-%y %H:%M:%S'),
             'legal_name':
             data['taxpayer']['legal_name'],
             'mode':company.mode,
@@ -1310,7 +1314,9 @@ def insert_invoice(data):
             "non_revenue_amount": non_revenue_amount,
             "pos_checks": pos_checks
 
+
         })
+        print(invoice,'................')
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
@@ -3485,7 +3491,6 @@ def check_invoice_exists(invoice_number):
 @frappe.whitelist()
 def Error_Insert_invoice(data):
     try:
-        print(data)
         if "invoice_object_from_file" not in data:
             data['invoice_object_from_file'] = {"data":[]}
         if "invoice_from" in data:
@@ -3503,7 +3508,6 @@ def Error_Insert_invoice(data):
             else:
                 sez = 0
         if "gst_number" in data:
-            print(data["gst_number"],">>>>>>>>>>>>>>>")
             if data["gst_number"]==None:
                 data["gst_number"]=""
         if len(data['gst_number'])<15 and len(data['gst_number'])>0:
@@ -3564,6 +3568,9 @@ def Error_Insert_invoice(data):
                 # 'qr_generated':qr_generated,
                 'invoice_date':
                 datetime.datetime.strptime(data['invoice_date'],
+                                        '%d-%b-%y %H:%M:%S'),
+                'checkout_date':
+                datetime.datetime.strptime(data['guest_data']['checkout_date'],
                                         '%d-%b-%y %H:%M:%S'),
                 'legal_name':
                 " ",
