@@ -139,6 +139,8 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
                               {'signature':signature,"agree":agree})
     if company.name == 'NHA-01' and company.name == 'KMH-01':
         create_bbox(name)
+    else:
+        create_bbox(name)
     frappe.db.commit()
     data = {
         'name': name,
@@ -190,13 +192,14 @@ import pdfplumber
 import fitz
 def create_bbox(name):
     try:
+        # print("HITTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
         doc = frappe.get_doc('Invoices',name)
         if doc.invoice_from in ["Web", "Pms"] and doc.signature_file is not None and doc.signature_file != '':
             folder_path = frappe.utils.get_bench_path()
             company = frappe.get_doc('company', doc.company)
             site_folder_path = company.site_name
             file_path = folder_path+'/sites/'+site_folder_path+doc.invoice_file
-            print(doc.invoice_file)
+            # print(doc.invoice_file)
             # signature_file = folder_path+'/sites/'+site_folder_path+doc.signature_file
             signature_file =folder_path+'/sites/'+site_folder_path+'/public'+doc.signature_file
 
@@ -221,15 +224,33 @@ def create_bbox(name):
                 each_page.insertImage(rect, filename=signature_file)
                 # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
                 original_name,extension = file_path.split('.')
-                document.save(original_name.strip()+'signed.pdf')
-                original_name,extension = doc.invoice_file.split("/")[-1].split('.pdf').strip()
-
-                print(f'/private/files/{original_name}signed.pdf',"55555555555555555555555555555555555555555")
+                document.save(original_name+'signed.pdf')
+                files = {"file": open(original_name+'signed.pdf', "rb")}
+                payload = {
+                        "is_private": 1,
+                        "folder": "Home",
+                        "doctype": "Invoices",
+                        "fieldname": "name",
+                        "docname":name
+                }
+                site = company.host
+                upload_qr_image = requests.post(
+                        site + "api/method/upload_file", files=files, data=payload
+                )
+                response = upload_qr_image.json()
+                print(response)
                 
+                # original_name,extension = doc.invoice_file.split("/")[-1].split('.pdf')
+
+
                 doc = frappe.get_doc('Invoices',name)
-                doc.invoice_file = f'/private/files/{original_name}signed.pdf'
+                doc.invoice_file = response['message']['file_url']
+                # print(f'/private/files/{original_name}signed.pdf',"55555555555555555555555555555555555555555")
                 doc.save()
                 frappe.db.commit()
+                # print("HITTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+                os.remove(file_path)
+
                 # document.save(file_path,incremental=True)
                             
             # doc.save()
