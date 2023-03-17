@@ -1,4 +1,4 @@
-import frappe
+# import frappe
 import pdfplumber
 import sys, traceback
 import pdfplumber
@@ -28,7 +28,7 @@ def create_bbox(doc,method=None):
                             bottom = word['bottom']
                             document = fitz.open(file_path)
                             page = document[index]  # get first page
-                            rect = fitz.Rect(x0+50, top+50, top, bottom)  # define your rectangle here
+                            rect = fitz.Rect(x0, top, x1+100, bottom)  # define your rectangle here
                             image_file = signature_file, 'rb'
                             page.InsertImage(rect, filename=image_file)
                             # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
@@ -60,3 +60,45 @@ def create_bbox(doc,method=None):
 
 
 # print(clean_text)
+
+
+import numpy as np
+
+def remove_background(image, bg_color=255):
+    # assumes rgb image (w, h, c)
+    intensity_img = np.mean(image, axis=2)
+
+    # identify indices of non-background rows and columns, then look for min/max indices
+    non_bg_rows = np.nonzero(np.mean(intensity_img, axis=1) != bg_color)
+    non_bg_cols = np.nonzero(np.mean(intensity_img, axis=0) != bg_color)
+    r1, r2 = np.min(non_bg_rows), np.max(non_bg_rows)
+    c1, c2 = np.min(non_bg_cols), np.max(non_bg_cols)
+
+    # return cropped image
+    return image[r1:r2+1, c1:c2+1, :]
+
+
+
+from PIL import Image, ImageChops
+
+def trim(im, border):
+  bg = Image.new(im.mode, im.size, border)
+  diff = ImageChops.difference(im, bg)
+  bbox = diff.getbbox()
+  if bbox:
+    return im.crop(bbox)
+
+def create_thumbnail(path, size):
+  image = Image.open(path)
+  name, extension = path.split('.')
+  options = {}
+  if 'transparency' in image.info:
+    options['transparency'] = image.info["transparency"]
+  
+  image.thumbnail((size, size), Image.ANTIALIAS)
+  image = trim(image, 255) ## Trim whitespace
+  image.save(name + '_new.' + extension, **options)
+  return image
+
+# path = '/home/caratred/Desktop/projects/frappe-bench/sites/kochi_marriott/public/files/4000-2387022d5d5a.png'
+# create_thumbnail(path,300)

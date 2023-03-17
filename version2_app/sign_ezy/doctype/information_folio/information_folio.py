@@ -121,7 +121,14 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
         site_folder_path = f'{cwd}/{site_name}'
         
         signature_file_url = convert_base64_to_image(signature,name,site_folder_path,company)
+        # /home/caratred/Desktop/projects/frappe-bench/sites/kochi_marriott/public/files
         print(signature_file_url['message']['file_url'],"******************************8")
+        # folder_path = frappe.utils.get_bench_path()
+        # site_folder_path = company.site_name
+        # file = site_folder_path + "/private/files/" + name + ".png"
+        signature_file =site_folder_path+'/public'+signature_file_url['message']['file_url']
+        # path = '/home/caratred/Desktop/projects/frappe-bench/sites/kochi_marriott/public/files/4000-2387022d5d5a.png'
+        create_thumbnail(signature_file,2000)
         
         if signature_file_url != False:                                
             invoice_doc = frappe.db.set_value('Invoices', name,
@@ -130,7 +137,8 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
     else:
         doc = frappe.db.set_value(doctype, name,
                               {'signature':signature,"agree":agree})
-    create_bbox(name)
+    if company.name == 'NHA-01' and company.name == 'KMH-01':
+        create_bbox(name)
     frappe.db.commit()
     data = {
         'name': name,
@@ -150,6 +158,31 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
     return True
 
 
+
+from PIL import Image, ImageChops
+
+def trim(im, border):
+  bg = Image.new(im.mode, im.size, border)
+  diff = ImageChops.difference(im, bg)
+  bbox = diff.getbbox()
+  if bbox:
+    return im.crop(bbox)
+
+def create_thumbnail(path, size):
+  image = Image.open(path)
+  name, extension = path.split('.')
+  options = {}
+  if 'transparency' in image.info:
+    options['transparency'] = image.info["transparency"]
+  
+  image.thumbnail((size, size), Image.ANTIALIAS)
+  image = trim(image, 255) ## Trim whitespace
+  image.save(path, **options)
+  return image
+
+
+
+
 import frappe
 import pdfplumber
 import sys, traceback
@@ -157,13 +190,16 @@ import pdfplumber
 import fitz
 def create_bbox(name):
     try:
-        doc = frappe.db.get_doc('Invoices',name)
+        doc = frappe.get_doc('Invoices',name)
         if doc.invoice_from in ["Web", "Pms"] and doc.signature_file is not None and doc.signature_file != '':
             folder_path = frappe.utils.get_bench_path()
             company = frappe.get_doc('company', doc.company)
             site_folder_path = company.site_name
             file_path = folder_path+'/sites/'+site_folder_path+doc.invoice_file
-            signature_file = folder_path+'/sites/'+site_folder_path+doc.signature_file
+            print(doc.invoice_file)
+            # signature_file = folder_path+'/sites/'+site_folder_path+doc.signature_file
+            signature_file =folder_path+'/sites/'+site_folder_path+'/public'+doc.signature_file
+
             x0,x1,top, bottom = '','','',''
 
             with pdfplumber.open(file_path) as pdf:
@@ -177,13 +213,24 @@ def create_bbox(name):
                             x1 = word['x1']
                             top = word['top']
                             bottom = word['bottom']
-                            document = fitz.open(file_path)
-                            page = document[index]  # get first page
-                            rect = fitz.Rect(x0+50, top+50, top, bottom)  # define your rectangle here
-                            image_file = signature_file, 'rb'
-                            page.InsertImage(rect, filename=image_file)
-                            # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
-                            document.save(file_path)
+
+                document = fitz.open(file_path)
+                each_page = document[-1]  # get first page
+                rect = fitz.Rect(x0, top, x1+100, bottom)  # define your rectangle here
+                # image_file = signature_file, 'rb'
+                each_page.insertImage(rect, filename=signature_file)
+                # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
+                original_name,extension = file_path.split('.')
+                document.save(original_name.strip()+'signed.pdf')
+                original_name,extension = doc.invoice_file.split("/")[-1].split('.pdf').strip()
+
+                print(f'/private/files/{original_name}signed.pdf',"55555555555555555555555555555555555555555")
+                
+                doc = frappe.get_doc('Invoices',name)
+                doc.invoice_file = f'/private/files/{original_name}signed.pdf'
+                doc.save()
+                frappe.db.commit()
+                # document.save(file_path,incremental=True)
                             
             # doc.save()
     except Exception as e:
