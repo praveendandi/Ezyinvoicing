@@ -137,10 +137,11 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
     else:
         doc = frappe.db.set_value(doctype, name,
                               {'signature':signature,"agree":agree})
-    if company.name == 'NHA-01' and company.name == 'KMH-01':
-        create_bbox(name)
-    else:
-        create_bbox(name)
+    create_bbox(name)
+    # if company.name == 'NHA-01' and company.name == 'KMH-01':
+    #     create_bbox(name)
+    # else:
+    #     create_bbox(name)
     frappe.db.commit()
     data = {
         'name': name,
