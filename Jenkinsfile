@@ -1,5 +1,7 @@
 pipeline {
-  agent none
+  agent {
+        label Test
+      }
   options {
       skipDefaultCheckout true
   }
@@ -14,7 +16,9 @@ pipeline {
 
   stages {
     stage('Checkout') {
-      agent Test
+      agent {
+        label Test
+      }
       steps {
         git credentialsId: 'gitlab-token', url: 'https://gitlab.com/frappe/frappe.git', branch: "${FRAPPE_BRANCH}"
         git credentialsId: 'gitlab-token', url: "https://gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git", branch: "${APP_BRANCH}"
@@ -22,7 +26,9 @@ pipeline {
     }
 
     stage('Detect Tag') {
-      agent Test
+      agent {
+        label Test
+      }
       steps {
         echo
             'Running Detect Tag phase. '
@@ -42,7 +48,9 @@ pipeline {
     }
 
      stage('Push Changes') {
-       agent none
+       agent {
+        label Test
+      }
        steps {
          sh "cd ${APP_NAME} && git add . && git commit -m 'Auto-update app' && git push origin ${APP_BRANCH}"
        }
