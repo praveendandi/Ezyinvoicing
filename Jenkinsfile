@@ -1,11 +1,11 @@
 pipeline {
-  agent none
+  agent Test
 
   environment {
     GITLAB_TOKEN = credentials('glpat-72tFJ_LRsEW5LJnVVxzp')
     APP_NAME = 'EzyinvoiceDemo'
     APP_BRANCH = 'master'
-    WRK_DIR = '/home/erpnext/bench/frappe-branch/apps/'
+    WRK_DIR = '/home/frappe/frappe-branch/apps'
     FRAPPE_BRANCH = 'version-13'
   }
 
