@@ -1,5 +1,7 @@
 pipeline {
-  agent Test
+  agent none
+  options {
+      skipDefaultCheckout true
 
   environment {
     GITLAB_TOKEN = credentials('glpat-72tFJ_LRsEW5LJnVVxzp')
