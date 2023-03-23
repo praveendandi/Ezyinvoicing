@@ -21,6 +21,8 @@ pipeline {
     stage('Detect Tag') {
       agent Test
       steps {
+        echo
+            'Running Detect Tag phase. '
         script {
           def tagsBefore = sh(script: "cd ${WRK_DIR}/${APP_NAME} && git tag --list", returnStdout: true).trim().split()
           sh "cd ${APP_NAME} && git fetch --tags"
