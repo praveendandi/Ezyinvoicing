@@ -1,6 +1,6 @@
 pipeline {
   agent {
-        label Test
+        label 'Test'
       }
   options {
       skipDefaultCheckout true
@@ -17,7 +17,7 @@ pipeline {
   stages {
     stage('Checkout') {
       agent {
-        label Test
+        label 'Test'
       }
       steps {
         git credentialsId: 'gitlab-token', url: 'https://gitlab.com/frappe/frappe.git', branch: "${FRAPPE_BRANCH}"
@@ -27,7 +27,7 @@ pipeline {
 
     stage('Detect Tag') {
       agent {
-        label Test
+        label 'Test'
       }
       steps {
         echo
@@ -49,7 +49,7 @@ pipeline {
 
      stage('Push Changes') {
        agent {
-        label Test
+        label 'Test'
       }
        steps {
          sh "cd ${APP_NAME} && git add . && git commit -m 'Auto-update app' && git push origin ${APP_BRANCH}"
