@@ -226,7 +226,7 @@ def create_bbox(name):
                 # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
                 print(file_path,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
                 print(file_path.split('.'),"&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-                original_name,extension = file_path.split('.')
+                original_name,extension = file_path.split('.pdf')
                 document.save(original_name+'signed.pdf')
                 files = {"file": open(original_name+'signed.pdf', "rb")}
                 payload = {
