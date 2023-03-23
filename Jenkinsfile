@@ -1,9 +1,9 @@
 pipeline {
-  agent Test
+  agent none
 
   environment {
     GITLAB_TOKEN = credentials('glpat-72tFJ_LRsEW5LJnVVxzp')
-    APP_NAME = 'EzyinvoiceDemo'
+    APP_NAME = 'version2_app'
     APP_BRANCH = 'master'
     WRK_DIR = '/home/frappe/frappe-branch/apps'
     FRAPPE_BRANCH = 'version-13'
@@ -14,7 +14,7 @@ pipeline {
       agent Test
       steps {
         git credentialsId: 'gitlab-token', url: 'https://gitlab.com/frappe/frappe.git', branch: "${FRAPPE_BRANCH}"
-        git credentialsId: 'gitlab-token', url: "https://gitlab.caratred.com/ganesh.s/${APP_NAME}.git", branch: "${APP_BRANCH}"
+        git credentialsId: 'gitlab-token', url: "https://gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git", branch: "${APP_BRANCH}"
       }
     }
 
