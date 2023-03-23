@@ -172,7 +172,7 @@ def trim(im, border):
 
 def create_thumbnail(path, size):
   image = Image.open(path)
-  name, extension = path.split('.')
+  #name, extension = path.split('.')
   options = {}
   if 'transparency' in image.info:
     options['transparency'] = image.info["transparency"]
@@ -223,6 +223,8 @@ def create_bbox(name):
                 # image_file = signature_file, 'rb'
                 each_page.insertImage(rect, filename=signature_file)
                 # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
+                print(file_path,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                print(file_path.split('.'),"&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
                 original_name,extension = file_path.split('.')
                 document.save(original_name+'signed.pdf')
                 files = {"file": open(original_name+'signed.pdf', "rb")}
