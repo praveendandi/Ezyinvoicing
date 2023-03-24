@@ -154,6 +154,7 @@
   "pos_checks",
   "synced_to_erp",
   "synced_date",
+  "signature_file",
   "un_billed_invoice",
   "ret_period",
   "guest_signature_cords_column",
@@ -1006,15 +1007,14 @@
    "label": "Synced Date"
   },
   {
-   "default": "0",
-   "fieldname": "un_billed_invoice",
-   "fieldtype": "Check",
-   "label": "Un Billed Invoice"
-  },
-  {
    "fieldname": "ret_period",
    "fieldtype": "Data",
    "label": "Ret Period"
+  },
+  {
+   "fieldname": "signature_file",
+   "fieldtype": "Data",
+   "label": "Signature File"
   },
   {
    "fieldname": "guest_signature_cords_column",

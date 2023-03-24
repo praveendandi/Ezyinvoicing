@@ -101,8 +101,7 @@ app_license = "MIT"
 # }
 doc_events = {
 	"Invoices": {
-        "after_insert":["version2_app.events.invoice_created",
-                        "version2_app.add_signature_bbox.create_bbox"],
+        "after_insert":["version2_app.events.invoice_created",],
 
         "on_update":["version2_app.events.invoice_update",
                     #  "version2_app.add_signature_bbox.create_bbox"
