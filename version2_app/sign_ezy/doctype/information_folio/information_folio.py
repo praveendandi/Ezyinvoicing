@@ -128,7 +128,7 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
         # file = site_folder_path + "/private/files/" + name + ".png"
         signature_file =site_folder_path+'/public'+signature_file_url['message']['file_url']
         # path = '/home/caratred/Desktop/projects/frappe-bench/sites/kochi_marriott/public/files/4000-2387022d5d5a.png'
-        create_thumbnail(signature_file,2000)
+        # create_thumbnail(signature_file,2000)
         
         if signature_file_url != False:                                
             invoice_doc = frappe.db.set_value('Invoices', name,
@@ -220,7 +220,9 @@ def create_bbox(name):
 
                 document = fitz.open(file_path)
                 each_page = document[-1]  # get first page
-                rect = fitz.Rect(x0, top, x1+100, bottom)  # define your rectangle here
+                rect = fitz.Rect(x0+50, top-100, x1+100,bottom+100) # define your rectangle here
+
+                # rect = fitz.Rect(x0, top, x1+100, bottom)  # define your rectangle here
                 # image_file = signature_file, 'rb'
                 each_page.insertImage(rect, filename=signature_file)
                 # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
