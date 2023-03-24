@@ -2592,7 +2592,7 @@ def delete_arrival_activity():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_apikey(user):
     try:
         if frappe.db.exists("User", user):
