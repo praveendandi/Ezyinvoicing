@@ -24,8 +24,7 @@ ENV_PROD="stable"
             git checkout tags/$(git describe --tags --abbrev=0 --match="$ENV_PROD")
             bench migrate
         else
-        echo 
-            "Stable tag not found"
+        echo "Stable tag not found"
         # cd "$DIR2"
         # cd "$REPO2"
         #  git tag --points-at HEAD | grep -qE "^$ENV_UAT"; then
