@@ -8,7 +8,7 @@ REPO1="version2_app"
 #REPO2="healthcare"
 #REPO3="version2_app"
 
-# Define the environment tags
+# Define the environment tags tags
 ENV_PROD="stable"
 #ENV_UAT="uat"
 #ENV_TEST="test"
