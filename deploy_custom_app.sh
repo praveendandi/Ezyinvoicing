@@ -8,9 +8,8 @@ declare -A CUSTOM_APPS=(
   ["invoice_sync"]="https://gitlab.caratred.com/sumanth512/invoice-sync.git"
   ["healthcare"]="https://github.com/frappe/health.git"
 )
-
 # Loop through each custom app
-for APP in "${!CUSTOM_APPS}"
+for APP in "${!CUSTOM_APPS[@]}"
 do
   # Check if the custom app is already installed
   if [[ -d "${FRAPPE_SITES_PATH}/${site_name}/apps/${APP}" ]]; then
