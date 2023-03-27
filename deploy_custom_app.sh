@@ -1,5 +1,6 @@
 #!/bin/bash
-WORKDIR=/home/erpnext/bench/test-bench/
+WORKDIR=/home/erpnext/bench/test-bench
+site_name=test.local
 app1=version2_app
 app2=invoice_sync
 app1_repo_url=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
@@ -28,9 +29,9 @@ else
   cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
   echo "Installing $app1"
-  bench get-app $app1_repo_url
+  bench get-app ${app1_repo_url}
   # Install the app in the given site
-  bench --site test.local install-app $app1
+  bench --site ${site_name} install-app ${app1}
 fi
 
 # Check if the second app exists
@@ -48,9 +49,9 @@ else
   cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
   echo "Installing $app2"
-  bench get-app $app2_repo_url
+  bench get-app ${app2_repo_url}
   # Install the app in the given site
-  bench --site test.local install-app $app2
+  bench --site ${site_name} install-app $app2
 fi
 
 # Once all the apps are updated, migrate the database and requirements
