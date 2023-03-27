@@ -34,6 +34,7 @@ from frappe.utils import logger
 from version2_app.events import invoiceCreated
 import time
 import os
+import json
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
@@ -976,7 +977,7 @@ def insert_invoice(data):
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:
-            data['invoice_object_from_file'] = " "	
+            data['invoice_object_from_file'] = " "
         company = frappe.get_doc('company',data['company_code'])
         sales_amount_before_tax = 0
         sales_amount_after_tax = 0
@@ -1195,6 +1196,13 @@ def insert_invoice(data):
             pos_checks = 0
         else:
             pos_checks = data['guest_data']['pos_checks']
+        
+        with open('/home/caratred/frappe-bench/apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json', 'r') as f:
+            json_data = json.load(f)
+            for each in json_data:
+                if data['taxpayer']['state_code'] == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                    print(place_supplier_state_name,"OOOOOOOOOOo")
 
         invoice = frappe.get_doc({
             'doctype':
@@ -1312,7 +1320,8 @@ def insert_invoice(data):
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
             "non_revenue_amount": non_revenue_amount,
-            "pos_checks": pos_checks
+            "pos_checks": pos_checks,
+            "place_of_supply_json" : place_supplier_state_name
 
 
         })
@@ -3617,7 +3626,8 @@ def Error_Insert_invoice(data):
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
                 "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
-                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
+                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0,
+                "place_of_supply_json":data['place_of_supply_json'] if 'place_of_supply_json' in data else None,
             })
             if 'amened' in data:
                 if data['amened'] == 'Yes':
