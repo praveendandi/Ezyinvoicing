@@ -30,7 +30,7 @@ else
   echo "Installing $app1"
   bench get-app $app1 $app1_repo_url
   # Install the app in the given site
-  bench --site lifescc install-app $app1
+  bench --site test.local install-app $app1
 fi
 
 # Check if the second app exists
@@ -50,7 +50,7 @@ else
   echo "Installing $app2"
   bench get-app $app2_repo_url
   # Install the app in the given site
-  bench --site lifescc install-app $app2
+  bench --site test.local install-app $app2
 fi
 
 # Once all the apps are updated, migrate the database and requirements
