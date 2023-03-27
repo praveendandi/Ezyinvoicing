@@ -1,5 +1,5 @@
 #!/bin/bash
-WORKDIR=/home/erpnext/bench/frappe-bench/
+WORKDIR=/home/erpnext/bench/test-bench/
 app1=version2_app
 app2=invoice_sync
 app1_repo_url=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
@@ -58,23 +58,23 @@ bench migrate
 bench update --requirements
 
 # Check if the third app exists
-if [ -d "frappe-bench/apps/$app3" ]
-then
-  echo "Updating $app3"
-  # Change directory to the app directory
-  cd "frappe-bench/apps/$app3"
-  # Pull the latest changes from the git repository
-  git pull
-  # Get the latest tag for the branch and update to it
-  git fetch --tags
-  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
-  # Change directory back to the frappe-bench directory
-  cd ../../..
-else
-  # If the app does not exist, get it from the git repository
-  echo "Installing $app3"
-  bench get-app $app3 $app3_repo_url
-  # Install the app in the given site
-  bench --site lifescc install-app $app3
-fi
+# if [ -d "frappe-bench/apps/$app3" ]
+# then
+#   echo "Updating $app3"
+#   # Change directory to the app directory
+#   cd "frappe-bench/apps/$app3"
+#   # Pull the latest changes from the git repository
+#   git pull
+#   # Get the latest tag for the branch and update to it
+#   git fetch --tags
+#   git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+#   # Change directory back to the frappe-bench directory
+#   cd ../../..
+# else
+#   # If the app does not exist, get it from the git repository
+#   echo "Installing $app3"
+#   bench get-app $app3 $app3_repo_url
+#   # Install the app in the given site
+#   bench --site lifescc install-app $app3
+# fi
 done
