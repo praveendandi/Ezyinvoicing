@@ -55,6 +55,7 @@ else
 fi
 cd ${WORKDIR}
 # Once all the apps are updated, migrate the database and requirements
+bench use ${site_name}
 bench migrate
 bench update --requirements
 
