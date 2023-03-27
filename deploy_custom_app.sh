@@ -1,33 +1,83 @@
 #!/bin/bash
+WORKDIR=/home/erpnext/bench
+app1=version2_app
+app2=invoice_sync
+app3=hrms
+app1_repo_url=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+app2_repo_url=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred.com/sumanth512/invoice-sync.git
+app3_repo_url=https://github.com/frappe/hrms.git
 
-# Set the Frappe sites path and the associative array of custom app names and GitLab repo URLs
-site_name=lifescc
-FRAPPE_SITES_PATH=/home/erpnext/bench/frappe-bench/sites
-declare -A CUSTOM_APPS=(
-  ["version2_app"]="https://gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git"
-  ["invoice_sync"]="https://gitlab.caratred.com/sumanth512/invoice-sync.git"
-  ["healthcare"]="https://github.com/frappe/health.git"
-)
-# Loop through each custom app
-for APP in "${!CUSTOM_APPS[@]}"
-do
-  # Check if the custom app is already installed
-  if [[ -d "${FRAPPE_SITES_PATH}/${site_name}/apps/${APP}" ]]; then
-    # If it's already installed, check if there are any updates in the GitLab repo
-    cd "${FRAPPE_SITES_PATH}/${site_name}/apps/${APP}"
-    git fetch
-    LOCAL=$(git rev-parse HEAD)
-    REMOTE=$(git rev-parse @{u})
-    if [[ $LOCAL != $REMOTE ]]; then
-      # If there are updates, update the custom app and migrate the site
-      git pull
-      bench migrate
-    fi
-  else
-    # If it's not installed, install the custom app and migrate the site
-    REPO_URL=${CUSTOM_APPS[$APP]}
-    bench get-app ${APP} ${REPO_URL}
-    bench --site site1.local install-app ${APP}
-    bench migrate
-  fi
-done
+# Check if the first app exists
+cd $WORKDIR
+if [ -d "frappe-bench/apps/$app1" ]
+then
+  echo "Updating $app1"
+  # Change directory to the app directory
+  cd "frappe-bench/apps/$app1"
+  # Pull the latest changes from the git repository
+  # Check if current branch is "master"
+if [ $(git rev-parse --abbrev-ref HEAD) = "master" ]; then
+
+  # Fetch tags from remote repository
+  git fetch --tags
+
+  # Get the latest tag on the current branch
+  latest_tag=$(git describe --tags --abbrev=0)
+
+  # Checkout to the latest tag
+  git checkout $latest_tag
+  # Get the latest tag for the branch and update to it
+  ##git fetch --tags
+  ##git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+  # Change directory back to the frappe-bench directory
+  cd ../../..
+else
+  # If the app does not exist, get it from the git repository
+  echo "Installing $app1"
+  bench get-app $app1 $app1_repo_url
+  # Install the app in the given site
+  bench --site lifescc install-app $app1
+fi
+
+cd $WORKDIR
+# Check if the second app exists
+if [ -d "frappe-bench/apps/$app2" ]
+then
+  echo "Updating $app2"
+  # Change directory to the app directory
+  cd "frappe-bench/apps/$app2"
+  # Pull the latest changes from the git repository
+  git pull
+  # Get the latest tag for the branch and update to it
+  git fetch --tags
+  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+  # Change directory back to the frappe-bench directory
+  cd ../../..
+else
+  # If the app does not exist, get it from the git repository
+  echo "Installing $app2"
+  bench get-app $app2 $app2_repo_url
+  # Install the app in the given site
+  bench --site lifescc install-app $app2
+fi
+cd $WORKDIR
+# Check if the third app exists
+if [ -d "frappe-bench/apps/$app3" ]
+then
+  echo "Updating $app3"
+  # Change directory to the app directory
+  cd "frappe-bench/apps/$app3"
+  # Pull the latest changes from the git repository
+  git pull
+  # Get the latest tag for the branch and update to it
+  git fetch --tags
+  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+  # Change directory back to the frappe-bench directory
+  cd ../../..
+else
+  # If the app does not exist, get it from the git repository
+  echo "Installing $app3"
+  bench get-app $app3 $app3_repo_url
+  # Install the app in the given site
+  bench --site lifescc install-app $app3
+fi
