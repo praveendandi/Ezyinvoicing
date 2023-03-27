@@ -25,6 +25,7 @@ then
   # Change directory back to the frappe-bench directory
   cd ../../..
 else
+  cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
   echo "Installing $app1"
   bench get-app $app1 $app1_repo_url
@@ -44,6 +45,7 @@ then
   # Change directory back to the frappe-bench directory
   cd ../../..
 else
+  cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
   echo "Installing $app2"
   bench get-app $app2_repo_url
