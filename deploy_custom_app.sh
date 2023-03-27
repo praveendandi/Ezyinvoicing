@@ -53,7 +53,7 @@ else
   # Install the app in the given site
   bench --site ${site_name} install-app $app2
 fi
-
+cd ${WORKDIR}
 # Once all the apps are updated, migrate the database and requirements
 bench migrate
 bench update --requirements
