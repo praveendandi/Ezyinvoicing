@@ -1,5 +1,5 @@
 #!/bin/bash
-WORKDIR=/home/erpnext/bench/
+WORKDIR=/home/erpnext/bench/frappe-bench/
 app1=version2_app
 app2=invoice_sync
 app3=hrms
@@ -8,12 +8,12 @@ app2_repo_url=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred
 app3_repo_url=https://github.com/frappe/hrms.git
 
 # Check if the first app exists
-cd $WORKDIR
-if [ -d "/home/erpnext/bench/frappe-bench/apps/$app1" ]
+
+if [ -d "${WORKDIR}/apps/$app1" ]
 then
   echo "Updating $app1"
   # Change directory to the app directory
-  cd "/home/erpnext/bench/frappe-bench/apps/$app1"
+  cd "${WORKDIR}/apps/$app1"
   #git remote remove origin
   #git remote remove upstream
 
@@ -36,11 +36,11 @@ fi
 
 cd $WORKDIR
 # Check if the second app exists
-if [ -d "frappe-bench/apps/$app2" ]
+if [ -d "${WORKDIR}/apps/$app2" ]
 then
   echo "Updating $app2"
   # Change directory to the app directory
-  cd "frappe-bench/apps/$app2"
+  cd "${WORKDIR}/apps/$app2"
   # Pull the latest changes from the git repository
   git pull
   # Get the latest tag for the branch and update to it
