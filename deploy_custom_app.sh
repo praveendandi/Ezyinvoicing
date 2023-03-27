@@ -78,4 +78,3 @@ bench update --requirements
 #   # Install the app in the given site
 #   bench --site lifescc install-app $app3
 # fi
-done
