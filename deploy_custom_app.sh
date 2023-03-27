@@ -14,6 +14,11 @@ then
   echo "Updating $app1"
   # Change directory to the app directory
   cd "/home/erpnext/bench/frappe-bench/apps/$app1"
+  git remote remove origin
+  git remote remove upstream
+
+  git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+  git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
   # Pull the latest changes from the git repository
   # Get the latest tag for the branch and update to it
   git fetch --tags
