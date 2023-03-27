@@ -1,5 +1,5 @@
 #!/bin/bash
-WORKDIR=/home/erpnext/bench
+WORKDIR=/home/erpnext/bench/
 app1=version2_app
 app2=invoice_sync
 app3=hrms
@@ -9,11 +9,11 @@ app3_repo_url=https://github.com/frappe/hrms.git
 
 # Check if the first app exists
 cd $WORKDIR
-if [ -d "frappe-bench/apps/$app1" ]
+if [ -d "/home/erpnext/bench/frappe-bench/apps/$app1" ]
 then
   echo "Updating $app1"
   # Change directory to the app directory
-  cd "frappe-bench/apps/$app1"
+  cd "/home/erpnext/bench/frappe-bench/apps/$app1"
   # Pull the latest changes from the git repository
   # Check if current branch is "master"
 if [ $(git rev-parse --abbrev-ref HEAD) = "master" ]; then
