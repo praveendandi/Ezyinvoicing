@@ -15,22 +15,10 @@ then
   # Change directory to the app directory
   cd "/home/erpnext/bench/frappe-bench/apps/$app1"
   # Pull the latest changes from the git repository
-  # Check if current branch is "master"
-if [ $(git rev-parse --abbrev-ref HEAD) = "master" ]; then
-
-  # Fetch tags from remote repository
-  git fetch --tags
-
-  # Get the latest tag on the current branch
-  latest_tag=$(git describe --tags --abbrev=0)
-
-  # Checkout to the latest tag
-  git checkout $latest_tag
-
-fi
   # Get the latest tag for the branch and update to it
-  ##git fetch --tags
-  ##git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+  git fetch --tags
+  
+  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
   # Change directory back to the frappe-bench directory
   cd ../../..
 else
