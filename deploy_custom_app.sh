@@ -51,7 +51,7 @@ then
 else
   # If the app does not exist, get it from the git repository
   echo "Installing $app2"
-  bench get-app $app2 $app2_repo_url
+  bench get-app $app2_repo_url
   # Install the app in the given site
   bench --site lifescc install-app $app2
 fi
