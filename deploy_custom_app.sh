@@ -28,7 +28,7 @@ else
   cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
   echo "Installing $app1"
-  bench get-app $app1 $app1_repo_url
+  bench get-app $app1_repo_url
   # Install the app in the given site
   bench --site test.local install-app $app1
 fi
