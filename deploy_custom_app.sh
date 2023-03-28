@@ -70,7 +70,7 @@ cd ${WORKDIR}
 # Once all the apps are updated, migrate the database and requirements
 bench use ${site_name}
 bench migrate
-bench update --requirements
+#bench update --requirements
 
 # Check if the third app exists
 # if [ -d "frappe-bench/apps/$app3" ]
