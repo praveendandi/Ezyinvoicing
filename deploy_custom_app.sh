@@ -16,15 +16,16 @@ then
   echo "Updating $APP1"
   # Change directory to the app directory
   cd "$WORKDIR/apps/$APP1"
-   git remote remove origin
-   git remote remove upstream
+#    git remote remove origin
+#    git remote remove upstream
 
-   git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
-   git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+#    git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+#    git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
 
-# Pull the latest changes from the git repository
+# # Pull the latest changes from the git repository
 # Get the current branch or tag
-
+cd /home/erpnext/bench/test-bench/
+pwd
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 CURRENT_TAG=$(git describe --exact-match --tags HEAD 2>/dev/null)
 
