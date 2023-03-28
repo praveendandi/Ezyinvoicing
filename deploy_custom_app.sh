@@ -2,8 +2,8 @@
 
 # Define the ENV
 STABLE_TAG_PREFIX="stable-"
-WORKDIR=/home/frappe/frappe-bench
-SITE_NAME=ezyinvoicing.local
+WORKDIR=/home/erpnext/bench/test-bench
+SITE_NAME=test.local
 APP1=version2_app
 APP2=invoice_sync
 APP1_REPO_URL=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
