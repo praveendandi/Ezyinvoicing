@@ -13,29 +13,35 @@ then
   echo "Updating $app1"
   # Change directory to the app directory
   cd "${WORKDIR}/apps/${app1}"
-  #git remote remove origin
-  #git remote remove upstream
+   # git remote remove origin
+   # git remote remove upstream
 
-  #git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
-  #git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
-  # Pull the latest changes from the git repository
-  # Get the latest tag for the branch and update to it
+   # git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+   # git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+
+# Pull the latest changes from the git repository
+# Get the latest tag for the branch and update to it
 # Define the prefix to look for
-prefix="stable"
+TAG_PREFIX="stable"
 
-# Get the latest tag that matches the prefix
-latest_tag=$(git tag -l "$prefix*" --sort=-v:refname | head -0)
+# Get the name of the current branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# Check if the latest tag exists and starts with the prefix
-if [[ -n $latest_tag && $latest_tag == $prefix* ]]; then
-  # Checkout the latest tag
-  git checkout $latest_tag
+# Check if the current branch is "master"
+if [[ "$CURRENT_BRANCH" == "master" ]]; then
+  # Get the name of the latest tag with the prefix "stable"
+  LATEST_TAG=$(git describe --tags --match "$TAG_PREFIX*" --abbrev=0)
+
+  # Check if a tag with the prefix "stable" was found
+  if [[ "$LATEST_TAG" == "$TAG_PREFIX"* ]]; then
+    echo "Found tag: $LATEST_TAG"
+    git checkout "$LATEST_TAG"
+  else
+    echo "No tag found with prefix $TAG_PREFIX"
+  fi
 else
-  echo "No tag found matching the prefix $prefix"
+  echo "Current branch is not master"
 fi
-  # git fetch --tags
-  
-  # git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
   # # Change directory back to the frappe-bench directory
   cd ../../..
 else
