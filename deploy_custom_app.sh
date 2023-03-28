@@ -24,7 +24,7 @@ if [ -d "$WORKDIR/apps/$APP1" ]; then
 # Pull the latest changes from the git repository
 # Step 2: Check the git branch
     pwd
-  if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]]; then
+  if [[ "$(git rev-parse --abbrev-ref --short HEAD)" == "master" ]]; then
     # Check for latest tag with prefix stable
     tag=$(git describe --tags --match "stable-*" --abbrev=0)
     if [[ "$tag" == "" ]]; then
