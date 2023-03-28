@@ -15,7 +15,6 @@ if [ -d "$WORKDIR/apps/$APP1" ]; then
   echo "Updating $APP1"
   # Change directory to the app directory
   cd "$WORKDIR/apps/$APP1"
-
    # git remote remove origin
    # git remote remove upstream
 
@@ -50,6 +49,7 @@ if [ -d "$WORKDIR/apps/$APP1" ]; then
                 # Checkout the latest stable tag
                 git checkout "$latest_stable_tag"
                 echo "Checked out tag: $latest_stable_tag"
+                bench migrate
             else
                 echo "No stable tags found"
             fi
