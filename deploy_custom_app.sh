@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the ENV
-STABLE_PREFIX="ezy-"
+STABLE_PREFIX="stable-"
 WORKDIR=/home/frappe/frappe-bench
 SITE_NAME=ezyinvoicing.local
 APP1=version2_app
@@ -36,6 +36,8 @@ if [ "$CURRENT_BRANCH" == "master" ]; then
     # Checkout the latest stable tag with the prefix
     git checkout "$STABLE_TAG"
   echo $STABLE_TAG checkout successfull
+  else
+  echo $STABLE_TAG not found.
   fi
 else
   echo CURRENT_BRANCH is not "master"
@@ -47,6 +49,8 @@ else
     # Checkout the latest stable tag with the prefix
     echo $STABLE_TAG
     git checkout "$STABLE_TAG"
+    else
+    echo $STABLE_TAG not found.
   fi
 fi
 
@@ -63,7 +67,7 @@ else
     git checkout "$LAST_SUCCESS_TAG"
     bench migrate
     # TODO: Deploy the site
-  else
+else
   # # Change directory back to the frappe-bench directory
   cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
@@ -75,17 +79,24 @@ fi
   fi
 fi
 
-# Check if the second app exists
+# Check if the first app exists
+
 if [ -d "${WORKDIR}/apps/${APP2}" ]
 then
   echo "Updating $APP2"
   # Change directory to the app directory
   cd "${WORKDIR}/apps/${APP2}"
-  # Get the latest tag for the branch and update to it
-  # Get the name of the current branch
-  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  echo $CURRENT_BRANCH
-     echo $APP1 updated successfully
+   # git remote remove origin
+   # git remote remove upstream
+
+   # git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+   # git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+
+# Pull the latest changes from the git repository
+# Get the latest tag for the branch and update to it
+# Get the name of the current branch
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+echo $CURRENT_BRANCH
 
 # Check if we're on the master branch
 if [ "$CURRENT_BRANCH" == "master" ]; then
@@ -95,6 +106,8 @@ if [ "$CURRENT_BRANCH" == "master" ]; then
     # Checkout the latest stable tag with the prefix
     git checkout "$STABLE_TAG"
   echo $STABLE_TAG checkout successfull
+  else
+  echo $STABLE_TAG not found.
   fi
 else
   echo CURRENT_BRANCH is not "master"
@@ -106,6 +119,8 @@ else
     # Checkout the latest stable tag with the prefix
     echo $STABLE_TAG
     git checkout "$STABLE_TAG"
+    else
+    echo $STABLE_TAG not found.
   fi
 fi
 
@@ -123,13 +138,13 @@ else
     bench migrate
     # TODO: Deploy the site
 else
+  # # Change directory back to the frappe-bench directory
   cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
   echo "Installing $APP2"
   bench get-app ${APP2_REPO_URL}
   # Install the app in the given site
-  bench --site ${SITE_NAME} install-app $APP2
-  bench migrate
+  bench --site ${SITE_NAME} install-app ${APP2}
 fi
   fi
 fi
