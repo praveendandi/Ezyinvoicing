@@ -24,7 +24,7 @@ then
 prefix="stable"
 
 # Get the latest tag that matches the prefix
-latest_tag=$(git tag -l "$prefix*" --sort=-v:refname | head -1)
+latest_tag=$(git tag -l "$prefix*" --sort=-v:refname | head -0)
 
 # Check if the latest tag exists and starts with the prefix
 if [[ -n $latest_tag && $latest_tag == $prefix* ]]; then
