@@ -11,11 +11,11 @@ APP2_REPO_URL=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred
 
 # Check if the first app exists
 
-if [ -d "${WORKDIR}/apps/${APP1}" ]
+if [ -d "$WORKDIR/apps/$APP1" ]
 then
   echo "Updating $APP1"
   # Change directory to the app directory
-  cd "${WORKDIR}/apps/${APP1}"
+  cd "$WORKDIR/apps/$APP1"
    # git remote remove origin
    # git remote remove upstream
 
@@ -26,6 +26,7 @@ then
 # Get the latest tag for the branch and update to it
 # Check current branch
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+echo $CURRENT_BRANCH
 
 if [ "$CURRENT_BRANCH" == "master" ]; then
   # Check for latest stable tag with prefix
@@ -60,10 +61,10 @@ else
 fi
 else
   # # Change directory back to the frappe-bench directory
-  cd ${WORKDIR}
+  cd $WORKDIR
   # If the app does not exist, get it from the git repository
   echo "Installing $APP1"
-  bench get-app ${APP1_REPO_URL}
+  bench get-app $APP1_REPO_URL
   # Install the app in the given site
-  bench --site ${SITE_NAME} install-app ${APP1}
+  bench --site $SITE_NAME install-app $APP1
 fi
