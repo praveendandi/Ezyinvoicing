@@ -27,7 +27,7 @@ if [ -d "$WORKDIR/apps/$APP1" ]; then
         if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]]; then
         # Find the latest tag with the prefix "stable"
         git fetch --tag
-        latest_stable_tag=$(git describe --abbrev=0 --tags --match "stable*")
+        latest_stable_tag=$(git describe --all --abbrev=0 --tags --match "stable*")
 
         # Check if a stable tag was found
         if [ -n "$latest_stable_tag" ]; then
@@ -43,7 +43,7 @@ if [ -d "$WORKDIR/apps/$APP1" ]; then
 
         # Find the latest tag with the prefix "stable"
         git fetch --tag
-        latest_stable_tag=$(git describe --abbrev=0 --tags --match "stable*")
+        latest_stable_tag=$(git describe --all --abbrev=0 --tags --match "stable*")
 
         # Check if a stable tag was found
             if [ -n "$latest_stable_tag" ]; then
