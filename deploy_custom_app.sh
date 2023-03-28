@@ -1,10 +1,13 @@
 #!/bin/bash
+
+# Define the prefix for the stable tag
+STABLE_PREFIX="stable-"
 WORKDIR=/home/erpnext/bench/test-bench
-site_name=test.local
-app1=version2_app
-app2=invoice_sync
-app1_repo_url=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
-app2_repo_url=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred.com/sumanth512/invoice-sync.git
+SITE_NAME=ezyinvoicing.local
+APP1=version2_app
+APP2=invoice_sync
+APP1_REPO_URL=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+APP2_REPO_URL=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred.com/sumanth512/invoice-sync.git
 
 # Check if the first app exists
 
@@ -21,80 +24,49 @@ then
 
 # Pull the latest changes from the git repository
 # Get the latest tag for the branch and update to it
-# Define the prefix to look for
-TAG_PREFIX="stable"
-
 # Get the name of the current branch
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# Check if the current branch is "master"
-if [[ "$CURRENT_BRANCH" == "master" ]]; then
-  # Get the name of the latest tag with the prefix "stable"
-  LATEST_TAG=$(git describe --tags --match "$TAG_PREFIX*" --abbrev=0)
-
-  # Check if a tag with the prefix "stable" was found
-  if [[ "$LATEST_TAG" == "$TAG_PREFIX"* ]]; then
-    echo "Found tag: $LATEST_TAG"
-    git checkout "$LATEST_TAG"
-  else
-    echo "No tag found with prefix $TAG_PREFIX"
+# Check if we're on the master branch
+if [ "$CURRENT_BRANCH" == "master" ]; then
+  # Check for a stable tag with the prefix
+  STABLE_TAG=$(git tag -l "$STABLE_PREFIX*" | sort -V | tail -n1)
+  if [ -n "$STABLE_TAG" ]; then
+    # Checkout the latest stable tag with the prefix
+    git checkout "$STABLE_TAG"
   fi
 else
-  echo "Current branch is not master"
+  # Checkout the master branch
+  git checkout master
+  # Check for a stable tag with the prefix
+  STABLE_TAG=$(git tag -l "$STABLE_PREFIX*" | sort -V | tail -n1)
+  if [ -n "$STABLE_TAG" ]; then
+    # Checkout the latest stable tag with the prefix
+    git checkout "$STABLE_TAG"
+  fi
 fi
+
+# Migrate the site
+  bench use $SITE_NAME
+if bench migrate; then
+  # If the migration succeeds, echo "build success" and deployed
+  echo "build success"
+  # TODO: Deploy the site
+else
+  # If the migration fails, checkout the previous successful tag branch and migrate again
+  LAST_SUCCESS_TAG=$(git tag --list --merged HEAD "success-*" | sort -V | tail -n1)
+  if [ -n "$LAST_SUCCESS_TAG" ]; then
+    git checkout "$LAST_SUCCESS_TAG"
+    bench migrate
+    # TODO: Deploy the site
+  else
   # # Change directory back to the frappe-bench directory
-  cd ../../..
-else
   cd ${WORKDIR}
   # If the app does not exist, get it from the git repository
-  echo "Installing $app1"
-  bench get-app ${app1_repo_url}
+  echo "Installing $APP1"
+  bench get-app ${APP1_REPO_URL}
   # Install the app in the given site
-  bench --site ${site_name} install-app ${app1}
+  bench --site ${SITE_NAME} install-app ${APP1}
 fi
-
-# Check if the second app exists
-if [ -d "${WORKDIR}/apps/${app2}" ]
-then
-  echo "Updating $app2"
-  # Change directory to the app directory
-  cd "${WORKDIR}/apps/${app2}"
-  # Get the latest tag for the branch and update to it
-  git fetch --tags
-  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
-  # Change directory back to the frappe-bench directory
-  cd ../../..
-else
-  cd ${WORKDIR}
-  # If the app does not exist, get it from the git repository
-  echo "Installing $app2"
-  bench get-app ${app2_repo_url}
-  # Install the app in the given site
-  bench --site ${site_name} install-app $app2
+  fi
 fi
-cd ${WORKDIR}
-# Once all the apps are updated, migrate the database and requirements
-bench use ${site_name}
-bench migrate
-#bench update --requirements
-
-# Check if the third app exists
-# if [ -d "frappe-bench/apps/$app3" ]
-# then
-#   echo "Updating $app3"
-#   # Change directory to the app directory
-#   cd "frappe-bench/apps/$app3"
-#   # Pull the latest changes from the git repository
-#   git pull
-#   # Get the latest tag for the branch and update to it
-#   git fetch --tags
-#   git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
-#   # Change directory back to the frappe-bench directory
-#   cd ../../..
-# else
-#   # If the app does not exist, get it from the git repository
-#   echo "Installing $app3"
-#   bench get-app $app3 $app3_repo_url
-#   # Install the app in the given site
-#   bench --site lifescc install-app $app3
-# fi
