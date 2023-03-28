@@ -77,7 +77,6 @@ else
   bench --site ${SITE_NAME} install-app ${APP1}
 fi
   fi
-fi
 
 # Check if the first app exists
 
