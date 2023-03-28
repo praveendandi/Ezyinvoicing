@@ -20,10 +20,23 @@ then
   #git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
   # Pull the latest changes from the git repository
   # Get the latest tag for the branch and update to it
-  git fetch --tags
+# Define the prefix to look for
+prefix="stable"
+
+# Get the latest tag that matches the prefix
+latest_tag=$(git tag -l "$prefix*" --sort=-v:refname | head -1)
+
+# Check if the latest tag exists and starts with the prefix
+if [[ -n $latest_tag && $latest_tag == $prefix* ]]; then
+  # Checkout the latest tag
+  git checkout $latest_tag
+else
+  echo "No tag found matching the prefix $prefix"
+fi
+  # git fetch --tags
   
-  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
-  # Change directory back to the frappe-bench directory
+  # git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+  # # Change directory back to the frappe-bench directory
   cd ../../..
 else
   cd ${WORKDIR}
