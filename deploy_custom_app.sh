@@ -24,7 +24,7 @@ if [ -d "$WORKDIR/apps/$APP1" ]; then
 
   # Pull the latest changes from the git repository
   # Check if the current branch is master
-        if [[ "$(git rev-parse --abbrev-ref HEAD)"=="master" ]]; then
+        if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]]; then
         # Find the latest tag with the prefix "stable"
         git fetch --tag
         latest_stable_tag=$(git describe --abbrev=0 --tags --match "stable*")
