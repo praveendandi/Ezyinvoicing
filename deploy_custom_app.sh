@@ -2,8 +2,8 @@
 
 # Define the ENV
 STABLE_PREFIX="stable-"
-WORKDIR=/home/erpnext/bench/test-bench
-SITE_NAME=test.local
+WORKDIR=/home/frappe/frappe-bench
+SITE_NAME=ezyinvoicing.local
 APP1=version2_app
 APP2=invoice_sync
 APP1_REPO_URL=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
@@ -129,9 +129,6 @@ else
   bench get-app ${APP2_REPO_URL}
   # Install the app in the given site
   bench --site ${SITE_NAME} install-app $APP2
+  bench migrate
+ fi
 fi
-cd ${WORKDIR}
-# Once all the apps are updated, migrate the database and requirements
-bench use ${SITE_NAME}
-bench migrate
-#bench update --requirements
