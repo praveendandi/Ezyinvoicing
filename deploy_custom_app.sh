@@ -3,7 +3,7 @@
 # Define the prefix for the stable tag
 STABLE_PREFIX="stable-"
 WORKDIR=/home/erpnext/bench/test-bench
-SITE_NAME=ezyinvoicing.local
+SITE_NAME=test.local
 APP1=version2_app
 APP2=invoice_sync
 APP1_REPO_URL=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
