@@ -10,7 +10,7 @@ APP2_REPO_URL=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred
 
 # Check if the first app exists
 
-if [[ -d "$WORKDIR/apps/$APP1" ]]; then
+if [ -d "$WORKDIR/apps/$APP1" ]; then
   
   echo "Updating $APP1"
   # Change directory to the app directory
