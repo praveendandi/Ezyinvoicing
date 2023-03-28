@@ -11,11 +11,11 @@ APP2_REPO_URL=https://gitlab-ci-token:glpat-hkCE2pJqAC4ywuTHD4wP@gitlab.caratred
 
 # Check if the first app exists
 
-if [ -d "${WORKDIR}/apps/${app1}" ]
+if [ -d "${WORKDIR}/apps/${APP1}" ]
 then
-  echo "Updating $app1"
+  echo "Updating $APP1"
   # Change directory to the app directory
-  cd "${WORKDIR}/apps/${app1}"
+  cd "${WORKDIR}/apps/${APP1}"
    # git remote remove origin
    # git remote remove upstream
 
