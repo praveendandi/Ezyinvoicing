@@ -23,6 +23,7 @@ if [[ -d "$WORKDIR/apps/$APP1" ]]; then
 
 # Pull the latest changes from the git repository
 # Step 2: Check the git branch
+    pwd
   if [[ "$(git rev-parse --abbrev-ref HEAD)" == "master" ]]; then
     # Check for latest tag with prefix stable
     tag=$(git describe --tags --match "stable-*" --abbrev=0)
@@ -35,7 +36,7 @@ if [[ -d "$WORKDIR/apps/$APP1" ]]; then
     fi
 else
     # Check if git branch is detached tag
-    if [[ "$(git describe --tags --exact-match)" != "" ]]; then
+    if [[ "$(git describe --tags)" != "" ]]; then
         # Checkout to master branch
         git checkout master
         # Check for latest tag with prefix stable
@@ -59,28 +60,3 @@ else
   bench get-app $APP1_REPO_URL  # Install the app in the given site
   bench --site $SITE_NAME install-app $APP1
 fi
-
-# Check if the second app exists
-if [ -d "${WORKDIR}/apps/${app2}" ]
-then
-  echo "Updating $app2"
-  # Change directory to the app directory
-  cd "${WORKDIR}/apps/${app2}"
-  # Get the latest tag for the branch and update to it
-  git fetch --tags
-  git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
-  # Change directory back to the frappe-bench directory
-  cd ../../..
-else
-  cd ${WORKDIR}
-  # If the app does not exist, get it from the git repository
-  echo "Installing $app2"
-  bench get-app ${app2_repo_url}
-  # Install the app in the given site
-  bench --site ${site_name} install-app $app2
-fi
-cd ${WORKDIR}
-# Once all the apps are updated, migrate the database and requirements
-bench use ${site_name}
-bench migrate
-#bench update --requirements
