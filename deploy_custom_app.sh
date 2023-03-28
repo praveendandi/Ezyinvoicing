@@ -130,5 +130,6 @@ else
   # Install the app in the given site
   bench --site ${SITE_NAME} install-app $APP2
   bench migrate
- fi
+fi
+  fi
 fi
