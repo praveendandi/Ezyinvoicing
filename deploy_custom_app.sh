@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the ENV
-STABLE_PREFIX="stable-"
+STABLE_PREFIX="ezy-"
 WORKDIR=/home/frappe/frappe-bench
 SITE_NAME=ezyinvoicing.local
 APP1=version2_app
