@@ -35,3 +35,12 @@ fi
 # Migrate the site and set up requirements
 bench --site $site_name migrate
 bench setup requirements
+
+# Check if the migration was successful
+if [ $? -eq 0 ]; then
+  echo "$custom_app updated successfully"
+else
+  # If the migration failed, checkout the previous tag branch
+  git checkout $current_branch
+  bench --site $site_name migrate
+fi
