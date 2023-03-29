@@ -47,8 +47,8 @@ bench --site $site_name migrate
 
 # Check if the migration was successful
 if [ $? -eq 0 ]; then
-  echo "$custom_app updated successfully"
   bench setup requirements
+  echo "$custom_app updated successfully"
 else
   # If the migration failed, checkout the previous tag branch
   git checkout $current_branch
