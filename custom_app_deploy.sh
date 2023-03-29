@@ -32,4 +32,4 @@ fi
 
 # Migrate the site and set up requirements
 bench --site $site_name migrate
-bench --site $site_name setup requirements
+bench setup requirements
