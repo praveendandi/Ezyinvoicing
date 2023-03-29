@@ -40,6 +40,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 from frappe.utils import cstr
 
+
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 
@@ -970,6 +971,7 @@ def create_invoice(data):
 
 @frappe.whitelist()
 def insert_invoice(data):
+    # print(data)
     # '''
     # insert invoice data     data, company_code, taxpayer,items_data
     # '''
@@ -1196,14 +1198,16 @@ def insert_invoice(data):
             pos_checks = 0
         else:
             pos_checks = data['guest_data']['pos_checks']
-        
-        with open('/home/caratred/frappe-bench/apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json', 'r') as f:
+
+
+        # if  data["invoice_category"] == "Tax Invoice" or data["invoice_category"] == "Credit Invoice" or data["invoice_category"]=="Debit Invoice":
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
             json_data = json.load(f)
             for each in json_data:
-                if data['taxpayer']['state_code'] == each['tin']:
+                if company.state_code == each['tin']:
                     place_supplier_state_name = f"{each['state']}-({each['tin']})"
-                    print(place_supplier_state_name,"OOOOOOOOOOo")
-
+        
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1322,9 +1326,8 @@ def insert_invoice(data):
             "non_revenue_amount": non_revenue_amount,
             "pos_checks": pos_checks,
             "place_of_supply_json" : place_supplier_state_name
-
-
         })
+
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
