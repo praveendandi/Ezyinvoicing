@@ -9,6 +9,8 @@ tag_prefix=stable
 # Check if custom_app exists in frappe-bench
 if [ ! -d "/home/frappe/frappe-bench/apps/$custom_app" ]; then
   # If it doesn't exist, get the app from git_url and install it
+  # Change to the bench directory 
+  cd /home/frappe/frappe-bench
   bench get-app $git_url
   bench --site $site_name install-app $custom_app
 fi
