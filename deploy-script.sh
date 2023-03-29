@@ -9,7 +9,14 @@ GIT_URL="https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/
 
 # Check if the custom app exists
 # Change directory to the app directory
-    cd "${WORKDIR}/apps/${app1}"
+    cd "$WORKDIR/apps/$CUSTOM_APP"
+    git remote remove origin
+    git remote remove upstream
+
+    git remote add origin https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+    git remote add upstream https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+
+
 if ! bench list-apps | grep -q "$CUSTOM_APP"; then
     # If it doesn't exist, download and install it
     bench get-app $GIT_URL 
