@@ -22,10 +22,12 @@ current_branch=$(git branch --show-current)
 
 if [[ $current_branch == "master" ]]; then
     # If it's on the master branch, check for the latest "stable" tag
+    git fetch tag
     latest_stable_tag=$(git describe --abbrev=0 --tags --match "stable*")
 else
     # If it's on any other branch or detached head, switch to master and check for the latest "stable" tag
     git checkout master
+    git fetch tag
     latest_stable_tag=$(git describe --abbrev=0 --tags --match "stable*")
 fi
 
