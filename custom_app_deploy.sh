@@ -30,8 +30,9 @@ else
   git fetch --tags
   latest_tag=$(git describe --tags --match "${tag_prefix}*" `git rev-list --tags --max-count=1`)
   git checkout $latest_tag
-else
-  echo Latest $tag_prefix Not found 
+  elif
+    echo Latest $tag_prefix Not found 
+  fi
 fi
 
 # Migrate the site and set up requirements
