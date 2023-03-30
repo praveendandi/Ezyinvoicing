@@ -1,11 +1,6 @@
 Version2 App
 POS Bills
-Passport Scanner
-Sign Ezy
-Arrivals
 Generics
-EzyCheckins
-CLBS
-EZYGST
 E-Signature
+clbs
 Reconciliation
