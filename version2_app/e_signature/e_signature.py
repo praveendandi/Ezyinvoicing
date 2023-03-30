@@ -135,11 +135,10 @@ def send_files(files, user_name, summary):
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, type="invoice"):
     try:
         company = frappe.get_last_doc("company")
-        print(company,".....")
         if type == "etax":
             get_value = etax
         else:

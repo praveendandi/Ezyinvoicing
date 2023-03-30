@@ -266,8 +266,6 @@
   "in_house_driving_ocr",
   "section_break_248",
   "ome_scanner",
-  "clbs_section",
-  "clbs",
   "ezy_gst_section",
   "ezy_gst_module",
   "arrival_information_file_type",
@@ -1679,12 +1677,6 @@
    "label": "Summary Footer"
   },
   {
-   "default": "0",
-   "fieldname": "clbs",
-   "fieldtype": "Check",
-   "label": "CLBS"
-  },
-  {
    "fieldname": "scan_ezy_settings_section",
    "fieldtype": "Section Break",
    "label": "Scan Ezy Settings"
@@ -1746,11 +1738,6 @@
   {
    "fieldname": "column_break_248",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "clbs_section",
-   "fieldtype": "Section Break",
-   "label": "CLBS"
   },
   {
    "fieldname": "ezy_gst_section",
@@ -1983,7 +1970,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-29 15:05:17.074925",
+ "modified": "2023-03-30 19:54:41.820957",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
