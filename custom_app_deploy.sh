@@ -5,6 +5,7 @@ custom_app=version2_app
 git_url=https://gitlab-ci-token:glpat-yk-_nkFvkGysxbYUevnz@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
 site_name=ezyinvoicing.local
 tag_prefix=stable
+branch_name=Merge_Branches
 
 # Check if custom_app exists in frappe-bench
 if [ ! -d "/home/frappe/frappe-bench/apps/$custom_app" ]; then
@@ -19,7 +20,7 @@ fi
 cd /home/frappe/frappe-bench/apps/$custom_app
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-if [ "$current_branch" == "master" ]; then
+if [ "$current_branch" == "$branch_name" ]; then
   # If the current branch is master, fetch the latest tag with the prefix and checkout to it
   git fetch --tags
   latest_tag=$(git describe --tags --match "${tag_prefix}*" `git rev-list --tags --max-count=1`)
@@ -31,7 +32,7 @@ if [ "$current_branch" == "master" ]; then
   fi
 else
   # If the current branch is not master, checkout to it and fetch the latest tag with the prefix
-  git checkout master
+  git checkout $branch_name
   git fetch --tags
   latest_tag=$(git describe --tags --match "${tag_prefix}*" `git rev-list --tags --max-count=1`)
   if [ -n "$latest_tag" ]; then
