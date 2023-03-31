@@ -36,6 +36,7 @@ def bulkupload(data):
             for each in json_data:
                 if companyData.state_code == each['tin']:
                     place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                    
         # print(items_dataframe)
         gst_data={}
         gst_df=pd.read_csv(folder_path+'/sites/'+site_folder_path+invoice_data["gst_file"],header=None,sep = '|')
@@ -83,7 +84,7 @@ def bulkupload(data):
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
                 # if companyData.name == "SGBW-01":
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
-                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
+                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].replace("/","").strip()
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         paymentTypes = list(map(lambda x: x.lower(), paymentTypes))

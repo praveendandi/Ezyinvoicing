@@ -971,7 +971,6 @@ def create_invoice(data):
 
 @frappe.whitelist()
 def insert_invoice(data):
-    # print(data)
     # '''
     # insert invoice data     data, company_code, taxpayer,items_data
     # '''
@@ -1086,7 +1085,6 @@ def insert_invoice(data):
             ready_to_generate_irn = "No"
         roundoff_amount = 0
         data['invoice_round_off_amount'] = roundoff_amount
-        
         sales_amount_before_tax = value_before_gst + other_charges_before_tax 
         sales_amount_after_tax = value_after_gst + other_charges
         sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
@@ -1108,6 +1106,7 @@ def insert_invoice(data):
             debit_invoice = "No"	
 
         
+
         if data['total_invoice_amount'] == 0:
             total = (value_after_gst + other_charges) - credit_value_after_gst
             if (total>0 and total<1) or (total>-1 and total<1):
@@ -1200,7 +1199,6 @@ def insert_invoice(data):
             pos_checks = data['guest_data']['pos_checks']
 
 
-        # if  data["invoice_category"] == "Tax Invoice" or data["invoice_category"] == "Credit Invoice" or data["invoice_category"]=="Debit Invoice":
         folder_path = frappe.utils.get_bench_path()
         with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
             json_data = json.load(f)
@@ -3545,7 +3543,6 @@ def Error_Insert_invoice(data):
                             socket = invoiceCreated(invoice_bin)
                         return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin}
 
-
         company = frappe.get_doc('company',data['company_code'])
         if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
             invType = data['invoice_type']
@@ -3560,6 +3557,13 @@ def Error_Insert_invoice(data):
             
             if data["guest_name"]=="":
                 data["guest_name"]="NA"
+
+            folder_path = frappe.utils.get_bench_path()
+            with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+                json_data = json.load(f)
+                for each in json_data:
+                    if company.state_code == each['tin']:
+                        place_supplier_state_name = f"{each['state']}-({each['tin']})"
             invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -3630,7 +3634,7 @@ def Error_Insert_invoice(data):
                 "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
                 "pos_checks": data["pos_checks"] if "pos_checks" in data else 0,
-                "place_of_supply_json":data['place_of_supply_json'] if 'place_of_supply_json' in data else None,
+                "place_of_supply_json":place_supplier_state_name if place_supplier_state_name in data else None,
             })
             if 'amened' in data:
                 if data['amened'] == 'Yes':
