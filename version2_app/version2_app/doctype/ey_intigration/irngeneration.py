@@ -152,8 +152,11 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "accessToken": gsp.gsp_test_token,
                 "Content-Type": 'application/json',
             }
-            # print(headers)
-            # print(req)
+            print('___________________________________________________')
+            print(headers)
+            print('******************************************************')
+            print(req)
+            print('___________________________________________________')
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
                     irn_response = requests.post(test_irn,
