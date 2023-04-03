@@ -11,7 +11,7 @@ from pathlib import Path
 from webbrowser import get
 
 import frappe
-import fitz
+# import fitz
 import base64
 import pandas as pd
 import pdfkit

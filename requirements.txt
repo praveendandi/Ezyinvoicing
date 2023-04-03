@@ -29,10 +29,10 @@ html2text
 typing-extensions
 paytmchecksum
 opencv-python
-fitz
+# fitz
 pgeocode
 datefinder
-PyMuPDF==1.18
+PyMuPDF==1.20
 pyHanko
 uharfbuzz
 fontTools

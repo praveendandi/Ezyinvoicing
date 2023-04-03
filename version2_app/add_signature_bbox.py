@@ -1,7 +1,7 @@
 from PIL import Image, ImageChops
 import sys, traceback
 import pdfplumber
-import fitz
+# import fitz
 
 def trim(im, border):
   bg = Image.new(im.mode, im.size, border)
