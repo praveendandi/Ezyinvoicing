@@ -20,11 +20,12 @@ BRANCH_NAME="master"
   pwd
   echo "Creating backup of $SITE_NAME..."
   bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR_TO_COPY
-# Check if the migration was successful  
+# Check if the migration was successful
 if [ $? -eq 0 ]; then
   echo "Backup created successfully"
 else
   echo "$SITE_NAME Backup failed"
+  exit
 fi
 
 # Check if $APP_NAME exists in frappe-bench
