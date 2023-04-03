@@ -12,7 +12,7 @@ BRANCH_NAME="master"
 
 # Create a backup of the app
 # change directory to frappe-bench
-  cd $WORK_DIR
+  cd $WRK_DIR
   echo "Creating backup of $SITE_NAME..."
   bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR_TO_COPY
   echo "Backup created successfully"
