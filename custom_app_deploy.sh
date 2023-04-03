@@ -28,7 +28,7 @@ else
 fi
 
 # Check if $APP_NAME exists in frappe-bench
-if [ ! -d "$WORK_DIR/apps/$APP_NAME" | echo "$APP_NAME already exists"]; then
+if [ ! -d "$WORK_DIR/apps/$APP_NAME" ]; then
   # If it doesn't exist, get the app from GIT_URL and install it
   echo "$APP_NAME doesn't exists"
   # Change to the bench directory 
