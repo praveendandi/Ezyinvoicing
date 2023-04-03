@@ -22,7 +22,7 @@ if [ ! -d "$WORK_DIR/apps/$APP_NAME" | echo "$APP_NAME already exists"]; then
   # If it doesn't exist, get the app from GIT_URL and install it
   echo "$APP_NAME doesn't exists"
   # Change to the bench directory 
-  cd $WRK_DIR
+  cd $WORK_DIR
   echo "cloning $APP_NAME in frappe-bench"
   bench get-app $GIT_URL --branch $BRANCH_NAME
   echo "Installing $APP_NAME in $SITE_NAME
@@ -77,4 +77,5 @@ else
   # If the migration failed, checkout the previous tag commit id branch
   git checkout $COMMIT_ID
   bench --site $SITE_NAME migrate
+  bench version
 fi
