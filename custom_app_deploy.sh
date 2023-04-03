@@ -12,7 +12,7 @@ BRANCH_NAME="master"
 
 # Create a backup of the site
 
-# change directory to frappe-bench
+# Change directory to frappe-bench
    cd $WORK_DIR
 if bench --site $SITE_NAME list-apps | grep -q "$APP_NAME"; then
    echo "$APP_NAME is installed on the site $SITE_NAME"
@@ -73,7 +73,7 @@ fi
 
 # Check if the migration was successful
 if [ $? -eq 0 ]; then
-    bench setup requirements
+     bench setup requirements
     echo "$APP_NAME updated successfully"
   else
 # If the migration failed, checkout the previous tag commit id branch
