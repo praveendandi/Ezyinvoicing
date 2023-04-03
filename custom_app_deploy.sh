@@ -26,7 +26,7 @@ if [ $? -eq 0 ]; then
 else
   echo "$SITE_NAME Backup failed"
   exit
-fi
+
 
 # Check if $APP_NAME exists in frappe-bench
 if [ ! -d "$WORK_DIR/apps/$APP_NAME" ]; then
@@ -89,4 +89,5 @@ else
   git checkout $COMMIT_ID
   bench --site $SITE_NAME migrate
   bench version
+fi
 fi
