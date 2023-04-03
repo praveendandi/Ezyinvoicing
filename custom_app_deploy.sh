@@ -74,4 +74,5 @@ if [ $? -eq 0 ]; then
     git checkout $COMMIT_ID
     bench --site $SITE_NAME migrate
     bench version
+    exit 1
 fi
