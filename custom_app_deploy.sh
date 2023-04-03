@@ -18,7 +18,6 @@ if [ ! -d "$WORK_DIR/apps/$APP_NAME" ]; then
   bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR
   echo "Backup created successfully"
 # If it doesn't exist, get the app from GIT_URL and install it
-  else
   echo "$APP_NAME doesn't exists"
 # Change to the bench directory 
   cd $WORK_DIR
