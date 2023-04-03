@@ -2,8 +2,8 @@
 
 # Define variables
 APP_NAME="version2_app"
-BKP_DIR_TO_COPY="~/DBbackups"
-WRK_DIR="/home/caratred/bench/frappe-bench"
+BKP_DIR="~/DBbackups"
+WORK_DIR="/home/caratred/bench/frappe-bench"
 GIT_CI_TOKEN=glpat-yk-_nkFvkGysxbYUevnz
 GIT_URL="https://gitlab-ci-token:"$GIT_CI_TOKEN"@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git"
 SITE_NAME="ezyinvoicing.local"
@@ -14,7 +14,7 @@ BRANCH_NAME="master"
 # change directory to frappe-bench
   cd $WORK_DIR
   echo "Creating backup of $SITE_NAME..."
-  bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR_TO_COPY
+  bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR
   echo "Backup created successfully"
 
 # Check if $APP_NAME exists in frappe-bench
@@ -29,13 +29,6 @@ if [ ! -d "$WORK_DIR/apps/$APP_NAME" | echo "$APP_NAME already exists"]; then
   bench --site $SITE_NAME install-app $APP_NAME
   echo "$APP_NAME installed successfully in $SITE_NAME"
 fi
-
-# Create a backup of the app
-# change directory to frappe-bench
-  cd $WORK_DIR
-  echo "Creating backup of $APP_NAME..."
-  bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR_TO_COPY
-  echo "Backup created successfully"
 
 # Change to the app directory and check for the current branch
   cd $APP_NAME
