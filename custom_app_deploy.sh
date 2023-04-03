@@ -82,4 +82,5 @@ else
   # If the migration failed, checkout the previous tag commit id branch
   git checkout $COMMIT_ID
   bench --site $SITE_NAME migrate
+  bench version
 fi
