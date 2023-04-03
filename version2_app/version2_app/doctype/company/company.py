@@ -777,7 +777,7 @@ def reprocess_zero_invoices():
         frappe.log_error("Ezy-invoicing reprocess_zero_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def get_company():
     try:
         company = frappe.get_last_doc('company')

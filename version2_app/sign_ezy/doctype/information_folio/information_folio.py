@@ -5,9 +5,12 @@
 from __future__ import unicode_literals
 # import frappe
 from frappe.model.document import Document
-import frappe
+import frappe,os
 import datetime
 import json
+import requests,base64,traceback,sys
+from frappe.utils import cstr, get_site_name, logger, random_string
+
 
 class InformationFolio(Document):
 	pass
@@ -109,9 +112,36 @@ def insert_information_folio(data):
 
 @frappe.whitelist(allow_guest=True)
 def update_signature(name=None, signature=None, agree=0, work_station=None, tab=None, doctype=None):
-    doc = frappe.db.set_value(doctype, name,
+    # print(name,signature,agree,work_station,tab,doctype)
+    
+    if len(signature)>10:
+        cwd = os.getcwd()
+        company = frappe.get_last_doc("company")
+        site_name = cstr(frappe.local.site)
+        site_folder_path = f'{cwd}/{site_name}'
+        
+        signature_file_url = convert_base64_to_image(signature,name,site_folder_path,company)
+        # /home/caratred/Desktop/projects/frappe-bench/sites/kochi_marriott/public/files
+        print(signature_file_url['message']['file_url'],"******************************8")
+        # folder_path = frappe.utils.get_bench_path()
+        # site_folder_path = company.site_name
+        # file = site_folder_path + "/private/files/" + name + ".png"
+        signature_file =site_folder_path+'/public'+signature_file_url['message']['file_url']
+        # path = '/home/caratred/Desktop/projects/frappe-bench/sites/kochi_marriott/public/files/4000-2387022d5d5a.png'
+        # create_thumbnail(signature_file,2000)
+        
+        if signature_file_url != False:                                
+            invoice_doc = frappe.db.set_value('Invoices', name,
+                                    {'signature':signature,"agree":agree,"signature_file":signature_file_url['message']['file_url']})
+            
+    else:
+        doc = frappe.db.set_value(doctype, name,
                               {'signature':signature,"agree":agree})
-
+    create_bbox(name)
+    # if company.name == 'NHA-01' and company.name == 'KMH-01':
+    #     create_bbox(name)
+    # else:
+    #     create_bbox(name)
     frappe.db.commit()
     data = {
         'name': name,
@@ -124,5 +154,144 @@ def update_signature(name=None, signature=None, agree=0, work_station=None, tab=
         "custom_socket", {'message': 'Signature Updated', 'data': data})
     frappe.publish_realtime(
         "custom_socket", {'message': doctype+' Signature Updated', 'data': data})
+    
+
+    
 
     return True
+
+
+
+from PIL import Image, ImageChops
+
+def trim(im, border):
+  bg = Image.new(im.mode, im.size, border)
+  diff = ImageChops.difference(im, bg)
+  bbox = diff.getbbox()
+  if bbox:
+    return im.crop(bbox)
+
+def create_thumbnail(path, size):
+  image = Image.open(path)
+  #name, extension = path.split('.')
+  options = {}
+  if 'transparency' in image.info:
+    options['transparency'] = image.info["transparency"]
+  
+  image.thumbnail((size, size), Image.ANTIALIAS)
+  image = trim(image, 255) ## Trim whitespace
+  image.save(path, **options)
+  return image
+
+
+
+
+import frappe
+import pdfplumber
+import sys, traceback
+import pdfplumber
+import fitz
+def create_bbox(name):
+    try:
+        # print("HITTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+        doc = frappe.get_doc('Invoices',name)
+        if doc.invoice_from in ["Web", "Pms"] and doc.signature_file is not None and doc.signature_file != '':
+            folder_path = frappe.utils.get_bench_path()
+            company = frappe.get_doc('company', doc.company)
+            site_folder_path = company.site_name
+            file_path = folder_path+'/sites/'+site_folder_path+doc.invoice_file
+            # print(doc.invoice_file)
+            # signature_file = folder_path+'/sites/'+site_folder_path+doc.signature_file
+            signature_file =folder_path+'/sites/'+site_folder_path+'/public'+doc.signature_file
+
+            x0,x1,top, bottom = '','','',''
+
+            with pdfplumber.open(file_path) as pdf:
+                count = len(pdf.pages)
+                for index in range(count):
+                    first_page = pdf.pages[index]
+                    words = first_page.extract_words()
+                    for word in words:
+                        if word['text'] in ['SIGNATURE','Signature']:
+                            x0 = word['x0']
+                            x1 = word['x1']
+                            top = word['top']
+                            bottom = word['bottom']
+
+                document = fitz.open(file_path)
+                each_page = document[-1]  # get first page
+                rect = fitz.Rect(x0+50, top-100, x1+100,bottom+100) # define your rectangle here
+
+                # rect = fitz.Rect(x0, top, x1+100, bottom)  # define your rectangle here
+                # image_file = signature_file, 'rb'
+                each_page.insertImage(rect, filename=signature_file)
+                # page.draw_rect(rect,  color = (0, 1, 0), width = 2)
+                print(file_path,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                print(file_path.split('.'),"&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                original_name,extension = file_path.split('.pdf')
+                document.save(original_name+'signed.pdf')
+                files = {"file": open(original_name+'signed.pdf', "rb")}
+                payload = {
+                        "is_private": 1,
+                        "folder": "Home",
+                        "doctype": "Invoices",
+                        "fieldname": "name",
+                        "docname":name
+                }
+                site = company.host
+                upload_qr_image = requests.post(
+                        site + "api/method/upload_file", files=files, data=payload
+                )
+                response = upload_qr_image.json()
+                print(response)
+                
+                # original_name,extension = doc.invoice_file.split("/")[-1].split('.pdf')
+
+
+                doc = frappe.get_doc('Invoices',name)
+                doc.invoice_file = response['message']['file_url']
+                # print(f'/private/files/{original_name}signed.pdf',"55555555555555555555555555555555555555555")
+                doc.save()
+                frappe.db.commit()
+                # print("HITTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+                os.remove(file_path)
+
+                # document.save(file_path,incremental=True)
+                            
+            # doc.save()
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("create_bbox","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success": False, "message": str(e)}
+
+
+def convert_base64_to_image(base, name, site_folder_path, company):
+    try:
+        # print(base.split('data:image/png;base64,')[1])
+        file = site_folder_path + "/private/files/" + name + ".png"
+        # res = bytes(base, 'utf-8')
+        with open(file, "wb") as fh:
+            fh.write(base64.b64decode(base.split('data:image/png;base64,')[1]))
+        files = {"file": open(file, "rb")}
+        payload = {
+            "is_private": 0,
+            "folder": "Home"
+            # "doctype": "Precheckins",
+        }
+        site = company.host
+        upload_qr_image = requests.post(
+            site + "api/method/upload_file", files=files, data=payload
+        )
+        response = upload_qr_image.json()
+        if "message" in response:
+            return response
+        else:
+            return False
+    except Exception as e:
+        print(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error(
+            "Scan-Guest Details Opera",
+            "line No:{}\n{}".format(exc_tb.tb_lineno, traceback.format_exc()),
+        )
+        return {"success": False, "message": str(e)}

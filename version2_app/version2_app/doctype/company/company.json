@@ -307,7 +307,8 @@
   "qr_b2c_rect_x1",
   "qr_b2c_rect_y0",
   "qr_b2c_rect_y1",
-  "website"
+  "website",
+  "scan_ids"
  ],
  "fields": [
   {
@@ -1972,11 +1973,17 @@
    "fieldname": "website",
    "fieldtype": "Data",
    "label": "Website"
+  },
+  {
+   "default": "0",
+   "fieldname": "scan_ids",
+   "fieldtype": "Check",
+   "label": "Scan IDS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-02 12:23:33.893626",
+ "modified": "2023-03-29 15:05:17.074925",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
