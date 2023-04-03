@@ -3,7 +3,7 @@
 # Define variables
 APP_NAME="version2_app"
 BKP_DIR_TO_COPY="~/DBbackups"
-WRK_DIR="/home/caratred/bench/frappe-bench"
+WORK_DIR="/home/caratred/bench/frappe-bench"
 GIT_CI_TOKEN=glpat-yk-_nkFvkGysxbYUevnz
 GIT_URL="https://gitlab-ci-token:"$GIT_CI_TOKEN"@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git"
 SITE_NAME="ezyinvoicing.local"
@@ -12,7 +12,7 @@ BRANCH_NAME="master"
 
 # Create a backup of the app
 # change directory to frappe-bench
-  cd $WRK_DIR
+  cd $WORK_DIR
   echo "Creating backup of $SITE_NAME..."
   bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR_TO_COPY
   echo "Backup created successfully"
