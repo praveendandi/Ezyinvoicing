@@ -29,7 +29,7 @@ if [ ! -d "$WORK_DIR/apps/$APP_NAME" ]; then
 fi
 
 # Change to the app directory and check for the current branch
-  cd $APP_NAME
+  cd $WORK_DIR/$APP_NAME
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
   COMMIT_ID=$(git rev-parse --short $CURRENT_BRANCH)
   echo "Latest commit ID of branch $CURRENT_BRANCH: $COMMIT_ID"
@@ -45,7 +45,7 @@ if [ "$CURRENT_BRANCH" == "$BRANCH_NAME" ]; then
     exit 1
   fi
 else
-  # If the current branch is not $CURRENT_BRANCH, checkout to it and fetch the latest tag with the prefix
+# If the current branch is not $CURRENT_BRANCH, checkout to it and fetch the latest tag with the prefix
   git checkout $BRANCH_NAME
   git fetch --tags
   LATEST_TAG=$(git describe --tags --match "${TAG_PREFIX}*" `git rev-list --tags --max-count=1`)
@@ -62,11 +62,11 @@ fi
 
 # Check if the migration was successful
 if [ $? -eq 0 ]; then
-  bench setup requirements
-  echo "$APP_NAME updated successfully"
-else
-  # If the migration failed, checkout the previous tag commit id branch
-  git checkout $COMMIT_ID
-  bench --site $SITE_NAME migrate
-  bench version
+    bench setup requirements
+    echo "$APP_NAME updated successfully"
+  else
+# If the migration failed, checkout the previous tag commit id branch
+    git checkout $COMMIT_ID
+    bench --site $SITE_NAME migrate
+    bench version
 fi
