@@ -13,9 +13,11 @@ BRANCH_NAME="master"
 # Create a backup of the app
 # activate python ENV
   cd /home/frappe
+  pwd
   . py37-venv/bin/activate
 # change directory to frappe-bench
   cd $WORK_DIR
+  pwd
   echo "Creating backup of $SITE_NAME..."
   bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR_TO_COPY
 # Check if the migration was successful  
