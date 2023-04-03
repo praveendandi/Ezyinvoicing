@@ -11,7 +11,10 @@ TAG_PREFIX="stable"
 BRANCH_NAME="master"
 
 # Create a backup of the app
+
 # change directory to frappe-bench
+  cd /home/frappe
+  . py37-venv/bin/activate
   cd $WORK_DIR
   echo "Creating backup of $SITE_NAME..."
   bench --site $SITE_NAME backup --with-files --backup-path $BKP_DIR
