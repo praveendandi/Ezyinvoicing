@@ -32,17 +32,30 @@ def Reinitiate_invoice(data):
         # del data['total_invoice_amount']
         company = frappe.get_doc('company',data['company_code'])
         invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+            json_data = json.load(f)
+
         if "place_of_supply" in data.keys():
             place_of_supply = data['place_of_supply']
+            for each in json_data:
+                if data['place_of_supply'] == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                    # print(place_supplier_state_name,"OOOOOOOOOOo","inove change_,,,,,,,,,,,,,,,,,")
         else:
             doc = frappe.db.exists("Invoices",data['guest_data']['invoice_number'])
             if doc:
                 invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
                 place_of_supply = invoice_doc.place_of_supply
+                for each in json_data:
+                    if place_of_supply == each['tin']:
+                        place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                        # print(place_supplier_state_name,"OOOOOOOOOOo","reprocess................")
                 if not place_of_supply:
                     place_of_supply = company.state_code
             else:
                 place_of_supply = company.state_code
+        
         # if "invoice_object_from_file" in data.keys():
         #     if isinstance(data["invoice_object_from_file"],dict):
         #         data["invoice_object_from_file"] = ""
@@ -92,7 +105,7 @@ def Reinitiate_invoice(data):
             for item in data['items_data']:
                 if item['taxable'] == 'No' and item['item_type'] != "Discount":
                     other_charges += float(item['item_value_after_gst'])
-                    print(item["taxable"],"---------------",item['item_value_after_gst'])
+                    # print(item["taxable"],"---------------",item['item_value_after_gst'])
                     other_charges_before_tax += float(item['item_value'])
                     total_vat_amount += float(item['vat_amount'])
                     if frappe.db.exists("SAC HSN CODES", {"sac_index":item["sac_index"], "ignore_non_taxable_items": 1}):
@@ -209,7 +222,6 @@ def Reinitiate_invoice(data):
         if "confirmation_number" not in data['guest_data']:
             data['guest_data']['confirmation_number'] = ""
 
-
         doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
         
         # if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
@@ -245,6 +257,7 @@ def Reinitiate_invoice(data):
         doc.location=data['taxpayer']['location']
         doc.pincode=data['taxpayer']['pincode']
         doc.state_code=data['taxpayer']['state_code']
+        doc.place_of_supply_json = place_supplier_state_name
         doc.amount_before_gst=round(value_before_gst, 2)
         doc.amount_after_gst=round(value_after_gst, 2)
         doc.credit_value_before_gst=round(credit_value_before_gst,2)

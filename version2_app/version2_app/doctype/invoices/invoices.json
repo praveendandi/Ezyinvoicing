@@ -161,7 +161,8 @@
   "x0",
   "x1",
   "top",
-  "bottom"
+  "bottom",
+  "place_of_supply_json"
  ],
  "fields": [
   {
@@ -1047,6 +1048,11 @@
    "label": " Checkout Date"
   },
   {
+   "fieldname": "place_of_supply_json",
+   "fieldtype": "Data",
+   "label": "Place Of Supply JSON"
+  },
+  {
     "default": "0",
     "fieldname": "un_billed_invoice",
     "fieldtype": "Check",
@@ -1056,7 +1062,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-14 18:21:51.498609",
+ "modified": "2023-03-27 19:00:39.079573",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

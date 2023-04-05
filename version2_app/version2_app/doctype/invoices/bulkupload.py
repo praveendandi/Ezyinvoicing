@@ -29,6 +29,14 @@ def bulkupload(data):
         items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
         with open(items_file_path) as xml_file:
             items_dataframe = xmltodict.parse(xml_file.read())
+            
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+            json_data = json.load(f)
+            for each in json_data:
+                if companyData.state_code == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                    
         # print(items_dataframe)
         gst_data={}
         gst_df=pd.read_csv(folder_path+'/sites/'+site_folder_path+invoice_data["gst_file"],header=None,sep = '|')
@@ -76,7 +84,7 @@ def bulkupload(data):
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
                 # if companyData.name == "SGBW-01":
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
-                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
+                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].replace("/","").strip()
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         paymentTypes = list(map(lambda x: x.lower(), paymentTypes))
@@ -122,10 +130,11 @@ def bulkupload(data):
             #     each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if companyData.name == "SGBW-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = str(each[bulk_meta_data["detail_folio"]["invoice_number"]])[1:]
+            
             if str(each[bulk_meta_data["detail_folio"]["invoice_number"]]) in gst_data.keys():
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
-                            'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
+                            'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,"place_of_supply_json":place_supplier_state_name,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']]},'invoice_type':"B2B"}
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
@@ -134,7 +143,7 @@ def bulkupload(data):
             else:
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
-                            'gstNumber':"",'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
+                            'gstNumber':"",'company_code':companyData.name,'place_of_supply':companyData.state_code,"place_of_supply_json":place_supplier_state_name,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']]},'invoice_type':"B2C"}
                 # print(each[bulk_meta_data["detail_folio"]["invoice_type"]],"=====")
                 if bulk_meta_data['invoice_company_code']!="":
@@ -281,6 +290,7 @@ def bulkupload(data):
                 error_data['gst_number'] == ""
             error_data['state_code'] =  " "
             error_data['room_number'] = each_item['room_number']
+            error_data['place_of_supply_json'] = each_item['place_of_supply_json']
             # invoice_referrence_objects[each_item['invoice_number']][0]['gstNumber'] = each_item['gstNumber']
             error_data['invoice_object_from_file'] = {"data": invoice_object}
             error_data['pincode'] = ""

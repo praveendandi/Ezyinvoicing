@@ -34,10 +34,12 @@ from frappe.utils import logger
 from version2_app.events import invoiceCreated
 import time
 import os
+import json
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 from frappe.utils import cstr
+
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -976,7 +978,7 @@ def insert_invoice(data):
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:
-            data['invoice_object_from_file'] = " "	
+            data['invoice_object_from_file'] = " "
         company = frappe.get_doc('company',data['company_code'])
         sales_amount_before_tax = 0
         sales_amount_after_tax = 0
@@ -1083,7 +1085,6 @@ def insert_invoice(data):
             ready_to_generate_irn = "No"
         roundoff_amount = 0
         data['invoice_round_off_amount'] = roundoff_amount
-        
         sales_amount_before_tax = value_before_gst + other_charges_before_tax 
         sales_amount_after_tax = value_after_gst + other_charges
         sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
@@ -1105,6 +1106,7 @@ def insert_invoice(data):
             debit_invoice = "No"	
 
         
+
         if data['total_invoice_amount'] == 0:
             total = (value_after_gst + other_charges) - credit_value_after_gst
             if (total>0 and total<1) or (total>-1 and total<1):
@@ -1196,6 +1198,14 @@ def insert_invoice(data):
         else:
             pos_checks = data['guest_data']['pos_checks']
 
+
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+            json_data = json.load(f)
+            for each in json_data:
+                if company.state_code == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+        
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1312,10 +1322,10 @@ def insert_invoice(data):
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
             "non_revenue_amount": non_revenue_amount,
-            "pos_checks": pos_checks
-
-
+            "pos_checks": pos_checks,
+            "place_of_supply_json" : place_supplier_state_name
         })
+
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
@@ -3533,7 +3543,6 @@ def Error_Insert_invoice(data):
                             socket = invoiceCreated(invoice_bin)
                         return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin}
 
-
         company = frappe.get_doc('company',data['company_code'])
         if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
             invType = data['invoice_type']
@@ -3548,6 +3557,13 @@ def Error_Insert_invoice(data):
             
             if data["guest_name"]=="":
                 data["guest_name"]="NA"
+
+            folder_path = frappe.utils.get_bench_path()
+            with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+                json_data = json.load(f)
+                for each in json_data:
+                    if company.state_code == each['tin']:
+                        place_supplier_state_name = f"{each['state']}-({each['tin']})"
             invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -3617,7 +3633,8 @@ def Error_Insert_invoice(data):
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
                 "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
-                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
+                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0,
+                "place_of_supply_json":place_supplier_state_name if place_supplier_state_name in data else None,
             })
             if 'amened' in data:
                 if data['amened'] == 'Yes':
