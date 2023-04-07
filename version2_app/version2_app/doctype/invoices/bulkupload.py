@@ -84,7 +84,7 @@ def bulkupload(data):
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]])[4:]
                 # if companyData.name == "SGBW-01":
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
-                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].replace("/","").strip()
+                gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         paymentTypes = list(map(lambda x: x.lower(), paymentTypes))
@@ -251,19 +251,15 @@ def bulkupload(data):
                     continue
                 # if inv_data.docstatus!=2 and inv_data.irn_generated not in ["Success", "Pending", "Cancelled"] and inv_data.invoice_type=="B2B":
                 #     reupload = True
-                elif inv_data.invoice_type == "B2C":
-                    if inv_data.irn_generated=="Success":
+                elif inv_data.invoice_type == "B2C" :
+                    if inv_data.irn_generated=="Success" and companyData.reprocess_bulk_success_invoices != 1:
                         continue
                     else:
                         reupload = True
                 else:
                     reupload = True
             else:
-                reupload = False	
-            # if check_invoice['data'].name in ["4000-219618"]:
-            #     print(reupload,"This is reupload fflag////////[[[[[[[[[[[[[")
-            #     kjsfgakjsfgksgfksdgfkhsdgfkhsdg
-            #     break
+                reupload = False
 
             if each_item['invoice_category'] == "empty":
                 each_item['invoice_category'] = "Tax Invoice"
