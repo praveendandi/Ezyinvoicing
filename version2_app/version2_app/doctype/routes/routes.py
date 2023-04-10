@@ -10,7 +10,7 @@ class Routes(Document):
 	pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def user_by_roles_companies():
     values =frappe.db.sql('''select `tabHas Role`.role, `tabUser`.username,`tabUser`.email, `tabUser`.full_name,`tabUser`.enabled,`tabUser`.first_name,`tabUser`.full_name from `tabUser` inner join `tabHas Role` on `tabUser`.email=`tabHas Role`.parent where `tabUser`.username  not like 'adm%' and `tabHas Role`.role like 'ezy%' and `tabHas Role`.role not like 'EzyInvoicing%'  order by `tabUser`.email ''',as_dict=1)
     return values,
