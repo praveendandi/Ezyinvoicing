@@ -36,7 +36,7 @@ import time
 import os
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
-# import fitz
+import fitz
 from frappe.utils import cstr
 
 frappe.utils.logger.set_log_level("DEBUG")

@@ -11,7 +11,7 @@ import shlex
 import shutil
 import sys
 import time
-# import fitz
+import fitz
 import traceback
 from datetime import date, datetime, timedelta
 from email.mime import image
