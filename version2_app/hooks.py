@@ -208,7 +208,7 @@ doc_events = {
         "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     },
     "Role":{
-        "after_insert":"version2_app.version2_app.doctype.roles_permission.roles_permission.update_roles_routes"
+        # "after_insert":"version2_app.version2_app.doctype.roles_permission.roles_permission.update_roles_routes"
     },
     "Routes":{
     "on_update":"version2_app.version2_app.doctype.roles_permission.roles_permission.add_new_routes_to_existing"
