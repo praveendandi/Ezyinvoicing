@@ -24,7 +24,10 @@ def BulkUploadReprocess(data):
         line_items = json.loads(invoice_data.invoice_object_from_file)
         if "data" in line_items.keys():
             if invoice_data.invoice_type == "B2B":
-                invoice_data.gst_number = line_items["data"]["gstNumber"]
+                if line_items['data']['gstNumber'] == invoice_data.gst_number:
+                    invoice_data.gst_number = line_items["data"]["gstNumber"]
+                else:
+                    invoice_data.gst_number = invoice_data.gst_number
         #     line_items = {"data": line_items}
         #     invoice_data.invoice_object_from_file = json.dumps(line_items)
         # if isinstance(line_items["data"], dict):
