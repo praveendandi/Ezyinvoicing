@@ -36,7 +36,7 @@ def reset_initial_password(user):
        
     
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def change_old_password(user, pwd):
     try:
         confirm_pwd = check_password(
