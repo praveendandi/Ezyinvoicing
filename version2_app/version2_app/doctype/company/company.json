@@ -308,7 +308,8 @@
   "qr_b2c_rect_y0",
   "qr_b2c_rect_y1",
   "website",
-  "scan_ids"
+  "scan_ids",
+  "reprocess_bulk_success_invoices"
  ],
  "fields": [
   {
@@ -1979,11 +1980,17 @@
    "fieldname": "scan_ids",
    "fieldtype": "Check",
    "label": "Scan IDS"
+  },
+  {
+   "default": "0",
+   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldtype": "Check",
+   "label": "Reprocess Bulk Success Invoices"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-29 15:05:17.074925",
+ "modified": "2023-04-07 15:39:55.261483",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
