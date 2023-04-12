@@ -2877,6 +2877,23 @@ def create_pdf_each_invoice(doc):
     except Exception as e:
         pass
 
-
-
-
+@frappe.whitelist(allow_guest=True)
+def before_insert_company(doc,method=None):
+    try:
+        company_doc = frappe.get_last_doc('company',)
+        doc = frappe.get_last_doc('Invoices',)
+        doc.legal_name = company_doc.legal_name
+        doc.trade_name = company_doc.trade_name
+        doc.gst_number = company_doc.gst_number
+        doc.address_1 = company_doc.address_1
+        doc.address_2 = company_doc.address_2
+        doc.pincode = company_doc.pincode
+        doc.location = company_doc.location
+        doc.place_of_supply = company_doc.place_of_supply
+        doc.application_reference_number = company_doc.application_reference_number
+        print(doc.legal_name,doc.trade_name,doc.gst_number,doc.address_1,doc.address_2,doc.pincode,doc.location,doc.place_of_supply,doc.application_reference_number,"....")
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("before_insert_company",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}

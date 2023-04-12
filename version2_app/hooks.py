@@ -111,6 +111,7 @@ doc_events = {
 		# "on_update": "version2_app.events.invoiceUpdate",
 		# "on_cancel": "method",
 		# "on_trash": "method"
+        "before_insert":["version2_app.events.before_insert_company"]
 	},
     "Arrival Information": {
         "after_insert": "version2_app.events.arrival_information",
