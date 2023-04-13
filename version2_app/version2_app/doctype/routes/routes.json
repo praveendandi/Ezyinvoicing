@@ -9,7 +9,8 @@
  "field_order": [
   "route_name",
   "status",
-  "route"
+  "route",
+  "module"
  ],
  "fields": [
   {
@@ -29,11 +30,17 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Route"
+  },
+  {
+   "fieldname": "module",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Module"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-03 19:17:04.168711",
+ "modified": "2023-04-12 14:43:56.423887",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Routes",

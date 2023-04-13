@@ -5,6 +5,13 @@ import frappe
 from frappe.utils import cstr, encode
 from frappe.utils.password import check_password
 from frappe.model.document import Document
+from frappe.utils import  date_diff, today
+import datetime
+import pandas as pd
+
+
+
+
 
 
 class Routes(Document):
@@ -36,7 +43,7 @@ def reset_initial_password(user):
        
     
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def change_old_password(user, pwd):
     try:
         confirm_pwd = check_password(
@@ -47,3 +54,15 @@ def change_old_password(user, pwd):
             return {'success': False, "message": "Password not matched"}
     except Exception as e:
         return {"message":"Incorrect User or Password"}
+    
+
+@frappe.whitelist(allow_guest=True)
+def reset_password_reminder(username):
+    last_password_reset_date = frappe.db.get_list('User',filters={'username':username},fields=['last_password_reset_date']) or today()
+    reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
+    start_date = datetime.datetime.now() + datetime.timedelta(reset_pwd_after_days)
+    days = (datetime.datetime.now()-start_date).days
+    return {"no of days left to change password":days}
+
+
+
