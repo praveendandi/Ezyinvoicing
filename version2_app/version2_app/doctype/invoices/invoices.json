@@ -162,7 +162,18 @@
   "x1",
   "top",
   "bottom",
-  "place_of_supply_json"
+  "place_of_supply_json",
+  "company_name",
+  "company_gst",
+  "company_legal_name",
+  "company_trade_name",
+  "company_address_1",
+  "company_address_2",
+  "company_pincode",
+  "company_place_of_supply",
+  "company_location",
+  "company_application_reference_number",
+  "company_data_filing"
  ],
  "fields": [
   {
@@ -1053,16 +1064,71 @@
    "label": "Place Of Supply JSON"
   },
   {
-    "default": "0",
-    "fieldname": "un_billed_invoice",
-    "fieldtype": "Check",
-    "label": "Un Billed Invoice"
-   } 
+   "default": "0",
+   "fieldname": "un_billed_invoice",
+   "fieldtype": "Check",
+   "label": "Un Billed Invoice"
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "Company Name"
+  },
+  {
+   "fieldname": "company_gst",
+   "fieldtype": "Data",
+   "label": "Company GST"
+  },
+  {
+   "fieldname": "company_legal_name",
+   "fieldtype": "Data",
+   "label": "Company Legal Name"
+  },
+  {
+   "fieldname": "company_trade_name",
+   "fieldtype": "Data",
+   "label": "Company Trade Name"
+  },
+  {
+   "fieldname": "company_address_1",
+   "fieldtype": "Data",
+   "label": "Company Address_1"
+  },
+  {
+   "fieldname": "company_address_2",
+   "fieldtype": "Data",
+   "label": "Company Address_2"
+  },
+  {
+   "fieldname": "company_pincode",
+   "fieldtype": "Data",
+   "label": "Company Pincode"
+  },
+  {
+   "fieldname": "company_place_of_supply",
+   "fieldtype": "Data",
+   "label": "Company Place of Supply"
+  },
+  {
+   "fieldname": "company_location",
+   "fieldtype": "Data",
+   "label": "Company Location"
+  },
+  {
+   "fieldname": "company_application_reference_number",
+   "fieldtype": "Data",
+   "label": "Company Application Reference Number"
+  },
+  {
+   "fieldname": "company_data_filing",
+   "fieldtype": "Data",
+   "label": "Company Data Filing"
+  }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-03-27 19:00:39.079573",
+ "modified": "2023-04-13 12:37:06.279298",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",

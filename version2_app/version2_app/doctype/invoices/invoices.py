@@ -31,7 +31,7 @@ import random
 import math
 from frappe.utils import get_site_name
 from frappe.utils import logger
-from version2_app.events import invoiceCreated,before_insert_company
+from version2_app.events import invoiceCreated
 import time
 import os
 import json
@@ -39,6 +39,7 @@ import json
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 from frappe.utils import cstr
+
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -970,13 +971,10 @@ def create_invoice(data):
 
 @frappe.whitelist()
 def insert_invoice(data):
-
     # '''
     # insert invoice data     data, company_code, taxpayer,items_data
     # '''
     try:
-        company_data = before_insert_company
-        print(company_data,"///////////////////")
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:

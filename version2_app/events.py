@@ -2880,18 +2880,20 @@ def create_pdf_each_invoice(doc):
 @frappe.whitelist(allow_guest=True)
 def before_insert_company(doc,method=None):
     try:
-        company_doc = frappe.get_last_doc('company',)
-        doc = frappe.get_last_doc('Invoices',)
-        doc.legal_name = company_doc.legal_name
-        doc.trade_name = company_doc.trade_name
-        doc.gst_number = company_doc.gst_number
-        doc.address_1 = company_doc.address_1
-        doc.address_2 = company_doc.address_2
-        doc.pincode = company_doc.pincode
-        doc.location = company_doc.location
-        doc.place_of_supply = company_doc.place_of_supply
-        doc.application_reference_number = company_doc.application_reference_number
-        print(doc.legal_name,doc.trade_name,doc.gst_number,doc.address_1,doc.address_2,doc.pincode,doc.location,doc.place_of_supply,doc.application_reference_number,"....")
+        company = frappe.get_last_doc('company')
+        doc.company_name = company.company_name
+        doc.company_gst = company.gst_number
+        doc.company_legal_name = company.legal_name
+        doc.company_trade_name = company.trade_name
+        doc.company_address_1 = company.address_1
+        doc.company_address_2 = company.address_2
+        doc.company_pincode = company.pincode
+        doc.company_place_of_supply = company.place_of_supply
+        doc.company_location = company.location
+        doc.company_application_reference_number = company.application_reference_number
+        doc.company_data_filing = company.data_filing
+        # print(doc.as_dict())
+        # print(company.name)
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("before_insert_company",
