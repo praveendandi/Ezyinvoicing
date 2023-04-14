@@ -5,12 +5,9 @@ import frappe
 from frappe.utils import cstr, encode
 from frappe.utils.password import check_password
 from frappe.model.document import Document
-from frappe.utils import  date_diff, today
+from frappe.utils import datetime ,today
+from datetime import date
 import datetime
-import pandas as pd
-
-
-
 
 
 
@@ -20,8 +17,20 @@ class Routes(Document):
 
 @frappe.whitelist()
 def user_by_roles_companies():
-    values = frappe.db.sql('''select `tabHas Role`.role, `tabUser`.username,`tabUser`.email, `tabUser`.full_name,`tabUser`.enabled,`tabUser`.first_name,`tabUser`.full_name from `tabUser` inner join `tabHas Role` on `tabUser`.email=`tabHas Role`.parent where `tabUser`.username  not like 'adm%' and `tabHas Role`.role like 'ezy%' and `tabHas Role`.role not like 'EzyInvoicing%'  order by `tabUser`.email ''', as_dict=1)
-    return values
+    user_details = frappe.db.get_list("User",['name','email','username'],{'username':('not like',('%adm%')),'email':('not like',('guest@example.com'))})
+    for i in user_details:
+        get_role = frappe.db.get_list("Has Role",{'parent':i['email'],'role':('Like',('%ezy-%'))},['role'])
+        if len(get_role) >0:
+            i['role'] = get_role[0]['role']
+        else:
+            i['role'] = None
+        get_company = frappe.db.get_list('User Permission',{'user':i['email']},['for_value'])
+        if len(get_company)>0:
+            i['for_value'] = get_company[0]['for_value']
+        else:
+            i['for_value'] = None
+    return user_details
+   
 
 
 @frappe.whitelist(allow_guest=True)
@@ -58,11 +67,17 @@ def change_old_password(user, pwd):
 
 @frappe.whitelist(allow_guest=True)
 def reset_password_reminder(username):
-    last_password_reset_date = frappe.db.get_list('User',filters={'username':username},fields=['last_password_reset_date']) or today()
+    last_password_reset_date = datetime.date(2023, 5, 29)
+    # last_password_reset_date = frappe.db.get_list('User',filters={'username':username},fields=['last_password_reset_date']) or today()
     reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
-    start_date = datetime.datetime.now() + datetime.timedelta(reset_pwd_after_days)
-    days = (datetime.datetime.now()-start_date).days
-    return {"no of days left to change password":days}
-
-
+    # days = (last_password_reset_date[0]["last_password_reset_date"])
+    days = last_password_reset_date
+    int_days = int(days.strftime("%d"))
+    if reset_pwd_after_days >= int_days:
+        remaining_days = reset_pwd_after_days - int_days
+        if remaining_days == 0:
+            return 0
+        if remaining_days <=7:
+            return remaining_days
+            
 

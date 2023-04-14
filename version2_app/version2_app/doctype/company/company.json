@@ -306,7 +306,9 @@
   "qr_b2c_rect_y0",
   "qr_b2c_rect_y1",
   "website",
-  "scan_ids"
+  "scan_ids",
+  "clbs_section",
+  "clbs"
  ],
  "fields": [
   {
@@ -1966,11 +1968,22 @@
    "fieldname": "scan_ids",
    "fieldtype": "Check",
    "label": "Scan IDS"
+  },
+  {
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
+   "fieldtype": "Check",
+   "label": "CLBS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-03-30 19:54:41.820957",
+ "modified": "2023-04-13 18:14:18.572907",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
