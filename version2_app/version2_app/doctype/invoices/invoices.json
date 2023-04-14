@@ -173,7 +173,11 @@
   "company_place_of_supply",
   "company_location",
   "company_application_reference_number",
-  "company_data_filing"
+  "company_data_filing",
+  "company_state_code",
+  "company_fssai_number",
+  "company_logo",
+  "company_custom_e_tax_invoice_logo_image"
  ],
  "fields": [
   {
@@ -1123,12 +1127,32 @@
    "fieldname": "company_data_filing",
    "fieldtype": "Data",
    "label": "Company Data Filing"
+  },
+  {
+   "fieldname": "company_logo",
+   "fieldtype": "Data",
+   "label": "Company Logo"
+  },
+  {
+   "fieldname": "company_state_code",
+   "fieldtype": "Data",
+   "label": "Company State Code"
+  },
+  {
+   "fieldname": "company_fssai_number",
+   "fieldtype": "Small Text",
+   "label": "Company FSSAI Number"
+  },
+  {
+   "fieldname": "company_custom_e_tax_invoice_logo_image",
+   "fieldtype": "Data",
+   "label": "Company Custom E Tax Invoice Logo Image"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-04-13 12:37:06.279298",
+ "modified": "2023-04-14 12:38:43.187144",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
