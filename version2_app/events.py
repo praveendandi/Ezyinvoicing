@@ -9,7 +9,8 @@ from version2_app.parsers import *
 import re
 import shlex
 import shutil
-import sys
+
+
 import time
 import fitz
 import traceback
@@ -2880,21 +2881,9 @@ def create_pdf_each_invoice(doc):
 def before_insert_company(doc,method=None):
     try:
         company = frappe.get_last_doc('company')
-        doc.company_name = company.company_name
         doc.company_gst = company.gst_number
-        doc.company_legal_name = company.legal_name
-        doc.company_trade_name = company.trade_name
-        doc.company_address_1 = company.address_1
-        doc.company_address_2 = company.address_2
-        doc.company_pincode = company.pincode
-        doc.company_place_of_supply = company.place_of_supply
-        doc.company_location = company.location
-        doc.company_state_code = company.state_code
-        doc.company_logo = company.company_logo
-        doc.company_custom_e_tax_invoice_logo_image = company.custom_e_tax_invoice_logo_image
         doc.company_application_reference_number = company.application_reference_number
         doc.company_data_filing = company.data_filing
-        doc.company_fssai_number = company.fssai_number 
         # print(doc.as_dict())
         # print(company.name)
     except Exception as e:
