@@ -90,5 +90,3 @@ def reset_password_reminder(username):
             return 0
         if remaining_days <=7:
             return remaining_days
-
-
