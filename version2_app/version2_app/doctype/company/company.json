@@ -308,10 +308,10 @@
   "website",
   "scan_ids",
   "clbs_section",
+  "clbs",
   "reprocess_bulk_success_invoices",
   "einvoice_missing_date_feature",
-  "einvoice_missing_start_date",
-  "clbs"
+  "einvoice_missing_start_date"
  ],
  "fields": [
   {
@@ -1982,7 +1982,7 @@
    "default": "0",
    "fieldname": "clbs",
    "fieldtype": "Check",
-   "label": "clbs"
+   "label": "CLBS"
   },
   {
    "default": "0",
@@ -2005,7 +2005,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-20 15:43:35.172429",
+ "modified": "2023-04-20 16:07:53.977924",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
