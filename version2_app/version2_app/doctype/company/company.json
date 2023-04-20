@@ -266,8 +266,6 @@
   "in_house_driving_ocr",
   "section_break_248",
   "ome_scanner",
-  "clbs_section",
-  "clbs",
   "ezy_gst_section",
   "ezy_gst_module",
   "arrival_information_file_type",
@@ -309,7 +307,9 @@
   "qr_b2c_rect_y1",
   "website",
   "scan_ids",
-  "reprocess_bulk_success_invoices"
+  "reprocess_bulk_success_invoices",
+  "clbs_section",
+  "clbs"
  ],
  "fields": [
   {
@@ -1680,12 +1680,6 @@
    "label": "Summary Footer"
   },
   {
-   "default": "0",
-   "fieldname": "clbs",
-   "fieldtype": "Check",
-   "label": "CLBS"
-  },
-  {
    "fieldname": "scan_ezy_settings_section",
    "fieldtype": "Section Break",
    "label": "Scan Ezy Settings"
@@ -1747,11 +1741,6 @@
   {
    "fieldname": "column_break_248",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "clbs_section",
-   "fieldtype": "Section Break",
-   "label": "CLBS"
   },
   {
    "fieldname": "ezy_gst_section",
@@ -1985,12 +1974,22 @@
    "default": "0",
    "fieldname": "reprocess_bulk_success_invoices",
    "fieldtype": "Check",
-   "label": "Reprocess Bulk Success Invoices"
+   "label": "Reprocess Bulk Success Invoices",
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
+   "fieldtype": "Check",
+   "label": "CLBS"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
  "modified": "2023-04-07 15:39:55.261483",
+ "modified": "2023-04-13 18:14:18.572907",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
