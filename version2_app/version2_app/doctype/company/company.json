@@ -307,11 +307,11 @@
   "qr_b2c_rect_y1",
   "website",
   "scan_ids",
-  "reprocess_bulk_success_invoices",
   "clbs_section",
-  "clbs",
+  "reprocess_bulk_success_invoices",
   "einvoice_missing_date_feature",
-  "einvoice_missing_start_date"
+  "einvoice_missing_start_date",
+  "clbs"
  ],
  "fields": [
   {
@@ -1974,9 +1974,6 @@
   },
   {
    "default": "0",
-   "fieldname": "reprocess_bulk_success_invoices",
-   "fieldtype": "Check",
-   "label": "Reprocess Bulk Success Invoices",
    "fieldname": "clbs_section",
    "fieldtype": "Section Break",
    "label": "CLBS"
@@ -1985,8 +1982,7 @@
    "default": "0",
    "fieldname": "clbs",
    "fieldtype": "Check",
-   "label": "CLBS",
-   "label": "Reprocess Bulk Success Invoices"
+   "label": "clbs"
   },
   {
    "default": "0",
@@ -1999,17 +1995,20 @@
    "fieldname": "einvoice_missing_start_date",
    "fieldtype": "Date",
    "label": "Einvoice Missing Start Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldtype": "Check",
+   "label": "Reprocess Bulk Success Invoices"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-07 15:39:55.261483",
- "modified": "2023-04-13 18:14:18.572907",
- "modified": "2023-04-17 16:14:29.660711",
+ "modified": "2023-04-20 15:43:35.172429",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
