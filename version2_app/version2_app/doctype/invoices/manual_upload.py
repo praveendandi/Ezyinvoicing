@@ -72,14 +72,12 @@ def manual_upload(data):
 @frappe.whitelist()
 def manual_upload_data(data):
     try:
-        print("startt--------------------------",data)
         start_time = datetime.datetime.now()
         folder_path = frappe.utils.get_bench_path()
         items_data_file = data['invoice_file']
         company = data['company']
         companyData = frappe.get_doc('company',data['company'])
         if companyData.bulk_excel_upload_type=="Bulkupload Without Headers":
-            print("++++++++++++++++++")
             output=bulkupload(data)
             if output['success'] == False:
                 frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
