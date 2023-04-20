@@ -1,6 +1,5 @@
 Version2 App
 POS Bills
-Generics
 E-Signature
 clbs
 Reconciliation
