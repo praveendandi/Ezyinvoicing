@@ -753,10 +753,8 @@ def send_summary_mail(data):
                 filesize = file_size["size"]
         if filesize > 25:
             return {"success": False, "message": "File size is more than 25MB"}
-        print(summary_files, "..........................................")
         files_summary = frappe.db.get_list("File", filters={"file_url": [
                                            "in", summary_files]}, group_by="file_url", pluck='name')
-        print(files_summary, ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
         response = make(recipients=data["email"],
                         subject=data["subject"],
                         content=data["response"],
@@ -795,7 +793,6 @@ def get_all_summary_files(summary=None, add_signature=False, user=None):
             if not etax_tax["success"]:
                 return etax_tax
             if add_signature == True and user != "Administrator":
-                print("..///........,,,,,")
                 add_sig = send_files(etax_tax["file_urls"], user, summary)
                 if not add_sig["success"]:
                     return add_sig
