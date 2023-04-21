@@ -25,7 +25,7 @@ def after_lut_Number():
             print(i['invoice_number'],i['invoice_date'],"......................")
             frappe.db.set_value('Invoices',i['invoice_number'],{'company_application_reference_number':application_reference_number,'company_data_filing':data_filing,'company_gst':gst_number},update_modified=False)
             frappe.db.commit()
-        return {"success":True}
+        return {"success":True, "message": "updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("after_lut_Number",
@@ -56,7 +56,7 @@ def before_lut_Number():
             print(i['invoice_number'],i['invoice_date'],"......................")
             frappe.db.set_value('Invoices',i['invoice_number'],{'company_application_reference_number':application_reference_number,'company_data_filing':data_filing,'company_gst':gst_number},update_modified=False)
             frappe.db.commit()
-        return {"success":True}
+        return {"success":True, "message": "updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("before_lut_Number",
