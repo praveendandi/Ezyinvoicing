@@ -9,7 +9,7 @@ def migrating_routes():
     dataframe1 = pd.read_excel(file_path)
     data = dataframe1.to_dict("records")
     for i in data:
-        if not frappe.db.exists("Routes",{"route_name":i['Route Name']}):
+        if not frappe.db.exists("Routes",{"route_name":i['Route Name'],"route":i['Route']}):
             routes_data= frappe.get_doc({"doctype":"Routes","route_name":i['Route Name'],"route":i['Route']})
             routes_data.insert()
 
