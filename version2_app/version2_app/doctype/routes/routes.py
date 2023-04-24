@@ -31,7 +31,7 @@ def user_by_roles_companies():
    
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reset_initial_password(user):
     try:
         # print(''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user))

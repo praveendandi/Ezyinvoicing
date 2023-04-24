@@ -39,5 +39,6 @@ def add_new_routes_to_existing(doc,method=None):
                 child_doc = frappe.get_doc({"doctype": "Permission List","parentfield":"permission_list", "parent": each.name, "select_route": doc.name, "route_link": doc.route,"parenttype":"Roles Permission"})
                 child_doc.insert(ignore_permissions=True,ignore_links=True)
                 frappe.db.commit()
+                
     except Exception as e:
         print(str(e))
