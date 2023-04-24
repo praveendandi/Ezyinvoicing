@@ -34,6 +34,7 @@ def user_by_roles_companies():
 @frappe.whitelist()
 def reset_initial_password(user):
     try:
+        print(":;;;;;;;;;;;;;;;;;;")
         # print(''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user))
         get_user_details = frappe.db.sql(
             ''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user), as_dict=1)
