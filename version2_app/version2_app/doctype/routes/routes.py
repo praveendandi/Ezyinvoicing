@@ -34,7 +34,6 @@ def user_by_roles_companies():
 @frappe.whitelist(allow_guest=True)
 def reset_initial_password(user):
     try:
-        print(''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user))
         get_user_details = frappe.db.sql(
             ''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user), as_dict=1)
         if len(get_user_details) <= 0:
@@ -43,15 +42,11 @@ def reset_initial_password(user):
                     "email": get_user_details[0]['email'],
                     "username": get_user_details[0]['username']}
         if get_user_details[0]['last_active'] == None and get_user_details[0]['last_password_reset_date'] == None:
-            print({'user': get_user_details[0]['username'], 'success': True, "message": "New login force to reset"})
-            return {'user': get_user_details[0]['username'], 'success': True, "message": "New login force to reset"}
+            return {'user': get_user_details[0]['email'], 'success': True, "message": "New login force to reset"}
         else:
-            print(".....")
             if get_user_details[0]['last_active'] != None and get_user_details[0]['last_password_reset_date'] != None:
-                last_password_reset_date = frappe.db.get_list('User',filters={'username':user},fields=['last_password_reset_date'],ignore_permissions=True)
-                print(last_password_reset_date)
+                last_password_reset_date = frappe.db.get_list('User',filters={'username':user},fields=['last_password_reset_date'], ignore_permissions=True)
                 date_obj = last_password_reset_date[0]['last_password_reset_date']
-                print(date_obj,"====")
                 reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
                 int_days = int(date_obj.strftime("%d"))
                 if reset_pwd_after_days >= int_days:
@@ -60,8 +55,8 @@ def reset_initial_password(user):
                         return {"message":"reset password"}
                     # if remaining_days <=7:
                     #     return remaining_days
-            print({'user': get_user_details[0]['username'], 'success': False, "message": "Old login","remaining_days":remaining_days})
-            return {'user': get_user_details[0]['username'], 'success': False, "message": "Old login","remaining_days":remaining_days}
+        
+            return {'user': get_user_details[0]['email'], 'success': False, "message": "Old login","remaining_days":remaining_days}
     except Exception as e:
         return {"message":"Invalid User"}
        
