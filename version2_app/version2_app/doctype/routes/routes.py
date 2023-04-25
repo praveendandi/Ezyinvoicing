@@ -44,7 +44,7 @@ def reset_initial_password(user):
         if get_user_details[0]['last_active'] == None and get_user_details[0]['last_password_reset_date'] == None:
             return {'user': get_user_details[0]['email'], 'success': True, "message": "New login force to reset"}
         else:
-            if get_user_details[0]['last_active'] != None and get_user_details[0]['last_password_reset_date'] != None:
+            if get_user_details[0]['last_active'] != None or get_user_details[0]['last_password_reset_date'] != None:
                 last_password_reset_date = frappe.db.get_list('User',filters={'username':user},fields=['last_password_reset_date'], ignore_permissions=True)
                 date_obj = last_password_reset_date[0]['last_password_reset_date']
                 reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
