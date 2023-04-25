@@ -28,7 +28,7 @@ def execute(filters=None):
 	print(data)
 	today = getdate()
 	for row in data:
-		eight_days_ago = add_days(row[1], -8)
+		eight_days_ago = add_days(row[1], 8)
 		row.append(eight_days_ago)
 	
 	fields.append('days')
