@@ -14,8 +14,11 @@ def get_missing_count():
     print(company.einvoice_missing_start_date)
     query = '''SELECT irn_number,invoice_date,invoice_category, COUNT(*) 
     AS data_count FROM `tabInvoices` WHERE invoice_date > DATE_SUB(NOW(), INTERVAL 8 DAY) AND irn_number is NULL 
-    and invoice_type='B2B' and invoice_from != 'Web' GROUP BY invoice_date,invoice_category;'''
+    and invoice_type='B2B' and invoice_from != 'Web' GROUP BY invoice_date,invoice_category'''
 
+
+
+    print(query)
     data = frappe.db.sql(query, as_dict=1)
     result = {}
     for cat in data:
@@ -114,13 +117,21 @@ def get_missing_count():
 
 @frappe.whitelist()
 def check_invoice_date_if_graterthan_days(invoice_number):
+    company = frappe.get_last_doc('company')
+    print(company.einvoice_missing_date_feature)
+    print(company.einvoice_missing_start_date)
+  
     doc = frappe.get_doc('Invoices', invoice_number)
     if doc:
-        today = getdate()
-        eight_days_ago = add_days(today, -8)
-        if doc.invoice_date <= eight_days_ago:
-            return {"message":"Invoice date expired","success":False}
-        else:
+        # invoice date cond
+        if doc.invoice_date < company.einvoice_missing_start_date:
             return {"message":"valid Invoice date","success":True}
+        else:
+            today = getdate()
+            eight_days_ago = add_days(today, -8)
+            if doc.invoice_date <= eight_days_ago:
+                return {"message":"Invoice date expired","success":False}
+            else:
+                return {"message":"valid Invoice date","success":True}
     else:
         return {"message":"Invoice not found","success":False}
