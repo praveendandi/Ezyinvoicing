@@ -32,7 +32,7 @@ def user_by_roles_companies():
 
 
 @frappe.whitelist(allow_guest=True)
-def reset_initial_password(user):
+def reset_initial_password(user,ignore_permission=True):
     try:
         get_user_details = frappe.db.sql(
             ''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user), as_dict=1)
@@ -68,9 +68,10 @@ def reset_initial_password(user):
 @frappe.whitelist(allow_guest=True)
 def change_old_password(user, pwd):
     try:
+        # email= frappe.db.sql('''select * from `tabUser` Where email = '{user}' ''')
         confirm_pwd = check_password(
             user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True)
-        print(confirm_pwd,"....................")
+        print(user,pwd,"....................")
         if confirm_pwd == user:
             return {'success': True, "message": "Password matched"}
         else:
