@@ -42,6 +42,7 @@ def reset_initial_password(user,ignore_permission=True):
                     "email": get_user_details[0]['email'],
                     "username": get_user_details[0]['username']}
         if get_user_details[0]['last_active'] == None:
+            ignore_permissions = True
         # if get_user_details[0]['last_active'] == None and get_user_details[0]['last_password_reset_date'] == None:
             return {'user': get_user_details[0]['email'], 'success': True, "message": "New login force to reset"}
         else:
