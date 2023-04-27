@@ -7,26 +7,26 @@ from frappe.model.document import Document
 class RolesPermission(Document):
     pass
 
-@frappe.whitelist()
-def update_roles_routes(doc,method=None):
-    roles_list= frappe.get_list('Role')
-    get_list = frappe.db.get_list("Routes",fields=["name","route",'module'])
-    if len(get_list)>0:
-        for each in roles_list:
-            if not frappe.db.exists("Roles Permission", each.name, cache=True):
-                doc = frappe.get_doc({ 'doctype': 'Roles Permission','select_role':each.name})
-                for route in get_list:
-                    select_route = route.get('name')
-                    route_link = route.get('route')
-                    module= route.get('module')
-                    doc.append('permission_list',{
-                                'select_route':select_route,
-                                'route_link':route_link,
-                                'module':module
-                    })
-                doc.insert()
-                doc.save()
-                frappe.db.commit()
+# @frappe.whitelist()
+# def update_roles_routes(doc,method=None):
+#     roles_list= frappe.get_list('Role')
+#     get_list = frappe.db.get_list("Routes",fields=["name","route",'module'])
+#     if len(get_list)>0:
+#         for each in roles_list:
+#             if not frappe.db.exists("Roles Permission", each.name, cache=True):
+#                 doc = frappe.get_doc({ 'doctype': 'Roles Permission','select_role':each.name})
+#                 for route in get_list:
+#                     select_route = route.get('name')
+#                     route_link = route.get('route')
+#                     module= route.get('module')
+#                     doc.append('permission_list',{
+#                                 'select_route':select_route,
+#                                 'route_link':route_link,
+#                                 'module':module
+#                     })
+#                 doc.insert()
+#                 doc.save()
+#                 frappe.db.commit()
 
 
 @frappe.whitelist()
