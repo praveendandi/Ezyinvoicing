@@ -67,6 +67,7 @@ def change_old_password(user, pwd):
     try:
         confirm_pwd = check_password(
             user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True)
+        print(confirm_pwd,"....................")
         if confirm_pwd == user:
             return {'success': True, "message": "Password matched"}
         else:
