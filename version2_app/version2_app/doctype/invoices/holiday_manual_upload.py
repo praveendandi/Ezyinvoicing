@@ -101,8 +101,18 @@ def holidayinManualupload(data):
                 each['taxinvnum']=str(each['taxinvnum'])+"-1"
                 
             if each['taxinvnum'] not in invoice_referrence_objects:
-                invoice_referrence_objects[each['taxinvnum']] = []
-                invoice_referrence_objects[each['taxinvnum']].append(each)
+                if "P01" in each['taxinvnum']:
+                    invoice_num = each['taxinvnum']
+                    pos_inv_date = each['invoicedate']
+                    pos_inv_date = datetime.datetime.strptime(pos_inv_date,'%Y-%m-%d').strftime('%m%y')
+                    pos_inv_date = pos_inv_date.replace(" 00:00:00","")
+                    pos_inv_number = invoice_num + pos_inv_date
+                    each['taxinvnum'] = pos_inv_number
+                    invoice_referrence_objects[each['taxinvnum']] = []
+                    invoice_referrence_objects[each['taxinvnum']].append(each)
+                else:
+                    invoice_referrence_objects[each['taxinvnum']] = []
+                    invoice_referrence_objects[each['taxinvnum']].append(each)
             else:
                 invoice_referrence_objects[each['taxinvnum']].append(each)
             
