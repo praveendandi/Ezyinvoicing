@@ -59,7 +59,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-before_migrate=["version2_app.route_migrations.migrating_routes"]
+# before_migrate=["version2_app.route_migrations.migrating_routes"]
 
 # before_install = "version2_app.install.before_install"
 # after_install = "version2_app.install.after_install"
