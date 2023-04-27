@@ -76,7 +76,7 @@ def get_missing_count():
     AS data_count FROM `tabInvoices` WHERE invoice_date > DATE_SUB(NOW(), 
     INTERVAL 8 DAY) AND irn_number is NULL and invoice_type='B2B' and invoice_from = 'Web' and invoice_category = 'Tax Invoice' GROUP BY invoice_date;'''
     manual_data = frappe.db.sql(manual_query, as_dict=1)
-    print(manual_data)
+    # print(manual_data)
     for final in final_result:
         del final['day']
         for manual in manual_data:
@@ -87,7 +87,7 @@ def get_missing_count():
     AS data_count FROM `tabInvoices` WHERE invoice_date > DATE_SUB(NOW(), 
     INTERVAL 8 DAY) AND irn_number is NULL and invoice_type='B2B' and invoice_category = 'Credit Invoice' GROUP BY invoice_date;'''
     manual_data = frappe.db.sql(manual_credit_query, as_dict=1)
-    print(manual_data)
+    # print(manual_data)
     for final in final_result:
         # del final['day']
         for manual in manual_data:
@@ -118,8 +118,8 @@ def get_missing_count():
 @frappe.whitelist()
 def check_invoice_date_if_graterthan_days(invoice_number):
     company = frappe.get_last_doc('company')
-    print(company.einvoice_missing_date_feature)
-    print(company.einvoice_missing_start_date)
+    # print(company.einvoice_missing_date_feature)
+    # print(company.einvoice_missing_start_date)
   
     doc = frappe.get_doc('Invoices', invoice_number)
     if doc:
