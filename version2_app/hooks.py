@@ -59,7 +59,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-# before_migrate=["version2_app.migrate_routes.route_migrations.migrating_routes"]
+before_migrate=["version2_app.route_migrations.migrating_routes"]
 
 # before_install = "version2_app.install.before_install"
 # after_install = "version2_app.install.after_install"
@@ -211,7 +211,7 @@ doc_events = {
         "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
     },
     "Role":{
-        # "after_insert":"version2_app.version2_app.doctype.roles_permission.roles_permission.update_roles_routes"
+        "after_insert":"version2_app.version2_app.doctype.roles_permission.roles_permission.update_roles_routes"
     },
     "Routes":{
     "on_update":"version2_app.version2_app.doctype.roles_permission.roles_permission.add_new_routes_to_existing"
