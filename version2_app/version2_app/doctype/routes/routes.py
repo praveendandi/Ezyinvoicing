@@ -7,7 +7,7 @@ from frappe.model.document import Document
 from datetime import date
 import datetime
 import sys, traceback
-
+from frappe import _
 
 
 class Routes(Document):
@@ -46,6 +46,8 @@ def reset_initial_password(user):
             return {'user': get_user_details[0]['email'], 'success': True, "message": "New login force to reset"}
         else:
             if get_user_details[0]['last_active'] != None or get_user_details[0]['last_password_reset_date'] != None:
+                if last_password_reset_date == None:
+                    frappe.throw(_("Month and Year is not selected"))
                 last_password_reset_date = frappe.db.get_list('User',filters={'username':user},fields=['last_password_reset_date'], ignore_permissions=True)
                 date_obj = last_password_reset_date[0]['last_password_reset_date']
                 reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
@@ -67,6 +69,8 @@ def change_old_password(user, pwd):
     try:
         confirm_pwd = check_password(
             user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True)
+        frappe.log_error("change_old_password",confirm_pwd)
+
         print(user,pwd,"....................")
         if confirm_pwd == user:
             return {'success': True, "message": "Password matched"}
