@@ -6,6 +6,7 @@ from frappe.utils.password import check_password
 from frappe.model.document import Document
 from datetime import date
 import datetime
+import sys, traceback
 
 
 
@@ -55,6 +56,8 @@ def reset_initial_password(user):
                         return {"message":"The password of your account has expired."}
                 return {'user': get_user_details[0]['email'], 'success': False, "message": "Old login","remaining_days":remaining_days}
     except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("reset_initial_password","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"message":"Invalid User"}
        
     
