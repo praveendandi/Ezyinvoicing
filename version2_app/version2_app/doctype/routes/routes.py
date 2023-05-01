@@ -32,7 +32,7 @@ def user_by_roles_companies():
 
 
 @frappe.whitelist(allow_guest=True)
-def reset_initial_password(user,ignore_permission=True):
+def reset_initial_password(user):
     try:
         get_user_details = frappe.db.sql(
             ''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user), as_dict=1)
@@ -41,26 +41,19 @@ def reset_initial_password(user,ignore_permission=True):
                     "message": f'No user found with this email {user}',
                     "email": get_user_details[0]['email'],
                     "username": get_user_details[0]['username']}
-        if get_user_details[0]['last_active'] == None:
-            ignore_permissions = True
-        # if get_user_details[0]['last_active'] == None and get_user_details[0]['last_password_reset_date'] == None:
+        if get_user_details[0]['last_active'] == None and get_user_details[0]['last_password_reset_date'] == None:
             return {'user': get_user_details[0]['email'], 'success': True, "message": "New login force to reset"}
         else:
-        #     if get_user_details[0]['last_active'] != None or get_user_details[0]['last_password_reset_date'] != None:
-            return {'user': get_user_details[0]['email'], 'success': False, "message": "Old login"}
-            # if get_user_details[0]['last_active'] != None or get_user_details[0]['last_password_reset_date'] != None:
-                # last_password_reset_date = frappe.db.get_list('User',filters={'username':user},fields=['last_password_reset_date'], ignore_permissions=True)
-                # date_obj = last_password_reset_date[0]['last_password_reset_date']
-                # reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
-                # int_days = int(date_obj.strftime("%d"))
-                # if reset_pwd_after_days >= int_days:
-                #     remaining_days = reset_pwd_after_days - int_days
-                #     if remaining_days == 0:
-                #         return {"message":"reset password"}
-                #     # if remaining_days <=7:
-                #     #     return remaining_days
-        
-                # return {'user': get_user_details[0]['email'], 'success': False, "message": "Old login"}
+            if get_user_details[0]['last_active'] != None or get_user_details[0]['last_password_reset_date'] != None:
+                last_password_reset_date = frappe.db.get_list('User',filters={'username':user},fields=['last_password_reset_date'], ignore_permissions=True)
+                date_obj = last_password_reset_date[0]['last_password_reset_date']
+                reset_pwd_after_days =frappe.db.get_single_value("System Settings", "force_user_to_reset_password")
+                int_days = int(date_obj.strftime("%d"))
+                if reset_pwd_after_days >= int_days:
+                    remaining_days = reset_pwd_after_days - int_days
+                    if remaining_days == 0:
+                        return {"message":"The password of your account has expired."}
+                return {'user': get_user_details[0]['email'], 'success': False, "message": "Old login","remaining_days":remaining_days}
     except Exception as e:
         return {"message":"Invalid User"}
        
@@ -69,7 +62,6 @@ def reset_initial_password(user,ignore_permission=True):
 @frappe.whitelist(allow_guest=True)
 def change_old_password(user, pwd):
     try:
-        # email= frappe.db.sql('''select * from `tabUser` Where email = '{user}' ''')
         confirm_pwd = check_password(
             user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True)
         print(user,pwd,"....................")
@@ -79,5 +71,14 @@ def change_old_password(user, pwd):
             return {'success': False, "message": "Password not matched"}
     except Exception as e:
         return {"message":"Incorrect User or Password"}
-    
 
+
+@frappe.whitelist(allow_guest=True)
+def update_pwd(email,last_password_reset_date,new_password):
+    doc = frappe.get_doc("User", email)
+    doc.last_password_reset_date = last_password_reset_date
+    doc.new_password = new_password
+    doc.save(ignore_permissions=True)
+    return email
+
+    
