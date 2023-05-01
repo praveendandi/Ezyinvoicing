@@ -65,11 +65,12 @@ def reset_initial_password(user):
 @frappe.whitelist(allow_guest=True)
 def change_old_password(user, pwd):
     try:
+         
         confirm_pwd = check_password(
             user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True)
+        confirm_pwd=confirm_pwd.strip()
         frappe.log_error("change_old_password",confirm_pwd)
 
-        print(user,pwd,"....................")
         if confirm_pwd == user:
             return {'success': True, "message": "Password matched"}
         else:
