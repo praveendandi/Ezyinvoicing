@@ -59,7 +59,7 @@ app_license = "MIT"
 # Installation
 # ------------
 
-# before_migrate=["version2_app.route_migrations.migrating_routes"]
+before_migrate=["version2_app.route_migrations.migrating_routes"]
 
 # before_install = "version2_app.install.before_install"
 # after_install = "version2_app.install.after_install"
@@ -249,13 +249,15 @@ scheduler_events = {
         # "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
         "10 00 * * *":["version2_app.events.delete_error_logs"],
         "30 * * * *":["version2_app.mail_read.mailreader"],
+        "5 * * * *":["version2_app.version2_app.doctype.routes.routes.disable_inactive_users"],
         "20 00 * * *":["version2_app.events.delete_email_queue"]},
         
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
         "version2_app.events.deleteemailfilesdaily",
         "version2_app.events.delete_arrival_activity",
-        "version2_app.database_utils.remove_unwanted_data_ervery_day.remove_data_from_database_every_day"
+        "version2_app.database_utils.remove_unwanted_data_ervery_day.remove_data_from_database_every_day",
+        # "version2_app.version2_app.doctype.routes.routes.disable_inactive_users"
     ]
 }
 # scheduler_events = {
