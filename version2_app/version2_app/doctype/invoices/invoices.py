@@ -1381,13 +1381,28 @@ def insert_invoice(data):
             return {"success": True,"data":invoice}
         else:
             if v.irn_generated in ["Pending"] and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+                
                 tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
                 if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or v.sez==1:
                     pass
                 else:
                     if v.invoice_from != "Web":
                         data = {'invoice_number': v.name,'generation_type': "System"}
-                        irn_generate = generateIrn(data)
+                        if company.einvoice_missing_date_feature !=1:
+                            irn_generate = generateIrn(data)
+                        else:
+                            if invoice.invoice_date <= company.einvoice_missing_start_date:
+                                irn_generate = generateIrn(data)
+                            else:
+                                from frappe.utils import add_days, getdate,date_diff 
+                                today = getdate()
+                                eight_days_ago = date_diff(today,invoice.invoice_date)
+                                if eight_days_ago <= 8:
+                                    irn_generate = generateIrn(data)
+                                else:
+                                    print("Invoice date expired")
+                                
+
 
         # if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
         # 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
