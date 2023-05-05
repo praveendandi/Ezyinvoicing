@@ -130,14 +130,15 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                     "unitPrice": item["Qty"],
                     "itemAmt": item["TotAmt"],
                     "totalItemAmt": item["TotItemVal"],
-                    "lineItemAmt":gst_data['ValDtls']['TotInvValFc']
+                    # 'lineItemAmt': item["AssAmt"]
+                    "lineItemAmt":gst_data['ValDtls']['TotInvValFc']+gst_data['ValDtls']['OthChrg']
                     # "udf1": "0016090023",
                     # "udf2": "ZF1",
                     # "udf3": "Invoice (ZF1)",
                     # "udf4": "0016090023"
             })
         req[0]['lineItems'] = line_items
-        # print(req)
+        # print(req,"LLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>.")
         # return True
         gsp = frappe.db.get_value('GSP APIS', {"company": company.name,
                 "provider":company.provider}, [
@@ -152,11 +153,11 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "accessToken": gsp.gsp_test_token,
                 "Content-Type": 'application/json',
             }
-            print('___________________________________________________')
-            print(headers)
-            print('******************************************************')
-            print(req)
-            print('___________________________________________________')
+            # print('___________________________________________________')
+            # print(headers)
+            # print('******************************************************')
+            # print(req)
+            # print('___________________________________________________')
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
                     irn_response = requests.post(test_irn,

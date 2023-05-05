@@ -174,7 +174,6 @@ def generateIrn(data):
             get_is_credit_items = frappe.db.get_list("Items", filters=[["parent","=",data['invoice_number']]], pluck="is_credit_item")
             if "Yes" in get_is_credit_items:
                 abs_path = os.path.dirname(os.getcwd())
-                print(abs_path,"////")
                 file_path = abs_path + '/apps/version2_app/version2_app/version2_app/doctype/invoices/reinitate_invoice.py'
                 module_name = 'auto_adjustment'
                 spec = importlib.util.spec_from_file_location(module_name, file_path)
@@ -380,7 +379,6 @@ def generateIrn(data):
             "TotInvVal": round(TotInnVal,2) if company_details['data'].vat_reporting==1 else round(TotInnVal-invoice.total_vat_amount, 2),
             "TotInvValFc": round(TotInvValFc, 2)
         }        
-        # print(gst_data['ValDtls'])
         if len(gst_data['ItemList']) == 0:
             return {"success":False,"message":"Items cannot be Empty"}
         if ass_value > 0:
