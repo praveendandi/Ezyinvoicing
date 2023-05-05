@@ -131,7 +131,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                     "itemAmt": item["TotAmt"],
                     "totalItemAmt": item["TotItemVal"],
                     # 'lineItemAmt': item["AssAmt"]
-                    "lineItemAmt":gst_data['ValDtls']['TotInvValFc']+gst_data['ValDtls']['OthChrg']
+                    "lineItemAmt":round(gst_data['ValDtls']['TotInvValFc']+gst_data['ValDtls']['OthChrg'],3)
                     # "udf1": "0016090023",
                     # "udf2": "ZF1",
                     # "udf3": "Invoice (ZF1)",
