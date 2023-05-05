@@ -55,7 +55,7 @@ def convert_image_to_base64(image):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def summary_print_formats(name):
     try:
         doc = frappe.db.get_value(
@@ -211,7 +211,7 @@ def combine_pdf(files, filename, name, add_signature=False):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def download_pdf(name, add_signature=False, email=False):
     try:
         if add_signature == "true":
@@ -327,9 +327,9 @@ def extract_summary_breakups(filters, summary):
             total_items.append(each)
         df = pd.DataFrame.from_records(total_items)
         data = df.groupby(['service_type', 'invoice_number'], as_index=False).agg(
-            {"Date_string": 'first', "service_type": 'first', "invoice_category": 'first',
+            {"Date_string": 'first', "invoice_category": 'first',
              "item_value_after_gst": 'sum', "company": 'first', "summaries": 'first',
-             'invoice_number': 'first', "sac_code": list})
+             "sac_code": list})
         data.rename(columns={'Date_string': 'date', 'service_type': 'category',
                     'invoice_category': 'invoice_type',
                              'item_value_after_gst': 'amount'}, inplace=True)
@@ -450,7 +450,7 @@ def create_breakup_details(doc, details_data, summary):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_summary_breakup(filters=[], summary=None):
     try:
         if len(filters) > 0:
@@ -498,7 +498,7 @@ def update_invoices(invoices=[], data={}):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
     try:
         deleted_invoices = json.loads(deleted_invoices)
@@ -532,7 +532,7 @@ def delete_invoice_summary_breakup(deleted_invoices=[], summary=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_summary_breakup(data):
     try:
         if len(data["summary"]) == 0:
@@ -550,7 +550,7 @@ def update_summary_breakup(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_summary_breakup(summary=None):
     try:
         if summary:
@@ -599,7 +599,7 @@ def get_summary_breakup(summary=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_gst_summary(summaries):
     try:
         get_summary_breakups = frappe.db.get_list(
@@ -623,7 +623,7 @@ def get_gst_summary(summaries):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def update_summary(data, name):
     try:
         if not frappe.db.exists({'doctype': 'Summaries',
@@ -651,7 +651,7 @@ def update_summary(data, name):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def submit_summary(summary):
     try:
         if frappe.db.exists({"doctype": "Summaries", "name": summary}):
@@ -695,7 +695,7 @@ def submit_summary(summary):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def send_summary_mail(data):
     try:
         company = frappe.get_last_doc('company')
@@ -921,7 +921,7 @@ def add_signature_images(files, user_name):
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def etax_invoice_to_pdf(summary):
     try:
         company = frappe.get_last_doc("company")
@@ -971,7 +971,7 @@ def etax_invoice_to_pdf(summary):
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def summary_amendment(summary):
     try:
         enqueue(

@@ -7,7 +7,7 @@ import frappe
 import os, importlib.util
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def get_parser_filePath(company):
     try:
         folder_path = frappe.utils.get_bench_path()

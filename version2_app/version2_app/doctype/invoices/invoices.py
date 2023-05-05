@@ -34,10 +34,12 @@ from frappe.utils import logger
 from version2_app.events import invoiceCreated
 import time
 import os
+import json
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 from frappe.utils import cstr
+
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -594,6 +596,7 @@ def send_invoicedata_to_gcb(invoice_number):
                 "invoice_number": doc.invoice_number,
                 "invoice_type": doc.invoice_type,
                 "invoice_date": str(doc.invoice_date),
+                # "checkout_date": str(doc.checkout_date),
                 "pms_invoice_summary": doc.total_invoice_amount,
                 "irn": "N/A",
                 "company_name": company.company_name,
@@ -607,7 +610,6 @@ def send_invoicedata_to_gcb(invoice_number):
             if company.pms_property_url:
                 b2c_data["file_url"] = company.pms_property_url
             if company.pms_information_invoice_for_payment_qr == "Yes":
-                print("=====================")
                 payment_list = frappe.db.get_list("Invoice Payments",filters={"invoice_number":doc.invoice_number},fields=["item_value","date","payment","payment_reference"])
                 if len(payment_list)>0:
                     for each in payment_list:
@@ -990,7 +992,7 @@ def insert_invoice(data):
         if "invoice_category" not in list(data['guest_data']):
             data['guest_data']['invoice_category'] = "Tax Invoice"
         if "invoice_object_from_file" not in data:
-            data['invoice_object_from_file'] = " "	
+            data['invoice_object_from_file'] = " "
         company = frappe.get_doc('company',data['company_code'])
         sales_amount_before_tax = 0
         sales_amount_after_tax = 0
@@ -1097,7 +1099,6 @@ def insert_invoice(data):
             ready_to_generate_irn = "No"
         roundoff_amount = 0
         data['invoice_round_off_amount'] = roundoff_amount
-        
         sales_amount_before_tax = value_before_gst + other_charges_before_tax 
         sales_amount_after_tax = value_after_gst + other_charges
         sales_amount_after_tax = sales_amount_after_tax - credit_value_after_gst
@@ -1119,6 +1120,7 @@ def insert_invoice(data):
             debit_invoice = "No"	
 
         
+
         if data['total_invoice_amount'] == 0:
             total = (value_after_gst + other_charges) - credit_value_after_gst
             if (total>0 and total<1) or (total>-1 and total<1):
@@ -1147,6 +1149,11 @@ def insert_invoice(data):
                     sales_amount_before_tax = data["total_invoice_amount"]
                     sales_amount_after_tax = data['total_invoice_amount']
                 if abs(roundoff_amount)>6:
+                # if company.name == "SMBKC-01":
+                #     round_amount = 2
+                # else:
+                #     round_amount = 6
+                    # if abs(roundoff_amount)>round_amount:
                     if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                         
                         calculated_data = {"sales_amount_before_tax":sales_amount_before_tax,"sales_amount_after_tax":sales_amount_after_tax,"other_charges_before_tax":other_charges_before_tax,
@@ -1205,6 +1212,22 @@ def insert_invoice(data):
         else:
             pos_checks = data['guest_data']['pos_checks']
 
+
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+            json_data = json.load(f)
+            for each in json_data:
+                if company.state_code == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+
+        if 'checkout_date' in data['guest_data']:
+            if data['guest_data']['checkout_date'] != None:
+                checkout_date = datetime.datetime.strptime(data['guest_data']['checkout_date'],'%d-%b-%y %H:%M:%S')
+            else:
+                checkout_date = None
+        else:
+            checkout_date = None
+
         invoice = frappe.get_doc({
             'doctype':
             'Invoices',
@@ -1230,6 +1253,9 @@ def insert_invoice(data):
             'invoice_date':
             datetime.datetime.strptime(data['guest_data']['invoice_date'],
                                         '%d-%b-%y %H:%M:%S'),
+            'checkout_date':checkout_date,
+            # datetime.datetime.strptime(data['guest_data']['checkout_date'],
+            #                             '%d-%b-%y %H:%M:%S') if "checkout_date" in data['guest_data'] else None,
             'legal_name':
             data['taxpayer']['legal_name'],
             'mode':company.mode,
@@ -1318,8 +1344,10 @@ def insert_invoice(data):
             "tax_invoice_referrence_date": data["tax_invoice_referrence_date"] if "tax_invoice_referrence_date" in data else "",
             "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1": data["invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1"] if "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1" in data else 0,
             "non_revenue_amount": non_revenue_amount,
-            "pos_checks": pos_checks
+            "pos_checks": pos_checks,
+            "place_of_supply_json" : place_supplier_state_name
         })
+
         if "sez" in data:
             invoice.arn_number = company.application_reference_number if company.application_reference_number and data["sez"]==1 else ""
         if data['amened'] == 'Yes':
@@ -1367,13 +1395,28 @@ def insert_invoice(data):
             return {"success": True,"data":invoice}
         else:
             if v.irn_generated in ["Pending"] and company.allow_auto_irn == 1 and data['total_invoice_amount'] != 0:
+                
                 tax_payer_details =  frappe.get_doc('TaxPayerDetail',data['guest_data']['gstNumber'])
                 if (v.has_credit_items == "Yes" and company.auto_adjustment in ["Manual","Automatic"]) or tax_payer_details.disable_auto_irn == 1 or tax_payer_details.tax_type=="SEZ" or v.sez==1:
                     pass
                 else:
                     if v.invoice_from != "Web":
                         data = {'invoice_number': v.name,'generation_type': "System"}
-                        irn_generate = generateIrn(data)
+                        if company.einvoice_missing_date_feature !=1:
+                            irn_generate = generateIrn(data)
+                        else:
+                            if invoice.invoice_date <= company.einvoice_missing_start_date:
+                                irn_generate = generateIrn(data)
+                            else:
+                                from frappe.utils import add_days, getdate,date_diff 
+                                today = getdate()
+                                eight_days_ago = date_diff(today,invoice.invoice_date)
+                                if eight_days_ago <= 8:
+                                    irn_generate = generateIrn(data)
+                                else:
+                                    print("Invoice date expired")
+                                
+
 
         # if len(data['guest_data']['gstNumber']) < 15 and len(data['guest_data']['gstNumber'])>0:
         # 	error_data = {'invoice_number':data['guest_data']['invoice_number'],'guest_name':data['guest_data']['name'],"invoice_type":"B2B","invoice_file":data['guest_data']['invoice_file'],"room_number":data['guest_data']['room_number'],'irn_generated':"Error","qr_generated":"Pending",'invoice_date':data['guest_data']['invoice_date'],'pincode':" ","state_code":" ","company":company.name,"error_message":"Invalid GstNumber","items":items}
@@ -3582,7 +3625,6 @@ def check_invoice_exists(invoice_number):
 
                 invoiceExists = frappe.get_doc('Invoices', invoice_number)
                 if invoiceExists:
-
                     return {"success": True, "data": invoiceExists}
             return {"success": False}
         return {"success":False}	
@@ -3600,7 +3642,7 @@ def Error_Insert_invoice(data):
             invoice_from = data['invoice_from']
         else:
             invoice_from = "Pms"
-            data['invoice_from'] = "Pms"	
+            data['invoice_from'] = "Pms" 
         if "sez" in data:
             sez = data["sez"]
         else:
@@ -3611,9 +3653,9 @@ def Error_Insert_invoice(data):
             else:
                 sez = 0
         if "gst_number" in data:
-            print(data["gst_number"],">>>>>>>>>>>>>>>")
             if data["gst_number"]==None:
                 data["gst_number"]=""
+
         if len(data['gst_number'])<15 and len(data['gst_number'])>0:
             if 'items_data' not in list(data.keys()):
                 data['items_data'] = []
@@ -3637,7 +3679,6 @@ def Error_Insert_invoice(data):
                             socket = invoiceCreated(invoice_bin)
                         return {"success":False,"message":"Error","name":data['invoice_number'],"data":invoice_bin}
 
-
         company = frappe.get_doc('company',data['company_code'])
         if not frappe.db.exists('Invoices', {"name": data['invoice_number'], "irn_generated": ["!=", "Cancelled"]}):
             invType = data['invoice_type']
@@ -3649,8 +3690,25 @@ def Error_Insert_invoice(data):
                 data['invoice_type'] ="B2B"
             if "gst_number" not in data or "gstNumber" not in data:
                 data['gst_number'] = ""
+            
             if data["guest_name"]=="":
                 data["guest_name"]="NA"
+
+            folder_path = frappe.utils.get_bench_path()
+            with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+                json_data = json.load(f)
+                for each in json_data:
+                    if company.state_code == each['tin']:
+                        place_supplier_state_name = f"{each['state']}-({each['tin']})"
+
+            if 'checkout_date' in data:
+                if data['checkout_date'] != None:
+                    checkout_date = datetime.datetime.strptime(data['checkout_date'],'%d-%b-%y %H:%M:%S')
+                else:
+                    checkout_date = None
+            else:
+                checkout_date = None
+
             invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -3673,6 +3731,9 @@ def Error_Insert_invoice(data):
                 'invoice_date':
                 datetime.datetime.strptime(data['invoice_date'],
                                         '%d-%b-%y %H:%M:%S'),
+                'checkout_date':checkout_date,
+                # "checkout_date": datetime.datetime.strptime(data['checkout_date'],
+                #                         '%d-%b-%y %H:%M:%S') if "checkout_date" in data else None,
                 'legal_name':
                 " ",
                 'address_1':
@@ -3718,8 +3779,21 @@ def Error_Insert_invoice(data):
                 "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
                 "confirmation_number":data["confirmation_number"] if "confirmation_number" in data else "",
                 "arn_number": company.application_reference_number if company.application_reference_number and sez==1 else "",
-                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0
+                "pos_checks": data["pos_checks"] if "pos_checks" in data else 0,
+                "place_of_supply_json":place_supplier_state_name if place_supplier_state_name in data else None,
             })
+            if 'amened' in data:
+                if data['amened'] == 'Yes':
+                    invCount = frappe.db.get_value('Invoices',{"invoice_number": data['invoice_number']},["invoice_number"], as_dict=1)
+                    invoice.amended_from = invCount.invoice_number
+                    if "-" in invCount.invoice_number[-4:]:
+                        amenedindex = invCount.invoice_number.rfind("-")
+                        ameneddigit = int(invCount.invoice_number[amenedindex+1:])
+                        ameneddigit = ameneddigit+1 
+                        invoice.invoice_number = data['invoice_number'] + "-"+str(ameneddigit)
+                        # pass
+                    else:
+                        invoice.invoice_number = data['invoice_number'] + "-1"	
             v = invoice.insert(ignore_permissions=True, ignore_links=True)
             
             if 'items_data' in list(data.keys()):
@@ -4015,6 +4089,30 @@ def update_non_revenue_amount():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
         return {"success": False, "message": e}  
+
+
+@frappe.whitelist()
+def update_non_revenue_codes():
+    try:
+        get_non_revenue_list = frappe.db.get_list("SAC HSN CODES", filters = {"ignore_non_taxable_items": 1}, pluck="sac_index")
+        if len(get_non_revenue_list) > 0:
+            get_items = frappe.db.get_list("Items", filters = {"sac_index":["in",get_non_revenue_list]}, fields=["parent", "sac_index", "name"])
+            if len(get_items) > 0:
+                for each in get_items:
+                    sac_code = frappe.db.get_value("SAC HSN CODES",{"sac_index": each["sac_index"]},["code"])
+                    frappe.db.sql("""update `tabItems` set sac_code='{}' where name='{}'""".format(sac_code, each["name"]))
+                    # invoice_doc = frappe.get_doc("Invoices",each["parent"])
+                    # invoice_doc.non_revenue_amount = each["item_value_after_gst"]
+                    # invoice_doc.save()
+                    frappe.db.commit()
+            return {"success": True}
+        return {"success": False, "message": "No data found"}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("update_non_revenue_amount","line No:{}\n{}".format(exc_tb.tb_lineno,str(e)))
+        return {"success": False, "message": e}  
+
+
 # @frappe.whitelist()
 # def b2b_success_to_credit_note(data):
 # 	try:

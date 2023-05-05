@@ -12,7 +12,7 @@ class InvoicePayments(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def insert_invoice_payments(data):
     try:
         frappe.db.delete('Invoice Payments', {'invoice_number': data['invoice_number']})

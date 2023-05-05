@@ -9,6 +9,7 @@ from version2_app.parsers import *
 import re
 import shlex
 import shutil
+
 import sys
 import time
 import fitz
@@ -43,7 +44,7 @@ logger = frappe.logger("api")
 # user_name = frappe.session.user
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def num_to_words(num):
     try:
         given_num = abs(float((num)))
@@ -59,10 +60,12 @@ def invoice_update(doc, method=None):
     try:
         company = frappe.get_last_doc("company")
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
+            print("//////////////////////////")
             etax = html_to_pdf(doc.name)
             if etax["success"]:
                 doc.etax_invoice_created
         if doc.sales_amount_after_tax:
+            print("...........................")
             total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
@@ -74,6 +77,7 @@ def invoice_update(doc, method=None):
 
 def invoice_created(doc, method=None):
     try:
+        print("/.................../........///////////.")
         company = frappe.get_last_doc("company")
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
             etax = html_to_pdf(doc.name)
@@ -933,7 +937,7 @@ def create_pos_bill(doc, method=None):
 #         frappe.log_error("create_pos_checks","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
 #         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def extract_data_from_pos_check(data={}):
     try:
         pos_date = ""
@@ -1052,7 +1056,7 @@ def extract_data_from_pos_check(data={}):
         frappe.log_error("extract_data_from_pos_check","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def extract_data_from_invoice(data={}):
 #     try:
 #         check_num = frappe.db.get_value('POS Checks',{'pos_check_reference_number': "reference_check_number"}, ["parent"])
@@ -1086,7 +1090,7 @@ def deleteemailfilesdaily():
         frappe.log_error("Ezy-invoicing deletemailfilesdaily Event","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def delete_error_logs():
     lastdate = date.today() - timedelta(days=7)
     print(lastdate)
@@ -1434,7 +1438,7 @@ def deletePromotionsSocket(doc, method=None):
         print(str(e))
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def block_irn():
     try:
         company = frappe.get_last_doc("company")
@@ -1464,7 +1468,7 @@ def block_irn():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def backup_file_perticulerdoctypes(data):
     try:
         get_company=frappe.db.get_value("company",{"name":data["company_code"]},["host","site_name"])
@@ -1482,7 +1486,7 @@ def backup_file_perticulerdoctypes(data):
         frappe.log_error("backupfile:" + str(e))
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def arrival_information(doc, method=None):
     try:
         user_name = frappe.session.user
@@ -1550,7 +1554,7 @@ def arrival_information(doc, method=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def send_invoice_mail_scheduler():
     try:
         get_arrivals = frappe.db.get_list(
@@ -1615,7 +1619,7 @@ def send_invoice_mail_scheduler():
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def guest_attachments(doc, method=None):
     try:
         # print("/////////////////")
@@ -1758,7 +1762,7 @@ def guest_attachments(doc, method=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def guest_update_attachment_logs(doc, method=None):
     try:
         data = {}
@@ -1856,7 +1860,7 @@ def guest_update_attachment_logs(doc, method=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def send_email(confirmation_number, company):
     user_name = frappe.session.user
     company_doc = frappe.get_doc("company", company)
@@ -1917,7 +1921,7 @@ def send_email(confirmation_number, company):
     frappe.db.commit()
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def pre_mail():
     try:
         user_name = frappe.session.user
@@ -2150,7 +2154,7 @@ def pre_mail():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def manual_mail(data):
     user_name = frappe.session.user
     date_time = datetime.datetime.now()
@@ -2627,7 +2631,7 @@ def update_mail_send_confirmation(confirmation_number):
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 
 
 def delete_error_logs():
@@ -2645,7 +2649,7 @@ def delete_error_logs():
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 
 
 def delete_email_queue():
@@ -2662,7 +2666,7 @@ def delete_email_queue():
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def ezy_suite_dashboard(from_date, to_date):
     try:
         total_reservations = frappe.db.sql(
@@ -2731,7 +2735,7 @@ def ezy_suite_dashboard(from_date, to_date):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def fetch_invoice_details(filters=[]):
     try:
         if len(filters) > 0:
@@ -2779,7 +2783,7 @@ def summaries_insert(doc, method=None):
         return {"Success":False,"message":str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def convert_image_to_base64(image):
     try:
         company = frappe.get_last_doc("company")
@@ -2801,7 +2805,7 @@ def convert_image_to_base64(image):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def html_to_pdf(invoice_number=None,month=None,year=None):
     try:
         print(invoice_number,month)
@@ -2874,6 +2878,16 @@ def create_pdf_each_invoice(doc):
     except Exception as e:
         pass
 
-
-
-
+def before_insert_company(doc,method=None):
+    try:
+        company = frappe.get_last_doc('company')
+        doc.company_gst = company.gst_number
+        doc.company_application_reference_number = company.application_reference_number
+        doc.company_data_filing = company.data_filing
+        # print(doc.as_dict())
+        # print(company.name)
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("before_insert_company",
+                         "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
+        return {"success": False, "message": str(e)}

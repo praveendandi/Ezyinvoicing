@@ -14,7 +14,7 @@ import frappe
 import traceback,os,sys
 # import pandas as pd
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def invoicereconciliationcount(data):
     try:
         

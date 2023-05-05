@@ -14,7 +14,7 @@ frappe.utils.logger.set_log_level("DEBUG")
 class PosBills(Document):
 	pass
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_pos_bills(bills):
     try:
         # print(bills['transaction_date'])

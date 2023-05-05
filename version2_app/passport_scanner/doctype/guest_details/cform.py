@@ -166,7 +166,7 @@ def download_captcha():
 """refresh captcha"""
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def refresh_captcha():
     try:
         refresh_butoon = driver.find_element_by_xpath('//*[@title="Refresh Image"]')
@@ -185,7 +185,7 @@ enter userid password and captcha image
 """
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def login_cform():
     try:
         global data

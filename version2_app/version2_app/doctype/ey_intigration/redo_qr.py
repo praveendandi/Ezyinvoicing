@@ -11,12 +11,10 @@ import qrcode
 
 
 
-
+@frappe.whitelist()
 def create_ey_qr_code(invoice_number,data ={}):
-    try:
-        
+    try:  
         invoice = frappe.get_doc('Invoices', invoice_number)
-
         folder_path = frappe.utils.get_bench_path()
         company = frappe.get_doc('company', invoice.company)
         site_folder_path = company.site_name
@@ -30,8 +28,7 @@ def create_ey_qr_code(invoice_number,data ={}):
             elif invoice.invoice_category == "Debit Invoice":	
                 category = "DBN"
             else:
-                category = "CRN"
-            
+                category = "CRN"            
             payload = {
                     "Irn": invoice.irn_number,
                     "suppGstin":invoice.gst_number,
@@ -127,7 +124,6 @@ def create_ey_qr_code(invoice_number,data ={}):
                 box_size=3,
                 border=4
             )
-            print(invoice.credit_qr_code, "from eerugerjher")
             if invoice.invoice_category == "Tax Invoice":
                 qr.add_data(invoice.qr_code)
             elif invoice.invoice_category == "Debit Invoice":

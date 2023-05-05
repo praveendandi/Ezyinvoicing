@@ -9,6 +9,8 @@ from frappe.utils import logger
 from frappe.utils import get_site_name
 import time
 import traceback,os,sys
+from version2_app.version2_app.doctype.ey_intigration.redo_qr import create_ey_qr_code
+
 
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
@@ -120,27 +122,23 @@ def create_credit_qr_image(invoice_number, gsp):
         # path = folder_path + '/sites/' + get_site_name(frappe.local.request.host) + "/private/files/"
         path = folder_path + '/sites/' + site_folder_path + "/private/files/"
         # print(path)
-        if company.provider!='ey':
-
-            headers = {
-                "user_name": gsp['username'],
-                "password": gsp['password'],
-                "gstin": gsp['gst'],
-                "requestid": str(random.randint(0, 1000000000000000000)),
-                "Authorization": "Bearer " + gsp['token'],
-                "Irn": invoice.credit_irn_number
-                
-            }
-            if company.irn_qr_size=="Small":
-                headers['height']="150"
-                headers['width']="150"
-            if company.proxy == 0:
-                if company.skip_ssl_verify == 0:
-                    qr_response = requests.get(gsp['generate_qr_code'],
-                                                headers=headers,
-                                                stream=True,verify=False)
-                else:
-                    qr_response = requests.get(gsp['generate_qr_code'],
+        
+        headers = {
+            
+            "user_name": gsp['username'],
+            "password": gsp['password'],
+            "gstin": gsp['gst'],
+            "requestid": str(random.randint(0, 1000000000000000000)),
+            "Authorization": "Bearer " + gsp['token'],
+            "Irn": invoice.credit_irn_number
+            
+        }
+        if company.irn_qr_size=="Small":
+            headers['height']="150"
+            headers['width']="150"
+        if company.proxy == 0:
+            if company.skip_ssl_verify == 0:
+                qr_response = requests.get(gsp['generate_qr_code'],
                                             headers=headers,
                                             stream=True,verify=False)								
             else:

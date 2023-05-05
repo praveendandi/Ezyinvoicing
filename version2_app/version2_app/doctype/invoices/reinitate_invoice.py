@@ -32,30 +32,42 @@ def Reinitiate_invoice(data):
         # del data['total_invoice_amount']
         company = frappe.get_doc('company',data['company_code'])
         invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+            json_data = json.load(f)
+
         if "place_of_supply" in data.keys():
             place_of_supply = data['place_of_supply']
+            for each in json_data:
+                if data['place_of_supply'] == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                    # print(place_supplier_state_name,"OOOOOOOOOOo","inove change_,,,,,,,,,,,,,,,,,")
         else:
             doc = frappe.db.exists("Invoices",data['guest_data']['invoice_number'])
             if doc:
                 invoice_doc = frappe.get_doc("Invoices",data['guest_data']['invoice_number'])
                 place_of_supply = invoice_doc.place_of_supply
+                for each in json_data:
+                    if place_of_supply == each['tin']:
+                        place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                        # print(place_supplier_state_name,"OOOOOOOOOOo","reprocess................")
                 if not place_of_supply:
                     place_of_supply = company.state_code
             else:
                 place_of_supply = company.state_code
-        if "invoice_object_from_file" in data.keys():
-            if isinstance(data["invoice_object_from_file"],list):
-                data["invoice_object_from_file"] = ""
-            if isinstance(data["invoice_object_from_file"],str):
-                if not isinstance(data["invoice_object_from_file"],dict):
-                    data["invoice_object_from_file"] = data["invoice_object_from_file"].replace('\" \"',"")
-            if data["invoice_object_from_file"] != "":
-                if "data" not in data['invoice_object_from_file']:
-                    data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
-                else:
-                    data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
+        
+        # if "invoice_object_from_file" in data.keys():
+        #     if isinstance(data["invoice_object_from_file"],dict):
+        #         data["invoice_object_from_file"] = ""
+        #     if isinstance(data["invoice_object_from_file"],str):
+        #         if not isinstance(data["invoice_object_from_file"],dict):
+        #             data["invoice_object_from_file"] = data["invoice_object_from_file"].replace('\" \"',"")
+        #     if data["invoice_object_from_file"] != "":
+        #         if "data" not in data['invoice_object_from_file']:
+        #             data['invoice_object_from_file'] = json.dumps({"data":data['invoice_object_from_file']})
+        #         else:
+        #             data['invoice_object_from_file'] = json.dumps(data['invoice_object_from_file'])
         # if "raise_credit" in data['guest_data']:
-
         sales_amount_before_tax = 0
         sales_amount_after_tax = 0
         value_before_gst = 0
@@ -93,7 +105,7 @@ def Reinitiate_invoice(data):
             for item in data['items_data']:
                 if item['taxable'] == 'No' and item['item_type'] != "Discount":
                     other_charges += float(item['item_value_after_gst'])
-                    print(item["taxable"],"---------------",item['item_value_after_gst'])
+                    # print(item["taxable"],"---------------",item['item_value_after_gst'])
                     other_charges_before_tax += float(item['item_value'])
                     total_vat_amount += float(item['vat_amount'])
                     if frappe.db.exists("SAC HSN CODES", {"sac_index":item["sac_index"], "ignore_non_taxable_items": 1}):
@@ -210,7 +222,6 @@ def Reinitiate_invoice(data):
         if "confirmation_number" not in data['guest_data']:
             data['guest_data']['confirmation_number'] = ""
 
-
         doc = frappe.get_doc('Invoices',data['guest_data']['invoice_number'])
         
         # if data['guest_data']['room_number'] == 0 and '-' not in str(sales_amount_after_tax):
@@ -218,7 +229,7 @@ def Reinitiate_invoice(data):
         # 	invoice_category = "Debit Invoice"
         # else:
         # 	invoice_category = doc.invoice_category	
-        invoice_from = doc.invoice_from
+        invoice_from = doc.invoice_from if "invoice_from" not in data.keys() else data["invoice_from"]
         
         converted_from_tax_invoices_to_manual_tax_invoices = doc.converted_from_tax_invoices_to_manual_tax_invoices
         doc.total_inovice_amount = total_invoice_amount
@@ -246,6 +257,7 @@ def Reinitiate_invoice(data):
         doc.location=data['taxpayer']['location']
         doc.pincode=data['taxpayer']['pincode']
         doc.state_code=data['taxpayer']['state_code']
+        doc.place_of_supply_json = place_supplier_state_name
         doc.amount_before_gst=round(value_before_gst, 2)
         doc.amount_after_gst=round(value_after_gst, 2)
         doc.credit_value_before_gst=round(credit_value_before_gst,2)
@@ -297,6 +309,11 @@ def Reinitiate_invoice(data):
             else:
                 if company.only_b2c == "No":
                     if abs(invoice_round_off_amount)>6:
+                    # if company.name == "SMBKC-01":
+                    #     round_amount = 2
+                    # else:
+                    #     round_amount = 6
+                        # if abs(invoice_round_off_amount)>round_amount:
                         if int(data['total_invoice_amount']) != int(pms_invoice_summary+other_charges) and int(math.ceil(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.floor(data['total_invoice_amount'])) != int(math.ceil(pms_invoice_summary+other_charges)) and int(math.ceil(data['total_invoice_amount'])) != int(math.floor(pms_invoice_summary+other_charges)):
                             generateb2cQr = False
                             doc.error_message = " Invoice Total Mismatch"
@@ -335,7 +352,8 @@ def Reinitiate_invoice(data):
         doc.invoice_round_off_amount = invoice_round_off_amount
         if "invoice_object_from_file" in data.keys():
             if data["invoice_object_from_file"] != "":
-                doc.invoice_object_from_file = data['invoice_object_from_file']
+                doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])
+        doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         
         items = data['items_data']
@@ -428,13 +446,11 @@ def reprocess_calulate_items(data):
             if sez == 0:
                 if each_item["is_manual_edit"] == "Yes":
                     if "manual_edit" not in each_item:
-                        print("/////////////////")
                         each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                         total_items.append(each_item)
                         continue
                     else:
                         if each_item["manual_edit"] == "No":
-                            print("............")
                             each_item["date"] = datetime.datetime.strptime(each_item["date"],'%Y-%m-%d').strftime("%d-%m-%y")
                             total_items.append(each_item)
                             continue
@@ -672,7 +688,6 @@ def reprocess_calulate_items(data):
                     acc_igst_percentage = percentage_gst["igst_percentage"]
                     if item["lut_exempted"] == 0 and sez == 1:
                         if "lut_exempted_value" in item:
-                            print(".........")
                             item["igst"] = percentage_gst["igst_percentage"]
                 else:
                     {"success": False, "message": "error in slab helper function"}
@@ -912,7 +927,6 @@ def reprocess_calulate_items(data):
                         final_item['igst'] = 0
                         final_item['type'] = "Excempted"
                     else:
-                        print(".....................", acc_igst_percentage)
                         final_item['cgst'] = acc_gst_percentage/2
                         final_item['sgst'] = acc_gst_percentage/2
                         final_item['igst'] = acc_igst_percentage
@@ -1120,7 +1134,6 @@ def reprocess_calulate_items(data):
             # data_details["previous_lut_item"] = item["previous_lut_item"]
             total_items.append(data_details)
         total_items.extend(second_list)
-        print(total_items,"/////////////////{???????????????????????/")
         for xyz in total_items:
             xyz["date"] = datetime.datetime.strptime(xyz["date"],"%d-%m-%y").strftime('%Y-%m-%d %H:%M:%S')
         final_data.update({"guest_data":data["guest_data"], "taxpayer":data["taxpayer"],"items_data":total_items,"company_code":data["company_code"],"total_invoice_amount":data["total_inovice_amount"],"invoice_number":data["invoice_number"],"sez":sez,"place_of_supply":placeofsupply,"lut":lut})
@@ -1140,7 +1153,7 @@ def reprocess_calulate_items(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def auto_adjustment(data):
     try:
         invoice_doc = frappe.get_doc("Invoices",data["invoice_number"])
@@ -1230,7 +1243,7 @@ def auto_adjustment(data):
         print(e, "auto_adjustment")
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def b2b_success_to_credit_note(data):
     try:
         user = frappe.session.user
@@ -1365,7 +1378,7 @@ def b2b_success_to_credit_note(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def raise_credit_taxinvoice(invoice_number,invdate,taxinvoice_number):
     try:
         doc_details = frappe.get_doc("Invoices",invoice_number)

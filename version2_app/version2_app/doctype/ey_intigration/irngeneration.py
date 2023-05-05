@@ -15,7 +15,7 @@ def get_return_period_from_invoice_date(inv_date):
 
 def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
     try:
-        print(gsp)
+        # print(gst_data)
         if gst_data['DocDtls']['Typ'] == 'INV':
             doc_type = 'INV'
         elif gst_data['DocDtls']['Typ'] == 'DBN':
@@ -139,6 +139,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             })
         req[0]['lineItems'] = line_items
         # print(req,"LLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>.")
+        # print(req)
         # return True
         gsp = frappe.db.get_value('GSP APIS', {"company": company.name,
                 "provider":company.provider}, [
@@ -158,6 +159,8 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             # print('******************************************************')
             # print(req)
             # print('___________________________________________________')
+            # print(headers)
+            # print(req)
             if company.proxy == 0:
                 if company.skip_ssl_verify == 0:
                     irn_response = requests.post(test_irn,

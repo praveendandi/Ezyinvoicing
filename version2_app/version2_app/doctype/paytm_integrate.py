@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def paytmIntegrate(total_amount,check_no,outlet):
     try:
         paytmParams = dict()

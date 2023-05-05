@@ -7,7 +7,7 @@ import frappe
 import pandas as pd
 import traceback
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def execute(filters=None):
     try:
         # print(filters,"======")           
@@ -15,28 +15,28 @@ def execute(filters=None):
         if company_data[0]["show_pending_invoices_in_reports"]==1 or company_data[0]["mode"]=="Testing":
             if "export" in filters:
                 if filters["export"]:
-                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':["in",["Pending","Success"]]}
+                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':["in",["Pending","Success"]], 'un_billed_invoice': 0}
                 else:
-                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice']}
+                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
             else:
-                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice']}
+                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
             pd.set_option("display.max_rows", None, "display.max_columns", None)
-            columns = ["Invoice Number","Document Type","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges", "IRN Number", "Acknowledge Number", "Acknowledge Date"]
+            columns = ["Invoice Number","Document Type","Invoice Date",'Checkout Date',"Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges", "IRN Number", "Acknowledge Number", "Acknowledge Date"]
             
-            fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges", "irn_number", "ack_no", "ack_date"]
+            fields = ['invoice_number','invoice_date','checkout_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges", "irn_number", "ack_no", "ack_date"]
             doc = frappe.db.get_list('Invoices', filters=filter, fields=fields,as_list=True)
         else:
             if "export" in filters:
                 if filters["export"]:
-                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':['=','Success']}
+                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':['=','Success'], 'un_billed_invoice': 0}
                 else:
-                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']}
+                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
             else:
-                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice']}
+                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
             pd.set_option("display.max_rows", None, "display.max_columns", None)
-            columns = ["Invoice Number","Document Type","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges", "IRN Number", "Acknowledge Number", "Acknowledge Date"]
+            columns = ["Invoice Number","Document Type","Invoice Date","Checkout Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges", "IRN Number", "Acknowledge Number", "Acknowledge Date"]
             
-            fields = ['invoice_number','invoice_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges", "irn_number", "ack_no", "ack_date"]
+            fields = ['invoice_number','invoice_date','checkout_date','gst_number','invoice_type','trade_name','place_of_supply','sez','sales_amount_after_tax',"other_charges", "irn_number", "ack_no", "ack_date"]
             doc = frappe.db.get_list('Invoices', filters=filter, fields=fields,as_list=True)
         if len(doc) == 0:
             data = []
@@ -69,7 +69,6 @@ def execute(filters=None):
         invoice_df = pd.DataFrame(doc,columns=fields)
         
         latest_invoice = frappe.get_last_doc('Invoices')
-
         company = frappe.get_doc('company',latest_invoice.company) 
         mergedDf = pd.merge(invoice_df, grouped_df)
         mergedDf["Transaction type"] = "Sales"
@@ -85,6 +84,7 @@ def execute(filters=None):
         mergedDf["Return Month And Year (MM-YYYY)"] = " "
         mergedDf["Original Invoice Number"] = mergedDf['invoice_number'].tolist()
         mergedDf["Original Invoice Date"] = mergedDf['invoice_date'].tolist()
+        mergedDf["Checkout Date"] = mergedDf['checkout_date'].tolist()
         mergedDf["Original Customer GSTIN / UIN"] = mergedDf['gst_number'].tolist()
         # mergedDf["UQC"] = " "
         # mergedDf["Quantity"] = " "
@@ -99,7 +99,6 @@ def execute(filters=None):
         else:
             mergedDf.rename(columns={'invoice_number': 'Invoice Number',"other_charges":"Other Charges","irn_number":"IRN Number", "ack_no":"Acknowledge Number", "ack_date":"Acknowledge Date", "unit_of_measurement_description":"HSN UOM","sez":"Document Type",'invoice_date': 'Invoice Date','gst_number':'Gst Number','invoice_type':'Invoice Type','trade_name':'Registered Name','place_of_supply':'Place of Supply (POS)','sac_code':'SAC / HSN CODE','gst_rate':'Gst Number','gst_rate':'Total GST RATE %','tax_value':'Taxable Value','non_tax_value':'Non Taxable Value','sales_amount_after_tax':'Original Invoice Value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','quantity':"HSN Quantity"}, inplace=True)
         mergedDf = mergedDf.sort_values(by=['Invoice Number'])
-        # print(mergedDf,"===========")
         mergedDf = mergedDf[columns]
         if "export" in filters:
             if filters["export"]:

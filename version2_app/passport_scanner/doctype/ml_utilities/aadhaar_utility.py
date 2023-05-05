@@ -16,7 +16,7 @@ from version2_app.passport_scanner.doctype.ml_utilities.common_utility import (
 # import datefinder
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def fetch_aadhaar_details(image_1=None, image_2=None):
     try:
         company = frappe.get_last_doc("company")
@@ -50,7 +50,7 @@ def fetch_aadhaar_details(image_1=None, image_2=None):
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def aadhaar_data_changes(data):
     try:
         company = frappe.get_last_doc("company")

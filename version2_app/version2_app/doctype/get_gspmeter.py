@@ -7,7 +7,7 @@ import traceback,os,sys
 import datetime
 from dateutil.relativedelta import relativedelta
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gspmetering(data):
     try:
         date=datetime.datetime.today()
@@ -95,7 +95,7 @@ def gspmetering(data):
         return {"status":False,"message":str(e)}  
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def gspmetering_post(data):
     get_gsp=frappe.get_doc(data)
     get_gsp.insert()

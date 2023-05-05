@@ -7,7 +7,7 @@ from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 def hyatt_mumbai(data):
     try:
         invoice_data=data
