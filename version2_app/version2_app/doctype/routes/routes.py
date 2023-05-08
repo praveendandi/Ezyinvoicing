@@ -56,7 +56,7 @@ def reset_initial_password(user):
                 if reset_pwd_after_days >= int_days:
                     remaining_days = reset_pwd_after_days - int_days
                     if remaining_days == 0:
-                        return {"message":"The password of your account has expired."}
+                        return {"message":"The password of your account has expired","remaining_days":remaining_days}
                 return {'user': get_user_details[0]['email'], 'success': False, "message": "Old login","remaining_days":remaining_days}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
