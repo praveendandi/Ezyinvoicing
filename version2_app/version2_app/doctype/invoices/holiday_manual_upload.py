@@ -106,7 +106,8 @@ def holidayinManualupload(data):
                     pos_inv_date = each['invoicedate']
                     pos_inv_date = datetime.datetime.strptime(pos_inv_date,'%Y-%m-%d').strftime('%m%y')
                     pos_inv_date = pos_inv_date.replace(" 00:00:00","")
-                    pos_inv_number = invoice_num + pos_inv_date
+                    pos_inv_number = f"{pos_inv_date}-{invoice_num}"
+                    # pos_inv_number = invoice_num + pos_inv_date
                     each['taxinvnum'] = pos_inv_number
                     invoice_referrence_objects[each['taxinvnum']] = []
                     invoice_referrence_objects[each['taxinvnum']].append(each)
