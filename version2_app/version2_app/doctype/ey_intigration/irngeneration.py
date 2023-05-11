@@ -75,9 +75,9 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             "invOtherCharges": gst_data['ValDtls']['OthChrg'],
             "invCgstAmt": gst_data['ValDtls']['CgstVal'],
             "invSgstAmt": gst_data['ValDtls']['SgstVal'],
-            "invCessAdvaloremAmt": gst_data['ValDtls']['CesVal'],
+            "invCessAdvaloremAmt": 0,
             "invCessSpecificAmt": gst_data['ValDtls']['CesVal'],
-            "invStateCessAmt": gst_data['ValDtls']['StCesVal'],
+            "invStateCessAmt": 0,
             "invStateCessSpecificAmt": gst_data['ValDtls']['StCesVal'],
             # "totalInvValueInWords": " FOUR THOUSAND SEVEN HUNDRED SEVENTY NINE Rupees",
             # "tranType": "O",
@@ -99,6 +99,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
         }]
         
         line_items = []
+        # print(gst_data,";;;;;;;;;;;;;;;;;;;;;;;;...................")
         for item in gst_data['ItemList']:
             line_items.append({
                     "itemNo": item['SlNo'],
