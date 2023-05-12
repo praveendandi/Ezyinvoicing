@@ -97,7 +97,7 @@ def before_place_of_supply_update():
         return {"success":True, "message": "updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("before_lut_Number",
+        frappe.log_error("before_place_of_supply_update",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
     
@@ -131,7 +131,7 @@ def after_place_of_supply_update():
         return {"success":True, "message": "updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("before_lut_Number",
+        frappe.log_error("after_place_of_supply_update",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
     
