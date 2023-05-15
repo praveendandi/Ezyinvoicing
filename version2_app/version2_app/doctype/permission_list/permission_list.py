@@ -15,12 +15,15 @@ def migrate_user_role_per():
 		doc = frappe.get_doc({'doctype': 'Role',"role_name":"ezy-admin"})
 		doc.insert()
 		frappe.db.commit()
-		parent_role = frappe.db.get_list('Roles Permission',{'select_role':'ezy-admin'},['select_role'])
-		for i in parent_role:
-			perm_list = frappe.db.get_list('Permission List',{'parent':i.select_role,'module':'Master Data','select_route':('in',('User Management-Details','Permissions','Role Management','User Management'))},['name','module','select_route','route_link','read','write','create','delete_perm','export']) 
-			print(perm_list)
-			for each in perm_list:
-				if frappe.db.exists({"doctype": "Permission List",'parent':i.select_role,"parentfield":"permission_list", "route_link": each.route_link, "module": each.module,"select_route":each.select_route,"parenttype":"Roles Permission"}):
-					child_doc= frappe.db.set_value('Permission List',each.name,{'read':1,'export':1,'write':1,'create':1,'delete_perm':1})
-					frappe.db.commit()
+
+@frappe.whitelist()
+def update_perm_after_migrate():		
+	parent_role = frappe.db.get_list('Roles Permission',{'select_role':'ezy-admin'},['select_role'])
+	for i in parent_role:
+		perm_list = frappe.db.get_list('Permission List',{'parent':i.select_role,'module':'Master Data','select_route':('in',('User Management-Details','Permissions','Role Management','User Management'))},['name','module','select_route','route_link','read','write','create','delete_perm','export']) 
+		print(perm_list)
+		for each in perm_list:
+			if frappe.db.exists({"doctype": "Permission List",'parent':i.select_role,"parentfield":"permission_list", "route_link": each.route_link, "module": each.module,"select_route":each.select_route,"parenttype":"Roles Permission"}):
+				child_doc= frappe.db.set_value('Permission List',each.name,{'read':1,'export':1,'write':1,'create':1,'delete_perm':1})
+				frappe.db.commit()
 
