@@ -3,12 +3,12 @@
 # Define variables
 APP_NAME="version2_app"
 BKP_DIR="~/DBbackups"
-WORK_DIR="/home/frappe/frappe-bench"
+WORK_DIR="/home/frappe/HIEX-bench"
 GIT_CI_TOKEN="glpat-yk-_nkFvkGysxbYUevnz"
 GIT_URL="https://gitlab-ci-token:"$GIT_CI_TOKEN"@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git"
 SITE_NAME="ezyinvoicing.local"
 TAG_PREFIX="stable"
-BRANCH_NAME="master"
+BRANCH_NAME="Merge_Branches"
 
 # Create a backup of the site
 
