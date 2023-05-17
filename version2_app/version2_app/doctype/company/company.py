@@ -817,7 +817,7 @@ def reprocess_b2c_invoices():
     
 
 @frappe.whitelist()
-def reprocess_B2C_pending_inoices():
+def reprocess_B2C_pending_invoices():
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
         if doc[0]["new_parsers"] == 0:
