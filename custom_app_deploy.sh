@@ -59,7 +59,7 @@ else
 # If the current branch is not $CURRENT_BRANCH, checkout to it and fetch the latest tag with the prefix
   git checkout $BRANCH_NAME
   git fetch --tags
-  LATEST_TAG=$(git describe --tags --match "${TAG_PREFIX}*" "$(git rev-list --tags --max-count=1)")
+  LATEST_TAG=$(git describe --tags --match "${TAG_PREFIX}-*" "$(git rev-list --tags --max-count=1)")
   if [ -n "$LATEST_TAG" ]; then
     git checkout "$LATEST_TAG"
   else
