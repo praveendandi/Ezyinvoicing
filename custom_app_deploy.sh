@@ -7,6 +7,7 @@ WORK_DIR=/home/frappe/HIEX-bench
 INVOICE_PARSERS=/home/frappe/HIEX-bench/apps/version2_app/version2_app/parsers_invoice/invoice_parsers
 GIT_CI_TOKEN=glpat-yk-_nkFvkGysxbYUevnz
 GIT_URL=https://gitlab-ci-token:$GIT_CI_TOKEN@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+GIT_PARSERS_URL=https://GIT_CI_TOKEN:glpat-_DiMvF-rreUMypxhSGqm@gitlab.caratred.com:prasanthvajja/invoice_parsers.git
 SITE_NAME=ezyinvoicing.local
 TAG_PREFIX=stable
 BRANCH_NAME=Merge_Branches
