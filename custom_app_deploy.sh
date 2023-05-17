@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Define variables
-APP_NAME="version2_app"
-BKP_DIR="/home/frappe/DBbackups"
-WORK_DIR="/home/frappe/HIEX-bench"
-GIT_CI_TOKEN="glpat-yk-_nkFvkGysxbYUevnz"
-GIT_URL="https://gitlab-ci-token:$GIT_CI_TOKEN@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git"
-SITE_NAME="ezyinvoicing.local"
-TAG_PREFIX="stable"
-BRANCH_NAME="Merge_Branches"
+APP_NAME=version2_app
+BKP_DIR=/home/frappe/DBbackups
+WORK_DIR=/home/frappe/HIEX-bench
+GIT_CI_TOKEN=glpat-yk-_nkFvkGysxbYUevnz
+GIT_URL=https://gitlab-ci-token:$GIT_CI_TOKEN@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+SITE_NAME=ezyinvoicing.local
+TAG_PREFIX=stable
+BRANCH_NAME=Merge_Branches
 
 # Create a backup of the site
 
@@ -72,7 +72,7 @@ fi
   bench --site $SITE_NAME migrate
 
 # Check if the migration was successful
-if ! bench --site $SITE_NAME migrate; 
+if ! "bench --site $SITE_NAME migrate"; 
 then
     bench setup requirements
     echo $APP_NAME updated successfully
