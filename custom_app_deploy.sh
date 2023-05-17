@@ -60,8 +60,8 @@ else
   git checkout $BRANCH_NAME
   git fetch --tags
   LATEST_TAG=$(git describe --tags --match "${TAG_PREFIX}*" "$(git rev-list --tags --max-count=1)")
-  if [ -n $LATEST_TAG ]; then
-    git checkout $LATEST_TAG
+  if [ -n "$LATEST_TAG" ]; then
+    git checkout "$LATEST_TAG"
   else
     echo $TAG_PREFIX not found in branch $BRANCH_NAME
     exit 1
@@ -72,12 +72,13 @@ fi
   bench --site $SITE_NAME migrate
 
 # Check if the migration was successful
-if [ $? -eq 0 ]; then
-     bench setup requirements
+if ! bench --site $SITE_NAME migrate; 
+then
+#     bench setup requirements
     echo $APP_NAME updated successfully
   else
 # If the migration failed, checkout the previous tag commit id branch
-    git checkout $COMMIT_ID
+    git checkout "$COMMIT_ID"
     bench --site $SITE_NAME migrate
     bench version
 fi
