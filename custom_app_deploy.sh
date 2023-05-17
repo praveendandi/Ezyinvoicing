@@ -4,11 +4,13 @@
 APP_NAME=version2_app
 BKP_DIR=/home/frappe/DBbackups
 WORK_DIR=/home/frappe/HIEX-bench
+PARSERS-DIR=$WORK_DIR/apps/$APP_NAME/$APP_NAME/parsers_invoice/invoice_parsers/
 GIT_CI_TOKEN=glpat-yk-_nkFvkGysxbYUevnz
 GIT_URL=https://gitlab-ci-token:$GIT_CI_TOKEN@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
 SITE_NAME=ezyinvoicing.local
 TAG_PREFIX=stable
 BRANCH_NAME=Merge_Branches
+timestamp=$(date +%Y%m%d%H%M%S)
 
 # Create a backup of the site
 
@@ -18,7 +20,7 @@ if bench --site $SITE_NAME list-apps | grep -q "$APP_NAME"; then
    echo "$APP_NAME is installed on the site $SITE_NAME"
    echo "Creating backup..."
 # If custom_app is installed, create a backup of the site
-   bench --site $SITE_NAME backup --backup-path "$BKP_DIR"
+   bench --site $SITE_NAME backup --compress --backup-path "$BKP_DIR"
    echo "Backup created successfully!"
 else
 # If custom_app is not installed, display a message and exit
@@ -36,7 +38,7 @@ if [ ! -d "$WORK_DIR/apps/$APP_NAME" ]; then
    bench get-app $GIT_URL --branch $BRANCH_NAME
    echo Installing $APP_NAME in $SITE_NAME
    bench --site $SITE_NAME install-app $APP_NAME
-     echo $APP_NAME installed successfully in $SITE_NAME
+   echo $APP_NAME installed successfully in $SITE_NAME
 fi
 
 # Change to the app directory and check for the current branch
@@ -47,7 +49,7 @@ fi
 
 if [ "$CURRENT_BRANCH" == "$BRANCH_NAME" ]; then
 # If the current branch is $BRANCH_NAME, fetch the latest tag with the prefix and checkout to it
-   git fetch --tags
+   git fetch --tags --all
    LATEST_TAG=$(git describe --tags --match "${TAG_PREFIX}-*" "$(git rev-list --tags --max-count=1)")
   if [ -n "$LATEST_TAG" ]; then
     git checkout "$LATEST_TAG"
@@ -70,13 +72,10 @@ fi
 
 # Migrate the site and set up requirements
   bench --site $SITE_NAME migrate
-
+  bench setup requirements
 # Check if the migration was successful
-if ! "bench --site $SITE_NAME migrate"; 
-then
-    bench setup requirements
+if [! "bench --site $SITE_NAME migrate"]; then
     echo $APP_NAME updated successfully
-    bench version
     exit 1
   else
 # If the migration failed, checkout the previous tag commit id branch
