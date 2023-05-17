@@ -74,8 +74,10 @@ fi
 # Check if the migration was successful
 if ! bench --site $SITE_NAME migrate; 
 then
-#     bench setup requirements
+    bench setup requirements
     echo $APP_NAME updated successfully
+    bench version
+    exit 1
   else
 # If the migration failed, checkout the previous tag commit id branch
     git checkout "$COMMIT_ID"
