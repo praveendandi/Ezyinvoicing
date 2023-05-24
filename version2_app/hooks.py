@@ -251,7 +251,7 @@ scheduler_events = {
         # "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
         "10 00 * * *":["version2_app.events.delete_error_logs"],
         "30 * * * *":["version2_app.mail_read.mailreader"],
-        "5 * * * *":["version2_app.version2_app.doctype.routes.routes.disable_inactive_users"],
+        "0 0 * * *":["version2_app.version2_app.doctype.routes.routes.disable_inactive_users"],
         "20 00 * * *":["version2_app.events.delete_email_queue"]},
         
     "daily": [

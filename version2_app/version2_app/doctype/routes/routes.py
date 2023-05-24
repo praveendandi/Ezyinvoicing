@@ -34,7 +34,7 @@ def user_by_roles_companies():
     return user_details
    
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reset_initial_password(user):
     try:
         get_user_details = frappe.get_doc('User',{'username':user}) 
@@ -50,7 +50,7 @@ def reset_initial_password(user):
                 difference_in_days = pwd_expiry_date - today
                 remaining_days = difference_in_days.days
                 if remaining_days == 7:
-                    return {"The password of your account will expire in:",remaining_days}
+                    return {"The password of your account will expire in":remaining_days}
                 if remaining_days == 0:
                     return {"message":"The password of your account has expired.","remaining_days":remaining_days}
             return {'user': get_user_details.email, 'success': False, "message": "Old login","pwd_expiry_date":remaining_days}
@@ -119,14 +119,19 @@ def update_pwd(email,last_password_reset_date,new_password):
 @frappe.whitelist()
 def disable_inactive_users():
     """Disable users who haven't logged in for 90 days"""
-    inactive_days = 90
-    cutoff_date = add_days(now_datetime(), -inactive_days)
-    inactive_users = frappe.get_all('User', filters={'last_login': ('<=', cutoff_date)})
-    for user in inactive_users:
-        if user.name!= "Guest":
-            frappe.db.set_value('User', user.name, 'enabled', 0)
-            frappe.db.commit()    
-        return user
+    try:
+        inactive_days = 90
+        cutoff_date = add_days(now_datetime(), -inactive_days)
+        inactive_users = frappe.get_all('User', filters={'last_login': ('<=', cutoff_date)})
+        for user in inactive_users:
+            if user.name!= "Guest":
+                frappe.db.set_value('User', user.name, 'enabled', 0)
+                frappe.db.commit()    
+            return user
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("disable_inactive_users","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        
     
 
 @frappe.whitelist()
