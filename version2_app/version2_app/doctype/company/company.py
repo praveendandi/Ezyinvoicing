@@ -816,7 +816,7 @@ def reprocess_b2c_invoices():
         return {"success":False,"message":str(e)}
     
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest =True)
 def reprocess_B2C_pending_invoices():
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
@@ -827,14 +827,18 @@ def reprocess_B2C_pending_invoices():
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={"invoice_type": "B2C",'irn_generated': 'Pending','invoice_from':('in',('Pms','File'))},fields=["name","invoice_number","invoice_file"])
-        print(data,"??????????")
+        data = frappe.db.get_list('Invoices',filters={"invoice_type": "B2C",'irn_generated': 'Pending','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file"])
         if len(data)>0:
             for each in data:
-                obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
-                reinitiate = module.reinitiateInvoice(obj)
-                doc = frappe.get_doc("Invoices",each['name'])
-                frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
+                if data['invoice_from'] == "Pms":
+                    obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+                    reinitiate = module.reinitiateInvoice(obj)
+                    doc = frappe.get_doc("Invoices",each['name'])
+                    frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
+                else:
+                    bulk_upload_reprocessapi = BulkUploadReprocess({"invoice_number":each['name']})
+                    doc = frappe.get_doc("Invoices",each['name'])
+                    frappe.publish_realtime("custom_socket", {'data':bulk_upload_reprocessapi,'message':bulk_upload_reprocessapi,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
             return {"success":True}
         else:
             return {"success":False, "message":"no data found"}
