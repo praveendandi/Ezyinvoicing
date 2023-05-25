@@ -1,109 +1,110 @@
 import frappe
 import json
 import requests
+from version2_app.version2_app.doctype.invoice_reconciliations.invoice_reconciliations import invoicereconciliationcount
 
 @frappe.whitelist()
-def get_total_dashboard_count_sync_history(month=None,year=None):
+def get_total_dashboard_count_sync_history(data):
     company = frappe.get_last_doc("company")
     print(company)
     total_b2b_invoices_count = frappe.db.sql("""select count(name) as total_invoices_b2b from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and irn_generated='Success'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2c_invoices_count = frappe.db.sql("""select count(name) as total_invoices_b2c from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and irn_generated='Success'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2b_invoices_count_pending = frappe.db.sql("""select count(name) as total_invoices_b2b_pending from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and irn_generated='Pending' """.format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2b_invoices_count_error = frappe.db.sql("""select count(name) as total_invoices_b2b_error from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and irn_generated="Error" """.format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2c_invoices_count_pending = frappe.db.sql("""select count(name) as total_invoices_b2c_pending from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and irn_generated='Pending' """.format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2c_invoices_count_error = frappe.db.sql("""select count(name) as total_invoices_b2c_error from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and irn_generated="Error" """.format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2b_invoices_count_not_synced = frappe.db.sql("""select count(name) as total_b2b_invoices_not_synced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and irn_generated='Success' and synced_to_erp=0""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2b_invoices_count_synced = frappe.db.sql("""select count(name) as total_b2b_invoices_synced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and irn_generated='Success' and synced_to_erp=1""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2c_invoices_count_not_synced = frappe.db.sql("""select count(name) as total_b2c_invoices_not_synced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and irn_generated='Success' and synced_to_erp=0""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_b2c_invoices_count_synced = frappe.db.sql("""select count(name) as total_b2c_invoices_synced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and irn_generated='Success' and synced_to_erp=1""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_reg = frappe.db.sql("""select count(name) as total_credit_invoices_reg from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and invoice_category='Credit Invoice' and irn_generated='Success'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_reg_synced = frappe.db.sql("""select count(name) as total_credit_invoices_reg_synced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and invoice_category='Credit Invoice' and irn_generated='Success' and synced_to_erp=1""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_reg_unsynced = frappe.db.sql("""select count(name) as total_credit_invoices_reg_unsynced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and invoice_category='Credit Invoice' and irn_generated='Success' and synced_to_erp=0""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_unreg_synced = frappe.db.sql("""select count(name) as total_credit_invoices_unreg_synced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and invoice_category='Credit Invoice' and irn_generated='Success' and synced_to_erp=1""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_unreg_unsynced = frappe.db.sql("""select count(name) as total_credit_invoices_unreg_unsynced from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and invoice_category='Credit Invoice' and irn_generated='Success' and synced_to_erp=0""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     
     total_credit_invoices_reg_pending = frappe.db.sql("""select count(name) as total_credit_invoices_reg_pending from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and invoice_category='Credit Invoice' and irn_generated='Pending'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_reg_error = frappe.db.sql("""select count(name) as total_credit_invoices_reg_error from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2B' and invoice_category='Credit Invoice' and irn_generated='Error'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_unreg_pending = frappe.db.sql("""select count(name) as total_credit_invoices_unreg_pending from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and invoice_category='Credit Invoice' and irn_generated='Pending'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_unreg_error = frappe.db.sql("""select count(name) as total_credit_invoices_unreg_error from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and invoice_category='Credit Invoice' and irn_generated='Error'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
     total_credit_invoices_unreg = frappe.db.sql("""select count(name) as total_credit_invoices_unreg from `tabInvoices` WHERE month(invoice_date)={} and year(invoice_date)={} and invoice_type='B2C' and invoice_category='Credit Invoice' and irn_generated='Success'""".format(
-                month, year
+                data["month"],data["year"]
             ),
             as_dict=1,
         )
@@ -133,15 +134,15 @@ def get_total_dashboard_count_sync_history(month=None,year=None):
     sync_history["Total NotSynced Invoices"]= sync_history["B2B NotSynced"]+sync_history["B2C NotSynced"]+sync_history["CreditNote(Registered) NotSynced"]+sync_history["CreditNote(UnRegistered) NotSynced"]
     sync_history["Total Pending Invoices"] = sync_history["B2B Pending"]+sync_history["B2C Pending"]+sync_history["CreditNote(Registered) Pending"]+sync_history["CreditNote(UnRegistered) Pending"]
     sync_history["Total Error Invoices"] = sync_history["B2B Error"]+sync_history["B2C Error"]+sync_history["CreditNote(Registered) Error"]+sync_history["CreditNote(UnRegistered) Error"]
-    # sync_history_payload = {'doctype': 'EzyInvoice Status',"company":company.company_name,"business_unit":company.company_code,"status_in_json":sync_history,"period":month+year}
-    # headers = {"content-type": "application/json"}
-    # post_data = requests.post(
-    #                 "http://192.168.29.38:8000"
-    #                 + "/api/resource/EzyInvoice Status",
-    #                 headers=headers,
-    #                 json=sync_history_payload,
-    #                 verify=False,
-    #             )
-    # print(post_data.text,"///////////")
-    sync_history_invoices = {"Invoice Data":sync_history}
-    print(sync_history_invoices,"/////////////////")
+    get_data = invoicereconciliationcount(data)
+    get_data_recon=get_data["data"]
+    sync_history_invoices = {"Invoice Data":sync_history,"Invoice Reconciliations":get_data_recon}
+    sync_history_payload = {'doctype': 'EzyInvoice Status',"company":company.company_name,"business_unit":company.company_code,"status_in_json":sync_history_invoices,"period":data["month"]+data["year"]}
+    headers = {"content-type": "application/json"}
+    post_data = requests.post(
+                    "http://192.168.29.38:8000"
+                    + "/api/resource/EzyInvoice Status",
+                    headers=headers,
+                    json=sync_history_payload,
+                    verify=False,
+                )
