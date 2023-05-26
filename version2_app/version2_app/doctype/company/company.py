@@ -827,10 +827,11 @@ def reprocess_B2C_pending_invoices():
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        data = frappe.db.get_list('Invoices',filters={"invoice_type": "B2C",'irn_generated': 'Pending','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file"])
+        data = frappe.db.get_list('Invoices',filters={"invoice_type": "B2C",'irn_generated': 'Pending','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file","invoice_from"])
+        print(data)
         if len(data)>0:
             for each in data:
-                if data['invoice_from'] == "Pms":
+                if each['invoice_from'] == "Pms":
                     obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
                     reinitiate = module.reinitiateInvoice(obj)
                     doc = frappe.get_doc("Invoices",each['name'])
