@@ -84,26 +84,23 @@ if [ $? -eq 0 ]; then
     git pull origin master
     if [ $? -eq 0 ]; then 
       echo Parsers updated successfully....
+    fi
       echo updating frontend 
       cd $FRONTEND_DIR || exit 1
       git pull origin master
       if [ $? -eq 0 ]; then 
         echo Frontend updated successfully....
+      fi
         echo updating Invoice-Sync
         cd $INVOICE_SYNC_DIR || exit 1
         git pull origin master
         if [ $? -eq 0 ]; then
           echo Invoice-sync updated successfully....
+        fi
 #    exit 1
 else
 # If the migration failed, checkout the previous tag commit id branch
     cd $WORK_DIR/apps/$APP_NAME || exit
     git checkout "$COMMIT_ID"
     bench --site $SITE_NAME migrate
-      fi
-
-    fi
-
-  fi
-
 fi
