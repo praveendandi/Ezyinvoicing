@@ -43,11 +43,6 @@ fi
 
 # Change to the app directory and check for the current branch
   cd "$WORK_DIR"/apps/$APP_NAME || exit
-  #git config --global --add safe.directory '*'
-  #git remote remove origin
-  #git remote remove upstream
-  #git remote add origin $GIT_URL
-  #git remote add upstream $GIT_URL
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
   COMMIT_ID=$(git rev-parse --short "$CURRENT_BRANCH")
   echo Latest commit ID of branch "$CURRENT_BRANCH": "$COMMIT_ID"
@@ -76,15 +71,11 @@ else
 fi
 # Migrate the site and set up requirements
 #  bench --site $SITE_NAME migrate
-  bench setup requirements
 # Check if the migration was successful
 if ! bench --site $SITE_NAME migrate; then
     echo $APP_NAME updated successfully
     echo updating invoice-parsers 
     cd $INVOICE_PARSERS || exit
-    #git config --global --add safe.directory '*'
-    #git remote remove origin
-    #git remote add origin $GIT_PARSERS_URL
     git pull origin master
     exit 1
   else
