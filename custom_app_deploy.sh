@@ -70,14 +70,15 @@ else
   fi
 fi
 # Migrate the site and set up requirements
-#  bench --site $SITE_NAME migrate
+  bench --site $SITE_NAME migrate
 # Check if the migration was successful
-if ! bench --site $SITE_NAME migrate; then
+# if ! bench --site $SITE_NAME migrate; then
+  if [ $? -eq 0]; then 
     echo $APP_NAME updated successfully
     echo updating invoice-parsers 
     cd $INVOICE_PARSERS || exit
     git pull origin master
-    exit 1
+#    exit 1
   else
 # If the migration failed, checkout the previous tag commit id branch
     cd $WORK_DIR/apps/$APP_NAME || exit
