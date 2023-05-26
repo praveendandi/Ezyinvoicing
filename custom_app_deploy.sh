@@ -85,12 +85,12 @@ if [ $? -eq 0 ]; then
     if [ $? -eq 0 ]; then 
       echo Parsers updated successfully....
       echo updating frontend 
-      cd $FRONTEND_DIR/
+      cd $FRONTEND_DIR || exit
       git pull origin master
       if [ $? -eq 0 ]; then 
         echo Frontend updated successfully....
         echo updating Invoice-Sync
-        cd $INVOICE_SYNC_DIR/
+        cd $INVOICE_SYNC_DIR || exit
         git pull origin master
         if [ $? -eq 0 ]; then
           echo Invoice-sync updated successfully....
