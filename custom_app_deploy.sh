@@ -4,10 +4,14 @@
 APP_NAME=version2_app
 BKP_DIR=/home/frappe/DBbackups
 WORK_DIR=/home/frappe/frappe-bench
-INVOICE_PARSERS=/home/frappe/frappe-bench/apps/version2_app/version2_app/parsers_invoice/invoice_parsers
+FRONTEND_DIR=/home/frappe/ezy-invoice-production
+INVOICE_PARSERS_DIR=/home/frappe/frappe-bench/apps/version2_app/version2_app/parsers_invoice/invoice_parsers
+INVOICE_SYNC_DIR=/home/frappe/frappe-bench/apps/invoice_sync
 GIT_CI_TOKEN=glpat-yk-_nkFvkGysxbYUevnz
-GIT_URL=https://gitlab-ci-token:$GIT_CI_TOKEN@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
-GIT_PARSERS_URL=https://GIT_CI_TOKEN:glpat-_DiMvF-rreUMypxhSGqm@gitlab.caratred.com:prasanthvajja/invoice_parsers.git
+BACKEND_GIT_URL=https://gitlab-ci-token:$GIT_CI_TOKEN@gitlab.caratred.com/ganesh.s/EzyinvoiceDemo.git
+PARSERS_GIT_URL=https://GIT_CI_TOKEN:glpat-_DiMvF-rreUMypxhSGqm@gitlab.caratred.com:prasanthvajja/invoice_parsers.git
+FRONTEND_GIT_URL=https//gitlab-ci-token:glpat-6jFz6cnTHdHyDpuPVujy@gitlab.caratred.com/pavansai1122/zy-invoice-production.git
+SYNC_GIT_URL=https://gitlab-ci-token:glpat-ABxg_B5Uqsy6yTLkqWpw@gitlab.caratred.com/sumanth512/invoice-sync.git
 SITE_NAME=ezyinvoicing.local
 TAG_PREFIX=stable
 BRANCH_NAME=Merge_Branches
@@ -76,12 +80,30 @@ fi
 if [ $? -eq 0 ]; then 
     echo $APP_NAME updated successfully
     echo updating invoice-parsers 
-    cd $INVOICE_PARSERS || exit
+    cd $INVOICE_PARSERS_DIR || exit
     git pull origin master
+    if [ $? -eq 0 ]; then 
+      echo Parsers updated successfully....
+      echo updating frontend 
+      cd $FRONTEND_DIR/
+      git pull origin master
+      if [ $? -eq 0 ]; then 
+        echo Frontend updated successfully....
+        echo updating Invoice-Sync
+        cd $INVOICE_SYNC_DIR/
+        git pull origin master
+        if [ $? -eq 0 ]; then
+          echo Invoice-sync updated successfully....
 #    exit 1
 else
 # If the migration failed, checkout the previous tag commit id branch
     cd $WORK_DIR/apps/$APP_NAME || exit
     git checkout "$COMMIT_ID"
     bench --site $SITE_NAME migrate
+      fi
+
+    fi
+
+  fi
+
 fi
