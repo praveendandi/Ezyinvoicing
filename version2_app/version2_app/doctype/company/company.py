@@ -816,7 +816,7 @@ def reprocess_b2c_invoices():
         return {"success":False,"message":str(e)}
     
 
-@frappe.whitelist(allow_guest =True)
+@frappe.whitelist()
 def reprocess_B2C_pending_invoices():
     try:
         doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
@@ -828,7 +828,6 @@ def reprocess_B2C_pending_invoices():
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         data = frappe.db.get_list('Invoices',filters={"invoice_type": "B2C",'irn_generated': 'Pending','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file","invoice_from"])
-        print(data)
         if len(data)>0:
             for each in data:
                 if each['invoice_from'] == "Pms":
