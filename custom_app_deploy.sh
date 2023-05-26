@@ -80,17 +80,17 @@ fi
 if [ $? -eq 0 ]; then 
     echo $APP_NAME updated successfully
     echo updating invoice-parsers 
-    cd $INVOICE_PARSERS_DIR || exit
+    cd $INVOICE_PARSERS_DIR || exit 1
     git pull origin master
     if [ $? -eq 0 ]; then 
       echo Parsers updated successfully....
       echo updating frontend 
-      cd $FRONTEND_DIR || exit
+      cd $FRONTEND_DIR || exit 1
       git pull origin master
       if [ $? -eq 0 ]; then 
         echo Frontend updated successfully....
         echo updating Invoice-Sync
-        cd $INVOICE_SYNC_DIR || exit
+        cd $INVOICE_SYNC_DIR || exit 1
         git pull origin master
         if [ $? -eq 0 ]; then
           echo Invoice-sync updated successfully....
