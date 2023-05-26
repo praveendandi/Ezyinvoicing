@@ -43,6 +43,7 @@ fi
 
 # Change to the app directory and check for the current branch
   cd "$WORK_DIR"/apps/$APP_NAME || exit
+  git config --global --add safe.directory '*'
   git remote remove origin
   git remote remove upstream
   git remote add origin $GIT_URL
@@ -81,6 +82,7 @@ if ! bench --site $SITE_NAME migrate; then
     echo $APP_NAME updated successfully
     echo updating invoice-parsers 
     cd $INVOICE_PARSERS || exit
+    git config --global --add safe.directory '*'
     git remote remove origin
     git remote add origin $GIT_PARSERS_URL
     git pull origin master
