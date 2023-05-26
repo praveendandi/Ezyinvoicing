@@ -73,7 +73,7 @@ fi
   bench --site $SITE_NAME migrate
 # Check if the migration was successful
 # if ! bench --site $SITE_NAME migrate; then
-if [ $? -eq 0]; then 
+if [ $? -eq 0 ]; then 
     echo $APP_NAME updated successfully
     echo updating invoice-parsers 
     cd $INVOICE_PARSERS || exit
