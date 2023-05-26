@@ -88,7 +88,7 @@ if [ $? -eq 0 ]; then
 #    fi
       echo updating frontend 
       cd $FRONTEND_DIR || exit 
-      git pull origin master
+      git pull origin master --allow-unrelated-histories
 #      if [ $? -eq 0 ]; then 
         echo Frontend updated successfully....
 #        exit 1
