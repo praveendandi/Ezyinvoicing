@@ -8,7 +8,9 @@
  "field_order": [
   "sync_schedule_time",
   "amendments_based_on_filing_date",
-  "filing_end_day"
+  "filing_end_day",
+  "einvoice_count",
+  "last_sync_count_time"
  ],
  "fields": [
   {
@@ -27,12 +29,22 @@
    "fieldname": "filing_end_day",
    "fieldtype": "Data",
    "label": "Filing End Day"
+  },
+  {
+   "fieldname": "einvoice_count",
+   "fieldtype": "Int",
+   "label": "EInvoice Count Sync Duration"
+  },
+  {
+   "fieldname": "last_sync_count_time",
+   "fieldtype": "Time",
+   "label": "Last Sync Count Time"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-01-20 12:59:47.295968",
+ "modified": "2023-05-27 10:34:53.979497",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "EzyGST Settings",
