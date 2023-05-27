@@ -36,6 +36,7 @@ def bulkupload(data):
             for each in json_data:
                 if companyData.state_code == each['tin']:
                     place_supplier_state_name = f"{each['state']}-({each['tin']})"
+                    print(place_supplier_state_name,"/////")
                     
         # print(items_dataframe)
         gst_data={}
