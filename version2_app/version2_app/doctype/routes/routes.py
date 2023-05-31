@@ -34,7 +34,7 @@ def user_by_roles_companies():
     return user_details
    
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def reset_initial_password(user):
     try:
         get_user_details = frappe.get_doc('User',{'username':user}) 

@@ -59,8 +59,9 @@ app_license = "MIT"
 # Installation
 # ------------
 
-after_migrate=["version2_app.version2_app.doctype.routes.routes.migrating_routes"]
-before_migrate =['version2_app.version2_app.doctype.permission_list.permission_list.migrate_user_role_per']
+after_migrate=["version2_app.version2_app.doctype.routes.routes.migrating_routes",
+               "version2_app.version2_app.doctype.permission_list.permission_list.migrate_user_role_per"]
+# before_migrate =['version2_app.version2_app.doctype.permission_list.permission_list.migrate_user_role_per']
 
 
 # before_install = "version2_app.install.before_install"
