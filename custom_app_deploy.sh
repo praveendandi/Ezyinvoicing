@@ -95,7 +95,7 @@ if [ $? -eq 0 ]; then
 #      fi
         echo updating Invoice-Sync
         cd $INVOICE_SYNC_DIR || exit 
-        git pull origin master
+        git pull
 #        if [ $? -eq 0 ]; then
           echo Invoice-sync updated successfully....
 #          exit 1
