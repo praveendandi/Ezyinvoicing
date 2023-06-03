@@ -36,7 +36,7 @@ def bulkupload(data):
             for each in json_data:
                 if companyData.state_code == each['tin']:
                     place_supplier_state_name = f"{each['state']}-({each['tin']})"
-                    print(place_supplier_state_name,"/////")
+                    print(place_supplier_state_name,"?????")
                     
         # print(items_dataframe)
         gst_data={}
@@ -88,6 +88,8 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "A000-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="BMHW-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "39854" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="JWMMJ-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "39021" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 # if companyData.name == "ABCBP-01":
@@ -146,6 +148,8 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "A000-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="BMHW-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39854" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="JWMMJ-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39021" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if companyData.name == "ABCBP-01":
             #     each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if companyData.name == "SGBW-01":
