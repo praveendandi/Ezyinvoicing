@@ -217,7 +217,7 @@ def generateIrn(data):
                 "TaxSch": "GST",
                 "SupTyp": invoice.suptyp,
                 "RegRev": "N",
-                "IgstOnIntra": "Y" if invoice.place_of_supply == company_details['data'].state_code and invoice.sez == 1 else "N"
+                "IgstOnIntra": "Y" if invoice.state_code == company_details['data'].state_code==1 and invoice.sez == 1 else "N"
             },
             "SellerDtls": {
                 "Gstin":
