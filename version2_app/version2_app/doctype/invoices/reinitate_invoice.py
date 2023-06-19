@@ -1018,7 +1018,7 @@ def reprocess_calulate_items(data):
                     final_item['item_value'] = item['item_value']
                     final_item['taxable'] = sac_code_based_gst_rates.taxble
                     final_item['type'] = "Non-Gst"
-                    final_item['revenue_item'] = "Non-Revenue"
+                    final_item['revenue_item'] = "Non-Revenue" if sac_code_based_gst_rates.ignore_non_taxable_items == 1 else "Revenue"
                     # final_item['item_mode'] = "Debit"
                     if "-" in str(item['item_value']):
                         final_item['item_mode'] = ItemMode

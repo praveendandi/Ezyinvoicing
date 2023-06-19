@@ -39,6 +39,8 @@ import json
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 from frappe.utils import cstr
+from version2_app.version2_app.doctype.ey_intigration.api_urls import test_login,prod_login,test_cancel_irn,prod_cancel_irn
+
 
 
 frappe.utils.logger.set_log_level("DEBUG")
@@ -56,9 +58,12 @@ class Invoices(Document):
             # get seller details
 
             company_details = check_company_exist_for_Irn(invoice.company)
+            print(company_details,"commmmmmmm")
             # get gsp_details
             gsp_data = {"mode":company_details['data'].mode,"code":company_details['data'].name,"provider":company_details['data'].provider}
+            print(gsp_data,"::::::::::::::::::::")
             GSP_details = gsp_api_data_for_irn(gsp_data)
+            print(GSP_details,"/gsssssppppp///////////////////////")
             # GSP_details = gsp_api_data(company_details.name,
             # 						   company_details.mode,
             # 						   company_details.provider)
@@ -83,8 +88,11 @@ class Invoices(Document):
                     credit_error_message = credit_cancel_response["message"]
                     logger.error(f"{invoice_number},     cancel_irn,   {credit_error_message}")
                     return {"success": False, "message": credit_error_message}
+            print(">>>>>>>>>>>>>>>>>>>..kkkkkk")
             cancel_response = cancel_irn(invoice.irn_number, GSP_details, reason,company_details['data'],invoice_number)
+            
             if cancel_response['success']:
+                print("sucressssssssssssss")
                 invoice.cancelled_on = cancel_response['result']['CancelDate']
                 invoice.cancel_message = reason
                 invoice.irn_cancelled = 'Yes'
@@ -216,8 +224,8 @@ def generateIrn(data):
             "TranDtls": {
                 "TaxSch": "GST",
                 "SupTyp": invoice.suptyp,
-                "RegRev": "N",
-                "IgstOnIntra": "Y" if invoice.place_of_supply == company_details['data'].state_code and invoice.sez == 1 else "N"
+                "RegRev": "Y" if invoice.state_code == company_details['data'].state_code and invoice.sez == 1 else "N",
+                "IgstOnIntra": "Y" if invoice.state_code == company_details['data'].state_code and invoice.sez == 1 else "N"
             },
             "SellerDtls": {
                 "Gstin":
@@ -759,36 +767,78 @@ def send_invoicedata_to_gcb(invoice_number):
 
 def cancel_irn(irn_number, gsp, reason, company, invoice_number):
     try:
-
-        headers = {
-            "user_name": gsp['data']['username'],
-            "password": gsp['data']['password'],
-            "gstin": gsp['data']['gst'],
-            "requestid": str(random.randint(0, 1000000000000000000)),
-            "Authorization": "Bearer " + gsp['data']['token'],
-        }
-        payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
-        if company.proxy == 0:
-            if company.skip_ssl_verify == 0:
-                cancel_response = requests.post(gsp['data']['cancel_irn'],
-                                                headers=headers,
-                                                json=payload,verify=False)
+        if company.provider != 'ey':
+            headers = {
+                "user_name": gsp['data']['username'],
+                "password": gsp['data']['password'],
+                "gstin": gsp['data']['gst'],
+                "requestid": str(random.randint(0, 1000000000000000000)),
+                "Authorization": "Bearer " + gsp['data']['token'],
+            }
+            print(headers,">>>>>>>>>>>>>>>")
+            payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
+            print(payload,">>>>>ffffffffffff>>>>>>>>>>")
+            if company.proxy == 0:
+                if company.skip_ssl_verify == 0:
+                    cancel_response = requests.post(gsp['data']['cancel_irn'],
+                                                    headers=headers,
+                                                    json=payload,verify=False)
+                    print(cancel_response,"LLLLLLLLL")
+                else:
+                    cancel_response = requests.post(gsp['data']['cancel_irn'],
+                                                    headers=headers,
+                                                    json=payload,verify=False)
+                    print(cancel_response,"mmmmmmmmmmm")
             else:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://", "@")
+                proxies = {
+                    'https':
+                    'https://' + company.proxy_username + ":" +
+                    company.proxy_password + proxyhost}
+                print(proxies, "     proxy console")
                 cancel_response = requests.post(gsp['data']['cancel_irn'],
                                                 headers=headers,
-                                                json=payload,verify=False)
+                                                json=payload,
+                                                proxies=proxies,verify=False)
+                print(cancel_response,"KKKKKKKKKKKKK")
+
         else:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://", "@")
-            proxies = {
-                'https':
-                'https://' + company.proxy_username + ":" +
-                company.proxy_password + proxyhost}
-            print(proxies, "     proxy console")
-            cancel_response = requests.post(gsp['data']['cancel_irn'],
-                                            headers=headers,
-                                            json=payload,
-                                            proxies=proxies,verify=False)
+            print(company.as_dict(),"elseeeeeeeeeeeeeeeeeee")
+            headers = {
+                "user_name": gsp['data']['username'],
+                "password": gsp['data']['password'],
+                "gstin": gsp['data']['gst'],
+                "requestid": str(random.randint(0, 1000000000000000000)),
+                "Authorization": "Bearer " + gsp['data']['token'],
+            }
+            print(headers,">>>>>>>>>>>>>>>")
+            payload = {"irn": irn_number, "cnlrem": reason, "cnlrsn": "1"}
+            print(payload,">>>>>ffffffffffff>>>>>>>>>>")
+            if company.proxy == 0:
+                if company.skip_ssl_verify == 0:
+                    cancel_response = requests.post(gsp['data']['cancel_irn'],
+                                                    headers=headers,
+                                                    json=payload,verify=False)
+                    print(cancel_response,"LLLLLLLLL")
+                else:
+                    cancel_response = requests.post(gsp['data']['cancel_irn'],
+                                                    headers=headers,
+                                                    json=payload,verify=False)
+                    print(cancel_response,"mmmmmmmmmmm")
+            else:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://", "@")
+                proxies = {
+                    'https':
+                    'https://' + company.proxy_username + ":" +
+                    company.proxy_password + proxyhost}
+                print(proxies, "     proxy console")
+                cancel_response = requests.post(gsp['data']['cancel_irn'],
+                                                headers=headers,
+                                                json=payload,
+                                                proxies=proxies,verify=False)
+                print(cancel_response,"oooooooooooooooo")
         if cancel_response.status_code == 200:
             insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","cancel_irn":'True',"status":"Success","company":company.name})
             insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
@@ -796,6 +846,7 @@ def cancel_irn(irn_number, gsp, reason, company, invoice_number):
             insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","cancel_irn":'True',"status":"Failed","company":company.name})
             insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)									
         repsone = cancel_response.json()
+        print(repsone,"llllllllllllll")
         return repsone
     except Exception as e:
         print("cancel irn", e)
@@ -2195,7 +2246,7 @@ def calulate_items(data):
                             final_item['igst'] = 0
                             final_item['igst_amount'] = 0
                             final_item['gst_rate'] = gst_tax_percentage
-                            final_item['revenue_item'] = "Non-Revenue"
+                            final_item['revenue_item'] = "Non-Revenue" if sac_code_based_gst_rates.ignore_non_taxable_items == 1 else "Revenue"
                         else:
                             # if (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (net_value == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
                             # 	calulate_net_yes(item,sac_code_based_gst_rates,companyDetails,sez,placeofsupply)
@@ -2920,7 +2971,7 @@ def get_tax_payer_details(data):
     get TaxPayerDetail from gsp   gstNumber, code, apidata
     '''
     try:
-        print(data["gstNumber"],">>>>>>>>>>>>>>>>>>>>>>>.....")
+        # print(data["gstNumber"],">>>>>>>>>>>>>>>>>>>>>>>.....")
         company = frappe.get_doc('company',data['code'])
         headers = {'Content-Type': 'application/json'}
         tay_payer_details = frappe.db.get_value('TaxPayerDetail',data['gstNumber'])
@@ -3451,6 +3502,7 @@ def gsp_api_data_for_irn(data):
             'gst_prod_number',
         ],
                                        as_dict=1)
+        print(gsp_apis,"::???????LLLLLKK")
         api_details = dict()
         api_details['auth'] = gsp_apis[
             'auth_test'] if mode == 'Testing' else gsp_apis['auth_prod']
@@ -3487,8 +3539,7 @@ def gsp_api_data_for_irn(data):
         api_details['gst'] = gsp_apis[
             'gst_test_number'] if mode == 'Testing' else gsp_apis[
                 'gst_prod_number']
-        # print(api_details)
-        # print(api_details)
+        print(api_details,"JJJJJJJJJJJJJJJJJJJJJJJJJJJJEEEEE")
         return {"success": True, "data": api_details}
     except Exception as e:
         print(e, "gsp api details for irn")
