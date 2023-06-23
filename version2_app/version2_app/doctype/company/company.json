@@ -2004,11 +2004,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-17 16:14:29.660711",
+ "modified": "2023-06-20 15:49:58.982101",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
