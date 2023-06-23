@@ -25,7 +25,7 @@ class UserSignature(Document):
     pass
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=None, X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
     try:
         company_data = frappe.get_last_doc('company')
@@ -151,8 +151,9 @@ def send_files(files, user_name, summary):
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, type="invoice",src=False):
+    print(invoice_number)
     try:
         company = frappe.get_last_doc("company")
         if type == "etax":
@@ -232,4 +233,20 @@ def add_signature_on_etax(invoice_number=None,e_tax_format=None,source_from=Fals
         return etax_qr
     except Exception as e:
         frappe.log_error(str(e), "add_esignature_to_invoice")
+        return{"success": False, "message": str(e)}
+
+
+
+
+@frappe.whitelist()
+def add_signature_for_existing_invoices():
+    try:
+        Invoice = frappe.get_last_doc('Invoices')
+        inv = frappe.db.get_list('Invoices',fields =['invoice_number'])
+        invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date < '2023-07-01' ''',as_dict=1)
+        for i  in invoice_date:
+            attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
+            return {"success":True,"message":"Signature updated to invoices"}
+    except Exception as e:
+        frappe.log_error(str(e), "add_esignature_to_existing_invoices")
         return{"success": False, "message": str(e)}
