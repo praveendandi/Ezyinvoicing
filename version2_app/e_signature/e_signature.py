@@ -25,7 +25,7 @@ class UserSignature(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret=None, X1=400, Y1=10, X2=590, Y2=70, company=None, summary=None):
     try:
         company_data = frappe.get_last_doc('company')
@@ -151,7 +151,7 @@ def send_files(files, user_name, summary):
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, type="invoice",src=False):
     try:
         company = frappe.get_last_doc("company")
@@ -185,7 +185,7 @@ def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, t
         return{"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def add_signature_on_etax(invoice_number=None,e_tax_format=None,source_from=False):
     try:
         company = frappe.get_last_doc("company")
