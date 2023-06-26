@@ -246,7 +246,7 @@ def add_signature_for_existing_invoices():
         invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date < '2023-07-01' ''',as_dict=1)
         for i  in invoice_date:
             attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
-            return {"success":True,"message":"Signature updated to invoices"}
+        return {"success":True,"message":"Signature updated to invoices"}
     except Exception as e:
         frappe.log_error(str(e), "add_esignature_to_existing_invoices")
         return{"success": False, "message": str(e)}
