@@ -1411,6 +1411,7 @@ def insert_invoice(data):
         get_invoice = frappe.get_doc("Invoices",data['invoice_number'])
         if get_invoice.invoice_from=="Pms":
             socket = invoiceCreated(get_invoice)
+        print({"success": True,"data":get_invoice},"==========================0-9876555")    
         return {"success": True,"data":get_invoice}
     except Exception as e:
         print(e, "insert invoice")

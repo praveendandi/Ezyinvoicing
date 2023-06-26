@@ -37,6 +37,7 @@ from PIL import Image
 from weasyprint import HTML
 from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
 import datetime
+from version2_app.e_signature.e_signature import add_esignature_to_invoice
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
 
@@ -60,12 +61,10 @@ def invoice_update(doc, method=None):
     try:
         company = frappe.get_last_doc("company")
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
-            print("//////////////////////////")
             etax = html_to_pdf(doc.name)
             if etax["success"]:
                 doc.etax_invoice_created
         if doc.sales_amount_after_tax:
-            print("...........................")
             total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
@@ -76,9 +75,9 @@ def invoice_update(doc, method=None):
 
 
 def invoice_created(doc, method=None):
-    try:
-        print("/.................../........///////////.")
+    try:        
         company = frappe.get_last_doc("company")
+        attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
             etax = html_to_pdf(doc.name)
             if etax["success"]:
@@ -305,6 +304,7 @@ def precheckinsdocuments(doc, method=None):
 
 
 def invoiceCreated(doc):
+    # attach_digital_sign=add_signature()
     try:
         # frappe.publish_realtime("invoice_created", "message")
         frappe.publish_realtime(
