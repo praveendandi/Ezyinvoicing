@@ -988,7 +988,7 @@ def reprocess_calulate_items(data):
             # 		final_item['item_mode'] = "Debit"
             else:
                 # if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
-                if (item['sac_code'] != "996311" or item['sac_code'] != "997321"):
+                 if (item['sac_code'] != "996311" or item['sac_code'] != "997321"):
                     if sac_code_based_gst_rates.taxble == "No":
                         # if (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
                         # 	vatcessrate = item["state_cess"]+item["cess"]+item["vat"]
