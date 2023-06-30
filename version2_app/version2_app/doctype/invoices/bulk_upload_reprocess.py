@@ -22,10 +22,13 @@ def BulkUploadReprocess(data):
         invoice_number = data['invoice_number']
         invoice_data = frappe.get_doc('Invoices',invoice_number)
         line_items = json.loads(invoice_data.invoice_object_from_file)
-        if "data" in line_items.keys():
-            if invoice_data.invoice_type == "B2B":
-                if line_items['data']['gstNumber'] == invoice_data.gst_number:
-                    invoice_data.gst_number = line_items["data"]["gstNumber"]
+        if 'data' in line_items:
+            for item in line_items['data']:
+                if isinstance(item, dict) and 'gstNumber' in item.keys():
+                    if line_items['data'][0]['gstNumber'] == invoice_data.gst_number:
+                        invoice_data.gst_number = line_items["data"][0]["gstNumber"]
+                    else:
+                        invoice_data.gst_number = invoice_data.gst_number
                 else:
                     invoice_data.gst_number = invoice_data.gst_number
         #     line_items = {"data": line_items}
