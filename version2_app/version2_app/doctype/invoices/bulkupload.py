@@ -155,8 +155,6 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39021" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="TWKR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("9999","")
-            if invoice_data["company"]=="TWKR-01":
-                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("9999","")
             if invoice_data["company"]=="IKR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "IKR-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if companyData.name == "ABCBP-01":
