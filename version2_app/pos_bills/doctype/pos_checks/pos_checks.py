@@ -354,7 +354,7 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
             # gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{} CIN NO:{}\nPlace Of Supply:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,company_doc.place_of_supply)
             invoice_number = "\nInvoice No "+yearformat+monformat+dayformat+check_no + "\n"
         else:
-            invoice_number = ""
+            invoice_number = "\nInvoice No "+ check_no +"\n"
         return {"success":True,"string":text,"invoice_number":invoice_number}
     except Exception as e:
         print(str(e))
