@@ -21,6 +21,7 @@ from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import format_date
 from datetime import date
+from datetime import datetime
 
 class POSChecks(Document):
     pass
@@ -145,6 +146,7 @@ def create_pos_bills(data):
 
 
 def extract_data(payload,company_doc):
+    
     try:
         data={}
         raw_data = payload.split("\n")
@@ -152,6 +154,7 @@ def extract_data(payload,company_doc):
         check_date = ""
         check_number = ""
         now = datetime.now()
+        current_date = now.strftime("%Y%m%d")
         for line in raw_data:
             if company_doc.closed_check_reference in payload and company_doc.void_check_reference not in payload:
                 data["check_type"] = "Check Closed"
@@ -199,8 +202,8 @@ def extract_data(payload,company_doc):
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
                     check_no_regex = re.findall("\w+\d+|\d+",check_string)
-                    current_date = ("{}{}".format(now.year,now.month))
-                    data["check_no"] = current_date+check_no_regex[0] if len(check_no_regex) > 0 else ""
+                    # current_date = ("{}{}{}".format(now.year,now.month,now.date))
+                    data["check_no"] = current_date + check_no_regex[0] if len(check_no_regex) > 0 else ""
                     # data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
                     check_number = check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
@@ -555,9 +558,11 @@ def update_check_in_items(invoice_number=None, check_name=None):
     
 
 def update_pos_check(doc, method=None):
+    print(doc.check_date)
     try:
         if doc.check_no and doc.check_date:
-            check_date = datetime.strptime(doc.check_date,"%Y-%m-%d").strftime('%Y%m')
+            check_date = datetime.strptime(doc.check_date,"%Y-%m-%d").strftime('%Y%m%d')
+            print(check_date,">>>>>>>>>>>")
             ref = check_date+doc.check_no
             get_doc = frappe.get_doc("POS Checks", doc.name)
             get_doc.pos_check_reference_number = ref
