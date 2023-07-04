@@ -154,7 +154,7 @@ def extract_data(payload,company_doc):
         check_date = ""
         check_number = ""
         now = datetime.now()
-        current_date = now.strftime("%Y%m%d")
+        current_date = now.strftime("%y%m%d")
         for line in raw_data:
             if company_doc.closed_check_reference in payload and company_doc.void_check_reference not in payload:
                 data["check_type"] = "Check Closed"
