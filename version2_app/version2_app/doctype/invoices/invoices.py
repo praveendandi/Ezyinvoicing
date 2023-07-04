@@ -1171,7 +1171,7 @@ def insert_invoice(data):
         if "taxpayer" in data and "email" in data:
             if "Arrival" in data["taxpayer"]["email"]:
                 data["taxpayer"]["email"]=data["taxpayer"]["email"].replace("Arrival", "").strip()
-        if len(data['items_data'])==0 or data['total_invoice_amount'] == 0:
+        if len(data['items_data'])==0 or (0<=data['total_invoice_amount'] <= 0.9):
             irn_generated = "Zero Invoice"
             taxpayer= {"legal_name": "","email":data['taxpayer']['email'],"address_1": "","address_2": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
             data['taxpayer'] =taxpayer
