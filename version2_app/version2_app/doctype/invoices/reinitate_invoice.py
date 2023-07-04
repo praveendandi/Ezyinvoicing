@@ -323,7 +323,7 @@ def Reinitiate_invoice(data):
                 # 	doc.irn_generated ="Pending"
                 # 	doc.ready_to_generate_irn = "Yes"		
         else:
-            if len(data['items_data'])==0 and data['total_invoice_amount'] == 0 and invoice_from != "Web" and doc.lut == 0:
+            if len(data['items_data'])==0 and (0<=data['total_invoice_amount'] <= 0.9) and invoice_from != "Web" and doc.lut == 0:
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
                 generateb2cQr = False
@@ -334,7 +334,7 @@ def Reinitiate_invoice(data):
                 doc.irn_generated = "Pending"
                 doc.ready_to_generate_irn = "Yes"
         if invoice_from != "Web":		
-            if data['total_invoice_amount'] == 0 or data['total_invoice_amount'] == 0.0:
+            if (0<=data['total_invoice_amount'] <= 0.9) or (0.0<=data['total_invoice_amount'] <= 0.9):
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
                 doc.invoice_type = "B2C"
