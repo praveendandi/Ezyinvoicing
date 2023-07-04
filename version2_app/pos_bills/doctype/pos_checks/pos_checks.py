@@ -561,8 +561,7 @@ def update_pos_check(doc, method=None):
     print(doc.check_date)
     try:
         if doc.check_no and doc.check_date:
-            check_date = datetime.strptime(doc.check_date,"%Y-%m-%d").strftime('%Y%m%d')
-            print(check_date,">>>>>>>>>>>")
+            check_date = datetime.strptime(doc.check_date,"%Y-%m-%d").strftime('%Y%m')
             ref = check_date+doc.check_no
             get_doc = frappe.get_doc("POS Checks", doc.name)
             get_doc.pos_check_reference_number = ref
