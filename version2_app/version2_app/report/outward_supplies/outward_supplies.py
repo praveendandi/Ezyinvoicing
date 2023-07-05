@@ -15,11 +15,11 @@ def execute(filters=None):
         if company_data[0]["show_pending_invoices_in_reports"]==1 or company_data[0]["mode"]=="Testing":
             if "export" in filters:
                 if filters["export"]:
-                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':["in",["Pending","Success"]], 'un_billed_invoice': 0}
+                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':["in",["Pending","Success"]], 'un_billed_invoice': 0,'total_invoice_amount': [">=", 1]}
                 else:
-                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
+                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0,'total_invoice_amount': [">=", 1]}
             else:
-                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
+                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':["in",["Pending","Success"]],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0,'total_invoice_amount': [">=", 1]}
             pd.set_option("display.max_rows", None, "display.max_columns", None)
             columns = ["Invoice Number","Document Type","Invoice Date",'Checkout Date',"Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges", "IRN Number", "Acknowledge Number", "Acknowledge Date"]
             
@@ -28,11 +28,11 @@ def execute(filters=None):
         else:
             if "export" in filters:
                 if filters["export"]:
-                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':['=','Success'], 'un_billed_invoice': 0}
+                    filter = {'invoice_date': ['Between',[filters['from_date'],filters['to_date']]],'irn_generated':['=','Success'], 'un_billed_invoice': 0,'total_invoice_amount': [">=", 1]}
                 else:
-                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
+                    filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0,'total_invoice_amount': [">=", 1]}
             else:
-                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0}
+                filter = {'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['=','Tax Invoice'], 'un_billed_invoice': 0,'total_invoice_amount': [">=", 1]}
             pd.set_option("display.max_rows", None, "display.max_columns", None)
             columns = ["Invoice Number","Document Type","Invoice Date","Checkout Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","HSN UOM","HSN Quantity","Place of Supply (POS)","Taxable Value","Non Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value","Other Charges", "IRN Number", "Acknowledge Number", "Acknowledge Date"]
             
