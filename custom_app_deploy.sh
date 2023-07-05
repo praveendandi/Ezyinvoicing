@@ -93,15 +93,25 @@ if [ $? -eq 0 ]; then
         echo Frontend updated successfully....
 #        exit 1
 #      fi
-        echo updating Invoice-Sync
-        cd $INVOICE_SYNC_DIR || exit 
-        git pull origin master
+    if [ -d "$INVOICE_SYNC_DIR" ]; then
+    echo updating Invoice-Sync
+    cd $INVOICE_SYNC_DIR || exit
+    git pull origin master
+    echo Invoice-sync updated successfully....
+    else
+    echo "Invoice-Sync app not installed"
+    echo "Skipping app update."
+    fi
+else
+#        echo updating Invoice-Sync
+#       cd $INVOICE_SYNC_DIR || exit 
+#        git pull origin master
 #        if [ $? -eq 0 ]; then
-          echo Invoice-sync updated successfully....
+#          echo Invoice-sync updated successfully....
 #          exit 1
 #        fi
 #    exit 1
-else
+#else
 # If the migration failed, checkout the previous tag commit id branch
     cd $WORK_DIR/apps/$APP_NAME || exit
     git checkout "$COMMIT_ID"
