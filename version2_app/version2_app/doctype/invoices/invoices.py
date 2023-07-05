@@ -253,7 +253,7 @@ def generateIrn(data):
                 "Pos":
                 "01" if company_details['data'].mode == "Testing" else
                 # company_details['data'].state_code,
-                invoice.place_of_supply,
+                invoice.state_code,
                 "Addr1":
                 taxpayer_details['data'].address_1,
                 "Addr2":
