@@ -22,7 +22,6 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             doc_type = 'DR'
         elif gst_data['DocDtls']['Typ'] == 'CRN':
             doc_type = 'CR'
-        print(gst_data['BuyerDtls'])
         if gst_data['TranDtls']['SupTyp'] == 'B2B':
             gst_data['TranDtls']['SupTyp'] = 'TAX'
         req=[
@@ -41,7 +40,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             # "billToState": company.state_code,
             "billToState": gst_data['BuyerDtls']['Stcd'],
             "shipToState": company.state_code,
-            "pos": company.state_code,
+            "pos": gst_data['BuyerDtls']['Pos'],
             "sec7OfIgstFlag": gst_data['TranDtls']['IgstOnIntra'],
             "reverseCharge": gst_data['TranDtls']['RegRev'],
             "autoPopToRefundFlag": "N",
