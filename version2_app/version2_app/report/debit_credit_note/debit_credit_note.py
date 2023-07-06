@@ -84,6 +84,9 @@ def execute(filters=None):
 
 		mergedDf.rename(columns={'invoice_category':'Transaction type','tax_invoice_referrence_number':'Original Invoice Number','invoice_number': 'Debit Note No / Credit Note No.', 'tax_invoice_referrence_date': 'Debit Note / Credit Note Date','gst_number':'CustomerGSTIN/UIN','invoice_type':'Type','trade_name':'Customer Name','sac_code':'SAC / HSN CODE','gst_rate':'Total GST RATE %','item_value':'Base Amount','item_value_after_gst':'Invoice value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','irn_number':'IRN Number','ack_no':'Acknowledge Number','ack_date': 'Acknowledge Date'}, inplace=True)
 		mergedDf['Month'] = pd.DatetimeIndex(mergedDf['Debit Note / Credit Note Date']).month
+		mergedDf['Month'] = mergedDf['Month'].fillna(-1) 
+		mergedDf['Month'] = mergedDf['Month'].astype(int)
+		# Apply the lambda function to convert month numbers to abbreviations
 		mergedDf['Month'] = mergedDf['Month'].apply(lambda x: calendar.month_abbr[x])
 
 		mergedDf = mergedDf[columns]
