@@ -2,7 +2,7 @@
 
 # Define variables
 APP_NAME=version2_app
-BKP_DIR=/home/frappe/DBbackups
+BKP_DIR=/home/frappe/DBbackup
 WORK_DIR=/home/frappe/frappe-bench
 FRONTEND_DIR=/home/frappe/ezy-invoice-production
 INVOICE_PARSERS_DIR=/home/frappe/frappe-bench/apps/version2_app/version2_app/parsers_invoice/invoice_parsers
