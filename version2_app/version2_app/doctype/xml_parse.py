@@ -73,6 +73,7 @@ def extract_xml(file_list):
                     doc.insert(ignore_permissions=True)
                     frappe.db.commit()
                     d110_data = json.loads(json.dumps(each))
+                    frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple reconciliation file uploading","bill_number":each['BILL_NO'],"company":company_doc.company_code})
                     if isinstance(d110_data["LIST_G_TRX_NO"]["G_TRX_NO"], dict):
                         txr_data = d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]
                         if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
@@ -138,6 +139,7 @@ def extract_xml(file_list):
                 doc.insert(ignore_permissions=True)
                 frappe.db.commit()
                 d110_data = json.loads(json.dumps(each))
+                frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple reconciliation file uploading","bill_number":each['BILL_NO'],"company":company_doc.company_code})
                 for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
                     print(txr_data,"////////////////////////////")
                     if txr_data["TRANSACTION_DESCRIPTION"] == None:
@@ -160,6 +162,7 @@ def extract_xml(file_list):
                     reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     reconciliations_doc.invoice_found = "No"
                     reconciliations_doc.save()
+        frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file uploaded','type':"simple recon file uploaded"})
         return {"success": True, "message": "file upload"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
