@@ -38,6 +38,9 @@ def extract_xml(file_list):
             data_dict = xmltodict.parse(xml_file.read())
         data=[]
         if isinstance(data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"], list):
+            count=0
+            total_count = len(data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"])
+
             for each in data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
                 each['BILL_NO'] = each["BILL_NO"].strip()
                 if company_doc.name=="RBBORRM-01":
@@ -73,7 +76,8 @@ def extract_xml(file_list):
                     doc.insert(ignore_permissions=True)
                     frappe.db.commit()
                     d110_data = json.loads(json.dumps(each))
-                    frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple reconciliation file uploading","bill_number":each['BILL_NO'],"company":company_doc.company_code})
+                    count+=1
+                    frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple reconciliation file uploading","bill_number":each['BILL_NO'],"company":company_doc.company_code,"invoice_count":count,"total_invoice_count":total_count})
                     if isinstance(d110_data["LIST_G_TRX_NO"]["G_TRX_NO"], dict):
                         txr_data = d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]
                         if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
@@ -139,9 +143,8 @@ def extract_xml(file_list):
                 doc.insert(ignore_permissions=True)
                 frappe.db.commit()
                 d110_data = json.loads(json.dumps(each))
-                frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple reconciliation file uploading","bill_number":each['BILL_NO'],"company":company_doc.company_code})
+                frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple reconciliation file uploading","bill_number":each['BILL_NO'],"company":company_doc.company_code,"invoice_count":count,"total_invoice_count":total_count})
                 for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
-                    print(txr_data,"////////////////////////////")
                     if txr_data["TRANSACTION_DESCRIPTION"] == None:
                         continue
                     if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
