@@ -16,7 +16,7 @@ text-to-image
 scipy
 pytesseract
 pdf2image
-opencv-python
+#opencv-python
 email-to
 pyshorteners
 #tensorflow
@@ -32,7 +32,7 @@ opencv-python
 fitz
 pgeocode
 datefinder
-PyMuPDF
+PyMuPDF==1.18.16
 pyHanko
 uharfbuzz
 fontTools
