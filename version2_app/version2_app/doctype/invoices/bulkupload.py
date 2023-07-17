@@ -93,6 +93,10 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("9999","")
             if invoice_data["company"]=="IKR-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "IKR-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="KHK-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "NKHK"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="HRC-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "HRC"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="CMNM-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("CYNM","")
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "CYNM-" +str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
@@ -161,6 +165,10 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("9999","")
             if invoice_data["company"]=="IKR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "IKR-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="KHK-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "NKHK" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="HRC-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "HRC" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="CMNM-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("CYNM","")
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "CYNM-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
