@@ -20,7 +20,7 @@ def html_to_pdf(html_data, filename, name, etax=False):
         htmldoc.write_pdf(file_path)
         files_new = {"file": open(file_path, 'rb')}
         payload_new = {'is_private': 1, 'folder': 'Home', 'doctype': 'Summaries',
-                       'docname': name, 'fieldname': filename}
+                       'docname': name}
         file_response = requests.post(company.host+"api/method/upload_file", files=files_new,
                                       data=payload_new).json()
         frappe.log_error(json.dumps(file_response), "html_to_pdf")
