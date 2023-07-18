@@ -233,10 +233,10 @@ def generateIrn(data):
                 "Loc":
                 company_details['data'].location,
                 "Pin":
-                193502 if company_details['data'].mode == "Testing" else
+                175032 if company_details['data'].mode == "Testing" else
                 company_details['data'].pincode,
                 "Stcd":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 company_details['data'].state_code,
                 "Ph":
                 company_details['data'].phone_number,
@@ -251,7 +251,7 @@ def generateIrn(data):
                 "TrdNm":
                 taxpayer_details['data'].trade_name,
                 "Pos":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 # company_details['data'].state_code,
                 invoice.place_of_supply,
                 "Addr1":
@@ -277,6 +277,7 @@ def generateIrn(data):
             },
             "ItemList": [],
         }
+        # print(gst_data,":::::")
         total_igst_value = 0
         total_sgst_value = 0
         total_cgst_value = 0
