@@ -140,8 +140,8 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "IXBCY-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="HHG-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "HYDHY-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
-            if invoice_data["company"]=="WMPL-01":
-                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "9784-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="CBMBHOPAL-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "A000-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="RCP-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("7392","")
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "7392-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]

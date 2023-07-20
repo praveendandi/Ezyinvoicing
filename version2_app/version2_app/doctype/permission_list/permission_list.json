@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-04-03 15:31:48.056299",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "select_route",
+  "create",
+  "write",
+  "read",
+  "export",
+  "route_link",
+  "module",
+  "delete_perm"
+ ],
+ "fields": [
+  {
+   "fieldname": "select_route",
+   "fieldtype": "Link",
+   "label": "Select route",
+   "options": "Routes"
+  },
+  {
+   "default": "0",
+   "fieldname": "create",
+   "fieldtype": "Check",
+   "label": "Create"
+  },
+  {
+   "default": "0",
+   "fieldname": "write",
+   "fieldtype": "Check",
+   "label": "Write"
+  },
+  {
+   "default": "0",
+   "fieldname": "read",
+   "fieldtype": "Check",
+   "label": "Read"
+  },
+  {
+   "default": "0",
+   "fieldname": "export",
+   "fieldtype": "Check",
+   "label": "Export"
+  },
+  {
+   "fieldname": "route_link",
+   "fieldtype": "Data",
+   "label": "Route Link"
+  },
+  {
+   "fieldname": "module",
+   "fieldtype": "Data",
+   "label": "Module"
+  },
+  {
+   "default": "0",
+   "fieldname": "delete_perm",
+   "fieldtype": "Check",
+   "label": "Delete"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-04-12 13:43:23.869269",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Permission List",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

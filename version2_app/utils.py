@@ -8,6 +8,8 @@ from weasyprint import HTML
 from frappe.utils import cstr
 
 
+
+@frappe.whitelist()
 def html_to_pdf(html_data, filename, name, etax=False):
     try:
         company = frappe.get_last_doc('company')

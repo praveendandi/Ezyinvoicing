@@ -1,0 +1,64 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:select_role",
+ "creation": "2023-04-03 15:27:30.121529",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "select_role",
+  "permission_list"
+ ],
+ "fields": [
+  {
+   "fieldname": "select_role",
+   "fieldtype": "Link",
+   "label": "Select Role",
+   "options": "Role",
+   "unique": 1
+  },
+  {
+   "fieldname": "permission_list",
+   "fieldtype": "Table",
+   "label": "Permission List",
+   "options": "Permission List"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-04-08 13:08:35.677201",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Roles Permission",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "EzyInvoicing",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

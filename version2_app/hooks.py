@@ -59,6 +59,11 @@ app_license = "MIT"
 # Installation
 # ------------
 
+after_migrate=["version2_app.version2_app.doctype.routes.routes.migrating_routes",
+               "version2_app.version2_app.doctype.permission_list.permission_list.migrate_user_role_per"]
+# before_migrate =['version2_app.version2_app.doctype.permission_list.permission_list.migrate_user_role_per']
+
+
 # before_install = "version2_app.install.before_install"
 # after_install = "version2_app.install.after_install"
 
@@ -207,6 +212,12 @@ doc_events = {
         "after_insert": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
         "on_update": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments",
         "on_trash": "version2_app.clbs.doctype.summary_payments.summary_payments.summary_payments"
+    },
+    "Role":{
+        "after_insert":"version2_app.version2_app.doctype.roles_permission.roles_permission.update_roles_routes"
+    },
+    "Routes":{
+    "on_update":"version2_app.version2_app.doctype.roles_permission.roles_permission.add_new_routes_to_existing"
     }
 }
 
@@ -241,13 +252,15 @@ scheduler_events = {
         # "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
         "10 00 * * *":["version2_app.events.delete_error_logs"],
         "30 * * * *":["version2_app.mail_read.mailreader"],
+        "0 0 * * *":["version2_app.version2_app.doctype.routes.routes.disable_inactive_users"],
         "20 00 * * *":["version2_app.events.delete_email_queue"]},
         
     "daily": [
         "version2_app.version2_app.doctype.document_bin.document_bin.dailyDeletedocumentBin",
         "version2_app.events.deleteemailfilesdaily",
         "version2_app.events.delete_arrival_activity",
-        "version2_app.database_utils.remove_unwanted_data_ervery_day.remove_data_from_database_every_day"
+        "version2_app.database_utils.remove_unwanted_data_ervery_day.remove_data_from_database_every_day",
+        # "version2_app.version2_app.doctype.routes.routes.disable_inactive_users"
     ]
 }
 # scheduler_events = {

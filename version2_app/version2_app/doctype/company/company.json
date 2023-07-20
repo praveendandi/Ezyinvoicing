@@ -266,8 +266,6 @@
   "in_house_driving_ocr",
   "section_break_248",
   "ome_scanner",
-  "clbs_section",
-  "clbs",
   "ezy_gst_section",
   "ezy_gst_module",
   "arrival_information_file_type",
@@ -309,6 +307,8 @@
   "qr_b2c_rect_y1",
   "website",
   "scan_ids",
+  "clbs_section",
+  "clbs",
   "reprocess_bulk_success_invoices",
   "einvoice_missing_date_feature",
   "einvoice_missing_start_date"
@@ -1682,12 +1682,6 @@
    "label": "Summary Footer"
   },
   {
-   "default": "0",
-   "fieldname": "clbs",
-   "fieldtype": "Check",
-   "label": "CLBS"
-  },
-  {
    "fieldname": "scan_ezy_settings_section",
    "fieldtype": "Section Break",
    "label": "Scan Ezy Settings"
@@ -1749,11 +1743,6 @@
   {
    "fieldname": "column_break_248",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "clbs_section",
-   "fieldtype": "Section Break",
-   "label": "CLBS"
   },
   {
    "fieldname": "ezy_gst_section",
@@ -1985,9 +1974,15 @@
   },
   {
    "default": "0",
-   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
    "fieldtype": "Check",
-   "label": "Reprocess Bulk Success Invoices"
+   "label": "CLBS"
   },
   {
    "default": "0",
@@ -2000,11 +1995,17 @@
    "fieldname": "einvoice_missing_start_date",
    "fieldtype": "Date",
    "label": "Einvoice Missing Start Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldtype": "Check",
+   "label": "Reprocess Bulk Success Invoices"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-20 15:49:58.982101",
+ "modified": "2023-04-20 16:07:53.977924",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

@@ -19,7 +19,6 @@ import razorpay
 from escpos.printer import Network
 from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
-from version2_app.passport_scanner.doctype.ml_utilities.common_utility import format_date
 from datetime import date
 from datetime import datetime
 
