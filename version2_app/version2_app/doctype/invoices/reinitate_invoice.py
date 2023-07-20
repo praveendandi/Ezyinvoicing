@@ -1257,7 +1257,7 @@ def b2b_success_to_credit_note(data):
         if "holiday" in data and data["holiday"] == "Yes":
             invoice_date = "31-aug-21 00:00:00"
         else:
-            invoice_date = datetime.datetime.strptime((data['tax_invoice_referrence_date']),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+            invoice_date = datetime.datetime.strptime((data['invoice_date']),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
         if company.name == "CPGN-01" and data["invoice_number"] == "1136548":
             calulate_items_data = frappe.db.get_list('Items',{"parent":data["invoice_number"]},["date","item_value","item_name","sort_order","sac_code","item_type",
                         "cgst","sgst","igst","item_taxable_value","gst_rate","item_value_after_gst","cess","cess_amount","state_cess","state_cess_amount","cgst_amount","sgst_amount","igst_amount","parent",

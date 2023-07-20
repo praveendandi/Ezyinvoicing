@@ -2029,6 +2029,7 @@ def pre_mail():
                     return {"success": False, "message": "Invitation Sent"}
                 elif company.mail_frequency == "Daily":
                     for x in get_arrival_data:
+                        print(x)
                         email_address = str(x["guest_email_address"])
                         guest_first_name = str(x["guest_first_name"])
                         guest_last_name = str(x["guest_last_name"])
