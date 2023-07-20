@@ -33,6 +33,7 @@ fitz
 pgeocode
 datefinder
 PyMuPDF==1.20
+tools
 pyHanko
 uharfbuzz
 fontTools
