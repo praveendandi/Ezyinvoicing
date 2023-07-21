@@ -11,6 +11,8 @@ import sys, traceback
 import frappe
 import pandas as pd
 from frappe.utils import now_datetime, add_days
+from datetime import datetime
+
 
 
 class Routes(Document):
@@ -37,6 +39,9 @@ def user_by_roles_companies():
 @frappe.whitelist(allow_guest=True)
 def reset_initial_password(user):
     try:
+        reset_pwd_after_days = frappe.db.get_single_value("System Settings","force_user_to_reset_password")
+        if reset_pwd_after_days <=0:
+            return  {"success": False, "message": "add no of days in system settingss"}
         get_user_details = frappe.get_doc('User',{'username':user}) 
         if get_user_details.last_active == None and get_user_details.last_password_reset_date == None:
             return {'user': get_user_details.email, 'success': True, "message": "New login force to reset"}
@@ -44,7 +49,7 @@ def reset_initial_password(user):
             if get_user_details.last_active != None or get_user_details.last_password_reset_date != None:
                 last_password_reset_date = frappe.db.get_list('User',{'username':user},['last_password_reset_date'],ignore_permissions=True)
                 date_obj = last_password_reset_date[0]['last_password_reset_date']
-                reset_pwd_after_days =frappe.db.get_single_value("System Settings","force_user_to_reset_password")
+                # reset_pwd_after_days =frappe.db.get_single_value("System Settings","force_user_to_reset_password")
                 pwd_expiry_date = (date_obj + timedelta(reset_pwd_after_days))
                 today = date.today()
                 difference_in_days = pwd_expiry_date - today
@@ -107,13 +112,19 @@ def change_old_password(user, pwd):
         return {"message":"Incorrect User or Password"}
 
 
+
 @frappe.whitelist(allow_guest=True)
-def update_pwd(email,last_password_reset_date,new_password):
-    doc = frappe.get_doc("User", email)
-    doc.last_password_reset_date = last_password_reset_date
-    doc.new_password = new_password
-    doc.save(ignore_permissions=True)
-    return email
+def update_pwd(email,last_password_reset_date,new_password,old_pwd):
+    try:
+        confirm_pwd = check_password(email, old_pwd)
+        doc = frappe.get_doc("User", email)
+        doc.last_password_reset_date = last_password_reset_date
+        doc.new_password = new_password
+        doc.old_pwd = old_pwd
+        doc.save(ignore_permissions=True)
+        return {"success":True}
+    except Exception as e:
+        return {"message":"Incorrect User or  Password"}
 
 
 @frappe.whitelist()
@@ -121,13 +132,16 @@ def disable_inactive_users():
     """Disable users who haven't logged in for 90 days"""
     try:
         inactive_days = 90
-        cutoff_date = add_days(now_datetime(), -inactive_days)
-        inactive_users = frappe.get_all('User', filters={'last_login': ('<=', cutoff_date)})
+        current_datetime = now_datetime()
+        cutoff_date = current_datetime - timedelta(days=inactive_days)
+        inactive_users = frappe.get_all('User',fields=['last_login','name'], filters={
+            'last_login': ['<=', cutoff_date],
+            'email': ['!=', 'guest@example.com']})
         for user in inactive_users:
-            if user.name!= "Guest":
+            if user.name!= "Guest" and user.last_login is not None:
                 frappe.db.set_value('User', user.name, 'enabled', 0)
                 frappe.db.commit()    
-            return user
+        return user
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("disable_inactive_users","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))

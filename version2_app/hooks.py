@@ -260,7 +260,7 @@ scheduler_events = {
         "version2_app.events.deleteemailfilesdaily",
         "version2_app.events.delete_arrival_activity",
         "version2_app.database_utils.remove_unwanted_data_ervery_day.remove_data_from_database_every_day",
-        # "version2_app.version2_app.doctype.routes.routes.disable_inactive_users"
+        "version2_app.version2_app.doctype.routes.routes.disable_inactive_users"
     ]
 }
 # scheduler_events = {
