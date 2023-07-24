@@ -93,6 +93,6 @@ def get_all_payment_details():
 
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        frappe.log_error("get_all_sac_code_details",
+        frappe.log_error("get_all_payment_details",
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
