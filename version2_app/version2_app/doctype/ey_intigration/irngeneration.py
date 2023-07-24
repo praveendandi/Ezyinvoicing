@@ -98,7 +98,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
         }]
         
         line_items = []
-        # print(gst_data,";;;;;;;;;;;;;;;;;;;;;;;;...................")
+        print(gst_data,";;;;;;;;;;;;;;;;;;;;;;;;...................")
         for item in gst_data['ItemList']:
             line_items.append({
                     "itemNo": item['SlNo'],
@@ -138,7 +138,7 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                     # "udf4": "0016090023"
             })
         req[0]['lineItems'] = line_items
-        # print(req,"LLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>.")
+        print(req,"LLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>.")
         # print(req)
         # return True
         gsp = frappe.db.get_value('GSP APIS', {"company": company.name,
