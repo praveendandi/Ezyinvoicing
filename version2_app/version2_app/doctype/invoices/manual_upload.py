@@ -19,12 +19,14 @@ import json
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
-from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
+from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice, auto_adjustment
 from version2_app.version2_app.doctype.invoices.holiday_manual_upload import holidayinManualupload
 from version2_app.version2_app.doctype.invoices.opera_manula_bulkupload import operabulkupload
 from version2_app.version2_app.doctype.invoices.hyatt_manual_upload import hyattbulkupload
 from frappe.utils.background_jobs import enqueue
 from version2_app.version2_app.doctype.invoices.hyatt_mumbai import hyatt_mumbai
+from version2_app.version2_app.doctype.invoices.hyatt_bulk import hyatt_bulkupload
+from version2_app.version2_app.doctype.invoices.bulkupload import bulkupload
 from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newdelhi
 
 
@@ -39,7 +41,6 @@ from version2_app.version2_app.doctype.invoices.grand_newdelhi import grand_newd
 # 	# print(data,type(data))
 # 	return {"success":True}
 # 	# except Exception as e:
-# 	# 	logger.error(f"manual upload queue  {str(e)}")
 # 	# 	return {"success":False,"message":str(e)}
 
 
@@ -77,6 +78,17 @@ def manual_upload_data(data):
         items_data_file = data['invoice_file']
         company = data['company']
         companyData = frappe.get_doc('company',data['company'])
+        if companyData.bulk_excel_upload_type=="Bulkupload Without Headers":
+            print("++++++++++++++++++")
+            output=bulkupload(data)
+            if output['success'] == False:
+                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+            return output
+        if companyData.bulk_excel_upload_type=="Hyatt Bulkupload" or companyData.bulk_excel_upload_type=="Bulkupload With Headers":
+            output=hyatt_bulkupload(data)
+            if output['success'] == False:
+                frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","messagedata":output['message'],"company":company})
+            return output
         if companyData.bulk_excel_upload_type=="Grand" or companyData.bulk_excel_upload_type=="Novotel Vijayawada":
             output=grand_newdelhi(data)
             if output['success'] == False:
@@ -131,7 +143,7 @@ def manual_upload_data(data):
                             x['FT_CREDIT'] = x['FT_DEBIT']
                         items_pdf_dict = {'date':item_date,'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
                         # continue
-                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION'] or "Cess" in x['TRANSACTION_DESCRIPTION'] or "CESS" in x['TRANSACTION_DESCRIPTION']:
+                    elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION'] or "Cess" in x['TRANSACTION_DESCRIPTION'] or "CESS" in x['TRANSACTION_DESCRIPTION'] or "UTGST" in x['TRANSACTION_DESCRIPTION']:
                         items_pdf_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
                     
                     # if x['FT_DEBIT'] is None:
@@ -156,7 +168,7 @@ def manual_upload_data(data):
                     items_pdf_dict = {'date':item_date,'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac',"FT_CREDIT":float(x['FT_CREDIT'])}
                 # if x['FT_DEBIT'] is None:
                 #     x['FT_DEBIT'] = x['FT_CREDIT']    
-                elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION'] or "Cess" in x['TRANSACTION_DESCRIPTION'] or "CESS" in x['TRANSACTION_DESCRIPTION']:
+                elif "CGST" in x['TRANSACTION_DESCRIPTION'] or "SGST" in x['TRANSACTION_DESCRIPTION'] or 'IGST' in x['TRANSACTION_DESCRIPTION'] or 'VAT' in x['TRANSACTION_DESCRIPTION'] or "Cess" in x['TRANSACTION_DESCRIPTION'] or "CESS" in x['TRANSACTION_DESCRIPTION'] or "UTGST" in x['TRANSACTION_DESCRIPTION']:
                     items_pdf_dict = {'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],"sac_code":'No Sac'}
                 else:
                     items.append({'date':item_date,'item_value':float(x['FT_DEBIT']),'name':x['TRANSACTION_DESCRIPTION'],'sort_order':1,"sac_code":'No Sac'})
@@ -175,7 +187,6 @@ def manual_upload_data(data):
         #     frappe.db.commit()
         #     frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":"Invoice data mismatch","company":company})
         #     return {"success":False,"message":"Invoice data mismatch"}
-        print("[===============[===================")
         gst_data_file = data['gst_file']
         gst_file_path = folder_path+'/sites/'+site_folder_path+gst_data_file
         gst_dataframe = pd.read_csv(gst_file_path)
@@ -240,7 +251,7 @@ def manual_upload_data(data):
             if each['invoice_category'] == "empty":
                 each['invoice_category'] = "Tax Invoice"
             each['invoice_from'] = "File"
-            each['company_code'] = data['company']
+            each['company_code'] = companyData.name
             
             each['invoice_date'] = each['invoice_date'].replace("/","-")
             each['invoice_date'] = each['invoice_date'].replace("00:00:00","")
@@ -254,7 +265,7 @@ def manual_upload_data(data):
             each['print_by'] = "System"
             each['start_time'] = str(datetime.datetime.utcnow())
             each['name'] = each['guest_name']
-            error_data = {"invoice_type":'B2B' if each['gstNumber'] != '' else 'B2C',"invoice_number":each['invoice_number'],"company_code":data['company'],"invoice_date":each['invoice_date']}
+            error_data = {"invoice_type":'B2B' if each['gstNumber'] != '' else 'B2C',"invoice_number":each['invoice_number'],"company_code":company,"invoice_date":each['invoice_date']}
             error_data['invoice_file'] = ""
             error_data['guest_name'] = each['guest_name']
             error_data['gst_number'] = each['gstNumber']
@@ -309,6 +320,9 @@ def manual_upload_data(data):
                                     if insertInvoiceApiResponse['data'].irn_generated == "Success":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
+                                        if each['invoice_category'] == "Tax Invoice":
+                                            inv_data = {"invoice_number":each['invoice_number']}
+                                            auto_adjustment(inv_data)
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
@@ -332,6 +346,9 @@ def manual_upload_data(data):
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Success":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                     elif insertInvoiceApiResponse['data'].irn_generated == "Pending":
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Pending":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
+                                        if each['invoice_category'] == "Tax Invoice":
+                                            inv_data = {"invoice_number":each['invoice_number']}
+                                            auto_adjustment(inv_data)
                                     else:
                                         output_date.append({'invoice_number':insertInvoiceApiResponse['data'].name,"Error":insertInvoiceApiResponse['data'].irn_generated,"date":str(insertInvoiceApiResponse['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 else:
@@ -435,14 +452,14 @@ def manual_upload_data(data):
                     
                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company, "count":len(input_data), "invoice_count":countIn})
             countIn+=1
         df = pd.DataFrame(output_date)
         df = df.groupby('date').count().reset_index()
         output_data = df.to_dict('records')
         # data['UserName'] = "Ganesh"
         InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'],"start_time":str(start_time),"referrence_file":data['invoice_file'],"gst_file":data['gst_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Completed','type':"Bulk_upload_data","data":output_data,"company":company})
         # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
@@ -456,5 +473,5 @@ def manual_upload_data(data):
         # make_error_snapshot(e)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing manual_upload_data Bulk upload","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":data['company']})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Exception','type':"Bulk Invoices Exception","message":str(e),"company":company})
         return {"success":False,"message":str(e)}

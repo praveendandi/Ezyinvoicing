@@ -26,7 +26,10 @@
   "address_street",
   "block_status",
   "status",
-  "disable_auto_irn"
+  "disable_auto_irn",
+  "company_portals",
+  "synced_date",
+  "synced_to_erp"
  ],
  "fields": [
   {
@@ -139,11 +142,28 @@
    "fieldname": "disable_auto_irn",
    "fieldtype": "Check",
    "label": "Disable Auto IRN"
+  },
+  {
+   "fieldname": "company_portals",
+   "fieldtype": "Link",
+   "label": "Company Portals",
+   "options": "Company Portals"
+  },
+  {
+   "fieldname": "synced_date",
+   "fieldtype": "Date",
+   "label": "Synced Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "synced_to_erp",
+   "fieldtype": "Check",
+   "label": "Synced to ERP"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-04-16 10:44:02.024180",
+ "modified": "2022-09-29 16:39:18.556963",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "TaxPayerDetail",

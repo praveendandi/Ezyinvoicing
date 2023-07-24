@@ -12,6 +12,7 @@ import string
 from frappe.utils import get_site_name
 import pandas as pd
 import numpy as np
+import pathlib
 from version2_app.version2_app.doctype.invoices.invoices import *
 from version2_app.version2_app.doctype.payment_types.payment_types import *
 from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats import InsertExcelUploadStats
@@ -38,19 +39,20 @@ def holidayinManualupload(data):
             folioid=""
             site_folder_path = companyData.site_name
             items_file_path = folder_path+'/sites/'+site_folder_path+items_data_file
-            if ".csv" in items_file_path:
+            file_extension = pathlib.Path(items_file_path).suffix
+            if ".csv" == file_extension.lower():
                 try:
                     items_dataframe = pd.read_csv(items_file_path,error_bad_lines=False,delimiter='|')
                 except UnicodeDecodeError:
                     items_dataframe = pd.read_csv(items_file_path,encoding ='latin1',error_bad_lines=False,delimiter='|')
-            elif ".xml" in items_file_path:
+            elif ".xml" ==file_extension.lower():
                 with open(items_file_path) as xml_file:
                     items_dataframe = xmltodict.parse(xml_file.read())
             else:
                 items_dataframe = pd.read_excel(items_file_path,error_bad_lines=False,delimiter='|')
 
             # items_dataframe = pd.read_excel(items_file_path)
-            if ".xml" not in items_file_path:
+            if ".xml" != file_extension.lower():
                 items_dataframe = items_dataframe.fillna('empty')
                 items_dataframe = items_dataframe.sort_values("taxinvnum")
                 invoice_columns = list(items_dataframe.columns.values)
@@ -89,13 +91,16 @@ def holidayinManualupload(data):
             each['invoiceamount'] = round(each['invoiceamount'],2)
             each['taxcode_dsc'] = str(each['taxcode_dsc'])
             # print(each['taxinvnum'],len(each['taxinvnum']))
-            del each['accountdate']# = str(each['accountdate'])
+            # del each['accountdate']# = str(each['accountdate'])
             del each['arrdate']# = str(each['arrdate'])
             del each['depdate']# = str(each['depdate'])
             del each['org_invoicedate']
+            get_invoice_data=frappe.db.get_value('Invoices',{"name":each['taxinvnum'],"irn_generated":"Cancelled"},as_dict=1)
+            print(get_invoice_data,"++++++++++++++++",each["taxinvnum"])
+            if get_invoice_data:
+                each['taxinvnum']=str(each['taxinvnum'])+"-1"
                 
             if each['taxinvnum'] not in invoice_referrence_objects:
-                
                 invoice_referrence_objects[each['taxinvnum']] = []
                 invoice_referrence_objects[each['taxinvnum']].append(each)
             else:
@@ -104,6 +109,7 @@ def holidayinManualupload(data):
             paymentTypes = GetPaymentTypes()
             payment_Types  = [''.join(each) for each in paymentTypes['data']]
             each['invoicedate'] = str(each['invoicedate'])
+            each['accountdate'] = str(each['accountdate'])
             csi = total_invoice_amount-each['sgstamount']-each['sgstamount']-each['ngstamount']
             if csi != 0:
                 gst_percentage = round((each['sgstamount']/csi)*100,1)
@@ -111,10 +117,10 @@ def holidayinManualupload(data):
                 gst_percentage = 0
             if each['goods_desc'] not in payment_Types:
                 # totalitemAmount = each['invoiceamount']-each['sgstamount']-each['sgstamount']-each['ngstamount']
-                if "00:00:00" in each['invoicedate']:
-                    item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
+                if "00:00:00" in each['accountdate']:
+                    item_date = datetime.datetime.strptime(each['accountdate'],'%Y-%m-%d %H:%M:%S').strftime(companyData.invoice_item_date_format)
                 else:
-                    item_date = datetime.datetime.strptime(each['invoicedate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
+                    item_date = datetime.datetime.strptime(each['accountdate'],'%Y-%m-%d').strftime(companyData.invoice_item_date_format)
                 # if frappe.db.exists('SAC HSN CODES', each['goods_desc']):
                 #     sac_doc = frappe.get_doc('SAC HSN CODES',each['goods_desc'])
                 #     list_data["sac_desc"] = each['goods_desc']
@@ -216,11 +222,10 @@ def holidayinManualupload(data):
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(input_data),"company":company})
         countIn = 1
-        print(len(input_data),"count")
         if input_data == [] and len(list_data)>0:
             input_data.append(list_data)
         for each in input_data:
-            each['gstNumber'] = str(each['gstNumber'])
+            each['gstNumber'] = str(each['gstNumber']).strip()
             # each['total_invoice_amount']= 10000
             print(each['invoice_number'],"       invoice Number ",countIn)
             check_invoice = check_invoice_exists(str(each['invoice_number']))
@@ -311,7 +316,12 @@ def holidayinManualupload(data):
                         #         list_data["sac_code"] = "NOT Found"
                         #         break
                         # if each["sac_code"] == "Found":
-                        if reupload==False:
+                        if each["total_invoice_amount"] < 0:
+                            each['invoice_category'] = "Credit Invoice"
+                        get_invoice_data=frappe.db.get_value('Invoices',{"name":each["invoice_number"],"irn_generated":["in",["Success","Cancelled"]]},as_dict=1)
+                        print(get_invoice_data,"++++++++++++++++",each["folioid"])
+                        if reupload==False and get_invoice_data==None:
+                            
                             insertInvoiceApiResponse = insert_invoice({"folioid":each["folioid"],"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":each['invoice_number'],"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:
                                 
@@ -333,7 +343,7 @@ def holidayinManualupload(data):
                                 
                                 output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                                 # print("B2C insertInvoiceApi fialed:  ",insertInvoiceApiResponse['message'])
-                        else:
+                        elif get_invoice_data==None:
                             insertInvoiceApiResponse = Reinitiate_invoice({"folioid":each["folioid"],"guest_data":each,"company_code":data['company'],"items_data":each['items'],"total_invoice_amount":each['total_invoice_amount'],"invoice_number":str(each['invoice_number']),"amened":'No',"taxpayer":taxpayer,"sez":sez,"invoice_object_from_file":{"data":invoice_referrence_objects[each['invoice_number']]}})
                             if insertInvoiceApiResponse['success']== True:
                                 
@@ -448,14 +458,15 @@ def holidayinManualupload(data):
                     
                 #     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each['invoice_number']),"company":company, "count":len(input_data), "invoice_count":countIn})
             countIn+=1
         df = pd.DataFrame(output_date)
-        df = df.groupby('date').count().reset_index()
-        output_data = df.to_dict('records')
-        InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'] if "username" in data else "","start_time":str(start_time),"referrence_file":data['invoice_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
-        # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
+        if df.empty is False:
+            df = df.groupby('date').count().reset_index()
+            output_data = df.to_dict('records')
+            InsertExcelUploadStats({"data":output_data,"uploaded_by":data['username'] if "username" in data else "","start_time":str(start_time),"referrence_file":data['invoice_file']})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Completed','type':"Bulk_upload_data","data":output_data,"company":company})
+            # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:
         print(traceback.print_exc())
@@ -572,7 +583,7 @@ def holidayinnerrorbulkreprocess(file_path,company):
 
 @frappe.whitelist(allow_guest=True)
 def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
-    # try:
+    try:
         companyData = frappe.get_doc('company',company)
         site_folder_path = companyData.site_name
         folder_path = frappe.utils.get_bench_path()
@@ -624,7 +635,7 @@ def holidayinnreprocesserrorbulkupload(file_path,company,xml_file):
                 data=payload_new).json()
             url = upload_report['message']['file_url']
             return url
-    # except Exception as e:
-    #     exc_type, exc_obj, exc_tb = sys.exc_info()
-    #     frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
-    #     return {"success":False,"message":str(e)}   
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing holidayinnerrorbulkreprocess","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}   

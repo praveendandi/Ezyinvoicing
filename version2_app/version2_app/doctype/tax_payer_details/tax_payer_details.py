@@ -12,6 +12,7 @@ class TaxPayerDetails(Document):
     pass
 import requests,random
 import frappe
+import json
 Headers = {
     'Content-Type': 'application/json'
 } 
@@ -27,7 +28,7 @@ def getTaxPayerDetails(data):
                     # filters={
                     # 	'Status': data['status']
                     # },
-                    fields=['gst_number','legal_name','trade_name','creation','status'],
+                    fields=['gst_number','legal_name','trade_name','creation','status', 'synced_date', 'synced_to_erp'],
                     order_by=data['sortKey'],
                     start=data['start'],
                     page_length=data['end'],
@@ -38,7 +39,7 @@ def getTaxPayerDetails(data):
                     filters={
                         'Status': data['status']
                     },
-                    fields=['gst_number','legal_name','trade_name','creation','status'],
+                    fields=['gst_number','legal_name','trade_name','creation','status', 'synced_date', 'synced_to_erp'],
                     order_by=data['sortKey'],
                     start=data['start'],
                     page_length=data['end'],
@@ -50,7 +51,7 @@ def getTaxPayerDetails(data):
             filters={
                 data['key']: ['like', '%'+data['value']+'%']
             },
-            fields=['gst_number','legal_name','trade_name','creation','status'],
+            fields=['gst_number','legal_name','trade_name','creation','status', 'synced_date', 'synced_to_erp'],
             order_by=data['sortKey'],
             start=data['start'],
             page_length=data['end'],
@@ -68,6 +69,8 @@ def getTaxPayerDetails(data):
             listData['legal_name'] = each[1]
             listData['creation'] = each[3]
             listData['status'] = each[4]
+            listData["synced_date"] = each[5]
+            listData["synced_to_erp"] = each[6]
             invoiceData = frappe.db.get_list('Invoices',filters={'gst_number':each[0]},fields=['has_credit_items','name','invoice_number'],as_list=True)
             # listData['']
             listData['invoice_count'] = len(list(invoiceData))
@@ -129,6 +132,8 @@ def TaxPayerDetails(data):
     get TaxPayerDetail from gsp   gstNumber, code, apidata
     '''
     try:
+        if isinstance(data,str):
+            data = json.loads(data)
         fields = ['gst_number','name','legal_name','address_1','address_2','location','pincode','gst_status','tax_type','trade_name','phone_number','state_code','status','block_status','company']
         tay_payer_details = frappe.db.get_value('TaxPayerDetail', data['gstNumber'],fields,as_dict=1)
         if tay_payer_details is None:

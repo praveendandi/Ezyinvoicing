@@ -158,6 +158,12 @@
   "work_station_pass_code",
   "device_font_style_document",
   "self_assisted",
+  "show_pending_invoices_in_reports",
+  "bulkupload_json",
+  "pos_footer",
+  "pos_text",
+  "enable_pdf_upload",
+  "vat_reporting",
   "column_break_141",
   "mail_schedule",
   "no_of_days",
@@ -244,6 +250,11 @@
   "column_break_235",
   "pathik_password",
   "pathik_session",
+  "pos_extra_text_after_qr",
+  "summary_header",
+  "column_break_248",
+  "summary_terms_and_conditions",
+  "summary_footer",
   "scan_ezy_settings_section",
   "classfiy_api",
   "in_house_passport_ocr",
@@ -254,7 +265,48 @@
   "in_house_aadhar_ocr",
   "in_house_driving_ocr",
   "section_break_248",
-  "ome_scanner"
+  "ome_scanner",
+  "clbs_section",
+  "clbs",
+  "ezy_gst_section",
+  "ezy_gst_module",
+  "arrival_information_file_type",
+  "show_application_reference_number_in_etax",
+  "application_reference_number",
+  "data_filing",
+  "sezwp_terms_and_conditions",
+  "sezwop_terms_and_conditions",
+  "opera_scan_button",
+  "enable_slab_for_room_service_charge",
+  "sc_slab_12_starting_range",
+  "sc_slab_12_end_range",
+  "auto_b2c_success_for_gstr",
+  "pos_date_reference",
+  "pos_date_regex",
+  "pos_bill_domain",
+  "pos_check_date_format",
+  "items_per_page",
+  "skip_pos_check_data_extraction",
+  "create_etax_invoices_in_separate_folder",
+  "save_etax_invoice_folder",
+  "minutes_until_auto_logout",
+  "erp_company_name",
+  "abbr",
+  "signature_image",
+  "signature_pfx",
+  "pfx_password",
+  "e_tax_format",
+  "pos_qr",
+  "pos_b2b_qr_section",
+  "qr_b2b_rect_x0",
+  "qr_b2b_rect_x1",
+  "qr_b2b_rect_y0",
+  "qr_b2b_rect_y1",
+  "pos_b2c_qr_section",
+  "qr_b2c_rect_x0",
+  "qr_b2c_rect_x1",
+  "qr_b2c_rect_y0",
+  "qr_b2c_rect_y1"
  ],
  "fields": [
   {
@@ -271,21 +323,21 @@
   },
   {
    "fieldname": "company_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Company Name",
    "reqd": 1
   },
   {
    "fieldname": "trade_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Trade Name",
    "reqd": 1
   },
   {
    "fieldname": "legal_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "label": "Legal Name",
    "reqd": 1
@@ -347,13 +399,13 @@
   },
   {
    "fieldname": "address_1",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address 1",
    "reqd": 1
   },
   {
    "fieldname": "address_2",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Address 2",
    "reqd": 1
   },
@@ -376,12 +428,12 @@
   },
   {
    "fieldname": "merchant_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Merchant Name"
   },
   {
    "fieldname": "b2c_qr_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "B2C QR URL"
   },
   {
@@ -390,7 +442,7 @@
   },
   {
    "fieldname": "location",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Location",
    "reqd": 1
   },
@@ -402,12 +454,12 @@
   },
   {
    "fieldname": "state",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "State"
   },
   {
    "fieldname": "city",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "City"
   },
   {
@@ -423,7 +475,7 @@
   },
   {
    "fieldname": "merchant_virtual_payment_address",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Merchant Virtual Payment Address"
   },
   {
@@ -476,7 +528,7 @@
   },
   {
    "fieldname": "site_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Site Name"
   },
   {
@@ -487,12 +539,12 @@
   },
   {
    "fieldname": "invoice_item_date_format",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Invoice Item Date Format"
   },
   {
    "fieldname": "font_file_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Font File Path"
   },
   {
@@ -508,17 +560,17 @@
   },
   {
    "fieldname": "proxy_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy Url"
   },
   {
    "fieldname": "proxy_username",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy UserName"
   },
   {
    "fieldname": "proxy_password",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Proxy Password"
   },
   {
@@ -572,17 +624,17 @@
   },
   {
    "fieldname": "sc_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "SC Name"
   },
   {
    "fieldname": "sc_gst_percentage",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "SC GST Percentage"
   },
   {
    "fieldname": "adjustment_service_charge_list",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Adjustment Service Charge List"
   },
   {
@@ -612,7 +664,7 @@
    "fieldname": "bulk_excel_upload_type",
    "fieldtype": "Select",
    "label": "Bulk Excel Upload Type",
-   "options": "None\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai"
+   "options": "None\nGrand\nHyatt Bulkupload\nMarriot\nOpera\nHolidayIn\nHyatt\nHyatt Mumbai\nHyatt Hyderabad\nBulkupload With Headers\nBulkupload Without Headers"
   },
   {
    "default": "0",
@@ -622,22 +674,22 @@
   },
   {
    "fieldname": "parsers_branch_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Parsers Branch Name"
   },
   {
    "fieldname": "ui_git_branch",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ui Git Branch"
   },
   {
    "fieldname": "angular_project_production_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Angular Project Production Path"
   },
   {
    "fieldname": "backend_git_branch",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Backend Git Branch"
   },
   {
@@ -658,7 +710,7 @@
   },
   {
    "fieldname": "backend_git_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Backend Git Path"
   },
   {
@@ -674,7 +726,7 @@
   },
   {
    "fieldname": "system_storage_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "System Storage Path"
   },
   {
@@ -726,7 +778,7 @@
   },
   {
    "fieldname": "licensing_host",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Licensing Host"
   },
   {
@@ -761,7 +813,7 @@
   },
   {
    "fieldname": "ipp_printer_file_path",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ipp Printer File Path"
   },
   {
@@ -793,102 +845,102 @@
   {
    "default": "0",
    "fieldname": "whats_app",
-   "fieldtype": "Check",
+   "fieldtype": "Small Text",
    "label": "Whats App"
   },
   {
    "fieldname": "scenario_key",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Scenario Key"
   },
   {
    "fieldname": "template_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Template Name"
   },
   {
    "fieldname": "api_key",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Api Key"
   },
   {
    "fieldname": "api",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Api"
   },
   {
    "fieldname": "domain_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Domain URL"
   },
   {
    "fieldname": "void_check_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Void Check Reference"
   },
   {
    "fieldname": "void_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Void Total Amt Regex"
   },
   {
    "fieldname": "closed_check_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Closed Check Reference"
   },
   {
    "fieldname": "closed_check_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Closed Check Total Amt Regex"
   },
   {
    "fieldname": "normal_check_total_amt_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Normal Check Total Amt Regex"
   },
   {
    "fieldname": "check_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Check Number Reference"
   },
   {
    "fieldname": "check_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Check Number Regex"
   },
   {
    "fieldname": "table_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Table Number Reference"
   },
   {
    "fieldname": "table_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Table Number Regex"
   },
   {
    "fieldname": "guest_number_reference",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest Number Reference"
   },
   {
    "fieldname": "guest_number_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest Number Regex"
   },
   {
    "fieldname": "bill_amount_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Bill Amount Regex"
   },
   {
    "fieldname": "fssai_number",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "FSSAI Number"
   },
   {
    "fieldname": "print_check_type",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Print Check Type"
   },
   {
@@ -911,7 +963,7 @@
   },
   {
    "fieldname": "block_irn_information",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Block Irn Information"
   },
   {
@@ -1031,11 +1083,11 @@
    "label": "Pre Checkins"
   },
   {
-   "default": "No",
+   "default": "Disable",
    "fieldname": "e_signature",
    "fieldtype": "Select",
    "label": "E signature",
-   "options": "Yes\nNo"
+   "options": "Disable\nUser\nOrganization"
   },
   {
    "default": "No",
@@ -1063,7 +1115,7 @@
   },
   {
    "fieldname": "no_of_days",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Mail Schedule Days"
   },
   {
@@ -1081,17 +1133,17 @@
   },
   {
    "fieldname": "pre_checkin_mail_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pre Checkin Mail Subject"
   },
   {
    "fieldname": "cancellation_email_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Cancellation Email Subject"
   },
   {
    "fieldname": "thank_you_mail_subject",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Thank You Mail Subject"
   },
   {
@@ -1129,7 +1181,7 @@
   },
   {
    "fieldname": "ezycheckins_socket_host",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Ezycheckins Socket Host"
   },
   {
@@ -1145,7 +1197,7 @@
   },
   {
    "fieldname": "guest_gst_number",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Guest GST Number"
   },
   {
@@ -1192,7 +1244,7 @@
   },
   {
    "fieldname": "pms_property_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "PMS Property URL"
   },
   {
@@ -1202,7 +1254,7 @@
   },
   {
    "fieldname": "cform_user_name",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "CForm User Name"
   },
   {
@@ -1217,7 +1269,7 @@
   },
   {
    "fieldname": "cform_password",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "CForm Password"
   },
   {
@@ -1245,7 +1297,7 @@
   },
   {
    "fieldname": "member_ship_url",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Member Ship URL"
   },
   {
@@ -1467,12 +1519,12 @@
   },
   {
    "fieldname": "dynamic_colour_for_tab",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Dynamic Colour for Tab"
   },
   {
    "fieldname": "work_station_pass_code",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Work Station Pass Code"
   },
   {
@@ -1482,12 +1534,12 @@
   },
   {
    "fieldname": "reg_card_identification_text",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Reg Card Identification Text"
   },
   {
    "fieldname": "paid_out_receipts",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Paid Out Receipts Identification"
   },
   {
@@ -1496,17 +1548,17 @@
   },
   {
    "fieldname": "reg_card_confirmation_no_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Reg Card Confirmation no Regex"
   },
   {
    "fieldname": "paid_out_confirmation_no_regex",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Paid Out Confirmation no Regex"
   },
   {
    "fieldname": "advance_deposits_identification",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Advance Deposits Identification"
   },
   {
@@ -1568,13 +1620,67 @@
   },
   {
    "fieldname": "pathik_username",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pathik Username"
   },
   {
    "fieldname": "pathik_password",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Pathik Password"
+  },
+  {
+   "fieldname": "bulkupload_json",
+   "fieldtype": "Attach",
+   "label": "BulkUpload Json"
+  },
+  {
+   "fieldname": "pos_footer",
+   "fieldtype": "Text",
+   "label": "POS Footer"
+  },
+  {
+   "fieldname": "pos_text",
+   "fieldtype": "Text",
+   "label": "POS Text"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_pdf_upload",
+   "fieldtype": "Check",
+   "label": "Enable PDF Upload"
+  },
+  {
+   "default": "1",
+   "fieldname": "vat_reporting",
+   "fieldtype": "Check",
+   "label": "Vat Reporting"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_pending_invoices_in_reports",
+   "fieldtype": "Check",
+   "label": "Show Pending Invoices In Reports"
+  },
+  {
+   "fieldname": "summary_header",
+   "fieldtype": "Text",
+   "label": "Summary Header"
+  },
+  {
+   "fieldname": "summary_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "Summary Terms and Conditions"
+  },
+  {
+   "fieldname": "summary_footer",
+   "fieldtype": "Text",
+   "label": "Summary Footer"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
+   "fieldtype": "Check",
+   "label": "CLBS"
   },
   {
    "fieldname": "scan_ezy_settings_section",
@@ -1634,15 +1740,240 @@
    "fieldname": "ome_scanner",
    "fieldtype": "Check",
    "label": "OME scanner"
+  },
+  {
+   "fieldname": "column_break_248",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
+  },
+  {
+   "fieldname": "ezy_gst_section",
+   "fieldtype": "Section Break",
+   "label": "EZY GST"
+  },
+  {
+   "default": "0",
+   "fieldname": "ezy_gst_module",
+   "fieldtype": "Check",
+   "label": "Ezy GST Module"
+  },
+  {
+   "fieldname": "pos_extra_text_after_qr",
+   "fieldtype": "Text",
+   "label": "POS Extra Text After QR"
+  },
+  {
+   "default": "Txt",
+   "fieldname": "arrival_information_file_type",
+   "fieldtype": "Select",
+   "label": "Arrival Information File Type",
+   "options": "Txt\nCsv\nXml"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_application_reference_number_in_etax",
+   "fieldtype": "Check",
+   "label": "Show Application Reference Number in ETax"
+  },
+  {
+   "fieldname": "application_reference_number",
+   "fieldtype": "Text",
+   "label": "Application Reference Number"
+  },
+  {
+   "fieldname": "data_filing",
+   "fieldtype": "Date",
+   "label": "Data Filing"
+  },
+  {
+   "fieldname": "sezwp_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "SEZWP Terms and Conditions"
+  },
+  {
+   "fieldname": "sezwop_terms_and_conditions",
+   "fieldtype": "Text",
+   "label": "SEZWOP Terms and Conditions"
+  },
+  {
+   "default": "0",
+   "fieldname": "opera_scan_button",
+   "fieldtype": "Check",
+   "label": "Opera Scan Button"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_slab_for_room_service_charge",
+   "fieldtype": "Check",
+   "label": "Enable Slab For Room Service Charge"
+  },
+  {
+   "fieldname": "sc_slab_12_starting_range",
+   "fieldtype": "Int",
+   "label": "SC Slab 12% Starting Range"
+  },
+  {
+   "fieldname": "sc_slab_12_end_range",
+   "fieldtype": "Int",
+   "label": "SC Slab 12% End Range"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_b2c_success_for_gstr",
+   "fieldtype": "Check",
+   "label": "Auto B2C Success for GSTR"
+  },
+  {
+   "fieldname": "pos_date_reference",
+   "fieldtype": "Data",
+   "label": "POS Date Reference"
+  },
+  {
+   "fieldname": "pos_date_regex",
+   "fieldtype": "Long Text",
+   "label": "POS Date Regex"
+  },
+  {
+   "fieldname": "pos_bill_domain",
+   "fieldtype": "Long Text",
+   "label": "POS Bill Domain"
+  },
+  {
+   "fieldname": "pos_check_date_format",
+   "fieldtype": "Long Text",
+   "label": "POS Check Date Format"
+  },
+  {
+   "default": "100",
+   "fieldname": "items_per_page",
+   "fieldtype": "Select",
+   "label": "Items Per Page",
+   "options": "20\n50\n100\n150\n500"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_pos_check_data_extraction",
+   "fieldtype": "Check",
+   "label": "Skip POS Check Data Extraction"
+  },
+  {
+   "default": "0",
+   "fieldname": "create_etax_invoices_in_separate_folder",
+   "fieldtype": "Check",
+   "label": "Create ETax Invoices in Separate Folder "
+  },
+  {
+   "default": "0",
+   "fieldname": "save_etax_invoice_folder",
+   "fieldtype": "Data",
+   "label": "Save ETax Invoice Folder"
+  },
+  {
+   "default": "30",
+   "fieldname": "minutes_until_auto_logout",
+   "fieldtype": "Int",
+   "label": "Minutes Until Auto Logout"
+  },
+  {
+   "fieldname": "erp_company_name",
+   "fieldtype": "Data",
+   "label": "ERP Company Name"
+  },
+  {
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "ABBR"
+  },
+  {
+   "fieldname": "signature_image",
+   "fieldtype": "Attach",
+   "label": "Signature Image"
+  },
+  {
+   "fieldname": "signature_pfx",
+   "fieldtype": "Attach",
+   "label": "Signature PFX"
+  },
+  {
+   "fieldname": "pfx_password",
+   "fieldtype": "Data",
+   "label": "PFX Password"
+  },
+  {
+   "default": "Portrait",
+   "fieldname": "e_tax_format",
+   "fieldtype": "Select",
+   "label": "E-Tax Format",
+   "options": "Portrait\nLandscape"
+  },
+  {
+   "default": "0",
+   "fieldname": "pos_qr",
+   "fieldtype": "Check",
+   "label": "POS QR"
+  },
+  {
+   "fieldname": "pos_b2b_qr_section",
+   "fieldtype": "Section Break",
+   "label": "POS B2B QR"
+  },
+  {
+   "depends_on": "eval:doc.email =='pos_qr'",
+   "fieldname": "qr_b2b_rect_x0",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect X0"
+  },
+  {
+   "fieldname": "qr_b2b_rect_x1",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect X1"
+  },
+  {
+   "fieldname": "qr_b2b_rect_y0",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect Y0"
+  },
+  {
+   "fieldname": "qr_b2b_rect_y1",
+   "fieldtype": "Int",
+   "label": "QR B2B Rect Y1"
+  },
+  {
+   "fieldname": "pos_b2c_qr_section",
+   "fieldtype": "Section Break",
+   "label": "POS B2C QR"
+  },
+  {
+   "fieldname": "qr_b2c_rect_x0",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect X0"
+  },
+  {
+   "fieldname": "qr_b2c_rect_x1",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect X1"
+  },
+  {
+   "fieldname": "qr_b2c_rect_y0",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect Y0"
+  },
+  {
+   "fieldname": "qr_b2c_rect_y1",
+   "fieldtype": "Int",
+   "label": "QR B2C Rect Y1"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-03-14 15:46:28.162882",
+ "modified": "2022-12-01 15:49:18.539069",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

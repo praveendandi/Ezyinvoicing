@@ -38,19 +38,21 @@ def hyatt_mumbai(data):
         invoice_referrence_objects = {}
         invoice_number_list = [x['BILL_NO'] for x in items_dataframe["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]]
         for each in items_dataframe["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
+            if not each['FOLIO_TYPE']:
+                continue
             if each['SUMFT_DEBITPERBILL_NO']==None:
                 each['SUMFT_DEBITPERBILL_NO']=0
             if each['BILL_NO'] in gst_data.keys():
                 data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':gst_data[each["BILL_NO"]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
-                            'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2B"}
+                            'guest_data':{'invoice_category':each['FOLIO_TYPE'].lower().title()},'invoice_type':"B2B"}
                 data["invoice_number"] = "GHM"+data["invoice_number"]
             else:
                 data={'invoice_category':each['FOLIO_TYPE'],'invoice_number':each['BILL_NO'],'invoice_date':each['BILL_GENERATION_DATE'],
                             'room_number':each['ROOM'],'guest_name':each['DISPLAY_NAME'],'total_invoice_amount':float(each['SUMFT_DEBITPERBILL_NO']),
                             'gstNumber':"",'company_code':companyData.name,'place_of_supply':companyData.state_code,'invoice_item_date_format':companyData.invoice_item_date_format,
-                            'guest_data':{'invoice_category':each['FOLIO_TYPE']},'invoice_type':"B2C"}
+                            'guest_data':{'invoice_category':each['FOLIO_TYPE'].lower().title()},'invoice_type':"B2C"}
                 data["invoice_number"] = "GHM"+data["invoice_number"]
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]]
             items = []
@@ -334,14 +336,14 @@ def hyatt_mumbai(data):
                     
                     output_date.append({'invoice_number':errorInvoice['data'].name,"Error":errorInvoice['data'].irn_generated,"date":str(errorInvoice['data'].invoice_date),"B2B":B2B,"B2C":B2C})
                     # print("calulateItemsApi fialed:  ",calulateItemsApiResponse['message'])
-            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each_item['invoice_number']),"company":company})
+            frappe.publish_realtime("custom_socket", {'message':'Bulk Invoice Created','type':"Bulk_file_invoice_created","invoice_number":str(each_item['invoice_number']),"company":company, "count":len(invoice_number_list), "invoice_count":countIn})
             countIn+=1
         df = pd.DataFrame(output_date)
         df = df.groupby('date').count().reset_index()
         output_data = df.to_dict('records')
         # data['UserName'] = "Ganesh"
         InsertExcelUploadStats({"data":output_data,"uploaded_by":invoice_data['username'],"start_time":str(start_time),"referrence_file":invoice_data['invoice_file'],"gst_file":invoice_data['gst_file']})
-        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Created','type':"Bulk_upload_data","data":output_data,"company":company})
+        frappe.publish_realtime("custom_socket", {'message':'Bulk Invoices Completed','type':"Bulk_upload_data","data":output_data,"company":company})
         # return {"success":True,"message":"Successfully Uploaded Invoices","data":output_data}		
         return {"success":True,"message":"Successfully Uploaded"}
     except Exception as e:

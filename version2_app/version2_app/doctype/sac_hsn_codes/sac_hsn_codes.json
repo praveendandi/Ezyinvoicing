@@ -34,7 +34,12 @@
   "sac_index",
   "ignore_non_taxable_items",
   "bulk_upload_service_charge",
-  "disable_cess_for_sc"
+  "disable_cess_for_sc",
+  "disable_vat_for_sc",
+  "category",
+  "is_service_charge_item",
+  "synced_to_erp",
+  "synced_date"
  ],
  "fields": [
   {
@@ -216,11 +221,40 @@
    "fieldname": "disable_cess_for_sc",
    "fieldtype": "Check",
    "label": "Disable Cess For SC"
+  },
+  {
+   "default": "0",
+   "fieldname": "disable_vat_for_sc",
+   "fieldtype": "Check",
+   "label": "Disable Vat For SC"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "label": "Category",
+   "options": "Rooms\nFood & beverages\nFood IRD\nBanquet\nBanquet-ODC\nBanquet Hall hire\nOther banquet Misc\nBanquet AV\nLaundry\nSpa and Health Clubs\nConcierge service\nShared Services\nTobacco\nLiquor\nTransportation Charges\nTelephone Charges\nMiscellaneous Charges\nNon Revenue"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_service_charge_item",
+   "fieldtype": "Check",
+   "label": "Is Service Charge Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "synced_to_erp",
+   "fieldtype": "Check",
+   "label": "Synced to ERP"
+  },
+  {
+   "fieldname": "synced_date",
+   "fieldtype": "Date",
+   "label": "Synced Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-07-20 14:37:03.279780",
+ "modified": "2022-09-29 16:38:36.033317",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "SAC HSN CODES",

@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "creation": "2022-02-28 15:43:49.569597",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "category",
+  "invoice_type",
+  "amount",
+  "company",
+  "summaries",
+  "summary_breakup_details",
+  "invoice_number",
+  "sac_codes",
+  "deleted_breakups"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Date"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Rooms\nFood & beverages\nFood IRD\nBanquet\nBanquet-ODC\nBanquet Hall hire\nOther banquet Misc\nBanquet AV\nLaundry\nSpa and Health Clubs\nConcierge service\nShared Services\nTobacco\nLiquor\nMiscellaneous Charges\nTransportation Charges\nTelephone Charges\nNon Revenue",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Invoice Type",
+   "options": "Tax Invoice\nCredit Invoice\nDebit Invoice",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "summaries",
+   "fieldtype": "Link",
+   "label": "Summaries",
+   "options": "Summaries"
+  },
+  {
+   "fieldname": "summary_breakup_details",
+   "fieldtype": "Table",
+   "label": "Summary Breakup Details",
+   "options": "Summary Breakup Details"
+  },
+  {
+   "fieldname": "invoice_number",
+   "fieldtype": "Data",
+   "label": "Invoice Number"
+  },
+  {
+   "fieldname": "sac_codes",
+   "fieldtype": "Small Text",
+   "label": "SAC Codes"
+  },
+  {
+   "default": "0",
+   "fieldname": "deleted_breakups",
+   "fieldtype": "Check",
+   "label": "Deleted Breakups"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-08-08 17:26:34.422060",
+ "modified_by": "Administrator",
+ "module": "CLBS",
+ "name": "Summary Breakups",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "ezy-Finance",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

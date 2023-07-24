@@ -5,3 +5,7 @@ Sign Ezy
 Arrivals
 Generics
 EzyCheckins
+CLBS
+EZYGST
+E-Signature
+Reconciliation

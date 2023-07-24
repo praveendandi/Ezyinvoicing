@@ -25,9 +25,6 @@ import os
 from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
-frappe.utils.logger.set_log_level("DEBUG")
-logger = frappe.logger("api")
-
 
 @frappe.whitelist(allow_guest=True)
 def IrnObject(invoice_number):

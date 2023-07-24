@@ -140,7 +140,21 @@
   "credit_note_raised",
   "suptyp",
   "signature",
-  "agree"
+  "agree",
+  "amount_in_word",
+  "summary",
+  "clbs_summary_generated",
+  "invoice_submitted_in_clbs",
+  "lut",
+  "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
+  "non_revenue_amount",
+  "arn_number",
+  "etax_invoice_created",
+  "pos_checks",
+  "synced_to_erp",
+  "synced_date",
+  "un_billed_invoice",
+  "ret_period"
  ],
  "fields": [
   {
@@ -164,7 +178,7 @@
    "hidden": 1,
    "in_list_view": 1,
    "label": "IRN Generated",
-   "options": "Pending\nSuccess\nCancelled\nError\nNA\nZero Invoice\nDraft",
+   "options": "Pending\nSuccess\nCancelled\nError\nNA\nZero Invoice\nDraft\nOn Hold",
    "read_only": 1
   },
   {
@@ -916,12 +930,91 @@
    "fieldname": "agree",
    "fieldtype": "Check",
    "label": "Agree"
+  },
+  {
+   "fieldname": "amount_in_word",
+   "fieldtype": "Data",
+   "label": "Amount In Word"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Link",
+   "label": "Summary",
+   "options": "Summaries"
+  },
+  {
+   "default": "0",
+   "fieldname": "lut",
+   "fieldtype": "Check",
+   "label": "Lut"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs_summary_generated",
+   "fieldtype": "Check",
+   "label": "CLBS Summary Generated"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_submitted_in_clbs",
+   "fieldtype": "Check",
+   "label": "Invoice Submitted in CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "invoice_mismatch_while_bulkupload_auto_b2c_success_gstr1",
+   "fieldtype": "Check",
+   "label": "Invoice Mismatch While Bulkupload Auto B2C Success GSTR1"
+  },
+  {
+   "fieldname": "non_revenue_amount",
+   "fieldtype": "Float",
+   "label": "Non Revenue Amount"
+  },
+  {
+   "fieldname": "arn_number",
+   "fieldtype": "Data",
+   "label": "ARN Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "etax_invoice_created",
+   "fieldtype": "Check",
+   "label": "ETax Invoice Created"
+  },
+  {
+   "default": "0",
+   "fieldname": "pos_checks",
+   "fieldtype": "Check",
+   "label": "Pos Checks"
+  },
+  {
+   "default": "0",
+   "fieldname": "synced_to_erp",
+   "fieldtype": "Check",
+   "label": "Synced to ERP"
+  },
+  {
+   "fieldname": "synced_date",
+   "fieldtype": "Date",
+   "label": "Synced Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "un_billed_invoice",
+   "fieldtype": "Check",
+   "label": "Un Billed Invoice"
+  },
+  {
+   "fieldname": "ret_period",
+   "fieldtype": "Data",
+   "label": "Ret Period"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-11-01 19:10:41.954984",
+ "modified": "2023-01-09 18:46:40.161480",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "Invoices",
@@ -942,6 +1035,7 @@
   },
   {
    "cancel": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
