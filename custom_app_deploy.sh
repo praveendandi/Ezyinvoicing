@@ -74,7 +74,7 @@ else
   fi
 fi
 # Migrate the site and set up requirements
-  bench --site $SITE_NAME migrate
+  # bench --site $SITE_NAME migrate
 # Check if the migration was successful
 # if ! bench --site $SITE_NAME migrate; then
 if [ $? -eq 0 ]; then 
@@ -98,6 +98,8 @@ if [ $? -eq 0 ]; then
     cd $INVOICE_SYNC_DIR || exit
     git pull origin master
     echo Invoice-sync updated successfully....
+    bench --site $SITE_NAME migrate
+    
     else
     echo "Invoice-Sync app not installed"
     echo "Skipping app update."
