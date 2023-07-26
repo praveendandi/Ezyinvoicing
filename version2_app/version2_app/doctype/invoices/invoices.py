@@ -4089,3 +4089,67 @@ def generate_irn(data):
     data = json.loads(data)
     var = generateIrn(data)
     return var
+
+
+
+@frappe.whitelist(allow_guest= True)
+# def gettaxpayer_from_gst(gstn):
+# company = frappe.get_last_doc('company')
+# print(company.licensing_host,"????????")
+# json_response = requests.get(company.licensing_host+"api/method/ezylicensing.ezylicensing.doctype.gst_api_intigration.get_taxpayer_details.get_gst_taxpayer_details")
+# print(json_response,"?////////////////")
+
+
+# def gettaxpayer_from_gst(gstn):
+#     company = frappe.get_last_doc('company')
+#     headers = {'Authorization': "token "+"7a08ee495c4476a"+":"+"4fb0e244bf0f0a7",}
+#     print(company.name,":::::::::::;")
+#     gsp= frappe.get_last_doc('GSP APIS')
+#     # headers = {
+#     # "gspappid": gsp.gsp_test_app_id,
+#     # "gspappsecret": gsp.gsp_test_app_secret
+#     # }
+#     print(headers,">>>>>")
+#     # email = frappe.db.get_value('GSP APIS', {'company': company}, 'company')
+#     # print(email,"/////")
+#     # gsp = frappe.db.get_value('GSP APIS',fields=['name','company'])
+#     # print(gsp)
+#     # 'auth_test', 'auth_prod', 'gsp_test_app_id', 'gsp_prod_app_id',
+#     # 'gsp_prod_app_secret', 'gsp_test_app_secret', 'name')
+#     # mode = gsp['mode']
+#     # if mode == 'Testing':
+#     # headers = {
+#     # "gspappid": gsp["gsp_test_app_id"],
+#     # "gspappsecret": gsp["gsp_test_app_secret"],
+#     # }
+#     # headers = {'Content-Type': 'application/json'}
+#     # print(headers,company.licensing_host,":::::::::::::::")
+#     response = requests.get(company.licensing_host+"/api/method/ezylicensing.ezylicensing.doctype.gst_api_intigration.get_taxpayer_details.get_gst_taxpayer_details/"+gstn,headers=headers, verify=False)
+#     print(response,">>>>>:LLOLLLLL")
+#     # if response.status_code == 200:
+#     # response_text = response.text
+#     # print(response_text,">>>>>>>>>>>>>>")
+#     # response_json = response.json()
+#     # print(response_json,"?????????")
+#     # return response_text 
+#     # else:
+#     # print(f"Request failed with status code: {response.status_code}")
+#     # return None
+#     # response_data = gettaxpayer_from_gst('07AEYPN0893C1Z3')
+#     # print(response_data)
+
+
+
+
+# import requests
+
+def gettaxpayer_from_gst(gstn):
+    company = frappe.get_last_doc('company')
+    gsp= frappe.get_last_doc('GSP APIS')
+    # headers = {'Content-Type': 'application/json'}
+    headers = {'Authorization': "token " + "91d2c6baa79a5b0" + ":" + "5ed80b98a84feff",}
+    url = company.licensing_host + "/api/method/ezylicensing.ezylicensing.doctype.gst_api_intigration.get_taxpayer_details.get_gst_taxpayer_details?gstn=" + gstn
+    response = requests.get(url, headers=headers, verify=False)
+    response_json = response.json()
+    print(response_json,"?????????")
+    return response_json
