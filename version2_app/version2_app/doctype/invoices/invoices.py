@@ -233,10 +233,10 @@ def generateIrn(data):
                 "Loc":
                 company_details['data'].location,
                 "Pin":
-                193502 if company_details['data'].mode == "Testing" else
+                175032 if company_details['data'].mode == "Testing" else
                 company_details['data'].pincode,
                 "Stcd":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 company_details['data'].state_code,
                 "Ph":
                 company_details['data'].phone_number,
@@ -251,7 +251,7 @@ def generateIrn(data):
                 "TrdNm":
                 taxpayer_details['data'].trade_name,
                 "Pos":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 # company_details['data'].state_code,
                 invoice.place_of_supply,
                 "Addr1":
@@ -3221,9 +3221,7 @@ def login_gsp(code,mode):
                 gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
                 # gsp_update.gsp_test_token_expired_on = login_response['expiry']
                 gsp_update.gsp_test_token = login_response['accessToken']
-                print(gsp_update.gsp_test_token,"gsp tokennnnnnnnnnn")
                 gsp_update.test_refresh_token = login_response['refreshToken']
-                print(gsp_update.test_refresh_token,"test refersh token.....")
                 gsp_update.save(ignore_permissions=True)
                 frappe.db.commit()
                 return True
