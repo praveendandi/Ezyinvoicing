@@ -3221,7 +3221,9 @@ def login_gsp(code,mode):
                 gsp_update = frappe.get_doc('GSP APIS', gsp['name'])
                 # gsp_update.gsp_test_token_expired_on = login_response['expiry']
                 gsp_update.gsp_test_token = login_response['accessToken']
+                print(gsp_update.gsp_test_token,"gsp tokennnnnnnnnnn")
                 gsp_update.test_refresh_token = login_response['refreshToken']
+                print(gsp_update.test_refresh_token,"test refersh token.....")
                 gsp_update.save(ignore_permissions=True)
                 frappe.db.commit()
                 return True
