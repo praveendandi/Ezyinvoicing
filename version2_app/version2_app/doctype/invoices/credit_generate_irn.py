@@ -476,10 +476,10 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
                 "Loc":
                 company_details['data'].location,
                 "Pin":
-                193502 if company_details['data'].mode == "Testing" else
+                175032 if company_details['data'].mode == "Testing" else
                 company_details['data'].pincode,
                 "Stcd":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 company_details['data'].state_code,
                 "Ph":
                 company_details['data'].phone_number,
@@ -494,7 +494,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
                 "TrdNm":
                 taxpayer_details['data'].trade_name,
                 "Pos":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 # company_details['data'].state_code,
                 invoice.place_of_supply,
                 "Addr1":
