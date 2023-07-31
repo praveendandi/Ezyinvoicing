@@ -2004,25 +2004,14 @@
    "label": "Einvoice Missing Start Date"
   },
   {
-<<<<<<< HEAD
-   "default": "0",
-   "fieldname": "create_manual_invoice",
-   "fieldtype": "Check",
-   "label": "Create Manual Invoice"
-=======
    "fieldname": "attach_date_format_to_pos_bills",
    "fieldtype": "Data",
    "label": "Attach Date Format To Pos Bills"
->>>>>>> d430837d8b48a34326efee669a34393dcf3e6805
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
-<<<<<<< HEAD
- "modified": "2023-07-19 17:19:16.409659",
-=======
  "modified": "2023-07-13 12:45:02.956075",
->>>>>>> d430837d8b48a34326efee669a34393dcf3e6805
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
