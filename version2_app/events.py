@@ -2572,6 +2572,7 @@ def update_company(doc, method=None):
 def delete_arrival_activity():
     try:
         last_week = datetime.datetime.now() - datetime.timedelta(days=2)
+        print(last_week)
         arrival_activity = frappe.db.get_all(
             "Arrival Activities",
             filters={"creation": ["<", last_week]},
