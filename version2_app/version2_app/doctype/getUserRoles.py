@@ -22,7 +22,7 @@ def getUserRoles():
             data = json.loads(frappe.request.data)
             print(data,"etst")
             for i in data['role']:
-                if i == 'ezy-admin':
+                if i == 'ezy-admin' and i=='ezy-Admin':
                     return {"success": False, "message": "Cannot assign 'ezy-admin' role."}
                 doc = frappe.get_doc({
                     "docstatus": 0,
