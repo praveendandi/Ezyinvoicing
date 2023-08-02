@@ -480,8 +480,8 @@ def fileCreated(doc, method=None):
                 company = frappe.get_last_doc("company")
                 if company.block_print == "True":
                     return {"success": False, "message": "Print has been Blocked"}
-                if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
-                    update_documentbin(doc.file_url, "")
+            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url and "sign-" not in doc.file_url and not doc.file_url.startswith("sign-"):
+                update_documentbin(doc.file_url, "")
         return True
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
