@@ -21,6 +21,7 @@ from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
 from version2_app.passport_scanner.doctype.ml_utilities.common_utility import format_date
 from datetime import date
+from datetime import datetime
 
 class POSChecks(Document):
     pass
@@ -145,6 +146,7 @@ def create_pos_bills(data):
 
 
 def extract_data(payload,company_doc):
+    
     try:
         data={}
         raw_data = payload.split("\n")
@@ -152,6 +154,11 @@ def extract_data(payload,company_doc):
         check_date = ""
         check_number = ""
         now = datetime.now()
+        if company_doc.attach_date_format_to_pos_bills is not None and company_doc.attach_date_format_to_pos_bills != "":
+            current_date = now.strftime(company_doc.attach_date_format_to_pos_bills)
+        else:
+            current_date = ""
+        
         for line in raw_data:
             if company_doc.closed_check_reference in payload and company_doc.void_check_reference not in payload:
                 data["check_type"] = "Check Closed"
@@ -199,10 +206,8 @@ def extract_data(payload,company_doc):
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
                     check_no_regex = re.findall("\w+\d+|\d+",check_string)
-                    current_date = ("{}{}".format(now.year,now.month))
                     data["check_no"] = current_date+check_no_regex[0] if len(check_no_regex) > 0 else ""
-                    # data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
-                    check_number = check_no_regex[0] if len(check_no_regex) > 0 else ""
+                    check_number =current_date+check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     table_regex = re.findall(company_doc.table_number_regex, line.strip())
                     table_string = table_regex[0] if len(table_regex)>0 else ""
@@ -351,7 +356,7 @@ def add_extra_text_while_print(check_no,outlet,company_doc):
             # gst_details = "\nGSTIN--:{}, FSSAI {}\nTIN NO:{} CIN NO:{}\nPlace Of Supply:{}\nRETAIL INVOICE\n".format(outlet_doc.gstin,outlet_doc.fssai,outlet_doc.tin_no,outlet_doc.cin_no,company_doc.place_of_supply)
             invoice_number = "\nInvoice No "+yearformat+monformat+dayformat+check_no + "\n"
         else:
-            invoice_number = ""
+            invoice_number = "\nInvoice No "+ check_no +"\n"
         return {"success":True,"string":text,"invoice_number":invoice_number}
     except Exception as e:
         print(str(e))
@@ -555,6 +560,7 @@ def update_check_in_items(invoice_number=None, check_name=None):
     
 
 def update_pos_check(doc, method=None):
+    print(doc.check_date)
     try:
         if doc.check_no and doc.check_date:
             check_date = datetime.strptime(doc.check_date,"%Y-%m-%d").strftime('%Y%m')

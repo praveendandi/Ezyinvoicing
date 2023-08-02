@@ -235,7 +235,7 @@ scheduler_events = {
         # "10 1 * * * ":["version2_app.events.deleteemailfilesdaily"],
         "20 1 * * *":["version2_app.events.dailyIppprinterFiles"],
         "0 12 * * *":["version2_app.events.block_irn"],
-        "0 2 * * *":["version2_app.events.delete_arrival_activity"],
+        # "0 2 * * *":["version2_app.events.delete_arrival_activity"],
         "* * * * *":["version2_app.events.pre_mail"],
         # "09 11 * * * *": ["version2_app.version2_app.doctype.emailTemplat.sampleFun"],
         # "*/2 * * * *":["version2_app.events.send_invoice_mail_scheduler"],
