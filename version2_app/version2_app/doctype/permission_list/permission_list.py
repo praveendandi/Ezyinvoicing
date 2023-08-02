@@ -25,26 +25,4 @@ def migrate_user_role_per():
                     frappe.db.commit()
 
 
-from frappe.sessions import delete_session
-from frappe.core.doctype.session_default_settings.session_default_settings import clear_session_defaults
-# from frappe.sessions import clear_sessions
-# from frappe.auth import clear_cookies	
-# # from  auth import logout
-
-# # from frappe.frappe.auth import LoginManager
-# # from frappe.auth import LoginManager
-
-from frappe.auth import LoginManager
-Auth = LoginManager()
-
-
-@frappe.whitelist()
-def logout_user():
-    user = frappe.session.user
-    resp = Auth.logout(user=user)
-    clear_sessions= clear_session_defaults
-    if user == frappe.session.user:
-        delete_session(frappe.session.sid, user=user, reason="User Manually Logged Out")
-    return {"Success":True,"message":"User logged out succuessfully"}
-
 

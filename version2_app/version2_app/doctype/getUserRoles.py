@@ -22,6 +22,8 @@ def getUserRoles():
             data = json.loads(frappe.request.data)
             print(data,"etst")
             for i in data['role']:
+                if i == 'ezy-admin':
+                    return {"success": False, "message": "Cannot assign 'ezy-admin' role."}
                 doc = frappe.get_doc({
                     "docstatus": 0,
                     "doctype": "Has Role",
@@ -41,6 +43,8 @@ def getUserRoles():
             par = frappe.db.delete('Has Role', {'parent': data['parent']})
             # frappe.db.commit()
             for i in data['role']:
+                if i == 'ezy-admin':
+                    return {"success": False, "message": "Cannot assign 'ezy-admin' role."}
                 doc = frappe.get_doc({
                     "docstatus": 0,
                     "doctype": "Has Role",
