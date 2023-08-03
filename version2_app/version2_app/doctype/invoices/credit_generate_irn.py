@@ -108,6 +108,7 @@ def attach_qr_code(invoice_number):
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing attach_qr_code Credit Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e, "attach qr code")
+from version2_app.version2_app.doctype.ey_intigration.redo_qr import create_ey_qr_code
 
 
 def create_credit_qr_image(invoice_number, gsp):
@@ -139,53 +140,51 @@ def create_credit_qr_image(invoice_number, gsp):
             if company.skip_ssl_verify == 0:
                 qr_response = requests.get(gsp['generate_qr_code'],
                                             headers=headers,
-                                            stream=True,verify=False)
+                                            stream=True,verify=False)								
             else:
+                proxyhost = company.proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+                print(proxies, "     proxy console")
                 qr_response = requests.get(gsp['generate_qr_code'],
-                                        headers=headers,
-                                        stream=True,verify=False)								
+                                            headers=headers,
+                                            stream=True,proxies=proxies,verify=False)
+
+            if qr_response.status_code==200:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+            else:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)	
+
+
+            file_name = invoice_number + "creditqr.png"
+            full_file_path = path + file_name
+            with open(full_file_path, "wb") as f:
+                for chunk in qr_response.iter_content(1024):
+                    f.write(chunk)
+            files = {"file": open(full_file_path, 'rb')}
+            payload = {
+                "is_private": 1,
+                "folder": "Home",
+                "doctype": "Invoices",
+                "docname": invoice_number,
+                'fieldname': 'credit_qr_code_image'
+            }
+            site = company.host
+            upload_qr_image = requests.post(site + "api/method/upload_file",
+                                            files=files,
+                                            data=payload)
+            response = upload_qr_image.json()
+            if 'message' in response:
+                invoice.credit_qr_code_image = response['message']['file_url']
+                invoice.save()
+                frappe.db.commit()
+                # attach_qr_code(invoice_number, gsp,invoice.company)
+
+            return {"succes":True,"message":"QR Generated Successfully"}
         else:
-            proxyhost = company.proxy_url
-            proxyhost = proxyhost.replace("http://","@")
-            proxies = {'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
-            print(proxies, "     proxy console")
-            qr_response = requests.get(gsp['generate_qr_code'],
-                                        headers=headers,
-                                        stream=True,proxies=proxies,verify=False)
-
-        if qr_response.status_code==200:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Success","company":company.name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-        else:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","create_qr_image":'True',"status":"Failed","company":company.name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)	
-
-
-        file_name = invoice_number + "creditqr.png"
-        full_file_path = path + file_name
-        with open(full_file_path, "wb") as f:
-            for chunk in qr_response.iter_content(1024):
-                f.write(chunk)
-        files = {"file": open(full_file_path, 'rb')}
-        payload = {
-            "is_private": 1,
-            "folder": "Home",
-            "doctype": "Invoices",
-            "docname": invoice_number,
-            'fieldname': 'credit_qr_code_image'
-        }
-        site = company.host
-        upload_qr_image = requests.post(site + "api/method/upload_file",
-                                        files=files,
-                                        data=payload)
-        response = upload_qr_image.json()
-        if 'message' in response:
-            invoice.credit_qr_code_image = response['message']['file_url']
-            invoice.save()
-            frappe.db.commit()
-            # attach_qr_code(invoice_number, gsp,invoice.company)
-
-        return {"succes":True,"message":"QR Generated Successfully"}
+            return create_ey_qr_code(invoice_number,{})
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing create_credit_qr_image Credit Irn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
@@ -476,10 +475,10 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
                 "Loc":
                 company_details['data'].location,
                 "Pin":
-                193502 if company_details['data'].mode == "Testing" else
+                175032 if company_details['data'].mode == "Testing" else
                 company_details['data'].pincode,
                 "Stcd":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 company_details['data'].state_code,
                 "Ph":
                 company_details['data'].phone_number,
@@ -494,7 +493,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
                 "TrdNm":
                 taxpayer_details['data'].trade_name,
                 "Pos":
-                "01" if company_details['data'].mode == "Testing" else
+                "02" if company_details['data'].mode == "Testing" else
                 # company_details['data'].state_code,
                 invoice.place_of_supply,
                 "Addr1":
@@ -609,6 +608,7 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
                 gst_data["TranDtls"]["IgstOnIntra"] = "Y"
                 gst_data["TranDtls"]["RegRev"] = "Y"
         response = postIrn(gst_data, GSP_details['data'],company_details, invoice_number)
+        print("$$$$$$$$$4",response)
         if response['success']==True:
             irnobj.allowance_irn_request_object = json.dumps({"data": gst_data})
             irnobj.allowance_irn_response_object = json.dumps({"data":response})
@@ -676,46 +676,51 @@ def CreditgenerateIrn(invoice_number,generation_type,irnobjName):
         frappe.log_error("Ezy-invoicing CreditgenerateIrn","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success": False, "message": str(e)}
 
+from version2_app.version2_app.doctype.ey_intigration.irngeneration import ey_generate_einvoice
 
 def postIrn(gst_data, gsp,company,invoice_number):
     try:
-        # print(gst_data)
-        headers = {
-            "user_name": gsp['username'],
-            "password": gsp['password'],
-            "gstin": gsp['gst'],
-            "requestid": str(random.randint(0, 1000000000000000000)),
-            "Authorization": "Bearer " + gsp['token']
-        }
-        if company['data'].proxy == 0:
-            if company['data'].skip_ssl_verify ==0:
-                irn_response = requests.post(gsp['generate_irn'],
+        if company['data'].provider != 'ey':
+            # print(gst_data)
+            headers = {
+                "user_name": gsp['username'],
+                "password": gsp['password'],
+                "gstin": gsp['gst'],
+                "requestid": str(random.randint(0, 1000000000000000000)),
+                "Authorization": "Bearer " + gsp['token']
+            }
+            if company['data'].proxy == 0:
+                if company['data'].skip_ssl_verify ==0:
+                    irn_response = requests.post(gsp['generate_irn'],
+                                                    headers=headers,
+                                                    json=gst_data,verify=False)
+                else:
+                    irn_response = requests.post(gsp['generate_irn'],
                                                 headers=headers,
                                                 json=gst_data,verify=False)
             else:
+                proxyhost = company['data'].proxy_url
+                proxyhost = proxyhost.replace("http://","@")
+                proxies = {'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost}
+                print(proxies, "     proxy console")
                 irn_response = requests.post(gsp['generate_irn'],
-                                            headers=headers,
-                                            json=gst_data,verify=False)
-        else:
-            
-            proxyhost = company['data'].proxy_url
-            proxyhost = proxyhost.replace("http://","@")
-            proxies = {'https':'https://'+company['data'].proxy_username+":"+company['data'].proxy_password+proxyhost}
-            print(proxies, "     proxy console")
-            irn_response = requests.post(gsp['generate_irn'],
-                                            headers=headers,
-                                            json=gst_data,proxies=proxies,verify=False)									
-        if irn_response.status_code == 200:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company['data'].name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                                                headers=headers,
+                                                json=gst_data,proxies=proxies,verify=False)									
+            if irn_response.status_code == 200:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Success","company":company['data'].name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
 
-            return irn_response.json()
+                return irn_response.json()
+            else:
+                insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company['data'].name})
+                insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
+                response_error_message = str(irn_response.text)
+                frappe.log_error(frappe.get_traceback(),invoice_number)
+                return {"success": False, 'message': irn_response.text}
         else:
-            insertGsPmetering = frappe.get_doc({"doctype":"Gsp Metering","generate_irn":'True',"status":"Failed","company":company['data'].name})
-            insertGsPmetering.insert(ignore_permissions=True, ignore_links=True)
-            response_error_message = str(irn_response.text)
-            frappe.log_error(frappe.get_traceback(),invoice_number)
-            return {"success": False, 'message': irn_response.text}
+            resp = ey_generate_einvoice(gst_data, gsp, company['data'], invoice_number)
+            # print(resp,"*********************")
+            return resp
         # print(irn_response.text)
     except Exception as e:
         print(e, "post irn credit")

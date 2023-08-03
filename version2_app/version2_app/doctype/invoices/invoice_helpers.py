@@ -35,6 +35,13 @@ def TotalMismatchError(data,calculated_data):
         else:
             pos_checks = data['guest_data']['pos_checks']
         
+        folder_path = frappe.utils.get_bench_path()
+        with open(folder_path+"/"+"apps/version2_app/version2_app/version2_app/doctype/invoices/state_code.json") as f:
+            json_data = json.load(f)
+            for each in json_data:
+                if companyDetails.state_code == each['tin']:
+                    place_supplier_state_name = f"{each['state']}-({each['tin']})"
+        
         invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -140,7 +147,8 @@ def TotalMismatchError(data,calculated_data):
                 "sez":data["sez"] if "sez" in data else 0,
                 "allowance_invoice":allowance_invoice,
                 "debit_invoice":debit_invoice,
-                "invoice_object_from_file":json.dumps(data['invoice_object_from_file'])
+                "invoice_object_from_file":json.dumps(data['invoice_object_from_file']),
+                "place_of_supply_json" : place_supplier_state_name
             })
         if data['amened'] == 'Yes':
             invCount = frappe.db.get_list(

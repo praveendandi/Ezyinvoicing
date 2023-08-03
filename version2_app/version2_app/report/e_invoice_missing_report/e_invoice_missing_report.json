@@ -1,0 +1,50 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2023-04-15 11:44:15.581440",
+ "disable_prepared_report": 1,
+ "disabled": 1,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2023-04-28 17:53:03.758217",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "E-invoice missing report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Invoices",
+ "report_name": "E-invoice missing report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "ezy-IT"
+  },
+  {
+   "role": "ezy-Finance"
+  },
+  {
+   "role": "ezy-FrontOffice"
+  },
+  {
+   "role": "Guest"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "ezy-Inbox"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "All"
+  }
+ ]
+}

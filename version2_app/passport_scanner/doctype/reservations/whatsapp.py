@@ -11,7 +11,7 @@ from PIL import ImageFont
 
 frappe.utils.logger.set_log_level("DEBUG")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def sendInvoicesToWhatsApp(data):
     try:
         company = frappe.get_last_doc('company')
@@ -49,7 +49,7 @@ def sendInvoicesToWhatsApp(data):
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def sendPOSBillsToWhatsApp(data):
 #     try:
 #         company = frappe.get_last_doc('company')

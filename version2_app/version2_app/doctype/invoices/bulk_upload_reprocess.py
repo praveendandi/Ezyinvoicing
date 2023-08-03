@@ -16,7 +16,7 @@ from version2_app.version2_app.doctype.invoices.hyatt_bulk import hyatt_bulkuplo
 
  
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def BulkUploadReprocess(data):
     try:
         invoice_number = data['invoice_number']
@@ -24,7 +24,10 @@ def BulkUploadReprocess(data):
         line_items = json.loads(invoice_data.invoice_object_from_file)
         if "data" in line_items.keys():
             if invoice_data.invoice_type == "B2B":
-                invoice_data.gst_number = line_items["data"]["gstNumber"]
+                if line_items['data']['gstNumber'] == invoice_data.gst_number:
+                    invoice_data.gst_number = line_items["data"]["gstNumber"]
+                else:
+                    invoice_data.gst_number = invoice_data.gst_number
         #     line_items = {"data": line_items}
         #     invoice_data.invoice_object_from_file = json.dumps(line_items)
         # if isinstance(line_items["data"], dict):
@@ -107,7 +110,7 @@ def BulkUploadReprocess(data):
             for each in line_items['data']['items']:
 
                 if each['name'].lower() not in payment_Types:
-                    if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or "VAT" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or "UTGST" in each["name"] or "UGST" in each["name"]:
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or "IGST" in each["name"] or ("VAT" in each["name"] and "Saarvat" not in each["name"])  or "Cess" in each["name"] or "CESS" in each["name"] or "UTGST" in each["name"] or "UGST" in each["name"]:
                         continue
                     item_dict = {}
                     date_time_obj = datetime.datetime.strptime(each['date'],'%d-%m-%y').strftime(company.invoice_item_date_format)
@@ -143,7 +146,7 @@ def BulkUploadReprocess(data):
                     error_data['invoice_type'] = "B2B"
             for each in line_items['data']['items']:
                 if each['name'].lower() not in payment_Types:
-                    if  "CGST" in each["name"] or "SGST" in each["name"] or "VAT" in each["name"] or "Vat" in each["name"] or "vat" in each["name"]  or "Cess" in each["name"] or "CESS" in each["name"] or "UTGST" in each["name"] or "UGST" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
+                    if  "CGST" in each["name"] or "SGST" in each["name"] or ("VAT" in each["name"] or "Vat" in each["name"] or "vat" in each["name"] and "Saarvat" not in each["name"])  or "Cess" in each["name"] or "CESS" in each["name"] or "UTGST" in each["name"] or "UGST" in each["name"] or ("IGST" in each["name"] and "Debit Note - IGST" not in each["name"]):
                         continue
                     item_dict = {}
                     if company.name=="TGND-01":

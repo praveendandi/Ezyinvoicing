@@ -21,6 +21,7 @@ def create_ey_qr_code(invoice_number,data ={}):
         path = folder_path + '/sites/' + site_folder_path + "/private/files/"						   					   
         file_name = invoice.name+"b2b" + "qr.png"
         full_file_path = path + file_name
+        # print(full_file_path)
         if len(data.keys())>0:
             if invoice.invoice_category == "Tax Invoice":
                 category = "INV"
@@ -147,6 +148,7 @@ def create_ey_qr_code(invoice_number,data ={}):
         #         f.write(chunk)
 
         files = {"file": open(full_file_path, 'rb')}
+        print(full_file_path)
         payload = {
             "is_private": 1,
             "folder": "Home",

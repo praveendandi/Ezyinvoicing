@@ -306,7 +306,15 @@
   "qr_b2c_rect_x0",
   "qr_b2c_rect_x1",
   "qr_b2c_rect_y0",
-  "qr_b2c_rect_y1"
+  "qr_b2c_rect_y1",
+  "ey_variables_section",
+  "source_identifier",
+  "division",
+  "website",
+  "scan_ids",
+  "reprocess_bulk_success_invoices",
+  "einvoice_missing_date_feature",
+  "einvoice_missing_start_date"
  ],
  "fields": [
   {
@@ -1966,14 +1974,59 @@
    "fieldname": "qr_b2c_rect_y1",
    "fieldtype": "Int",
    "label": "QR B2C Rect Y1"
+  },
+  {
+   "fieldname": "ey_variables_section",
+   "fieldtype": "Section Break",
+   "label": "EY variables"
+  },
+  {
+   "fieldname": "source_identifier",
+   "fieldtype": "Data",
+   "label": "Source Identifier"
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Data",
+   "label": "Division"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
+  },
+  {
+   "default": "0",
+   "fieldname": "scan_ids",
+   "fieldtype": "Check",
+   "label": "Scan IDS"
+  },
+  {
+   "default": "0",
+   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldtype": "Check",
+   "label": "Reprocess Bulk Success Invoices"
+  },
+  {
+   "default": "0",
+   "fieldname": "einvoice_missing_date_feature",
+   "fieldtype": "Check",
+   "label": "Einvoice Missing Date Feature",
+   "reqd": 1
+  },
+  {
+   "fieldname": "einvoice_missing_start_date",
+   "fieldtype": "Date",
+   "label": "Einvoice Missing Start Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-01 15:49:18.539069",
+ "modified": "2023-04-17 16:14:29.660711",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

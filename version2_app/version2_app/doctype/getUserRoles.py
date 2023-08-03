@@ -15,7 +15,7 @@ from version2_app.version2_app.doctype.excel_upload_stats.excel_upload_stats imp
 from version2_app.version2_app.doctype.invoices.reinitate_invoice import Reinitiate_invoice
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getUserRoles():
     try:
         if frappe.local.request.method == "POST":

@@ -36,6 +36,7 @@
   "extract_prod_signed_invoice",
   "section_break_15",
   "gsp_prod_app_id",
+  "prod_refresh_token",
   "gsp_prod_app_secret",
   "gst__prod_username",
   "gst_prod_password",
@@ -46,6 +47,7 @@
   "testing_gsp_details_section",
   "gsp_test_app_id",
   "gsp_test_app_secret",
+  "test_refresh_token",
   "gst__test_username",
   "gst_test_password",
   "column_break_27",
@@ -302,11 +304,21 @@
    "fieldname": "gst__prod_username",
    "fieldtype": "Data",
    "label": "GST  PROD Username"
+  },
+  {
+   "fieldname": "prod_refresh_token",
+   "fieldtype": "Small Text",
+   "label": "Prod Refresh Token"
+  },
+  {
+   "fieldname": "test_refresh_token",
+   "fieldtype": "Small Text",
+   "label": "Test Refresh Token"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-06-18 10:34:55.603120",
+ "modified": "2022-12-20 12:07:34.166588",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "GSP APIS",

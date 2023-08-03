@@ -22,7 +22,7 @@ def validateConnection(property_code=None, ip_address=None, type=None):
         return False
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def removeTab(name=None):
 #     # delete tablet config
 #     frappe.db.delete('Tablet Config', {

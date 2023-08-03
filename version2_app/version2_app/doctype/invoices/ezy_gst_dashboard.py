@@ -30,7 +30,7 @@ from openpyxl.cell import Cell
 # from xlsxwriter import add_worksheet
 from version2_app.version2_app.report.outward_supplies.outward_supplies import execute
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getGSTR1DashboardDetails(year=None, month=None):
     try:
         get_b2b_tax_invoice_summaries = frappe.db.sql(
@@ -74,7 +74,7 @@ def getGSTR1DashboardDetails(year=None, month=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getInvoices(filters=[], limit_page_length=20, limit_start=0, month=None, year=None, export=False):
     try:
         if isinstance(filters, str):
@@ -535,7 +535,7 @@ def nill_rated_items(month=None, year=None, limit_page_length=20, limit_start=0,
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def document_sequence(month=None, year=None):
     try:
         data = {}
@@ -589,7 +589,7 @@ def document_sequence(month=None, year=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def reconciliation(start_date, end_date, workbook="true"):
     try:
         # if isinstance(filters, str):
@@ -1078,7 +1078,7 @@ def compare_invoice_summary(start_date, end_date):
         return {"success": False, "message": str(e)}
 
 
-# @frappe.whitelist(allow_guest=True)
+# @frappe.whitelist()
 # def count(start_date, end_date, export=False):
 #     try:
 #         company = frappe.get_last_doc("company")
@@ -1117,7 +1117,7 @@ def compare_invoice_summary(start_date, end_date):
 #                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
 #         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def create_reconciliation(start_date=None, end_date=None, redo=False, recon_id=None):
     try:
         # Getting recon ID
@@ -1406,7 +1406,7 @@ def insert_records(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def export_recon(doctype=None, reconID=None, export="False", filter={}, export_workbook = False):
     try:
         doc_name = doctype
@@ -1549,7 +1549,7 @@ def export_recon(doctype=None, reconID=None, export="False", filter={}, export_w
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def export_workbook_recon(reconID=None):
     try:
         doctypes = ["Invoice Count", "Missing in Opera", "Zero Invoice", "Missing in EzyInvoicing", "Invoice Type Missmatch", "Ezy Invoicing Summary",
@@ -1606,7 +1606,7 @@ def export_workbook_recon(reconID=None):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def delete_recon_file(name=[]):
     try:
         if not isinstance(name, list):
@@ -1651,7 +1651,7 @@ def delete_recon(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def Redo_recon(name=None):
     try:
         print(name,"...........................")
@@ -1669,7 +1669,7 @@ def Redo_recon(name=None):
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def outward_supply(month=None, year=None):
     try:
         start_date = year+'-'+month+"-01"
@@ -1682,7 +1682,7 @@ def outward_supply(month=None, year=None):
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def last_recon_update(month=None, year=None):
     try:
         # if not month or not year:
@@ -1699,7 +1699,7 @@ def last_recon_update(month=None, year=None):
                          "line No:{}\n{}".format(exc_tb.tb_lineno, str(e)))
         return {"success": False, "message": str(e)}
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def dashborad_recon(recon_id=None):
     try:
         invoice_count = frappe.db.sql("""SELECT ezyinvoicing_count as 'ezyinvoicing_count', missing_in_ezyinvoicing as 'missing_in_ezyinvoicing', opera_folios_count as 'opera_folio_count', missing_in_opera as 'missing_in_opera', (ezyinvoicing_count-opera_folios_count) as 'ezy_opera_variance' from `tabInvoice Count` where recon_id='{}'""".format(recon_id), as_dict=1)

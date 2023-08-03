@@ -9,7 +9,7 @@ class IdTextDocumentDetails(Document):
     pass
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def insert_doc_details(data):
     try:
         doc = frappe.get_doc(

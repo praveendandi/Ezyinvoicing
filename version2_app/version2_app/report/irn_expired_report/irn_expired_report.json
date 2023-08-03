@@ -1,0 +1,50 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2023-04-28 17:43:05.230679",
+ "disable_prepared_report": 1,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2023-04-28 17:43:05.230679",
+ "modified_by": "Administrator",
+ "module": "Version2 App",
+ "name": "Irn Expired Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Invoices",
+ "report_name": "Irn Expired Report",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "ezy-IT"
+  },
+  {
+   "role": "ezy-Finance"
+  },
+  {
+   "role": "ezy-FrontOffice"
+  },
+  {
+   "role": "Guest"
+  },
+  {
+   "role": "Administrator"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "ezy-Inbox"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "All"
+  }
+ ]
+}

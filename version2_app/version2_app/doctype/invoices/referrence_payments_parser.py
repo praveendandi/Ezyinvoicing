@@ -172,7 +172,7 @@ def funForHash(raw_data):
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def paymentsAndReferences(data):   
     try:
         start_time = datetime.datetime.utcnow()

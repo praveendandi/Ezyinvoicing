@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 # import frappe
 from frappe.model.document import Document
-from version2_app.version2_app.doctype.invoices.invoices import gsp_api_data
+from version2_app.version2_app.doctype.invoices.invoices import gsp_api_data,updatelogin_gsp
 host = "http://localhost:8000/api/method/"
 
 class TaxPayerDetails(Document):
@@ -19,7 +19,7 @@ Headers = {
 import datetime
 import os,sys,traceback
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def getTaxPayerDetails(data):
     try:
         if data['type'] == "All":
@@ -90,8 +90,6 @@ def getTaxPayerDetails(data):
 
 def request_get(api, data,company):
     try:
-        
-
         headerData = {
             "user_name": data['apidata']["username"],
             "password": data['apidata']["password"],
@@ -120,13 +118,13 @@ def request_get(api, data,company):
         if raw_response.status_code == 200:
             return raw_response.json()
         else:
-            print(raw_response)
+            return {'success':False,"message":raw_response.json()['error']}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing request_get Gst","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         print(e,"request get")
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def TaxPayerDetails(data):
     '''
     get TaxPayerDetail from gsp   gstNumber, code, apidata
@@ -140,12 +138,16 @@ def TaxPayerDetails(data):
         
             companyApis = frappe.get_doc('company', data['code'])
             
-            gspApiDataResponse = gsp_api_data({"mode":companyApis.mode,"code":companyApis.company_code,"provider":companyApis.provider})
-            
+            # gspApiDataResponse = gsp_api_data({"mode":companyApis.mode,"code":companyApis.company_code,"provider":companyApis.provider})
+            gspApiDataResponse = gsp_api_data({"mode":companyApis.mode,
+            "code":companyApis.company_code,"provider":'Adaequare'})
             if gspApiDataResponse['success'] == True:
                 GspData = {"gstNumber":data['gstNumber'],"code":data['code'],"apidata":gspApiDataResponse['data']}
                 response = request_get(gspApiDataResponse['data']['get_taxpayer_details']+ data['gstNumber'],
                                     GspData,companyApis.__dict__)
+
+                print(response,"errorr")
+    
                 if response['success']:
                         
                     details = response['result']
@@ -216,7 +218,11 @@ def TaxPayerDetails(data):
                     return {"success":True,"data":tax_payer,"update":False}
                     
                 else:
-                    return {"success":False,"message":response['message'],"response":response}
+                    if response['message'] == 'invalid_token':
+                        updatelogin_gsp({"code":data['code'],"mode":companyApis.mode})
+                        TaxPayerDetails(data)
+                    else:
+                        return {"success":False,"message":response['message'],"response":response}
             
             return {"success":False,"message":gspApiDataResponse['message']}	
         else:

@@ -26,7 +26,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 # import fitz
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def IrnObject(invoice_number):
 	try:
 		invoice = frappe.get_doc('Invoices', invoice_number)
