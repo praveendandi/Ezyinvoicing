@@ -11,7 +11,11 @@ def execute(filters=None):
 	try:
 		pd.set_option("display.max_rows", None, "display.max_columns", None)
 		# columns = ["Invoice Number","Invoice Date","Transaction type","Transaction Subtype","Gst Number","Gst Check","Invoice Type","Registered Name","SAC / HSN CODE","Place of Supply (POS)","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount","Port Code","Shipping Bill / Bill of Export No.","Shipping Bill / Bill of Export Date","UQC","Quantity","Invoice Cancellation","Pre GST Regime Credit / Debit Note","Original Invoice Number","Original Invoice Date","Original Customer GSTIN / UIN","Original Transaction Type","Reason for issuing Credit / Debit Note","Return Month And Year (MM-YYYY)","Original Invoice Value"]
+<<<<<<< HEAD
 		columns = ['Receiver GSTIN / UIN','Receiver Name','Invoice Type (R / SEZ / DE)','Invoice Number','Guest Name','Invoice Date','Checkout Date','Invoice Value','Place Of Supply','Reverse Charge','E-Commerce GSTIN','SAC / HSN CODE','Applicable % of Tax Rate','Tax Rate','Taxable Value','Non Taxable Value','Integrated Tax Amount','Central Tax Amount','State / UT Tax Amount','State Cess Amount','Central Cess Amount',"Irn Generated","Irn Number","Ack No","Ack Date"]
+=======
+		columns = ['Receiver GSTIN / UIN','Receiver Name','Invoice Type (R / SEZ / DE)','Invoice Number','Guest Name','Invoice Date','Checkout Date','Invoice Value','Place Of Supply','Reverse Charge','E-Commerce GSTIN','Applicable % of Tax Rate','Tax Rate','Taxable Value','Non Taxable Value','Integrated Tax Amount','Central Tax Amount','State / UT Tax Amount','State Cess Amount','Central Cess Amount',"Irn Generated","Irn Number","Ack No","Ack Date"]
+>>>>>>> 6d12bebbed01e84ed4825557c637b5ba4b9af6dc
 		fields = ['invoice_number','guest_name','invoice_date','checkout_date','gst_number','trade_name','place_of_supply','invoice_category','total_invoice_amount','sez',"irn_generated","irn_number","ack_no","ack_date"]
 		doc = frappe.db.get_list('Invoices', filters={'invoice_date': ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['=','Success'],'invoice_category':['!=','Credit Invoice'],'invoice_type':'B2C', 'un_billed_invoice': 0},fields=fields,as_list=True)
 		if len(doc) == 0:
@@ -52,11 +56,15 @@ def execute(filters=None):
 
 		mergedDf['place_of_supply'] = mergedDf['place_of_supply'].fillna(company.state_code)
 		# mergedDf.loc[(mergedDf.invoice_type=="B2C"),'Gst Check'] = ' '
+<<<<<<< HEAD
 		mergedDf.rename(columns={'invoice_number': 'Invoice Number','guest_name':'Guest Name', 'invoice_date': 'Invoice Date','checkout_date':'Checkout Date','gst_number':'Receiver GSTIN / UIN','trade_name':'Receiver Name','total_invoice_amount':'Invoice Value','place_of_supply':'Place Of Supply','sac_code':'SAC / HSN CODE','gst_rate':'Tax Rate','tax_value':'Taxable Value','non_tax_value':'Non Taxable Value','igst_amount':'Integrated Tax Amount','cgst_amount':'Central Tax Amount','sgst_amount':'State / UT Tax Amount','state_cess_amount':'State Cess Amount','cess_amount':"Central Cess Amount","irn_generated":"Irn Generated","irn_number":"Irn Number","ack_no":"Ack No","ack_date":"Ack Date"}, inplace=True)
 		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
 		mergedDf = mergedDf[columns]
 		data = mergedDf.values.tolist()
 
+=======
+		mergedDf.rename(columns={'invoice_number': 'Invoice Number','guest_name':'Guest Name', 'invoice_date': 'Invoice Date','checkout_date':'Checkout Date','gst_number':'Receiver GSTIN / UIN','trade_name':'Receiver Name','total_invoice_amount':'Invoice Value','place_of_supply':'Place Of Supply','gst_rate':'Tax Rate','tax_value':'Taxable Value','non_tax_value':'Non Taxable Value','igst_amount':'Integrated Tax Amount','cgst_amount':'Central Tax Amount','sgst_amount':'State / UT Tax Amount','state_cess_amount':'State Cess Amount','cess_amount':"Central Cess Amount","irn_generated":"Irn Generated","irn_number":"Irn Number","ack_no":"Ack No","ack_date":"Ack Date"}, inplace=True)
+>>>>>>> 6d12bebbed01e84ed4825557c637b5ba4b9af6dc
 		mergedDf = mergedDf.sort_values(by=['Invoice Number'])
 		mergedDf = mergedDf[columns]
 		data = mergedDf.values.tolist()

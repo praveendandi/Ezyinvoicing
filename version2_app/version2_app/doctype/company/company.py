@@ -814,3 +814,36 @@ def reprocess_b2c_invoices():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing reprocess_b2c_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
+    
+
+@frappe.whitelist()
+def reprocess_B2C_pending_invoices():
+    try:
+        doc = frappe.db.get_list('company',fields=['name',"new_parsers"])
+        if doc[0]["new_parsers"] == 0:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        else:
+            file_path = abs_path + '/apps/version2_app/version2_app/parsers_invoice/invoice_parsers/'+doc[0]["name"]+'/reinitiate_parser.py'
+        spec = importlib.util.spec_from_file_location(module_name, file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        data = frappe.db.get_list('Invoices',filters={"invoice_type": "B2C",'irn_generated': 'Pending','invoice_from':["in",['Pms','File']]},fields=["name","invoice_number","invoice_file","invoice_from"])
+        if len(data)>0:
+            for each in data:
+                if each['invoice_from'] == "Pms":
+                    obj = {"filepath":each["invoice_file"],"invoice_number":each["name"]}
+                    reinitiate = module.reinitiateInvoice(obj)
+                    doc = frappe.get_doc("Invoices",each['name'])
+                    frappe.publish_realtime("custom_socket", {'data':reinitiate,'message':reinitiate,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
+                else:
+                    bulk_upload_reprocessapi = BulkUploadReprocess({"invoice_number":each['name']})
+                    doc = frappe.get_doc("Invoices",each['name'])
+                    frappe.publish_realtime("custom_socket", {'data':bulk_upload_reprocessapi,'message':bulk_upload_reprocessapi,'type':"reprocess pending invoicess","invoice_number":each['name'],"status":doc.irn_generated,"guest_name":doc.guest_name,"company":doc.company})
+            return {"success":True}
+        else:
+            return {"success":False, "message":"no data found"}
+    except Exception as e:
+        print("reprocess_B2C_pending_inoices", str(e))
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("Ezy-invoicing reprocess_pending_invoices","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}

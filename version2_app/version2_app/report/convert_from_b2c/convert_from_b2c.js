@@ -17,4 +17,5 @@ frappe.query_reports["Convert From B2C"] =
             "default": frappe.datetime.month_end()
         }
     ]
+    
 };

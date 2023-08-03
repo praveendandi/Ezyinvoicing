@@ -213,6 +213,7 @@ def combine_pdf(files, filename, name, add_signature=False):
 
 @frappe.whitelist()
 def download_pdf(name, add_signature=False, email=False):
+    print(name, add_signature,"..................0000000")
     try:
         if add_signature == "true":
             add_signature = True

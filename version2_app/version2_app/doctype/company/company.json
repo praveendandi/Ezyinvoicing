@@ -314,7 +314,9 @@
   "scan_ids",
   "reprocess_bulk_success_invoices",
   "einvoice_missing_date_feature",
-  "einvoice_missing_start_date"
+  "einvoice_missing_start_date",
+  "create_manual_invoice",
+  "attach_date_format_to_pos_bills"
  ],
  "fields": [
   {
@@ -2018,15 +2020,19 @@
    "fieldname": "einvoice_missing_start_date",
    "fieldtype": "Date",
    "label": "Einvoice Missing Start Date"
+  },
+  {
+   "fieldname": "attach_date_format_to_pos_bills",
+   "fieldtype": "Data",
+   "label": "Attach Date Format To Pos Bills"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-17 16:14:29.660711",
+ "modified": "2023-07-13 12:45:02.956075",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
- "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
