@@ -480,8 +480,8 @@ def fileCreated(doc, method=None):
                 company = frappe.get_last_doc("company")
                 if company.block_print == "True":
                     return {"success": False, "message": "Print has been Blocked"}
-                if ".pdf" in doc.file_url and "with-qr" not in doc.file_url:
-                    update_documentbin(doc.file_url, "")
+            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url and "sign-" not in doc.file_url and not doc.file_url.startswith("sign-"):
+                update_documentbin(doc.file_url, "")
         return True
         logger.error(f"fileCreated,   {traceback.print_exc()}")
     except Exception as e:
@@ -2029,6 +2029,7 @@ def pre_mail():
                     return {"success": False, "message": "Invitation Sent"}
                 elif company.mail_frequency == "Daily":
                     for x in get_arrival_data:
+                        print(x)
                         email_address = str(x["guest_email_address"])
                         guest_first_name = str(x["guest_first_name"])
                         guest_last_name = str(x["guest_last_name"])
@@ -2571,6 +2572,7 @@ def update_company(doc, method=None):
 def delete_arrival_activity():
     try:
         last_week = datetime.datetime.now() - datetime.timedelta(days=2)
+        print(last_week)
         arrival_activity = frappe.db.get_all(
             "Arrival Activities",
             filters={"creation": ["<", last_week]},
