@@ -92,7 +92,7 @@ def bulkupload(data):
             if invoice_data["company"]=="TWKR-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("9999","")
             if invoice_data["company"]=="IKR-01":
-                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "IKR-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace(" ","")
             if invoice_data["company"]=="KHK-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "NKHK"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="HRC-01":
