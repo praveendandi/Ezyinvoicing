@@ -312,8 +312,8 @@
   "reprocess_bulk_success_invoices",
   "einvoice_missing_date_feature",
   "einvoice_missing_start_date",
-  "create_manual_invoice",
-  "attach_date_format_to_pos_bills"
+  "attach_date_format_to_pos_bills",
+  "create_manual_invoice"
  ],
  "fields": [
   {
@@ -2007,11 +2007,17 @@
    "fieldname": "attach_date_format_to_pos_bills",
    "fieldtype": "Data",
    "label": "Attach Date Format To Pos Bills"
+  },
+  {
+   "default": "1",
+   "fieldname": "create_manual_invoice",
+   "fieldtype": "Check",
+   "label": "Create Manual Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-07-13 12:45:02.956075",
+ "modified": "2023-08-04 17:03:34.765446",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
