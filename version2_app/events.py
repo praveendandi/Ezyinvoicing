@@ -77,7 +77,7 @@ def invoice_update(doc, method=None):
 def invoice_created(doc, method=None):
     try:        
         company = frappe.get_last_doc("company")
-        if company == "RBHR-01":
+        if company.name == "RBHR-01":
             attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
             etax = html_to_pdf(doc.name)
