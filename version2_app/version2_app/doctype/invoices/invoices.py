@@ -39,7 +39,7 @@ import json
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import fitz
 from frappe.utils import cstr
-
+from version2_app.version2_app.doctype.invoices.get_taxpayer_from_ezylicensing import gettaxpayer_from_gst
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
@@ -2933,17 +2933,20 @@ def get_tax_payer_details(data):
                     proxyhost = proxyhost.replace("http://","@")
                     proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
                                     'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
-                    json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,proxies=proxies,verify=False)
+                    # json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,proxies=proxies,verify=False)
+                    json_response = gettaxpayer_from_gst(gstn=data['gstNumber'])
                 else:
                     if company.skip_ssl_verify == 1:
-                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
+                        json_response = gettaxpayer_from_gst(gstn=data['gstNumber'])
+                        # json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
                     else:
-                        json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
-                if json_response.content:
-                    response = request_get(
-                        data['apidata']['get_taxpayer_details'] + data['gstNumber'],
-                        data['apidata'], data['invoice'], data['code'])
-                    
+                        json_response = gettaxpayer_from_gst(gstn=data['gstNumber'])
+                        # json_response = requests.get(company.licensing_host+"/api/resource/TaxPayerDetail/"+data['gstNumber'],headers=headers,verify=False)
+                if json_response:
+                    response =gettaxpayer_from_gst(gstn=data['gstNumber'])
+                    # response = request_get(
+                    #     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
+                    #     data['apidata'], data['invoice'], data['code'])
                     if response['success']:
                         company = frappe.get_doc('company',data['code'])
                         details = response['result']
@@ -2995,7 +2998,7 @@ def get_tax_payer_details(data):
                         tax_payer.address_street = details['AddrSt']
                         tax_payer.block_status = ''
                         tax_payer.status = details['Status']
-                        if details['Status'] == "ACT":
+                        if details['Status'] == "ACT" or details['Status'] == "Active" :
                             tax_payer.status = 'Active'
                             doc = tax_payer.insert(ignore_permissions=True)
                             return {"success": True, "data": doc}
@@ -3026,9 +3029,10 @@ def get_tax_payer_details(data):
                     return {"success": True, "data": get_doc}
             else:
                 print(data['gstNumber'],"-----------------")
-                response = request_get(
-                    data['apidata']['get_taxpayer_details'] + data['gstNumber'],
-                    data['apidata'], data['invoice'], data['code'])
+                response =gettaxpayer_from_gst(gstn=data['gstNumber'])
+                # response = request_get(
+                #     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
+                #     data['apidata'], data['invoice'], data['code'])
                 if response['success']:
                     print(response,"_____________________")
                     company = frappe.get_doc('company',data['code'])
@@ -3080,7 +3084,7 @@ def get_tax_payer_details(data):
                     tax_payer.address_street = details['AddrSt']
                     tax_payer.block_status = ''
                     tax_payer.status = details['Status']
-                    if details['Status'] == "ACT":
+                    if details['Status'] == "ACT" or details['Status'] == "Active":
                         tax_payer.status = 'Active'
                         doc = tax_payer.insert(ignore_permissions=True)
                         return {"success": True, "data": doc}

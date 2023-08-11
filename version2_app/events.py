@@ -77,7 +77,8 @@ def invoice_update(doc, method=None):
 def invoice_created(doc, method=None):
     try:        
         company = frappe.get_last_doc("company")
-        attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
+        if company.name == "RBHR-01":
+            attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
             etax = html_to_pdf(doc.name)
             if etax["success"]:
@@ -87,7 +88,6 @@ def invoice_created(doc, method=None):
             total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
-                # print(doc.amount_in_word,"===============")
                 # doc.save(ignore_permissions=True)
                 # frappe.db.commit()
         if frappe.db.exists('Invoice Reconciliations', doc.name):
@@ -437,7 +437,7 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
-        if "job-" in doc.file_name:
+        if "job-" in doc.file_name and 'sign-' not in doc.file_name:
             if not frappe.db.exists(
                 {"doctype": "Document Bin", "invoice_file": doc.file_url}
             ):
@@ -480,6 +480,7 @@ def fileCreated(doc, method=None):
                 company = frappe.get_last_doc("company")
                 if company.block_print == "True":
                     return {"success": False, "message": "Print has been Blocked"}
+                
             if ".pdf" in doc.file_url and "with-qr" not in doc.file_url and "sign-" not in doc.file_url and not doc.file_url.startswith("sign-"):
                 update_documentbin(doc.file_url, "")
         return True
