@@ -1,7 +1,7 @@
 import frappe
 import sys
 
-@frappe.whitelist(allow_guest= True)
+@frappe.whitelist()
 def disable_service_charge():
     try:
         sac_list = frappe.db.get_list("SAC HSN CODES",fields=["name","service_charge","state_cess_rate"])
