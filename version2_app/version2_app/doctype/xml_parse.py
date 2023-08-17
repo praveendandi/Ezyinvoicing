@@ -60,7 +60,13 @@ def extract_xml(file_list):
                 else:
                     convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d/%b/%y').strftime('%Y-%m-%d')
                 if "-" in each["BILL_GENERATION_DATE_CHAR"]:
-                    convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                    try:
+                        convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        try:
+                            convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%m-%d-%y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            convert_bill_generation_date_char = None
                 elif "." in each["BILL_GENERATION_DATE_CHAR"]:
                     convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%m.%y').strftime('%Y-%m-%d')
                 else:
@@ -125,7 +131,13 @@ def extract_xml(file_list):
             else:
                 convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d/%b/%y').strftime('%Y-%m-%d')
             if "-" in each["BILL_GENERATION_DATE_CHAR"]:
-                convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                try:
+                    convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                except ValueError:
+                    try:
+                        convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%m-%d-%y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        convert_bill_generation_date_char = None
             elif "." in each["BILL_GENERATION_DATE_CHAR"]:
                 convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%m.%y').strftime('%Y-%m-%d')
             else:
