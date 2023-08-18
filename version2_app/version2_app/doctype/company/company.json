@@ -2027,10 +2027,7 @@
    "label": "Attach Date Format To Pos Bills"
   },
   {
-<<<<<<< HEAD
-=======
    "default": "1",
->>>>>>> a60b09905eaf56d0035c946ffa8d94f529e3b3fa
    "fieldname": "create_manual_invoice",
    "fieldtype": "Check",
    "label": "Create Manual Invoice"
