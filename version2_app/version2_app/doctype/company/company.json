@@ -2027,6 +2027,10 @@
    "label": "Attach Date Format To Pos Bills"
   },
   {
+<<<<<<< HEAD
+=======
+   "default": "1",
+>>>>>>> a60b09905eaf56d0035c946ffa8d94f529e3b3fa
    "fieldname": "create_manual_invoice",
    "fieldtype": "Check",
    "label": "Create Manual Invoice"
@@ -2034,7 +2038,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-03 15:07:36.264774",
+ "modified": "2023-08-04 17:03:34.765446",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",

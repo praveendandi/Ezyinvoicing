@@ -22,21 +22,40 @@ def BulkUploadReprocess(data):
         invoice_number = data['invoice_number']
         invoice_data = frappe.get_doc('Invoices',invoice_number)
         line_items = json.loads(invoice_data.invoice_object_from_file)
+
         if 'data' in line_items:
             for item in line_items['data']:
-                if isinstance(item, dict) and 'gstNumber' in item.keys():
-                    if line_items['data'][0]['gstNumber'] == invoice_data.gst_number:
-                        invoice_data.gst_number = line_items["data"][0]["gstNumber"]
-                    else:
-                        invoice_data.gst_number = invoice_data.gst_number
+                if isinstance(item,dict):
+                    if "taxid" in item.keys() or "gstNumber" in item.keys():
+                        if "gstNumber" in item.keys():
+                            if line_items['data'][0]['gstNumber']:
+                                invoice_data.gst_number = line_items["data"][0]["gstNumber"]
+                                break
+                            else:
+                                invoice_data.gst_number = line_items["data"][0]["gstNumber"]
+                        else:
+                            if "taxid" in item.keys():
+                                if line_items['data'][0]['taxid']:
+                                    invoice_data.gst_number = line_items["data"][0]["taxid"]
+                                    break
+                                else:
+                                    invoice_data.gst_number = line_items["data"][0]["taxid"]
                 else:
-                    invoice_data.gst_number = invoice_data.gst_number
-        #     line_items = {"data": line_items}
-        #     invoice_data.invoice_object_from_file = json.dumps(line_items)
-        # if isinstance(line_items["data"], dict):
-        #     if "data" in line_items["data"].keys():
-        #         line_items = line_items["data"]
-        #         invoice_data.invoice_object_from_file = json.dumps(line_items)
+                    if isinstance(item,str):
+                        if "gstNumber" == item:
+                            if line_items['data']['gstNumber']:
+                                invoice_data.gst_number = line_items["data"]["gstNumber"]
+                                break
+                            else:
+                                invoice_data.gst_number = line_items["data"]["gstNumber"]
+                        else:
+                            if "taxid" == item:
+                                if line_items['data']['taxid']:
+                                    invoice_data.gst_number = line_items["data"]["taxid"]
+                                    break
+                                else:
+                                    invoice_data.gst_number = line_items["data"]["taxid"]
+        
         invoice_total_amount = invoice_data.total_invoice_amount
         company = frappe.get_doc('company',invoice_data.company)
         gstNumber = (invoice_data.gst_number).strip() 

@@ -40,6 +40,7 @@ import datetime
 from version2_app.e_signature.e_signature import add_esignature_to_invoice
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("api")
+from version2_app.remove_copy_of_invoice import remove_copy_of_invoice
 
 # from version2_app.passport_scanner.doctype.dropbox.dropbox import create_scanned_doc
 # user_name = frappe.session.user
@@ -77,7 +78,10 @@ def invoice_update(doc, method=None):
 def invoice_created(doc, method=None):
     try:        
         company = frappe.get_last_doc("company")
-        attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
+        if company.name == "NCO-01":
+            remove_cp_on_invoice = remove_copy_of_invoice(doc.invoice_number)
+        if company.name == "RBHR-01":
+            attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
         if company.create_etax_invoices_in_separate_folder == 1 and doc.etax_invoice_created == 0 and doc.irn_generated == "Success":
             etax = html_to_pdf(doc.name)
             if etax["success"]:
@@ -87,7 +91,6 @@ def invoice_created(doc, method=None):
             total_amount_in_words = num_to_words(doc.sales_amount_after_tax)
             if total_amount_in_words["success"] == True:
                 doc.amount_in_word = total_amount_in_words["data"]
-                # print(doc.amount_in_word,"===============")
                 # doc.save(ignore_permissions=True)
                 # frappe.db.commit()
         if frappe.db.exists('Invoice Reconciliations', doc.name):
@@ -437,7 +440,7 @@ def insert_folios(company, file_path):
 
 def fileCreated(doc, method=None):
     try:
-        if "job-" in doc.file_name:
+        if "job-" in doc.file_name and 'sign-' not in doc.file_name and "whitepage" not in doc.file_name:
             if not frappe.db.exists(
                 {"doctype": "Document Bin", "invoice_file": doc.file_url}
             ):
@@ -480,7 +483,8 @@ def fileCreated(doc, method=None):
                 company = frappe.get_last_doc("company")
                 if company.block_print == "True":
                     return {"success": False, "message": "Print has been Blocked"}
-            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url and "sign-" not in doc.file_url and not doc.file_url.startswith("sign-"):
+                
+            if ".pdf" in doc.file_url and "with-qr" not in doc.file_url and "sign-" not in doc.file_url and not doc.file_url.startswith("sign-") and  "whitepage" not in doc.file_url and not doc.file_url.startswith("whitepage"):
                 update_documentbin(doc.file_url, "")
         return True
         logger.error(f"fileCreated,   {traceback.print_exc()}")

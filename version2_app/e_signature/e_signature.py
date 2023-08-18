@@ -19,6 +19,7 @@ from version2_app.utils import html_to_pdf, convert_image_to_base64
 import shutil
 from os import path
 import pandas as pd
+from datetime import datetime, timedelta
 
 
 
@@ -75,7 +76,7 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
         # return pdf_signer
 
         file_name = os.path.basename(invoice)
-        file_name1 = f"'sign-'{file_name}"
+        file_name1 = "sign-"+file_name
         output_file_path = invoice_file+"/public/files/"+file_name1
         signed_file_path = invoice_file + "/private/files/" + file_name1
 
@@ -118,7 +119,6 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
             frappe.db.sql(
                 """DELETE FROM `tabFile` where`tabFile`.file_url = '{}'""".format(invoice))
             frappe.db.commit()
-            print(response['message']['file_url'],"orrrrrrr")
             return {"success": True, "file": response['message']['file_url']}
         
     except Exception as e:
@@ -156,7 +156,6 @@ def send_files(files, user_name, summary):
 
 @frappe.whitelist()
 def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, type="invoice",src=False):
-    print(invoice_number)
     try:
         company = frappe.get_last_doc("company")
         if type == "etax":
@@ -243,23 +242,14 @@ def add_signature_on_etax(invoice_number=None,e_tax_format=None,source_from=Fals
 
 @frappe.whitelist()
 def add_signature_for_existing_invoices():
-    print("////////////")
     try:
         company_code = frappe.get_last_doc('company')
-        print(company_code)
-        print(company_code.e_signature)
         if company_code.e_signature == "Disable":
             return {"success": False, "message": "digital signature is in disable mode"}
         else:
             Invoice = frappe.get_last_doc('Invoices')
-            print(Invoice)
             inv = frappe.db.get_list('Invoices',fields =['invoice_number'])
-            invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date < '2023-07-01' ''',as_dict=1)
-            inv_df = pd.DataFrame.from_records(inv)
-            filter_df_inv = pd.DataFrame.from_records(invoice_date)
-            merged_inner = pd.merge(left=inv_df, right=filter_df_inv, left_on='invoice_number', right_on='invoice_number')
-            renamimg_data = merged_inner.rename(columns={'invoice_number': 'invoice_number', 'invoice_date_x':'invoice_date'})
-            convert_data = renamimg_data.to_dict('records')
+            invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date <= '2023-07-01' ''',as_dict=1)
             for i  in invoice_date:
                 attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
             return {"success":True,"message":"Signature updated to invoices"}
@@ -271,22 +261,16 @@ def add_signature_for_existing_invoices():
 
 @frappe.whitelist()
 def after_add_signature_for_existing_invoices():
-    print("///////")
     try:
         company_code = frappe.get_last_doc('company')
-        print(company_code)
         if company_code.e_signature == "Disable":
             return {"success": False, "message": "digital signature is in disable mode"}
         else:
             Invoice = frappe.get_last_doc('Invoices')
-            print(Invoice)
             inv = frappe.db.get_list('Invoices',fields =['invoice_number'])
-            invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date > '2023-07-01' ''',as_dict=1)
-            inv_df = pd.DataFrame.from_records(inv)
-            filter_df_inv = pd.DataFrame.from_records(invoice_date)
-            merged_inner = pd.merge(left=inv_df, right=filter_df_inv, left_on='invoice_number', right_on='invoice_number')
-            renamimg_data = merged_inner.rename(columns={'invoice_number': 'invoice_number', 'invoice_date_x':'invoice_date'})
-            convert_data = renamimg_data.to_dict('records')
+            one_days_ago = datetime.now() - timedelta(days=1)
+            formatted_date = one_days_ago.strftime('%Y-%m-%d')
+            invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` WHERE invoice_date >= %s''',(formatted_date), as_dict=True)
             for i  in invoice_date:
                 attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
             return {"success":True,"message":"Signature updated to invoices"}
