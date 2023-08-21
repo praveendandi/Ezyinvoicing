@@ -1,6 +1,5 @@
 frappe
-#pdfplumber
-pdfplumber==0.10.1
+pdfplumber
 pandas
 qrcode
 google-cloud-storage
@@ -33,7 +32,7 @@ opencv-python
 fitz
 pgeocode
 datefinder
-PyMuPDF==1.20
+PyMuPDF==1.18
 pyHanko
 uharfbuzz
 fontTools
