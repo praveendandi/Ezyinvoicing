@@ -313,7 +313,8 @@
   "einvoice_missing_date_feature",
   "einvoice_missing_start_date",
   "attach_date_format_to_pos_bills",
-  "create_manual_invoice"
+  "create_manual_invoice",
+  "multiple_accommodations_items_on_one_date"
  ],
  "fields": [
   {
@@ -2013,11 +2014,17 @@
    "fieldname": "create_manual_invoice",
    "fieldtype": "Check",
    "label": "Create Manual Invoice"
+  },
+  {
+   "default": "0",
+   "fieldname": "multiple_accommodations_items_on_one_date",
+   "fieldtype": "Check",
+   "label": "Multiple Accommodations Items on One Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-04 17:03:34.765446",
+ "modified": "2023-08-22 17:39:48.646075",
  "modified_by": "Administrator",
  "module": "Version2 App",
  "name": "company",
