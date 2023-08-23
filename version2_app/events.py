@@ -78,7 +78,7 @@ def invoice_update(doc, method=None):
 def invoice_created(doc, method=None):
     try:        
         company = frappe.get_last_doc("company")
-        if company.name == "NCO-01":
+        if company.name == "NCO-01" or company.name == "NICO-01" :
             remove_cp_on_invoice = remove_copy_of_invoice(doc.invoice_number)
         if company.name == "RBHR-01":
             attach_digital_sign=add_esignature_to_invoice(invoice_number=doc.invoice_number, based_on="user", etax=None, type="invoice",src=False)
