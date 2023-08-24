@@ -307,6 +307,9 @@
   "qr_b2c_rect_x1",
   "qr_b2c_rect_y0",
   "qr_b2c_rect_y1",
+  "ey_variables_section",
+  "source_identifier",
+  "division",
   "website",
   "scan_ids",
   "reprocess_bulk_success_invoices",
@@ -1973,6 +1976,21 @@
    "fieldname": "qr_b2c_rect_y1",
    "fieldtype": "Int",
    "label": "QR B2C Rect Y1"
+  },
+  {
+   "fieldname": "ey_variables_section",
+   "fieldtype": "Section Break",
+   "label": "EY variables"
+  },
+  {
+   "fieldname": "source_identifier",
+   "fieldtype": "Data",
+   "label": "Source Identifier"
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Data",
+   "label": "Division"
   },
   {
    "fieldname": "website",

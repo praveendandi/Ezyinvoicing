@@ -41,7 +41,7 @@ def execute(filters=None):
 			items_debit_doc=()
 		if len(credit_invoices)>0:
 
-			items_credit_doc = frappe.db.get_list('Items',filters={'parent':['in',credit_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
+			items_credit_doc = frappe.db.get_list('Items',filters={'parent':['in',credit_names]},fields =items_fields ,as_list=True)
 		else:
 			items_credit_doc = ()
 		# if len(sysCredit_invoices)>0:
@@ -72,6 +72,7 @@ def execute(filters=None):
 		
 		
 		mergedDf = pd.merge(invoice_df, grouped_df)
+		# print(mergedDf,"======")
 		if mergedDf.empty:
 			data = []
 			columns = []
