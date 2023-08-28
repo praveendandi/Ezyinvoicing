@@ -16,8 +16,18 @@ def gettaxpayer_from_gst(gstn):
         # headers = {'Content-Type': 'application/json'}
         headers = {'Authorization': "token " + "8af689b810b7742" + ":" + "cbe1df1298593cb",}
         url = company.licensing_host + "/api/method/ezylicensing.ezylicensing.doctype.gst_api_intigration.get_taxpayer_details.get_gst_taxpayer_details?gstn=" + gstn
-        response = requests.get(url, headers=headers, verify=False)
-        response_json = response.json()        
+        if company.proxy == 1:
+            proxyhost = company.proxy_url
+            proxyhost = proxyhost.replace("http://","@")
+            proxies = {'http':'http://'+company.proxy_username+":"+company.proxy_password+proxyhost,
+                            'https':'https://'+company.proxy_username+":"+company.proxy_password+proxyhost}
+            response = requests.get(url, headers=headers, proxies=proxies,verify=False)
+        else:
+            if company.skip_ssl_verify == 1:
+                response = requests.get(url, headers=headers, verify=False)
+            else:
+                response = requests.get(url, headers=headers, verify=False)
+        response_json = response.json()
         result = {
             'Gstin':None,
             'TradeName':None,
