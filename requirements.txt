@@ -22,7 +22,7 @@ tensorflow
 razorpay
 selenium
 pytesseract
-WeasyPrint==52
+WeasyPrint==52.2
 html2text
 # opencv-python
 typing-extensions
