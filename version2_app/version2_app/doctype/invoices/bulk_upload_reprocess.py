@@ -22,39 +22,51 @@ def BulkUploadReprocess(data):
         invoice_number = data['invoice_number']
         invoice_data = frappe.get_doc('Invoices',invoice_number)
         line_items = json.loads(invoice_data.invoice_object_from_file)
+        
+        # if "data" in line_items.keys():            
+        #     if invoice_data.invoice_type == "B2B":                
+        #         if line_items['data']['gstNumber'] == invoice_data.gst_number:                    
+        #             invoice_data.gst_number = line_items["data"]["gstNumber"]                
+        #         else:                    
+        #             invoice_data.gst_number = invoice_data.gst_number
 
         if 'data' in line_items:
             for item in line_items['data']:
                 if isinstance(item,dict):
                     if "taxid" in item.keys() or "gstNumber" in item.keys():
                         if "gstNumber" in item.keys():
-                            if line_items['data'][0]['gstNumber']:
-                                invoice_data.gst_number = line_items["data"][0]["gstNumber"]
-                                break
-                            else:
-                                invoice_data.gst_number = line_items["data"][0]["gstNumber"]
-                        else:
-                            if "taxid" in item.keys():
-                                if line_items['data'][0]['taxid']:
-                                    invoice_data.gst_number = line_items["data"][0]["taxid"]
+                            if invoice_data.invoice_type == "B2B": 
+                                if line_items['data'][0]['gstNumber'] and invoice_data.gst_number != '':
+                                    invoice_data.gst_number = line_items["data"][0]["gstNumber"] if invoice_data.gst_number ==  line_items["data"][0]["gstNumber"] else invoice_data.gst_number
                                     break
                                 else:
-                                    invoice_data.gst_number = line_items["data"][0]["taxid"]
+                                    invoice_data.gst_number = invoice_data.gst_number  if invoice_data.gst_number != '' else line_items["data"][0]["gstNumber"]
+                        else:
+                            if "taxid" in item.keys():
+                                if invoice_data.invoice_type == "B2B":
+                                    if line_items['data'][0]['taxid'] and invoice_data.gst_number != '':
+                                        invoice_data.gst_number = line_items["data"][0]["taxid"] if invoice_data.gst_number ==  line_items["data"][0]["taxid"] else invoice_data.gst_number
+                                        break
+                                    else:
+                                        invoice_data.gst_number = invoice_data.gst_number  if invoice_data.gst_number != '' else line_items["data"][0]["taxid"]
                 else:
                     if isinstance(item,str):
                         if "gstNumber" == item:
-                            if line_items['data']['gstNumber']:
-                                invoice_data.gst_number = line_items["data"]["gstNumber"]
-                                break
-                            else:
-                                invoice_data.gst_number = line_items["data"]["gstNumber"]
-                        else:
-                            if "taxid" == item:
-                                if line_items['data']['taxid']:
-                                    invoice_data.gst_number = line_items["data"]["taxid"]
+                            if invoice_data.invoice_type == "B2B":
+                                if line_items['data']['gstNumber'] and invoice_data.gst_number != '':
+                                    invoice_data.gst_number = line_items["data"]["gstNumber"] if invoice_data.gst_number ==  line_items["data"]["gstNumber"] else invoice_data.gst_number
                                     break
                                 else:
-                                    invoice_data.gst_number = line_items["data"]["taxid"]
+                                    invoice_data.gst_number = invoice_data.gst_number if invoice_data.gst_number != '' else line_items["data"]["gstNumber"]
+                        else:
+                            if "taxid" == item:
+                                if invoice_data.invoice_type == "B2B":
+                                    if line_items['data']['taxid'] and invoice_data.gst_number != '':
+                                        invoice_data.gst_number = line_items["data"]["taxid"] if invoice_data.gst_number ==  line_items["data"]["taxid"] else invoice_data.gst_number
+                                        break
+                                    else:
+                                        invoice_data.gst_number = invoice_data.gst_number if invoice_data.gst_number != '' else line_items["data"]["taxid"]
+                                    
         
         invoice_total_amount = invoice_data.total_invoice_amount
         company = frappe.get_doc('company',invoice_data.company)
