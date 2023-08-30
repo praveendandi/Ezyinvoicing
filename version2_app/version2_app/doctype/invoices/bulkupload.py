@@ -110,6 +110,8 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "SHLCY-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="SGBBG-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "SGBBG"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="CISBRNV-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 # if companyData.name == "ABCBP-01":
@@ -190,6 +192,8 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "SHLCY-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="SGBBG-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "SGBBG" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="CISBRNV-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   each[bulk_meta_data["detail_folio"]["invoice_number"]].lstrip("0")
             # if companyData.name == "ABCBP-01":
             #     each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if companyData.name == "SGBW-01":
@@ -216,6 +220,15 @@ def bulkupload(data):
                     data["invoice_number"] =data["invoice_number"]
                     # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
+            
+            if companyData.name == "CISBRNV-01":            
+                inv_date = each[bulk_meta_data["detail_folio"]["invoice_date"]]            
+                inv_number = each[bulk_meta_data["detail_folio"]["invoice_number"]]            
+                inv_date = datetime.datetime.strptime(inv_date,'%d-%b-%y').strftime('%y%m')
+                combine_inv_number_and_inv_date = f"{inv_date}{inv_number}"
+                each['BILL_NO'] = combine_inv_number_and_inv_date
+                data.update({"invoice_number":combine_inv_number_and_inv_date})          
+                           
             items = []
             items_pdf = []
             sac_description=frappe.db.get_list("SAC HSN CODES")
