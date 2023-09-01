@@ -13,7 +13,7 @@ import requests
 from frappe.utils import data as date_util
 from version2_app.version2_app.doctype.invoices.credit_generate_irn import CreditgenerateIrn
 from version2_app.version2_app.doctype.invoices.invoice_helpers import TotalMismatchError,error_invoice_calculation
-from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages, SCCheckRatePercentages
+from version2_app.version2_app.doctype.invoices.invoice_helpers import CheckRatePercentages, SCCheckRatePercentages, check_accommodation
 from version2_app.version2_app.doctype.invoices.referrence_payments_parser import paymentsAndReferences
 import pandas as pd
 import traceback
@@ -1754,6 +1754,14 @@ def calulate_items(data):
                     placeofsupply = companyDetails.state_code
             else:
                 placeofsupply = companyDetails.state_code
+        if len(data['items']) > 0:
+            if companyDetails.multiple_accommodations_items_on_one_date == 1:
+                check_acc = check_accommodation(data["items"])
+                if "success" in check_acc:
+                    if check_acc["success"]:
+                        data["items"] = check_acc["data"]
+                    else:
+                        return check_acc
         for item in data['items']:
             final_item = {}
             if "quantity" in list(item.keys()):
