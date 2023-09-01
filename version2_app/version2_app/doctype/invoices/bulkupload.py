@@ -112,6 +112,11 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "SGBBG"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="CISBRNV-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
+            if invoice_data["company"]=="CMR-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "RPRCY-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="TRGR-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]][1:])
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "1--" +str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 # if companyData.name == "ABCBP-01":
@@ -194,6 +199,11 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "SGBBG" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="CISBRNV-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =   each[bulk_meta_data["detail_folio"]["invoice_number"]].lstrip("0")
+            if invoice_data["company"]=="CMR-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   "RPRCY-"+each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="TRGR-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   "1--" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if companyData.name == "ABCBP-01":
             #     each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if companyData.name == "SGBW-01":
@@ -220,8 +230,7 @@ def bulkupload(data):
                     data["invoice_number"] =data["invoice_number"]
                     # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
-            
-            if companyData.name == "CISBRNV-01":            
+            if companyData.name == "CISBRNV-01":
                 inv_date = each[bulk_meta_data["detail_folio"]["invoice_date"]]            
                 inv_number = each[bulk_meta_data["detail_folio"]["invoice_number"]]            
                 inv_date = datetime.datetime.strptime(inv_date,'%d-%b-%y').strftime('%y%m')
@@ -275,7 +284,6 @@ def bulkupload(data):
                         x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                     
                     items_pdf_dict = {'date':item_date,'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
-                
                 elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or (('Vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']]) and "Saarvat" not in x[bulk_meta_data["detail_folio"]['transaction_description']])  or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UTGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):                    
                     items_pdf_dict = {'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac'}
                 else:
