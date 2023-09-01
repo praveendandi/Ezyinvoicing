@@ -59,6 +59,11 @@ def extract_xml(file_list):
                     convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d.%b.%y').strftime('%Y-%m-%d')
                 else:
                     convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d/%b/%y').strftime('%Y-%m-%d')
+                if company_doc.name == "CISBRNV-01":
+                    bill_no = each["BILL_NO"].lstrip("0")
+                    invoice_date = datetime.datetime.strptime(convert_bill_generation_date,'%Y-%m-%d').strftime('%y%m')
+                    each["BILL_NO"] = invoice_date + bill_no
+                    
                 if "-" in each["BILL_GENERATION_DATE_CHAR"]:
                     try:
                         convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
@@ -71,6 +76,8 @@ def extract_xml(file_list):
                     convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%m.%y').strftime('%Y-%m-%d')
                 else:
                     convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d/%m/%y').strftime('%Y-%m-%d')
+                
+                
                 if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                     bill_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     if bill_doc.invoice_found=="No":
@@ -123,7 +130,6 @@ def extract_xml(file_list):
                 each["BILL_NO"] = each["BILL_NO"].lstrip("0")
             if company_doc.change_invoice_reconciliation_invoice_number == 1:
                 each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
-            # print(each['BILL_NO'])
             if "-" in each["BILL_GENERATION_DATE"]:
                 convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
             elif "." in each["BILL_GENERATION_DATE"]:

@@ -22,7 +22,6 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             doc_type = 'DR'
         elif gst_data['DocDtls']['Typ'] == 'CRN':
             doc_type = 'CR'
-        print(gst_data['BuyerDtls'])
         if gst_data['TranDtls']['SupTyp'] == 'B2B':
             gst_data['TranDtls']['SupTyp'] = 'TAX'
         req=[
@@ -34,12 +33,15 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             "docDate": gst_data['DocDtls']['Dt'].replace('/','-'),
             "custGstin": gst_data['BuyerDtls']['Gstin'],
             "custOrSupName": gst_data['BuyerDtls']['LglNm'],
+            "custTradeName": gst_data['BuyerDtls']['TrdNm'],
             "custOrSupAddr1":  gst_data['BuyerDtls']['Addr1'],
+            "custOrSupAddr2":  gst_data['BuyerDtls']['Addr2'],
             "custOrSupAddr4": gst_data['BuyerDtls']['Loc'],
             # "billToState": company.state_code,
             "billToState": gst_data['BuyerDtls']['Stcd'],
             "shipToState": company.state_code,
             "pos": company.state_code,
+            # "pos": gst_data['BuyerDtls']['Pos'],
             "sec7OfIgstFlag": gst_data['TranDtls']['IgstOnIntra'],
             "reverseCharge": gst_data['TranDtls']['RegRev'],
             "autoPopToRefundFlag": "N",
@@ -73,9 +75,9 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             "invOtherCharges": gst_data['ValDtls']['OthChrg'],
             "invCgstAmt": gst_data['ValDtls']['CgstVal'],
             "invSgstAmt": gst_data['ValDtls']['SgstVal'],
-            "invCessAdvaloremAmt": gst_data['ValDtls']['CesVal'],
+            "invCessAdvaloremAmt": 0,
             "invCessSpecificAmt": gst_data['ValDtls']['CesVal'],
-            "invStateCessAmt": gst_data['ValDtls']['StCesVal'],
+            "invStateCessAmt": 0,
             "invStateCessSpecificAmt": gst_data['ValDtls']['StCesVal'],
             # "totalInvValueInWords": " FOUR THOUSAND SEVEN HUNDRED SEVENTY NINE Rupees",
             # "tranType": "O",
@@ -91,10 +93,13 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
             # "exchangeRt": "1.00000",
             # "companyCode": "8304",
             # "salesOrg": "8304",
+            'division':company.division,
+            "srcIdentifier":company.source_identifier,
             "lineItems": []
         }]
         
         line_items = []
+        print(gst_data,";;;;;;;;;;;;;;;;;;;;;;;;...................")
         for item in gst_data['ItemList']:
             line_items.append({
                     "itemNo": item['SlNo'],
@@ -126,13 +131,15 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                     "unitPrice": item["Qty"],
                     "itemAmt": item["TotAmt"],
                     "totalItemAmt": item["TotItemVal"],
-                    "lineItemAmt":gst_data['ValDtls']['TotInvValFc']
+                    # 'lineItemAmt': item["AssAmt"]
+                    "lineItemAmt":round(gst_data['ValDtls']['TotInvValFc']+gst_data['ValDtls']['OthChrg'],3)
                     # "udf1": "0016090023",
                     # "udf2": "ZF1",
                     # "udf3": "Invoice (ZF1)",
                     # "udf4": "0016090023"
             })
         req[0]['lineItems'] = line_items
+        print(req,"LLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>.")
         # print(req)
         # return True
         gsp = frappe.db.get_value('GSP APIS', {"company": company.name,
@@ -148,6 +155,11 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "accessToken": gsp.gsp_test_token,
                 "Content-Type": 'application/json',
             }
+            # print('___________________________________________________')
+            # print(headers)
+            # print('******************************************************')
+            # print(req)
+            # print('___________________________________________________')
             # print(headers)
             # print(req)
             if company.proxy == 0:
@@ -186,12 +198,16 @@ def ey_generate_einvoice(gst_data, gsp, company, invoice_number):
                 "Content-Type": 'application/json',
             }
             if company.proxy == 0:
+                print(
+                    prod_irn,'((((((((((((((((()))))))))))))))))',req, '***************', 
+                    headers
+                )
                 if company.skip_ssl_verify == 0:
                     irn_response = requests.post(prod_irn,
                                                     headers=headers,
                                                     json={"req":req},verify=False)
                 else:
-                    irn_response = requests.post(gsp['generate_irn'],
+                    irn_response = requests.post(prod_irn,
                                                 headers=headers,
                                                 json={"req":req},verify=False)
             else:

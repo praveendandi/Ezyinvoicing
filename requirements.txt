@@ -1,5 +1,5 @@
 frappe
-pdfplumber==0.10.1
+pdfplumber
 pandas
 qrcode
 google-cloud-storage
@@ -36,4 +36,4 @@ pyHanko
 uharfbuzz
 fontTools
 # attrs
-PyMuPDF==1.20
+PyMuPDF==1.18.16
