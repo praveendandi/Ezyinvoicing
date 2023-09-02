@@ -35,4 +35,6 @@ PyMuPDF==1.20.2
 pyHanko
 uharfbuzz
 fontTools
+mail-parser
+email-listener
 # attrs
