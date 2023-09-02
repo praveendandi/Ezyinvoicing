@@ -1,0 +1,161 @@
+# Copyright (c) 2023, caratred and contributors
+# For license information, please see license.txt
+
+import frappe
+from frappe.utils.password import check_password
+from frappe.model.document import Document
+from datetime import date
+import datetime
+from datetime import date, timedelta
+import sys, traceback
+import frappe
+import pandas as pd
+from frappe.utils import now_datetime, add_days
+from datetime import datetime
+
+
+
+class Routes(Document):
+    pass
+
+
+@frappe.whitelist()
+def user_by_roles_companies():
+    user_details = frappe.db.get_list("User",['email','first_name','last_name','full_name','username','enabled',],{'username':('not like',('%adm%')),'email':('not like',('guest@example.com'))})
+    for i in user_details:
+        get_role = frappe.db.get_list("Has Role",{'parent':i['email'],'role':('Like',('%ezy-%'))},['role'])
+        if len(get_role) >0:
+            i['role'] = get_role[0]['role']
+        else:
+            i['role'] = None
+        get_company = frappe.db.get_list('User Permission',{'user':i['email']},['for_value'])
+        if len(get_company)>0:
+            i['for_value'] = get_company[0]['for_value']
+        else:
+            i['for_value'] = None
+    return user_details
+   
+
+@frappe.whitelist(allow_guest=True)
+def reset_initial_password(user):
+    try:
+        reset_pwd_after_days = frappe.db.get_single_value("System Settings","force_user_to_reset_password")
+        if reset_pwd_after_days <=0:
+            return  {"success": False, "message": "add no of days in system settingss"}
+        get_user_details = frappe.get_doc('User',{'username':user}) 
+        if get_user_details.last_active == None and get_user_details.last_password_reset_date == None:
+            return {'user': get_user_details.email, 'success': True, "message": "New login force to reset"}
+        else:
+            if get_user_details.last_active != None or get_user_details.last_password_reset_date != None:
+                last_password_reset_date = frappe.db.get_list('User',{'username':user},['last_password_reset_date'],ignore_permissions=True)
+                date_obj = last_password_reset_date[0]['last_password_reset_date']
+                # reset_pwd_after_days =frappe.db.get_single_value("System Settings","force_user_to_reset_password")
+                pwd_expiry_date = (date_obj + timedelta(reset_pwd_after_days))
+                today = date.today()
+                difference_in_days = pwd_expiry_date - today
+                remaining_days = difference_in_days.days
+                if remaining_days == 7:
+                    return {"The password of your account will expire in":remaining_days}
+                if remaining_days == 0:
+                    return {"message":"The password of your account has expired.","remaining_days":remaining_days}
+            return {'user': get_user_details.email, 'success': False, "message": "Old login","pwd_expiry_date":remaining_days}
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("reset_initial_password","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"message":"Invalid User"}
+
+
+# @frappe.whitelist(allow_guest=True)
+# def reset_initial_password(user):
+#     try:
+#         get_user_details = frappe.db.sql(
+#             ''' select * from `tabUser` Where email = '{user}' or username = '{username}' '''.format(user=user, username=user), as_dict=1)
+#         if len(get_user_details) <= 0:
+#             return {'success': False,
+#                     "message": f'No user found with this email {user}',
+#                     "email": get_user_details[0]['email'],
+#                     "username": get_user_details[0]['username']}
+#         if get_user_details[0]['last_active'] == None and get_user_details[0]['last_password_reset_date'] == None:
+#             return {'user': get_user_details[0]['email'], 'success': True, "message": "New login force to reset"}
+    
+            # date_obj = last_password_reset_date[0]['last_password_reset_date']
+            # reset_pwd_after_days =frappe.db.get_single_value("System Settings","force_user_to_reset_password")
+            # pwd_expiry_date = (date_obj + timedelta(reset_pwd_after_days))
+            # today = date.today()
+            # difference_in_days = pwd_expiry_date - today
+            # remaining_days = difference_in_days.days
+            # if remaining_days == 7:
+            #     print(remaining_days)
+            #     return {"The password of your account will expire in:",remaining_days}
+            # if remaining_days == 0:
+            #     return {"message":"The password of your account has expired.","remaining_days":remaining_days}
+            # return {'user': get_user_details.email, 'success': False, "message": "Old login",}
+#     except Exception as e:
+#         exc_type, exc_obj, exc_tb = sys.exc_info()
+#         frappe.log_error("reset_initial_password","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+#         return {"message":"Invalid User"}
+       
+    
+@frappe.whitelist(allow_guest=True)
+def change_old_password(user, pwd):
+    try:
+        confirm_pwd = check_password(
+            user, pwd, doctype="User", fieldname="password", delete_tracker_cache=True)
+        confirm_pwd=confirm_pwd.strip()
+        frappe.log_error("change_old_password",confirm_pwd)
+
+        if confirm_pwd == user:
+            return {'success': True, "message": "Password matched"}
+        else:
+            return {'success': False, "message": "Password not matched"}
+    except Exception as e:
+        return {"message":"Incorrect User or Password"}
+
+
+
+@frappe.whitelist(allow_guest=True)
+def update_pwd(email,last_password_reset_date,new_password,old_pwd):
+    try:
+        confirm_pwd = check_password(email, old_pwd)
+        doc = frappe.get_doc("User", email)
+        doc.last_password_reset_date = last_password_reset_date
+        doc.new_password = new_password
+        doc.old_pwd = old_pwd
+        doc.save(ignore_permissions=True)
+        return {"success":True}
+    except Exception as e:
+        return {"message":"Incorrect User or  Password"}
+
+
+@frappe.whitelist()
+def disable_inactive_users():
+    """Disable users who haven't logged in for 90 days"""
+    try:
+        inactive_days = 90
+        current_datetime = now_datetime()
+        cutoff_date = current_datetime - timedelta(days=inactive_days)
+        inactive_users = frappe.get_all('User',fields=['last_login','name'], filters={
+            'last_login': ['<=', cutoff_date],
+            'email': ['!=', 'guest@example.com']})
+        for user in inactive_users:
+            if user.name!= "Guest" and user.last_login is not None:
+                frappe.db.set_value('User', user.name, 'enabled', 0)
+                frappe.db.commit()    
+        return user
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("disable_inactive_users","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        
+    
+
+@frappe.whitelist()
+def migrating_routes():
+    folder_path = frappe.utils.get_bench_path()
+    file_path = folder_path +"/apps/version2_app/version2_app/EzyInvRoutes.xlsx"
+    dataframe1 = pd.read_excel(file_path)
+    data = dataframe1.to_dict("records")
+    for i in data:
+        if not frappe.db.exists("Routes",{"route_name":i['Route Name']}):
+            routes_data= frappe.get_doc({"doctype":"Routes","route_name":i['Route Name'],"route":i['Route'],"module":i['Module']})
+            routes_data.insert()
+                

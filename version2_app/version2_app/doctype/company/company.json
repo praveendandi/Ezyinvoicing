@@ -266,8 +266,6 @@
   "in_house_driving_ocr",
   "section_break_248",
   "ome_scanner",
-  "clbs_section",
-  "clbs",
   "ezy_gst_section",
   "ezy_gst_module",
   "arrival_information_file_type",
@@ -312,6 +310,8 @@
   "division",
   "website",
   "scan_ids",
+  "clbs_section",
+  "clbs",
   "reprocess_bulk_success_invoices",
   "einvoice_missing_date_feature",
   "einvoice_missing_start_date",
@@ -1688,12 +1688,6 @@
    "label": "Summary Footer"
   },
   {
-   "default": "0",
-   "fieldname": "clbs",
-   "fieldtype": "Check",
-   "label": "CLBS"
-  },
-  {
    "fieldname": "scan_ezy_settings_section",
    "fieldtype": "Section Break",
    "label": "Scan Ezy Settings"
@@ -1755,11 +1749,6 @@
   {
    "fieldname": "column_break_248",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "clbs_section",
-   "fieldtype": "Section Break",
-   "label": "CLBS"
   },
   {
    "fieldname": "ezy_gst_section",
@@ -2006,9 +1995,15 @@
   },
   {
    "default": "0",
-   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldname": "clbs_section",
+   "fieldtype": "Section Break",
+   "label": "CLBS"
+  },
+  {
+   "default": "0",
+   "fieldname": "clbs",
    "fieldtype": "Check",
-   "label": "Reprocess Bulk Success Invoices"
+   "label": "CLBS"
   },
   {
    "default": "0",
@@ -2038,6 +2033,12 @@
    "fieldname": "multiple_accommodations_items_on_one_date",
    "fieldtype": "Check",
    "label": "Multiple Accommodations Items on One Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "reprocess_bulk_success_invoices",
+   "fieldtype": "Check",
+   "label": "Reprocess Bulk Success Invoices"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -2057,18 +2058,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Guest",
    "share": 1,
    "write": 1
   },

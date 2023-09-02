@@ -1254,7 +1254,7 @@ def insert_invoice(data):
             'invoice_date':
             datetime.datetime.strptime(data['guest_data']['invoice_date'],
                                         '%d-%b-%y %H:%M:%S'),
-            'checkout_date':checkout_date,
+            'checkout_date': checkout_date,
             # datetime.datetime.strptime(data['guest_data']['checkout_date'],
             #                             '%d-%b-%y %H:%M:%S') if "checkout_date" in data['guest_data'] else None,
             'legal_name':
@@ -3042,7 +3042,6 @@ def get_tax_payer_details(data):
                 #     data['apidata']['get_taxpayer_details'] + data['gstNumber'],
                 #     data['apidata'], data['invoice'], data['code'])
                 if response['success']:
-                    print(response,"_____________________")
                     company = frappe.get_doc('company',data['code'])
                     details = response['result']
                     if (details['AddrBnm'] == "") or (details['AddrBnm'] == None):
@@ -3714,7 +3713,7 @@ def Error_Insert_invoice(data):
                 for each in json_data:
                     if company.state_code == each['tin']:
                         place_supplier_state_name = f"{each['state']}-({each['tin']})"
-
+            
             if 'checkout_date' in data:
                 if data['checkout_date'] != None:
                     checkout_date = datetime.datetime.strptime(data['checkout_date'],'%d-%b-%y %H:%M:%S')
@@ -3722,7 +3721,7 @@ def Error_Insert_invoice(data):
                     checkout_date = None
             else:
                 checkout_date = None
-
+            
             invoice = frappe.get_doc({
                 'doctype':
                 'Invoices',
@@ -3734,8 +3733,6 @@ def Error_Insert_invoice(data):
                 'gst_number':data['gst_number'],
                 # if len(data['gst_number'])==15:
                 # 	'gst_number': data['gst_number'],
-
-
                 'invoice_file':
                 data['invoice_file'],
                 'room_number':
@@ -3745,9 +3742,7 @@ def Error_Insert_invoice(data):
                 'invoice_date':
                 datetime.datetime.strptime(data['invoice_date'],
                                         '%d-%b-%y %H:%M:%S'),
-                'checkout_date':checkout_date,
-                # "checkout_date": datetime.datetime.strptime(data['checkout_date'],
-                #                         '%d-%b-%y %H:%M:%S') if "checkout_date" in data else None,
+                "checkout_date": checkout_date,
                 'legal_name':
                 " ",
                 'address_1':

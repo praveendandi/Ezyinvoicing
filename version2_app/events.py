@@ -35,7 +35,7 @@ from frappe.utils import cstr, get_site_name, logger, random_string
 from frappe.utils.data import money_in_words
 from PIL import Image
 from weasyprint import HTML
-from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
+# from version2_app.passport_scanner.doctype.dropbox.dropbox import merge_guest_to_guest_details, extract_text
 import datetime
 from version2_app.e_signature.e_signature import add_esignature_to_invoice
 frappe.utils.logger.set_log_level("DEBUG")
@@ -76,7 +76,7 @@ def invoice_update(doc, method=None):
 
 
 def invoice_created(doc, method=None):
-    try:        
+    try:
         company = frappe.get_last_doc("company")
         if company.name == "NCO-01" or company.name == "NICO-01" :
             remove_cp_on_invoice = remove_copy_of_invoice(doc.invoice_number)
@@ -354,7 +354,6 @@ def update_documentbin(filepath, error_log):
         bin_data = frappe.db.get_list(
             "Document Bin", filters={"invoice_file": ["=", filepath]}
         )
-        print(bin_data)
         if len(bin_data) > 0:
             pass
         else:

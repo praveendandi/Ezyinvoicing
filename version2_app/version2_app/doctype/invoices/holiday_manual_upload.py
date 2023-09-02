@@ -96,7 +96,7 @@ def holidayinManualupload(data):
             del each['depdate']# = str(each['depdate'])
             del each['org_invoicedate']
             get_invoice_data=frappe.db.get_value('Invoices',{"name":each['taxinvnum'],"irn_generated":"Cancelled"},as_dict=1)
-            print(get_invoice_data,"++++++++++++++++",each["taxinvnum"])
+            # print(get_invoice_data,"++++++++++++++++",each["taxinvnum"])
             if get_invoice_data:
                 each['taxinvnum']=str(each['taxinvnum'])+"-1"
                 

@@ -1,6 +1,5 @@
-frappe
-pdfplumber
-pandas
+pdfplumber==0.10.1
+pandas==1.5.3
 qrcode
 google-cloud-storage
 XlsxWriter
@@ -23,7 +22,7 @@ tensorflow
 razorpay
 selenium
 pytesseract
-WeasyPrint==52
+WeasyPrint==52.5
 html2text
 # opencv-python
 typing-extensions
@@ -32,8 +31,10 @@ opencv-python
 fitz
 pgeocode
 datefinder
+PyMuPDF==1.20.0
 pyHanko
 uharfbuzz
 fontTools
+mail-parser
+email-listener
 # attrs
-PyMuPDF==1.18.16

@@ -15,7 +15,7 @@ import glob
 import json 
 
 
-@frappe.whitelist(e)
+@frappe.whitelist()
 def mailreader():
     try:
         cwd = os.getcwd() 

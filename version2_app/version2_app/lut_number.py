@@ -5,7 +5,7 @@ import pandas as pd
 import sys
 import json
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def after_lut_Number():
     try:
         company = frappe.get_last_doc('company')
@@ -25,7 +25,7 @@ def after_lut_Number():
             print(i['invoice_number'],i['invoice_date'],"......................")
             frappe.db.set_value('Invoices',i['invoice_number'],{'company_application_reference_number':application_reference_number,'company_data_filing':data_filing,'company_gst':gst_number},update_modified=False)
             frappe.db.commit()
-        return {"success":True}
+        return {"success":True, "message": "updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("after_lut_Number",
@@ -36,7 +36,7 @@ def after_lut_Number():
 
 
 
-@frappe.whitelist(allow_guest=True)
+@frappe.whitelist()
 def before_lut_Number():
     try:
         company = frappe.get_last_doc('company')
@@ -56,7 +56,7 @@ def before_lut_Number():
             print(i['invoice_number'],i['invoice_date'],"......................")
             frappe.db.set_value('Invoices',i['invoice_number'],{'company_application_reference_number':application_reference_number,'company_data_filing':data_filing,'company_gst':gst_number},update_modified=False)
             frappe.db.commit()
-        return {"success":True}
+        return {"success":True, "message": "updated successfully"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("before_lut_Number",
@@ -64,7 +64,9 @@ def before_lut_Number():
         return {"success": False, "message": str(e)}
     
 
-#Download Digital Signature print Format update keys
+
+
+
 @frappe.whitelist()
 def before_place_of_supply_update():
     try:
