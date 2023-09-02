@@ -1,4 +1,3 @@
-#frappe
 pdfplumber
 pandas
 qrcode
