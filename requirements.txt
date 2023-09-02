@@ -1,5 +1,5 @@
-pdfplumber
-pandas
+pdfplumber==0.10.1
+pandas==1.5.3
 qrcode
 google-cloud-storage
 XlsxWriter
