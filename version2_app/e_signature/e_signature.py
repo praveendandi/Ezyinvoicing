@@ -18,6 +18,8 @@ from dateutil.tz import tzutc, tzlocal
 from version2_app.utils import html_to_pdf, convert_image_to_base64
 import shutil
 from os import path
+import pandas as pd
+from datetime import datetime, timedelta
 
 
 
@@ -74,8 +76,9 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
         # return pdf_signer
 
         file_name = os.path.basename(invoice)
-        output_file_path = invoice_file+"/public/files/"+file_name
-        signed_file_path = invoice_file + "/private/files/" + file_name
+        file_name1 = "sign-"+file_name
+        output_file_path = invoice_file+"/public/files/"+file_name1
+        signed_file_path = invoice_file + "/private/files/" + file_name1
 
         with open(invoice_file+"/"+invoice, 'rb') as inf:
 
@@ -116,8 +119,8 @@ def add_signature(invoice=None, pfx_signature=None, signature_image=None, secret
             frappe.db.sql(
                 """DELETE FROM `tabFile` where`tabFile`.file_url = '{}'""".format(invoice))
             frappe.db.commit()
-        
             return {"success": True, "file": response['message']['file_url']}
+        
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("add_signature",
@@ -153,7 +156,6 @@ def send_files(files, user_name, summary):
 
 @frappe.whitelist()
 def add_esignature_to_invoice(invoice_number=None, based_on="user", etax=None, type="invoice",src=False):
-    print(invoice_number)
     try:
         company = frappe.get_last_doc("company")
         if type == "etax":
@@ -241,12 +243,37 @@ def add_signature_on_etax(invoice_number=None,e_tax_format=None,source_from=Fals
 @frappe.whitelist()
 def add_signature_for_existing_invoices():
     try:
-        Invoice = frappe.get_last_doc('Invoices')
-        inv = frappe.db.get_list('Invoices',fields =['invoice_number'])
-        invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date < '2023-07-01' ''',as_dict=1)
-        for i  in invoice_date:
-            attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
-        return {"success":True,"message":"Signature updated to invoices"}
+        company_code = frappe.get_last_doc('company')
+        if company_code.e_signature == "Disable":
+            return {"success": False, "message": "digital signature is in disable mode"}
+        else:
+            Invoice = frappe.get_last_doc('Invoices')
+            inv = frappe.db.get_list('Invoices',fields =['invoice_number'])
+            invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` where invoice_date <= '2023-07-01' ''',as_dict=1)
+            for i  in invoice_date:
+                attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
+            return {"success":True,"message":"Signature updated to invoices"}
+    except Exception as e:
+        frappe.log_error(str(e), "add_esignature_to_existing_invoices")
+        return{"success": False, "message": str(e)}
+
+
+
+@frappe.whitelist()
+def after_add_signature_for_existing_invoices():
+    try:
+        company_code = frappe.get_last_doc('company')
+        if company_code.e_signature == "Disable":
+            return {"success": False, "message": "digital signature is in disable mode"}
+        else:
+            Invoice = frappe.get_last_doc('Invoices')
+            inv = frappe.db.get_list('Invoices',fields =['invoice_number'])
+            one_days_ago = datetime.now() - timedelta(days=1)
+            formatted_date = one_days_ago.strftime('%Y-%m-%d')
+            invoice_date = frappe.db.sql('''select invoice_number,invoice_date from `tabInvoices` WHERE invoice_date >= %s''',(formatted_date), as_dict=True)
+            for i  in invoice_date:
+                attach_digital_sign=add_esignature_to_invoice(invoice_number=i.invoice_number, based_on="user", etax=None, type="invoice",src=False)
+            return {"success":True,"message":"Signature updated to invoices"}
     except Exception as e:
         frappe.log_error(str(e), "add_esignature_to_existing_invoices")
         return{"success": False, "message": str(e)}

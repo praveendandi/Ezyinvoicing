@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import get_site_name
+import pandas as pd
+import numpy as np
 import time
 import os,sys,traceback
 import datetime
@@ -187,6 +189,23 @@ def TotalMismatchError(data,calculated_data):
 def CheckRatePercentages(data, sez, placeofsupply, exempted, state_code):
     try:
         companyDetails = frappe.get_last_doc('company')
+
+        if "tax_identification" in data:
+            if data["tax_identification"] == "Yes":
+                if placeofsupply != state_code:
+                    igst_percentage = data["tax_rate"]
+                    gst_percentage = 0
+                elif sez == 1:
+                    if exempted == 1:
+                        gst_percentage = 0
+                        igst_percentage = 0
+                    else:
+                        igst_percentage = data["tax_rate"]
+                        gst_percentage = 0
+                else:
+                    gst_percentage = data["tax_rate"]
+                    igst_percentage = 0
+                return {"success":True,"gst_percentage":gst_percentage,"igst_percentage":igst_percentage}
 
         if abs(data['item_value'])>=companyDetails.slab_12_starting_range and abs(data['item_value'])<=companyDetails.slab_12_ending_range:
             gst_percentage = 12
@@ -535,3 +554,51 @@ def calulate_b2c_items(data=None):
         frappe.log_error("Ezy-invoicing calulate_b2c_items","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
         return {"success":False,"message":str(e)}
     
+
+def check_accommodation(data):
+    try:
+        if len(data) > 0:
+            companyDetails = frappe.get_last_doc('company')
+            df = pd.DataFrame.from_records(data)
+            df[['sac_code', 'taxable', "accommodation_slab"]] = df.apply(lambda df: get_sac_code(df['name']), axis=1, result_type='expand')
+            acc_df = df[(df['sac_code'] == '996311') & (df['taxable'] == "Yes")]
+            if len(acc_df) > 0:
+                group_acc = acc_df.groupby("date").agg({"item_value": "sum", "sac_code": "first"}).reset_index()
+                group_acc["tax_rate"] = 12
+                group_acc.loc[group_acc['item_value'] > companyDetails.slab_12_ending_range,'tax_rate'] = 18
+                group_acc.loc[group_acc['item_value'] > companyDetails.slab_12_ending_range,'tax_identification'] = "Yes"
+                group_acc.drop(["item_value"], axis=1, inplace=True)
+                merge_df = pd.merge(df, group_acc, how='left', on=['date', 'sac_code'])
+                merge_df["tax_rate"].replace({np.NAN: 0.0}, inplace=True)
+                merge_df["tax_identification"].replace({np.NAN: "No"}, inplace=True)
+                data = merge_df.to_dict('records')
+                return {"success": True, "data": data}
+            return {"success": True, "data": data}
+    except Exception as e:
+        # frappe.log_error(traceback.print_exc())
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        frappe.log_error("check_accommodation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        return {"success":False,"message":str(e)}
+    
+
+def get_sac_code(desc):
+    sac_code_based_gst = frappe.db.get_list(
+                    'SAC HSN CODES', filters={'name': ['=',desc]})
+    if not sac_code_based_gst:
+        sac_code_based_gst = frappe.db.get_list(
+            'SAC HSN CODES',
+            filters={'name': ['like', desc + '%']})
+        if len(sac_code_based_gst) > 0:
+            sac_names = list(map(lambda x : x['name'], sac_code_based_gst))
+            min_len_des = min(sac_names, key = len)
+            sac_code_based_gst = [{"name":min_len_des}]
+    if len(sac_code_based_gst)>0:
+        sac_code_based_gst_rates = frappe.get_doc('SAC HSN CODES',sac_code_based_gst[0]['name'])
+        sac_code = sac_code_based_gst_rates.code
+        taxable_value = sac_code_based_gst_rates.taxble
+        accommodation_slab = sac_code_based_gst_rates.accommodation_slab
+    else:
+        sac_code = "No SAC"
+        taxable_value = "Not defined"
+        accommodation_slab = 0
+    return (sac_code, taxable_value, accommodation_slab)

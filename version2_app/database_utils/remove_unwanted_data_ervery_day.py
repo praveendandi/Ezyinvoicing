@@ -42,5 +42,9 @@ def remove_data_from_database_every_day():
             lastdate = date.today() - timedelta(days=6)
             frappe.db.sql("""DELETE FROM `tabDocument Bin` WHERE creation < %s""", lastdate)
             frappe.db.commit()
+        elif table == 'Version':
+            days_before = (date.today() - timedelta(days=60)).isoformat()
+            frappe.db.delete("Version", {"creation": ["<=", str(days_before)]})
+            frappe.db.commit()
         else:
             frappe.db.truncate(table)

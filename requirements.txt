@@ -31,10 +31,9 @@ opencv-python
 fitz
 pgeocode
 datefinder
-PyMuPDF
+PyMuPDF==1.20.0
 pyHanko
 uharfbuzz
 fontTools
 mail-parser
 email-listener
-# attrs

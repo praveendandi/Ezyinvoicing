@@ -323,7 +323,7 @@ def Reinitiate_invoice(data):
                 # 	doc.irn_generated ="Pending"
                 # 	doc.ready_to_generate_irn = "Yes"		
         else:
-            if len(data['items_data'])==0 and (0<=data['total_invoice_amount'] <= 0.9) and invoice_from != "Web" and doc.lut == 0:
+            if len(data['items_data'])==0 and data['total_invoice_amount'] == 0 and invoice_from != "Web" and doc.lut == 0:
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
                 generateb2cQr = False
@@ -334,7 +334,7 @@ def Reinitiate_invoice(data):
                 doc.irn_generated = "Pending"
                 doc.ready_to_generate_irn = "Yes"
         if invoice_from != "Web":		
-            if (0<=data['total_invoice_amount'] <= 0.9) or (0.0<=data['total_invoice_amount'] <= 0.9):
+            if data['total_invoice_amount'] == 0 or data['total_invoice_amount'] == 0.0:
                 doc.ready_to_generate_irn = "No"
                 doc.irn_generated = "Zero Invoice"
                 doc.invoice_type = "B2C"
@@ -350,9 +350,9 @@ def Reinitiate_invoice(data):
         doc.total_invoice_amount = data["total_invoice_amount"]
         doc.place_of_supply = place_of_supply
         doc.invoice_round_off_amount = invoice_round_off_amount
-        if "invoice_object_from_file" in data.keys():
-            if data["invoice_object_from_file"] != "":
-                doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])
+        # if "invoice_object_from_file" in data.keys():
+        #     if data["invoice_object_from_file"] != "":
+        #         doc.invoice_object_from_file = json.dumps(data['invoice_object_from_file'])
         doc.invoice_from = invoice_from
         doc.save(ignore_permissions=True, ignore_version=True)
         
@@ -988,16 +988,16 @@ def reprocess_calulate_items(data):
             # 		final_item['item_mode'] = "Debit"
             else:
                 # if item['sac_code'] != "996311" and sac_code_based_gst_rates.taxble == "No" and not (("Service" in item['name']) or ("Utility" in item['name'])) and sac_code_based_gst_rates.type != "Discount":
-                 if (item['sac_code'] != "996311" or item['sac_code'] != "997321"):
+                if (item['sac_code'] != "996311" or item['sac_code'] != "997321"):
                     if sac_code_based_gst_rates.taxble == "No":
-                        # if (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
-                        # 	vatcessrate = item["state_cess"]+item["cess"]+item["vat"]
-                        # 	if "item_value_after_gst" in item:
-                        # 		base_value = round(item['item_value_after_gst'] * (100 / (vatcessrate + 100)),3)
-                        # 		final_item['item_value'] = base_value
-                        # 		final_item['item_value_after_gst'] = base_value
-                        # 		item["item_value"] = base_value
-                        # else:
+                    # if (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 0) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 0 and companyDetails.reverse_calculation == 1) or (item["net"] == "Yes" and sac_code_based_gst_rates.inclusive_of_service_charge == 1 and companyDetails.reverse_calculation == 0):
+                    # 	vatcessrate = item["state_cess"]+item["cess"]+item["vat"]
+                    # 	if "item_value_after_gst" in item:
+                    # 		base_value = round(item['item_value_after_gst'] * (100 / (vatcessrate + 100)),3)
+                    # 		final_item['item_value'] = base_value
+                    # 		final_item['item_value_after_gst'] = base_value
+                    # 		item["item_value"] = base_value
+                    # else:
                         final_item['item_value_after_gst'] = item['item_value']
                         final_item['item_value'] = item['item_value']
                         final_item['sort_order'] = item['sort_order']
@@ -1019,7 +1019,7 @@ def reprocess_calulate_items(data):
                         final_item['item_value'] = item['item_value']
                         final_item['taxable'] = sac_code_based_gst_rates.taxble
                         final_item['type'] = "Non-Gst"
-                        final_item['revenue_item'] = "Non-Revenue"
+                        final_item['revenue_item'] = "Non-Revenue" if sac_code_based_gst_rates.ignore_non_taxable_items == 1 else "Revenue"
                         # final_item['item_mode'] = "Debit"
                         if "-" in str(item['item_value']):
                             final_item['item_mode'] = ItemMode
@@ -1268,7 +1268,7 @@ def b2b_success_to_credit_note(data):
         if "holiday" in data and data["holiday"] == "Yes":
             invoice_date = "31-aug-21 00:00:00"
         else:
-            invoice_date = datetime.datetime.strptime(str(datetime.datetime.today().date()),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
+            invoice_date = datetime.datetime.strptime((data['invoice_date']),'%Y-%m-%d').strftime('%d-%b-%y %H:%M:%S')
         if company.name == "CPGN-01" and data["invoice_number"] == "1136548":
             calulate_items_data = frappe.db.get_list('Items',{"parent":data["invoice_number"]},["date","item_value","item_name","sort_order","sac_code","item_type",
                         "cgst","sgst","igst","item_taxable_value","gst_rate","item_value_after_gst","cess","cess_amount","state_cess","state_cess_amount","cgst_amount","sgst_amount","igst_amount","parent",
@@ -1302,7 +1302,7 @@ def b2b_success_to_credit_note(data):
             doc_invoice.credit_note_raised = "Yes"
             doc_invoice.save(ignore_permissions=True,ignore_version=True)
             if data['taxinvoice'] == "Yes":
-                raise_credit_taxinvoice(data['invoice_number'],data['invoice_date'],data['taxinvoice_number'])
+                raise_credit_taxinvoice(data['invoice_number'],data['tax_invoice_referrence_date'],data['taxinvoice_number'])
         else:
             if len(invoice_data) > 0:
                 item_data = frappe.db.get_list('Items',filters={"parent":data["invoice_number"],"is_service_charge_item":"No"},fields=["*"])
@@ -1373,7 +1373,7 @@ def b2b_success_to_credit_note(data):
                 doc_invoice.credit_note_raised = "Yes"
                 doc_invoice.save(ignore_permissions=True,ignore_version=True)
                 if data['taxinvoice'] == "Yes":
-                    raise_credit_taxinvoice(data['invoice_number'],data['invoice_date'],data['taxinvoice_number'])
+                    raise_credit_taxinvoice(data['invoice_number'],data['tax_invoice_referrence_date'],data['taxinvoice_number'])
             # subject1 = 'Credit Note Created and Invoice Number is {}'.format(invoice_number)
             # parent_activity = frappe.get_doc({'doctype': 'Version','data': '<!DOCTYPE html><html><body><p>{}</p></body></html>'.format(subject1),"ref_doctype":"Invoices","docname":data["invoice_number"]})
             # parent_activity.insertS(ignore_permissions=True,ignore_version=True)
@@ -1389,7 +1389,7 @@ def b2b_success_to_credit_note(data):
         return {"success": False, "message": str(e)}
 
 
-@frappe.whitelist()
+@frappe.whitelist(allow_guest=True)
 def raise_credit_taxinvoice(invoice_number,invdate,taxinvoice_number):
     try:
         doc_details = frappe.get_doc("Invoices",invoice_number)
@@ -1401,6 +1401,7 @@ def raise_credit_taxinvoice(invoice_number,invdate,taxinvoice_number):
         data['qr_code_generated'] = "Pending"
         data['signed_invoice_generated']= 'No'
         data['invoice_date'] = invdate
+        # data['date']=date
         # items = data['items']
         items = [item.__dict__ for item in data['items']]
         del data['items']

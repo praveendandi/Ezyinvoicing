@@ -38,6 +38,9 @@ def extract_xml(file_list):
             data_dict = xmltodict.parse(xml_file.read())
         data=[]
         if isinstance(data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"], list):
+            count=0
+            total_count = len(data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"])
+
             for each in data_dict["FOLIO_DETAILS"]["LIST_G_BILL_NO"]["G_BILL_NO"]:
                 each['BILL_NO'] = each["BILL_NO"].strip()
                 if company_doc.name=="RBBORRM-01":
@@ -56,12 +59,25 @@ def extract_xml(file_list):
                     convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d.%b.%y').strftime('%Y-%m-%d')
                 else:
                     convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d/%b/%y').strftime('%Y-%m-%d')
+                if company_doc.name == "CISBRNV-01":
+                    bill_no = each["BILL_NO"].lstrip("0")
+                    invoice_date = datetime.datetime.strptime(convert_bill_generation_date,'%Y-%m-%d').strftime('%y%m')
+                    each["BILL_NO"] = invoice_date + bill_no
+                    
                 if "-" in each["BILL_GENERATION_DATE_CHAR"]:
-                    convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                    try:
+                        convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        try:
+                            convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%m-%d-%y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            convert_bill_generation_date_char = None
                 elif "." in each["BILL_GENERATION_DATE_CHAR"]:
                     convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%m.%y').strftime('%Y-%m-%d')
                 else:
                     convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d/%m/%y').strftime('%Y-%m-%d')
+                
+                
                 if frappe.db.exists('Invoice Reconciliations', each["BILL_NO"]):
                     bill_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     if bill_doc.invoice_found=="No":
@@ -73,6 +89,8 @@ def extract_xml(file_list):
                     doc.insert(ignore_permissions=True)
                     frappe.db.commit()
                     d110_data = json.loads(json.dumps(each))
+                    count+=1
+                    frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple_reconciliation_file_uploading","company":company_doc.company_code,"invoice_number":each['BILL_NO'],"invoice_count":count,"total_invoice_count":total_count})
                     if isinstance(d110_data["LIST_G_TRX_NO"]["G_TRX_NO"], dict):
                         txr_data = d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]
                         if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
@@ -112,7 +130,6 @@ def extract_xml(file_list):
                 each["BILL_NO"] = each["BILL_NO"].lstrip("0")
             if company_doc.change_invoice_reconciliation_invoice_number == 1:
                 each['BILL_NO'] = module.invoiceNumberMethod(each['BILL_NO'])
-            # print(each['BILL_NO'])
             if "-" in each["BILL_GENERATION_DATE"]:
                 convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d-%b-%y').strftime('%Y-%m-%d')
             elif "." in each["BILL_GENERATION_DATE"]:
@@ -120,7 +137,13 @@ def extract_xml(file_list):
             else:
                 convert_bill_generation_date = datetime.datetime.strptime(each["BILL_GENERATION_DATE"], '%d/%b/%y').strftime('%Y-%m-%d')
             if "-" in each["BILL_GENERATION_DATE_CHAR"]:
-                convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                try:
+                    convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d-%m-%y').strftime('%Y-%m-%d')
+                except ValueError:
+                    try:
+                        convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%m-%d-%y').strftime('%Y-%m-%d')
+                    except ValueError:
+                        convert_bill_generation_date_char = None
             elif "." in each["BILL_GENERATION_DATE_CHAR"]:
                 convert_bill_generation_date_char = datetime.datetime.strptime(each["BILL_GENERATION_DATE_CHAR"], '%d.%m.%y').strftime('%Y-%m-%d')
             else:
@@ -138,8 +161,8 @@ def extract_xml(file_list):
                 doc.insert(ignore_permissions=True)
                 frappe.db.commit()
                 d110_data = json.loads(json.dumps(each))
+                frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file','type':"simple_reconciliation_file_uploading","company":company_doc.company_code,"invoice_number":each['BILL_NO'],"invoice_count":count,"total_invoice_count":total_count})
                 for txr_data in d110_data["LIST_G_TRX_NO"]["G_TRX_NO"]:
-                    print(txr_data,"////////////////////////////")
                     if txr_data["TRANSACTION_DESCRIPTION"] == None:
                         continue
                     if "CGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "SGST" not in txr_data["TRANSACTION_DESCRIPTION"] and "IGST" not in txr_data["TRANSACTION_DESCRIPTION"]:
@@ -160,10 +183,13 @@ def extract_xml(file_list):
                     reconciliations_doc = frappe.get_doc('Invoice Reconciliations', each["BILL_NO"])
                     reconciliations_doc.invoice_found = "No"
                     reconciliations_doc.save()
+        frappe.publish_realtime("custom_socket", {'message':'Simple reconciliation file uploaded','type':"simple_reconciliation_file_uploaded"})
         return {"success": True, "message": "file upload"}
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         frappe.log_error("Ezy-invoicing extract_xml Reconciliation","line No:{}\n{}".format(exc_tb.tb_lineno,traceback.format_exc()))
+        frappe.publish_realtime("custom_socket", {'message':'Simple Reconciliations Exception','type':"simple_reconciliations_exception","message":str(e),"company":company_doc.name})
+
         print(traceback.print_exc())
         return {"success":False,"message":str(e)}
 

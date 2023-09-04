@@ -81,18 +81,44 @@ def bulkupload(data):
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "HYDHY-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="WMPL-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "9784-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="BMHW-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "39854-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="TWHM-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("9999","")
+            if invoice_data["company"]=="TWHH-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("8888","")
+            # print(item[bulk_meta_data["Gst_details"]["invoice_number"]],item[bulk_meta_data["Gst_details"]["gst_number"]])
+            # item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if invoice_data["company"]=="RBRTB-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "TBFL-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="CBMBHOPAL-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = "A000-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
-            if invoice_data["company"]=="BMHW-01":
-                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "39854" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="JWMMJ-01":
-                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "39021" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "39021-" + str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             if invoice_data["company"]=="TWKR-01":
                 item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("9999","")
             if invoice_data["company"]=="IKR-01":
-                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "IKR-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace(" ","")
+            if invoice_data["company"]=="JWMG-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "GOIVM-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="HRC-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "HRC"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="CMNM-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).replace("CYNM","")
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "CYNM-" +str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="CMSHILLONG-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "SHLCY-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="SGBBG-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "SGBBG"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="CISBRNV-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
+            if invoice_data["company"]=="CMR-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "RPRCY-"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="TWRH-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "DEDWI"+str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
+            if invoice_data["company"]=="TRGR-01":
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]][1:])
+                item[bulk_meta_data["Gst_details"]["invoice_number"]] = "1--" +str(item[bulk_meta_data["Gst_details"]["invoice_number"]])
             item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")
             if item[bulk_meta_data["Gst_details"]["gst_number"]].strip() != "":
                 # if companyData.name == "ABCBP-01":
@@ -100,6 +126,7 @@ def bulkupload(data):
                 # if companyData.name == "SGBW-01":
                 #     item[bulk_meta_data["Gst_details"]["invoice_number"]] = str(item[bulk_meta_data["Gst_details"]["invoice_number"]]).lstrip("0")[1:]
                 gst_data[str(item[bulk_meta_data["Gst_details"]["invoice_number"]])]=item[bulk_meta_data["Gst_details"]["gst_number"]].strip()
+        
         paymentTypes = GetPaymentTypes()
         paymentTypes  = [''.join(each) for each in paymentTypes['data']]
         paymentTypes = list(map(lambda x: x.lower(), paymentTypes))
@@ -107,7 +134,7 @@ def bulkupload(data):
         invoice_referrence_objects = {}
         invoice_number_list = [bulk_meta_data["detail_folio"]["invoice_number"] for x in items_dataframe[bulk_meta_data["detail_folio"]["folio"]][bulk_meta_data["detail_folio"]["invoice_list"]][bulk_meta_data["detail_folio"]["invoice_data"]]]
         for each in items_dataframe[bulk_meta_data["detail_folio"]["folio"]][bulk_meta_data["detail_folio"]["invoice_list"]][bulk_meta_data["detail_folio"]["invoice_data"]]:
-            each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].lstrip("0")
+            # each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].lstrip("0")
             if each[bulk_meta_data["detail_folio"]['sum_val']]==None:
                 each[bulk_meta_data["detail_folio"]['sum_val']]=0
             if invoice_data["company"]=="JWMB-01":
@@ -140,6 +167,14 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "IXBCY-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="HHG-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "HYDHY-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="WMPL-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "9784-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="BMHW-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39854-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="TWHM-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("9999","")
+            if invoice_data["company"]=="TWHH-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("8888","")
             if invoice_data["company"]=="CBMBHOPAL-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "A000-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="RCP-01":
@@ -149,14 +184,32 @@ def bulkupload(data):
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "TBFL-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="CBMBHOPAL-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] = "A000-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
-            if invoice_data["company"]=="BMHW-01":
-                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39854" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="JWMMJ-01":
-                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39021" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = "39021-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             if invoice_data["company"]=="TWKR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("9999","")
             if invoice_data["company"]=="IKR-01":
                 each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "IKR-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="JWMG-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "GOIVM-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="HRC-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "HRC" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="CMNM-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]].replace("CYNM","")
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "CYNM-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="CMSHILLONG-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "SHLCY-" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="SGBBG-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =  "SGBBG" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="CISBRNV-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   each[bulk_meta_data["detail_folio"]["invoice_number"]].lstrip("0")
+            if invoice_data["company"]=="CMR-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   "RPRCY-"+each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="TWRH-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   "DEDWI"+each[bulk_meta_data["detail_folio"]["invoice_number"]]
+            if invoice_data["company"]=="TRGR-01":
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
+                each[bulk_meta_data["detail_folio"]["invoice_number"]] =   "1--" + each[bulk_meta_data["detail_folio"]["invoice_number"]]
             # if companyData.name == "ABCBP-01":
             #     each[bulk_meta_data["detail_folio"]["invoice_number"]] = each[bulk_meta_data["detail_folio"]["invoice_number"]][4:]
             if companyData.name == "SGBW-01":
@@ -165,7 +218,7 @@ def bulkupload(data):
             if str(each[bulk_meta_data["detail_folio"]["invoice_number"]]) in gst_data.keys():
                 data={'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']],'invoice_number':each[bulk_meta_data["detail_folio"]["invoice_number"]],'invoice_date':each[bulk_meta_data["detail_folio"]["invoice_date"]],
                             'room_number':each[bulk_meta_data["detail_folio"]['room_number']],'guest_name':each[bulk_meta_data["detail_folio"]["guest_name"]],'total_invoice_amount':float(each[bulk_meta_data["detail_folio"]["sum_val"]]),
-                            'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,"place_of_supply_json":place_supplier_state_name,'invoice_item_date_format':companyData.invoice_item_date_format,
+                            'gstNumber':gst_data[each[bulk_meta_data["detail_folio"]["invoice_number"]]].replace(" ","").strip(),'company_code':companyData.name,'place_of_supply':companyData.state_code,"place_of_supply_json":place_supplier_state_name,'invoice_item_date_format':companyData.invoice_item_date_format,
                             'guest_data':{'invoice_category':each[bulk_meta_data["detail_folio"]['invoice_type']]},'invoice_type':"B2B"}
                 if bulk_meta_data['invoice_company_code']!="":
                     data["invoice_number"] = bulk_meta_data['invoice_company_code']+data["invoice_number"]
@@ -183,6 +236,14 @@ def bulkupload(data):
                     data["invoice_number"] =data["invoice_number"]
                     # data["invoice_number"] = re.sub(r'0+(.+)', r'\1',data["invoice_number"])
                 # data["items"]=[dict(val) for val in each["LIST_G_TRX_NO"]["G_TRX_NO"]] 
+            if companyData.name == "CISBRNV-01":
+                inv_date = each[bulk_meta_data["detail_folio"]["invoice_date"]]            
+                inv_number = each[bulk_meta_data["detail_folio"]["invoice_number"]]            
+                inv_date = datetime.datetime.strptime(inv_date,'%d-%b-%y').strftime('%y%m')
+                combine_inv_number_and_inv_date = f"{inv_date}{inv_number}"
+                each['BILL_NO'] = combine_inv_number_and_inv_date
+                data.update({"invoice_number":combine_inv_number_and_inv_date})          
+                           
             items = []
             items_pdf = []
             sac_description=frappe.db.get_list("SAC HSN CODES")
@@ -202,7 +263,7 @@ def bulkupload(data):
                         # else:
                         # items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
                         # continue
-                    elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'Vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UTGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
+                    elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or (('Vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']]) and "Saarvat" not in x[bulk_meta_data["detail_folio"]['transaction_description']])  or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UTGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):
                         # if "%" in x[bulk_meta_data["detail_folio"]['transaction_description']:
                         items_pdf_dict = {'date':item_date,"taxcode_dsc":"No Sac","goods_desc":x[bulk_meta_data["detail_folio"]['transaction_description']],"taxinnum":x[bulk_meta_data["detail_folio"]['taxinnum']],'item_value': float(x[bulk_meta_data["detail_folio"]["item_value"]])  if x[bulk_meta_data["detail_folio"]["item_value"]] else 0.0,'name':x[bulk_meta_data["detail_folio"]['transaction_description']].split("|")[0],"sac_code":'No Sac'}
                     # if x[bulk_meta_data["detail_folio"]["item_value"] is None:
@@ -229,9 +290,7 @@ def bulkupload(data):
                         x[bulk_meta_data["detail_folio"]["item_valu_credit"]] = x[bulk_meta_data["detail_folio"]["item_value"]]
                     
                     items_pdf_dict = {'date':item_date,'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac',"FT_CREDIT":float(x[bulk_meta_data["detail_folio"]["item_valu_credit"]])}
-                
-                elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'Vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UTGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UGST" in x[bulk_meta_data["detail_folio"]['transaction_description']]:
-                    
+                elif "CGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "SGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or (('Vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'vat' in x[bulk_meta_data["detail_folio"]['transaction_description']] or 'VAT' in x[bulk_meta_data["detail_folio"]['transaction_description']]) and "Saarvat" not in x[bulk_meta_data["detail_folio"]['transaction_description']])  or "Cess" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "CESS" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UTGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or "UGST" in x[bulk_meta_data["detail_folio"]['transaction_description']] or ('IGST' in x[bulk_meta_data["detail_folio"]['transaction_description']] and "Debit Note - IGST" not in x[bulk_meta_data["detail_folio"]['transaction_description']]):                    
                     items_pdf_dict = {'date':item_date,'item_value':float(x[bulk_meta_data["detail_folio"]["item_value"]]),'name':x[bulk_meta_data["detail_folio"]['transaction_description']],"sac_code":'No Sac'}
                 else:
                     if x[bulk_meta_data["detail_folio"]["item_value"]]:
@@ -249,7 +308,6 @@ def bulkupload(data):
             refobj['items'] = items_pdf
             invoice_referrence_objects[each['BILL_NO']] = refobj
             # invoice_referrence_objects[re.sub(r'0+(.+)', r'\1',each['BILL_NO'])] = refobj
-        # print(">>>>>>>>>>>>",gst_data)
         output_date=[]
         taxpayer= {"legal_name": "","address_1": "","address_2": "","email": "","trade_name": "","phone_number": "","location": "","pincode": "","state_code": ""}
         frappe.publish_realtime("custom_socket", {'message':'Bulk Upload Invoices Count','type':"Bulk_upload_invoice_count","count":len(invoice_number_list),"company":company})

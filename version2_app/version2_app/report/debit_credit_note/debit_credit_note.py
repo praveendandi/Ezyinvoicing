@@ -14,10 +14,10 @@ import numpy as np
 def execute(filters=None):
 	try:
 		pd.set_option("display.max_rows", None, "display.max_columns", None)
-		columns = ["Original Invoice Number","Transaction type","Debit Note No / Credit Note No.","Debit Note / Credit Note Date","Month","CustomerGSTIN/UIN","Customer Name","Type","SAC / HSN CODE","Invoice value","Base Amount","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount",'IRN Number', 'Acknowledge Number', 'Acknowledge Date']
-		fields = ['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','irn_number','ack_no','ack_date','tax_invoice_referrence_date']
-		debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Debit Invoice'], 'un_billed_invoice': 0},fields=['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','irn_number','ack_no','ack_date','tax_invoice_referrence_date'],as_list=True)
-		credit_invoices = frappe.db.get_list('Invoices', filters={'tax_invoice_referrence_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Credit Invoice'], 'un_billed_invoice': 0},fields=['invoice_number', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','credit_irn_number as irn_number','credit_ack_no as ack_no','credit_ack_date as ack_date','tax_invoice_referrence_date'],as_list=True)
+		columns = ["Original Invoice Number","Transaction type","Debit Note No / Credit Note No.","Guest Name","Debit Note / Credit Note Date","Month","CustomerGSTIN/UIN","Customer Name","Type","SAC / HSN CODE","Invoice value","Base Amount","Taxable Value","Total GST RATE %","IGST Rate","IGST Amount","CGST Rate","CGST Amount","SGST / UT Rate","SGST / UT GST Amount","GST Compensation Cess Rate","GST Compensation Cess Amount",'IRN Number', 'Acknowledge Number', 'Acknowledge Date']
+		fields = ['invoice_number','guest_name', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','irn_number','ack_no','ack_date']
+		debit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Debit Invoice'], 'un_billed_invoice': 0},fields=['invoice_number','guest_name', 'invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','irn_number','ack_no','ack_date'],as_list=True)
+		credit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Credit Invoice'], 'un_billed_invoice': 0},fields=['invoice_number','guest_name','invoice_date','gst_number','invoice_type','trade_name','tax_invoice_referrence_number','invoice_category','credit_irn_number as irn_number','credit_ack_no as ack_no','credit_ack_date as ack_date'],as_list=True)
 		# sysCredit_invoices = frappe.db.get_list('Invoices', filters={'invoice_date':  ['Between',(filters['from_date'],filters['to_date'])],'irn_generated':['like','%Success%'],'invoice_category':['=','Tax Invoice'],'has_credit_items':['=','Yes']},fields=fields,as_list=True)
 
 		doc = debit_invoices+credit_invoices
@@ -41,7 +41,7 @@ def execute(filters=None):
 			items_debit_doc=()
 		if len(credit_invoices)>0:
 
-			items_credit_doc = frappe.db.get_list('Items',filters={'parent':['in',credit_names],'item_mode':['=',"Credit"]},fields =items_fields ,as_list=True)
+			items_credit_doc = frappe.db.get_list('Items',filters={'parent':['in',credit_names]},fields =items_fields ,as_list=True)
 		else:
 			items_credit_doc = ()
 		# if len(sysCredit_invoices)>0:
@@ -72,6 +72,7 @@ def execute(filters=None):
 		
 		
 		mergedDf = pd.merge(invoice_df, grouped_df)
+		# print(mergedDf,"======")
 		if mergedDf.empty:
 			data = []
 			columns = []
@@ -82,8 +83,11 @@ def execute(filters=None):
 		mergedDf.loc[(mergedDf.invoice_category=="Debit Invoice"),'invoice_category'] = 'Debit Note'
 		mergedDf.loc[(mergedDf.invoice_category=="Credit Invoice"),'invoice_category'] = 'Credit Note For Sales'
 
-		mergedDf.rename(columns={'invoice_category':'Transaction type','tax_invoice_referrence_number':'Original Invoice Number','invoice_number': 'Debit Note No / Credit Note No.', 'tax_invoice_referrence_date': 'Debit Note / Credit Note Date','gst_number':'CustomerGSTIN/UIN','invoice_type':'Type','trade_name':'Customer Name','sac_code':'SAC / HSN CODE','gst_rate':'Total GST RATE %','item_value':'Base Amount','item_value_after_gst':'Invoice value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','irn_number':'IRN Number','ack_no':'Acknowledge Number','ack_date': 'Acknowledge Date'}, inplace=True)
+		mergedDf.rename(columns={'invoice_category':'Transaction type','tax_invoice_referrence_number':'Original Invoice Number','invoice_number': 'Debit Note No / Credit Note No.','guest_name':'Guest Name', 'invoice_date': 'Debit Note / Credit Note Date','gst_number':'CustomerGSTIN/UIN','invoice_type':'Type','trade_name':'Customer Name','sac_code':'SAC / HSN CODE','gst_rate':'Total GST RATE %','item_value':'Base Amount','item_value_after_gst':'Invoice value','igst':'IGST Rate','igst_amount':'IGST Amount','cgst':'CGST Rate','cgst_amount':'CGST Amount','sgst':'SGST / UT Rate','sgst_amount':'SGST / UT GST Amount','gst_cess_rate':'GST Compensation Cess Rate','gst_cess_amount':'GST Compensation Cess Amount','irn_number':'IRN Number','ack_no':'Acknowledge Number','ack_date': 'Acknowledge Date'}, inplace=True)
 		mergedDf['Month'] = pd.DatetimeIndex(mergedDf['Debit Note / Credit Note Date']).month
+		mergedDf['Month'] = mergedDf['Month'].fillna(-1) 
+		mergedDf['Month'] = mergedDf['Month'].astype(int)
+		# Apply the lambda function to convert month numbers to abbreviations
 		mergedDf['Month'] = mergedDf['Month'].apply(lambda x: calendar.month_abbr[x])
 
 		mergedDf = mergedDf[columns]

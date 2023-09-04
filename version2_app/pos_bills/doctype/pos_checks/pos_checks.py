@@ -153,7 +153,11 @@ def extract_data(payload,company_doc):
         check_date = ""
         check_number = ""
         now = datetime.now()
-        current_date = now.strftime("%y%m%d")
+        if company_doc.attach_date_format_to_pos_bills is not None and company_doc.attach_date_format_to_pos_bills != "":
+            current_date = now.strftime(company_doc.attach_date_format_to_pos_bills)
+        else:
+            current_date = ""
+        
         for line in raw_data:
             if company_doc.closed_check_reference in payload and company_doc.void_check_reference not in payload:
                 data["check_type"] = "Check Closed"
@@ -201,10 +205,8 @@ def extract_data(payload,company_doc):
                     check_regex = re.findall(company_doc.check_number_regex, line.strip())
                     check_string = check_regex[0] if len(check_regex)>0 else ""
                     check_no_regex = re.findall("\w+\d+|\d+",check_string)
-                    # current_date = ("{}{}{}".format(now.year,now.month,now.date))
-                    data["check_no"] = current_date + check_no_regex[0] if len(check_no_regex) > 0 else ""
-                    # data["check_no"] = check_no_regex[0] if len(check_no_regex) > 0 else ""
-                    check_number = check_no_regex[0] if len(check_no_regex) > 0 else ""
+                    data["check_no"] = current_date+check_no_regex[0] if len(check_no_regex) > 0 else ""
+                    check_number =current_date+check_no_regex[0] if len(check_no_regex) > 0 else ""
                 if company_doc.table_number_reference in line and "GSTIN" not in line and "GST IN" not in line:
                     table_regex = re.findall(company_doc.table_number_regex, line.strip())
                     table_string = table_regex[0] if len(table_regex)>0 else ""
