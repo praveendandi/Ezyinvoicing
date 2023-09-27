@@ -1340,6 +1340,9 @@ SOFTWARE.
 ngx-clipboard
 MIT
 
+ngx-cookie-service
+MIT
+
 ngx-json-viewer
 MIT
 MIT License
