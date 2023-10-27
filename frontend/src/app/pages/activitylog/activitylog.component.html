@@ -1,0 +1,84 @@
+<section class="activity-logs">
+  <div class="modal-header my-auto text-left d-block">
+    <h6> <i (click)="activeModal.close()" class="ri-arrow-left-line"></i> <strong>Activity Log</strong></h6>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-6" [ngClass]="{'col-12': !activeLog}">
+        <div class="a-logs card-max-height">
+          <ul class="list-unstyled px-3">
+            <li *ngFor="let item of activityLogs" (click)="onLogClick(item)">
+              <ng-container>
+                <div>
+                  <strong> <i class="ri-history-line"></i> {{item.modified_by}}</strong>
+                  <small class="float-right">{{item.creation | date : 'short'}}</small>
+                </div>
+                <ng-template [ngIf]="item.data?.createdBy">
+                  <!-- created by -->
+                  Created by {{item.data?.createdBy}}
+                </ng-template>
+                <ng-template [ngIf]="item.data?.changed && item.data?.changed.length">Changed value of
+                  {{(item.data.changed[0][0] | underscoreSpace |uppercase) || '" "'}} from
+                  <small>{{item.data.changed[0][1] || '" "' }}</small> to
+                  <small>{{item.data.changed[0][2]|| '" "'}} </small>
+                </ng-template>
+                <ng-template [ngIf]="item.data?.added && item.data?.added.length">
+                  added list
+                </ng-template>
+                <ng-template [ngIf]="item.data?.removed && item.data?.removed.length">
+                  removed list
+                </ng-template>
+              </ng-container>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <ng-container *ngIf="activityLogs.length  < this.total_count">
+            <p class="text-right pr-3 more text-primary" (click)="activityMore(activityLogs.length)">
+              more
+            </p>
+          </ng-container>
+        </div>
+      </div>
+      <div class="col-6" *ngIf="activeLog">
+        <div class="card-max-height">
+          <strong>Values Changed</strong>
+          <table class="table table-sm table-bordered"
+            *ngIf="(activeLog.data?.changed?.length || activeLog.data?.added?.length || activeLog.data?.removed?.length) else createdMsg">
+            <thead class="thead-light">
+              <tr>
+                <th>Event</th>
+                <th>Property</th>
+                <th>Original Value</th>
+                <th>New Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-template ngFor
+                [ngForOf]="[activeLog?.data?.changed,activeLog?.data?.added,activeLog?.removed?.removed]" let-activites
+                let-i="index">
+                <tr *ngFor="let log of activites">
+                  <td style="padding-left: 8px !important;">
+                    <ng-container [ngSwitch]="i">
+                      <small *ngSwitchCase="0" class="text-left">Change</small>
+                      <small *ngSwitchCase="1" class="text-left">Add</small>
+                      <small *ngSwitchCase="2" class="text-left">Remove</small>
+                    </ng-container>
+                  </td>
+                  <td style="min-width: 120px;"><small class="text-left">{{log[0]}}</small></td>
+                  <td><small class="text-left">{{log[1]}}</small></td>
+                  <td><small class="text-left">{{log[2]}}</small></td>
+
+                </tr>
+              </ng-template>
+            </tbody>
+          </table>
+          <ng-template #createdMsg>
+            <p>{{activeLog.data?.created_by}} created</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

@@ -1,0 +1,45 @@
+.c-header {
+  .btn-light {
+      background: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: none;
+      padding: 10px 40px 10px 10px;
+      line-height: 1;
+      &:active {
+          box-shadow: none;
+      }
+  }
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: #AD8B3A;
+  position: absolute;
+  display: block;
+  left: 6px;
+  color: #fff;
+  top: 8px;
+  text-align: center;
+  line-height: 32px;
+  border-radius: 50%;
+}
+.header-2{
+  background: #214350;
+  padding-bottom: 60px !important;
+  color: white;
+}
+.d-card{
+  margin: 2px;
+  border: 1px solid #E3DADA;
+}
+.cards-m{
+  margin-top: -47px;
+}
+.pad-1{
+  padding-left: 41px;
+}
+.pad-2{
+  padding-left: 31px;
+}

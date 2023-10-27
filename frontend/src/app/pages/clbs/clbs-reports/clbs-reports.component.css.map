@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,MAAM,AAAA,cAAc,CAAC;EACjB,SAAS,EAAE,IAAI;EACf,MAAM,EAAE,IAAI;CACf;;AAED,AAAA,cAAc,CAAC;EACX,QAAQ,EAAE,QAAQ;EAClB,OAAO,EAAE,CAAC;EACV,KAAK,EAAE,KAAK;EACZ,UAAU,EAAE,OAAkB;CACjC;;AAED,AAAA,EAAE,CAAC;EACC,UAAU,EAAE,MAAM;EAClB,UAAU,EAAE,KAAK;CACpB;;AAED,AAAA,eAAe,CAAC;EACZ,OAAO,EAAE,IAAI;CAChB",
+    "sources": [
+        "clbs-reports.component.scss"
+    ],
+    "names": [],
+    "file": "clbs-reports.component.css"
+}

@@ -1,0 +1,15 @@
+<div class="card">
+    <div class="modal-header">
+        <h5 class="" id="modal-basic-title">Enter OTP</h5>
+        <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+    </div>
+    <div class="modal-body">
+        <div class="row justify-content-center">
+            <input id="partitioned" type="text" maxlength=6 minlength="6" name="otp" (keyup)="otpEntered($event)" required/>
+        </div>
+    </div>
+
+
+</div>

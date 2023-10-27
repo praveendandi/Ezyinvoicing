@@ -1,0 +1,61 @@
+<section>
+
+    <div class="row mb-3">
+        <div class="col-md-9 col-lg-9">
+            <div class="d-flex">
+                <h4 class="font-weight-bold text-white">Permissions</h4>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3">
+            <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+                <select appMatInput name="roles" id="roles" class="custom-select" placeholder="Select role"
+                    (change)="selectRole($event)" required>
+                    <option>Select Role</option>
+                    <option *ngFor="let item of rolesList" [value]="item?.name">{{item?.name}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="thead">
+                    <tr>
+                        <th>#</th>
+                        <th>Document Type</th>
+                        <th>Level</th>
+                        <th>Read</th>
+                        <th>Write</th>
+                        <th>Create</th>
+                        <th>Delete</th>
+                        <th>Submit</th>
+                        <th>Cancel</th>
+                        <th>Amend</th>
+                        <th>Set User Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of permissionsList;let i =index">
+                        <td>{{(i+1) }}</td>
+                        <td>{{item?.parent}}</td>
+                        <td>{{item?.permlevel}}</td>
+                        <td><i *ngIf="item?.read == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.write == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.create == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.delete == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.submit == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.cancel == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.amend == '1'" class="ri-check-line"></i></td>
+                        <td><i *ngIf="item?.set_user_permissions == '1'" class="ri-check-line"></i></td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div class="text-center py-3" *ngIf="!permissionsList.length">
+                <h5>No Data Found</h5>
+            </div>
+        </div>
+
+    </div>
+</section>

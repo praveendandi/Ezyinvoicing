@@ -1,0 +1,97 @@
+.login-card {
+  min-height: 100vh;
+  width: 100%;
+  display: -webkit-box;
+  display: flex;
+  display: -ms-flexbox;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.login-card .card {
+  min-width: 500px;
+}
+
+.login-card .card .col-8 h2 {
+  font-size: 1.45rem;
+}
+
+@media (max-width: 767px) {
+  .card {
+    min-width: 320px !important;
+  }
+}
+
+.bg-login {
+  background: url(../../../assets/images/login-bg.png);
+  background-size: contain;
+  background-position: center center;
+  height: 100vh;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.bg-login .content h2 {
+  color: #fff;
+  font-size: 28px;
+  line-height: 39px;
+  font-weight: 600;
+}
+
+.bg-login .content span.c-border {
+  width: 180px;
+  height: 2px;
+  background: #fff;
+  display: block;
+  margin: 20px 0;
+}
+
+.bg-login .content ul li {
+  font-size: 17px;
+  color: #fff;
+  padding: 5px 0;
+  font-weight: 500;
+}
+
+.bg-login .content ul li i {
+  margin-right: 10px;
+  font-weight: 700;
+}
+
+.bg-login .card h2 {
+  color: #17125C;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+.faq i {
+  font-size: 20px;
+  position: relative;
+  top: 3px;
+}
+
+.faq b {
+  color: #17125C;
+}
+
+.faq a:hover {
+  text-decoration: none;
+}
+/*# sourceMappingURL=login.component.css.map */

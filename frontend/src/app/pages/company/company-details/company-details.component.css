@@ -1,0 +1,63 @@
+.clearfix {
+  cursor: pointer;
+}
+
+.clearfix label {
+  margin: 0.25rem;
+}
+
+.clearfix .text-muted {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.6rem;
+}
+
+.rounded-sm {
+  margin-bottom: 0 !important;
+}
+
+.f-upload {
+  padding: 20px 10px;
+  position: relative;
+}
+
+.upload-btn {
+  position: absolute;
+  top: 4px;
+  padding: 6px;
+  background: #F26135;
+  color: #fff;
+  border-radius: 3px;
+  right: 5px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.slabCard {
+  background-color: #F2F2F2;
+}
+
+.slabCard .slabCount {
+  padding-left: 16px;
+}
+
+.slabCard .edit {
+  margin-right: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.bank-border {
+  border-bottom: 2px #F2F2F2 solid;
+  width: 90%;
+  position: relative;
+  top: -15px;
+}
+
+.clbs-border {
+  border-bottom: 2px #F2F2F2 solid;
+  width: 85%;
+  position: relative;
+  top: -15px;
+}
+/*# sourceMappingURL=company-details.component.css.map */

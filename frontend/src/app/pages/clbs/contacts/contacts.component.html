@@ -1,0 +1,112 @@
+<div class="container-fluid h-100vh">
+  <section >
+    <div class="row py-3 filter-card shadow-sm">
+        <div class="col-md-5 grid">
+            <div class="d-flex align-items-center">
+                <h6 class="m-0"><b>Contacts ({{filters.totalCount}})</b></h6>
+                <button [routerLink]="[ '/clbs/create-contact' ]" [queryParams]="{prop:'Create'}" class="btn btn-primary btn-sm shadow ml-3" type="button"><b><i class="ri-add-line"></i></b></button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card row mt-3 list-table shadow-sm">
+        <div class="col-md-12 p-0">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Contact</th>
+                            <th>Type</th>
+                            <th>Tax Payers</th>
+                            <th>Location</th>
+                            <th>Created Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr >
+                          <td></td>
+                          <td>
+                              <div class="input-group input-group-sm">
+                                  <div class="input-group-prepend">
+                                      <span class="input-group-text">
+                  <i class="ri-search-line"></i>
+                </span>
+                                  </div>
+                                  <input #search type="search" [(ngModel)]="filters.search" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                              </div>
+                          </td>
+                          <td></td>
+                          <td>
+                              <div class="input-group input-group-sm">
+                                  <div class="input-group-prepend">
+                                      <span class="input-group-text">
+                  <i class="ri-search-line"></i>
+                </span>
+                                  </div>
+                                  <input #searchGST type="search" [(ngModel)]="filters.searchGST" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                              </div>
+                          </td>
+                          <td></td>
+                          <td></td>
+
+                          <td></td>
+                          <td></td>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr *ngFor="let item of contactsList;let i = index">
+                            <td [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}">
+                                {{i+1}}
+                            </td>
+                            <td [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}">{{item.contact_name}}</td>
+                            <td [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}">{{item.contact_type}}</td>
+                            <td [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}">{{item.taxpayer}}</td>
+                            <td [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}">{{item.location_name}}</td>
+                            <td [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}">{{item.creation | date:["MMM d, y, h:mm a"]}}</td>
+                            <!-- <td>{{item.status?'Active':'Inactive'}}</td> -->
+                            <td>
+                                <div class="custom-control custom-switch ml-2 cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" [title]="item.contact_status?'Active':'Inactive'">
+                                    <input type="checkbox" class="custom-control-input" [(ngModel)]="item.contact_status" id="check{{i}}" name="check{{i}}" (change)="item.contact_status = $event.currentTarget.checked?1:0;changeContactStatus(item);">
+                                    <label class="custom-control-label" for="check{{i}}"></label>
+                                </div>
+                            </td>
+                            <td class="d-flex">
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="View" [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}" queryParamsHandling="merge" class="view mt-1 cursor-pointer"><i class="ri-eye-line btn-hover-gray p-1"></i></span>
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'Edit',name:item.name}" class="view pl-2 mt-1"><i class="ri-edit-box-line cursor-pointer btn-hover-gray p-1"></i></span>
+
+                            </td>
+                        </tr>
+
+
+                    </tbody>
+                </table>
+            </div>
+
+
+
+        </div>
+    </div>
+    <div class="d-flex justify-content-between morec mt-1" *ngIf="contactsList.length">
+      <div class="text-right px-3">
+          <ng-container *ngIf="contactsList.length  < this.filters.totalCount">
+              <p class="cursor-pointer px-2 py-1 pagination " (click)="this.filters.start = contactsList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                  more
+              </p>
+          </ng-container>
+      </div>
+      <div class="px-3">
+          <div class="row no-gutters pagination">
+              <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(20)" [ngClass]="{'bg-count': filters.itemsPerPage == 20 }">20</p>
+              <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(50)" [ngClass]="{'bg-count': filters.itemsPerPage == 50 }">50</p>
+              <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(100)" [ngClass]="{'bg-count': filters.itemsPerPage == 100 }">100</p>
+              <p class="px-2 py-1 mb-0 cursor-pointer" (click)="checkPagination(500)" [ngClass]="{'bg-count': filters.itemsPerPage == 500 }">500</p>
+          </div>
+      </div>
+
+  </div>
+</section>
+</div>
+

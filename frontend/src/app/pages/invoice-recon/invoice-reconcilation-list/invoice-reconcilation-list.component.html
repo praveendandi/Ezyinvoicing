@@ -1,0 +1,349 @@
+<section class="border-bottom bg-theme-color px-1 py-2">
+
+  <div class="row mb-3">
+    <div class="col-md-7 col-lg-7">
+        <div class="d-flex">
+            <h5 class="font-weight-bold text-white"> Advanced Reconciliation </h5>
+
+            <div class="form-group ml-2 w-c-50 my-auto">
+                <select id="my-select" [(ngModel)]="month" (ngModelChange)="selectMonthYear(month,year)" class="custom-select bg-white" name="month">
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+
+              </div>
+              <div class="form-group ml-2 w-c-50 my-auto" >
+                <select id="my-select" [(ngModel)]="year" (ngModelChange)="selectMonthYear(month,year)" class="custom-select bg-white" name="year">
+                  <option *ngFor="let item of yearsList" [value]="item">{{item}}</option>
+              </select>
+              </div>
+        </div>
+    </div>
+    <div class="col-md-5 col-lg-5 ">
+      <div class="d-flex justify-content-end" >
+        <ng-container *ngIf="reconDetails.length">
+
+        <button class="btn btn-sm btn-danger mr-2" [disabled]='checkSelection()'
+        (click)="deleteReconModal(delete_recon);"><em class="ri-delete-bin-6-fill"></em> Delete</button>
+
+      <button class="btn btn-sm btn-primary" [disabled]="this.reconUnderProcessStatus" (click)="reconciliationModel(addRecon)"><em class="ri-add-line"></em>
+        New Reconciliation</button>
+      </ng-container>
+        <!-- <button (click)="openModelXml(xmlUpload)" class="btn btn-primary btn-sm mx-2" appPermissionButton accessType="write" type="button"> Upload File</button>
+        <button class="btn btn-primary btn-sm" appPermissionButton accessType="write" type="button" (click)="export(exportModal)">Export Reco.</button> -->
+      </div>
+    </div>
+
+</div>
+
+
+  <!-- <div class="">
+    <div class="row">
+      <div class="col-md-4">
+        <h6 class="mb-0 mt-2">
+          <span class="back-arrow" [routerLink]="['../../dashboard']"><i class="ri-arrow-left-line"></i></span>
+          <strong>Reconciliation History</strong>
+        </h6>
+      </div>
+      <div class="col-md-8 text-right">
+        <div class="d-flex align-items-center justify-content-end">
+          <div>
+            <p class="m-0"> <span class="pr-2">{{companyDetails?.company_name || 'EzyGST'}} </span> | <span
+                class="pr-2">GSTIN: {{companyDetails?.gst_number|| '------'}} </span>
+            </p>
+          </div>
+          <div class="ml-3 w-25">
+            <div>
+              <div class="d-flex">
+                <div class="flex-fill">
+                  <div class="">
+                    <select id="my-select" class="form-control selct-btn" name="month" [(ngModel)]="month"
+                      (ngModelChange)="selectMonthYear(month,year)">
+                      <option *ngFor="let mon of monthList" [value]="mon.short">{{mon.long}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex-fill ml-3">
+                  <div class="">
+                    <select id="my-select" class="form-control selct-btn" name="year" [(ngModel)]="year"
+                      (ngModelChange)="selectMonthYear(month,year)">
+                      <option *ngFor="let yr of yearsList">{{yr}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</section>
+
+<div class="card" *ngIf="reconDetails.length">
+  <!-- <div class="p-2">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="d-flex">
+          <button class="btn btn-sm btn-danger mr-2" [disabled]='checkSelection()'
+            (click)="deleteReconModal(delete_recon);"><i class="ri-delete-bin-6-fill"></i> Delete</button>
+        </div>
+      </div>
+      <div class="col-md-6 text-right">
+        <button class="btn btn-sm btn-primary" [disabled]="this.reconUnderProcessStatus" (click)="reconciliationModel(addRecon)"><i class="ri-add-line"></i>
+          New Reconciliation</button>
+      </div>
+    </div>
+  </div> -->
+  <div class="table-responsive" style="height: 80vh;">
+    <table class="table tid-table">
+      <thead class="thead">
+        <tr>
+          <th>
+            <div class="custom-control custom-checkbox text-center" ngbTooltip="Select All">
+              <input (change)="checkedItemsAll($event)" type="checkbox" [(ngModel)]="selectAll"
+                class="custom-control-input" id="customCheckAll" name="itemAll">
+              <label class="custom-control-label" for="customCheckAll" ></label>
+            </div>
+          </th>
+          <th>S.No</th>
+          <th>Prepared By</th>
+          <th>Period</th>
+          <th>Created On</th>
+          <th>Reconcilation Actions</th>
+          <th>GSTR Actions</th>
+        </tr>
+      </thead>
+      <ng-container *ngFor="let recon of reconDetails; let index = index; let even = even">
+        <tbody>
+          <tr>
+            <td>
+              <div  class="custom-control custom-checkbox text-center">
+                <input [(ngModel)]="recon.checked" (change)="checkedItems($event, recon)" type="checkbox"
+                  class="custom-control-input" id="customCheck{{index}}" name="scustomCheck{{index}}">
+                <label class="custom-control-label" for="customCheck{{index}}"></label>
+              </div>
+            </td>
+            <td>{{ index+1 }}</td>
+            <td>{{ recon.user_id}}</td>
+            <td>{{ recon.start_date |date : 'dd/MM/yyyy'}} - {{ recon.end_date |date : 'dd/MM/yyyy'}}</td>
+            <td>{{ recon.creation | date:'dd/MM/yyyy hh:mm:ss'}}</td>
+            <td class="d-flex">
+              <button *ngIf="recon?.recordStatus != 'processing'" class="btn btn-sm btn-info mr-2" [routerLink]="['../../invoice-recon/invoice-recon']"
+                [queryParams]="{name:recon.name,startDate:recon.start_date ,endDate: recon.end_date }">View</button>
+              <button [disabled]="reconUnderProcessStatus" *ngIf="recon?.recordStatus != 'processing'" class="btn btn-sm btn-info mr-2" (click)="redoRecon_modal(redo_recon)"><em
+                  class="ri-restart-line m-1"></em>Re-process</button>
+              <div *ngIf="recon?.recordStatus == 'processing'" style=" width: -webkit-fill-available;">
+                <p class="m-0"><small>Creating...{{recon?.percentage}}%</small></p>
+                    <ngb-progressbar [type]="'info'" textType="white"
+                        [value]="recon?.percentage" [showValue]="false">
+                    </ngb-progressbar>
+              </div>
+
+            </td>
+            <td>
+              <!-- <button class="btn btn-sm btn-info mr-2">Prepare GSTRA</button>
+              <button class="btn btn-sm btn-info">Preview GSTRA</button> -->
+            </td>
+          </tr>
+          <ng-template #redo_recon let-modal>
+            <div class="modal-body">
+              <div class="d-flex">
+                <div class="sec-1">
+                  <div>
+                    <em class="ri-restart-line delete-icon"></em>
+                  </div>
+                </div>
+                <div class="sec-1">
+                  <p class="alert-title">Are you sure you want to reprocess the selected record?</p>
+                  <p class="alert-disc">This records will be updated immediately,You can't undo this</p>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary btn-sm mx-2" (click)="modal.close()">Cancel</button>
+                <button class="btn btn-primary btn-sm" (click)="redoRecon(recon?.name)">Confirm</button>
+              </div>
+            </div>
+          </ng-template>
+        </tbody>
+      </ng-container>
+    </table>
+  </div>
+</div>
+<section class="summary-purchase" *ngIf="!reconDetails.length">
+  <div class="no-data py-10">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <h5>No Reconciliation Data Found</h5>
+          <p class="mb-1">Click new reconcile to start reconcile</p>
+          <button [disabled]="checkDateForReconcile()" type="button" class="btn btn-sm px-5 btn-secondary mt-2"
+            (click)="reconciliationModel(addRecon)">New Reconciliation</button>
+        </div>
+      </div>
+      <p class="m-3 text-center "><b>Note:</b>   Before using Advance reconciliation, upload .xml file in simple reconciliation page. <a href="/home/invoice-reconciliation">click here</a></p>
+
+    </div>
+  </div>
+</section>
+
+
+
+<ng-template #addRecon let-modal>
+  <div class="modal-header">
+    <h6 class="mb-0" id="modal-basic-title">Select Reconciliation Period </h6>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form #form="ngForm">
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group calendar w-c-50 position-relative my-auto">
+            <input class="form-control h-auto" [min]="fromMinDate" [max]="fromMaxDate" [(ngModel)]="fromDate" required
+              #fromDate_value='ngModel' name="fromDate_value" (dateTimeChange)="dateChange()" [owlDateTime]="dt1"
+              [selectMode]="'rangeFrom'" [owlDateTimeTrigger]="dt1" placeholder="From Date" >
+            <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+              <i class="ri-calendar-2-line text-dark"></i>
+            </span>
+            <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+            <small class="text-danger" *ngIf="form.submitted && fromDate[0] == null">Required</small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group calendar w-c-50 position-relative my-auto">
+            <input class="form-control h-auto" [min]="toMinDate" [max]="toMaxDate" [(ngModel)]="toDate" required
+              #toDate_value="ngModel" name="toDate_value" (dateTimeChange)="dateChange()" [owlDateTime]="dt2"
+              [selectMode]="'rangeTo'" [owlDateTimeTrigger]="dt2" placeholder="To Date" >
+            <span class="example-trigger" [owlDateTimeTrigger]="dt2">
+              <i class="ri-calendar-2-line text-dark"></i>
+            </span>
+            <owl-date-time [pickerType]="'calendar'" #dt2></owl-date-time>
+            <small class="text-danger" *ngIf="form.submitted && toDate[1] == null">Required</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="mx-3 note-para"><small><b>Note: </b> Before using Advance reconciliation, Detailed_folio.xml, upload.xml file in simple reconciliation page. <a href="/home/invoice-reconciliation">click here</a> </small></p>
+
+    <div class="modal-footer">
+
+      <div class="text-right">
+        <button class="btn btn-outline-dark btn-sm mr-2" type="button" (click)="modal.dismiss()">Cancel</button>
+        <button class="btn btn-primary btn-sm" type="submit" (click)="getReconcilationData(form)">Submit</button>
+      </div>
+    </div>
+  </form>
+
+</ng-template>
+<ng-template #delete_recon let-modal>
+  <div class="modal-body">
+    <div class="d-flex">
+      <div class="sec-1">
+        <div>
+          <em class="ri-delete-bin-line delete-icon"></em>
+        </div>
+      </div>
+      <div class="sec-1">
+        <p class="alert-title">Are you sure you want to delete selected records?</p>
+        <p class="alert-disc">This items will deleted immediately, You can't undo this action</p>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-outline-primary btn-sm mx-2" (click)="modal.close()">Cancel</button>
+      <button class="btn btn-primary btn-sm" (click)="deleteReconData()">Confirm</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #xmlUpload let-modal>
+  <div class="modal-header">
+      <h5 class="" id="modal-basic-title">Upload File</h5>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+  <div class="modal-body">
+      <div class="fileUpload" *ngIf="selectedFile.length==0">
+          <label for="file" class="d-block cursor-pointer text-center">
+              <i class="ri-upload-cloud-line"></i>
+              <h6><strong>Upload Xml Invoice</strong></h6>
+          </label>
+          <input accept=".xml" (change)="selectFiles($event.target.files)" class="opacity-0 d-none" type="file" name="" id="file">
+      </div>
+      <div *ngIf="selectedFile.length>0">
+          <div *ngIf="!uploadedFile">
+              <div class=" text-center" *ngFor="let file of selectedFile; let i = index">
+                  <div class="preview-box position-relative">
+                      <div class="p-close"><i (click)="removeFromList(file,i)" class="ri-close-circle-line"></i>
+                      </div>
+                      <div class="p-file"> <i class="ri-file-4-line"></i></div>
+                      <div>
+                          <p>{{file?.file?.name}}</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div *ngIf="uploadedFile" class="text-success text-center">File uploaded successfully </div>
+      </div>
+  </div>
+  <div class="modal-footer d-block  pb-4 border-0" *ngIf="selectedFile.length > 0 ">
+      <div class="text-right">
+
+          <button *ngIf="uploadedFile" class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="modal.close('Success')">Ok</button>
+          <button *ngIf="!uploadedFile" class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="modal.dismiss('Cross click')">Cancel</button>
+
+          <button *ngIf="!uploadedFile" (click)="uploadFiles()" [disabled]="selectedFile.length == 0 " class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton accessType="write" type="button">Upload</button>
+      </div>
+  </div>
+</ng-template>
+<ng-template #exportModal let-modal>
+<div class="modal-header">
+    <h5 class="" id="modal-basic-title"> Download Invoice Reconciliation File</h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body export-modal">
+  <div class="d-flex">
+    <div class="form-group calendar w-c-50 position-relative my-auto" >
+      <!-- [(ngModel)]="filters.search.filterDate" -->
+      <input class="form-control h-auto"   [max]="fromMaxDate" [(ngModel)]="fromDate"
+        (dateTimeChange)="updateRouterParams();fromDateSelected($event.value[0])" [owlDateTime]="dt1" [selectMode]="'rangeFrom'" [owlDateTimeTrigger]="dt1"
+        placeholder="From Date">
+      <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+        <i class="ri-calendar-2-line"></i>
+      </span>
+      <owl-date-time [pickerType]="'calendar'" #dt1  ></owl-date-time>
+    </div>
+
+    <div class="form-group calendar w-c-50 position-relative my-auto" >
+      <!-- [(ngModel)]="filters.search.filterDate" -->
+      <input class="form-control h-auto"  [min]="toMinDate" [max]="toMaxDate" [(ngModel)]="toDate"
+        (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt2" [selectMode]="'rangeTo'" [owlDateTimeTrigger]="dt2"
+        placeholder="To Date">
+      <span class="example-trigger" [owlDateTimeTrigger]="dt2">
+        <i class="ri-calendar-2-line"></i>
+      </span>
+      <owl-date-time [pickerType]="'calendar'" #dt2  ></owl-date-time>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center my-3">
+    <button class="btn btn-primary btn-sm" (click)="download()">Download</button>
+  </div>
+</div>
+</ng-template>
+
+

@@ -1,0 +1,23 @@
+.sync-status{
+    position: absolute;
+    right: 140px;
+    top: 25px;
+    font-size: 14px;   
+}
+
+.sync-status i{
+    font-size: 16px;
+    margin-right: 3px;
+    line-height: 20px;
+}
+
+.sync-status p {
+    display: flex;
+}
+
+.btn-right {
+    position: absolute;
+    right:5px;
+    top:10px;
+    width: 30%;
+}

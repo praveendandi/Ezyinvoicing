@@ -1,0 +1,75 @@
+<div class="p-2">
+    <div class="modal-header py-2">
+        <div class="d-flex">
+            <h5 class="mr-3" id="modal-basic-title"><strong>Upload Files</strong></h5>
+        </div>
+
+        <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body ">
+
+        <div class="col-md-12">
+
+            <div class="fileUpload" *ngIf="selectedFiles.length==0">
+                <label for="file" class="d-block cursor-pointer text-center">
+                    <i class="ri-upload-cloud-line"></i>
+                    <h6><strong>Upload Pdf Invoice</strong></h6>
+                </label>
+                <input accept=".pdf" (change)="selectFiles($event.target.files)" class="opacity-0 d-none" multiple
+                    type="file" name="" id="file">
+            </div>
+
+
+            <div *ngIf="selectedFiles.length>0">
+                <div *ngIf="progressInfos.length == 0" class="row">
+                    <div class="col-md-2 text-center" *ngFor="let file of selectedFiles; let i = index">
+                        <div class="preview-box position-relative">
+                            <div class="p-close"><i (click)="removeFromList(file,i)" class="ri-close-circle-line"></i>
+                            </div>
+                            <div class="p-file"> <i class="ri-file-4-line"></i></div>
+                            <div>
+                                <p>{{file?.file?.name}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- <div *ngIf="allFilesUplaoded" class="text-success text-center">All Files are uploaded successfully</div> -->
+
+        <div *ngIf="progressInfos.length > 0">
+            <div *ngFor="let progressInfo of progressInfos" class="mb-2">
+                <div class="d-flex mx-3">
+                    <b *ngIf="progressInfo?.color == 'warning'"> <i class="ri-close-line mr-2" style="color: red;"></i></b>
+                    <b *ngIf="progressInfo?.color == 'success'"> <i class="ri-check-line mr-2" style="color: green;"></i></b>
+                    <small class="mr-3 col-md-9">{{ progressInfo.fileName }}</small>
+                    <span class="col-md-3">
+                        <ngb-progressbar [type]="progressInfo.color" textType="white"
+                            [value]="progressInfo.parserProgress +progressInfo.uploadProgress" [showValue]="true">
+                        </ngb-progressbar>
+                    </span>
+                    
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer d-block  pb-4 border-0" *ngIf="selectedFiles.length > 0 ">
+        <div class="text-right">
+
+            <button *ngIf="allFilesUplaoded" class="btn btn-outline-primary mb-0  text-uppercase" type="button"
+                (click)="closeModalRefrsh()">Ok</button>
+            <button *ngIf=" progressInfos.length == 0" class="btn btn-outline-primary mb-0  text-uppercase"
+                type="button" (click)="closeModal()">Cancel</button>
+
+            <button *ngIf=" progressInfos.length == 0" (click)="uploadFiles()" [disabled]="selectedFiles.length == 0 "
+                class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton accessType="write"
+                type="button">Upload</button>
+        </div>
+    </div>
+</div>

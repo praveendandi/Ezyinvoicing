@@ -1,0 +1,155 @@
+<header class="shadow">
+    <div class="">
+        <div class="row m-0 px-3 pt-2">
+            <div class="col-md-8 d-flex align-items-center my-auto text-white">
+                <h6 class="m-0"> <i (click)="goback()" class="ri-arrow-left-line back btn-hover"></i></h6>
+                <div class="pl-2">
+                    <h6 class="m-0"><b> {{summaryData?.summary_title}}</b></h6>
+                    <div class="d-flex">
+                        <p class="mb-0 pr-2">{{summaryData?.tax_payer_details}}</p>
+                        <div class="border-right "></div>
+                        <p class="mb-0 px-2">{{summaryData?.legal_name || '-----'}}</p>
+                        <div class="border-right "></div>
+                        <p class="mb-0 px-2">{{summaryData?.from_date| date:'d MMMM, y'}} - {{summaryData?.to_date | date:'d MMMM , y'}}</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-4 my-auto">
+
+            </div>
+        </div>
+
+    </div>
+</header>
+<section class="my-2">
+    <div class="container-fluid" id="invoice-d">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="d-flex align-items-center mt-1">
+                    <!-- <button class="btn btn-primary btn-sm" type="button">Add B2C</button> -->
+                    <div class="custom-control custom-checkbox">
+                        <input (change)="addB2CEnableFn()" type="checkbox"   [(ngModel)]="addB2CEnable" class="custom-control-input" id="addB2CEnable" name="addB2CEnable">
+                        <label class="custom-control-label" for="addB2CEnable">Pickup B2C Invoices</label>
+                    </div>
+
+                    <div class="form-group mb-0 contact-select px-2" *ngIf="addB2CEnable">
+
+                        <div>
+                            <input autocomplete="off" class="form-control" type="text" placeholder="Select B2C Invoice" [(ngModel)]="b2cInvoicedetails.invoice" name="b2cInvoice" id="b2cInvoice"  #b2cInvoice='ngModel' 
+                            (keyup)="b2cInvoiceSearch(b2cInvoice)" (focus)="inputfocus(); b2cInvoiceSearch(b2cInvoice)" (blur)="inputblur()" />
+
+                            <div class="input-wrapper paragraphClass">
+                                <ul class="p-0">
+                                    <li  *ngFor="let item1 of b2cInvoiceList" (click)="itemSelection(item1)" class="p-2 cursor-pointer">
+                                        <b> {{ item1.name }} <small>{{ item1.guest_name ? item1.guest_name : "NA" }}</small></b>
+
+                                    </li>
+
+                                </ul>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <!-- <div>
+                        <h6 class="m-0"><b><i class="ri-arrow-left-line arrow-back"></i> <span class="ml-3">
+                                    {{summaryData?.summary_title}}</span></b></h6>
+                    </div> -->
+                    <!-- <div class="mx-3">
+                        <label for="from_Date" class="m-0">From Date</label>
+                        <input class="form-control" type="date" name="from_Date" [(ngModel)]="summaryData.from_date" #from_date="ngModel">
+                    </div>
+                    <div>
+                        <label for="to_date" class="m-0">To Date</label>
+                        <input class="form-control" type="date" name="to_date" [(ngModel)]="summaryData.to_date" #to_date="ngModel">
+                    </div> -->
+
+                    <!-- <div class=" calendar w-c-50 position-relative">
+                        <input class="form-control h-auto" [(ngModel)]="filters.search.filterDate" (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt1" [selectMode]="'range'" [owlDateTimeTrigger]="dt1" placeholder="Date Time">
+                        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+                <i class="ri-pencil-fill"></i>
+              </span>
+                        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                    </div> -->
+                </div>
+            </div>
+            <div class="col-md-3 my-auto">
+                <input type="text" class="form-control m-0" placeholder="search by Invoice" name="invoice" [(ngModel)]="filters.search.invoice" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" #invoice="ngModel">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 list-table">
+                <div class="bg-white mt-3">
+                    <table class="table  table-sm mb-5">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <!-- <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="customCheckAll" name="itemAll" (change)="checkedItemsAll($event)" type="checkbox" [(ngModel)]="selectAll">
+                                        <label class="custom-control-label" for="customCheck"></label>
+                                    </div> -->
+                                    <div class="custom-control custom-checkbox">
+                                        <input (change)="checkedItemsAll($event)" type="checkbox" [(ngModel)]="selectAll" class="custom-control-input" id="customCheckAll" name="itemAll">
+                                        <label class="custom-control-label" for="customCheckAll" ngbTooltip="Select All"></label>
+                                    </div>
+                                </th>
+                                <th>Invoice Date</th>
+                                <th>Invoice No</th>
+                                <th>Invoice Type</th>
+                                <th>GST Number</th>
+                                <th>Trade Name</th>
+                                <th>Taxable Value</th>
+                                <th>CGST</th>
+                                <th>SGST</th>
+                                <th>IGST</th>
+                                <th>Total Amount</th>
+                                <th>In Other Summaries</th>
+                                <!-- <th>Actions</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of invoicesData;let i = index">
+                                <td>
+                                    <div class="custom-control custom-checkbox" [ngClass]="{'selected':item?.summary}" [ngbTooltip]="item?.summary?'Exists in another summary' : ''" *ngIf="!item?.summary">
+                                        <input (change)="checkedItems($event, item)" type="checkbox" class="custom-control-input" [ngClass]="{'selected':item?.summary}" id="customCheck{{i}}" name="item{{i}}" [(ngModel)]="item.checked" [disabled]="item?.summary">
+                                        <label class="custom-control-label" for="customCheck{{i}}"></label>
+                                    </div>
+                                </td>
+                                <td>{{item?.invoice_date}}</td>
+                                <td>{{item?.invoice_number}}</td>
+                                <td>{{item?.invoice_type}}</td>
+                                <td>{{item?.gst_number}}</td>
+                                <td>{{item?.trade_name}}</td>
+                                <td>{{item?.sales_amount_before_tax}}</td>
+                                <td>{{item?.cgst_amount}}</td>
+                                <td>{{item?.sgst_amount}}</td>
+                                <td>{{item?.igst_amount}}</td>
+                                <td>{{item?.sales_amount_after_tax}}</td>
+                                <td> <a class="cursor-pointer" [routerLink]="['/clbs/summary-details/'+item?.summary]">{{item?.summary ? 'View' : ''}}</a></td>
+                                <!-- <td class="text-center"><i class="ri-eye-fill cursor-pointer "></i></td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center py-3" *ngIf="!invoicesData.length">
+                        <h4>No Data Found</h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="c-footer shadow">
+            <div class="row ">
+                <div class="col-md-12 text-right">
+                    <!-- <button class="btn btn-outline-primary px-3 c-o-b shadow-sm bg-white" type="button"><i
+                            class="ri-download-fill mr-2"></i> Save as Draft</button> -->
+                    <button (click)="createSummaries()" class="btn btn-primary ml-3 px-3 c-o-b1 shadow-sm" type="button" [disabled]="!dupinvoicesList.length">{{pageType=='create'?'Create':'Update'}} Summary <i
+                            class="ri-arrow-right-line pl-3"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,21 @@
+select.custom-select {
+  font-size: 12px;
+  height: 34px;
+}
+
+.input-wrapper {
+  position: absolute;
+  z-index: 1;
+  width: 17rem;
+  background: #fafafa;
+}
+
+ul {
+  overflow-y: scroll;
+  max-height: 15rem;
+}
+
+.paragraphClass {
+  display: none;
+}
+/*# sourceMappingURL=clbs-reports.component.css.map */

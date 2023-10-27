@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,SAAS,CAAC;EACN,SAAS,EAAE,KAAK;CAOnB;;AARD,AAEI,SAFK,CAEL,CAAC,CAAC;EACE,QAAQ,EAAE,QAAQ;EAClB,GAAG,EAAE,GAAG;EACR,KAAK,EAAE,IAAI;EACX,MAAM,EAAE,OAAO;CAClB;;AAGL,AAAA,OAAO,CAAC;EACJ,SAAS,EAAE,KAAK;EAChB,WAAW,EAAE,IAAI;CACpB",
+    "sources": [
+        "err-logs.component.scss"
+    ],
+    "names": [],
+    "file": "err-logs.component.css"
+}

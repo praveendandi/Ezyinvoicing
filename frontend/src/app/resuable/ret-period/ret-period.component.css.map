@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,cAAc,CAAC;EACX,SAAS,EAAE,IAAI;EACf,MAAM,EAAE,IAAI;CACf;;AAED,AAAA,aAAa,CAAC;EACV,SAAS,EAAE,IAAI;EACf,MAAM,EAAE,IAAI;CACf",
+    "sources": [
+        "ret-period.component.scss"
+    ],
+    "names": [],
+    "file": "ret-period.component.css"
+}

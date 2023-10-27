@@ -1,0 +1,30 @@
+.fileUpload{
+    i{
+        font-size: 100px;
+    }
+}
+
+.preview-box{
+    .p-file{
+        font-size: 30px;
+    }
+ }
+
+ .preview-box{
+     padding: 15px 0;
+     margin-bottom: 15px;
+     border: 1px solid #eee;
+     p{
+         margin: 0;
+         font-size: 13px;
+     }
+     .p-close{
+         i{
+            position: absolute;
+            left: -5px;
+            top: -12px;
+            color: red;
+            font-size: 20px;
+         }
+     }
+ }

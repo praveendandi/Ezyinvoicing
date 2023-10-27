@@ -1,0 +1,110 @@
+.clearfix {
+    cursor: pointer;
+    label {
+        margin: 0.25rem;
+    }
+    .text-muted {
+        position: absolute;
+        top: 0.8rem;
+        left: 0.6rem;
+    }
+}
+
+.rounded-sm {
+    margin-bottom: 0 !important;
+}
+
+.f-upload {
+    padding: 20px 10px;
+    position: relative;
+}
+
+.upload-btn {
+    position: absolute;
+    top: 4px;
+    padding: 6px;
+    background: #F26135;
+    color: #fff;
+    border-radius: 3px;
+    right: 5px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.slabCard {
+    background-color: #F2F2F2;
+    .slabCount {
+        padding-left: 16px;
+    }
+    .edit {
+        margin-right: 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+}
+
+.bank-border {
+    border-bottom: 2px #F2F2F2 solid;
+    width: 90%;
+    position: relative;
+    top: -15px
+}
+
+.clbs-border {
+    border-bottom: 2px #F2F2F2 solid;
+    width: 83%;
+    position: relative;
+    top: -15px
+}
+
+.signature_modal {
+    .nav-tabs .nav-link {
+        background: #fff;
+        border: none;
+        color: #495057;
+        border-radius: 5px;
+        margin-right: 0;
+        box-shadow: none !important;
+        padding: 0 1rem 0.5rem;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+        background: none;
+        border-bottom: 1px solid #f06135;
+        color: #f06135;
+        border-radius: 0;
+    }
+
+    .modal-header{
+        padding: 1rem 0 0;
+    }
+
+    .modal-header .close {
+        padding: 0.5rem;
+        margin: -1rem 0 -1rem auto;
+    }
+
+}
+
+.eyebutton{
+    position: absolute;
+    right: 5px;
+    top: 8px;
+    background-color: transparent;
+    border: 0;
+    color: #666;
+    font-size: 18px;;
+}
+.img-fluid {
+  max-width: 52% !important;
+}
+
+.timepicker i {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 17px;
+    cursor: pointer;
+}

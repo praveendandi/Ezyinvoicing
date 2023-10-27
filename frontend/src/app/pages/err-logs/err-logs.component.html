@@ -1,0 +1,95 @@
+<section>
+
+    <div class="row mb-3">
+        <div class="col-md-9 col-lg-9">
+            <div class="d-flex mb-3">
+                <!-- <h4 class="font-weight-bold text-white my-auto">Error Logs <small>({{this.filters.totalCount}})</small></h4> -->
+                <h4 class="text-white"><b> Error Logs  <small>({{this.filters.totalCount}})</small></b></h4>
+                <div class="d-flex mx-2">
+                    <div class="form-group w-c-50 mx-2">
+                        <select id="my-select" [(ngModel)]="filters.search.filterBy" (ngModelChange)="onDateFilterChange()"
+                          class="custom-select bg-white" name="">
+                          <option value="All">All</option>
+                          <option value="Today">Today</option>
+                          <option value="Yesterday">Yesterday</option>
+                          <option value="This Week">This Week</option>
+                          <option value="Last Week">Last Week</option>
+                          <option value="This Month">This Month</option>
+                          <option value="Last Month">Last Month</option>
+                          <option value="This Year">This Year</option>
+                          <option value="Custom">Custom</option>
+                        </select>
+                      </div>
+              
+                      <div class="form-group calendar w-c-50 position-relative" *ngIf="filters.search.filterBy == 'Custom'">
+                        <input class="form-control h-auto" [(ngModel)]="filters.search.filterDate"
+                          (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt1" [selectMode]="'range'"
+                          [owlDateTimeTrigger]="dt1" placeholder="Date Time">
+                        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+                          <i class="ri-calendar-2-line"></i>
+                        </span>
+                        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                      </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3">
+            <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+                <input type="search" class="form-control pl-5" [(ngModel)]="filters.search.name"
+                    (keyup)="filters.search.name = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+                    #search (keyup.enter)="updateRouterParams()" placeholder="Search by method">
+                <span class="search"><i class="ri-search-line"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card pb-1">
+        
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="thead" #head>
+                        <tr>
+                            <th>#</th>
+                            <th>Method</th>
+                            <th>Error</th>
+                            <th>Creation</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <tr *ngFor="let item of ErrLogList,let i=index">
+                            <th>{{i+1}}</th>
+                                <td>{{item?.method}}</td>
+
+                                <td>{{item?.error}}</td>
+
+                                <td>{{item?.creation | date}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center py-3" *ngIf="!ErrLogList.length">
+                    <h5>No Data Found</h5>
+                </div>
+
+
+            </div>
+        <div class="d-flex justify-content-between" *ngIf="ErrLogList.length">
+            <div class="px-3">
+                <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
+                    (change)="checkPagination()" id="itemsPerPage">
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                    <option [value]="100">100</option>
+                    <option [value]="150">150</option>
+                    <option [value]="500">500</option>
+                </select>
+            </div>
+            <div *ngIf="ErrLogList.length  < this.filters.totalCount">
+                <p class="text-right pr-5 more text-primary"
+                    (click)="this.filters.start = ErrLogList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                    more
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

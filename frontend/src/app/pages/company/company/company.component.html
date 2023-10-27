@@ -1,0 +1,55 @@
+<section>
+  <div class="card">
+    <div class="row p-3">
+      <div class="col-md-9 col-lg-9">
+        <div class="d-flex">
+          <h4 class="font-weight-bold">Company</h4>
+          <!-- <span class="create" [routerLink]="['/home/company-details']" queryParamsHandling="merge"><i
+              class="ri-add-line"></i></span> -->
+        </div>
+      </div>
+      <!-- <div class="col-lg-3 col-md-3">
+        <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+          <input type="search" [(ngModel)]="filters.search"
+            (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+            class="form-control pl-5" #search placeholder="Search">
+          <span class="search"><i class="ri-search-line"></i></span>
+        </div>
+      </div> -->
+    </div>
+    <div id="datatable">
+      <table class="table">
+        <thead class="thead">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Company Name</th>
+            <th>Trade Name</th>
+            <th>Legal Name</th>
+            <th>Created On</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let item of companyList | paginate:{itemsPerPage: this.filters.itemsPerPage, currentPage: this.filters.currentPage};let i =index">
+            <td>{{ this.filters.itemsPerPage * (this.filters.currentPage - 1) + i }}</td>
+            <td>{{item?.name || 'NA'}}</td>
+            <td>{{item?.company_name || 'NA'}}</td>
+            <td>{{item?.trade_name || 'NA'}}</td>
+            <td>{{item?.legal_name || 'NA'}}</td>
+            <td>{{item?.creation |date:'medium'}}</td>
+            <td>
+              <span [routerLink]="'../../company-details/'+item.name" [queryParams]="{view:true}"
+                [queryParamsHandling]="'merge'"><a>view</a></span>
+              <!-- <span class="ml-3" [routerLink]="'../../company-details'" [queryParams]="{id:item.name,view:false}"
+                [queryParamsHandling]="'merge'"><a>Edit</a></span> -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <pagination-controls (pageChange)="this.filters.currentPage = $event;updateRouterParams()" class="text-right">
+      </pagination-controls>
+    </div>
+  </div>
+</section>

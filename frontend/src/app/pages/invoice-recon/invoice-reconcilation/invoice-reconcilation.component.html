@@ -1,0 +1,1178 @@
+<section class="border-bottom bg-theme-color px-1 py-2">
+
+    <div class="row">
+      <div class="col-md-4">
+        <h6 class="mb-0 mt-2">
+          <span class="back-arrow" (click)="back()"><i class="ri-arrow-left-line"></i></span>
+          <span class="m-0"><strong>Reconciliation |</strong><small> {{filters.startDate }} -
+              {{filters.endDate }}</small> </span>
+        </h6>
+      </div>
+      <div class="col-md-8 text-right mt-2">
+        <div class="d-flex align-items-center justify-content-end">
+          <div>
+            <p class="m-0"> <span class="pr-2">{{companyDetails?.company_name || 'EzyGST'}} </span> | <span
+                class="pr-2">GSTIN: {{companyDetails?.gst_number|| '------'}} </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</section>
+<section class="card">
+  <div id="stepper1" class="bs-stepper">
+    <div class="d-flex" style="border-bottom: solid 2px white;">
+      <div class="pull-left mt-sm cursor-pointer">
+        <p class="mt-2 mb-0" (click)="scrollLeft()"><i class="ri-arrow-left-s-line h4"></i></p>
+      </div>
+      <div class="bs-stepper-header custom-slider-main" #widgetsContent>
+        <div class="step" data-target="#test-l-1">
+          <button class="step-trigger" (click)="changeTabs(docTypeList.invoice_count)">
+            <span class="bs-stepper-label">Dashboard</span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-2">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.missing_in_opera)">
+            <span class="bs-stepper-label">Missing In Opera <span *ngIf="selectedTab == docTypeList?.missing_in_opera && totalRecordsCount">({{totalRecordsCount}})</span> </span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-9">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.zero_invoice)">
+            <span class="bs-stepper-label">Zero Invoices <span *ngIf="selectedTab == docTypeList?.zero_invoice && totalRecordsCount">({{totalRecordsCount}})</span><br><small>(missing in opera)</small></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-3">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.missing_in_ezyInvoicing)">
+            <span class="bs-stepper-label">Missing In EzyInvoicing <span *ngIf="selectedTab == docTypeList?.missing_in_ezyInvoicing && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-4">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.invoice_type_missmatch)">
+            <span class="bs-stepper-label">Invoice Type Missmatch <span *ngIf="selectedTab == docTypeList?.invoice_type_missmatch && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-5">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.recon_hsn_summary)">
+            <span class="bs-stepper-label">Ezy Invoicing Summary <span *ngIf="selectedTab == docTypeList?.recon_hsn_summary && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-6">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.recon_opera_comparison)">
+            <span class="bs-stepper-label">Comparison <span *ngIf="selectedTab == docTypeList?.recon_opera_comparison && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-7">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.converted_b2b_to_b2c)">
+            <span class="bs-stepper-label">Converted B2B to B2C <span *ngIf="selectedTab == docTypeList?.converted_b2b_to_b2c && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-8">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.converted_b2c_to_b2b)">
+            <span class="bs-stepper-label">Converted B2C to B2B <span *ngIf="selectedTab == docTypeList?.converted_b2c_to_b2b && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-11">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.amendments)">
+            <span class="bs-stepper-label">Amendments<span *ngIf="selectedTab == docTypeList?.amendments && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+        <div class="step" data-target="#test-l-10">
+          <button class="step-trigger" (click)="changeTabs(docTypeList?.no_sac)">
+            <span class="bs-stepper-label">No Sac <span *ngIf="selectedTab == docTypeList?.no_sac && totalRecordsCount">({{totalRecordsCount}})</span></span>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="pull-right mt-sm cursor-pointer">
+        <p class="mt-2 mb-0" (click)="scrollRight()"><i class="ri-arrow-right-s-line h4"></i></p>
+      </div>
+    </div>
+
+
+
+    <div class="bs-stepper-content bg-gray m-3">
+      <div id="test-l-1" class="content">
+        <ng-container [ngTemplateOutlet]="dashboard"></ng-container>
+      </div>
+      <div id="test-l-2" class="content">
+        <ng-container [ngTemplateOutlet]="missing_in_opera"></ng-container>
+      </div>
+      <div id="test-l-3" class="content">
+        <ng-container [ngTemplateOutlet]="missing_in_ezyinvoicing"></ng-container>
+      </div>
+      <div id="test-l-4" class="content">
+        <ng-container [ngTemplateOutlet]="invoice_type_missmatch"></ng-container>
+      </div>
+      <div id="test-l-5" class="content">
+        <ng-container [ngTemplateOutlet]="ezy_invoicing_summary"></ng-container>
+      </div>
+      <div id="test-l-6" class="content">
+        <ng-container [ngTemplateOutlet]="comparison"></ng-container>
+      </div>
+      <div id="test-l-7" class="content">
+        <ng-container [ngTemplateOutlet]="converted_b2b_to_b2c"></ng-container>
+      </div>
+      <div id="test-l-8" class="content">
+        <ng-container [ngTemplateOutlet]="converted_b2c_to_b2b"></ng-container>
+      </div>
+      <div id="test-l-9" class="content">
+        <ng-container [ngTemplateOutlet]="zero_invoices"></ng-container>
+      </div>
+      <div id="test-l-10" class="content">
+        <ng-container [ngTemplateOutlet]="no_sac"></ng-container>
+      </div>
+      <div id="test-l-11" class="content">
+        <ng-container [ngTemplateOutlet]="amendments"></ng-container>
+      </div>
+    </div>
+  </div>
+
+
+  <ng-template #dashboard>
+    <div>
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between">
+            <div>
+              <p class="m-0 recon-title">Reconciliation Dashboard</p>
+            </div>
+            <div>
+              <button class="btn btn-primary btn-sm my-2"
+                (click)="redoRecon_modal(redo_recon)">Reprocess</button>
+            </div>
+          </div>
+          <div class="card card-1">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                  <div class="skyblue-box mx-2"></div>
+                  <p class="m-0 labels">Ezy <br>Invoicing</p>
+                </div>
+                <div class="d-flex">
+                  <p class="m-0 labels text-right">Opera<br>Folio</p>
+                  <div class="blue-box mx-2"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-5">
+                  <google-chart *ngIf="chartStatus" [type]="barchart1.type" [data]="barchart1.data"
+                    [columns]="barchart1.columnNames" [options]="barchart1.options" (select)="onSelect($event)">
+                  </google-chart>
+                </div>
+                <div class="col-2">
+                  <div class="variance">
+                    <p class="value">{{totalDashboardData?.invoice_count?.ezy_opera_variance}}</p>
+                    <p class="label">Variance</p>
+                  </div>
+                </div>
+                <div class="col-5">
+                  <google-chart *ngIf="chartStatus" [type]="barchart2.type" [data]="barchart2.data"
+                    [columns]="barchart2.columnNames" [options]="barchart2.options" (select)="onSelect($event)">
+                  </google-chart>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="card card-2">
+            <div class="card-body d-flex justify-content-between p-3">
+              <div>
+                <p class="value">{{totalDashboardData?.invoice_count?.ezyinvoicing_count}}</p>
+                <p class="title">Ezy Invoicing</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.invoice_count?.opera_folio_count}}</p>
+                <p class="title">Opera Folios</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.invoice_count?.missing_in_ezyinvoicing}}</p>
+                <p class="title">Missing in Ezy Invoicing</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.invoice_count?.missing_in_opera}}</p>
+                <p class="title">Missing in Opera</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.invoice_count?.zero_invoices}}</p>
+                <p class="title">Zero Invoices <br><small style="font-size:70%;">(Missing in Opera)</small> </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-3">
+            <div class="card-body">
+              <div class="wrapper">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th class="text-center">Ezy Invoicing</th>
+                      <th class="text-center">Variance</th>
+                      <th class="text-center">Opera Folio</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="m-3 text-center">
+                          <p class="value">Rs. {{totalDashboardData?.ezy_opera_comparison?.ezy_total_base_amount  |number:'1.1-2'}}</p>
+                          <p class="title"><small>Total Base Amount</small></p>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="m-3 mt-4 text-center text-danger">
+                          <p class="value">Rs. {{totalDashboardData?.ezy_opera_comparison?.ezy_total_base_amount -
+                            totalDashboardData?.ezy_opera_comparison?.opera_total_base_amount |number:'1.1-2'}}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="m-3 text-center">
+                          <p class="value">Rs. {{totalDashboardData?.ezy_opera_comparison?.opera_total_base_amount  |number:'1.1-2'}}</p>
+                          <p class="title"><small>Total Base Amount</small></p>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="m-3 text-center">
+                          <p class="value">Rs. {{totalDashboardData?.ezy_opera_comparison?.ezy_total_invoice_amount  |number:'1.1-2'}}
+                          </p>
+                          <p class="title"><small>Total Invoice Amount</small></p>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="m-3 mt-4 text-center text-danger">
+                          <p class="value">Rs. {{totalDashboardData?.ezy_opera_comparison?.ezy_total_invoice_amount -
+                            totalDashboardData?.ezy_opera_comparison?.opera_total_invoice_amount  |number:'1.1-2'}}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="m-3 text-center">
+                          <p class="value">Rs. {{totalDashboardData?.ezy_opera_comparison?.opera_total_invoice_amount  |number:'1.1-2'}}
+                          </p>
+                          <p class="title"><small>Total Invocie Amount</small></p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+
+            </div>
+          </div>
+
+          <div class="card card-4">
+            <div class="card-body d-flex justify-content-between p-3">
+              <div>
+                <p class="value">{{totalDashboardData?.opera_tax_credit?.opera_count_tax_to_credit}}</p>
+                <p class="title">Tax to Credit</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.opera_credit_tax?.opera_count_tax_to_credit}}</p>
+                <p class="title">Credit to tax</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.con_b2b_b2c?.count_of_b2b_to_b2c}}</p>
+                <p class="title">B2B to B2C</p>
+              </div>
+              <div style="border-right: solid 2px #D9D9D9;"></div>
+              <div>
+                <p class="value">{{totalDashboardData?.con_b2c_b2b?.count_of_b2c_to_b2b}}</p>
+                <p class="title">B2C to B2B</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-4">
+          <!-- <div class="card-5">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p class="title">Matching Result
+                    </p>
+                  </div>
+                  <div>
+                    <span class="label">Excellent</span>
+                  </div>
+                </div>
+                <div class="flex-wrapper">
+                  <div class="single-chart">
+                    <svg viewBox="0 0 36 36" class="circular-chart blue">
+                      <path class="circle-bg" d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path class="circle" stroke-dasharray="90, 90" d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <text x="18" y="20.35" class="percentage">90%</text>
+                    </svg>
+                  </div>
+                </div>
+
+              </div>
+              <div class="card-footer">
+                <div class="d-flex justify-content-between bottom-label">
+                  <div class="d-flex">
+                    <div class="red mx-1"></div>
+                    <p> &#60;50% Poor </p>
+                  </div>
+                  <div class="d-flex">
+                    <div class="yellow mx-1"></div>
+                    <p> &#62;50% & &#60;90% Good </p>
+                  </div>
+                  <div class="d-flex">
+                    <div class="green mx-1"></div>
+                    <p>&#62;50% Poor </p>
+                  </div>
+                </div>
+              </div>
+
+          </div> -->
+        </div>
+      </div>
+
+    </div>
+  </ng-template>
+
+  <ng-template #missing_in_opera>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+          <div class="form-group mx-1 my-0 calendar w-c-50 position-relative">
+            <input type="search" class="form-control h-auto pr-5" placeholder="Select date" [min]="this.filters.startDate" [max]="this.filters.endDate" [(ngModel)]="filters.search.invoice_date"
+              [owlDateTime]="dt1"  (ngModelChange)="onSearch.emit(filters)">
+              <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+                <i class="mx-2 ri-calendar-2-line"></i>
+              </span>
+                        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+          </div>
+          <div class="form-group mx-1 my-0">
+            <select name="invoice_type" id="invoice_type" class="custom-select"
+              [(ngModel)]="filters.search.invoice_type" (ngModelChange)="onSearch.emit(filters)">
+              <option value="all">All</option>
+              <option value="b2b">B2B</option>
+              <option value="b2c">B2C</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.missing_in_opera?.length" (click)="exportIndividually(docTypeList.missing_in_opera)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table">
+        <thead class="thead" #head>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Invoice Date</th>
+            <th>Invoice Type</th>
+            <th>Invoice Category</th>
+            <th>IRN Status</th>
+            <th>EzyInvoice Status</th>
+            <th>Invoice Amount</th>
+            <th>Taxable Value</th>
+            <th>IGST Amount</th>
+            <th>SGST Amount</th>
+            <th>CGST Amount</th>
+            <th>Total Gst Amount</th>
+            <th>Other Charges</th>
+            <th>CESS</th>
+            <th>VAT Amount</th>
+            <th>IRN Number</th>
+            <th>Acknowledgement No</th>
+            <th>Acknowledgement Date</th>
+          </tr>
+        </thead>
+        <tbody #container>
+          <tr *ngFor="let missingOpera of reconcilData?.missing_in_opera; let index = index; let even = even">
+            <ng-container *ngIf="index<reconcilData?.missing_in_opera?.length-1">
+              <td>{{ missingOpera?.invoice_number | noDataSign}}</td>
+              <td>{{ missingOpera?.invoice_date | date:'dd/MM/yyyy' | noDataSign}}</td>
+              <td>{{ missingOpera?.invoice_type | noDataSign}}</td>
+              <td>{{ missingOpera?.invoice_category | noDataSign}}</td>
+              <td>{{ missingOpera?.irn_status | noDataSign}}</td>
+              <td>{{ missingOpera?.ezyinvoice_status | noDataSign}}</td>
+              <td>{{ missingOpera?.invoice_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.total_tax_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.igst_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.sgst_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.cgst_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.total_gst_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.other_charges | noDataSign}}</td>
+              <td>{{ missingOpera?.cess | noDataSign}}</td>
+              <td>{{ missingOpera?.vat_amount | noDataSign}}</td>
+              <td>{{ missingOpera?.irn_number | noDataSign}}</td>
+              <td>{{ missingOpera?.acknowledgement_no | noDataSign}}</td>
+              <td>{{ missingOpera?.acknowledgement_date | date:'dd/MM/yyyy hh:mm:ss' | noDataSign}}</td>
+            </ng-container>
+
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center py-3" *ngIf="!reconcilData?.missing_in_opera?.length">
+        <h5>No Data Found</h5>
+      </div>
+
+
+    </div>
+  </ng-template>
+
+  <ng-template #zero_invoices>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="text" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+
+           <div class="form-group mx-1 my-0 calendar w-c-50 position-relative">
+            <input type="search" class="form-control h-auto pr-5" placeholder="Select date" [min]="this.filters.startDate" [max]="this.filters.endDate" [(ngModel)]="filters.search.invoice_date"
+              [owlDateTime]="dt2" (dateTimeChange)="onSearch.emit(filters)">
+              <span class="example-trigger" [owlDateTimeTrigger]="dt2">
+                <i class="mx-2 ri-calendar-2-line"></i>
+              </span>
+                        <owl-date-time [pickerType]="'calendar'" #dt2></owl-date-time>
+          </div>
+          <div class="form-group mx-1 my-0">
+            <select name="invoice_type" id="invoice_type" class="custom-select"
+              [(ngModel)]="filters.search.invoice_type" (ngModelChange)="onSearch.emit(filters)">
+              <option value="all">All</option>
+              <option value="b2b">B2B</option>
+              <option value="b2c">B2C</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.zero_invoice?.length" (click)="exportIndividually(docTypeList.zero_invoice)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table">
+        <thead class="thead" #head>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Invoice Date</th>
+            <th>Invoice Type</th>
+            <th>Invoice Category</th>
+            <th>IRN Status</th>
+            <th>EzyInvoice Status</th>
+            <th>Invoice Amount</th>
+            <th>Taxable Value</th>
+            <th>IGST Amount</th>
+            <th>SGST Amount</th>
+            <th>CGST Amount</th>
+            <th>Total Gst Amount</th>
+            <th>Other Charges</th>
+            <th>CESS</th>
+            <th>VAT Amount</th>
+            <th>IRN Number</th>
+            <th>Acknowledgement No</th>
+            <th>Acknowledgement Date</th>
+          </tr>
+        </thead>
+        <tbody #container>
+          <tr *ngFor="let zeroInvoice of reconcilData?.zero_invoice; let index = index; let even = even">
+            <ng-container *ngIf="index<reconcilData?.zero_invoice?.length-1">
+              <td>{{ zeroInvoice?.invoice_number | noDataSign}}</td>
+              <td>{{ zeroInvoice?.invoice_date |date:'dd/MM/yyyy' | noDataSign}}</td>
+              <td>{{ zeroInvoice?.invoice_type | noDataSign}}</td>
+              <td>{{ zeroInvoice?.invoice_category | noDataSign}}</td>
+              <td>{{ zeroInvoice?.irn_status | noDataSign}}</td>
+              <td>{{ zeroInvoice?.ezyinvoice_status | noDataSign}}</td>
+              <td>{{ zeroInvoice?.invoice_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.total_tax_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.igst_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.sgst_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.cgst_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.total_gst_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.other_charges | noDataSign}}</td>
+              <td>{{ zeroInvoice?.cess | noDataSign}}</td>
+              <td>{{ zeroInvoice?.vat_amount | noDataSign}}</td>
+              <td>{{ zeroInvoice?.irn_number | noDataSign}}</td>
+              <td>{{ zeroInvoice?.acknowledgement_no | noDataSign}}</td>
+              <td>{{ zeroInvoice?.acknowledgement_date | date:'dd/MM/yyyy hh:mm:ss' | noDataSign}}</td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center py-3" *ngIf="!reconcilData?.zero_invoice?.length">
+        <h5>No Data Found</h5>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #missing_in_ezyinvoicing>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.missing_in_ezyInvoicing?.length" (click)="exportIndividually(docTypeList.missing_in_ezyInvoicing)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 72vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.missing_in_ezyInvoicing?.length">
+          <tbody>
+            <tr
+              *ngFor="let missingEzyinvoicing of reconcilData?.missing_in_ezyInvoicing; let index = index; let even = even">
+              <td>{{ missingEzyinvoicing?.invoice_number | noDataSign}}</td>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.missing_in_ezyInvoicing?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #invoice_type_missmatch>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.invoice_type_missmatch?.length" (click)="exportIndividually(docTypeList.invoice_type_missmatch)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 72vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Opera</th>
+            <th>Ezyinvoicing</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.invoice_type_missmatch?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.invoice_type_missmatch; let index = index;">
+              <td>{{ item?.invoice_number | noDataSign}}</td>
+              <td>{{ item?.opera | noDataSign}}</td>
+              <td>{{ item?.ezyinvoicing | noDataSign }}</td>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.invoice_type_missmatch?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #ezy_invoicing_summary>
+
+    <div>
+      <div class="d-flex justify-content-between">
+        <div class="d-flex">
+          <select name="type" id="type" class="custom-select w-25 mb-3" [(ngModel)]="hsn_summary"
+            (change)="changeHSN_type(hsn_summary)">
+            <option value="all">HSN Summaries</option>
+            <option value="b2b">B2B HSN Summary</option>
+            <option value="b2c">B2C HSN Summary</option>
+          </select>
+          <div>
+            <div class="d-flex">
+              <div class="form-group mx-1 my-0">
+                <input type="search" class="form-control" placeholder="Enter SAC Code"
+                  [(ngModel)]="filters.search.sac_code" (ngModelChange)="onSearch.emit(filters)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div *ngIf="hsn_summary=='b2b'" style="line-height: 3;">
+          <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+            <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+              ngbDropdownToggle><strong>Export</strong></button>
+            <div class="dropdown-menu text-center" ngbDropdownMenu>
+              <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+              <button *ngIf="reconcilData?.b2b_hsn_summary?.length" (click)="exportIndividually(docTypeList.b2b_hsn_summary)" ngbDropdownItem>Current tab data</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="hsn_summary=='b2c'" style="line-height: 3;">
+          <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+            <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+              ngbDropdownToggle><strong>Export</strong></button>
+            <div class="dropdown-menu text-center" ngbDropdownMenu>
+              <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+              <button *ngIf="reconcilData?.b2c_hsn_summary?.length" (click)="exportIndividually(docTypeList.b2c_hsn_summary)" ngbDropdownItem>Current tab data</button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="hsn_summary=='all'" >
+          <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+            <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+              ngbDropdownToggle><strong>Export</strong></button>
+            <div class="dropdown-menu text-center" ngbDropdownMenu>
+              <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+              <button *ngIf="reconcilData?.recon_hsn_summary?.length" (click)="exportIndividually(docTypeList.recon_hsn_summary)" ngbDropdownItem>Current tab data</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="hsn_summary=='b2b' then b2b_hsn"></div>
+      <div *ngIf="hsn_summary=='b2c' then b2c_hsn"></div>
+      <div *ngIf="hsn_summary=='all' then all_hsn"></div>
+
+    </div>
+
+  </ng-template>
+
+  <ng-template #comparison>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+          <div class="form-group mx-1 my-0">
+            <select name="baseamountstatus" id="baseamountstatus" class="custom-select"
+              [(ngModel)]="filters.search.baseamountstatus" (ngModelChange)="onSearch.emit(filters)">
+              <option value="all">All</option>
+              <option value="MisMatch">MisMatch</option>
+              <option value="Match">Match</option>
+              <option value="Missing In Opera">Missing In Opera</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.recon_opera_comparison?.length" (click)="exportIndividually(docTypeList.recon_opera_comparison)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th style="border-left:solid 3px black">Ezyinvoicing Base Amount</th>
+            <th>Opera Base Amount</th>
+            <th>Base Difference Amount</th>
+            <th>Base Amount Status</th>
+            <th style="border-left:solid 3px black">Ezyinvoicing Invoice Amount</th>
+            <th>Opera Invoice Amount</th>
+            <th>Invoice Difference Amount</th>
+            <th>Invoice Amount Status</th>
+            <!-- <th style="border-left:solid 3px black">MissingIn</th> -->
+            <th style="border-left:solid 3px black">IRN Status</th>
+            <th>IRN Number</th>
+            <th>Acknowledgement No</th>
+            <th>Acknowledgement Date</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.recon_opera_comparison?.length">
+          <tbody>
+            <tr *ngFor="let comparison of reconcilData?.recon_opera_comparison; let index = index;"
+              [ngClass]="(comparison?.baseamountstatus=='MisMatch' || comparison?.invoiceamountstatus=='MisMatch')?'highlight-col':''">
+              <ng-container *ngIf="index<reconcilData?.recon_opera_comparison?.length-1">
+                <td>{{ comparison?.invoice_number | noDataSign}}</td>
+                <td style="border-left:solid 3px black">{{ comparison?.ezyinvoicingbaseamount | noDataSign}}</td>
+                <td>{{ comparison?.operabaseamount | noDataSign}}</td>
+                <td>{{ comparison?.basemissmatchamount | noDataSign}}</td>
+                <td>{{ comparison?.baseamountstatus | noDataSign}} </td>
+                <td style="border-left:solid 3px black">{{ comparison?.ezyinvoicinginvoiceamount | noDataSign}}</td>
+                <td>{{ comparison?.operainvoiceamount | noDataSign}}</td>
+                <td>{{ comparison?.invoicemissmatchamount | noDataSign}}</td>
+                <td>{{ comparison?.invoiceamountstatus | noDataSign}}</td>
+                <!-- <td style="border-left:solid 3px black">{{ comparison?.MissingIn | noDataSign}}</td> -->
+                <td style="border-left:solid 3px black">{{ comparison?.irnstatus | noDataSign}}</td>
+                <td>{{ comparison?.irnnumber | noDataSign}}</td>
+                <td>{{ comparison?.acknowledgementno | noDataSign}}</td>
+                <td>{{ comparison?.acknowledgementdate |date:'dd/MM/yyyy hh:mm:ss' | noDataSign}}</td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.recon_opera_comparison?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+
+  </ng-template>
+
+  <ng-template #converted_b2c_to_b2b>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.converted_b2c_to_b2b?.length" (click)="exportIndividually(docTypeList.converted_b2c_to_b2b)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Invoice Upload Type</th>
+            <th>Printed Date</th>
+            <th>Converted Date</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.converted_b2c_to_b2b?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.converted_b2c_to_b2b; let index = index;">
+              <td>{{item?.invoice_number | noDataSign}}</td>
+              <td>{{ item?.invoiceuploadtype | noDataSign }}</td>
+              <td>{{ item?.printeddate  |date:'dd/MM/yyyy' | noDataSign }}</td>
+              <td>{{ item?.converteddate |date:'dd/MM/yyyy' | noDataSign }}</td>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.converted_b2c_to_b2b?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #converted_b2b_to_b2c>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.converted_b2b_to_b2c?.length" (click)="exportIndividually(docTypeList.converted_b2b_to_b2c)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Invoice Upload Type</th>
+            <th>Printed Date</th>
+            <th>Converted Date</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.converted_b2b_to_b2c?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.converted_b2b_to_b2c; let index = index;">
+              <td>{{item?.invoice_number | noDataSign}}</td>
+              <td>{{ item?.invoiceuploadtype | noDataSign }}</td>
+              <td>{{ item?.printeddate  |date:'dd/MM/yyyy' | noDataSign }}</td>
+              <td>{{ item?.converteddate |date:'dd/MM/yyyy' | noDataSign }}</td>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.converted_b2b_to_b2c?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #all_hsn>
+
+    <div class="table-responsive fixed-h">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>SAC Code</th>
+            <th>GST Rate</th>
+            <th>UQC</th>
+            <th>Total Quantity</th>
+            <th>CGST Amount</th>
+            <th>SGST Amount</th>
+            <th>IGST Amount</th>
+            <th>State CESS Amount</th>
+            <th>Central CESS Amount</th>
+            <th>Total GST</th>
+            <th>Total Tax Amount</th>
+            <th>Total Amount</th>
+
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.recon_hsn_summary?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.recon_hsn_summary; let index = index;">
+              <ng-container *ngIf="index<reconcilData?.recon_hsn_summary?.length-1">
+                <td>{{ item?.sac_code | noDataSign}}</td>
+                <td>{{ item?.gst_rate | noDataSign}}</td>
+                <td>{{ item?.uqc | noDataSign}}</td>
+                <td>{{ item?.total_quantity | noDataSign}}</td>
+                <td>{{ item?.cgst_amount | noDataSign}}</td>
+                <td>{{ item?.sgst_amount | noDataSign}}</td>
+                <td>{{ item?.igst_amount | noDataSign}}</td>
+                <td>{{ item?.state_cess_amount | noDataSign}}</td>
+                <td>{{ item?.central_cess_amount | noDataSign}}</td>
+                <td>{{ item?.total_gst | noDataSign}}</td>
+                <td>{{ item?.total_tax_amount | noDataSign}}</td>
+                <td>{{ item?.total_amount | noDataSign}}</td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.recon_hsn_summary?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #b2b_hsn>
+
+    <div class="table-responsive fixed-h">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>SAC Code</th>
+            <th>GST Rate</th>
+            <th>UQC</th>
+            <th>Total Quantity</th>
+            <th>CGST Amount</th>
+            <th>SGST Amount</th>
+            <th>IGST Amount</th>
+            <th>State CESS Amount</th>
+            <th>Central CESS Amount</th>
+            <th>Total GST</th>
+            <th>Total Tax Amount</th>
+            <th>Total Amount</th>
+
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.b2b_hsn_summary?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.b2b_hsn_summary; let index = index;">
+              <ng-container *ngIf="index<reconcilData?.b2b_hsn_summary?.length-1">
+                <td>{{ item?.sac_code | noDataSign}}</td>
+                <td>{{ item?.gst_rate | noDataSign}}</td>
+                <td>{{ item?.uqc | noDataSign}}</td>
+                <td>{{ item?.total_quantity | noDataSign}}</td>
+                <td>{{ item?.cgst_amount | noDataSign}}</td>
+                <td>{{ item?.sgst_amount | noDataSign}}</td>
+                <td>{{ item?.igst_amount | noDataSign}}</td>
+                <td>{{ item?.state_cess_amount | noDataSign}}</td>
+                <td>{{ item?.central_cess_amount | noDataSign}}</td>
+                <td>{{ item?.total_gst | noDataSign}}</td>
+                <td>{{ item?.total_tax_amount | noDataSign}}</td>
+                <td>{{ item?.total_amount | noDataSign}}</td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.b2b_hsn_summary?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <ng-template #b2c_hsn>
+
+    <div class="table-responsive fixed-h">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>SAC Code</th>
+            <th>Gst Rate</th>
+            <th>UQC</th>
+            <th>Total Quantity</th>
+            <th>CGST Amount</th>
+            <th>SGST Amount</th>
+            <th>IGST Amount</th>
+            <th>State CESS Amount</th>
+            <th>Central CESS Amount</th>
+            <th>Total GST</th>
+            <th>Total Tax Amount</th>
+            <th>Total Amount</th>
+
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.b2c_hsn_summary?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.b2c_hsn_summary; let index = index;">
+              <ng-container *ngIf="index<reconcilData?.b2c_hsn_summary?.length-1">
+                <td>{{ item?.sac_code | noDataSign}}</td>
+                <td>{{ item?.gst_rate | noDataSign}}</td>
+                <td>{{ item?.uqc | noDataSign}}</td>
+                <td>{{ item?.total_quantity | noDataSign}}</td>
+                <td>{{ item?.cgst_amount | noDataSign}}</td>
+                <td>{{ item?.sgst_amount | noDataSign}}</td>
+                <td>{{ item?.igst_amount | noDataSign}}</td>
+                <td>{{ item?.state_cess_amount | noDataSign}}</td>
+                <td>{{ item?.central_cess_amount | noDataSign}}</td>
+                <td>{{ item?.total_gst | noDataSign}}</td>
+                <td>{{ item?.total_tax_amount | noDataSign}}</td>
+                <td>{{ item?.total_amount | noDataSign}}</td>
+              </ng-container>
+
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.b2c_hsn_summary?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+  <ng-template #amendments>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="search" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.amendments?.length" (click)="exportIndividually(docTypeList.amendments)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Invoice Upload Type</th>
+            <th>Printed Date</th>
+            <th>Converted Date</th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.amendments?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.amendments; let index = index;">
+              <td>{{item?.invoice_number | noDataSign}}</td>
+              <td>{{ item?.invoiceuploadtype | noDataSign }}</td>
+              <td>{{ item?.printeddate  |date:'dd/MM/yyyy' | noDataSign }}</td>
+              <td>{{ item?.converteddate |date:'dd/MM/yyyy' | noDataSign }}</td>
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.amendments?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+  <ng-template #no_sac>
+    <div class="d-flex justify-content-between my-2 " >
+      <div>
+        <div class="d-flex">
+          <div class="form-group mx-1 my-0">
+            <input type="text" class="form-control" placeholder="Search invoice number"
+              [(ngModel)]="filters.search.invoice_number" (ngModelChange)="onSearch.emit(filters)">
+          </div>
+
+        </div>
+      </div>
+      <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+        <button class="btn text-white border btn-block border-0 px-2 py-1 py-1 "
+          ngbDropdownToggle><strong>Export</strong></button>
+        <div class="dropdown-menu text-center" ngbDropdownMenu>
+          <button (click)="exportRecon()" ngbDropdownItem>All tabs data</button>
+          <button *ngIf="reconcilData?.no_sac?.length" (click)="exportIndividually(docTypeList.no_sac)" ngbDropdownItem>Current tab data</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" style="max-height: 69vh;">
+      <table class="table tid-table">
+        <thead>
+          <tr>
+            <th>Invoice Number</th>
+            <th>Item Description</th>
+            <th>SGST Amount</th>
+            <th>CGST Amount</th>
+            <th>IGST Amount</th>
+            <th>Taxable Value</th>
+            <th>VAT Amount</th>
+            <th>Before GST</th>
+            <th>IRN Status</th>
+
+          </tr>
+        </thead>
+        <ng-container *ngIf="reconcilData?.no_sac?.length">
+          <tbody>
+            <tr *ngFor="let item of reconcilData?.no_sac; let index = index;">
+              <ng-container *ngIf="index<reconcilData?.no_sac?.length-1">
+                <td>{{ item?.invoice_number | noDataSign}}</td>
+                <td>{{ item?.itemdescription | noDataSign}}</td>
+                <td>{{ item?.sgst_amount | noDataSign}}</td>
+                <td>{{ item?.cgst_amount | noDataSign}}</td>
+                <td>{{ item?.igst_amount | noDataSign}}</td>
+                <td>{{ item?.total_tax_amount | noDataSign}}</td>
+                <td>{{ item?.vat_amount | noDataSign}}</td>
+                <td>{{ item?.before_gst | noDataSign}}</td>
+                <td>{{ item?.irnstatus | noDataSign}}</td>
+              </ng-container>
+
+            </tr>
+          </tbody>
+        </ng-container>
+
+      </table>
+      <ng-container *ngIf="!reconcilData?.no_sac?.length">
+        <h6 class="text-center m-3"><strong>No Data</strong></h6>
+      </ng-container>
+    </div>
+  </ng-template>
+
+</section>
+
+<footer *ngIf="fixedFooterStatus()">
+  <ng-container [ngTemplateOutlet]="fixedFooter"></ng-container>
+</footer>
+
+<ng-template #fixedFooter>
+  <ngb-accordion #acc="ngbAccordion" [ngStyle]="{'pointer-events': footerTotalData.length>6? '' : 'none' }"
+    [closeOthers]="true" activeIds="static-1 " class="invoice-recon-gstr">
+    <ngb-panel id="static-1">
+      <ng-template ngbPanelTitle class="p-0 m-0">
+        <div class="card-header py-2">
+          <div class="bg-white row d-flex justify-content-between p-3">
+
+            <div class="col-11">
+              <div class="row">
+                <div class="col-2" *ngFor="let item of footerTotalData;let i = index">
+                  <ng-container *ngIf="i<=5">
+                    <p><b>Rs. {{item?.value | number: '1.1-2' | noDataSign }}</b></p>
+                    <small>{{totalSatasticsLabel[item?.label]}}</small>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+            <div class="col-1" *ngIf="footerTotalData.length>6">
+              <i class="ri-arrow-up-s-line"></i>
+            </div>
+          </div>
+        </div>
+
+      </ng-template>
+      <ng-template ngbPanelContent>
+        <div class="bg-white  p-3">
+          <div class="row">
+            <div class="col-11">
+              <div class="row">
+                <div class="col-2" *ngFor="let item of footerTotalData;let i = index">
+                  <ng-container *ngIf="i>5">
+                    <p><b>Rs. {{item?.value | number: '1.1-2' | noDataSign }}</b></p>
+                    <small>{{totalSatasticsLabel[item?.label]}}</small>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-panel>
+
+
+  </ngb-accordion>
+</ng-template>
+
+<ng-template #redo_recon let-modal>
+  <div class="modal-body">
+    <div class="d-flex">
+      <div class="sec-1">
+        <div>
+          <i class="ri-restart-line delete-icon"></i>
+        </div>
+      </div>
+      <div class="sec-1">
+        <p class="alert-title">Are you sure you want to reprocess the selected record?</p>
+        <p class="alert-disc">This records will be updated immediately,You can't undo this</p>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-outline-primary btn-sm mx-2" (click)="modal.close()">Cancel</button>
+      <button class="btn btn-primary btn-sm" (click)="redoRecon()">Confirm</button>
+    </div>
+  </div>
+</ng-template>

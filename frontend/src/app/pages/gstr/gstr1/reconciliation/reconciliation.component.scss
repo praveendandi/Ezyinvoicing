@@ -1,0 +1,133 @@
+.form-control {
+    font-size: 14px;
+    height: 35px;
+}
+
+.custom-select {
+    height: 35px;
+}
+
+.btn-primary {
+    background: #012254 !important;
+    border: 0;
+    border-radius: 0 !important;
+    font-size: 14px !important;
+}
+
+i {
+    vertical-align: middle !important;
+}
+
+.crums {
+    p {
+        font-size: 15px;
+    }
+}
+
+.underline {
+    text-decoration-line: underline;
+}
+
+.footerCard {
+    position: fixed;
+    bottom: 2px;
+    .c-border {
+        border-color: #FFE4E4 !important;
+    }
+}
+
+.footer-card {
+    position: fixed;
+    bottom: 2px;
+    // margin: 15px 0 30px 0;
+}
+
+.invoice {
+    th:first-child,
+    td:first-child {
+        position: sticky;
+        left: 0px;
+    }
+    th:last-child,
+    td:last-child {
+        position: sticky;
+        right: 0px;
+    }
+    td:first-child {
+        background: #fff;
+    }
+    th:last-child {
+        background: #f5f5f5;
+    }
+    td:last-child {
+        background: #fff;
+    }
+    table th,
+    table td {
+        white-space: nowrap;
+    }
+}
+
+.invoice-card {
+    height: 60vh !important;
+    overflow-y: scroll !important;
+}
+
+.custom-select {
+    font-size: 13px;
+}
+
+.pagination {
+    border: 1px solid lightgray;
+}
+
+.bg-count {
+    background-color: #FFD3D3 !important;
+    font-weight: bold;
+}
+
+.morec p {
+    font-size: 12px !important;
+}
+
+.more {
+    color: #ee3737 !important;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.calendar {
+    max-width: 200px;
+    i {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+    }
+}
+
+.search-dropdown {
+    border-radius: 3px;
+    button {
+        font-size: 15px !important;
+        margin-bottom: 0px;
+    }
+}
+
+.reconcile {
+    background: #0070D4;
+    border-radius: 0 !important;
+    padding: 10px 40px !important;
+    font-size: 13px;
+    color: #fff !important;
+}
+
+table .mismatched {
+    background: #FFBFC1 !important;
+}
+
+table .badge {
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 11px;
+}

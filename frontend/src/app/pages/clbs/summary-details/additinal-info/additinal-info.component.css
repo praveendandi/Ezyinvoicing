@@ -1,0 +1,21 @@
+.ql-container {
+  height: 30% !important;
+}
+
+input.form-control, select.custom-select {
+  font-size: 13px;
+  height: 28px;
+}
+
+.form-group {
+  margin-bottom: 13px !important;
+}
+
+.label {
+  margin-bottom: 0px !important;
+}
+
+.ngselect {
+  font-size: 13px;
+}
+/*# sourceMappingURL=additinal-info.component.css.map */

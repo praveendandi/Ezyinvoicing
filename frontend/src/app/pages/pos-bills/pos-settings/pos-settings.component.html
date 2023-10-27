@@ -1,0 +1,145 @@
+<section>
+    <div class="row mb-3">
+        <div class="col-md-9 col-lg-9">
+            <div class="d-flex">
+                <h4 class="text-white"><b>Printer Settings</b></h4>
+                <button (click)="addPrinterSettings('add', null)" class="btn btn-primary ml-3" type="button"><i
+                        class="ri-add-line"></i></button>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-3 text-right">
+            <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+                <input type="search" class="form-control pl-5" [(ngModel)]="filters.search" (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)" #search placeholder="Search by Outlet">
+                <span class="search"><i class="ri-search-line"></i></span>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-0 shadow">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="pl-4">S.No</th>
+                                    <th>Outlet</th>
+                                    <th>Printer</th>
+                                    <th>Mapped On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of posPrinters;let i =index">
+                                    <td>{{i+1}}</td>
+                                    <td>
+                                        {{item?.outlet || 'N/A'}}
+                                    </td>
+                                    <td>
+                                        {{item?.printer_name || 'N/A'}}
+                                    </td>
+                                    <td>
+                                        {{item?.mapped_on || date}}
+                                    </td>
+
+                                    <td>
+                                        <span class="text-primary cursor-pointer" (click)="addPrinterSettings('edit',item)">Edit</span>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <div class="text-center py-5" *ngIf="!posPrinters?.length">
+                            <h5><b>No Data Found</b></h5>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-11">
+
+                        </div>
+                        <div class="col-md-1">
+                            <div class="text-right mb-2" *ngIf="posPrinters?.length">
+                                <div class="px-2">
+                                    <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage" (change)="checkPagination()" id="itemsPerPage">
+                                        <option [value]="20">20</option>
+                                        <option [value]="50">50</option>
+                                        <option [value]="100">100</option>
+                                        <option [value]="150">150</option>
+                                        <option [value]="500">500</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<ng-template #settingsModal let-modal>
+    <div class="modal-header">
+        <h6><b class="text-capitalize">{{viewType}} Printer Settings</b></h6>
+        <button type="button" class="close" aria-label="Close" (click)="modalClose()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="outlet">Outlet</label>
+                        <select id="outlet" class="custom-select" name="outlet" [(ngModel)]="formData.outlet" required #outlet="ngModel">
+                            <option [ngValue]="undefined" hidden selected>Please Select Outlet</option>
+                            <option [value]="item.name" *ngFor="let item of outletList">{{item.outlet_name}}</option>
+                        </select>
+
+                        <small class="text-danger" *ngIf="form.touched && outlet?.errors?.required">Required</small>
+
+
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="printer">Printer</label>
+                        <select id="printer" class="custom-select" name="printer" [(ngModel)]="formData.printer" required #printer="ngModel">
+                            <option [ngValue]="undefined" hidden selected>Please Select Printer</option>
+                            <option [value]="item.name" *ngFor="let item of printersList">{{item.printer_name}}
+                            </option>
+                        </select>
+
+
+
+                        <small class="text-danger" *ngIf="form.touched && printer?.errors?.required">Required</small>
+
+
+                    </div>
+                </div>
+
+
+
+
+                <div class="text-right col-md-12">
+                    <button (click)="modalClose()" class="btn btn-outline-primary" type="button">Cancel</button>
+                    <button class="btn btn-primary ml-3" type="submit">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</ng-template>

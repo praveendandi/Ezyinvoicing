@@ -1,0 +1,182 @@
+.taxpayers {
+    .table td .view {
+      cursor: pointer;
+      text-decoration: underline;
+      color: #2164E8;
+      font-weight: 600;
+    }
+  
+    .table tbody tr:nth-of-type(even) {
+      background: #fff;
+    }
+  
+    .table tbody tr:nth-of-type(odd) {
+      background: #F0F0F0;
+    }
+  
+    .table-bordered {
+      border: 0;
+    }
+  
+    .table td .view {
+      cursor: pointer;
+      text-decoration: underline;
+      color: #2164E8;
+      font-weight: 600;
+  }
+  table {
+      thead th {
+          border-bottom: 0;
+          border-top: 0;
+          font-size: 12px;
+          padding: 9px 10px;
+      }
+  }
+
+  .table th,
+  .table td {
+      padding: 9px 10px;
+      font-size: 14px;
+      border: 1px solid rgba(221, 218, 218, 0.3);
+      white-space: nowrap;
+      padding-left: 1rem;
+      padding-right: 1rem
+  }
+  .table tbody td:first-child {
+      padding-left: 8px !important;
+  }
+
+  td {
+        // max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+  //   table td:nth-child(1) {
+  //       max-width: 50px !important;
+  //       text-align: center;
+  //   }
+    table td:nth-child(2) {
+        max-width: 300px !important;
+        // text-align: center;
+    }
+    table td:nth-child(3) {
+      max-width: 300px !important;
+      // text-align: center;
+      div {
+        max-width: 140px !important;
+      }
+    }
+    table td:nth-child(4) {
+        div {
+            max-width: 140px !important;
+        }
+    }
+    table td:nth-child(5) {
+        div {
+            max-width: 180px !important;
+        }
+    }
+    table td:nth-child(6) {
+        div {
+            max-width: 120px !important;
+        }
+    }
+    table td:nth-child(6) {
+        div {
+            max-width: 100px !important;
+        }
+    }
+    table td:nth-child(7) {
+        div {
+            max-width: 100px !important;
+        }
+    }
+    table td:nth-child(8) {
+        max-width: 100px !important;
+    }
+    table td:nth-child(9) {
+        max-width: 100px !important;
+    }
+    table td:nth-child(3) div {
+        max-width: fit-content !important;
+    }
+  
+  
+    .table tbody td:first-child {
+      padding-left: 8px !important;
+    }
+
+  
+    .badge-success {
+      padding: 6px 20px;
+      border-radius: 30px;
+      margin: 0 auto;
+      text-align: center;
+      background: #0BD726;
+      font-size: 12px;
+    }
+  
+    .badge-warning {
+      padding: 6px 20px;
+      border-radius: 30px;
+      margin: 0 auto;
+      text-align: center;
+      background: #FFD00A;
+      font-size: 12px;
+      color: #fff;
+    }
+  
+    .badge-danger {
+      padding: 6px 20px;
+      border-radius: 30px;
+      margin: 0 auto;
+      text-align: center;
+      background: #ff2f0a;
+      font-size: 12px;
+      color: #fff;
+    }
+  
+    tr.pending {
+      background: #FD8787 !important;
+    }
+  
+    .input-group {
+      max-width: 150px;
+    }
+  
+    select.custom-select {
+      height: auto;
+    }
+  
+    .form-group {
+      margin-bottom: 0;
+  
+      select {
+        font-size: 13px;
+      }
+  
+      .form-control {
+        padding: 5px;
+        border: 0 !important;
+      }
+    }
+  
+
+    
+  }
+  .w-c-50{min-width: 150px;margin-left: 20px;}
+  .more{
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .legalNameInp{
+    width: 20rem;
+  }
+
+  .btn-right{
+    position: absolute;
+    top: 0;
+    right: 0
+  }

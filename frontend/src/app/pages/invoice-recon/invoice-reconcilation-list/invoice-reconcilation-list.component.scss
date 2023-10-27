@@ -1,0 +1,183 @@
+.bg-theme-color {
+    color: #fff;
+    background-color: #1d4350;
+}
+
+.back-arrow {
+    padding: 0 0 0 22px;
+    position: relative;
+}
+
+.back-arrow i {
+    font-size: 25px;
+    position: absolute;
+    top: -2px;
+    left: -10px;
+    cursor: pointer;
+}
+
+.py-10 {
+    padding-top: 200px;
+    padding-bottom: 100px;
+}
+
+input.form-control,
+select.custom-select {
+    font-size: 14px;
+    height: 34px;
+}
+
+.table tbody td:first-child {
+    padding-left: 0.5rem !important;
+}
+
+.table thead tr th {
+    // background: #214350;
+    color: #000;
+    border-bottom: none;
+}
+.table .thead th:first-child {
+    padding-left: 0 !important;
+}
+.table tbody+tbody {
+    border-top: 0px solid #dee2e6;
+}
+
+$cell-padding: 4px;
+th,
+td {
+    border: 1px solid #dee2e6;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: $cell-padding;
+    text-align: left;
+    font-size: 13px;
+}
+
+table.tid-table {
+    width: 100%;
+    tr {
+        &.tid-detail-row {
+            >td {
+                padding: 0;
+                >div {
+                    width: 100%;
+                    box-sizing: border-box;
+                    max-height: 0;
+                    transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+                    overflow: hidden;
+                    >div {
+                        padding: $cell-padding;
+                    }
+                }
+            }
+            &.show>td>div {
+                max-height: 1000px;
+                transition: max-height 1s ease-in-out;
+            }
+            &.show>td>.table {
+                border: none;
+            }
+        }
+        &.tid-even {
+            background-color: #e2e2e2;
+        }
+    }
+}
+
+.w-35 {
+    width: 25%;
+}
+
+.selct-btn {
+    height: 31px;
+    padding: 0px;
+    width: 100px;
+}
+
+.btn:disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed;
+}
+
+.delete-icon {
+    font-size: 84px;
+    opacity: 0.5;
+}
+
+.alert-title {
+    margin: 0px;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.alert-disc {
+    margin: 0px;
+    font-size: 14px;
+    color: #444;
+}
+
+.sec-1 {
+    padding: 0px 12px;
+}
+ngb-progressbar{
+  width: -webkit-fill-available;
+}
+
+.fileUpload {
+    i {
+        font-size: 100px;
+    }
+}
+
+.preview-box {
+    .p-file {
+        font-size: 30px;
+    }
+}
+
+.preview-box {
+    padding: 10px 10px;
+    margin: 15px 40px;
+    //  margin-bottom: 15px;
+    border: 1px solid #eee;
+    p {
+        margin: 0;
+        font-size: 13px;
+    }
+    .p-close {
+        i {
+            position: absolute;
+            right: -5px;
+            top: -12px;
+            color: red;
+            font-size: 20px;
+        }
+    }
+}
+.w-c-50 {
+    min-width: 100px;
+    margin-left: 10px;
+}
+
+.form-group {
+    margin-bottom: 0;
+    select {
+        font-size: 13px;
+    }
+    .form-control {
+        padding: 5px;
+        // border: 0 !important;
+    }
+}
+
+select.custom-select {
+    height: 32px;
+}
+.note-para{
+    background-color: #d3ebf8;
+    padding-left: 10px;
+}

@@ -1,0 +1,389 @@
+<section *ngIf="(update || updateUI) && (this.loginUser?.full_name == 'Administrator')" class="updateBlink">
+
+    <div class=" py-2">
+        <div class="row m-0 p-0">
+            <div class="col-md-11">
+                <p class="p-0 m-0 text-center text-white">New Update is available. <a class="blink_me ml-5" (click)="updateNow()">Update Now</a></p>
+            </div>
+
+            <div class="col-md-1">
+                <button type="button" class="close pr-3" aria-label="Close" (click)="closeUpdate()">
+                    <span aria-hidden="true" class="text-white"><i class="ri-close-fill"></i></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="c-header" [ngClass]="{'c-h-header': screenAdjust}">
+    <div class="container-fluid  p-3 px-md-5">
+        <div class="row no-gutters">
+            <div class="col-md-2 my-auto">
+                <span class="logo"><img class="img-fluid" (click)="navigateDashboard()"
+                        on-click="selectedValue.value='Dashboard'" src="assets/images/EzyInvoicelogo.svg"
+                        alt="logo"></span>
+            </div>
+            <div class="col-lg-2 col-md-3">
+                <div class="d-flex flex-row">
+
+                    <span class="ml-4 align-self-center">
+
+                        <div ngbDropdown class="d-inline-block" id="menu-dropdown">
+                            <button class="btn btn-default" id="dropdownBasic1" ngbDropdownToggle>
+                                <span class="mr-4 text-truncate-c">{{activeLinkName }}</span>
+                    </button>
+                    <ng-container *ngIf="!posUser">
+                        <div class="border-0 shadow p-3" ngbDropdownMenu aria-labelledby="dropdownBasic1" #selectedValue>
+                        <div class="row">
+
+                            <div class="col">
+                                <h4 class="py-2">Activity</h4>
+                                <div class="">
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Dashboard'}" (click)="selectedMenu('Dashboard')" [routerLink]="['/home/dashboard']" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Dashboard'">Dashboard</button>
+                                    <!-- <button [routerLink]="['/home/company']" routerLinkActive="router-link-active"
+                                            ngbDropdownItem on-click="selectedValue.value='Company'">Company</button> -->
+                                    <button (click)="selectedMenu('Invoices')" [ngClass]="{'link-active': activeLinkName == 'Invoices'}" ngbDropdownItem on-click="selectedValue.value='Invoices'">
+                                            Invoices</button>
+                                    <button (click)="selectedMenu('Information_invoice')" *ngIf="this.companyDetails?.pms_information_invoice_for_payment_qr == 'Yes'" [routerLink]="['/home/Information_invoice']" routerLinkActive="router-link-active" [ngClass]="{'link-active': activeLinkName == 'Information Invoice'}"
+                                        ngbDropdownItem on-click="selectedValue.value='Information_invoice'">
+                                              Information Invoice</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'SYS. Credit Notes'}" (click)="selectedMenu('Credit Notes')" [routerLink]="['/home/credit-invoices']" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Credit Notes'"> SYS. Credit
+                                            Notes</button>
+
+                                    <button *ngIf="companyDetails?.manual_credit_invoice == '1'" [ngClass]="{'link-active': activeLinkName == 'Credit Notes'}" (click)="selectedMenu('Manual Credit Notes')" [routerLink]="['/home/manual-credit-notes']" [queryParams]="{type: 'Credit'}" routerLinkActive="router-link-active"
+                                        ngbDropdownItem on-click="selectedValue.value='Manual Credit Notes'">Credit
+                                            Notes</button>
+
+
+                                    <button *ngIf="companyDetails?.manual_debit_invoice=='1' " [ngClass]="{'link-active': activeLinkName == 'Debit Notes'}" (click)="selectedMenu('Manual Debit Notes')" [routerLink]="['/home/manual-credit-notes']" [queryParams]="{type: 'Debit'}" routerLinkActive="router-link-active"
+                                        ngbDropdownItem on-click="selectedValue.value='Manual Debit Notes'">Debit Notes</button>
+
+
+                                    <button *ngIf="companyDetails?.manual_tax_invoice == '1'" [ngClass]="{'link-active': activeLinkName == 'Manual Tax Invoices'}" (click)="selectedMenu('Manual Tax Invoices')" [routerLink]="['/home/manual-credit-notes']" [queryParams]="{type: 'Tax'}" routerLinkActive="router-link-active"
+                                        ngbDropdownItem on-click="selectedValue.value='Manual Tax Invoices'">Manual Tax
+                                            Invoices</button>
+
+                                    <button *ngIf="companyDetails?.bulk_excel_upload_type" [ngClass]="{'link-active': activeLinkName == 'Upload Invoices'}" (click)="selectedMenu('Upload Invoices')" [routerLink]="['/home/upload-invoice']" routerLinkActive="router-link-active" ngbDropdownItem
+                                        on-click="selectedValue.value='Upload Invoices'">Upload Invoices</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Simple Reconciliation'}" [routerLink]="['/home/invoice-reconciliation']" (click)="selectedMenu('Simple Reconciliation')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Simple Reconciliation'">Simple
+                                            Reconciliation</button>
+                                    <button *ngIf="companyDetails?.ezy_gst_module == 1" [ngClass]="{'link-active': activeLinkName == 'Amended Invoices'}" [routerLink]="['/home/amend-invoices']" (click)="selectedMenu('Amended Invoices')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Amended Invoices'">Amended
+                                                Invoices</button>
+
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <h4 class="py-2">Master Data</h4>
+                                <div class="">
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Payment Types'}" #link [routerLink]="['/home/payment-type']" (click)="selectedMenu('Payment Types')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Payment Types'">Payment
+                                            Types</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'SAC/HSN Codes'}" [routerLink]="['/home/sac-hsn-codes']" (click)="selectedMenu('SAC/HSN Codes')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='SAC/HSN Codes'">SAC/HSN codes</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Tax Payers Details'}" [routerLink]="['/home/tax-payers']" (click)="selectedMenu('Tax Payers Details')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Tax Payers Details'">Tax payer
+                                            details</button>
+                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'User Management'}" [routerLink]="['/home/users']" (click)="selectedMenu('User Management')" routerLinkActive="router-link-active" ngbDropdownItem
+                                        on-click="selectedValue.value='User Management'">User Management</button>
+                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Role Management'}" [routerLink]="['/home/roles']" (click)="selectedMenu('Role Management')" routerLinkActive="router-link-active" ngbDropdownItem
+                                        on-click="selectedValue.value='Role Management'">Role Management</button>
+                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Permissions'}" [routerLink]="['/home/permissions']" (click)="selectedMenu('Permissions')" routerLinkActive="router-link-active" ngbDropdownItem
+                                        on-click="selectedValue.value='Permissions'">Permissions</button>
+                                    <button *ngIf="(userData.full_name === 'Administrator' || SynchistoryUserRole) && companyDetails?.ezy_gst_module == 1" [ngClass]="{'link-active': activeLinkName == 'sync-history'}" [routerLink]="['/home/sync-history']" (click)="selectedMenu('sync-history')" routerLinkActive="router-link-active" ngbDropdownItem
+                                        on-click="selectedValue.value='sync-history'">Sync History</button>
+                                    <!-- <button *ngIf="companyDetails?.ezy_gst_module == 1 " (click)="selectedMenu('SYNC')" ngbDropdownItem>
+                                        Sync History
+                                    </button> -->
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <h4 class="py-2">Reports</h4>
+                                <div class="">
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Reports'}" [routerLink]="['/home/reports']" (click)="selectedMenu('Reports')" routerLinkActive="router-link-active" on-click="selectedValue.value='Reports'" ngbDropdownItem>Reports</button>
+                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Deleted Documents'}" [routerLink]="['/home/deleted-documents']" (click)="selectedMenu('Deleted Documents')" routerLinkActive="router-link-active"
+                                        ngbDropdownItem on-click="selectedValue.value='Deleted Documents'">Deleted
+                                            Documents</button>
+                                    <button *ngIf="userData.full_name === 'Administrator' || emailLogUsers" [ngClass]="{'link-active': activeLinkName == 'Email Logs'}" [routerLink]="['/home/email-logs']" (click)="selectedMenu('Email Logs')" routerLinkActive="router-link-active" ngbDropdownItem
+                                        on-click="selectedValue.value='Email Logs'">Email Logs</button>
+                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Update Logs'}" [routerLink]="['./bench-logs']" routerLinkActive="router-link-active" ngbDropdownItem>Update Logs</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Document Bin'}" [routerLink]="['./document-bin']" routerLinkActive="router-link-active" ngbDropdownItem>Document Bin</button>
+
+                                </div>
+                            </div>
+
+                            <ng-container *ngIf="userData.full_name === 'Administrator' || !loginFrontOfcUser || checkPOSvthFrontOfc || loginUSerRole">
+                                <div class="col" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
+                                    <h4 class="py-2">Ezy Sign</h4>
+
+                                    <ng-container *ngIf="userData.full_name === 'Administrator'|| loginUSerRole || (!loginFrontOfcUser && !checkPOSvthFrontOfc)">
+                                        <div class="" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
+
+                                            <div *ngIf="companyDetails?.pos_bills_module == 'Enable'" class="pt-1">
+                                                <button (click)="toggle('first')" class="btn btn-default p-0 c-men ">
+                                            <span>POS Bills  <i class="float-right" [ngClass]="{'ri-arrow-down-s-line': isCollapsed, 'ri-arrow-right-s-line' : !isCollapsed}"></i></span>
+                                    </button>
+                                                <div class="ml-1" *ngIf="isCollapsed">
+                                                    <button [ngClass]="{'link-active': activeLinkName == 'POS Bills'}" routerLinkActive="router-link-active" [routerLink]="['./pos-bills']" class="dropdown-item">POS Checks</button>
+                                                    <button *ngIf="companyDetails?.company_code != 'ZBPK-01'" [ngClass]="{'link-active': activeLinkName == 'Print Settings'}" routerLinkActive="router-link-active" [routerLink]="['./pos-bills-settings']" class="dropdown-item">Print Settings</button>
+                                                    <button [ngClass]="{'link-active': activeLinkName == 'Outlets'}" routerLinkActive="router-link-active" [routerLink]="['./outlets']" class="dropdown-item">Outlets</button>
+                                                    <button *ngIf="companyDetails?.company_code != 'ZBPK-01'" [ngClass]="{'link-active': activeLinkName == 'POS Printers'}" routerLinkActive="router-link-active" [routerLink]="['./ip-printer']" class="dropdown-item">POS Printers</button>
+                                                </div>
+                                            </div>
+
+                                            <div *ngIf="companyDetails?.sign_ezy_module == '1'" class="pt-1">
+                                                <button (click)="toggle('second')" class="btn btn-default p-0 c-men">
+                                            <span>Tab <i class="float-right" [ngClass]="{'ri-arrow-down-s-line': isCollapsedOne, 'ri-arrow-right-s-line' : !isCollapsedOne}"></i></span>
+                                        </button>
+                                                <div class="ml-1" *ngIf="isCollapsedOne">
+                                                    <button [ngClass]="{'link-active': activeLinkName == 'Tablets'}" routerLinkActive="router-link-active" [routerLink]="['./tablet']" class="dropdown-item" ngbDropdownItem> Tablet</button>
+                                                    <button [ngClass]="{'link-active': activeLinkName == 'Work Stations'}" routerLinkActive="router-link-active" [routerLink]="['./work-stations']" class="dropdown-item" ngbDropdownItem> WorkStations</button>
+                                                    <button [ngClass]="{'link-active': activeLinkName == 'Tablet Configurations'}" routerLinkActive="router-link-active" [routerLink]="['./tablet-conf']" class="dropdown-item" ngbDropdownItem> Tablet Configuration</button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="checkPOSvthFrontOfc">
+                                        <div class="" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
+
+                                            <div *ngIf="companyDetails?.pos_bills_module == 'Enable'" class="pt-1">
+                                                <button (click)="toggle('first')" class="btn btn-default p-0 c-men ">
+                                            <span>POS Bills  <i class="float-right" [ngClass]="{'ri-arrow-down-s-line': isCollapsed, 'ri-arrow-right-s-line' : !isCollapsed}"></i></span>
+                                    </button>
+                                                <div class="ml-1" *ngIf="isCollapsed">
+                                                    <button [ngClass]="{'link-active': activeLinkName == 'POS Bills'}" routerLinkActive="router-link-active" [routerLink]="['./pos-bills']" class="dropdown-item">POS Checks</button>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </ng-container>
+                                </div>
+
+                            </ng-container>
+
+                            <div class="col" *ngIf="(userData.full_name === 'Administrator'|| loginUSerRole) && companyDetails?.payment_reconciliation == 1 ">
+                                <h4 class="py-2">Credit Card Recon</h4>
+                                <div>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Payment Reconciliation'}" [routerLink]="'./payment-reconciliation'" routerLinkActive="router-link-active" ngbDropdownItem>Payment Reconciliation</button>
+                                </div>
+                            </div>
+                            <div class="col" *ngIf="userData.full_name === 'Administrator'|| loginUSerRole">
+                                <h4 class="py-2">Settings</h4>
+                                <div>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Company'}" [routerLink]="'./company-details/'+companyDetails?.name" routerLinkActive="router-link-active" [queryParams]="{view:true}" ngbDropdownItem>Company</button>
+
+                                    <button [ngClass]="{'link-active': activeLinkName == 'GSP API'}" routerLinkActive="router-link-active" [routerLink]="['./gsp-apis']" ngbDropdownItem>GSP API</button>
+
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Email Settings'}" routerLinkActive="router-link-active" [routerLink]="['./email-smtp']" ngbDropdownItem>Email Settings</button>
+
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Faqs'}" routerLinkActive="router-link-active" [routerLink]="['/faqs']" ngbDropdownItem>Faqs</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Error Logs'}" routerLinkActive="router-link-active" [routerLink]="['./error-logs']" ngbDropdownItem>Error Logs</button>
+
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <h4 class="py-2">Modules</h4>
+                                <div>
+                                  <button  *ngIf="companyDetails?.ezy_gst_module == 1" [ngClass]="{'link-active': activeLinkName == 'Advanced Reconcilation'}" [routerLink]="['/home/invoice-recon']" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Advanced Reconcilation'">Advanced
+                                    Reconciliation</button>
+
+                                        <button *ngIf="companyDetails?.clbs == 1 " (click)="selectedMenu('CLBS')" ngbDropdownItem>
+                                            CLBS
+                                            </button>
+                                        <!-- <button *ngIf="companyDetails?.ezy_gst_module == 1" (click)="selectedMenu('GST')" ngbDropdownItem>
+                                                Ezy GST
+                                                </button> -->
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    </ng-container>
+
+                    <ng-container *ngIf="posUser">
+                        <div class="border-0 w-30 shadow p-3" ngbDropdownMenu aria-labelledby="dropdownBasic1" #selectedValue>
+                            <div class="row border-bottom">
+                                <div class="col">
+                                    <h4>Ezy Sign</h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
+
+                                    <div *ngIf="companyDetails?.pos_bills_module == 'Enable'" class="pt-1">
+                                        <button (click)="toggle('first')" class="btn btn-default p-0 c-men ">
+                                    <span>POS Bills  <i class="float-right" [ngClass]="{'ri-arrow-down-s-line': isCollapsed, 'ri-arrow-right-s-line' : !isCollapsed}"></i></span>
+                            </button>
+                                        <div class="ml-1" *ngIf="isCollapsed">
+                                            <button [ngClass]="{'link-active': activeLinkName == 'POS Bills'}" routerLinkActive="router-link-active" [routerLink]="['./pos-bills']" class="dropdown-item">POS Checks</button>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+                </span>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-5 my-auto">
+            <div class="status-icons text-center">
+                <!-- <span class="text-white"> <i
+                            [ngClass]="{'ri-global-line spin bg-success': networkStatus, 'ri-error-warning-line': !networkStatus}"
+                            ngbTooltip="Network Status"></i>
+                        : {{networkStatus? 'Online' : 'Offline'}}</span>
+                <span class="px-2 text-white">|</span> -->
+                <span class=" text-white"> <i class="ri-computer-line spin" ngbTooltip="System Status"></i> :
+                        {{companyDetails?.mode}}</span>
+                <span class="px-2 text-white">|</span>
+                <span class="text-white "> <i class="ri-building-line spin" ngbTooltip="Name"></i> : <span
+                            class="text-truncate-company"
+                            [ngbTooltip]="companyDetails?.company_name">{{companyDetails?.company_name}}</span></span>
+
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-2 text-right">
+            <!-- <div class="border border-0 p-2 text-truncate d-flex mt-3 mt-md-0">
+                    <i class="ri-user-3-fill text-white"></i>
+                    <span class="ml-2 text-capitalize text-white">jaypee Mussorie</span>
+                </div> -->
+            <div class="row text-right justify-content-center">
+
+                <div class="p-2 px-3 " (click)="openNotifications()">
+                    <span class="text-white">
+                            <i class="ri-notification-2-fill notifications">
+                                <!-- <span *ngIf="newCount" class="countMark"></span> -->
+                    </i>
+                    </span>
+                </div>
+
+
+                <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
+                    <button class="btn text-white border btn-block border-0 p-2 " ngbDropdownToggle><strong><i
+                                    class="ri-user-3-fill px-2 text-white"></i>{{userData.full_name}}</strong></button>
+                    <div class="dropdown-menu text-center" ngbDropdownMenu>
+                        <!-- <button *ngIf="userData.full_name === 'Administrator'"
+                                [routerLink]="'./company-details/'+company?.name" [queryParams]="{view:true}"
+                                ngbDropdownItem>Company</button> -->
+                        <button (click)="getPrinterData()" ngbDropdownItem>Select Printer</button>
+
+                        <!-- <button *ngIf="userData.full_name === 'Administrator'" [routerLink]="['./gsp-apis']"
+                                ngbDropdownItem>GSP API</button>
+                            <button *ngIf="userData.full_name === 'Administrator'" [routerLink]="['./bench-logs']"
+                                ngbDropdownItem>Update Logs</button>
+                            <button (click)="documentBin()" ngbDropdownItem>Document Bin</button> -->
+                        <!-- <button (click)="diagnostic()" ngbDropdownItem>Diagnostic</button> -->
+                        <button (click)="changePassword(content)" ngbDropdownItem>Change Password</button>
+                        <button (click)="aboutUpdates(aboutContent)" ngbDropdownItem>About</button>
+                        <button [routerLink]="['/']" (click)="logout()" ngbDropdownItem>Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<div class="pt-100">
+
+</div>
+
+
+<ng-template #content let-modal>
+    <div class="modal-header border-0">
+        <h6 id="modal-basic-title"><strong></strong></h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body text-center">
+        <form>
+            <div class="form-group">
+                <input [(ngModel)]="new_password" appMatInput id="newPassword" class="form-control" type="password" name="new_password" required>
+                <label for="newPassword" class="mat-label">New Password</label>
+            </div>
+        </form>
+        <!-- <h6>Do you want to change password?</h6> -->
+
+    </div>
+    <div class="modal-footer border-0 d-block text-center pb-4">
+        <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button>
+        <button type="button" (click)="onSubmit()" class="btn btn-primary">Confirm</button>
+
+    </div>
+</ng-template>
+
+<ng-template #selectPrinter let-modal>
+    <div class="modal-header border-0 bg-gray printer-modal">
+        <div>
+            <h6 id="modal-basic-title" class="mb-0"><strong> Select Printers</strong></h6>
+
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <i class="ri-close-fill"></i>
+        </button>
+    </div>
+    <div class="modal-body printers-list py-0">
+        <div class="search-box">
+            <div class="input-group input-group-sm border-0">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-white border-0"><i class="ri-search-line"></i></span>
+                </div>
+                <input [(ngModel)]="searchText" type="text" class="form-control border-0" placeholder="Search Printers">
+
+            </div>
+        </div>
+        <form #printerForm="ngForm">
+            <div class="form-group">
+                <ul class="p-0 list-unstyled min-list">
+                    <li class="cursor-pointer" *ngFor="let item of printers | searchFilter : searchText" (click)="selectedPRinter(item)"> <i [ngClass]="{'ri-printer-fill text-success': checkPrinter === item}"></i> <i [ngClass]="{'ri-printer-line': checkPrinter !== item}"></i> <span class="ml-2">{{item}}</span></li>
+                </ul>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+
+
+<ng-template #aboutContent let-modal>
+    <div class="modal-header border-0">
+        <h6 id="modal-about-title"><strong>About</strong></h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>Version : <b>{{tagUpdate?.name}}</b></p>
+        <p>Description : <b> {{tagUpdate?.release?.description}}</b></p>
+        <p *ngIf="branchUpdate?.commit?.message">Last Patch Message : <b> {{branchUpdate?.commit?.message}}</b></p>
+    </div>
+
+</ng-template>
+
+<ng-template #updating let-modal>
+    <div class="modal-header border-0 ">
+        <h6 id="modal-about-title"> <span class="badge-warning px-2" style="top: 4px;"></span> Updating </h6>
+    </div>
+    <div class="modal-body">
+
+        <div class="my-4">
+            <ngb-progressbar [type]="progressInfos.color" textType="white" [value]="progressInfos.uploadProgress" [showValue]="true">
+            </ngb-progressbar>
+        </div>
+        <div>
+            <small class="text-center"> <b>Note </b>: Your system is being updated, please do not refresh. Page would be
+                redirected to Login screen, please reload (ctrl+shift+R) before login</small>
+
+
+        </div>
+        <!-- <div class="my-0">
+            <ng-lottie height="20%" [options]="options" (animationCreated)="animationCreated($event)" (loopComplete)="onLoopComplete()"></ng-lottie>
+        </div> -->
+    </div>
+</ng-template>
+<app-bulk-upload-excel-progressbar *ngIf="bulkUploadExcel" (item)="changeStatusOfCom($event)"></app-bulk-upload-excel-progressbar>

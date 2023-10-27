@@ -1,0 +1,77 @@
+.bgColor {
+    background-color: bisque;
+}
+
+.bgColorWhite {
+    // padding-top: 12px;
+    background-color: #fff;
+    color: #fff;
+}
+
+.blank_row {
+    height: 10px !important;
+    /* overwrites any other rules */
+    background-color: bisque;
+}
+
+.table th {
+    white-space: nowrap;
+    background-color: rgb(211, 240, 241);
+    padding: 2px 8px !important;
+}
+
+.table td {
+    white-space: nowrap;
+    padding: 2px 8px !important;
+}
+
+.numberedTable th:first-child,
+.numberedTable td:first-child {
+    position: sticky;
+    left: 0px;
+    background-color: bisque;
+}
+
+.btn-primary {
+    padding: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    background: #0070D4 !important;
+}
+
+.btn-light {
+    font-size: 12px !important;
+}
+
+.invoice-total {
+    h6 {
+        font-size: 15px;
+        color: #292929;
+    }
+}
+
+.icon-img {
+    cursor: pointer;
+}
+
+.misiing {
+    padding: 10px 15px;
+    border-radius: 5px;
+    h6 {
+        font-size: 15px;
+        margin: 0;
+    }
+    &.bg1 {
+        background: #F5F9B0;
+    }
+    &.bg2 {
+        background: #F9F3C2;
+    }
+    &.bg3 {
+        background: #FAA;
+    }
+}
+
+.fullpage {
+    font-size: x-small;
+}

@@ -1,0 +1,278 @@
+<section class="invoice position-relative">
+    <div class="d-flex mb-2">
+        <h4 class="text-white mt-1"><b>Dashboard</b></h4>
+        <div class="form-group w-c-50">
+            <select id="my-select" [(ngModel)]="dateFilters" (change)="onDateFilterChange()" class="custom-select"
+                name="">
+                <option value="Last Week">Last Week</option>
+                <option value="This Month">This Month</option>
+                <option value="Last Month">Last Month</option>
+                <option value="This Year">This Year</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10">
+            <div class="dashboard-list">
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>Invoices</li>
+                        <li>{{invoices?.success}} <br> <small>Success</small> </li>
+                        <li>{{invoices?.pending}} <br> <small>Pending</small></li>
+                        <li>{{invoices?.cancelled}} <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>Credit Notes</li>
+                        <li>{{credits?.success}} <br> <small>Success</small> </li>
+                        <li>{{credits?.pending}} <br> <small>Pending</small></li>
+                        <li>{{credits?.cancelled}} <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>Debit Notes</li>
+                        <li>{{debits?.success}} <br> <small>Success</small> </li>
+                        <li>{{debits?.pending}} <br> <small>Pending</small></li>
+                        <li>{{debits?.cancelled}} <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>Manual Invoices</li>
+                        <li>0 <br> <small>Success</small> </li>
+                        <li>0 <br> <small>Pending</small></li>
+                        <li>0 <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>Manual Credit Notes</li>
+                        <li>0 <br> <small>Success</small> </li>
+                        <li>0 <br> <small>Pending</small></li>
+                        <li>0 <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>Manual Debit Notes</li>
+                        <li>0 <br> <small>Success</small> </li>
+                        <li>0 <br> <small>Pending</small></li>
+                        <li>0 <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <!-- <div class="col-md-5">
+            <div class="dashboard-list">
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>PMS Invoices</li>
+                        <li>1000 <br> <small>Success</small> </li>
+                        <li>100 <br> <small>Pending</small></li>
+                        <li>100 <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>PMS Debit Invoices</li>
+                        <li>1000 <br> <small>Success</small> </li>
+                        <li>100 <br> <small>Pending</small></li>
+                        <li>100 <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+                <div class="each-list">
+                    <ul class="list-unstyled">
+                        <li>PMS Credit Invoices</li>
+                        <li>1000 <br> <small>Success</small> </li>
+                        <li>100 <br> <small>Pending</small></li>
+                        <li>100 <br> <small>Cancelled</small></li>
+                    </ul>
+                </div>
+            </div>
+        </div> -->
+        <div class="col-md-2 custom-hours ">
+            <div class="opacity-0">
+                <h6>0</h6>
+                <p>Man hours Saved</p>
+            </div>
+            <div class="pt-50">
+                <h6>{{sacTotalCount}}</h6>
+                <p>SAC HSN CODES</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-3 mt-3" *ngIf="lineChartData.length">
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-0"><b>Invoices</b></h5>
+                    <div class="d-flex">
+                        <div class="form-group ml-1">
+                            <select id="my-select1" [(ngModel)]="invoiceFilter.time_interval"
+                                (change)="onDateFilterChange1()" class="custom-select" name="">
+                                <option value="Yearly">Yearly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Daily">Daily</option>
+                            </select>
+                        </div>
+                        <div class="form-group ml-1">
+                            <select id="my-select2" [(ngModel)]="invoiceFilter.timespan" (change)="onDateFilterChange1()"
+                                class="custom-select" name="">
+                                <option value="Last Week">Last Week</option>
+                                <option value="This Month">This Month</option>
+                                <option value="Last Month">Last Month</option>
+                                <option value="Last Quarter">Last Quarter</option>
+                                <option value="This Year">This Year</option>
+                                <option value="Last Year">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- <ngx-charts-line-chart [showGridLines]="showGridLines" [view]="view" [scheme]="colorScheme"
+                    [results]="lineChartData" [gradient]="gradient" [xAxis]="showXAxis" [yAxis]="showYAxis"
+                    [showXAxisLabel]="showXAxisLabel" [showYAxisLabel]="showYAxisLabel" [xAxisLabel]="xAxisLabel"
+                    [yAxisLabel]="yAxisLabel">
+                </ngx-charts-line-chart> -->
+
+            </div>
+            <div class="card border-0 shadow-sm p-3 mt-3" *ngIf="barChartData.length">
+
+                <div class="d-flex justify-content-between">
+                    <h5><b>SAC HSN Codes</b></h5>
+                    <div class="d-flex">
+                        <div class="form-group ml-1">
+                            <select id="my-select3" [(ngModel)]="sacHsnFilter.time_interval"
+                                (change)="onDateFilterChange2()" class="custom-select" name="">
+                                <option value="Yearly">Yearly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Daily">Daily</option>
+                            </select>
+                        </div>
+                        <div class="form-group ml-1">
+                            <select id="my-select4" [(ngModel)]="sacHsnFilter.timespan" (change)="onDateFilterChange2()"
+                                class="custom-select" name="">
+                                <option value="Last Week">Last Week</option>
+                                <option value="This Month">This Month</option>
+                                <option value="Last Month">Last Month</option>
+                                <option value="Last Quarter">Last Quarter</option>
+                                <option value="This Year">This Year</option>
+                                <option value="Last Year">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <!-- <ngx-charts-bar-vertical [showGridLines]="showGridLines" [barPadding]="25" [view]="view"
+                        [scheme]="colorScheme" [results]="barChartData" [gradient]="gradient" [xAxis]="showXAxis"
+                        [yAxis]="showYAxis" [showXAxisLabel]="showXAxisLabel" [showYAxisLabel]="showYAxisLabel"
+                        [xAxisLabel]="xAxisLabel" [yAxisLabel]="yAxisLabel">
+                    </ngx-charts-bar-vertical> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-3 mt-3">
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-0"><b>SAC HSN Tax Summary</b></h5>
+                    <div class="d-flex">
+
+                        <div class="form-group ml-1">
+                            <select id="sacSummary" [(ngModel)]="sacHsnSumFilter"
+                                (change)="onDateFilterChangeSummary()" class="custom-select" name="">
+                                <option value="Last Week">Last Week</option>
+                                <option value="This Month">This Month</option>
+                                <option value="Last Month">Last Month</option>
+                                <option value="Last Quarter">Last Quarter</option>
+                                <option value="This Year">This Year</option>
+                                <option value="Last Year">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered bg-white shadow-sm">
+                        <thead class="thead">
+                            <tr>
+                                <th>SAC HSN Code</th>
+                                <th>CGST</th>
+                                <th>SGST</th>
+                                <th>IGST</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of sacHsnSummaries;let i = index">
+                                <td>{{item?.sac_hsn_code}}</td>
+                                <td>{{item?.cgst}}</td>
+                                <td>{{item?.sgst}}</td>
+                                <td>{{item?.igst}}</td>
+                                <td class="text-right">{{item?.cgst + item?.sgst + item?.igst }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center py-3" *ngIf="!sacHsnSummaries.length">
+                        <h4>No Data Found</h4>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm p-3 mt-3">
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-0"><b>Credit Note Summary</b></h5>
+                    <div class="d-flex">
+                        <div class="form-group ml-1">
+                            <select id="creditSummary" [(ngModel)]="creditSumFilter"
+                                (change)="onDateFilterCreditSummary()" class="custom-select" name="">
+                                <option value="Last Week">Last Week</option>
+                                <option value="This Month">This Month</option>
+                                <option value="Last Month">Last Month</option>
+                                <option value="Last Quarter">Last Quarter</option>
+                                <option value="This Year">This Year</option>
+                                <option value="Last Year">Last Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered bg-white shadow-sm">
+                        <thead class="thead">
+                            <tr>
+                                <th>SAC Code</th>
+                                <th>CGST</th>
+                                <th>SGST</th>
+                                <th>IGST</th>
+                                <th>Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of creditNoteSummaries;let i = index">
+                                <td>{{item?.sac_code}}</td>
+                                <td>{{item?.cgst}}</td>
+                                <td>{{item?.sgst}}</td>
+                                <td>{{item?.igst}}</td>
+                                <td>{{item?.cgst + item?.sgst + item?.igst}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center py-3" *ngIf="!creditNoteSummaries.length">
+                        <h4>No Data Found</h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</section>

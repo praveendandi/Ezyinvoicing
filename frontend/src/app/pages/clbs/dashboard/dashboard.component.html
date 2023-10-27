@@ -1,0 +1,118 @@
+<section>
+    <div class="border-bottom c-header">
+        <div class="row w-100">
+            <div class="col-6 my-auto pl-0">
+
+            </div>
+            <div class="col-6 text-right pr-0 invisible">
+                <div ngbDropdown class="d-inline-block border-left">
+                    <button class="btn border-0 btn-light pl-5  text-left" id="dropdownBasic1" ngbDropdownToggle> <span class="avatar">BT</span> Brandon Troff<br>
+                    <small>Accountant</small></button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                        <button ngbDropdownItem>Action - 1</button>
+                        <button ngbDropdownItem>Another Action</button>
+                        <button ngbDropdownItem>Something else is here</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="header-2 p-2 pt-4">
+            <h4 class="ml-3"><b>DASHBOARD</b></h4>
+        </div>
+        <div class="row w-100 cards-m pl-4">
+            <div class="col-3">
+                <div class="card  d-card">
+                    <div class="card-body d-flex">
+                        <div>
+                            <img class="mt-0 mr-2" src="assets/images/total_invoices_d.png" alt="">
+                        </div>
+                        <div class="mx-2">
+                            <p class="m-0"><b>10</b></p>
+                            <p class="m-0 title-3">Total Invoices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card d-card">
+                    <div class="card-body d-flex">
+                        <div>
+                            <img class="mt-0 mr-2" src="assets/images/summaryincon.png" alt="">
+                        </div>
+                        <div class="mx-2">
+                            <p class="m-0"><b>10</b></p>
+                            <p class="m-0 title-3">Total Invoices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card d-card">
+                    <div class="card-body d-flex">
+                        <div>
+                            <img class="mt-0 mr-2" src="assets/images/submittedicon.png" alt="">
+                        </div>
+                        <div class="mx-2">
+                            <p class="m-0"><b>10</b></p>
+                            <p class="m-0 title-3">Total Invoices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card  d-card">
+                    <div class="card-body d-flex">
+                        <div>
+                            <img class="mt-0 mr-2" src="assets/images/draftsicon.png" alt="">
+                        </div>
+                        <div class="mx-2">
+                            <p class="m-0"><b>10</b></p>
+                            <p class="m-0 title-3">Total Invoices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row w-100">
+            <div class="col-6 pad-1  pr-0 py-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6><b> Summary Statistics</b></h6>
+                            <ng-select class="w-25" [(ngModel)]="day">
+                                <ng-option value='1'>Today</ng-option>
+                                <ng-option value='2'>Yesterday</ng-option>
+                                <ng-option value='3'>This week</ng-option>
+                                <ng-option value='4'>Last Week</ng-option>
+
+                            </ng-select>
+                        </div>
+
+                        <google-chart [type]="type" [data]="data221" [columns]="columnNames221" [options]="options" (select)="onSelect($event)"></google-chart>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 pad-2 pr-0 py-2">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6><b> Summary Statistics</b></h6>
+                            <ng-select class="w-25" [(ngModel)]="day">
+                                <ng-option value='1'>Today</ng-option>
+                                <ng-option value='2'>Yesterday</ng-option>
+                                <ng-option value='3'>This week</ng-option>
+                                <ng-option value='4'>Last Week</ng-option>
+
+                            </ng-select>
+                        </div>
+                        <google-chart [type]="type" [data]="data221" [columns]="columnNames221" [options]="options" (select)="onSelect($event)"></google-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,51 @@
+.table th,
+.table td {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid rgba(221, 218, 218, 0.3);
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  font-size: 14px;
+}
+
+#invoice-POS {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 10px;
+  background-color: #e7e7e7;
+  margin: 0 auto;
+  font-family: monospace, monospace !important;
+}
+
+#invoice-POS .qr {
+  height: 95px;
+}
+
+#invoice-POS .logo {
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+.more {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.w-c-50 {
+  min-width: 100px;
+  margin-left: 10px;
+}
+
+.custom-select {
+  font-size: 14px;
+  height: 32px;
+  border: 0;
+  background: #f6f6f6;
+}
+/*# sourceMappingURL=pos-bills.component.css.map */

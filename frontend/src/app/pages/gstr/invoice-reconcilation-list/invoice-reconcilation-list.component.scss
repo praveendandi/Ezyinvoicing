@@ -1,0 +1,126 @@
+.bg-theme-color {
+    color: #fff;
+    background-color: #1d4350;
+}
+
+.back-arrow {
+    padding: 0 0 0 22px;
+    position: relative;
+}
+
+.back-arrow i {
+    font-size: 25px;
+    position: absolute;
+    top: -2px;
+    left: -10px;
+    cursor: pointer;
+}
+
+.py-10 {
+    padding-top: 200px;
+    padding-bottom: 100px;
+}
+
+input.form-control,
+select.custom-select {
+    font-size: 14px;
+    height: 34px;
+}
+
+.table tbody td:first-child {
+    padding-left: 0.5rem !important;
+}
+
+.table thead tr th {
+    background: #214350;
+    color: #fff;
+    border-bottom: none;
+}
+
+.table tbody+tbody {
+    border-top: 0px solid #dee2e6;
+}
+
+$cell-padding: 4px;
+th,
+td {
+    border: 1px solid #dee2e6;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: $cell-padding;
+    text-align: left;
+    font-size: 13px;
+}
+
+table.tid-table {
+    width: 100%;
+    tr {
+        &.tid-detail-row {
+            >td {
+                padding: 0;
+                >div {
+                    width: 100%;
+                    box-sizing: border-box;
+                    max-height: 0;
+                    transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+                    overflow: hidden;
+                    >div {
+                        padding: $cell-padding;
+                    }
+                }
+            }
+            &.show>td>div {
+                max-height: 1000px;
+                transition: max-height 1s ease-in-out;
+            }
+            &.show>td>.table {
+                border: none;
+            }
+        }
+        &.tid-even {
+            background-color: #e2e2e2;
+        }
+    }
+}
+
+.w-35 {
+    width: 25%;
+}
+
+.selct-btn {
+    height: 31px;
+    padding: 0px;
+    width: 100px;
+}
+
+.btn:disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed;
+}
+
+.delete-icon {
+    font-size: 84px;
+    opacity: 0.5;
+}
+
+.alert-title {
+    margin: 0px;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.alert-disc {
+    margin: 0px;
+    font-size: 14px;
+    color: #444;
+}
+
+.sec-1 {
+    padding: 0px 12px;
+}
+ngb-progressbar{
+  width: -webkit-fill-available;
+}
