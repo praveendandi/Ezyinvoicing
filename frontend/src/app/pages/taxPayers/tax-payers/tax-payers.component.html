@@ -1,21 +1,12 @@
 <section class="taxpayers position-relative">
     <div class="row m-0 py-2">
-        <div class="col-md-10 col-lg-10">
+        <div class="col-md-12 col-lg-12">
             <div class="d-flex">
-                <h4 class="font-weight-bold text-white">Tax Payers <small>({{this.filters.totalCount}})</small></h4>
-                <button class="create btn btn-primary" [routerLink]="['/home/tax-payers-details']"
-                    *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole " appPermissionButton
-                    accessType="create" moduleType="docType"><i class="ri-add-line"></i></button>
+                <h4 class="font-weight-bold text-white">Tax Payers  <small>({{this.filters.totalCount}})</small></h4>
+                <button class="create btn btn-primary" [routerLink]="['/home/tax-payers-details']" *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole "
+                    appPermissionButton accessType="create" moduleType="docType"><i class="ri-add-line"></i></button>
                 <!-- <button (click)="taxSynctoGST()" *ngIf="companyDetails?.ezy_gst_module == 1" class="btn btn-primary btn-small mx-2 btn-right" ngbTooltip="sync to gst"
                     appPermissionButton accessType="write" type="button">Sync to GST</button> -->
-
-
-            </div>
-        </div>
-        <div class="col-md-2 col-lg-2">
-            <div class="text-right">
-                <button class="btn btn-primary btn-small mr-2" type="button"
-                    (click)="taxPayerDetails_export()">Export</button>
             </div>
         </div>
         <!-- <div class="col-lg-3 col-md-3">
@@ -56,8 +47,8 @@
                                     </span>
                                 </div>
                                 <input #tradeName [(ngModel)]="filters.search.tradeName"
-                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" type="search"
-                                    (keyup.enter)="updateRouterParams()" class="form-control">
+                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" type="search" (keyup.enter)="updateRouterParams()"
+                                    class="form-control">
                                 <!-- <input type="text" (keyup)="search('tradeName')"  class="form-control" placeholder="Search" #tradeName [(ngModel)]="filters.search.tradeName"> -->
                             </div>
                         </td>
@@ -69,8 +60,8 @@
                                     </span>
                                 </div>
                                 <input #legalName [(ngModel)]="filters.search.legalName"
-                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                    (keyup.enter)="updateRouterParams()" type="search" class="form-control">
+                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" type="search"
+                                    class="form-control">
                                 <!-- <input type="text" (keyup)="search('legalName')"  class="form-control" placeholder="Search" #legalName [(ngModel)]="filters.search.legalName"> -->
                             </div>
                         </td>
@@ -82,8 +73,8 @@
                                     </span>
                                 </div>
                                 <input #gstNumber [(ngModel)]="filters.search.gstNumber"
-                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                    (keyup.enter)="updateRouterParams()" type="search" class="form-control">
+                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" type="search"
+                                    class="form-control">
                                 <!-- <input type="text" (keyup)="search('gstNumber')"  class="form-control" placeholder="Search" #gstNumber [(ngModel)]="filters.search.gstNumber"> -->
                             </div>
                         </td>
@@ -137,8 +128,7 @@
                                     queryParamsHandling="merge">view</a></span></td>
                         <td>{{item?.invoice_count}}</td>
                         <td>{{item?.creation | date : 'MMM dd y h:mm:ss'}}</td>
-                        <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_to_erp?'Synced':'Not Synced'}}
-                        </td>
+                        <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_to_erp?'Synced':'Not Synced'}}</td>
                         <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_date|date : ["MMM d y"]}}</td>
                         <td>
                             <span><a appPermissionButton accessType="read" moduleType="docType"

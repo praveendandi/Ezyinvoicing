@@ -12,7 +12,7 @@
         <div class="col-md-9 col-lg-9">
             <div class="d-flex">
                 <h4 class="font-weight-bold text-white my-auto">Outlets<small>({{this.filters.totalCount}})</small></h4>
-                <button class="create btn btn-primary" (click)="addOutlet(outletModal,'add',null);"><i class="ri-add-line"></i></button>
+                <button class="create btn btn-primary" (click)="addOutlet(outletModal,'add',null);" appPermissionButton accessType="create"><i class="ri-add-line"></i></button>
             </div>
         </div>
         <div class="col-lg-3 col-md-3">
@@ -85,7 +85,7 @@
                                     <td>
                                         {{item?.print}}
                                     </td>
-                                    <td> <a (click)="addOutlet(outletModal,'edit',item)">Edit</a></td>
+                                    <td> <a (click)="addOutlet(outletModal,'edit',item)" appPermissionButton accessType="write">Edit</a></td>
                                 </tr>
                             </tbody>
                         </table>

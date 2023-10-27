@@ -4,7 +4,7 @@
         <div class="col-md-5 grid">
             <div class="d-flex align-items-center">
                 <h6 class="m-0"><b>Summaries ({{filters.totalCount}})</b></h6>
-                <button [routerLink]="[ '/clbs/create-summary' ]" class="btn btn-primary btn-sm shadow ml-3" type="button"><b><i class="ri-add-line btn-hover-gray"></i></b></button>
+                <button [routerLink]="[ '/clbs/create-summary' ]" class="btn btn-primary btn-sm shadow ml-3" type="button" appPermissionButton accessType="create"><b><i class="ri-add-line btn-hover-gray"></i></b></button>
             </div>
         </div>
     </div>

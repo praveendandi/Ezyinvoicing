@@ -10,7 +10,6 @@ import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permi
 import { NgxPaginationModule } from 'ngx-pagination';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 import { InvoiceReconSearchPipeModule } from 'src/app/shared/pipes/invoice-recon-search.pipe';
-import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -25,8 +24,7 @@ import { NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
     MatInputDirectiveModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
-    InvoiceReconSearchPipeModule,
-    NgbProgressbarModule
+    InvoiceReconSearchPipeModule
   ]
 })
 export class InvoiceReconcilationModule { }

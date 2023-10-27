@@ -1,13 +1,13 @@
-<section>
+<section *ngIf="paramsData.id">
     <div class="card">
         <div class="card-body">
             <h4 class="font-weight-bold">User</h4>
             <p class="text-muted"><a [routerLink]="['/home/users']" [queryParamsHandling]="'preserve'"
                     [replaceUrl]="true" class="text-primary cursor-pointer">Users</a>/
-                Create User
+                Edit USer
             </p>
 
-            <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+            <form #form="ngForm" >
                 <div class="row">
                     <div class="col-lg-10 col-md-10">
                         <div class="row">
@@ -21,57 +21,119 @@
                                             *ngIf="form.submitted  && first_name?.errors?.required">Required</small>
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-6">
+                            <!-- <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <input type="text" appMatInput class="form-control" id="email" name="email"
-                                        [(ngModel)]="userDetails.email" #email="ngModel" [readonly]="paramsData?.type==='edit'" required>
+                                        [(ngModel)]="userDetails.email" #email="ngModel" [readonly]="paramsData?.type==='edit'" (ngModelChange)="checkUserName($event , 'Email')" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
                                     <label for="email" class="mat-label">Email *</label>
                                     <small class="text-danger" *ngIf="form.submitted  && email?.errors?.required">Required</small>
+                                    <small class="text-danger" *ngIf="checkDuplicateEmail">Already Exists</small>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6">
-                                <div class="form-group">
-                                    <input [(ngModel)]="userDetails.username" #username="ngModel" appMatInput id="userName" class="form-control" type="text" name="username" required>
-                                    <label for="userName" class="mat-label">UserName *</label>
-                                    <small class="text-danger" *ngIf="form.submitted && username?.errors?.required">Required</small>
-                                </div>
-                            </div>
-                            <div *ngIf="!paramsData.id" class="col-lg-6 col-md-6">
-                                <div class="form-group">
-                                    <input [(ngModel)]="userDetails.new_password" #new_password="ngModel" appMatInput id="newPassword" class="form-control" type="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$" name="new_password" required>
-                                    <label for="newPassword" class="mat-label">Password *</label>
-                                    <small class="text-mute">should contain special characters and alphanumeric </small><br>
-                                    <small class="text-danger" *ngIf="form.submitted && new_password?.errors?.required ">Required</small>
-                                    <small class="text-danger" *ngIf="form.submitted && new_password?.errors?.pattern">Check password pattern</small>
-                                </div>
-                            </div>
+                            </div> -->
+                           
                             <div class="col-lg-6 col-md-6">
                                 <div>
-                                    <ng-select placeholder="select Role"  class="" name="roles" id="role" [(ngModel)]="userDetails.roles" #roles="ngModel"
-                                        [multiple]="true" required>
-                                        <ng-option *ngFor="let item of roleList" [value]="item.name">{{item?.name}}
-                                        </ng-option>
+                                    <ng-select placeholder="select Role"  class="" name="roles" id="role" [(ngModel)]="userDetails.roles" #roles="ngModel" required>
+                                        <ng-option *ngFor="let item of roleList" [value]="item">{{item}}</ng-option>
                                     </ng-select>
                                     <!-- <label for="role" class="mat-label">Roles</label> -->
                                     <small class="text-danger" *ngIf="form.submitted && roles?.errors?.required ">Required</small>
                                 </div>
                             </div>
-                            <div *ngIf="paramsData.id" class="col-lg-6 col-md-6">
-                                <div class="form-group">
-                                    <select appMatInput name="enabled" id="enabled" class="custom-select"
-                                        [(ngModel)]="userDetails.enabled" #enabled="ngModel">
-                                        <option value="1">Active</option>
-                                        <option value="0">In-Active</option>
-                                    </select>
-                                    <label for="enabled" class="mat-label">Status</label>
-                                </div>
-                            </div>
+                            
+                           
                         </div>
                         <div class="text-right">
                             <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
                                 [routerLink]="['/home/users']">Cancel</button>
                             <button class="btn btn-primary mb-0 text-uppercase ml-3" appPermissionButton
-                                accessType="write" type="submit">Save</button>
+                                accessType="write" type="submit" (click)="onSubmit(form)" >Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+<section *ngIf="!paramsData.id">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="font-weight-bold">User</h4>
+            <p class="text-muted"><a [routerLink]="['/home/users']" [queryParamsHandling]="'preserve'"
+                    [replaceUrl]="true" class="text-primary cursor-pointer">Users</a>/
+                Create USer
+            </p>
+
+            <form #form="ngForm" >
+                <div class="row">
+                    <div class="col-lg-10 col-md-10">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="first_name"
+                                        name="first_name" [(ngModel)]="userDetails.first_name" #first_name="ngModel"
+                                       [readonly]="paramsData?.type==='edit'" required>
+                                    <label for="first_name" class="mat-label">First Name *</label>
+                                    <small class="text-danger"
+                                            *ngIf="form.submitted  && first_name?.errors?.required">Required</small>
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="email" name="email"
+                                        [(ngModel)]="userDetails.email" #email="ngModel" [readonly]="paramsData?.type==='edit'" (ngModelChange)="checkUserName($event , 'Email')" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required>
+                                    <label for="email" class="mat-label">Email *</label>
+                                    <small class="text-danger" *ngIf="form.submitted  && email?.errors?.required">Required</small>
+                                    <small class="text-danger" *ngIf="checkDuplicateEmail">Already Exists</small>
+                                </div>
+                            </div> -->
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input [(ngModel)]="userDetails.username" #username="ngModel" appMatInput  noWhiteSpace id="userName" class="form-control" type="text" name="username" (ngModelChange)="checkUserName($event , 'userName')" required>
+                                    <label for="userName" class="mat-label">UserName *</label>
+                                    <small class="text-danger" *ngIf="form.submitted && username?.errors?.required">Required</small>
+                                    <small class="text-danger" *ngIf="checkName">Already Exists</small>
+                                </div>
+                            </div>
+                         
+                            <div  class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input [(ngModel)]="userDetails.new_password" #new_password="ngModel" appMatInput id="newPassword" class="form-control" type="password" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$" name="new_password" required>
+                                    <label for="newPassword" class="mat-label">Password *</label>
+                                    <small class="text-mute"><b>Note </b> : should contain special characters and alphanumeric with min 6 and max 20 characters</small><br>
+                                    <small class="text-danger" *ngIf="form.submitted && new_password?.errors?.required ">Required</small>
+                                    <small class="text-danger" *ngIf="form.submitted && new_password?.errors?.pattern">Check password pattern</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input [(ngModel)]="userDetails.confirmPassword" #confirmPassword="ngModel" appMatInput id="confirmPassword" class="form-control" type="password" name="confirmPassword" required>
+                                    <label for="confirmPassword" class="mat-label">Confirm Password *</label>
+                                    <small class="text-danger" *ngIf="form.submitted && confirmPassword?.errors?.required ">Required</small>
+                                    <small class="text-danger" *ngIf="confirmPassword?.value && (new_password?.value !== confirmPassword?.value)">password mismatch</small>
+                                    
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <div>
+                                    <ng-select placeholder="select Role"  class="" name="roles" id="role" [(ngModel)]="userDetails.roles" #roles="ngModel" required>
+                                        <ng-option *ngFor="let item of roleList" [value]="item">{{item}}</ng-option>
+                                    </ng-select>
+                                    <!-- <label for="role" class="mat-label">Roles</label> -->
+                                    <small class="text-danger" *ngIf="form.submitted && roles?.errors?.required ">Required</small>
+                                </div>
+                            </div>
+                            
+                           
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                                [routerLink]="['/home/users']">Cancel</button>
+                            <button class="btn btn-primary mb-0 text-uppercase ml-3" appPermissionButton
+                                accessType="write" type="submit" (click)="onSubmit(form)" [disabled]="checkName || (new_password?.value !== confirmPassword?.value)">Save</button>
                         </div>
                     </div>
                 </div>

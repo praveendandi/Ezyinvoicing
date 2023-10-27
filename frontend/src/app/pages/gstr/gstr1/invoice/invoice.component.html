@@ -5,13 +5,11 @@
                 <h6 class="mb-0 text-white"><strong>Invoices</strong></h6>
                 <div class="d-flex align-items-center ">
                     <div>
-                        <p class="mb-0 text-white " [routerLink]="['/gstr/dashboard']"><small
-                                class="cursor-pointer underline">Dashboard</small></p>
+                        <p class="mb-0 text-white " [routerLink]="['/gstr/dashboard']"><small class="cursor-pointer underline">Dashboard</small></p>
                     </div>
                     <div><i class="ri-arrow-right-s-line text-white"></i></div>
                     <div>
-                        <p class="text-white mb-0" [routerLink]="['/gstr/gstr1']"><small
-                                class="cursor-pointer underline">GSTR1-Summary</small></p>
+                        <p class="text-white mb-0" [routerLink]="['/gstr/gstr1']"><small class="cursor-pointer underline">GSTR1-Summary</small></p>
                     </div>
                     <div><i class="ri-arrow-right-s-line text-white"></i></div>
                     <div>
@@ -83,16 +81,14 @@
                     <app-search-by-input></app-search-by-input>
 
                     <div class="ml-2">
-                        <select name="" id="invoice_category" [(ngModel)]="filters.search.category" class="form-control"
-                            (ngModelChange)="updateRouterParams()">
+                        <select name="" id="invoice_category" [(ngModel)]="filters.search.category" class="form-control" (ngModelChange)="updateRouterParams()">
                             <option value="">All</option>
                             <option value="Tax">Tax Summary</option>
                             <option value="Crt-Dbt">Credit/Debit Notes</option>
                         </select>
                     </div>
                     <div class=" ml-2">
-                        <select id="invoiceType" [(ngModel)]="filters.search.invoiceType"
-                            class="form-control typeSelect" (ngModelChange)="updateRouterParams()">
+                        <select id="invoiceType" [(ngModel)]="filters.search.invoiceType" class="form-control typeSelect" (ngModelChange)="updateRouterParams()">
                             <option value="B2B">B2B</option>
                             <option value="SEZWP">SEZWP</option>
                             <option value="SEZWOP">SEZWOP</option>
@@ -101,13 +97,10 @@
                     </div>
                     <div class=" ml-2">
                         <div class=" calendar w-c-50 position-relative">
-                            <input class="form-control h-auto pr-5" type="search"
-                                [(ngModel)]="filters.search.filterDate" (dateTimeChange)="updateRouterParams()"
-                                [owlDateTime]="dt1" [selectMode]="'range'" [owlDateTimeTrigger]="dt1"
-                                placeholder="Date Time">
+                            <input class="form-control h-auto pr-5" type="search" [(ngModel)]="filters.search.filterDate" (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt1" [selectMode]="'range'" [min]=minDate [max]=maxDate [owlDateTimeTrigger]="dt1" placeholder="Date Time">
                             <span class="example-trigger" [owlDateTimeTrigger]="dt1">
-                                <i class="mx-2 ri-calendar-2-line"></i>
-                            </span>
+                    <i class="mx-2 ri-calendar-2-line"></i>
+                  </span>
                             <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
                         </div>
                         <!-- <input class="form-control" placeholder="Search" type="date" name="" id="" [owlDateTime]="dt1" [owlDateTimeTrigger]="dt1">
@@ -225,18 +218,15 @@
                                     {{item?.total_gst_amount | currency:'INR'}}
                                 </td>
                                 <td class="text-right">
-                                    {{(item?.total_state_cess_amount + item?.total_central_cess_amount)|
-                                    currency:'INR'}}
+                                    {{(item?.total_state_cess_amount + item?.total_central_cess_amount)| currency:'INR'}}
                                 </td>
                                 <td>{{item?.irn_generated_time | date}}</td>
                                 <td>{{item?.gstr_saved_date |date}}</td>
                                 <td>
                                     <span *ngIf="item?.gstr_filed == 1" class="badge badge-success">Matched</span>
-                                    <span *ngIf="item?.gstr_filed == 0" class="badge badge-danger mismatched">Missing in
-                                        Ezy Invoicing</span>
+                                    <span *ngIf="item?.gstr_filed == 0" class="badge badge-danger mismatched">Missing in Ezy Invoicing</span>
                                 </td>
-                                <td><a class="cursor-pointer" [routerLink]="['/gstr/gstr1/invoice-details/'+item.name]"
-                                        [queryParamsHandling]="'preserve'">View</a></td>
+                                <td><a class="cursor-pointer" [routerLink]="['/gstr/gstr1/invoice-details/'+item.name]" [queryParamsHandling]="'preserve'">View</a></td>
                             </tr>
                         </tbody>
                     </table>
@@ -248,22 +238,17 @@
             <div class="d-flex justify-content-between my-2 morec" *ngIf="invoiceList.length">
                 <div class="text-right px-3">
                     <ng-container *ngIf="invoiceList.length  < this.filters.totalCount">
-                        <p class="cursor-pointer px-2 py-1 pagination "
-                            (click)="this.filters.start = invoiceList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                        <p class="cursor-pointer px-2 py-1 pagination " (click)="this.filters.start = invoiceList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
                             more
                         </p>
                     </ng-container>
                 </div>
                 <div class="px-3">
                     <div class="row no-gutters pagination" *ngIf="invoiceList.length > 20">
-                        <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(20)"
-                            [ngClass]="{'bg-count': filters.itemsPerPage == 20 }">20</p>
-                        <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(50)"
-                            [ngClass]="{'bg-count': filters.itemsPerPage == 50 }">50</p>
-                        <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(100)"
-                            [ngClass]="{'bg-count': filters.itemsPerPage == 100 }">100</p>
-                        <p class="px-2 py-1 mb-0 cursor-pointer" (click)="checkPagination(500)"
-                            [ngClass]="{'bg-count': filters.itemsPerPage == 500 }">500</p>
+                        <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(20)" [ngClass]="{'bg-count': filters.itemsPerPage == 20 }">20</p>
+                        <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(50)" [ngClass]="{'bg-count': filters.itemsPerPage == 50 }">50</p>
+                        <p class="px-2 py-1 mb-0 cursor-pointer border-right" (click)="checkPagination(100)" [ngClass]="{'bg-count': filters.itemsPerPage == 100 }">100</p>
+                        <p class="px-2 py-1 mb-0 cursor-pointer" (click)="checkPagination(500)" [ngClass]="{'bg-count': filters.itemsPerPage == 500 }">500</p>
                     </div>
                 </div>
 
@@ -289,27 +274,27 @@
                                 <p>Total Invoices</p>
                             </div>
                             <div class="col px-3 py-2 text-center">
-                                <h4><b>{{ (invoicesData?.total_invoices_amount | currency:'INR' ) || 0}}</b></h4>
+                                <h4><b>{{ (invoicesData?.total_invoices_amount  | currency:'INR' ) || 0}}</b></h4>
                                 <p>Total Invoice Value</p>
                             </div>
                             <div class="col px-3 py-2 text-center">
-                                <h4><b>{{ (invoicesData?.total_taxable_value | currency:'INR')|| 0}}</b></h4>
+                                <h4><b>{{ (invoicesData?.total_taxable_value  | currency:'INR')|| 0}}</b></h4>
                                 <p>Total Taxable Value</p>
                             </div>
                             <div class="col px-3 py-2 text-center">
-                                <h4><b>{{ (invoicesData?.total_igst | currency:'INR')|| 0}}</b></h4>
+                                <h4><b>{{ (invoicesData?.total_igst  | currency:'INR')|| 0}}</b></h4>
                                 <p>Total IGST</p>
                             </div>
                             <div class="col px-3 py-2 text-center">
-                                <h4><b>{{ (invoicesData?.total_cgst | currency:'INR')|| 0}}</b></h4>
+                                <h4><b>{{ (invoicesData?.total_cgst  | currency:'INR')|| 0}}</b></h4>
                                 <p>Total CGST</p>
                             </div>
                             <div class="col px-3 py-2 text-center">
-                                <h4><b>{{(invoicesData?.total_sgst | currency:'INR' ) || 0}}</b></h4>
+                                <h4><b>{{(invoicesData?.total_sgst  | currency:'INR' ) || 0}}</b></h4>
                                 <p>Total SGST</p>
                             </div>
                             <div class="col px-3 py-2 text-center">
-                                <h4><b>{{(invoicesData?.cess | currency:'INR') || 0}}</b></h4>
+                                <h4><b>{{(invoicesData?.cess  | currency:'INR')  || 0}}</b></h4>
                                 <p>Total CESS</p>
                             </div>
 

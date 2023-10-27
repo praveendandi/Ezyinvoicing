@@ -9,7 +9,6 @@ export class SocketService implements OnInit {
   public newReConProcessing = new Subject()
   public deleteReCon = new Subject()
   public sync_invoices = new Subject()
-  public d_sync = new Subject()
   public sync_sac_hsn_codes = new Subject()
   public sync_taxpayers = new Subject()
   public sync_completed = new Subject()
@@ -45,11 +44,9 @@ export class SocketService implements OnInit {
         case 'POS Checks':
           this.newPosChecks.next(data?.message);
           break;
-        case 'Invoices Syncing':
+        case 'Invoices Sync':
           this.sync_invoices.next(data?.message);
           break;
-        case 'D syncing':
-          this.d_sync.next(data?.message);
         case 'Item Sync':
           this.sync_sac_hsn_codes.next(data?.message);
           break;

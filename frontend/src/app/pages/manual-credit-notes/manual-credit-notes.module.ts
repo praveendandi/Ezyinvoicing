@@ -13,6 +13,7 @@ import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 import { ValidateGSTDirectiveModule } from 'src/app/shared/directives/validate-gst.directive';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
 import { QuillModule } from 'ngx-quill';
+import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { QuillModule } from 'ngx-quill';
     DecimaNumberDirectiveModule,
     ValidateGSTDirectiveModule,
     VirtualScrollerModule,
+    PermissionButtonDirectiveModule,
     QuillModule.forRoot()
   ]
 })

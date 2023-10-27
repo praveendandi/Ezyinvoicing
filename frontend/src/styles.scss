@@ -15,141 +15,133 @@ $theme-colors :("primary": #F26135, "secondary": #413BD3, "success": #00b34d, "d
 @import '~bs-stepper/dist/css/bs-stepper.min.css';
 
 body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background-color: #f2f2f2;
-  color: #333;
-  box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #f2f2f2;
+    color: #333;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
 }
 
 .bg-linear {
-  background: linear-gradient(90deg, #1d4350 0%, #a43931 104.81%)
+    background: linear-gradient(90deg, #1d4350 0%, #a43931 104.81%)
 }
 
 .cursor-pointer {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 input.ng-touched.ng-invalid:not(form) {
-  border: 1px solid var(--danger);
-  /* red */
+    border: 1px solid var(--danger);
+    /* red */
 }
 
 select.ng-touched.ng-invalid:not(form) {
-  border: 1px solid var(--danger);
-  /* red */
+    border: 1px solid var(--danger);
+    /* red */
 }
 
 textarea.ng-touched.ng-invalid:not(form) {
-  border: 1px solid var(--danger);
-  /* red */
+    border: 1px solid var(--danger);
+    /* red */
 }
 
 .ng-select.ng-touched.ng-invalid:not(form) {
-  border: 1px solid var(--danger) !important;
-  border-radius: 0.25rem;
-
-  .ng-select-container {
-    border: none;
-  }
+    border: 1px solid var(--danger) !important;
+    border-radius: 0.25rem;
+    .ng-select-container {
+        border: none;
+    }
 }
 
 .contact-select {
-  .ng-select .ng-select-container {
-    border: 0px !important;
-    height: 100% !important;
-    width: 100% !important;
-  }
-
-  // .ng-select .ng-select-focused:not(.ng-select-opened)>.ng-select-container{
-  //   box-shadow: 0px !important;
-  //   border-color: white !important ;
-  // }
+    .ng-select .ng-select-container {
+        border: 0px !important;
+        height: 100% !important;
+        width: 100% !important;
+    }
+    // .ng-select .ng-select-focused:not(.ng-select-opened)>.ng-select-container{
+    //   box-shadow: 0px !important;
+    //   border-color: white !important ;
+    // }
 }
 
 table tr {
-  page-break-inside: avoid !important;
+    page-break-inside: avoid !important;
 }
 
 .c-bb .dropdown-toggle::after {
-  background: none !important;
-  display: none !important;
-  border: 0 !important;
+    background: none !important;
+    display: none !important;
+    border: 0 !important;
 }
 
 .informationInvoicePdfViewModal .modal-dialog {
-  width: 100% !important;
-  height: auto !important;
-  max-width: 96% !important;
-  max-height: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 96% !important;
+    max-height: 100% !important;
 }
 
 .loader {
-  margin: 0 !important;
+    margin: 0 !important;
 }
 
 .pdfpreview .modal-dialog {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  margin: 0px;
-  width: 80%;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin: 0px;
+    width: 80%;
 }
 
 .pdfpreview .modal-content {
-  height: 100vh;
-  // position: absolute;
-  // top: 0px;
-  // right: 0px;
-  // margin: 0px;
+    height: 100vh;
+    // position: absolute;
+    // top: 0px;
+    // right: 0px;
+    // margin: 0px;
 }
 
 .opacity-0 {
-  opacity: 0;
+    opacity: 0;
 }
-
-.mail-quill-editor {
-  .ql-container.ql-snow {
+.mail-quill-editor{
+  .ql-container.ql-snow{
     height: 32vh !important;
     background: #f5f5f5;
   }
 }
-
 .clbs-setting-quill-editor {
-  .ql-container.ql-snow {
+  .ql-container.ql-snow{
     height: 22vh !important;
     background: #f5f5f5;
   }
 }
 
 .invoice-rec-calender {
-  owl-date-time-calendar .owl-dt-calendar-control {
-    pointer-events: none;
-    opacity: 0.5;
+    owl-date-time-calendar .owl-dt-calendar-control{
+        pointer-events: none;
+        opacity: 0.5;
+    }
   }
-}
-
-.invoice-recon-gstr {
-  .card-header .btn-link {
+.invoice-recon-gstr{
+  .card-header .btn-link{
     color: black !important;
     padding: 0px;
     text-transform: none;
   }
-
-  .card-header {
+  .card-header{
     border: none;
   }
-
-  .card {
+  .card{
     margin-bottom: 0px;
   }
-
-  .card-body {
+  .card-body{
     padding: 12px 0px;
     font-size: 13px;
     color: black;
@@ -157,27 +149,13 @@ table tr {
 }
 
 .file-upload {
-  .accordion .card-header .btn-link {
+  .accordion .card-header .btn-link{
     padding: 0px !important;
   }
-
-  #static-1 .card-body {
+  #static-1 .card-body{
     padding: 0px !important;
   }
-
-  .accordion .card {
+  .accordion .card{
     margin: 0px !important;
   }
-}
-
-.table tbody td:first-child {
-  padding-left: 8px !important;
-  // padding-left: 2rem !important;
-}
-
-
-table[_ngcontent-ddc-c177] td[_ngcontent-ddc-c177] {
-  padding: 4px 10px;
-  font-size: 13px;
-  border: 1px solid rgba(24, 23, 23, 0.3);
 }

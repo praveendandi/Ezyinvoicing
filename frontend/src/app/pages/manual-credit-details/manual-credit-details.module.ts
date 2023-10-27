@@ -16,6 +16,7 @@ import { QuillModule } from 'ngx-quill';
 import { TrimPipeModule } from './../../shared/pipes/trim.pipe';
 import { AmountToWordPipeModule } from 'src/app/shared/pipes/amount-to-word.pipe';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
+import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 
 
 @NgModule({
@@ -38,7 +39,8 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer';
     QuillModule.forRoot(),
     TrimPipeModule,
     AmountToWordPipeModule,
-    NgxJsonViewerModule
+    NgxJsonViewerModule,
+    PermissionButtonDirectiveModule
   ],
 })
 export class ManualCreditDetailsModule { }

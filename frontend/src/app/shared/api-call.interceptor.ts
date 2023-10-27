@@ -28,7 +28,8 @@ export class ApiCallInterceptor implements HttpInterceptor {
     // ApiUrls.summary_activity_log
     ApiUrls.posChecks,
     ApiUrls.summary_amendment,
-    ApiUrls.reconcilation
+    // ApiUrls.users,
+    ApiUrls.check_old_password 
   ]
 
   private cache = new Map<string, any>();
@@ -83,9 +84,6 @@ export class ApiCallInterceptor implements HttpInterceptor {
     if (request.url.includes('method/version2_app.clbs.doctype.summaries.summaries.summary_activity_log?')) {
       this.loader.hideLoader();
     }
-    if (request.url.includes('method/version2_app.version2_app.doctype.xml_parse.extract_xml')) {
-      this.loader.hideLoader();
-    }
     if (this.router.url.split("?")[0] == '/home/pos-bills' && request.url.includes('method/upload_file')) {
       this.loader.hideLoader();
     }
@@ -137,7 +135,6 @@ export class ApiCallInterceptor implements HttpInterceptor {
       if (err.status === 401 || err.error.exc_type == "CSRFTokenError") {
         //  this.toastr.show("Session Expired")
         localStorage.clear()
-        sessionStorage.removeItem("SelItem");
         // this.toastr.show("Session Expired")
         this.router.navigate(['']);
       }

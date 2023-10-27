@@ -4,13 +4,14 @@
     <div class="col-md-9 col-lg-9">
       <div class="d-flex">
         <h4 class="font-weight-bold text-white">Roles</h4>
+        <button class="create btn btn-primary" (click)="addRoles(rolesModel)" appPermissionButton accessType="create" moduleType="docType"><i class="ri-add-line"></i></button>
       </div>
     </div>
     <div class="col-lg-3 col-md-3">
       <div class="position-relative mt-2 mt-lg-0 mt-md-0">
         <input type="search" class="form-control pl-5" [(ngModel)]="filters.search"
           (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)" #search
-          placeholder="Search">
+          placeholder="Search by name">
         <span class="search"><i class="ri-search-line"></i></span>
       </div>
     </div>
@@ -25,7 +26,8 @@
             <th>Name</th>
             <!-- <th>Role</th> -->
             <th>Last Modified </th>
-            <th>Users</th>
+            <th>Status</th>
+            <!-- <th>Users</th> -->
           </tr>
         </thead>
         <tbody>
@@ -35,7 +37,14 @@
             <td>{{item?.name}}</td>
             <!-- <td>{{item?.role_name}}</td> -->
             <td> {{item?.modified | date:["MMM d, y, h:mm a"]}}</td>
-            <td><a (click)="ShowUsers(item,i)">Show Users</a></td>
+            <!-- <td><a (click)="ShowUsers(item,i)">Show Users</a></td> -->
+            <td>
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="status{{i}}" [(ngModel)]="item.status"
+                    #status{{i}}="ngModel" name="status{{i}}" (change)=" switchStatus(item)" [disabled]="item.name == 'ezy-admin'">
+                    <label class="custom-control-label" for="status{{i}}"><small></small></label>
+            </div>
+            </td>
           </tr>
 
         </tbody>
@@ -63,8 +72,56 @@
         <li *ngFor="let item of usersList">
           {{item | titlecase}}
         </li>
+        <p *ngIf="usersList.length == 0" class="text-center"> No Users</p>
       </ul>
     </div>
   </div>
 
+</ng-template>
+
+<ng-template #rolesModel let-modal>
+  <div class="modal-header">
+      <div class="d-flex justify-content-between flex-grow-1">
+        <h5 class="mb-0" id="modal-basic-title flex-grow-1">Create Role</h5>
+      </div>
+  
+      <button type="button" class="close mx-0" aria-label="Close" (click)="modal.close()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="addRolesForm(form,modal)" #form="ngForm">
+          <div class="row mx-3">
+              <div class="col-md-12 my-1">
+
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">ezy-</span>
+                  </div>
+                  <input id="role_name" class="form-control" autocomplete="off" type="text" name="role_name" appAlphaInput [(ngModel)]="rolesObj.role_name"
+                  #role_name="ngModel" placeholder="Enter Role Name" required >
+                  <br/>
+                  <small class="text-danger" *ngIf="form.submitted && role_name?.errors?.required">Required</small>
+                </div>
+
+                <!-- <div class="input-group mb-3 d-flex justify-content-center">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">ezy-</span>
+                  </div>
+                  <div class="form-group has-float-label">
+                      <input id="role_name" class="form-control" autocomplete="off" type="text" name="role_name" appAlphaInput [(ngModel)]="rolesObj.role_name"
+                      #role_name="ngModel" placeholder="Enter Role Name" required>
+                      <label class="form-label" for="role_name">Role Name</label>
+                    <small class="text-danger" *ngIf="form.submitted && role_name?.errors?.required">Required</small>
+                  </div>
+                </div> -->
+                  
+              </div>
+          </div>
+          <div class="d-flex justify-content-center mt-4">
+              <button type="button" (click)="modal.close()" class="btn btn-sm btn-outline-dark mx-1">Cancel</button>
+              <button type="submit" class="btn btn-sm btn-primary ml-20 mx-1">Save</button>
+          </div>
+      </form>
+    </div>
 </ng-template>

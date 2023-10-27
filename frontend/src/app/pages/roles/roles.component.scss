@@ -13,3 +13,23 @@ table {
     font-size: 14px;
     border: 1px solid rgba(221, 218, 218, 0.3);
 }
+
+.role-section{
+    .cursor-pointer{
+        text-decoration: none;
+    }
+  
+}
+.input-group-text{
+    font-size: 13px !important;
+    padding: 8px;
+}
+.ezy_fixed_text{
+    border: solid 1px;
+    border-radius: 3px;
+    padding: 5px;
+}
+.roleDefault{
+    color: #FE5358;
+    font-size: 6px;
+}

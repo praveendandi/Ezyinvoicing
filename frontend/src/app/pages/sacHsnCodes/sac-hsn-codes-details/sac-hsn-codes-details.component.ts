@@ -39,10 +39,10 @@ export class SacHsnCodesDetailsComponent implements OnInit {
     this.changeCompany();
   }
   getPermissions(): void {
-    const queryParams: any = {}
-    queryParams["doctype"] = Doctypes.sacCodes;
-    queryParams["name"] = this.paramsData?.id;
-    this.http.get(ApiUrls.permissions, { params: queryParams }).subscribe((res: any) => {
+    const queryParams :any ={}
+    queryParams["doctype"]=Doctypes.sacCodes;
+    queryParams["name"]= this.paramsData?.id;
+    this.http.get(ApiUrls.permissions,{params: queryParams}).subscribe((res:any)=>{
       this.userService.setUser(res)
     })
   }
@@ -74,8 +74,6 @@ export class SacHsnCodesDetailsComponent implements OnInit {
     })
   }
   onSubmit(form: NgForm): void {
-    debugger
-
     if (form) {
       if (this.paramsData.type === "edit") {
         this.http.put(`${ApiUrls.sacHsn}/${this.paramsData.id}`, form.value).subscribe((res: any) => {

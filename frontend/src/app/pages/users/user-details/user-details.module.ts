@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.directive';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NoWhiteSpaceInputDirectiveModule } from 'src/app/shared/directives/no-whitespaces.directive';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     FormsModule,
     PermissionButtonDirectiveModule,
     MatInputDirectiveModule,
-    NgSelectModule
+    NgSelectModule,
+    NoWhiteSpaceInputDirectiveModule
   ]
 })
 export class UserDetailsModule { }

@@ -18,11 +18,9 @@ import { environment } from 'src/environments/environment';
 export class CompanyDetailsComponent implements OnInit {
   @ViewChild('fontFileInp') fontFileHtmlRef: ElementRef;
   @ViewChild('form') companyForm: NgForm;
-  
   companyDetails: any = {};
   viewOnly = false;
   filename;
-  usertype:any=''
   fileToUpload;
   loginUser: any = {}
   loginUSerRole;
@@ -30,7 +28,7 @@ export class CompanyDetailsComponent implements OnInit {
   bankDetails: any = {};
   clbsSettings: any = {}
   scSlabRatesCount: any = {}
-  syncConfig: any = {};
+  syncConfig: any={};
   userName;
   UserSignature: any = {};
   signature_img: any = {}
@@ -49,11 +47,8 @@ export class CompanyDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    
     this.loginUser = JSON.parse(localStorage.getItem('login'))
-    console.log(this.loginUser.roles)
-    this.usertype=this.loginUser.roles[0].role
-    this.loginUSerRole = this.loginUser.rolesFilter.some((each: any) => (each == 'ezy-IT' || each == 'ezy-Finance'))
+    this.loginUSerRole = this.loginUser.rolesFilter.some((each: any) => (each.toLowerCase() == 'ezy-it' || each.toLowerCase() =='ezy-finance' || each.toLowerCase() =='ezy-admin' ))
     console.log(this.loginUSerRole)
     const params = this.activatedRoute.snapshot.params;
     this.viewOnly = !!params.id;
@@ -78,29 +73,28 @@ export class CompanyDetailsComponent implements OnInit {
         this.scSlabRatesCount.min = res.data?.sc_slab_12_starting_range;
         this.scSlabRatesCount.max = res.data?.sc_slab_12_end_range
 
-        if (this.companyDetails.ezy_gst_module == '1') {
+        if(this.companyDetails.ezy_gst_module == '1' ){
           this.getSyncConfig();
         }
-
         console.log(res, "====", this.scSlabRatesCount.max);
       });
-      this.http.get(`${ApiUrls.resource}/${Doctypes.bankDetails}`, {
-        params: {
-          filters: JSON.stringify([['company', '=', params.id]]),
+      this.http.get(`${ApiUrls.resource}/${Doctypes.bankDetails}`,{
+        params:{
+          filters: JSON.stringify([['company','=',params.id]]),
           fields: JSON.stringify(['*'])
         }
-      }).subscribe((res: any) => {
-        if (res?.data.length) {
+      }).subscribe((res:any)=>{
+        if(res?.data.length){
           this.bankDetails = res.data[0];
         }
       })
     }
     this.getClbsSettings();
-
+    
     this.getSyncShedule();
   }
 
-
+  
 
 
   handleFileInput(files: File[], field_name) {
@@ -114,7 +108,6 @@ export class CompanyDetailsComponent implements OnInit {
       // formData.append('doctype', this.companyDetails.doctype);
       // formData.append('fieldname', field_name);
       formData.append('docname', this.companyDetails.company_code);
-      // console.log(this.companyDetails.company_code)
       this.http.post(ApiUrls.uploadFile, formData).subscribe((res: any) => {
         if (res.message.file_url) {
           if (field_name === 'invoice_reinitiate_parsing_file') {
@@ -223,7 +216,7 @@ export class CompanyDetailsComponent implements OnInit {
       formData.append('docname', this.companyDetails?.company_code);
       this.http.post(ApiUrls.uploadFile, formData).subscribe((res: any) => {
         if (res.message.file_url) {
-          this.signature_pfx = res.message.file_url
+           this.signature_pfx = res.message.file_url
 
           // if (field_name === 'signature') {
           //   this.companyDetails['signature'] = res.message.file_url
@@ -256,7 +249,7 @@ export class CompanyDetailsComponent implements OnInit {
       formData.append('docname', this.companyDetails?.company_code);
       this.http.post(ApiUrls.uploadFile, formData).subscribe((res: any) => {
         if (res.message.file_url) {
-          this.signature_img = res.message.file_url
+           this.signature_img = res.message.file_url
 
         }
       })
@@ -278,10 +271,10 @@ export class CompanyDetailsComponent implements OnInit {
   }
 
   saveSignature(modal) {
-    let data = {};
-    this.signature_pfx ? data['signature_pfx'] = this.signature_pfx : ''
-    this.pfx_password ? data['pfx_password'] = this.pfx_password : ''
-    this.signature_img ? data['signature_image'] = this.signature_img : ''
+    let data={};
+    this.signature_pfx ? data['signature_pfx'] = this.signature_pfx:''
+    this.pfx_password? data['pfx_password'] = this.pfx_password:''
+    this.signature_img? data['signature_image'] = this.signature_img:''
 
     if (data) {
       this.http.put(ApiUrls.company + `/${this.companyDetails?.name}`, data).subscribe((res: any) => {
@@ -291,7 +284,7 @@ export class CompanyDetailsComponent implements OnInit {
           this.toaster.success('Saved');
           this.modal.dismissAll()
           // window.location.reload();
-        } else {
+        }else {
           this.toaster.error("Failed")
         }
       })
@@ -340,18 +333,18 @@ export class CompanyDetailsComponent implements OnInit {
         this.http.put(ApiUrls.company + `/${this.companyDetails?.name}`, data).subscribe((res: any) => {
           if (res) {
             localStorage.setItem("company", JSON.stringify(res.data))
-            if (res.data.ezy_gst_module == '1') {
+            if(res.data.ezy_gst_module == '1' ){
               this.updateSyncConfig();
             }
             // this.ngOnInit();
             this.toaster.success('Saved');
             window.location.reload();
-          } else {
+          }else {
             this.toaster.error("Failed")
           }
         })
       }
-
+     
       this.sheduleUpdate();
       // delete data.font_file;
       // Object.keys(data).forEach(key => {
@@ -431,21 +424,21 @@ export class CompanyDetailsComponent implements OnInit {
   }
 
 
-  save_bank_details() {
-    this.http.put(`${ApiUrls.resource}/${Doctypes.bankDetails}/${this.bankDetails?.name}`, {
-      data: this.bankDetails
-    }).subscribe((res: any) => {
-      if (res?.data) {
+  save_bank_details(){
+    this.http.put(`${ApiUrls.resource}/${Doctypes.bankDetails}/${this.bankDetails?.name}`,{
+      data:this.bankDetails
+    }).subscribe((res:any)=>{
+      if(res?.data){
         this.bankDetails = res.data;
       }
     })
   }
 
-  getClbsSettings() {
-    this.http.get(`${ApiUrls.clbsSettings}`).subscribe((res: any) => {
-      if (res?.data[0]) {
-        this.http.get(`${ApiUrls.clbsSettings}/${res?.data[0]?.name}`).subscribe((each: any) => {
-          if (each) {
+  getClbsSettings(){
+    this.http.get(`${ApiUrls.clbsSettings}`).subscribe((res:any)=>{
+      if(res?.data[0]){
+        this.http.get(`${ApiUrls.clbsSettings}/${res?.data[0]?.name}`).subscribe((each:any)=>{
+          if(each){
             this.clbsSettings = each?.data;
           }
         })
@@ -455,53 +448,53 @@ export class CompanyDetailsComponent implements OnInit {
 
   getSyncShedule() {
     let queryParams = {
-      doctype: Doctypes.EzygstSettings,
-      name: Doctypes.EzygstSettings
+      doctype:Doctypes.EzygstSettings,
+      name:Doctypes.EzygstSettings
     }
-    this.http.get(`${ApiUrls.getSync}`, { params: queryParams }).subscribe((res: any) => {
+    this.http.get(`${ApiUrls.getSync}`,{params:queryParams}).subscribe((res: any) => {
       this.ezygstSettings = res.docs[0];
       console.log('========', this.ezygstSettings);
     })
   }
 
-  sheduleUpdate() {
+  sheduleUpdate(){
     let obj = {
-      doctype: Doctypes.EzygstSettings,
-      name: Doctypes.EzygstSettings,
+      doctype:Doctypes.EzygstSettings,
+      name:Doctypes.EzygstSettings,
       sync_schedule_time: this.ezygstSettings?.sync_schedule_time,
       creation: this.ezygstSettings?.creation,
       modified: this.ezygstSettings?.modified
     }
     let formData = new FormData()
-    formData.append('action', 'Save')
+    formData.append('action','Save')
     formData.append('doc', JSON.stringify(obj));
-    this.http.post(`${ApiUrls.fileSave}`, formData).subscribe((res: any) => {
-      if (res?.data) {
+    this.http.post(`${ApiUrls.fileSave}`,formData).subscribe((res:any)=>{
+      if(res?.data){
         this.ezygstSettings = res.docs[0];
         this.toaster.success('Updated')
       }
     })
   }
+  
 
-
-  save_qr_details() {
+  save_qr_details(){
     console.log(this.clbsSettings?.name)
-    if (this.clbsSettings?.name) {
-      this.http.put(`${ApiUrls.clbsSettings}/${this.clbsSettings?.name}`, { data: this.clbsSettings }).subscribe((res: any) => {
-        if (res?.data) {
-          this.clbsSettings = res.data;
-          this.toaster.success('Updated')
-        }
-      })
-    } else {
-      this.clbsSettings['company'] = this.companyDetails.company_code
-      this.http.post(`${ApiUrls.clbsSettings}`, { data: this.clbsSettings }).subscribe((res: any) => {
-        if (res?.data) {
-          this.clbsSettings = res.data;
-          this.toaster.success('Updated')
-        }
-      })
-    }
+    if(this.clbsSettings?.name){
+    this.http.put(`${ApiUrls.clbsSettings}/${this.clbsSettings?.name}`,{data:this.clbsSettings}).subscribe((res:any)=>{
+      if(res?.data){
+        this.clbsSettings = res.data;
+        this.toaster.success('Updated')
+      }
+    })
+  }else{
+    this.clbsSettings['company']=this.companyDetails.company_code
+    this.http.post(`${ApiUrls.clbsSettings}`,{data:this.clbsSettings}).subscribe((res:any)=>{
+      if(res?.data){
+        this.clbsSettings = res.data;
+        this.toaster.success('Updated')
+      }
+    })
+  }
   }
 
   getSyncConfig() {
@@ -514,12 +507,11 @@ export class CompanyDetailsComponent implements OnInit {
   updateSyncConfig() {
 
     let form = new FormData()
-    form.append('doc', JSON.stringify(this.syncConfig))
-    form.append('action', 'Save')
-    this.http.post(`${ApiUrls.fileSave}`, form).subscribe((res: any) => {
+    form.append('doc',JSON.stringify(this.syncConfig))
+    form.append('action','Save')
+    this.http.post(`${ApiUrls.fileSave}`,form).subscribe((res: any) => {
       this.syncConfig = res.docs[0];
     })
   }
- 
 
 }

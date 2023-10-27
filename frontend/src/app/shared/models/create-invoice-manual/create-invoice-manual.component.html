@@ -8,6 +8,9 @@
     <div class="modal-body px-4 pt-2 pb-4">
         <form #form="ngForm" (ngSubmit)="onSubmit(form)">
             <div class="row">
+
+
+
                 <div class="col-md-12 addCredit mb-2">
                     <h5><strong>Tax Payer Details</strong></h5>
                 </div>
@@ -15,7 +18,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <input placeholder="Enter GST Number *" type="text" appMatInput class="form-control text-uppercase" id="gst_number" name="gst_number" (ngModelChange)="changeDescription($event)" minlength="15" maxlength="15" appValidateGST [(ngModel)]="taxPayerDetails.gst_number"
-                            #gst_number="ngModel" >
+                            #gst_number="ngModel" required>
                     </div>
                 </div>
 

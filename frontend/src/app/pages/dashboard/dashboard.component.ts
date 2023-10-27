@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ApiUrls } from '../../shared/api-urls';
@@ -11,7 +11,7 @@ import {DateToFilter} from 'src/app/shared/date-filter'
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit,OnDestroy {
 
   invoices = {
     pending: 0,
@@ -91,6 +91,10 @@ export class DashboardComponent implements OnInit {
     // }
   }
 
+
+  ngOnDestroy(): void {
+    
+  }
   getInvoices(): void {
     const pendingParams: any = { filters: [['irn_generated', '=', 'Pending']] };
     pendingParams.filters.push(new DateToFilter('Invoices', this.dateFilters).filter);

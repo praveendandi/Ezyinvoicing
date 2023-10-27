@@ -143,7 +143,8 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
   tabType: any = 'pfx';
   eTaxInvoiceDownloadBtn: any;
   syncList: any = {}
-  checkIRNdate: any;
+  checkIRNdate :any = false;
+
   constructor(
     private modal: NgbModal,
     private http: HttpClient,
@@ -160,7 +161,6 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    console.log(this.invoiceInfo, "=========")
     this.stateCodes = stateCode;
     this.companyDetails = JSON.parse(localStorage.getItem('company'))
     console.log(this.companyDetails.vat_reporting)
@@ -189,28 +189,24 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
       const params = this.activatedRoute.snapshot.params;
       if (params.id) {
         this.http.get(ApiUrls.invoices + '/' + params.id).subscribe((res: any) => {
-          console.log(res, '999999999999')
           const temp = this.invoiceInfo.credit_note_items || [];
           if (res.data?.invoice_object_from_file) {
             res.data.invoice_object_from_file = JSON.parse(res.data.invoice_object_from_file)?.data || []
           }
           this.invoiceInfo = { ...res.data };
-          if (this.invoiceInfo?.company_gst) {
-            this.getGSTDetailsbyInvoice()
-          }
+          this.getGSTDetailsbyInvoice()
 
           let today_date: any = Moment(this.invoiceInfo?.invoice_date).format('YYYY-MM-DD')
-          let date_expiry: any = this.companyDetails?.e_invoice_missing_start_date ? Moment(this.companyDetails?.e_invoice_missing_start_date).format('YYYY-MM-DD') : null
-
-          if (this.companyDetails?.e_invoice_missing_date_feature && (today_date >= date_expiry)) {
+          let date_expiry: any = this.companyDetails?.einvoice_missing_start_date ? Moment(this.companyDetails?.einvoice_missing_start_date).format('YYYY-MM-DD') : null
+          
+          if (this.companyDetails?.einvoice_missing_date_feature && (today_date >= date_expiry)) {
             let today_date: any = Moment(new Date()).format('YYYY-MM-DD') // new Date()
-            let date_expiry: any = Moment(Moment(this.invoiceInfo.invoice_date).add(this.companyDetails.no_of_days_to_expiry, 'd').format('YYYY-MM-DD')) //new Date(this.invoiceInfo.invoice_date);
+            let date_expiry: any = Moment(Moment(this.invoiceInfo.invoice_date).add(7, 'd').format('YYYY-MM-DD')) //new Date(this.invoiceInfo.invoice_date);
             date_expiry = Moment(date_expiry).format('YYYY-MM-DD')
             this.invoiceInfo['expiry_date'] = Moment(date_expiry).format('YYYY-MM-DD') //date_expiry
             this.invoiceInfo['expiry_days'] = Moment(date_expiry).diff(Moment(today_date), 'days') // Math.round(Math.abs((date_expiry - today_date) / oneDay))            
             this.checkIRNdate = date_expiry < today_date
           }
-
           this.changeInvoiceForm = { ...res.data };
           this.maxItemDate = Moment(new Date(this.changeInvoiceForm.invoice_date)).format('YYYY-MM-DD');;
           this.sez = this.invoiceInfo?.sez == 1 ? true : false;
@@ -315,26 +311,22 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
   }
 
   getGSTDetailsbyInvoice() {
-    this.http.post(ApiUrls.get_tax_payer_details, { data: { "gstNumber": this.invoiceInfo?.company_gst, "code": this.companyDetails.name } }).subscribe((res: any) => {
-      console.log(res, "100000000000000000000")
-      if (res?.message?.success) {
-        // this.invoiceInfo['company_fssai_number'] = this.companyDetails?.fssai_number;
-        console.log(this.companyDetails, "777777777777")
-        // this.invoiceInfo['cin_number'] = this.companyDetails?.cin_number;
-        // this.invoiceInfo['tin_number'] = this.companyDetails?.tin_number;
+    this.http.get(ApiUrls.taxPayerDefault + '/' + this.invoiceInfo?.company_gst).subscribe((res: any) => {
+      if (res && res?.data && res?.data?.name) {
+        console.log(res);
+        this.invoiceInfo['company_fssai_number'] = this.companyDetails?.fssai_number;
         this.invoiceInfo['company_name'] = this.companyDetails?.company_name
-        this.invoiceInfo['company_legal_name'] = res?.message?.data?.legal_name;
-        this.invoiceInfo['company_address_1'] = res?.message?.data?.address_1
-        this.invoiceInfo['company_address_2'] = res?.message?.data?.address_2;
-        this.invoiceInfo['company_location'] = res?.message?.data?.location;
-        this.invoiceInfo['company_pincode'] = res?.message?.data?.pincode;
-        this.invoiceInfo['company_state_code'] = res?.message?.data?.state_code;
+        this.invoiceInfo['company_legal_name'] = res?.data?.legal_name;
+        this.invoiceInfo['company_address_1'] = res?.data?.address_1
+        this.invoiceInfo['company_address_2'] = res?.data?.address_2;
+        this.invoiceInfo['company_location'] = res?.data?.location;
+        this.invoiceInfo['company_pincode'] = res?.data?.pincode;
+        this.invoiceInfo['company_state_code'] = res?.data?.state_code;
         this.invoiceInfo['company_logo'] = this.companyDetails?.company_logo
-        this.invoiceInfo['company_place_of_supply'] = res?.message?.data?.state_code;
+        this.invoiceInfo['company_place_of_supply'] = res?.data?.state_code;
         this.invoiceInfo['custom_e_tax_invoice_logo_image'] = this.companyDetails?.custom_e_tax_invoice_logo_image
       }
     })
-
   }
 
   checkPOS() {
@@ -439,7 +431,7 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
   }
   /**Generate IRN */
   generateIrn(): void {
-    if (this.companyDetails?.e_invoice_missing_date_feature) {
+    if (this.companyDetails?.einvoice_missing_date_feature) {
       this.http.post(ApiUrls.validate_irn_gen_date, { "invoice_number": this.invoiceInfo?.invoice_number }).subscribe((resp: any) => {
         if (resp?.message?.success) {
           this.generateIRNFn()
@@ -1051,7 +1043,7 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
                 filters: JSON.stringify([['reference_name', '=', this.invoiceInfo.name], ['status', '!=', 'Sent']])
               }
             }).subscribe((res: any) => {
-              this.toastr.success('Email Sent Successfully ');
+              this.toastr.success('Email Successfully Sent');
               this.modal.dismissAll();
               // const formData = new FormData();
               // formData.append('name', res.data[0].name);
@@ -1074,7 +1066,6 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
     formData.append('template_name', this.emailTempData.template_name);
     formData.append('doc', JSON.stringify(this.invoiceInfo))
     this.http.post(ApiUrls.getEmailTempData, formData).subscribe((res: any) => {
-      console.log(res)
       this.emailTempData.subject = res.message.subject;
       this.emailTempData.message = res.message.message;
     })
@@ -1213,25 +1204,25 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
     const pages = pdfDoc.getPages();
     const firstPage = this.companyDetails?.qr_page == 'Last' ? pages[pages.length - 1] : pages[0];
     let sampleImg = qrPng ? this.apiDomain + qrPng : null;
-    if (this.invoiceInfo?.signature) {
-      // let sign = this.apiDomain+this.invoiceInfo?.signature_file;       
-      const imgBytes2 = await this.http.get(this.invoiceInfo?.signature, { responseType: 'arraybuffer' }).toPromise();
-      const signImage = await pdfDoc.embedPng(imgBytes2);
-      const jpgDims = signImage.scale(0.5)
-      console.log("signImage ====== ", signImage, signImage.height)
-      pages[pages.length - 1].drawImage(signImage, {
-        // x: 470,
-        // y: 10,
-        // width: 130,
-        // height: 110
-        // x: parseInt(this.invoiceInfo?.x1) - parseInt(this.invoiceInfo?.x0),
-        // y: parseInt(this.invoiceInfo?.bottom) - parseInt(this.invoiceInfo?.top),
-        x: parseInt(this.invoiceInfo?.x0),
-        y: parseInt(this.invoiceInfo?.x1),
-        width: 130, //parseInt(this.invoiceInfo?.x1)- parseInt(this.invoiceInfo?.x0), //130,
-        height: 110 // parseInt(this.invoiceInfo?.bottom)-parseInt(this.invoiceInfo?.top) //110
-      })
-    }
+    // if (this.invoiceInfo?.signature) {
+    //   // let sign = this.apiDomain+this.invoiceInfo?.signature_file;       
+    //   const imgBytes2 = await this.http.get(this.invoiceInfo?.signature, { responseType: 'arraybuffer' }).toPromise();
+    //   const signImage = await pdfDoc.embedPng(imgBytes2);
+    //   const jpgDims = signImage.scale(0.5)
+    //   console.log("signImage ====== ", signImage, signImage.height)
+    //   pages[pages.length - 1].drawImage(signImage, {
+    //     // x: 470,
+    //     // y: 10,
+    //     // width: 130,
+    //     // height: 110
+    //     // x: parseInt(this.invoiceInfo?.x1) - parseInt(this.invoiceInfo?.x0),
+    //     // y: parseInt(this.invoiceInfo?.bottom) - parseInt(this.invoiceInfo?.top),
+    //     x: parseInt(this.invoiceInfo?.x0),
+    //     y: parseInt(this.invoiceInfo?.x1),
+    //     width: 130, //parseInt(this.invoiceInfo?.x1)- parseInt(this.invoiceInfo?.x0), //130,
+    //     height: 110 // parseInt(this.invoiceInfo?.bottom)-parseInt(this.invoiceInfo?.top) //110
+    //   })
+    // }
     if (sampleImg) {
       const imgBytes = await this.http.get(sampleImg, { responseType: 'arraybuffer' }).toPromise();
       const pngImage = await pdfDoc.embedPng(imgBytes);
@@ -2494,7 +2485,6 @@ export class InvoiceDetailsComponent implements OnInit, OnDestroy {
     if (form.valid) {
       let dataObj = {
         invoice_number: this.invoiceInfo?.invoice_number,
-        tax_invoice_referrence_date: form.value.original_invoice_date,
         invoice_date: form.value.invoice_date,
         taxinvoice: form.value.taxinvoice == true ? "Yes" : "No",
         taxinvoice_number: this.companyDetails?.create_taxinvoice_raisecredit == 'Yes' ? form.value.taxinvoice_number : `${this.invoiceInfo.invoice_number}-1`

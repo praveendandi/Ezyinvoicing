@@ -12,9 +12,7 @@ import { ApiUrls, Doctypes } from '../../api-urls';
   styleUrls: ['./sac-hsn.component.scss']
 })
 export class SacHsnComponent implements OnInit {
-  saccodedisable: boolean = false
-  sacCodetaxable: boolean = false
-  sacCodeRevenue: boolean = false
+
   sacCodeDetails: any = {};
   viewType;
   sacid;
@@ -37,10 +35,6 @@ export class SacHsnComponent implements OnInit {
     console.log(this.sacHsnCodErr)
     this.company = JSON.parse(localStorage.getItem('company'));
     this.getSacCodes();
-    this.sacCode();
-    if (this.viewType) {
-      this.saccodedisable = false
-    }
   }
 
   getSacCodes() {
@@ -67,38 +61,12 @@ export class SacHsnComponent implements OnInit {
       // queryParams.name = this.editSacHsn.name;
       this.http.get(`${ApiUrls.sacHsn}/${sacName}`).subscribe((res: any) => {
         console.log(res);
-
         if (res.data) {
           this.sacCodeDetails = res.data;
-          console.log(this.sacCodeDetails)
           this.sacCodeDetails.one_sc_applies_to_all = this.sacCodeDetails?.one_sc_applies_to_all === 0 ? false : true;
           this.sacCodeDetails.inclusive_of_service_charge = this.sacCodeDetails?.inclusive_of_service_charge === 0 ? false : true;
           this.sacCodeDetails.ignore = this.sacCodeDetails?.ignore === 0 ? false : true;
           this.viewType = 'edit'
-          console.log(this.company.ezy_gst_module == "1")
-          if (this.company.ezy_gst_module == "1") {
-            if (this.sacCodeDetails.code == "996339") {
-              this.sacCodeDetails.taxble = "No"
-              this.sacCodeDetails.ignore_non_taxable_items = "0"
-              this.sacCodeRevenue = true
-              this.sacCodetaxable = true
-            }
-            else if (this.sacCodeDetails.code == "912345") {
-              this.sacCodeDetails.taxble = "No"
-              this.sacCodeDetails.ignore_non_taxable_items = "1"
-              this.sacCodeRevenue = true
-              this.sacCodetaxable = true
-            }
-            else {
-              this.sacCodetaxable = false
-              this.sacCodeRevenue = false
-            }
-
-          }
-          if (this.company.ezy_gst_module == "0") {
-            this.saccodedisable = false
-          }
-
         }
       })
 
@@ -114,20 +82,16 @@ export class SacHsnComponent implements OnInit {
         sgst: 0,
         igst: 0
       };
-
     }
     if (this.sacHsnCodErr) {
       this.sacCodeDetails.description = this.sacHsnCodErr;
     }
-
-
   }
 
   closeModal() {
     this.activeModal.close("close");
   }
   onSubmit(form: NgForm): void {
-
     console.log('====', form.value.is_service_charge_item)
     form.value['description'] = form.value.description.trimEnd();
     form.value['one_sc_applies_to_all'] = form.value.one_sc_applies_to_all == true ? 1 : 0;
@@ -152,7 +116,6 @@ export class SacHsnComponent implements OnInit {
 
         const formData = new FormData();
         formData.append('doc', JSON.stringify(form.value));
-        console.log(form.value)
         formData.append('action', 'Save');
         this.http.post(`${ApiUrls.fileSave}`, formData).subscribe((res: any) => {
           try {
@@ -191,85 +154,4 @@ export class SacHsnComponent implements OnInit {
     this.sacCodeDetails.sgst = e;
     this.sacCodeDetails.igst = e * 2;
   }
-
-  sacCode() {
-    let login_data = JSON.parse(localStorage.getItem('login'))
-    console.log(login_data)
-    // if (login_data.name == 'Administrator') {
-    //   this.saccodedisable = false
-    // }
-    // else {
-    //   this.saccodedisable = true
-
-    // }
-    if (this.company.ezy_gst_module == "1") {
-      console.log('ezygst enabled')
-
-      if (login_data.name == 'Administrator') {
-        this.saccodedisable = false
-      }
-      else {
-        this.saccodedisable = true
-      }
-    }
-    if (this.company?.ezy_gst_module == "0") {
-      console.log('ezygst disabled')
-      this.saccodedisable = false
-
-    }
-
-
-  }
-
-  numberOnly(event): boolean {
-    const charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-      return false;
-    }
-    return true;
-
-  }
-  saccodekeysup() {
-    setTimeout(() => {
-      console.log(this.sacCodeDetails.code)
-      if (this.company.ezy_gst_module == "1") {
-        if (this.sacCodeDetails.code == "996339") {
-          this.sacCodeDetails.taxble = "No"
-          this.sacCodeDetails.ignore_non_taxable_items = "0"
-          this.sacCodeRevenue = true
-          this.sacCodetaxable = true
-        }
-        else if (this.sacCodeDetails.code == "912345") {
-          this.sacCodeDetails.taxble = "No"
-          this.sacCodeDetails.ignore_non_taxable_items = "1"
-          this.sacCodeRevenue = true
-          this.sacCodetaxable = true
-        }
-        else {
-          this.sacCodetaxable = false
-          this.sacCodeRevenue = false
-        }
-      }
-      else {
-        this.saccodedisable = false
-      }
-
-
-    }, 200);
-
-  }
-  taxable_data(event) {
-    if (this.company.ezy_gst_module == "1") {
-      if (this.sacCodeDetails.taxble == "Yes") {
-        this.sacCodeDetails.ignore_non_taxable_items = "0"
-      }
-      else {
-        this.sacCodeDetails.ignore_non_taxable_items = "1"
-
-      }
-    }
-
-
-  }
-
 }

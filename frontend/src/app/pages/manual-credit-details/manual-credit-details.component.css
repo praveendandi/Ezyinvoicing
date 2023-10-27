@@ -223,8 +223,7 @@
 }
 
 .preview table {
-  /* page-break-after: always; */
-  page-break-inside: initial !important;
+  page-break-after: always;
 }
 
 .preview tr {
@@ -244,7 +243,7 @@
   width: 100%;
   text-align: left;
   -webkit-box-sizing: 0;
-  box-sizing: 0;
+          box-sizing: 0;
 }
 
 .preview .table-bordered td,
@@ -442,7 +441,7 @@
   border-radius: 4px 0 0 4px;
   overflow: hidden;
   -webkit-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
   cursor: pointer;
 }
 
@@ -452,9 +451,9 @@
 
 .settings img {
   -webkit-filter: invert(1);
-  filter: invert(1);
+          filter: invert(1);
   -webkit-animation: pulse 4s infinite linear;
-  animation: pulse 4s infinite linear;
+          animation: pulse 4s infinite linear;
 }
 
 .pdf-view2 object {
@@ -511,7 +510,7 @@
   width: 100%;
   text-align: left;
   -webkit-box-sizing: 0;
-  box-sizing: 0;
+          box-sizing: 0;
 }
 
 .preview .table-bordered td,
@@ -730,8 +729,8 @@ button:focus {
 .invoiceIcon {
   cursor: pointer;
   -webkit-box-pack: end;
-  -ms-flex-pack: end;
-  justify-content: flex-end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
 }
 
 .invoiceIcon i {
@@ -773,5 +772,4 @@ button:focus {
 .qrCode {
   margin-right: 29%;
 }
-
 /*# sourceMappingURL=manual-credit-details.component.css.map */

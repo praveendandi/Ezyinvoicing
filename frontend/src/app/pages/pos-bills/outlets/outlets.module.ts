@@ -6,6 +6,7 @@ import { OutletsComponent } from './outlets.component';
 import { FormsModule } from '@angular/forms';
 import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.directive';
 import { ValidateGSTDirectiveModule } from 'src/app/shared/directives/validate-gst.directive';
+import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { ValidateGSTDirectiveModule } from 'src/app/shared/directives/validate-g
     OutletsRoutingModule,
     FormsModule,
     MatInputDirectiveModule,
-    ValidateGSTDirectiveModule
+    ValidateGSTDirectiveModule,
+    PermissionButtonDirectiveModule
   ]
 })
 export class OutletsModule { }

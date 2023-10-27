@@ -1,17 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin } from 'rxjs';
-import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { ApiUrls, Doctypes } from 'src/app/shared/api-urls';
 import { DateToFilter } from 'src/app/shared/date-filter';
 import * as Moment from 'moment';
 import moment from 'moment';
 import { environment } from 'src/environments/environment';
 import { DateTimeAdapter } from 'ng-pick-datetime';
-import { SocketService } from 'src/app/shared/services/socket.service';
 
 class InvoicesFilter {
   /**
@@ -40,10 +39,9 @@ class InvoicesFilter {
   templateUrl: './invoice-reconcilation.component.html',
   styleUrls: ['./invoice-reconcilation.component.scss']
 })
-export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
+export class InvoiceReconcilationComponent implements OnInit {
   filters = new InvoicesFilter();
   onSearch = new EventEmitter();
-  private destroyEvents: EventEmitter<boolean> = new EventEmitter();
   invoiceList = [];
   current_date = new Date();
   seletedMonth;
@@ -55,48 +53,34 @@ export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
   filter_date: string;
   today = Moment(new Date()).format('YYYY-12');
 
-  // Min moment: February 12 2018, 10:30
+   // Min moment: February 12 2018, 10:30
   // min = new Date(2018, 1, 12, 10, 30);
 
-  // Max moment: April 21 2018, 20:30
+   // Max moment: April 21 2018, 20:30
 
   fromMaxDate = new Date()
   toMaxDate = new Date()
-  toMinDate = new Date(this.toMaxDate.getFullYear(), this.toMaxDate.getMonth(), 1)
-  fromDate = [new Date(this.toMaxDate.getFullYear(), this.toMaxDate.getMonth(), 1), null];
+  toMinDate =new Date(this.toMaxDate.getFullYear(), this.toMaxDate.getMonth(),1)
+  fromDate = [new Date(this.toMaxDate.getFullYear(), this.toMaxDate.getMonth(),1),null];
   toDate = [null, this.toMaxDate]
-  years = []
+  years= []
   apiDomain = environment.apiDomain;
   companyDetails;
-  searchObj: any = {}
-  uploadProgress = {
-    status: 'NO',
-    progress: 0,
-    label: 'Uploading',
-    color: "secondary",
-    data: null
-  }
-  excelUploadData = {
-    totalCount: 0,
-    createdCount: 0,
-    status: ''
-  }
-  upload_bulk_invoices_disable = false;
+  searchObj:any={}
   constructor(
     private http: HttpClient,
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private modal: NgbModal,
     public dateTimeAdapter: DateTimeAdapter<any>,
-    private toastr: ToastrService,
-    private socketService : SocketService
+    private toastr: ToastrService
   ) {
     dateTimeAdapter.setLocale('en-IN');
   }
 
   ngOnInit(): void {
     this.getYear()
-    this.onDateFilterMonthChange(null, null);
+    this.onDateFilterMonthChange(null,null);
     this.companyDetails = JSON.parse(localStorage.getItem('company'))
     this.filters.itemsPerPage = this.companyDetails?.items_per_page
 
@@ -122,66 +106,37 @@ export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
       }
     })
     this.getList();
-
-    this.socketService.newInvoice.pipe(takeUntil(this.destroyEvents)).subscribe((res: any) => {
-      console.log(" ==== res === ", res)
-      if (res?.message?.type == "simple_reconciliation_file_uploading") {
-        this.uploadProgress.status = 'STARTED'
-        this.excelUploadData.totalCount = res?.message?.total_invoice_count
-        // this.upload_bulk_invoices_disable = true
-        this.excelUploadData.createdCount = res?.message?.invoice_count // this.excelUploadData.createdCount + 1
-
-        this.uploadProgress.progress = (this.excelUploadData.createdCount * 100) / this.excelUploadData.totalCount
-        this.uploadProgress.data = res.message.data
-        this.uploadProgress.color = 'success';
-        this.uploadProgress.label = 'Processing Files Successful';
-        // setTimeout(() => {
-        //   this.uploadProgress.status = 'SUCCESS';
-          
-        // }, 1000);
-
-        
-      }
-      if (res?.message?.message === 'Simple reconciliation file uploaded') {
-        this.upload_bulk_invoices_disable = false;
-        this.getList()
-      }
-      if (res?.message?.type === 'simple_reconciliations_exception') {
-        // this.execeptionError = true
-        // this.execptionData = res?.message
-      }
-    })
   }
   fromDateSelected(dt) {
     var today = new Date();
-    let month = dt.getMonth() + 1;
+    let month = dt.getMonth()+1;
     let year = dt.getFullYear();
-    let daysInMonth = new Date(year, month, 0).getDate();
-    this.toMinDate = dt
-    if (dt.getMonth() + 1 == today.getMonth() + 1) {
-      console.log('same month')
-      this.toMaxDate = today
-    } else {
-      console.log('not same month')
-      this.toMaxDate = new Date(year, month - 1, daysInMonth)
-    }
+   let daysInMonth = new Date(year, month, 0).getDate();
+   this.toMinDate = dt
+   if(dt.getMonth()+1 == today.getMonth()+1){
+     console.log('same month')
+     this.toMaxDate =  today
+   }else{
+     console.log('not same month')
+     this.toMaxDate = new Date(year,month-1,daysInMonth)
+   }
 
-    if (this.fromDate && this.toDate) {
-      if (this.fromDate[0].getDate() > this.toDate[1].getDate() || this.fromDate[0].getMonth() != this.toDate[1].getMonth()) {
-        this.toDate = [null, null];
-      }
+  if(this.fromDate && this.toDate){
+    if(this.fromDate[0].getDate()>this.toDate[1].getDate() || this.fromDate[0].getMonth() != this.toDate[1].getMonth()){
+      this.toDate=[null, null];
     }
+  }
 
   }
 
-  getYear() {
+  getYear(){
     var currentYear = new Date().getFullYear()
     var startYear = 2021;
-    for (var i = startYear; i <= currentYear; i++) {
+    for(var i=startYear; i<= currentYear; i++){
       this.years.push(startYear++);
     }
     return this.years;
-  }
+ }
   updateRouterParams(): void {
     const temp = JSON.parse(JSON.stringify(this.filters));
     temp.search = JSON.stringify(temp.search);
@@ -286,21 +241,21 @@ export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
       this.updateRouterParams();
     }
   }
-  onDateFilterMonthChange(selectedDate, selectedYear) {
+  onDateFilterMonthChange(selectedDate,selectedYear) {
     try {
 
       let current_date = new Date();
-      let select_date = selectedDate ? new Date(selectedDate) : new Date()
-      this.filter_date = moment(select_date).format('YYYY-MM');
+      let select_date  = selectedDate ? new Date(selectedDate) : new Date()
+      this.filter_date =  moment(select_date).format('YYYY-MM');
       // current_date.setDate(current_date.getDate());
-      if (select_date.getMonth() + 1 <= 9) {
-        this.seletedMonth = selectedDate ? `${0}${select_date.getMonth() + 1}` : `${0}${current_date.getMonth() + 1}`;
+      if (select_date.getMonth()+1 <= 9) {
+        this.seletedMonth = selectedDate ? `${0}${select_date.getMonth() + 1}`:`${0}${current_date.getMonth() + 1}`;
       } else {
-        this.seletedMonth = selectedDate ? `${select_date.getMonth() + 1}` : `${current_date.getMonth() + 1}`;
+        this.seletedMonth = selectedDate ? `${select_date.getMonth() + 1}`:`${current_date.getMonth()+1}`;
       }
       // let year_value = select_date.getFullYear();
-      let year_value = selectedYear ? JSON.parse(selectedYear) : current_date.getFullYear()
-      this.selectedyear = year_value
+      let year_value = selectedYear ? JSON.parse(selectedYear):current_date.getFullYear()
+       this.selectedyear =year_value
       this.http.post(ApiUrls.reconcilationCount, { data: { month: this.seletedMonth, year: JSON.stringify(year_value) } }).subscribe((res: any) => {
         if (res?.message?.success) {
           if (res?.message?.data) {
@@ -337,11 +292,11 @@ export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
     let moadl = this.modal.open(xmlUpload, { centered: true, size: 'md', backdrop: 'static' })
 
     moadl.result.then((response: any) => {
-      console.log("=========res ", response)
+      console.log("=========res ",response)
       if (response) {
         setTimeout((res: any) => {
           this.getList()
-          this.onDateFilterMonthChange(this.seletedMonth, this.selectedyear)
+          this.onDateFilterMonthChange(this.seletedMonth,this.selectedyear)
         }, 1000)
       }
     })
@@ -371,7 +326,7 @@ export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
         this.http.post(ApiUrls.reconcilation, { file_list: response?.message?.file_url }).subscribe((res: any) => {
           if (!res?.message?.success) {
             this.toastr.error(res?.message?.message)
-          } else {
+          }else{
             this.uploadedFile = true;
           }
         })
@@ -379,35 +334,32 @@ export class InvoiceReconcilationComponent implements OnInit, OnDestroy {
       }
     })
   }
-  export(content: any) {
+  export(content:any){
     this.modal.open(content, { centered: true, size: 'md', backdrop: 'static' })
 
 
   }
-  download() {
-    if (!(this.fromDate[0] && this.toDate[1])) {
-      this.toastr.warning('Select Dates')
-      return
+  download(){
+    if(!(this.fromDate[0] && this.toDate[1])){
+     this.toastr.warning('Select Dates')
+     return
     }
     let fromDate = this.fromDate[0]
     let toData = this.toDate[1];
-    this.http.post(ApiUrls.reconciliation, {
-      start_date: Moment(new Date(fromDate)).format('YYYY-MM-DD'),
-      end_date: Moment(new Date(toData)).format('YYYY-MM-DD'),
+    this.http.post(ApiUrls.reconciliation,{
+      start_date:Moment(new Date(fromDate)).format('YYYY-MM-DD'),
+      end_date :Moment(new Date(toData)).format('YYYY-MM-DD'),
       // month:JSON.stringify(fromDate.getMonth()+1),//this.seletedMonth,
       // year :JSON.stringify(fromDate.getFullYear())//JSON.stringify(this.selectedyear)
-    }).subscribe((res: any) => {
-      if (res.message.success) {
+    }).subscribe((res:any)=>{
+      if(res.message.success){
         const link = document.createElement('a');
         link.setAttribute('target', '_blank');
-        link.setAttribute('href', this.apiDomain + res.message.file_url);
+        link.setAttribute('href', this.apiDomain+res.message.file_url);
         link.setAttribute('download', res.message.file_name);
         link.click();
         link.remove();
       }
     })
-  }
-  ngOnDestroy(): void {
-    this.destroyEvents.emit(true);
   }
 }

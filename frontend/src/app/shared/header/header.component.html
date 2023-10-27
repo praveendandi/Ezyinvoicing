@@ -81,13 +81,13 @@
                                     <button [ngClass]="{'link-active': activeLinkName == 'SAC/HSN Codes'}" [routerLink]="['/home/sac-hsn-codes']" (click)="selectedMenu('SAC/HSN Codes')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='SAC/HSN Codes'">SAC/HSN codes</button>
                                     <button [ngClass]="{'link-active': activeLinkName == 'Tax Payers Details'}" [routerLink]="['/home/tax-payers']" (click)="selectedMenu('Tax Payers Details')" routerLinkActive="router-link-active" ngbDropdownItem on-click="selectedValue.value='Tax Payers Details'">Tax payer
                                             details</button>
-                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'User Management'}" [routerLink]="['/home/users']" (click)="selectedMenu('User Management')" routerLinkActive="router-link-active" ngbDropdownItem
+                                    <button [ngClass]="{'link-active': activeLinkName == 'User Management'}" [routerLink]="['/home/users']" (click)="selectedMenu('User Management')" routerLinkActive="router-link-active" ngbDropdownItem
                                         on-click="selectedValue.value='User Management'">User Management</button>
-                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Role Management'}" [routerLink]="['/home/roles']" (click)="selectedMenu('Role Management')" routerLinkActive="router-link-active" ngbDropdownItem
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Role Management'}" [routerLink]="['/home/roles']" (click)="selectedMenu('Role Management')" routerLinkActive="router-link-active" ngbDropdownItem
                                         on-click="selectedValue.value='Role Management'">Role Management</button>
-                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Permissions'}" [routerLink]="['/home/permissions']" (click)="selectedMenu('Permissions')" routerLinkActive="router-link-active" ngbDropdownItem
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Permissions'}" [routerLink]="['/home/permissions']" (click)="selectedMenu('Permissions')" routerLinkActive="router-link-active" ngbDropdownItem
                                         on-click="selectedValue.value='Permissions'">Permissions</button>
-                                    <button *ngIf="(userData.full_name === 'Administrator' || SynchistoryUserRole) && companyDetails?.ezy_gst_module == 1" [ngClass]="{'link-active': activeLinkName == 'sync-history'}" [routerLink]="['/home/sync-history']" (click)="selectedMenu('sync-history')" routerLinkActive="router-link-active" ngbDropdownItem
+                                    <button *ngIf="companyDetails?.ezy_gst_module == 1" [ngClass]="{'link-active': activeLinkName == 'sync-history'}" [routerLink]="['/home/sync-history']" (click)="selectedMenu('sync-history')" routerLinkActive="router-link-active" ngbDropdownItem
                                         on-click="selectedValue.value='sync-history'">Sync History</button>
                                     <!-- <button *ngIf="companyDetails?.ezy_gst_module == 1 " (click)="selectedMenu('SYNC')" ngbDropdownItem>
                                         Sync History
@@ -99,22 +99,22 @@
                                 <h4 class="py-2">Reports</h4>
                                 <div class="">
                                     <button [ngClass]="{'link-active': activeLinkName == 'Reports'}" [routerLink]="['/home/reports']" (click)="selectedMenu('Reports')" routerLinkActive="router-link-active" on-click="selectedValue.value='Reports'" ngbDropdownItem>Reports</button>
-                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Deleted Documents'}" [routerLink]="['/home/deleted-documents']" (click)="selectedMenu('Deleted Documents')" routerLinkActive="router-link-active"
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Deleted Documents'}" [routerLink]="['/home/deleted-documents']" (click)="selectedMenu('Deleted Documents')" routerLinkActive="router-link-active"
                                         ngbDropdownItem on-click="selectedValue.value='Deleted Documents'">Deleted
                                             Documents</button>
-                                    <button *ngIf="userData.full_name === 'Administrator' || emailLogUsers" [ngClass]="{'link-active': activeLinkName == 'Email Logs'}" [routerLink]="['/home/email-logs']" (click)="selectedMenu('Email Logs')" routerLinkActive="router-link-active" ngbDropdownItem
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Email Logs'}" [routerLink]="['/home/email-logs']" (click)="selectedMenu('Email Logs')" routerLinkActive="router-link-active" ngbDropdownItem
                                         on-click="selectedValue.value='Email Logs'">Email Logs</button>
-                                    <button *ngIf="userData.full_name === 'Administrator' || loginUSerRole" [ngClass]="{'link-active': activeLinkName == 'Update Logs'}" [routerLink]="['./bench-logs']" routerLinkActive="router-link-active" ngbDropdownItem>Update Logs</button>
+                                    <button [ngClass]="{'link-active': activeLinkName == 'Update Logs'}" [routerLink]="['./bench-logs']" routerLinkActive="router-link-active" ngbDropdownItem>Update Logs</button>
                                     <button [ngClass]="{'link-active': activeLinkName == 'Document Bin'}" [routerLink]="['./document-bin']" routerLinkActive="router-link-active" ngbDropdownItem>Document Bin</button>
 
                                 </div>
                             </div>
 
-                            <ng-container *ngIf="userData.full_name === 'Administrator' || !loginFrontOfcUser || checkPOSvthFrontOfc || loginUSerRole">
+                            <ng-container >
                                 <div class="col" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
                                     <h4 class="py-2">Ezy Sign</h4>
 
-                                    <ng-container *ngIf="userData.full_name === 'Administrator'|| loginUSerRole || (!loginFrontOfcUser && !checkPOSvthFrontOfc)">
+                                    <ng-container>
                                         <div class="" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
 
                                             <div *ngIf="companyDetails?.pos_bills_module == 'Enable'" class="pt-1">
@@ -143,32 +143,18 @@
                                         </div>
                                     </ng-container>
 
-                                    <ng-container *ngIf="checkPOSvthFrontOfc">
-                                        <div class="" *ngIf="companyDetails?.sign_ezy_module == '1' || companyDetails?.pos_bills_module == 'Enable'">
-
-                                            <div *ngIf="companyDetails?.pos_bills_module == 'Enable'" class="pt-1">
-                                                <button (click)="toggle('first')" class="btn btn-default p-0 c-men ">
-                                            <span>POS Bills  <i class="float-right" [ngClass]="{'ri-arrow-down-s-line': isCollapsed, 'ri-arrow-right-s-line' : !isCollapsed}"></i></span>
-                                    </button>
-                                                <div class="ml-1" *ngIf="isCollapsed">
-                                                    <button [ngClass]="{'link-active': activeLinkName == 'POS Bills'}" routerLinkActive="router-link-active" [routerLink]="['./pos-bills']" class="dropdown-item">POS Checks</button>
-                                                </div>
-                                            </div>
-
-
-                                        </div>
-                                    </ng-container>
+                                   
                                 </div>
 
                             </ng-container>
 
-                            <div class="col" *ngIf="(userData.full_name === 'Administrator'|| loginUSerRole) && companyDetails?.payment_reconciliation == 1 ">
+                            <div class="col" *ngIf="companyDetails?.payment_reconciliation == 1 ">
                                 <h4 class="py-2">Credit Card Recon</h4>
                                 <div>
                                     <button [ngClass]="{'link-active': activeLinkName == 'Payment Reconciliation'}" [routerLink]="'./payment-reconciliation'" routerLinkActive="router-link-active" ngbDropdownItem>Payment Reconciliation</button>
                                 </div>
                             </div>
-                            <div class="col" *ngIf="userData.full_name === 'Administrator'|| loginUSerRole">
+                            <div class="col">
                                 <h4 class="py-2">Settings</h4>
                                 <div>
                                     <button [ngClass]="{'link-active': activeLinkName == 'Company'}" [routerLink]="'./company-details/'+companyDetails?.name" routerLinkActive="router-link-active" [queryParams]="{view:true}" ngbDropdownItem>Company</button>
@@ -265,7 +251,7 @@
 
                 <div class="btn-group wotToggleDrDwn text-dark d-block" ngbDropdown role="group">
                     <button class="btn text-white border btn-block border-0 p-2 " ngbDropdownToggle><strong><i
-                                    class="ri-user-3-fill px-2 text-white"></i>{{userData.full_name}}</strong></button>
+                                    class="ri-user-3-fill px-2 text-white"></i>{{loginUser?.full_name}}</strong></button>
                     <div class="dropdown-menu text-center" ngbDropdownMenu>
                         <!-- <button *ngIf="userData.full_name === 'Administrator'"
                                 [routerLink]="'./company-details/'+company?.name" [queryParams]="{view:true}"
@@ -279,8 +265,8 @@
                             <button (click)="documentBin()" ngbDropdownItem>Document Bin</button> -->
                         <!-- <button (click)="diagnostic()" ngbDropdownItem>Diagnostic</button> -->
                         <button (click)="changePassword(content)" ngbDropdownItem>Change Password</button>
-                        <button (click)="aboutUpdates(aboutContent)" ngbDropdownItem>About</button>
-                        <button [routerLink]="['/']" (click)="logout()" ngbDropdownItem>Sign Out</button>
+                        <!-- <button (click)="aboutUpdates(aboutContent)" ngbDropdownItem>About</button> -->
+                        <button (click)="logout()" ngbDropdownItem>Sign Out</button>
                     </div>
                 </div>
             </div>
@@ -296,26 +282,46 @@
 
 <ng-template #content let-modal>
     <div class="modal-header border-0">
-        <h6 id="modal-basic-title"><strong></strong></h6>
+        <h6 id="modal-basic-title"><strong> Change Password</strong></h6>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
-    <div class="modal-body text-center">
-        <form>
-            <div class="form-group">
-                <input [(ngModel)]="new_password" appMatInput id="newPassword" class="form-control" type="password" name="new_password" required>
+    <div class="modal-body">
+        <form #form="ngForm">
+            <div class="form-group ">
+                <input [(ngModel)]="change_user_details.old_password" appMatInput id="old_password" class="form-control" type="password" name="old_password" #old_password="ngModel" (ngModelChange)="check_old_password($event)" required>
+                <label for="old_password" class="mat-label">Old Password</label>
+                <small class="text-danger" *ngIf="wrong_password == 'Incorrect User or Password'">{{wrong_password}}</small>
+                <small class="text-success" *ngIf="wrong_password == 'Password matched'" >{{wrong_password}}</small>
+            </div>
+            <div class="form-group ">
+                <input [(ngModel)]="change_user_details.new_password" appMatInput id="newPassword" class="form-control" type="password" name="new_password" #new_password="ngModel" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,20}$" maxlength="20" required>
                 <label for="newPassword" class="mat-label">New Password</label>
+                <small class="text-mute note-font"><b>Note </b> : should contain special characters and alphanumeric with min 6 and max 20 characters</small><br>
+                <small class="text-danger" *ngIf="form.submitted && new_password?.errors?.required ">Required</small>
+                <small class="text-danger" *ngIf="form.submitted && new_password.errors.pattern">Check password pattern</small>
+                <small class="text-danger" *ngIf="new_password?.value && (new_password?.value == old_password?.value)">Try new password</small>
+            </div>
+
+            <div class="form-group">
+                <input appMatInput id="confirmPassword" class="form-control" type="password" name="confirmPassword" [(ngModel)]="change_user_details.confirmPassword" #confirmPassword="ngModel" required>
+                <label for="confirmPassword" class="mat-label">Confirm Password</label>
+                <small class="text-danger" *ngIf="new_password?.value != confirmPassword?.value && confirmPassword?.value">password mismatch</small>
+            </div>
+
+            <div class=" d-flex justify-content-center py-3">
+                <button type="button" class="btn btn-outline-dark mx-2" (click)="modal.close('Save click')">Cancel</button>
+                <button type="button" (click)="onSubmit(form)" [disabled]="form.valid && (wrong_password == 'Incorrect User or Password' ||  new_password?.value != confirmPassword?.value || (new_password?.value == old_password?.value))"  class="btn btn-primary">Confirm</button>
+        
             </div>
         </form>
         <!-- <h6>Do you want to change password?</h6> -->
 
-    </div>
-    <div class="modal-footer border-0 d-block text-center pb-4">
-        <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button>
-        <button type="button" (click)="onSubmit()" class="btn btn-primary">Confirm</button>
+
 
     </div>
+    
 </ng-template>
 
 <ng-template #selectPrinter let-modal>

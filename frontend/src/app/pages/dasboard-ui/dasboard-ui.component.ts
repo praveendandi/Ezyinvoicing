@@ -1,27 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { ApiUrls, Doctypes } from 'src/app/shared/api-urls';
 import { DateToFilter } from 'src/app/shared/date-filter';
 import { environment } from 'src/environments/environment';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { Router } from '@angular/router';
-declare var $: any;
-class InvoicesFilter {
-  itemsPerPage = 1;
-  currentPage = 1;
-  totalCount = 0;
-  start = 0
-  active = 2;
-}
+
+
 @Component({
   selector: 'app-dasboard-ui',
   templateUrl: './dasboard-ui.component.html',
   styleUrls: ['./dasboard-ui.component.scss'],
 })
-export class DasboardUiComponent implements OnInit, AfterViewInit {
-  filters = new InvoicesFilter();
+export class DasboardUiComponent implements OnInit,AfterViewInit {
   diskSpace;
   freeSpace;
   diskPercent;
@@ -109,39 +101,35 @@ export class DasboardUiComponent implements OnInit, AfterViewInit {
   creditb2c = [];
   debitb2c = [];
   sacSummary = [];
-  companyDetails: any = {};
+  companyDetails: any;
   creditInvoiceLoader = false;
   progressbarLoader = false;
   missingInvoicesLoader = false;
   taxinvoicesLoader = false;
   taxb2bLoader = false;
   pending_IRN: any = []
-  invoice_recn_count: any = []
-  constructor(private http: HttpClient, private toastr: ToastrService, public pagination: NgbPaginationModule, private router: Router,) { }
+  constructor(private http: HttpClient, private toastr: ToastrService, private router : Router) { }
 
   ngOnInit(): void {
-
-    this.companyDetails = JSON.parse(localStorage.getItem('company'))
-
-    this.companyDetails = JSON.parse(localStorage.getItem('company'))
-
+    if(this.router.url === "/home/dashboard"){
+    this.companyDetails = JSON.parse(localStorage.getItem('company'))    
+    
     let today_date: any = moment(new Date()).format('YYYY-MM-DD')
-    let date_expiry: any = moment(this.companyDetails?.e_invoice_missing_start_date).format('YYYY-MM-DD')
-    if (this.companyDetails?.e_invoice_missing_date_feature && today_date >= date_expiry) {
+    let date_expiry: any = moment(this.companyDetails?.einvoice_missing_start_date).format('YYYY-MM-DD')
+    if (this.companyDetails?.einvoice_missing_date_feature && today_date >= date_expiry) {        
       this.get_invoice_Counts_for_irn();
-    } else {
+    }else{
       this.getGSTR();
     }
-
+     this.getDiskSpace();
+      this.getInvoiceCounts();
+      this.getTotalCount();
+      this.getInvoiceDetailsCount();      
+      this.getInvoiceReconcillation();
+    }
   }
-
   ngAfterViewInit(): void {
-    this.getDiskSpace();
-    this.getInvoiceCounts();
-    this.getTotalCount();
-    this.getInvoiceDetailsCount();
-    this.getGSTR();
-    this.getInvoiceReconcillation();
+       
   }
 
   getDiskSpace() {
@@ -222,6 +210,9 @@ export class DasboardUiComponent implements OnInit, AfterViewInit {
           }, {});
         }
       });
+
+      console.log(" == ",this.companyDetails)
+     
   }
 
   getGSTR() {
@@ -313,28 +304,9 @@ export class DasboardUiComponent implements OnInit, AfterViewInit {
     this.http.get(ApiUrls.missing_irn_generation).subscribe((res: any) => {
       if (res?.message.length) {
         this.pending_IRN = res?.message
-        this.invoice_recn_count = this.pending_IRN.map((each: any, index = 1) => {
-          console.log(each)
-          each['idx'] = index + 1
-          return each;
-        })
-        this.pending_IRN = this.pending_IRN.filter((each: any) => {
-          if (each?.idx <= 8) {
-            return each
-          }
-        })
       } else {
         this.toastr.error("Error Occured")
       }
     })
   }
-  downloadReport() {
-    this.http.post(ApiUrls.report_for_invoices, { report_type: 'due_in' }).subscribe((res: any) => {
-      if (res?.message?.success) {
-        window.open(`${this.apiDomain}${res?.message?.file_path}`, "_blank");
-      }
-    })
-  }
-
-
 }

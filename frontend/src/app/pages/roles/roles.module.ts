@@ -6,6 +6,7 @@ import { RolesComponent } from './roles.component';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
+import { AlphaInputDirectiveModule } from 'src/app/shared/directives/alpha-input.directive';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permi
     RolesRoutingModule,
     FormsModule,
     NgxPaginationModule,
-    PermissionButtonDirectiveModule
+    PermissionButtonDirectiveModule,
+    AlphaInputDirectiveModule
   ]
 })
 export class RolesModule { }

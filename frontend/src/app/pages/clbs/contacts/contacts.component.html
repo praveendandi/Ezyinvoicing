@@ -4,7 +4,7 @@
         <div class="col-md-5 grid">
             <div class="d-flex align-items-center">
                 <h6 class="m-0"><b>Contacts ({{filters.totalCount}})</b></h6>
-                <button [routerLink]="[ '/clbs/create-contact' ]" [queryParams]="{prop:'Create'}" class="btn btn-primary btn-sm shadow ml-3" type="button"><b><i class="ri-add-line"></i></b></button>
+                <button [routerLink]="[ '/clbs/create-contact' ]" [queryParams]="{prop:'Create'}" class="btn btn-primary btn-sm shadow ml-3" type="button" appPermissionButton accessType="create"><b><i class="ri-add-line"></i></b></button>
             </div>
         </div>
 
@@ -75,7 +75,7 @@
                             </td>
                             <td class="d-flex">
                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="View" [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'View',name:item.name}" queryParamsHandling="merge" class="view mt-1 cursor-pointer"><i class="ri-eye-line btn-hover-gray p-1"></i></span>
-                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'Edit',name:item.name}" class="view pl-2 mt-1"><i class="ri-edit-box-line cursor-pointer btn-hover-gray p-1"></i></span>
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Edit" [routerLink]="['../../clbs/create-contact/']" [queryParams]="{prop:'Edit',name:item.name}" class="view pl-2 mt-1" appPermissionButton accessType="write"><i class="ri-edit-box-line cursor-pointer btn-hover-gray p-1"></i></span>
 
                             </td>
                         </tr>

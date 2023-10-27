@@ -8,7 +8,6 @@ import { forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { ApiUrls, Doctypes } from 'src/app/shared/api-urls';
 import { SacHsnComponent } from 'src/app/shared/models/sac-hsn/sac-hsn.component';
-import { environment } from 'src/environments/environment';
 class SacHsnFilter {
   /**
    * Limit start of company filter
@@ -42,17 +41,16 @@ class SacHsnFilter {
   styleUrls: ['./sac-hsn-codes.component.scss']
 })
 export class SacHsnCodesComponent implements OnInit, OnDestroy {
-
   filters = new SacHsnFilter();
   onSearch = new EventEmitter();
   codesDetails = [];
   p = 1;
-  apiDomain = environment.apiDomain;
+
   sacCodeDetails: any = {};
   sacid;
   viewType;
   company;
-  loginUser: any = {};
+  loginUser:any ={};
   loginUSerRole;
   status = false;
   companyDetails;
@@ -90,7 +88,7 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
     })
     this.getCodesData()
     this.loginUser = JSON.parse(localStorage.getItem('login'))
-    this.loginUSerRole = this.loginUser.rolesFilter.some((each: any) => (each == 'ezy-IT' || each == 'ezy-Finance'))
+    this.loginUSerRole = this.loginUser.rolesFilter.some((each:any)=> (each == 'ezy-IT' || each =='ezy-Finance'))
   }
 
 
@@ -159,9 +157,9 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
   //   });
   // }
 
-  getInactive() {
+  getInactive(){
     this.status = !this.status
-    console.log("Status ===", this.status)
+    console.log("Status ===",this.status)
     this.getCodesData();
   }
   getCodesCount(): void {
@@ -180,7 +178,7 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
       const queryParams: any = { filters: [] };
       if (this.status) {
         queryParams.filters.push(['status', 'like', `In-Active`]);
-      } else {
+      }else{
         queryParams.filters.push(['status', 'like', `Active`]);
       }
       if (this.filters.synced_to_erp) {
@@ -215,9 +213,9 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
       }
       const [count, data] = res;
       this.filters.totalCount = count.data[0].total_count;
-      data.data = data.data.map((each: any, index) => {
-        if (each) {
-          each.index = this.codesDetails.length + index + 1;
+      data.data = data.data.map((each:any,index)=>{
+        if(each){
+        each.index = this.codesDetails.length + index+1;
         }
         return each;
       })
@@ -232,8 +230,8 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
     });
   }
 
-  editHsn(item, sactype, type) {
-    console.log("item ====", item)
+  editHsn(item, sactype,type) {
+    console.log("item ====",item)
     this.sacid = item.name;
     this.viewType = sactype;
     this.sacCodeDetails.one_sc_applies_to_all = item?.one_sc_applies_to_all == 0 ? false : true;
@@ -253,13 +251,13 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
     })
     editSacCode.componentInstance.editSacHsn = item;
     editSacCode.componentInstance.editType = type;
-    editSacCode.result.then((res: any) => {
-      if (res == 'close') {
+    editSacCode.result.then((res:any)=>{
+      if(res == 'close'){
         this.getCodesData();
       }
-
-    }, (reason) => {
-      console.log(reason);
+      
+    },(reason)=>{
+      console.log(reason);     
     })
     this.getSac();
   }
@@ -313,7 +311,7 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
         }, (err) => {
           form.form.setErrors({ error: err.error.message });
         })
-      } else {
+      }else{
         form.form.markAllAsTouched();
       }
     }
@@ -331,28 +329,22 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
 
     };
     this.viewType = 'add'
-
     // this.modal.open(this.content, {
     //   size: 'lg',
     //   centered: true,
     //   windowClass: 'modal-sac',
     //   animation: false
     // });
-
     const modalData = this.modal.open(SacHsnComponent, {
       size: 'lg',
       centered: true,
       windowClass: 'modal-sac',
       animation: false
-
     });
 
     modalData.result.then((res: any) => {
       this.getCodesData();
-
     })
-
-
   }
 
   ngOnDestroy() {
@@ -362,14 +354,14 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
   checkPagination(): void {
     // console.log(this.codesDetails.length)
     // if(this.filters.itemsPerPage < this.codesDetails.length){
-    this.filters.currentPage = 1
-    this.updateRouterParams()
+      this.filters.currentPage = 1
+      this.updateRouterParams()
     // }else{
     //   this.updateRouterParams() 
     // }
   }
 
-  howToAddSac(addSacHsn) {
+  howToAddSac(addSacHsn){
     this.modal.open(addSacHsn, {
       size: 'xl',
       centered: true,
@@ -392,13 +384,8 @@ export class SacHsnCodesComponent implements OnInit, OnDestroy {
   // }
 
 
-  sacHsnType() {
-    this.http.get(ApiUrls.sac_code_details).subscribe((res: any) => {
-      console.log(res)
-      window.open(`${this.apiDomain}${res.message.file_path}`, "_blank");
-    })
-  }
 
+  
 
 
 }

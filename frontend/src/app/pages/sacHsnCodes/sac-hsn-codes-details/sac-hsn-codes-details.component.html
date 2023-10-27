@@ -41,7 +41,7 @@
                                         *ngIf="form.submitted && taxble?.errors?.required">Required</small>
                                 </div>
                             </div>
-                            <ng-template [ngIf]="sacCodeDetails.taxble === 'Yes'">
+                            <ng-template [ngIf]= "sacCodeDetails.taxble === 'Yes'">
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-group">
                                         <input type="text" appMatInput class="form-control" id="code" name="code"
@@ -97,7 +97,7 @@
                                             *ngIf="form.submitted && igst?.errors?.required">Required</small>
                                     </div>
                                 </div>
-                            </ng-template>
+                            </ng-template >
                             <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <select appMatInput name="status" id="status" class="custom-select"
@@ -133,7 +133,7 @@
                                     <label for="TransactionCode" class="mat-label">TransactionCode</label>
                                 </div>
                             </div>
-
+        
                             <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <label for="Type" class="mat-label">Is Service</label>
@@ -142,11 +142,10 @@
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
-                                    <small class="text-danger"
-                                        *ngIf="IsService.touched && IsService?.errors?.required">Required</small>
+                                    <small class="text-danger" *ngIf="IsService.touched && IsService?.errors?.required">Required</small>
                                 </div>
                             </div>
-
+        
                             <!-- <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <label for="Type" class="mat-label">Cess</label>
@@ -158,7 +157,7 @@
                                     <small class="text-danger" *ngIf="Cess.touched && Cess?.errors?.required">Required</small>
                                 </div>
                             </div> -->
-
+        
                             <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <label for="Type" class="mat-label">Net</label>
@@ -167,21 +166,21 @@
                                         <option value="Yes">Yes</option>
                                         <option value="No">No</option>
                                     </select>
-                                    <small class="text-danger"
-                                        *ngIf="Net.touched && Net?.errors?.required">Required</small>
+                                    <small class="text-danger" *ngIf="Net.touched && Net?.errors?.required">Required</small>
                                 </div>
                             </div>
-
-
+        
+        
                             <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <input type="text" appMatInput class="form-control" id="State Cess Rate"
-                                        name="state_cess_rate" [(ngModel)]="sacCodeDetails.state_cess_rate"
-                                        #StateCessRate="ngModel" required>
+                                        name="state_cess_rate"
+                                        [(ngModel)]="sacCodeDetails.state_cess_rate" #StateCessRate="ngModel"
+                                        required>
                                     <label for="StateCessRate" class="mat-label">State Cess Rate</label>
                                 </div>
                             </div>
-
+        
                             <!-- <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <label for="Type" class="mat-label">State Cess</label>
@@ -193,16 +192,17 @@
                                     <small class="text-danger" *ngIf="StateCess.touched && StateCess?.errors?.required">Required</small>
                                 </div>
                             </div> -->
-
+        
                             <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <input type="text" appMatInput class="form-control" id="Central Cess Rate"
-                                        name="central_cess_rate" [(ngModel)]="sacCodeDetails.central_cess_rate" #Central
-                                        Cess Rate="ngModel" required>
+                                        name="central_cess_rate"
+                                        [(ngModel)]="sacCodeDetails.central_cess_rate" #Central Cess Rate="ngModel"
+                                        required>
                                     <label for="Central Cess Rate" class="mat-label">Central Cess Rate</label>
                                 </div>
                             </div>
-
+        
                             <!-- <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <label for="Type" class="mat-label">Central Cess</label>
@@ -214,18 +214,20 @@
                                     <small class="text-danger" *ngIf="CentralCess.touched && CentralCess?.errors?.required">Required</small>
                                 </div>
                             </div> -->
-
-
-
-
+        
+                            
+        
+        
                             <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
-                                    <input type="text" appMatInput class="form-control" id="VatRate" name="vat_rate"
-                                        [(ngModel)]="sacCodeDetails.vat_rate" #VatRate="ngModel" required>
+                                    <input type="text" appMatInput class="form-control" id="VatRate"
+                                        name="vat_rate"
+                                        [(ngModel)]="sacCodeDetails.vat_rate" #VatRate="ngModel"
+                                        required>
                                     <label for="VatRate" class="mat-label">Vat Rate</label>
                                 </div>
                             </div>
-
+        
                             <!-- <div class="col-lg-6 col-md-6">
                                 <div class="form-group">
                                     <label for="Type" class="mat-label">Vat</label>
@@ -239,11 +241,10 @@
                             </div> -->
 
                         </div>
-                        <div class="text-right">
+                        <div class="text-right" >
                             <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
                                 [routerLink]="['/home/sac-hsn-codes']">Cancel</button>
-                            <button class="btn btn-primary mb-0 ml-3 text-uppercase" appPermissionButton
-                                accessType="write" type="submit">Save</button>
+                            <button class="btn btn-primary mb-0 ml-3 text-uppercase" appPermissionButton accessType="write" type="submit">Save</button>
                         </div>
                     </div>
                 </form>

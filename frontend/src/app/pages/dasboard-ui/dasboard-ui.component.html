@@ -270,7 +270,7 @@
 
                 <!------- IRN generation Expiry dates -->
 
-                <ng-container *ngIf="companyDetails?.e_invoice_missing_date_feature">
+                <ng-container *ngIf="companyDetails?.einvoice_missing_date_feature">
 
                     <div class="row mt-4">
                         <div class="col-4">
@@ -278,17 +278,14 @@
                         </div>
                         <div class="col-8">
                             <div class="d-flex justify-content-end">
-                                <button class="btn btn-primary btn-sm" (click)="downloadReport()">Download</button>
-                                <!-- <button class="btn btn-primary btn-sm" [routerLink]="['/home/reports']" [queryParams]="{'reportType':'Irn Due Report'}">Download</button> -->
+                                    <button class="btn btn-primary btn-sm" [routerLink]="['/home/reports']" [queryParams]="{'reportType':'E-invoice missing report'}">Download</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="gallery">
-                        <div class=" row mt-4">
-
-                            <div class="col-md-3 col-sm-3 col-lg-4 col-3 mb-3"
-                                *ngFor="let item of pending_IRN ; let idx = index">
+                    <div>
+                        <div class="row mt-4">
+                            <div class="col-md-3 mb-3" *ngFor="let item of pending_IRN; let idx = index">
                                 <div class="card-body irn-card bg-white p-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="irn-header" [ngClass]="{'warning': idx >= 3}">
@@ -305,9 +302,8 @@
                                                 <p class="col-md-6 m-0">Tax-Invoice</p>
                                                 <p class="col-md-4 m-0"><b>{{item['Tax Invoice'] || 0}}</b></p>
                                                 <div class="col-md-2 irn-item-navigation">
-                                                    <i class="ri-arrow-right-line card-icon"
-                                                        [routerLink]="['/home/invoices']"
-                                                        [queryParams]="{'invoice_date':item.date,'invoiceType':'B2B','irn_generated':'Pending'}"></i>
+                                                    <i class="ri-arrow-right-line card-icon" [routerLink]="['/home/invoices']"
+                                                    [queryParams]="{'invoice_date':item.date,'invoiceType':'B2B','irn_generated':'Pending'}"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -316,9 +312,8 @@
                                                 <p class="col-md-6 m-0">Credit</p>
                                                 <p class="col-md-4 m-0"><b>{{item['Credit Invoice'] || 0}}</b></p>
                                                 <div class="col-md-2 irn-item-navigation">
-                                                    <i class="ri-arrow-right-line card-icon"
-                                                        [routerLink]="[ '/home/manual-credit-notes']"
-                                                        [queryParams]="{type: 'Credit', 'invoice_date':item.date, 'invoiceType':'B2B','irn_generated':'Pending'}"></i>
+                                                    <i class="ri-arrow-right-line card-icon" [routerLink]="[ '/home/manual-credit-notes']"
+                                                    [queryParams]="{type: 'Credit', 'invoice_date':item.date, 'invoiceType':'B2B','irn_generated':'Pending'}"></i>
                                                 </div>
 
                                             </div>
@@ -327,10 +322,9 @@
                                             <div class="row m-0 d-flex justify-content-between align-items-center">
                                                 <p class="col-md-6 m-0">Debit</p>
                                                 <p class="col-md-4 m-0"><b>{{item['Debit Invoice'] || 0}}</b></p>
-                                                <div class="col-md-2 irn-item-navigation">
-                                                    <i class="ri-arrow-right-line card-icon"
-                                                        [routerLink]="[ '/home/manual-credit-notes']"
-                                                        [queryParams]="{type: 'Debit', 'invoice_date':item.date, 'invoiceType':'B2B','irn_generated':'Pending'}"></i>
+                                                <div class="col-md-2 irn-item-navigation" >
+                                                    <i class="ri-arrow-right-line card-icon" [routerLink]="[ '/home/manual-credit-notes']"
+                                                    [queryParams]="{type: 'Debit', 'invoice_date':item.date, 'invoiceType':'B2B','irn_generated':'Pending'}"></i>
                                                 </div>
 
                                             </div>
@@ -340,9 +334,8 @@
                                                 <p class="col-md-6 m-0">Manual</p>
                                                 <p class="col-md-4 m-0"><b>{{item['manual'] || 0}}</b></p>
                                                 <div class="col-md-2 irn-item-navigation">
-                                                    <i class="ri-arrow-right-line card-icon"
-                                                        [routerLink]="[ '/home/manual-credit-notes']"
-                                                        [queryParams]="{type: 'Tax', 'invoice_date':item.date, 'invoiceType':'B2B','irn_generated':'Pending'}"></i>
+                                                    <i class="ri-arrow-right-line card-icon" [routerLink]="[ '/home/manual-credit-notes']"
+                                                    [queryParams]="{type: 'Tax', 'invoice_date':item.date, 'invoiceType':'B2B','irn_generated':'Pending'}"></i>
                                                 </div>
 
                                             </div>
@@ -350,15 +343,14 @@
                                     </div>
                                 </div>
                             </div>
-
+                           
                         </div>
                     </div>
-
                 </ng-container>
 
 
 
-                <ng-container *ngIf="!companyDetails?.e_invoice_missing_date_feature">
+                <ng-container *ngIf="!companyDetails?.einvoice_missing_date_feature">
 
                     <div class="row mt-4">
                         <div class="col-4">

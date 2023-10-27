@@ -4,26 +4,21 @@
             <div class="d-flex">
                 <h5 class="mr-3" id="modal-basic-title"><strong>SAC HSN Codes</strong></h5>
                 <div class="custom-control custom-checkbox form-group mb-0">
-                    <input type="checkbox" class="custom-control-input" id="ignore" name="ignore"
-                        [(ngModel)]="sacCodeDetails.ignore" #ignore="ngModel">
+                    <input type="checkbox" class="custom-control-input" id="ignore" name="ignore" [(ngModel)]="sacCodeDetails.ignore" #ignore="ngModel">
                     <label class="custom-control-label" for="ignore">Ignore</label>
                 </div>
                 <div class="sync-status" *ngIf="company?.ezy_gst_module == 1">
-                    <span *ngIf="sacCodeDetails?.synced_to_erp == 0">
-                        <p class="ml-3 mb-0 text-danger non-sync"><i class="ri-close-circle-line"></i> Not Synced</p>
-                    </span>
+                    <span *ngIf="sacCodeDetails?.synced_to_erp == 0"><p class="ml-3 mb-0 text-danger non-sync"><i class="ri-close-circle-line"></i> Not Synced</p></span>
                     <div *ngIf="sacCodeDetails?.synced_to_erp == 1">
                         <p class="mb-0 text-success sync"><i class="ri-checkbox-circle-fill"></i> Synced to EzyGST </p>
-                        <p class="text-right mb-0" style="font-size: 12px"><i
-                                class="ri-calendar-check-line calendar"></i> {{sacCodeDetails?.synced_date |date : ["MMM
-                            d y"]}}</p>
+                        <p class="text-right mb-0" style="font-size: 12px"><i class="ri-calendar-check-line calendar"></i> {{sacCodeDetails?.synced_date |date : ["MMM d y"]}}</p>
                     </div>
                 </div>
                 <button type="button" class="close" aria-label="Close" (click)="closeModal()">
                     <span aria-hidden="true">&times;</span>
                 </button>
-            </div>
-            <div *ngIf="viewType === 'edit' && sacCodeDetails?.synced_to_erp == 0 && company?.ezy_gst_module == 1">
+            </div>   
+            <div *ngIf="viewType === 'edit' && sacCodeDetails?.synced_to_erp == 0">
                 <button (click)="SacsynctoGST()" class="btn btn-primary btn-sm mx-2 btn-right" ngbTooltip="sync to gst"
                     appPermissionButton accessType="write" type="button">Sync to GST</button>
             </div>
@@ -36,43 +31,33 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12">
                         <div class="form-group">
-                            <input title="Enter Opera transaction description" type="text" appMatInput
-                                class="form-control" id="description" name="description"
-                                [(ngModel)]="sacCodeDetails.description" #description="ngModel"
-                                [readonly]="viewType === 'edit'" required>
+                            <input title="Enter Opera transaction description" type="text" appMatInput class="form-control" id="description" name="description" [(ngModel)]="sacCodeDetails.description" #description="ngModel" [readonly]="viewType === 'edit'" required>
                             <label for="description" class="mat-label">Description </label>
-                            <small class="text-danger"
-                                *ngIf="form.submitted && description?.errors?.required">Required</small>
+                            <small class="text-danger" *ngIf="form.submitted && description?.errors?.required">Required</small>
                         </div>
                     </div>
 
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
-                            <input title="Enter Transaction code of description" type="text" appMatInput appNumberInput
-                                class="form-control" id="TransactionCode" name="transactioncode"
-                                [(ngModel)]="sacCodeDetails.transactioncode" #TransactionCode="ngModel">
+                            <input title="Enter Transaction code of description" type="text" appMatInput appNumberInput class="form-control" id="TransactionCode" name="transactioncode" [(ngModel)]="sacCodeDetails.transactioncode" #TransactionCode="ngModel">
                             <label for="TransactionCode" class="mat-label">TransactionCode</label>
                         </div>
                     </div>
 
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
-                            <input title="Enter SAC code of description" type="text" (keypress)="numberOnly($event)"
-                                (ngModelChange)="saccodekeysup()" appMatInput class="form-control" id="code" name="code"
-                                [disabled]="saccodedisable" [(ngModel)]="sacCodeDetails.code" #code="ngModel">
+                            <input title="Enter SAC code of description" type="text" appMatInput class="form-control" id="code" name="code" [(ngModel)]="sacCodeDetails.code" #code="ngModel">
                             <label for="code" class="mat-label">SAC Code</label>
-
                         </div>
                     </div>
 
 
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
-                            <select appMatInput name="type" id="type" class="custom-select"
-                                [(ngModel)]="sacCodeDetails.type" #type="ngModel" required>
-                                <option value="SAC">SAC</option>
-                                <option value="HSN">HSN</option>
-                            </select>
+                            <select appMatInput name="type" id="type" class="custom-select" [(ngModel)]="sacCodeDetails.type" #type="ngModel" required>
+                <option value="SAC">SAC</option>
+                <option value="HSN">HSN</option>
+              </select>
 
                             <label for="type" class="mat-label">Type</label>
                             <small class="text-danger" *ngIf="form.submitted && type?.errors?.required">Required</small>
@@ -81,42 +66,33 @@
 
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
-                            <select appMatInput name="taxble" id="taxble" class="custom-select"
-                                [disabled]="sacCodetaxable" [(ngModel)]="sacCodeDetails.taxble" #taxble="ngModel"
-                                (change)="taxable_data($event)" required>
-                                <option title="Select Yes if the description is taxable (Eg. Room Charges)" value="Yes">
-                                    Yes</option>
-                                <option title="Select No if the descriptions in not taxable (Eg. Liqour)" value="No">No
-                                </option>
-                            </select>
+                            <select appMatInput name="taxble" id="taxble" class="custom-select" [(ngModel)]="sacCodeDetails.taxble" #taxble="ngModel" required>
+                <option title="Select Yes if the description is taxable (Eg. Room Charges)" value="Yes">Yes</option>
+                <option title="Select No if the descriptions in not taxable (Eg. Liqour)" value="No">No</option>
+              </select>
                             <label for="taxble" class="mat-label">Taxble</label>
-                            <small class="text-danger"
-                                *ngIf="form.submitted && taxble?.errors?.required">Required</small>
+                            <small class="text-danger" *ngIf="form.submitted && taxble?.errors?.required">Required</small>
                         </div>
                     </div>
 
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
                             <label for="Type" class="mat-label">Net</label>
-                            <select appMatInput name="net" id="Net" class="custom-select"
-                                [(ngModel)]="sacCodeDetails.net" #Net="ngModel">
-                                <option title="Select Yes if the taxes are included in the price" value="Yes">Yes
-                                </option>
-                                <option title="Select No if the price in excluding of taxes" value="No">No</option>
-                            </select>
+                            <select appMatInput name="net" id="Net" class="custom-select" [(ngModel)]="sacCodeDetails.net" #Net="ngModel">
+                <option title="Select Yes if the taxes are included in the price" value="Yes">Yes</option>
+                <option title="Select No if the price in excluding of taxes" value="No">No</option>
+              </select>
                         </div>
                     </div>
 
 
-                    <div *ngIf="sacCodeDetails.code === '996311' || sacCodeDetails.code === '997321' "
-                        class="col-lg-6 col-md-6">
+                    <div *ngIf="sacCodeDetails.code === '996311' || sacCodeDetails.code === '997321' " class="col-lg-6 col-md-6">
                         <div class="form-group">
                             <label for="accommodation_slab" class="mat-label">Accommodation Slab</label>
-                            <select appMatInput name="accommodation_slab" id="accommodation_slab" class="custom-select"
-                                [(ngModel)]="sacCodeDetails.accommodation_slab" #accommodation_slab="ngModel">
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
+                            <select appMatInput name="accommodation_slab" id="accommodation_slab" class="custom-select" [(ngModel)]="sacCodeDetails.accommodation_slab" #accommodation_slab="ngModel">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
                         </div>
                     </div>
                     <!-- <div class="col-lg-6 col-md-6">
@@ -130,83 +106,67 @@
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
                             <label for="exempted" class="mat-label">Sez Exempted</label>
-                            <select appMatInput name="exempted" id="exempted" class="custom-select"
-                                [(ngModel)]="sacCodeDetails.exempted" #exempted="ngModel">
-                                <option value='1'>Yes</option>
-                                <option value='0'>No</option>
-                            </select>
+                            <select appMatInput name="exempted" id="exempted" class="custom-select" [(ngModel)]="sacCodeDetails.exempted" #exempted="ngModel">
+                <option value='1'>Yes</option>
+                <option value='0'>No</option>
+              </select>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
 
-                            <select appMatInput name="ignore_non_taxable_items" id="ignore_non_taxable_items"
-                                class="custom-select" [(ngModel)]="sacCodeDetails.ignore_non_taxable_items"
-                                [disabled]="sacCodeRevenue" #ignore_non_taxable_items="ngModel">
-                                <option value='1'>Non Revenue</option>
-                                <option value='0'>Revenue</option>
-                            </select>
+                            <select appMatInput name="ignore_non_taxable_items" id="ignore_non_taxable_items" class="custom-select" [(ngModel)]="sacCodeDetails.ignore_non_taxable_items" #ignore_non_taxable_items="ngModel">
+                <option value='1'>Non Revenue</option>
+                <option value='0'>Revenue</option>
+              </select>
                             <label class="mat-label" for="ignore_non_taxable_items">Item Type</label>
-                        </div>
-
-                    </div>
-                    <div *ngIf="sacCodeDetails.code === '999799' " class="col-lg-6 col-md-6">
-                        <div class="form-group">
-                            <label for="non_gst_revenue" class="mat-label">Non GST Revenue</label>
-                            <select appMatInput name="non_gst_revenue" id="non_gst_revenue" class="custom-select"
-                                [(ngModel)]="sacCodeDetails.non_gst_revenue" #non_gst_revenue="ngModel">
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
                         </div>
 
                     </div>
                     <div class="col-lg-6 col-md-6">
                         <div class="form-group">
                             <label for="status" class="mat-label">Status</label>
-                            <select appMatInput name="status" id="status" class="custom-select"
-                                [(ngModel)]="sacCodeDetails.status" #status="ngModel">
-                                <option value="Active">Active</option>
-                                <option value="In-Active">In-Active</option>
-                            </select>
+                            <select appMatInput name="status" id="status" class="custom-select" [(ngModel)]="sacCodeDetails.status" #status="ngModel">
+                <option  value="Active">Active</option>
+                <option value="In-Active">In-Active</option>
+              </select>
                         </div>
                     </div>
-                    <!-- <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-6 col-md-6">
                         <div class="custom-control custom-checkbox form-group">
 
                             <input type="checkbox" class="custom-control-input" id="is_service_charge_item" name="is_service_charge_item" [(ngModel)]="sacCodeDetails.is_service_charge_item" #is_service_charge_item="ngModel">
                             <label class="custom-control-label" for="is_service_charge_item">Is Service Charge Item</label>
                         </div>
-                    </div> -->
+                    </div>
 
                 </div>
                 <div class="col-lg-6 col-md-6" *ngIf="company?.clbs === 1">
                     <div class="form-group">
                         <label for="category" class="mat-label">Category</label>
-                        <select appMatInput name="category" id="category" class="custom-select"
-                            [(ngModel)]="sacCodeDetails.category" #category="ngModel">
-                            <option value="Rooms">Rooms</option>
-                            <option value="Food & beverages">Food & beverages</option>
-                            <option value="Food IRD">Food IRD</option>
-                            <option value="Banquet">Banquet</option>
-                            <option value="Banquet-ODC">Banquet-ODC</option>
-                            <option value="Banquet Hall hire">Banquet Hall hire</option>
-                            <option value="Other banquet Misc">Other banquet Misc</option>
-                            <option value="Banquet AV">Banquet AV</option>
-                            <option value="Laundry">Laundry</option>
-                            <option value="Spa and Health Clubs">Spa and Health Clubs</option>
-                            <option value="Concierge service">Concierge service</option>
-                            <option value="Miscellaneous">Miscellaneous</option>
-                            <option value="Shared Services">Shared Services</option>
-                            <option value="Tobacco">Tobacco</option>
-                            <option value="Liquor">Liquor</option>
-                            <option value="Telephone Charges">Telephone Charges</option>
-                            <option value="Transportation Charges">Transportation Charges</option>
-                            <option value="Non Revenue">Non Revenue</option>
-                        </select>
+                        <select appMatInput name="category" id="category" class="custom-select" [(ngModel)]="sacCodeDetails.category" #category="ngModel">
+            <option value="Rooms">Rooms</option>
+            <option value="Food & beverages">Food & beverages</option>
+            <option value="Food IRD">Food IRD</option>
+            <option value="Banquet">Banquet</option>
+            <option value="Banquet-ODC">Banquet-ODC</option>
+            <option value="Banquet Hall hire">Banquet Hall hire</option>
+            <option value="Other banquet Misc">Other banquet Misc</option>
+            <option value="Banquet AV">Banquet AV</option>
+            <option value="Laundry">Laundry</option>
+            <option value="Spa and Health Clubs">Spa and Health Clubs</option>
+            <option value="Concierge service">Concierge service</option>
+            <option value="Miscellaneous">Miscellaneous</option>
+            <option value="Shared Services">Shared Services</option>
+            <option value="Tobacco">Tobacco</option>
+            <option value="Liquor">Liquor</option>
+            <option value="Telephone Charges">Telephone Charges</option>
+            <option value="Transportation Charges">Transportation Charges</option>
+            <option value="Non Revenue">Non Revenue</option>
+          </select>
                     </div>
                 </div>
-                <!-- <div class="row">
+                <div class="row">
                     <div class="col-md-12">
                         <h6 class="c-border-bottom pb-2 mb-4"><strong>Service Charge</strong></h6>
                     </div>
@@ -304,7 +264,7 @@
                         </div>
                     </div>
 
-                </div> -->
+                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <h6 class="c-border-bottom pb-2 mb-4"><strong>Tax Rates</strong></h6>
@@ -312,65 +272,49 @@
                     <div class="col-md-6">
                         <div class="">
                             <div class="form-group">
-                                <input title="Enter CGST value" type="text" appMatInput appDecimaNumber
-                                    class="form-control" id="cgst" name="cgst"
-                                    [(ngModel)]="sacCodeDetails.ignore?0:sacCodeDetails.cgst" #cgst="ngModel"
-                                    (ngModelChange)="gstChange($event)"
-                                    [readOnly]="(viewType == 'edit' && sacCodeDetails?.accommodation_slab == '1')||sacCodeDetails.ignore"
+                                <input title="Enter CGST value" type="text" appMatInput appDecimaNumber class="form-control" id="cgst" name="cgst" [(ngModel)]="sacCodeDetails.ignore?0:sacCodeDetails.cgst" #cgst="ngModel" (ngModelChange)="gstChange($event)" [readOnly]="(viewType == 'edit' && sacCodeDetails?.accommodation_slab == '1')||sacCodeDetails.ignore"
                                     required>
                                 <label for="cgst" class="mat-label">CGST</label>
-                                <small class="text-danger"
-                                    *ngIf="form.submitted && cgst?.errors?.required">Required</small>
+                                <small class="text-danger" *ngIf="form.submitted && cgst?.errors?.required">Required</small>
                             </div>
                         </div>
 
                         <div class="">
                             <div class="form-group ">
-                                <input title="SGST value  autofill once the CGST value is given" type="text" appMatInput
-                                    appDecimaNumber class="form-control" id="sgst" name="sgst"
-                                    [(ngModel)]="sacCodeDetails.sgst" #sgst="ngModel" readOnly required>
+                                <input title="SGST value  autofill once the CGST value is given" type="text" appMatInput appDecimaNumber class="form-control" id="sgst" name="sgst" [(ngModel)]="sacCodeDetails.sgst" #sgst="ngModel" readOnly required>
                                 <label for="sgst" class="mat-label">SGST</label>
-                                <small class="text-danger"
-                                    *ngIf="form.submitted && sgst?.errors?.required">Required</small>
+                                <small class="text-danger" *ngIf="form.submitted && sgst?.errors?.required">Required</small>
                             </div>
                         </div>
 
                         <div class="">
                             <div class="form-group mb-0">
-                                <input
-                                    title="Enter IGST Value(* if the  description has CGST and SGST then IGST field gets disabled and vice versa)"
-                                    type="text" appMatInput appDecimaNumber class="form-control" id="igst" name="igst"
-                                    [(ngModel)]="sacCodeDetails.igst" #igst="ngModel" readOnly required>
+                                <input title="Enter IGST Value(* if the  description has CGST and SGST then IGST field gets disabled and vice versa)" type="text" appMatInput appDecimaNumber class="form-control" id="igst" name="igst" [(ngModel)]="sacCodeDetails.igst" #igst="ngModel"
+                                    readOnly required>
                                 <label for="igst" class="mat-label">IGST</label>
-                                <small class="text-danger"
-                                    *ngIf="form.submitted && igst?.errors?.required">Required</small>
+                                <small class="text-danger" *ngIf="form.submitted && igst?.errors?.required">Required</small>
                             </div>
                         </div>
 
 
                     </div>
                     <div class="col-md-6">
-                        <!-- <div class="">
-                            <div class="form-group">
-                                <input title="Enter State Cess rate if any" type="text" appMatInput appDecimaNumber class="form-control" id="State Cess Rate" name="state_cess_rate" [(ngModel)]="sacCodeDetails.state_cess_rate" readonly>
-                                <label for="StateCessRate" class="mat-label">State Cess Rate</label>
-                            </div>
-                        </div> -->
                         <div class="">
                             <div class="form-group">
-                                <input
-                                    title="Enter IGST Value(* if the  description has CGST and SGST then IGST field gets disabled and vice versa)"
-                                    type="text" appMatInput appDecimaNumber class="form-control" id="Central Cess Rate"
-                                    name="central_cess_rate" [(ngModel)]="sacCodeDetails.central_cess_rate"
+                                <input title="Enter State Cess rate if any" type="text" appMatInput appDecimaNumber class="form-control" id="State Cess Rate" name="state_cess_rate" [(ngModel)]="sacCodeDetails.state_cess_rate">
+                                <label for="StateCessRate" class="mat-label">State Cess Rate</label>
+                            </div>
+                        </div>
+                        <div class="">
+                            <div class="form-group">
+                                <input title="Enter IGST Value(* if the  description has CGST and SGST then IGST field gets disabled and vice versa)" type="text" appMatInput appDecimaNumber class="form-control" id="Central Cess Rate" name="central_cess_rate" [(ngModel)]="sacCodeDetails.central_cess_rate"
                                     #CentralCessRate="ngModel">
                                 <label for="Central Cess Rate" class="mat-label">Central Cess Rate</label>
                             </div>
                         </div>
                         <div class="">
                             <div class="form-group mb-0">
-                                <input title="Enter VAT rate if any" type="text" appMatInput appDecimaNumber
-                                    class="form-control" id="VatRate" name="vat_rate"
-                                    [(ngModel)]="sacCodeDetails.vat_rate" #VatRate="ngModel">
+                                <input title="Enter VAT rate if any" type="text" appMatInput appDecimaNumber class="form-control" id="VatRate" name="vat_rate" [(ngModel)]="sacCodeDetails.vat_rate" #VatRate="ngModel">
                                 <label for="VatRate" class="mat-label">Vat Rate</label>
                             </div>
                         </div>
@@ -384,11 +328,9 @@
     <div class="modal-footer d-block  pb-4 border-0 py-2">
         <div class="text-center">
 
-            <button class="btn btn-outline-primary mb-0  text-uppercase" type="button"
-                (click)="closeModal()">Cancel</button>
+            <button class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="closeModal()">Cancel</button>
 
-            <button (click)="onSubmit(form)" class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton
-                accessType="write" type="button">Save</button>
+            <button (click)="onSubmit(form)" class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton accessType="write" type="button">Save</button>
 
         </div>
     </div>

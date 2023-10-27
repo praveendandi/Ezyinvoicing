@@ -4,8 +4,7 @@
         <div class="col-md-7 col-lg-7">
             <div class="d-flex">
                 <h5 *ngIf="!showList" class="font-weight-bold text-white"><b></b> Simple Reconciliation </h5>
-                <h5 *ngIf="showList" class="font-weight-bold text-white"> <i
-                        class=" cursor-pointer ri-arrow-left-line mr-1" (click)="goBack()"></i> Missed Invoices
+                <h5 *ngIf="showList" class="font-weight-bold text-white"> <i class=" cursor-pointer ri-arrow-left-line mr-1" (click)="goBack()"></i> Missed Invoices
                     <small>({{filters.totalCount}})</small>
                 </h5>
                 <!-- <button class="create btn btn-primary" [routerLink]="['/home/users-details']" appPermissionButton
@@ -40,9 +39,7 @@
 
 
                 <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
-                    <select id="my-select" [(ngModel)]="seletedMonth"
-                        (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)"
-                        class="custom-select bg-white" name="">
+                    <select id="my-select" [(ngModel)]="seletedMonth" (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)" class="custom-select bg-white" name="">
                         <option value="01">January</option>
                         <option value="02">February</option>
                         <option value="03">March</option>
@@ -57,22 +54,18 @@
                         <option value="12">December</option>
                     </select>
 
-                </div>
-                <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
-                    <select id="my-select" [(ngModel)]="selectedyear"
-                        (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)"
-                        class="custom-select bg-white" name="">
-                        <option *ngFor="let item of years" [value]="item">{{item}}</option>
-                    </select>
-                </div>
+                  </div>
+                  <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
+                    <select id="my-select" [(ngModel)]="selectedyear" (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)" class="custom-select bg-white" name="">
+                      <option *ngFor="let item of years" [value]="item">{{item}}</option>
+                  </select>
+                  </div>
             </div>
         </div>
         <div class="col-md-5 col-lg-5 text-right">
-            <button (click)="showList?getList():onDateFilterMonthChange(seletedMonth,selectedyear)" ngbTooltip="Refresh"
-                class="btn btn-primary btn-small mr-2 refreshbtn" type="button"><span><i
-                        class="ri-refresh-line text-white"></i></span></button>
-            <button (click)="openModelXml(xmlUpload)" class="btn btn-primary btn-small mr-2" appPermissionButton
-                accessType="write" type="button"> Upload File</button>
+            <button (click)="showList?getList():onDateFilterMonthChange(seletedMonth,selectedyear)" ngbTooltip="Refresh" class="btn btn-primary btn-small mr-2 refreshbtn" type="button"><span><i
+                class="ri-refresh-line text-white"></i></span></button>
+            <button (click)="openModelXml(xmlUpload)" class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button"> Upload File</button>
             <!-- <button class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button" (click)="export(exportModal)">Export Reco.</button> -->
 
         </div>
@@ -150,16 +143,13 @@
                                         <i class="ri-search-line"></i>
                                     </span>
                                 </div>
-                                <input #codeInp type="search" [(ngModel)]="filters.search.name"
-                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                    (keyup.enter)="updateRouterParams()" class="form-control">
+                                <input #codeInp type="search" [(ngModel)]="filters.search.name" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                             </div>
                         </td>
 
                         <td class="bg-gray">
                             <div class="form-group">
-                                <select id="creditNotes" class="custom-select" [(ngModel)]="filters.search.folio_type"
-                                    (change)="onSearch.emit(filters)">
+                                <select id="creditNotes" class="custom-select" [(ngModel)]="filters.search.folio_type" (change)="onSearch.emit(filters)">
                                     <option value="">All</option>
                                     <option value="TAX INVOICE">Tax Invoice</option>
                                     <option value="CREDIT INVOICE">Credit Invoice</option>
@@ -174,17 +164,14 @@
                                         <i class="ri-search-line"></i>
                                     </span>
                                 </div>
-                                <input #codeInp type="search" [(ngModel)]="filters.search.display_name"
-                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                    (keyup.enter)="updateRouterParams()" class="form-control">
+                                <input #codeInp type="search" [(ngModel)]="filters.search.display_name" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                             </div>
                         </td>
                         <td></td>
                         <td></td>
                         <td class="bg-gray">
                             <div class="form-group">
-                                <select id="found" class="custom-select" [(ngModel)]="filters.search.found"
-                                    (change)="onSearch.emit(filters)">
+                                <select id="found" class="custom-select" [(ngModel)]="filters.search.found" (change)="onSearch.emit(filters)">
                                     <option value="">All</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
@@ -193,8 +180,7 @@
                         </td>
                         <!-- <td></td> -->
                     </tr>
-                    <tr [ngClass]="{'notFound': item.invoice_found === 'No'}"
-                        *ngFor="let item of invoiceList;let i =index">
+                    <tr [ngClass]="{'notFound': item.invoice_found === 'No'}" *ngFor="let item of invoiceList;let i =index">
                         <td>{{item?.index}}</td>
                         <td>{{item?.name}}</td>
                         <td>{{item?.folio_type}}</td>
@@ -217,8 +203,7 @@
         </div>
         <div class="d-flex pb-2 justify-content-between" *ngIf="invoiceList.length">
             <div class="px-3">
-                <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
-                    (change)="checkPagination()" id="itemsPerPage">
+                <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage" (change)="checkPagination()" id="itemsPerPage">
                     <option [value]="20">20</option>
                     <option [value]="50">50</option>
                     <option [value]="100">100</option>
@@ -227,8 +212,7 @@
                 </select>
             </div>
             <div *ngIf="invoiceList.length  < this.filters.totalCount">
-                <p class="text-right pr-5 more text-primary"
-                    (click)="this.filters.start = invoiceList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                <p class="text-right pr-5 more text-primary" (click)="this.filters.start = invoiceList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
                     more
                 </p>
             </div>
@@ -250,11 +234,10 @@
                 <i class="ri-upload-cloud-line"></i>
                 <h6><strong>Upload Xml Invoice</strong></h6>
             </label>
-            <input accept=".xml" (change)="selectFiles($event.target.files)" class="opacity-0 d-none" type="file"
-                name="" id="file">
+            <input accept=".xml" (change)="selectFiles($event.target.files)" class="opacity-0 d-none" type="file" name="" id="file">
         </div>
-        <div *ngIf="selectedFile.length>0"  >
-            <div *ngIf="!uploadedFile && uploadProgress.status == 'NO'">
+        <div *ngIf="selectedFile.length>0">
+            <div *ngIf="!uploadedFile">
                 <div class=" text-center" *ngFor="let file of selectedFile; let i = index">
                     <div class="preview-box position-relative">
                         <div class="p-close"><i (click)="removeFromList(file,i)" class="ri-close-circle-line"></i>
@@ -268,73 +251,50 @@
             </div>
             <div *ngIf="uploadedFile" class="text-success text-center">File uploaded successfully </div>
         </div>
-
-                                <div class="p-4"
-                                    *ngIf="uploadProgress.status == 'STARTED'">
-                                    <!-- <h2 class="text-center p-5">{{uploadProgress.label}}</h2> -->
-                                    <div class="d-flex">
-                                        <small
-                                            class="justify-content-between align-items-center"><b>{{excelUploadData.createdCount}}/{{excelUploadData.totalCount}}</b></small>
-                                    </div>
-
-                                    <ngb-progressbar [animated]="true" [title]="'pavan'" [type]="uploadProgress.color"
-                                        textType="white" [value]="uploadProgress.progress" [showValue]="true">
-                                    </ngb-progressbar>
-                                    <div class="mt-5 text-right" *ngIf="uploadProgress.status == 'ERROR'">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            (click)="modal.dismiss()">Cancel</button>
-                                        <button type="button" class="btn btn-primary ml-2"
-                                            (click)="uploadProgress.status = 'NO'; uploadProgress.progress = 1;uploadProgress.color='secondary'">Retry</button>
-                                    </div>
-                                </div>
     </div>
     <div class="modal-footer d-block  pb-4 border-0" *ngIf="selectedFile.length > 0 ">
         <div class="text-right">
 
-            <button *ngIf="uploadedFile" class="btn btn-outline-primary mb-0  text-uppercase" type="button"
-                (click)="modal.close('Success')">Ok</button>
-            <button *ngIf="!uploadedFile" class="btn btn-outline-primary mb-0  text-uppercase" type="button"
-                (click)="modal.dismiss('Cross click')">Cancel</button>
+            <button *ngIf="uploadedFile" class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="modal.close('Success')">Ok</button>
+            <button *ngIf="!uploadedFile" class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="modal.dismiss('Cross click')">Cancel</button>
 
-            <button *ngIf="!uploadedFile" (click)="uploadFiles()" [disabled]="selectedFile.length == 0 "
-                class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton accessType="write"
-                type="button">Upload</button>
+            <button *ngIf="!uploadedFile" (click)="uploadFiles()" [disabled]="selectedFile.length == 0 " class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton accessType="write" type="button">Upload</button>
         </div>
     </div>
 </ng-template>
 <ng-template #exportModal let-modal>
-    <div class="modal-header">
-        <h5 class="" id="modal-basic-title"> Download Invoice Reconciliation File</h5>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body export-modal">
-        <div class="d-flex">
-            <div class="form-group calendar w-c-50 position-relative my-auto">
-                <!-- [(ngModel)]="filters.search.filterDate" -->
-                <input class="form-control h-auto" [max]="fromMaxDate" [(ngModel)]="fromDate"
-                    (dateTimeChange)="updateRouterParams();fromDateSelected($event.value[0])" [owlDateTime]="dt1"
-                    [selectMode]="'rangeFrom'" [owlDateTimeTrigger]="dt1" placeholder="From Date">
-                <span class="example-trigger" [owlDateTimeTrigger]="dt1">
-                    <i class="ri-calendar-2-line"></i>
-                </span>
-                <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
-            </div>
+  <div class="modal-header">
+      <h5 class="" id="modal-basic-title"> Download Invoice Reconciliation File</h5>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+  <div class="modal-body export-modal">
+    <div class="d-flex">
+      <div class="form-group calendar w-c-50 position-relative my-auto" >
+        <!-- [(ngModel)]="filters.search.filterDate" -->
+        <input class="form-control h-auto"   [max]="fromMaxDate" [(ngModel)]="fromDate"
+          (dateTimeChange)="updateRouterParams();fromDateSelected($event.value[0])" [owlDateTime]="dt1" [selectMode]="'rangeFrom'" [owlDateTimeTrigger]="dt1"
+          placeholder="From Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt1  ></owl-date-time>
+      </div>
 
-            <div class="form-group calendar w-c-50 position-relative my-auto">
-                <!-- [(ngModel)]="filters.search.filterDate" -->
-                <input class="form-control h-auto" [min]="toMinDate" [max]="toMaxDate" [(ngModel)]="toDate"
-                    (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt2" [selectMode]="'rangeTo'"
-                    [owlDateTimeTrigger]="dt2" placeholder="To Date">
-                <span class="example-trigger" [owlDateTimeTrigger]="dt2">
-                    <i class="ri-calendar-2-line"></i>
-                </span>
-                <owl-date-time [pickerType]="'calendar'" #dt2></owl-date-time>
-            </div>
-        </div>
-        <div class="d-flex justify-content-center my-3">
-            <button class="btn btn-primary btn-sm" (click)="download()">Download</button>
-        </div>
+      <div class="form-group calendar w-c-50 position-relative my-auto" >
+        <!-- [(ngModel)]="filters.search.filterDate" -->
+        <input class="form-control h-auto"  [min]="toMinDate" [max]="toMaxDate" [(ngModel)]="toDate"
+          (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt2" [selectMode]="'rangeTo'" [owlDateTimeTrigger]="dt2"
+          placeholder="To Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt2">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt2  ></owl-date-time>
+      </div>
     </div>
+    <div class="d-flex justify-content-center my-3">
+      <button class="btn btn-primary btn-sm" (click)="download()">Download</button>
+    </div>
+  </div>
 </ng-template>

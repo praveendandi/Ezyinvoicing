@@ -34,6 +34,7 @@ import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.dir
 import { DecimaNumberDirectiveModule } from 'src/app/shared/directives/decimal-number.directive';
 import { DocumentTypesComponent } from './document-types/document-types.component';
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 
 
 @NgModule({
@@ -60,7 +61,8 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
     DecimaNumberDirectiveModule,
     NgbDropdownModule,
     NgbProgressbarModule,
-    DragDropModule
+    DragDropModule,
+    PermissionButtonDirectiveModule
   ]
 })
 export class ClbsModule { }

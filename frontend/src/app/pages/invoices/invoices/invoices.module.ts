@@ -11,12 +11,10 @@ import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.dir
 import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 import { SafePipeModule } from 'src/app/shared/pipes/safe.pipe';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
-import { ExpiredInvoicesComponent } from '../expired-invoices/expired-invoices.component';
-import { ExpiredInvoicesPipeModule } from 'src/app/shared/pipes/expired-invoices.pipe';
 
 
 @NgModule({
-  declarations: [InvoicesComponent,ExpiredInvoicesComponent],
+  declarations: [InvoicesComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -32,7 +30,6 @@ import { ExpiredInvoicesPipeModule } from 'src/app/shared/pipes/expired-invoices
     NgbProgressbarModule,
     VirtualScrollerModule,
     NgbDropdownModule,
-    ExpiredInvoicesPipeModule
   ],
   providers: [
     { provide: OWL_DATE_TIME_LOCALE, useValue: 'en-GB' }

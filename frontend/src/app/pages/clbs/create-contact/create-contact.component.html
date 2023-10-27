@@ -177,7 +177,7 @@
                     <div class="row " *ngIf="routingFromPage != 'View'">
                         <div class="col-md-12 text-right">
                             <button class="btn btn-outline-primary px-3 c-o-b shadow-sm bg-white" type="button" (click)="goBack()">Cancel</button>
-                            <button class="btn btn-primary ml-3 px-3 c-o-b1 shadow-sm" (click)="routingFromPage=='Edit'?updateContact(contact):saveContact(contact);createformsubmitted = true" type="button">{{routingFromPage=='Edit'?'Update':'Create'}}</button>
+                            <button class="btn btn-primary ml-3 px-3 c-o-b1 shadow-sm" appPermissionButton accessType="write" (click)="routingFromPage=='Edit'?updateContact(contact):saveContact(contact);createformsubmitted = true" type="button">{{routingFromPage=='Edit'?'Update':'Create'}}</button>
                         </div>
                     </div>
                 </form>

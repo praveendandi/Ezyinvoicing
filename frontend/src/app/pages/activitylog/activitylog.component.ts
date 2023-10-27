@@ -39,7 +39,7 @@ export class ActivitylogComponent implements OnInit {
   filters = new BenchLogFilter();
   total_count: number;
   constructor(
-    public activeModal: NgbActiveModal,
+    public activeModal: NgbActiveModal, 
     private http: HttpClient,) { }
 
   ngOnInit(): void {
@@ -47,61 +47,59 @@ export class ActivitylogComponent implements OnInit {
 
   }
 
-
+  
   getActivityLogs(count) {
-    this.http.get(ApiUrls.resource + `/DocType/` + this.docName).pipe(switchMap((res: any) => {
+  this.http.get(ApiUrls.resource + `/DocType/` + this.docName).pipe(switchMap((res: any) => {
       const queryParams: any = { filters: [] };
       queryParams.limit_start = this.filters.start;
       queryParams.limit_page_length = this.total_count;
-      let character1 = this.http.get(ApiUrls.resource + '/Version', {
-        params: {
-          filters: [JSON.stringify([['docname', '=', this.invoiceNumber]])],
-          fields: JSON.stringify(['data', 'name', 'creation', 'modified_by']),
-          order_by: `${'creation desc'}`,
-          limit_start: count,
-          limit_page_length: '7'
-        }
-      }).pipe(map((response: any) => {
-        res.data.dataFields = res.data.fields.reduce((prev, nxt) => {
-          prev[nxt.fieldname] = nxt.label;
+    let character1 = this.http.get(ApiUrls.resource + '/Version', {
+      params: {
+        filters: [JSON.stringify([['docname', '=', this.invoiceNumber]])],
+        fields: JSON.stringify(['data', 'name', 'creation', 'modified_by']),
+        order_by: `${'creation desc'}`,
+        limit_start : count,
+        limit_page_length : '7'
+      }
+    }).pipe(map((response: any) => {
+      res.data.dataFields = res.data.fields.reduce((prev, nxt) => {
+        prev[nxt.fieldname] = nxt.label;
+        return prev;
+      }, {});
+      return (response.data as any[]).map((each) => {
+        each.data = JSON.parse(each.data);
+        each.data = Object.keys(each.data).reduce((prev, key) => {
+          if (each.data[key] && Array.isArray(each.data[key]) && each.data[key].length) {
+            prev[key] = each.data[key].map((cr: string[]) => {
+              if (cr.length == 3) {
+                cr[0] = res.data.dataFields[cr[0]] || cr[0];
+              }
+              return cr;
+            });
+          } else {
+            prev[key] = each.data[key];
+          }
           return prev;
         }, {});
-        return (response.data as any[]).map((each) => {
-          each.data = JSON.parse(each.data);
-          each.data = Object.keys(each.data).reduce((prev, key) => {
-            if (each.data[key] && Array.isArray(each.data[key]) && each.data[key].length) {
-              prev[key] = each.data[key].map((cr: string[]) => {
-                if (cr.length == 3) {
-                  cr[0] = res.data.dataFields[cr[0]] || cr[0];
-                }
-                return cr;
-              });
-            } else {
-              prev[key] = each.data[key];
-            }
-            return prev;
-          }, {});
-          return each;
-        });
-      }));
-      let character2 = this.http.get(ApiUrls.resource + '/Version', {
-        params: {
-          filters: [JSON.stringify([['docname', '=', this.invoiceNumber]])],
-          fields: JSON.stringify(["count( `tabVersion`.`name`) AS total_count"]),
-        }
-      })
-      return forkJoin([character1, character2]);
-
-    })).subscribe((res) => {
-      const [data, count]: any = res;
-      console.log(data)
-
-      data.forEach((result: any) => {
+        return each;
+      });
+    }));
+    let character2 = this.http.get(ApiUrls.resource + '/Version', { 
+      params: {
+        filters: [JSON.stringify([['docname', '=', this.invoiceNumber]])],
+        fields: JSON.stringify(["count( `tabVersion`.`name`) AS total_count"]),
+      }
+    })
+    return forkJoin([character1, character2]);
+    
+  })).subscribe((res) => {
+      const [data, count]:any = res;
+      data.forEach((result:any)=>{
         this.activityLogs.push(result)
       })
       this.total_count = count?.data[0].total_count
-      console.log(this.activityLogs.length);
-      console.log(this.total_count);
+      // console.log(this.activityLogs.length);
+      // console.log(this.total_count);
     });
   }
 
@@ -117,7 +115,7 @@ export class ActivitylogComponent implements OnInit {
     console.log(this.filters.totalCount)
   }
 
-
+  
 
 
 }

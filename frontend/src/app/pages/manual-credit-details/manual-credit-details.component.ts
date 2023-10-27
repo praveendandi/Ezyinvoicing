@@ -44,7 +44,6 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
   sacCodeDetails = []
   sort_order = 0;
   // sacCodeDate;
-  companyDetails;
   sacCodePrice;
   sacDetails;
   apiDomain = environment.apiDomain;
@@ -101,7 +100,7 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
   eTaxInvoiceDownloadBtn: any;
   irnObject: any = {};
   paxEnableCompanyCode = 'RHV-01'
-  checkIRNdate: any;
+  checkIRNdate:any;
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
     $event.returnValue = true;
@@ -325,19 +324,21 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
         this.invoiceInfo = res.data;
 
         let today_date: any = Moment(this.invoiceInfo?.invoice_date).format('YYYY-MM-DD')
-        let date_expiry: any = this.companyData?.e_invoice_missing_start_date ? Moment(this.companyData?.e_invoice_missing_start_date).format('YYYY-MM-DD') : null
+          let date_expiry: any = this.companyData?.einvoice_missing_start_date ? Moment(this.companyData?.einvoice_missing_start_date).format('YYYY-MM-DD') : null
+          
+          if (this.companyData?.einvoice_missing_date_feature && (today_date >= date_expiry)) {
+            let today_date: any = Moment(new Date()).format('YYYY-MM-DD') // new Date()
+            let date_expiry: any = Moment(Moment(this.invoiceInfo.invoice_date).add(7, 'd').format('YYYY-MM-DD')) //new Date(this.invoiceInfo.invoice_date);
+            date_expiry = Moment(date_expiry).format('YYYY-MM-DD')
+            this.invoiceInfo['expiry_date'] = Moment(date_expiry).format('YYYY-MM-DD') //date_expiry
+            this.invoiceInfo['expiry_days'] = Moment(date_expiry).diff(Moment(today_date), 'days') // Math.round(Math.abs((date_expiry - today_date) / oneDay))            
+            this.checkIRNdate = date_expiry < today_date
+          }
 
-        if (this.companyData?.e_invoice_missing_date_feature && (today_date >= date_expiry)) {
-          let today_date: any = Moment(new Date()).format('YYYY-MM-DD') // new Date()
-          let date_expiry: any = Moment(Moment(this.invoiceInfo.invoice_date).add(this.companyData?.no_of_days_to_expiry, 'd').format('YYYY-MM-DD')) //new Date(this.invoiceInfo.invoice_date);
-          date_expiry = Moment(date_expiry).format('YYYY-MM-DD')
-          this.invoiceInfo['expiry_date'] = Moment(date_expiry).format('YYYY-MM-DD') //date_expiry
-          this.invoiceInfo['expiry_days'] = Moment(date_expiry).diff(Moment(today_date), 'days') // Math.round(Math.abs((date_expiry - today_date) / oneDay))            
-          this.checkIRNdate = date_expiry < today_date
-        }
+       
 
         this.invoiceInfo.gst_summaryTotal = (this.invoiceInfo.gst_summary as any[]).reduce((prev, nxt) => prev + parseFloat(nxt.amount), 0);
-        this.invoiceInfo?.company_gst ? this.getGSTDetailsbyInvoice() : null;
+        this.getGSTDetailsbyInvoice();
         const generatedTime = new Date(this.invoiceInfo.irn_generated_time);
         generatedTime.setTime(generatedTime.getTime() + (25 * 60 * 60 * 1000));
         this.invoiceInfo.showCancelIrn = generatedTime >= new Date();
@@ -385,21 +386,19 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
   }
 
 
-  getGSTDetailsbyInvoice() {
-    this.http.post(ApiUrls.get_tax_payer_details, { data: { "gstNumber": this.invoiceInfo?.company_gst, "code": this.companyData.name } }).subscribe((res: any) => {
-      if (res?.message?.success) {
-        // this.invoiceInfo['company_fssai_number'] = this.companyData?.fssai_number;
-        // this.invoiceInfo['cin_number'] = this.companyData?.cin_number;
-        // this.invoiceInfo['tin_number'] = this.companyData?.tin_number;
+  getGSTDetailsbyInvoice(){
+    this.http.get(ApiUrls.taxPayerDefault+'/'+this.invoiceInfo?.company_gst).subscribe((res:any)=>{
+      if(res&& res?.data && res?.data?.name){
+        this.invoiceInfo['company_fssai_number'] = this.companyData?.fssai_number;
         this.invoiceInfo['company_name'] = this.companyData?.company_name
-        this.invoiceInfo['company_legal_name'] = res?.message?.data?.legal_name;
-        this.invoiceInfo['company_address_1'] = res?.message?.data?.address_1
-        this.invoiceInfo['company_address_2'] = res?.message?.data?.address_2;
-        this.invoiceInfo['company_location'] = res?.message?.data?.location;
-        this.invoiceInfo['company_pincode'] = res?.message?.data?.pincode;
-        this.invoiceInfo['company_state_code'] = res?.message?.data?.state_code;
+        this.invoiceInfo['company_legal_name'] = res?.data?.legal_name;
+        this.invoiceInfo['company_address_1'] = res?.data?.address_1
+        this.invoiceInfo['company_address_2'] = res?.data?.address_2;
+        this.invoiceInfo['company_location'] = res?.data?.location;
+        this.invoiceInfo['company_pincode'] = res?.data?.pincode;
+        this.invoiceInfo['company_state_code'] = res?.data?.state_code;
         this.invoiceInfo['company_logo'] = this.companyData?.company_logo
-        this.invoiceInfo['company_place_of_supply'] = res?.message?.data?.state_code;
+        this.invoiceInfo['company_place_of_supply'] = res?.data?.state_code;
         this.invoiceInfo['custom_e_tax_invoice_logo_image'] = this.companyData?.custom_e_tax_invoice_logo_image
       }
     })
@@ -792,20 +791,20 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
   }
 
   generateIrn(): void {
-    if (this.companyData?.e_invoice_missing_date_feature) {
-      this.http.post(ApiUrls.validate_irn_gen_date, { "invoice_number": this.invoiceInfo?.invoice_number }).subscribe((resp: any) => {
-        if (resp?.message?.success) {
-          this.generateIRNFn()
-        } else {
-          this.toastr.error("IRN Generation Date is expired")
-        }
-      })
-    } else {
-      this.generateIRNFn()
-    }
+    if (this.companyData?.einvoice_missing_date_feature) {
+    this.http.post(ApiUrls.validate_irn_gen_date, { "invoice_number": this.invoiceInfo?.invoice_number }).subscribe((resp: any) => {
+      if (resp?.message?.success) {
+        this.generateIRNFn()
+      } else {
+        this.toastr.error("IRN Generation Date is expired")
+      }
+    })
+  }else{
+    this.generateIRNFn()
+  }
   }
 
-  generateIRNFn() {
+  generateIRNFn(){
     if (this.invoiceInfo.sez == 1) {
       let modal = this.modal.open(this.sezGenerateIRN, {
         centered: true, size: 'md', backdrop: 'static'
@@ -1058,22 +1057,6 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
       }
     }
     window.print();
-  }
-
-  synctoGST() {
-    let data = {
-      invoice_number: this.invoiceInfo.invoice_number,
-      doctype: Doctypes.invoices
-    }
-    this.http.post(ApiUrls.sync_data_to_erp_single, data).subscribe((res: any) => {
-      if (res.message.success) {
-        this.toastr.success(res.message.message);
-        // this.getInvoiceInfo();
-        this.getInvoiceData();
-      } else {
-        this.toastr.error(res.message.message)
-      }
-    });
   }
 
   manualSynctoGST() {
@@ -1416,12 +1399,12 @@ export class ManualCreditDetailsComponent implements OnInit, OnDestroy {
     // this.http.post(ApiUrls.validate_irn_gen_date, { "invoice_number": this.invoiceInfo?.invoice_number }).subscribe((resp: any) => {
     //   if (resp?.message?.success) {
 
-    this.taxPayerDetails = {};
-    this.checkApiMethod = false;
-    let modal = this.modal.open(this.B2CtoB2CTemp, { centered: true, size: 'md' })
+        this.taxPayerDetails = {};
+        this.checkApiMethod = false;
+        let modal = this.modal.open(this.B2CtoB2CTemp, { centered: true, size: 'md' })
 
 
-    this.taxPayerDetails.company = this.companyData?.name
+        this.taxPayerDetails.company = this.companyData?.name
 
     //   } else {
     //     this.toastr.error("IRN Generation Date is expired")

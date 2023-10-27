@@ -5,7 +5,6 @@ import { forkJoin } from 'rxjs';
 import { debounceTime, switchMap, switchMapTo } from 'rxjs/operators';
 import { ApiUrls, Doctypes } from 'src/app/shared/api-urls';
 import { ToastrService } from 'ngx-toastr';
-import { environment } from 'src/environments/environment';
 
 class TaxPayersFilter {
   search = {
@@ -16,9 +15,9 @@ class TaxPayersFilter {
   itemsPerPage = 20;
   currentPage = 1;
   totalCount = 0;
-  sortBy = '';
-  status = ''
-  start = 0;
+  sortBy= '';
+  status=''
+  start= 0;
   // synced_to_erp= ''
 }
 @Component({
@@ -27,15 +26,15 @@ class TaxPayersFilter {
   styleUrls: ['./tax-payers.component.scss']
 })
 export class TaxPayersComponent implements OnInit {
-  apiDomain = environment.apiDomain;
+
   filters = new TaxPayersFilter();
   onSearch = new EventEmitter();
   taxPayersList = [];
   searchType = '';
   searchText = '';
   sortBy = '';
-  status = 'All';
-  loginUser: any = {};
+  status ='All';
+  loginUser:any ={};
   loginUSerRole;
   companyDetails;
   // synced_to_erp;
@@ -52,7 +51,7 @@ export class TaxPayersComponent implements OnInit {
     this.filters.itemsPerPage = this.companyDetails?.items_per_page
     this.onSearch.pipe(debounceTime(500)).subscribe(res => {
       this.taxPayersList = [];
-      this.filters.start = 0;
+      this.filters.start=0;
       this.filters.totalCount = 0;
       this.updateRouterParams()
     });
@@ -69,7 +68,7 @@ export class TaxPayersComponent implements OnInit {
     })
     this.getAllPayers();
     this.loginUser = JSON.parse(localStorage.getItem('login'))
-    this.loginUSerRole = this.loginUser.rolesFilter.some((each) => (each == 'ezy-IT' || each == 'ezy-Finance'))
+    this.loginUSerRole = this.loginUser.rolesFilter.some((each)=>(each == 'ezy-IT' || each =='ezy-Finance'))
   }
 
   updateRouterParams(): void {
@@ -80,41 +79,41 @@ export class TaxPayersComponent implements OnInit {
     });
   }
 
-  checkPagination(): void {
+  checkPagination():void{
     if (this.filters.totalCount < (this.filters.itemsPerPage * this.filters.currentPage)) {
       this.filters.currentPage = 1
-      this.updateRouterParams()
-    } else {
+     this.updateRouterParams()
+    }else{
       this.updateRouterParams()
     }
   }
 
   getAllPayers(): void {
-    this.activatedParams.queryParams.pipe(switchMap((params: TaxPayersFilter) => {
-      if (this.filters.search.tradeName) {
+    this.activatedParams.queryParams.pipe(switchMap((params: TaxPayersFilter)=>{
+      if(this.filters.search.tradeName){
         this.searchText = this.filters.search.tradeName;
         this.searchType = 'trade_name'
-      } else if (this.filters.search.legalName) {
+      }else if(this.filters.search.legalName){
         this.searchText = this.filters.search.legalName;
         this.searchType = 'legal_name';
-      } else if (this.filters.search.gstNumber) {
+      }else if(this.filters.search.gstNumber){
         this.searchText = this.filters.search.gstNumber;
         this.searchType = 'gst_number';
       }
       // else  if(this.filters.synced_to_erp){
       //   this.synced_to_erp = this.filters.synced_to_erp;
       // }
-      else {
+      else{
         this.searchText = '';
         this.searchType = ''
       }
-      if (this.filters.sortBy) {
+      if(this.filters.sortBy){
         this.sortBy = this.filters.sortBy;
       }
-      if (this.filters.status) {
+      if(this.filters.status){
         this.status = this.filters.status;
       }
-
+     
       const dataBody = {
         data: {
           start: this.filters.start,
@@ -122,23 +121,23 @@ export class TaxPayersComponent implements OnInit {
           value: this.searchText,
           key: this.searchType,
           sortKey: this.sortBy,
-          type: this.searchText ? '' : 'All',
+          type: this.searchText ? '': 'All',
           status: this.status,
           // synced_to_erp: this.synced_to_erp
         }
       }
       return this.http.post(ApiUrls.taxPayers, dataBody)
-    })).subscribe((res: any) => {
+    })).subscribe((res:any)=>{
       try {
-        if (res?.message) {
-          if (this.filters.start != 0) {
-            this.taxPayersList = this.taxPayersList.concat(res.message?.data)
-          } else {
-            this.taxPayersList = res.message?.data;
-          }
-          this.filters.totalCount = res.message.count.gstCount;
-        }
-      } catch (e) { console.log(e) }
+            if (res?.message) {
+              if(this.filters.start != 0){
+                this.taxPayersList = this.taxPayersList.concat(res.message?.data)
+              }else{
+                this.taxPayersList = res.message?.data;
+              }
+              this.filters.totalCount = res.message.count.gstCount;
+            }
+          } catch (e) { console.log(e) }
     })
   }
 
@@ -163,12 +162,6 @@ export class TaxPayersComponent implements OnInit {
   //     }
   //   })
   // }
-  taxPayerDetails_export() {
-    this.http.get(ApiUrls.tax_payer_details).subscribe((res: any) => {
-      console.log(res)
-      window.open(`${this.apiDomain}${res.message.file_path}`, "_blank");
-    })
-  }
 
 
 }

@@ -13,8 +13,8 @@
       <div class="col-lg-3 col-md-3 text-right">
           <div id="dwtcontrolContainer" class="d-none"></div>
           <button class="btn btn-sm btn-primary mr-2" type="button" (click)="getPOSChecksData()" >Refresh</button>
-          <button *ngIf="companyDetails.clbs == 1 && this.companyDetails?.company_code != 'ZBPK-01'" class="btn btn-sm btn-primary mr-2" type="button" (click)="scanPosChecks(selectDateToScan,'upload')" >Upload</button>
-          <button *ngIf="companyDetails.clbs == 1 && this.companyDetails?.company_code != 'ZBPK-01'" class="btn btn-sm btn-primary" type="button" (click)="scanPosChecks(selectDateToScan,'scan')" >Scan</button>
+          <button *ngIf="companyDetails.clbs == 1 && this.companyDetails?.company_code != 'ZBPK-01'" class="btn btn-sm btn-primary mr-2" type="button" (click)="scanPosChecks(selectDateToScan,'upload')" appPermissionButton accessType="write" >Upload</button>
+          <button *ngIf="companyDetails.clbs == 1 && this.companyDetails?.company_code != 'ZBPK-01'" class="btn btn-sm btn-primary" type="button" (click)="scanPosChecks(selectDateToScan,'scan')" appPermissionButton accessType="write" >Scan</button>
           <!-- <button class="btn btn-sm btn-primary ml-2" type="button" (click)="successCallback()" >Open</button> -->
           <!-- <div class="position-relative mt-2 mt-lg-0 mt-md-0">
               <input type="search" class="form-control pl-5" [(ngModel)]="filters.search" (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)" #search (keyup.enter)="updateRouterParams()" placeholder="Search">

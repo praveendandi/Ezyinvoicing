@@ -3,7 +3,7 @@
         <div class="col-md-9 col-lg-9">
             <div class="d-flex">
                 <h4 class="text-white"><b>POS Printers</b></h4>
-                <button (click)="addPrinter('add', null)" class="btn btn-primary ml-3" type="button"><i
+                <button (click)="addPrinter('add', null)" class="btn btn-primary ml-3" type="button" appPermissionButton accessType="create"><i
                         class="ri-add-line"></i></button>
             </div>
         </div>
@@ -56,7 +56,7 @@
                                             {{item?.status || 'N/A'}}</span>
                                     </td>
                                     <td>
-                                        <span class="text-primary cursor-pointer" (click)="addPrinter('edit',item)">Edit</span>
+                                        <span class="text-primary cursor-pointer" (click)="addPrinter('edit',item)" appPermissionButton accessType="write">Edit</span>
                                     </td>
 
                                 </tr>

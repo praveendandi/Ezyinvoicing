@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
 import { PermissionResolver } from '../permission.resolver';
 import { Doctypes } from '../shared/api-urls';
-import { ExpiredInvoicesComponent } from '../pages/invoices/expired-invoices/expired-invoices.component';
 
 export const mainRoutes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+  // { path: '', pathMatch: 'full', redirectTo: 'gsp-apis' },
   {
     path: 'company',
     loadChildren: () =>
@@ -129,6 +128,16 @@ export const mainRoutes: Routes = [
         (m) => m.InvoiceDetailsModule
       ),
   },
+{
+  path: 'dashboard',
+  data:{
+    name:'Dashboard'
+  },
+  loadChildren: () =>
+    import('../pages/dasboard-ui/dasboard-ui.module').then(
+      (m) => m.DasboardUiModule
+    ),
+},
   // {
   //   path: 'dashboard',
   //   data: {
@@ -298,16 +307,6 @@ export const mainRoutes: Routes = [
   loadChildren:() => import('../pages/gsp-metering/gsp-metering.module').then(m=>m.GspMeteringModule)
 },
 {
-  path: 'dashboard',
-  data:{
-    name:'Dashboard'
-  },
-  loadChildren: () =>
-    import('../pages/dasboard-ui/dasboard-ui.module').then(
-      (m) => m.DasboardUiModule
-    ),
-},
-{
   path:'error-logs',
   data:{
     name:'Error Logs'
@@ -376,11 +375,6 @@ export const mainRoutes: Routes = [
   path:'amend-invoices',
   data: { name : 'Amended Invoices'},
   loadChildren:() => import('../pages/amend-invoices/amend-invoices.module').then(m=>m.AmendInvoicesModule)
-},
-
-{
-  path:'expired-invoices',
-  data: { name : 'Invoices'},component: ExpiredInvoicesComponent
 }
 
 ];

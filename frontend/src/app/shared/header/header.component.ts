@@ -4,7 +4,7 @@ import { HttpClient, HttpEventType } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ApiUrls, Doctypes, GitToken } from '../api-urls';
+import { ApiUrls, Doctypes } from '../api-urls';
 import { SocketService } from '../services/socket.service';
 import { UserService } from '../services/user.service';
 import { ToastrService } from 'ngx-toastr';
@@ -17,6 +17,7 @@ import { environment } from 'src/environments/environment';
 import { AnimationItem } from 'lottie-web';
 import { AnimationOptions } from 'ngx-lottie';
 import { PDFDocument } from 'pdf-lib';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-header',
@@ -35,11 +36,10 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   companyDetails;
   userData;
   loginUSerRole;
-  SynchistoryUserRole;
   emailId;
   networkStatus = false;
   printers = [];
-  checkPrinter;
+  // checkPrinter;
   new_password;
   selected;
   selectedValue;
@@ -75,7 +75,6 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   notificationsList = [];
   newCount = false;
   progressInfos: any = {};
-  posUser = false;
   public isCollapsed = false;
   public isCollapsedOne = false;
   public isCollapsedTwo = false;
@@ -96,28 +95,28 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   emailLogUsers: any;
   loginFrontOfcUser = false;
   bulkUploadExcel = false;
-
+  wrong_password :any ;
 checkPOSvthFrontOfc :any = false;
+change_user_details:any = {}
+posUser = false;
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private http: HttpClient,
     private modal: NgbModal,
     private socketService: SocketService,
-    private toaster: ToastrService
+    private toaster: ToastrService,
+    private cookie : CookieService
   ) { }
 
   ngOnInit(): void {
-    // console.log(this.router.url, 'asdsad');
     if(this.router.url === "/home/dashboard"){
      this.screenAdjust = true;
     } else {
       this.screenAdjust = false;
     }
     this.companyDetails = JSON.parse(localStorage.getItem('company'))
-    let permissions = JSON.parse(localStorage.getItem('permissions'));
-    let userRole = JSON.parse(localStorage.getItem('UserRoles'));
-    if(!permissions && !userRole){
+    if(!this.companyDetails?.name){
       this.getCompanyData();
     }
 
@@ -126,7 +125,6 @@ checkPOSvthFrontOfc :any = false;
     this.posUser = this.loginUser.rolesFilter.some((each:any)=> (each == 'ezy-Pos'))
     this.loginUSerRole = this.loginUser.rolesFilter.some((each:any)=> (each == 'ezy-IT'))
     this.loginFrontOfcUser = this.loginUser.rolesFilter.some((each:any)=> (each == 'ezy-FrontOffice'))
-    this.SynchistoryUserRole = this.loginUser.rolesFilter.some((each:any)=> (each == 'ezy-IT' || each == 'ezy-Finance'))
     // this.checkPOSvthFrontOfc = this.loginUser.rolesFilter.filter((each:any)=> (each == 'ezy-FrontOffice' && each == 'ezy-Pos'))
     let xyz = ['ezy-FrontOffice','ezy-Pos']
     this.checkPOSvthFrontOfc = xyz.reduce((a, b) => a && this.loginUser.rolesFilter.includes(b), true);
@@ -138,16 +136,10 @@ checkPOSvthFrontOfc :any = false;
     })
     if(this.loginUSerRole || this.emailLogUsers || this.loginFrontOfcUser){
       this.posUser = false;
-    }
+    }   
     const temp = this.activatedRoute.firstChild.snapshot;
     this.updateActiveLink(temp.data.name, temp.queryParams?.type);
     this.socketService.connectMe();
-
-
-
-    this.userData = JSON.parse(localStorage.getItem('login'));
-
-    this.checkPrinter = localStorage.getItem('printer');
     this.router.events.pipe(filter(event => event instanceof NavigationEnd),
       map(() => {
         if(this.router.url === "/home/dashboard"){
@@ -197,47 +189,47 @@ checkPOSvthFrontOfc :any = false;
           this.progressInfos = { uploadProgress: 25, color: 'info' };
         }, 1500)
       }
-      if (res.message.type === 'bench completed') {
-        setTimeout((res: any) => {
-          this.http.get(`${ApiUrls.migrateBench}`).subscribe((res: any) => {
-            if (res.message.success) {
-              this.progressInfos.uploadProgress = 70;
-              setTimeout((rs: any) => {
-                this.http.post(`${ApiUrls.Uiupdate}`, { "company": this.companyDetails.name }).subscribe((response: any) => {
-                  this.progressInfos.uploadProgress = 100;
-                  if(this.companyDetails?.proxy == 1){
-                    this.http.post(ApiUrls.checkProxy, { data: { company: this.companyDetails?.name, type: 'unset' } }).subscribe((proxy: any) => {
-                      setTimeout((res: any) => {
-                        if (proxy) {
-                          this.modal.dismissAll()
-                          localStorage.clear();
-                          this.router.navigate([''])
-                        }
-                      }, 1500)
-                    })
-                  }else{
-                    setTimeout((res: any) => {
-                      if (response) {
-                        this.modal.dismissAll()
-                        localStorage.clear();
-                        this.router.navigate([''])
-                      }
-                    }, 1500)
-                  }
+      // if (res.message.type === 'bench completed') {
+      //   setTimeout((res: any) => {
+      //     this.http.get(`${ApiUrls.migrateBench}`).subscribe((res: any) => {
+      //       if (res.message.success) {
+      //         this.progressInfos.uploadProgress = 70;
+      //         setTimeout((rs: any) => {
+      //           this.http.post(`${ApiUrls.Uiupdate}`, { "company": this.companyDetails.name }).subscribe((response: any) => {
+      //             this.progressInfos.uploadProgress = 100;
+      //             if(this.companyDetails?.proxy == 1){
+      //               this.http.post(ApiUrls.checkProxy, { data: { company: this.companyDetails?.name, type: 'unset' } }).subscribe((proxy: any) => {
+      //                 setTimeout((res: any) => {
+      //                   if (proxy) {
+      //                     this.modal.dismissAll()
+      //                     localStorage.clear();
+      //                     this.router.navigate([''])
+      //                   }
+      //                 }, 1500)
+      //               })
+      //             }else{
+      //               setTimeout((res: any) => {
+      //                 if (response) {
+      //                   this.modal.dismissAll()
+      //                   localStorage.clear();
+      //                   this.router.navigate([''])
+      //                 }
+      //               }, 1500)
+      //             }
 
 
 
-                })
-              }, 15000)
+      //           })
+      //         }, 15000)
 
 
-            }
-          })
-        }, 20000)
+      //       }
+      //     })
+      //   }, 20000)
 
 
 
-      }
+      // }
 
       if (res?.message?.message === 'Invoices Created') {
         this.showToast(res?.message,'invoice')
@@ -308,9 +300,9 @@ checkPOSvthFrontOfc :any = false;
     })
   }
   ngAfterViewInit() {
-    if (!this.checkPrinter) {
+    // if (!this.checkPrinter) {
       // this.getPrinterData();
-    }
+    // }
   }
 
   getCompanyData(){
@@ -320,31 +312,14 @@ checkPOSvthFrontOfc :any = false;
         this.http.get(ApiUrls.company + '/' + this.company?.name).subscribe((res: any) => {
           this.companyDetails = res.data;
           localStorage.setItem("company", JSON.stringify(res.data))
-          this.getUserName();
           this.updateGspTokens(res.data);
-          this.getUserRoles()
-          this.getPermissions();
           this.getNetworkStatus();
-
-          // let UIupdateStorage = localStorage.getItem('updateUI')
-          // let updateStorage = localStorage.getItem('update')
-          // if (UIupdateStorage) {
-
-          // } else {
-          //   this.checkUpdates();
-          // }
-          // if (updateStorage) {
-
-          // } else {
-          //   this.checkUpdates();
-          // }
         });
       }
     })
   }
   getPrinterData() {
     this.printers = [];
-    this.checkPrinter = localStorage.getItem('printer')
     this.http.get(ApiUrls.getPrinters).subscribe((res: any) => {
       if (res.message.success) {
         this.printers = res.message?.data;
@@ -355,22 +330,16 @@ checkPOSvthFrontOfc :any = false;
     })
 
   }
-  selectedPRinter(item) {
-    localStorage.setItem("printer", item)
-    this.modal.dismissAll()
-  }
-
 
   selectedMenu(item) {
     if(item === 'CLBS'){
-      window.open('/clbs', '_blank');
+      window.open('/clbs', '_blank', 'noopener=1');
     }else if(item === 'GST'){
-      window.open('/gstr','_blank');
+      window.open('/gstr','_blank', 'noopener=1');
     }else if(item === 'SYNC'){
-      window.open('/sync','_blank');
+      window.open('/sync','_blank', 'noopener=1');
     }
     else{
-    sessionStorage.setItem("SelItem", item);
     if (item === 'Invoices') {
       if (this.history) {
         this.router.navigate(['/home/invoices'], { queryParams: this.history })
@@ -388,10 +357,20 @@ checkPOSvthFrontOfc :any = false;
   }
   }
   logout(): void {
-    localStorage.clear();
-    sessionStorage.clear();
-    this.router.navigate(['/']);
-    window.location.reload()
+    this.http.get(ApiUrls.logout).subscribe((res:any)=>{
+      localStorage.clear();
+      sessionStorage.clear();
+      this.cookie.deleteAll()
+      // let cookie_names = ['sid','user_id','full_name','system_user']
+      // cookie_names.forEach(name=>{
+      //   document.cookie=`${name}="sumanth"; expire=2022-08-05T06:43:18.966Z; path=/;`;
+      // })
+      
+      this.router.navigate(['']);
+      
+      
+    })
+   
   }
   navigateDashboard() {
     this.router.navigate(['home/dashboard'])
@@ -412,54 +391,43 @@ checkPOSvthFrontOfc :any = false;
     })
   }
 
-  getUserRoles(): void {
-    this.http.get(ApiUrls.userRoles).subscribe((responce: any) => {
-      this.userRoles = responce.message.data.filter((each: any) => each.includes('ezy'))
-      localStorage.setItem("UserRoles", JSON.stringify(this.userRoles))
+
+  changePassword(content) {
+    this.change_user_details ={}
+    this.wrong_password = ''
+    this.modal.open(content, {
+      centered: true
     })
   }
 
-
-  changePassword(content) {
-    this.modal.open(content, {
-      centered: true
-    });
-  }
-
-  register(form: NgForm) {
-    this.companyDetails['new_password'] = form.value.new_password;
-    const formData = new FormData();
-    formData.append('doc', JSON.stringify(this.companyDetails));
-    formData.append('action', 'Save')
-    this.http.post(ApiUrls.fileSave, formData).subscribe((res: any) => {
-      this.toaster.success('Document Saved')
-    });
+  check_old_password(e:any){
+    if(e.length >= 6){
+    this.http.post(ApiUrls.check_old_password,{user:this.loginUser?.email,pwd:e}).subscribe((res:any)=>{
+      if(res?.message){
+        this.wrong_password = res?.message?.message
+      }
+    })
+    }
   }
 
 
-  onSubmit() {
-    if (this.new_password) {
-      this.http.put(`${ApiUrls.users}/${this.emailId}`, { new_password: this.new_password }).subscribe((res: any) => {
+  onSubmit(form:NgForm) {
+    form.form.markAllAsTouched();
+    if(form.valid){
+    if (this.change_user_details.new_password) {
+      this.http.put(`${ApiUrls.users}/${this.loginUser?.email}`, { new_password: this.change_user_details.new_password , last_password_reset_date: moment(new Date()).format("YYYY-MM-DD") }).subscribe((res: any) => {
         if (res.data) {
           this.toaster.success("Password Changed");
           this.modal.dismissAll();
+          this.logout();
+
         } else {
           this.toaster.error("Failed")
         }
       })
     }
   }
-
-  getUserName() {
-    this.http.get(ApiUrls.users, {
-      params: {
-        filters: JSON.stringify([["full_name", "=", this.userData.full_name]])
-      }
-    }).subscribe((res: any) => {
-      this.emailId = res.data[0]?.name;
-    });
   }
-
 
   getNetworkStatus() {
     this.http.get(ApiUrls.networkStatus).subscribe((res: any) => {
@@ -472,48 +440,6 @@ checkPOSvthFrontOfc :any = false;
     }, 60000);
   }
 
-  checkUpdates(): void {
-    let checkUpdate, data, uiData, checkUpdateUI, backendUpdate = false, UIupdate = false;
-    let branchNAme = this.companyDetails?.backend_git_branch;
-    /**Server Updates */
-    this.http.get(ApiUrls.checkUpdates).subscribe((res: any) => {
-      if (res.message.success) {
-        data = res?.message.message[0];
-      }
-      this.http.get("https://gitlab.caratred.com/api/v4/projects/329/repository/branches/" + branchNAme + "?private_token=" + GitToken.token).subscribe((res: any) => {
-        if (res) {
-          this.branchUpdate = res;
-          checkUpdate = res?.commit?.id;
-          console.log("backend ========", data?.replaceAll(/\s/g, ''), checkUpdate?.replaceAll(/\s/g, ''))
-          backendUpdate = (data?.replaceAll(/\s/g, '') !== checkUpdate?.replaceAll(/\s/g, '')) ? true : false;
-          this.update = (backendUpdate) ? true : false;
-          localStorage.setItem('update', JSON.stringify(this.update))
-        }
-      })
-    })
-
-    /**UI Upadates */
-    let uiBranchName = this.companyDetails?.ui_git_branch;
-    this.http.post(ApiUrls.uiUpdateGitCommit, { 'company': this.companyDetails.name }).subscribe((res: any) => {
-      if (res.message.success) {
-        uiData = res?.message.message[0];
-      }
-      this.http.get("https://gitlab.caratred.com/api/v4/projects/340/repository/branches/" + uiBranchName + "?private_token=" + GitToken.uiToken).subscribe((res: any) => {
-        if (res) {
-          this.branchUpdate = res;
-          checkUpdateUI = res?.commit?.id;
-          UIupdate = (uiData?.replaceAll(/\s/g, '') !== checkUpdateUI?.replaceAll(/\s/g, '')) ? true : false;
-          // this.update = (uiData?.replaceAll(/\s/g, '') !== checkUpdateUI?.replaceAll(/\s/g, '')) ? true : false;
-          // localStorage.setItem('update', JSON.stringify(this.update))
-          this.updateUI = (UIupdate) ? true : false;
-          localStorage.setItem('updateUI', JSON.stringify(this.updateUI))
-        }
-      })
-    })
-
-
-  }
-
   openNotifications() {
     this.newCount = false;
     const editSacCode = this.modal.open(NotificationsComponent, {
@@ -522,19 +448,6 @@ checkPOSvthFrontOfc :any = false;
       windowClass: 'modal-sac',
       animation: false
     });
-  }
-
-
-  aboutUpdates(aboutContent) {
-    this.modal.open(aboutContent, { centered: true })
-    this.getAboutData()
-  }
-
-  getAboutData() {
-    this.http.get("https://gitlab.caratred.com/api/v4/projects/329/repository/tags?private_token=" + GitToken.token).subscribe((res: any) => {
-      // this.tagUpdate = res[res.length - 1]
-      this.tagUpdate = res[0]
-    })
   }
 
   updateNow() {
@@ -639,7 +552,6 @@ checkPOSvthFrontOfc :any = false;
   }
 
   async fileType(invoice: any) {
-    console.log("title ====", invoice)
     let qrPng;
     let title = "Invoice"
     if (invoice?.has_credit_items == "Yes" && invoice.invoice_type == "B2B") {
@@ -741,5 +653,9 @@ checkPOSvthFrontOfc :any = false;
   ngOnDestroy() {
     this.destroyEvents.emit(true);
     this.socketService.disconnect();
+    let cookie_names = ['sid','user_id','full_name','system_user']
+      cookie_names.forEach(name=>{
+        document.cookie=`${name}="sumanth"; expire=2022-08-05T06:43:18.966Z; path=/;`;
+    })
   }
 }

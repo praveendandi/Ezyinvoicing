@@ -9,7 +9,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LoaderComponent } from './shared/loader.component';
 import { TrimPipe } from './shared/pipes/trim.pipe';
-import { NgbAccordionModule, NgbDropdownModule, NgbPaginationModule, NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAccordionModule, NgbDropdownModule, NgbProgressbarModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PermissionResolver } from './permission.resolver';
 import { AuthGuardService } from './shared/auth/auth-guard.service';
@@ -42,7 +42,9 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
 import { BulkUploadExcelProgressbarComponent } from './shared/models/bulk-upload-excel-progressbar/bulk-upload-excel-progressbar.component';
 import { ExcelService } from './shared/services/excel.service';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+import { AlphaInputDirectiveModule } from './shared/directives/alpha-input.directive';
+import { NotFoundComponent } from './resuable/not-found/not-found.component';
+import { CookieService } from 'ngx-cookie-service';
 
 
 
@@ -67,6 +69,7 @@ const config: SocketIoConfig = { url: '', options: {} };
     NotificationsComponent,
     FileuploadProgressbarComponent,
     BulkUploadExcelProgressbarComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -82,7 +85,6 @@ const config: SocketIoConfig = { url: '', options: {} };
     UnderscoreToSpaceModule,
     NgbProgressbarModule,
     FileuploadProgressbarModule,
-    NgbPaginationModule,
     NoWhiteSpaceInputDirectiveModule,
     NgCircleProgressModule.forRoot({
       // set defaults here
@@ -95,18 +97,17 @@ const config: SocketIoConfig = { url: '', options: {} };
     }),
     QuillModule.forRoot(),
     ToastrModule.forRoot({
-      timeOut: 10000,
+      timeOut: 5000,
       positionClass: 'toast-bottom-right',
-      // preventDuplicates: true,
+      preventDuplicates: true,
       // toastComponent: CustomToastrComponent
     }),
     SocketIoModule.forRoot(config),
     ClipboardModule,
-    LottieModule.forRoot({ player: playerFactory }),
+    LottieModule.forRoot({player:playerFactory}),
     VirtualScrollerModule,
     Ng2SearchPipeModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule
+    AlphaInputDirectiveModule
   ],
   providers: [
     {
@@ -119,6 +120,7 @@ const config: SocketIoConfig = { url: '', options: {} };
     { provide: PERFECT_SCROLLBAR_CONFIG, useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG },
     DatePipe,
     ExcelService,
+    CookieService
   ],
   bootstrap: [AppComponent],
   exports: [FileUploaderComponent, CreateInvoiceManualComponent, SplitLineItemsComponent, NotificationsComponent, CustomToastrComponent, MultiSplitItemComponent]

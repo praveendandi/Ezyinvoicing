@@ -53,10 +53,17 @@ export class PermissionButtonDirective implements OnInit {
     //     this.elementRef.nativeElement.disabled = res[this.accessType] > 0 ? false : true;
     //   }
     // })
+
+    // console.log(this.accessType , " ======= access type")
     this.permissions = JSON.parse(localStorage.getItem("checkPermissions"))
     let check = this.permissions?.hasOwnProperty(this.accessType)
     if (check) {
+      this.elementRef.nativeElement.style['pointer-events']= this.permissions[this.accessType] > 0 ? 'auto' : 'none'
+      this.elementRef.nativeElement.style.cursor= this.permissions[this.accessType] > 0 ? 'pointer' : 'not-allowed'
       this.elementRef.nativeElement.disabled = this.permissions[this.accessType] > 0 ? false : true;
+      
+     
+
       // console.log(this.elementRef.nativeElement.disabled,"hello", this.accessType)
     }
   }

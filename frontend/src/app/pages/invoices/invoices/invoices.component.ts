@@ -130,7 +130,6 @@ export class InvoicesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     this.companyInfo = JSON.parse(localStorage.getItem('company'))
-    console.log(this.companyInfo.company_code)
     this.filters.itemsPerPage = this.companyInfo?.items_per_page
     this.socketService.newInvoice.pipe(takeUntil(this.destroyEvents)).subscribe((res: any) => {
       if (res?.message?.message === 'Invoices Created') {
@@ -494,27 +493,17 @@ export class InvoicesComponent implements OnInit, OnDestroy {
           // each['expiry_days'] = Math.round(Math.abs((date_expiry - today_date) / oneDay))
 
           let today_date: any = Moment(each?.invoice_date).format('YYYY-MM-DD')
-
-          let date_expiry: any = this.companyInfo?.e_invoice_missing_start_date ? Moment(this.companyInfo?.e_invoice_missing_start_date).format('YYYY-MM-DD') : null
-         
-          if (this.companyInfo?.e_invoice_missing_date_feature && today_date >= date_expiry) {
+          let date_expiry: any = this.companyInfo?.einvoice_missing_start_date ? Moment(this.companyInfo?.einvoice_missing_start_date).format('YYYY-MM-DD') : null
+          if (this.companyInfo?.einvoice_missing_date_feature && today_date >= date_expiry) {
             let today_date: any = Moment(new Date()).format('YYYY-MM-DD')
-            // let date_expiry: any = Moment(Moment(each?.invoice_date).add(7, 'd').format('YYYY-MM-DD'))
-            let date_expiry: any = Moment(Moment(each?.invoice_date).add(this.companyInfo.no_of_days_to_expiry, 'd').format('YYYY-MM-DD'))
-
+            let date_expiry: any = Moment(Moment(each?.invoice_date).add(7, 'd').format('YYYY-MM-DD'))
             date_expiry = Moment(date_expiry).format('YYYY-MM-DD')
             each['expiry_date'] = Moment(date_expiry).format('YYYY-MM-DD')
-           
             each['expiry_days'] = Moment(date_expiry).diff(Moment(today_date), 'days')
-
-            console.log("each == ", each)
           }
-
-
         }
         return each;
       })
-      console.log(data.data)
       if (data.data) {
         data.data['checked'] = false;
         if (this.filters.currentPage !== 1) {
@@ -1003,7 +992,6 @@ export class InvoicesComponent implements OnInit, OnDestroy {
         this.http.post(ApiUrls.generateIrn_new, { data: dataObj }).subscribe(async (event: any) => {
           if (event.message.success) {
             this.dupinvoicesList[idx].uploaded = "success";
-
           } else {
             this.dupinvoicesList[idx].uploaded = "failed";
           }
@@ -1102,12 +1090,6 @@ export class InvoicesComponent implements OnInit, OnDestroy {
     this.redoErrItems = false;
     this.modal.dismissAll()
     this.destroyEvents.emit(true);
-  }
-  update_signature_on_pdf() {
-    this.http.get(ApiUrls.update_signature_on_pdf).subscribe((res: any) => {
-
-      console.log(res)
-    })
   }
 }
 

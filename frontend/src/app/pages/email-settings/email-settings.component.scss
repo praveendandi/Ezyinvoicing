@@ -1,21 +1,19 @@
-.newTemplate {
+.newTemplate{
     background-color: #C1C1C1;
     padding: 27px 0px;
-    border-radius: 4px;
+    border-radius: 4px ;
     overflow: hidden;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
     cursor: pointer;
-}
-
-.listTemplate {
+  }
+.listTemplate{
     background-color: white;
     border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
     cursor: pointer;
 }
-
-.text-truncate-company {
+.text-truncate-company{
     display: inline-block;
     /* min-width: 67px; */
     text-overflow: ellipsis;
@@ -25,31 +23,13 @@
     overflow: hidden;
     vertical-align: bottom;
     text-align: left;
-}
+  }
 
-.email-trmplates {
-    p {
-        display: flex;
-
-        b {
-            padding-right: 10px;
-        }
-    }
-}
-
-.upload-btn {
-    position: absolute;
-    top: 38px;
-    padding: 6px;
-    background: #F26135;
-    color: #fff;
-    border-radius: 3px;
-    right: 5px;
-    margin: 0;
-    cursor: pointer;
-}
-
-.f-upload {
-    padding: 20px 10px;
-    position: relative;
-}
+  .email-trmplates{
+      p{
+          display: flex;
+          b{
+              padding-right: 10px;
+          }
+      }
+  }

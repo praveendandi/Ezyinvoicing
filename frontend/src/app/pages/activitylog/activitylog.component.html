@@ -1,6 +1,7 @@
 <section class="activity-logs">
   <div class="modal-header my-auto text-left d-block">
     <h6> <i (click)="activeModal.close()" class="ri-arrow-left-line"></i> <strong>Activity Log</strong></h6>
+
   </div>
   <div class="modal-body">
     <div class="row">
@@ -34,11 +35,11 @@
         </div>
         <div>
           <ng-container *ngIf="activityLogs.length  < this.total_count">
-            <p class="text-right pr-3 more text-primary" (click)="activityMore(activityLogs.length)">
+          <p class="text-right pr-3 more text-primary" (click)="activityMore(activityLogs.length)">
               more
-            </p>
+          </p>
           </ng-container>
-        </div>
+      </div>
       </div>
       <div class="col-6" *ngIf="activeLog">
         <div class="card-max-height">

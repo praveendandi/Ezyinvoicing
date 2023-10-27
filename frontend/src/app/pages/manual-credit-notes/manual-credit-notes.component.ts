@@ -56,7 +56,6 @@ class InvoicesFilter {
 })
 export class ManualCreditNotesComponent implements OnInit, OnDestroy {
   manualType;
-  invoicenumberselectall: any
   filters = new InvoicesFilter();
   onSearch = new EventEmitter();
   // gstNumber;
@@ -238,17 +237,17 @@ export class ManualCreditNotesComponent implements OnInit, OnDestroy {
       data.data = data.data.map((each: any, index) => {
         if (each) {
           each.index = this.invoicesList.length + index + 1;
+
           let today_date: any = Moment(each?.invoice_date).format('YYYY-MM-DD')
-          let date_expiry: any = this.companyDetails?.e_invoice_missing_start_date ? Moment(this.companyDetails?.e_invoice_missing_start_date).format('YYYY-MM-DD') : null
-          if (this.companyDetails?.e_invoice_missing_date_feature && today_date >= date_expiry) {
+          let date_expiry: any = this.companyDetails?.einvoice_missing_start_date ? Moment(this.companyDetails?.einvoice_missing_start_date).format('YYYY-MM-DD') : null
+          if (this.companyDetails?.einvoice_missing_date_feature && today_date >= date_expiry) {
             let today_date: any = Moment(new Date()).format('YYYY-MM-DD')
-            let date_expiry: any = Moment(Moment(each?.invoice_date).add(this.companyDetails.no_of_days_to_expiry, 'd').format('YYYY-MM-DD'))
+            let date_expiry: any = Moment(Moment(each?.invoice_date).add(7, 'd').format('YYYY-MM-DD'))
             date_expiry = Moment(date_expiry).format('YYYY-MM-DD')
-            each['expiry_date'] = Moment(date_expiry).format('YYYY-MM-DD')
-            each['expiry_days'] = Moment(date_expiry).diff(Moment(today_date), 'days')
-
+              each['expiry_date'] = Moment(date_expiry).format('YYYY-MM-DD')
+              each['expiry_days'] = Moment(date_expiry).diff(Moment(today_date), 'days')
+            
           }
-
         }
         return each;
       })
@@ -276,19 +275,15 @@ export class ManualCreditNotesComponent implements OnInit, OnDestroy {
   }
 
   checkedItemsAll(event) {
-    console.log(event, '-----------------------')
     if (this.selectAll) {
       this.dupinvoicesList = this.invoicesList.filter((each: any) => {
         if (each.irn_generated == "Pending") {
-          console.log(each.expiry_days)
           each.checked = true
         }
-        // expiry_days
         return each;
       })
     } else {
       this.dupinvoicesList = this.invoicesList.filter((each: any) => {
-        // each.expiry_days >= 0 && each.irn_generated == "Pending"
         if (each.irn_generated == "Pending") {
           each.checked = false
         }
@@ -304,11 +299,7 @@ export class ManualCreditNotesComponent implements OnInit, OnDestroy {
     })
     console.log(this.dupinvoicesList)
   }
-
-
   checkedItems(event, item) {
-    console.log(item, '000000000000000000000000')
-    this.invoicenumberselectall = item
     const temp = this.invoicesList.filter((each: any) => each.checked);
     this.selectAll = temp.length == this.invoicesList.length;
     this.dupinvoicesList = temp;
@@ -320,31 +311,6 @@ export class ManualCreditNotesComponent implements OnInit, OnDestroy {
     })
     console.log(this.dupinvoicesList)
   }
-  // checkedItems(event, item) {
-  //   const temp = this.invoicesList.filter((each: any) => each.checked);
-  //   this.selectAll = temp.length == this.invoicesList.length;
-  //   this.dupinvoicesList = temp;
-  //   this.dupinvoicesList = this.dupinvoicesList.map((each: any) => {
-  //     if (each) {
-  //       each['doctype'] = Doctypes.invoices
-  //     }
-  //     return each;
-  //   })
-  //   console.log(this.dupinvoicesList)
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-
   openModalIRN(multiGenerateIrn) {
 
     let modalData = this.modal.open(multiGenerateIrn, { centered: true, size: 'md' })

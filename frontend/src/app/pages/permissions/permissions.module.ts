@@ -6,6 +6,7 @@ import { PermissionsComponent } from './permissions.component';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.directive';
+import { SearchPermissionPipeModule } from 'src/app/shared/pipes/search-user.pipe';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.dir
     PermissionsRoutingModule,
     FormsModule,
     NgxPaginationModule,
-    MatInputDirectiveModule
+    MatInputDirectiveModule,
+    SearchPermissionPipeModule
   ]
 })
 export class PermissionsModule { }

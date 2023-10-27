@@ -11,6 +11,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { SafePipeModule } from 'src/app/shared/pipes/safe.pipe';
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { VirtualScrollerModule } from 'ngx-virtual-scroller';
+import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permission-button.directive';
 
 @NgModule({
   declarations: [PosBillsComponent],
@@ -27,7 +28,8 @@ import { VirtualScrollerModule } from 'ngx-virtual-scroller';
     OwlNativeDateTimeModule,
     NgbNavModule,
     NgbDropdownModule,
-    NgbProgressbarModule
+    NgbProgressbarModule,
+    PermissionButtonDirectiveModule
   ]
 })
 export class PosBillsModule { }

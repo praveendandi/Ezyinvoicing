@@ -29,6 +29,7 @@ export class ReportsComponent implements OnInit {
   reportTypeList = [];
   company
   colListXL = []
+
   constructor(
     private http: HttpClient,
     private activatedRoute: ActivatedRoute,
@@ -44,14 +45,14 @@ export class ReportsComponent implements OnInit {
     //   ]
     // });
 
-    this.activatedRoute.queryParams.subscribe((res: any) => {
-      if (res) {
+    this.activatedRoute.queryParams.subscribe((res:any)=>{
+      if(res){
         this.filterDate.reportType = res?.reportType;
       }
     })
 
+    
     this.company = JSON.parse(localStorage.getItem("company"));
-    console.log(this.company)
     this.getTotalCountReports();
   }
 
@@ -97,24 +98,14 @@ export class ReportsComponent implements OnInit {
   }
 
   getReportsTypes(count): void {
-    const params: any = {
-      filters: JSON.stringify([["Report", "ref_doctype", "in", [Doctypes.invoices, Doctypes.deleteDocument]], ["Report", "disabled", "=", 0], ["Report", "name", "!=", "Amendment SAC HSN Summary"], ["Report", "name", "!=", "Amendment"]])
-    };
+    const params: any = { 
+      filters: JSON.stringify([["Report", "ref_doctype", "in", [Doctypes.invoices,Doctypes.deleteDocument]],["Report", "disabled", "=", 0],["Report","name","!=","Amendment SAC HSN Summary"],["Report","name","!=","Amendment"]]) };
     params["page_length"] = count;
     params["order_by"] = "`tabReport`.`creation` asc";
     this.http.get(ApiUrls.reportList, { params: params }).subscribe((res: any) => {
       this.reportTypeList = res?.data
-      console.log(this.reportTypeList)
-      if (this.company.e_invoice_missing_date_feature == 0) {
-        this.reportTypeList.splice(17, 2)
-      }
-      else {
-        this.reportTypeList = res?.data
-      }
-
       this.filterDate.reportType = this.reportTypeList[0].name
       this.getActivatedParamsData()
-
     })
   }
 
@@ -148,15 +139,12 @@ export class ReportsComponent implements OnInit {
       } else {
         filter = new DateToFilter('Reports', this.filterDate.default_Date).filter;
       }
-      let filtersParams = {
-        report_name: this.filterDate.reportType,
-      }
-      if (this.filterDate.reportType != 'Irn Due Report' && this.filterDate.reportType != 'Irn Expired Report') {
-        filtersParams['filters'] = JSON.stringify({ from_date: filter[0], to_date: filter[1] })
-      }
       console.log(filter)
       const resultApi = this.http.get(ApiUrls.reports, {
-        params: filtersParams
+        params: {
+          filters: JSON.stringify({ from_date: filter[0], to_date: filter[1] }),
+          report_name: this.filterDate.reportType,
+        }
       });
       return resultApi;
     })).subscribe((res: any) => {
@@ -206,9 +194,9 @@ export class ReportsComponent implements OnInit {
           // dynamicRowHeight: false,
           // pasteFromClipboard: false
         };
-        console.log("Options ====", options)
+        console.log("Options ====",options)
         const datatable = new DataTable(tableId, options);
-      } else {
+      }else{
         console.log("===============")
       }
     })
@@ -259,8 +247,5 @@ class DateToFilter {
         this.filter = [from, to];
         break;
     }
-  }
-  missingDateFeature() {
-
   }
 }

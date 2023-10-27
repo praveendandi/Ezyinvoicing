@@ -100,68 +100,66 @@ export class BenchLogsComponent implements OnInit,OnDestroy {
   }
 
 
-  update() {
-    // this.http.get(`${ApiUrls.permissions}?doctype=${Doctypes.benchSettings}&name=${Doctypes.benchSettings}`).subscribe((res:any)=>{
+  // update() {
    
-
-    /**Proxy to set */
-    if(this.companyDetails?.proxy == 1){
-      this.http.post(ApiUrls.checkProxy, { data: { company: this.companyDetails?.name, type: 'set' } }).subscribe((proxy: any) => {
-        if (proxy.message.success) {
-          this.http.post(`${ApiUrls.benchUpdate_new}`,{data:{company:this.companyDetails?.name,username:this.loginUser?.username}}).subscribe((res: any) => {
-            if (res) {
+  //   /**Proxy to set */
+  //   if(this.companyDetails?.proxy == 1){
+  //     this.http.post(ApiUrls.checkProxy, { data: { company: this.companyDetails?.name, type: 'set' } }).subscribe((proxy: any) => {
+  //       if (proxy.message.success) {
+  //         this.http.post(`${ApiUrls.benchUpdate_new}`,{data:{company:this.companyDetails?.name,username:this.loginUser?.username}}).subscribe((res: any) => {
+  //           if (res) {
   
-            }
-          })
-        }
-      })
-    }else{
-      this.http.post(`${ApiUrls.benchUpdate_new}`,{data:{company:this.companyDetails?.name,username:this.loginUser?.username}}).subscribe((res: any) => {
-        if (res) {
+  //           }
+  //         })
+  //       }
+  //     })
+  //   }else{
+  //     this.http.post(`${ApiUrls.benchUpdate_new}`,{data:{company:this.companyDetails?.name,username:this.loginUser?.username}}).subscribe((res: any) => {
+  //       if (res) {
 
-        }
-      })
-    }
-    // this.http.post(ApiUrls.checkProxy, { data: { company: this.companyDetails?.name, type: 'set' } }).subscribe((proxy: any) => {
-    //   if (proxy.message.success) {
-    //     this.http.get(`${ApiUrls.benchUpdate}`).subscribe((res: any) => {
-    //       if (res) {
-            // const date = new Date();
-            // const formData = new FormData();
-            // formData.append('key',JSON.stringify(date));
-            // formData.append('caller','bench_update');
-            // formData.append('docs',JSON.stringify(res?.docs[0]))
-            // formData.append('method',"console_command")
-            // formData.append('args',JSON.stringify({'key':date,'caller':'bench_update'}))
+  //       }
+  //     })
+  //   }
+  //   // this.http.post(ApiUrls.checkProxy, { data: { company: this.companyDetails?.name, type: 'set' } }).subscribe((proxy: any) => {
+  //   //   if (proxy.message.success) {
+  //   //     this.http.get(`${ApiUrls.benchUpdate}`).subscribe((res: any) => {
+  //   //       if (res) {
+  //           // const date = new Date();
+  //           // const formData = new FormData();
+  //           // formData.append('key',JSON.stringify(date));
+  //           // formData.append('caller','bench_update');
+  //           // formData.append('docs',JSON.stringify(res?.docs[0]))
+  //           // formData.append('method',"console_command")
+  //           // formData.append('args',JSON.stringify({'key':date,'caller':'bench_update'}))
 
-            // this.http.get(ApiUrls.generateIrn).subscribe((res: any) => {
-            //   console.log(res)
-            //   if (res) {
-            //     //  this.clearInterval = setInterval(()=>{
-            //     //    this.checkMaintenceMode()
+  //           // this.http.get(ApiUrls.generateIrn).subscribe((res: any) => {
+  //           //   console.log(res)
+  //           //   if (res) {
+  //           //     //  this.clearInterval = setInterval(()=>{
+  //           //     //    this.checkMaintenceMode()
 
-            //     //   },10000)
-            //   }
-            // })
+  //           //     //   },10000)
+  //           //   }
+  //           // })
 
 
-            // setTimeout(()=>{
-            //   this.http.get(ApiUrls.migrateBench).subscribe((res:any)=>{
-            //     if(res){
-            //       console.log(res)
-            //       this.modal.dismissAll()
-            //       localStorage.clear();
-            //       this.router.navigate([''])
-            //     }
-            //   })
-            // },30000)
+  //           // setTimeout(()=>{
+  //           //   this.http.get(ApiUrls.migrateBench).subscribe((res:any)=>{
+  //           //     if(res){
+  //           //       console.log(res)
+  //           //       this.modal.dismissAll()
+  //           //       localStorage.clear();
+  //           //       this.router.navigate([''])
+  //           //     }
+  //           //   })
+  //           // },30000)
 
-    //       }
-    //     })
-    //   }
-    // })
+  //   //       }
+  //   //     })
+  //   //   }
+  //   // })
 
-  }
+  // }
 
   // checkMaintenceMode():void{
   //   this.http.get(`${ApiUrls.resource}/${Doctypes.benchMangerCmd}`,{observe:'response'}).subscribe((response:any)=>{

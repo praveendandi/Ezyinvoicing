@@ -10,64 +10,42 @@
             <!-- <button (click)="getSynctoGst()" *ngIf="companyInfo?.ezy_gst_module == 1" class="btn btn-primary btn-small mr-2" ngbTooltip="sync to gst"
                 appPermissionButton accessType="write" type="button">Sync to GST
             </button> -->
-            <button [routerLink]="['/home/expired-invoices']" *ngIf="companyInfo?.e_invoice_missing_date_feature"
-                class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button">Expired
-                Invoices</button>
-            <button (click)="openModalIRN(multiGenerateIrn)" *ngIf="dupinvoicesList.length ; else elseIrn"
-                class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button">Generate
-                IRN</button>
-            <button (click)="openModelRedo(multiRedoErrors)" *ngIf="invoicesList.length"
-                class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button"> Redo
-                Error</button>
+            <button (click)="openModalIRN(multiGenerateIrn)" *ngIf="dupinvoicesList.length ; else elseIrn" class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button">Generate
+        IRN</button>
+            <button (click)="openModelRedo(multiRedoErrors)" *ngIf="invoicesList.length" class="btn btn-primary btn-small mr-2" appPermissionButton accessType="write" type="button"> Redo Error</button>
             <ng-template #elseIrn>
-                <span *ngIf="this.companyInfo.company_code== 'RBHR-01'">
-                    <button class="btn btn-primary btn-small mr-2" type="button"
-                        (click)="update_signature_on_pdf()">Update
-                        Signature</button>
-                </span>
-
                 <div ngbDropdown class="d-inline-block">
-                    <button class="btn btn-primary mr-2" id="file-uploads"
-                        *ngIf="companyInfo?.enable_pdf_upload == 1 || companyInfo?.bulk_excel_upload_type !== 'None'"
-                        ngbDropdownToggle [disabled]="upload_bulk_invoices_disable">Bulk Upload</button>
+                    <button class="btn btn-primary mr-2" id="file-uploads" *ngIf="companyInfo?.enable_pdf_upload == 1 || companyInfo?.bulk_excel_upload_type !== 'None'" ngbDropdownToggle [disabled]="upload_bulk_invoices_disable" appPermissionButton accessType="create">Bulk Upload</button>
                     <div ngbDropdownMenu aria-labelledby="file-uploads">
-                        <button class="px-2" *ngIf="companyInfo?.enable_pdf_upload == 1" (click)="uploadPdfFiles()"
-                            ngbDropdownItem>PDF Upload</button>
-                        <button class="px-2" *ngIf="companyInfo?.bulk_excel_upload_type !== 'None'"
-                            (click)="uploadExcelFile(excelUpload)" ngbDropdownItem>Excel Upload</button>
+                        <button class="px-2" *ngIf="companyInfo?.enable_pdf_upload == 1" (click)="uploadPdfFiles()" ngbDropdownItem >PDF Upload</button>
+                        <button class="px-2" *ngIf="companyInfo?.bulk_excel_upload_type !== 'None'" (click)="uploadExcelFile(excelUpload)" ngbDropdownItem>Excel Upload</button>
                     </div>
                     <ng-template #excelUpload let-modal>
                         <div class="p-2">
                             <div class="modal-header py-2">
                                 <div class="d-flex">
-                                    <h5 class="mr-3" id="modal-basic-title"><strong>{{uploadProgress?.status == 'NO' ?
-                                            'Excel
-                                            Upload':uploadProgress.label}}</strong></h5>
+                                    <h5 class="mr-3" id="modal-basic-title"><strong>{{uploadProgress?.status == 'NO' ? 'Excel
+                      Upload':uploadProgress.label}}</strong></h5>
                                 </div>
-                                <button *ngIf="uploadProgress?.status == 'ERROR' || execeptionError" type="button"
-                                    class="close" aria-label="Close" (click)="modal.dismiss()">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <button *ngIf="uploadProgress?.status == 'ERROR' || execeptionError" type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
                             </div>
                             <div class="modal-body">
-                                <div class="text-center text-danger" *ngIf="execeptionError">
-                                    <b>{{execptionData?.messagedata}}</b>
-                                </div>
+                                <div class="text-center text-danger" *ngIf="execeptionError"><b>{{execptionData?.messagedata}}</b></div>
                                 <div class="px-4" *ngIf="uploadProgress?.status == 'NO'">
                                     <div class="row">
                                         <div class="col-6">
                                             <p class="font-weight-bold mb-0">Invoice Details <br> Document</p>
                                             <small>only {{bulkFileType?.typeMsg}} files are accepted <br> <a
-                                                    href={{bulkFileType?.fileType}}>Click here to download sample
-                                                    format</a></small>
+                          href={{bulkFileType?.fileType}}>Click here to download sample
+                          format</a></small>
                                         </div>
                                         <div class="col-6 align-self-center text-right">
-                                            <input [accept]="bulkFileType?.type" type="file" (change)="fileInp1"
-                                                #fileInp1 hidden name="invoice-doc-file-1" id="invoice-doc-file-1">
-                                            <label for="invoice-doc-file-1"
-                                                class="ml-auto d-block cursor-pointer text-center input-file-upload-btn mb-0">
-                                                {{fileInp1?.files?.length ? 'Change':'Select'}}
-                                            </label>
+                                            <input [accept]="bulkFileType?.type" type="file" (change)="fileInp1" #fileInp1 hidden name="invoice-doc-file-1" id="invoice-doc-file-1">
+                                            <label for="invoice-doc-file-1" class="ml-auto d-block cursor-pointer text-center input-file-upload-btn mb-0">
+                        {{fileInp1?.files?.length ? 'Change':'Select'}}
+                      </label>
                                             <div class="file-name-preview ml-auto">{{fileInp1?.files[0]?.name}}</div>
                                         </div>
                                     </div>
@@ -77,54 +55,39 @@
                                         <div class="col-6">
                                             <p class="font-weight-bold mb-0">GST Details <br> Document</p>
                                             <small>only {{bulkFileType?.gstMsg}} files are accepted. <br> <a
-                                                    href={{bulkFileType?.fileGst}}>Click here to download sample
-                                                    format</a></small>
+                          href={{bulkFileType?.fileGst}}>Click here to download sample
+                          format</a></small>
                                         </div>
                                         <div class="col-6 align-self-center text-right mt-1">
-                                            <input [accept]="bulkFileType?.gst" type="file" (change)="fileInp2"
-                                                #fileInp2 hidden name="invoice-doc-file" id="invoice-doc-file-2">
-                                            <label for="invoice-doc-file-2"
-                                                class="ml-auto d-block cursor-pointer text-center input-file-upload-btn mb-0">
-                                                {{fileInp2?.files?.length ? 'Change':'Select'}}
-                                            </label>
+                                            <input [accept]="bulkFileType?.gst" type="file" (change)="fileInp2" #fileInp2 hidden name="invoice-doc-file" id="invoice-doc-file-2">
+                                            <label for="invoice-doc-file-2" class="ml-auto d-block cursor-pointer text-center input-file-upload-btn mb-0">
+                        {{fileInp2?.files?.length ? 'Change':'Select'}}
+                      </label>
                                             <div class="file-name-preview ml-auto">{{fileInp2?.files[0]?.name}}</div>
                                         </div>
                                     </div>
 
                                     <div class="mt-4 text-right">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            (click)="modal.dismiss()">Cancel</button>
-                                        <button type="button"
-                                            [disabled]="(!(fileInp1?.files[0]) && !(fileInp2?.files[0])) || execeptionError"
-                                            class="btn btn-primary ml-2" *ngIf="companyInfo?.upload_gst_details == 1"
-                                            (click)="uploadExcels(fileInp1,fileInp2)">Upload</button>
-                                        <button type="button" *ngIf="companyInfo?.upload_gst_details == 0"
-                                            [disabled]="!(fileInp1?.files[0]) || execeptionError"
-                                            class="btn btn-primary ml-2"
-                                            (click)="uploadExcels(fileInp1,null)">Upload</button>
+                                        <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">Cancel</button>
+                                        <button type="button" [disabled]="(!(fileInp1?.files[0]) && !(fileInp2?.files[0])) || execeptionError" class="btn btn-primary ml-2" *ngIf="companyInfo?.upload_gst_details == 1" (click)="uploadExcels(fileInp1,fileInp2)">Upload</button>
+                                        <button type="button" *ngIf="companyInfo?.upload_gst_details == 0" [disabled]="!(fileInp1?.files[0]) || execeptionError" class="btn btn-primary ml-2" (click)="uploadExcels(fileInp1,null)">Upload</button>
                                     </div>
                                 </div>
-                                <div class="p-4"
-                                    *ngIf="uploadProgress.status == 'STARTED' || uploadProgress.status == 'ERROR'">
+                                <div class="p-4" *ngIf="uploadProgress.status == 'STARTED' || uploadProgress.status == 'ERROR'">
                                     <!-- <h2 class="text-center p-5">{{uploadProgress.label}}</h2> -->
                                     <div class="d-flex">
-                                        <small
-                                            class="justify-content-between align-items-center"><b>{{excelUploadData.createdCount}}/{{excelUploadData.totalCount}}</b></small>
+                                        <small class="justify-content-between align-items-center"><b>{{excelUploadData.createdCount}}/{{excelUploadData.totalCount}}</b></small>
                                     </div>
 
-                                    <ngb-progressbar [animated]="true" [title]="'pavan'" [type]="uploadProgress.color"
-                                        textType="white" [value]="uploadProgress.progress" [showValue]="true">
+                                    <ngb-progressbar [animated]="true" [title]="'pavan'" [type]="uploadProgress.color" textType="white" [value]="uploadProgress.progress" [showValue]="true">
                                     </ngb-progressbar>
                                     <div class="mt-5 text-right" *ngIf="uploadProgress.status == 'ERROR'">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            (click)="modal.dismiss()">Cancel</button>
-                                        <button type="button" class="btn btn-primary ml-2"
-                                            (click)="uploadProgress.status = 'NO'; uploadProgress.progress = 1;uploadProgress.color='secondary'">Retry</button>
+                                        <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">Cancel</button>
+                                        <button type="button" class="btn btn-primary ml-2" (click)="uploadProgress.status = 'NO'; uploadProgress.progress = 1;uploadProgress.color='secondary'">Retry</button>
                                     </div>
                                 </div>
                                 <div class="p-4" *ngIf="uploadProgress.status == 'SUCCESS' && uploadProgress.data">
-                                    <div class="d-flex py-2 bg-light justify-content-around"
-                                        *ngFor="let each of uploadProgress.data">
+                                    <div class="d-flex py-2 bg-light justify-content-around" *ngFor="let each of uploadProgress.data">
                                         <div class="p-2">
                                             <small class="">Invoice Date</small>
                                             <p class="font-weight-bold mb-0">{{each.date}}</p>
@@ -150,10 +113,8 @@
                   </div> -->
                                     </div>
                                     <div class="mt-4 text-right">
-                                        <button type="button" class="btn btn-outline-primary"
-                                            (click)="modal.dismiss()">Close</button>
-                                        <button type="button" class="btn btn-primary ml-2" (click)="modal.dismiss()"
-                                            [routerLink]="['','home','upload-invoice']">View</button>
+                                        <button type="button" class="btn btn-outline-primary" (click)="modal.dismiss()">Close</button>
+                                        <button type="button" class="btn btn-primary ml-2" (click)="modal.dismiss()" [routerLink]="['','home','upload-invoice']">View</button>
                                     </div>
                                 </div>
                             </div>
@@ -166,12 +127,10 @@
                         class="ri-file-upload-line text-white"></i></span></button> -->
             </ng-template>
 
-            <button *ngIf="companyInfo?.pms_information_invoice_for_payment_qr ==='Yes'"
-                ngbTooltip="Information Invoice" [routerLink]="[ '/home/Information_invoice']"
-                class="btn btn-primary btn-small  mr-2" type="button"><span><i
-                        class="ri-file-info-fill text-white"></i></span></button>
-            <button (click)="refreshParams()" ngbTooltip="Refresh" class="btn btn-primary btn-small"
-                type="button"><span><i class="ri-refresh-line text-white"></i></span></button>
+            <button *ngIf="companyInfo?.pms_information_invoice_for_payment_qr ==='Yes'" ngbTooltip="Information Invoice" [routerLink]="[ '/home/Information_invoice']" class="btn btn-primary btn-small  mr-2" type="button"><span><i
+              class="ri-file-info-fill text-white"></i></span></button>
+            <button (click)="refreshParams()" ngbTooltip="Refresh" class="btn btn-primary btn-small" type="button"><span><i
+            class="ri-refresh-line text-white"></i></span></button>
         </div>
 
     </div>
@@ -179,51 +138,43 @@
         <div>
             <div class="d-flex mb-3">
                 <div class="form-group w-c-50 ml-0">
-                    <select id="my-select2" [(ngModel)]="filters.search.uploadType"
-                        (ngModelChange)="updateRouterParams()" class="custom-select bg-white">
-                        <option value="All">All</option>
-                        <option value="Pms">PMS</option>
-                        <option value="Web">Manual</option>
-                        <option value="File">Bulk Upload</option>
-                    </select>
+                    <select id="my-select2" [(ngModel)]="filters.search.uploadType" (ngModelChange)="updateRouterParams()" class="custom-select bg-white">
+            <option value="All">All</option>
+            <option value="Pms">PMS</option>
+            <option value="Web">Manual</option>
+            <option value="File">Bulk Upload</option>
+          </select>
                 </div>
-                <div class="form-group w-c-50 ml-2"
-                    *ngIf="filters.active == 2 || filters.active == 3 || filters.active == 5">
-                    <select id="my-select2" [(ngModel)]="filters.search.filterType" (ngModelChange)="onDateFilterType()"
-                        class="custom-select bg-white" name="">
-                        <option value="creation">Printed</option>
-                        <option value="invoice_date">Invoice</option>
+                <div class="form-group w-c-50 ml-2" *ngIf="filters.active == 2 || filters.active == 3 || filters.active == 5">
+                    <select id="my-select2" [(ngModel)]="filters.search.filterType" (ngModelChange)="onDateFilterType()" class="custom-select bg-white" name="">
+            <option value="creation">Printed</option>
+            <option value="invoice_date">Invoice</option>
 
-                    </select>
+          </select>
                 </div>
-                <div class="form-group w-c-50"
-                    *ngIf="filters.active == 2 || filters.active == 3 || filters.active == 5">
-                    <select id="my-select" [(ngModel)]="filters.search.filterBy" (ngModelChange)="onDateFilterChange()"
-                        class="custom-select bg-white" name="">
-                        <option value="All">All</option>
-                        <option value="Today">Today</option>
-                        <option value="Yesterday">Yesterday</option>
-                        <option value="This Week">This Week</option>
-                        <option value="Last Week">Last Week</option>
-                        <option value="This Month">This Month</option>
-                        <option value="Last Month">Last Month</option>
-                        <option value="This Year">This Year</option>
-                        <option value="Custom">Custom</option>
-                    </select>
+                <div class="form-group w-c-50" *ngIf="filters.active == 2 || filters.active == 3 || filters.active == 5">
+                    <select id="my-select" [(ngModel)]="filters.search.filterBy" (ngModelChange)="onDateFilterChange()" class="custom-select bg-white" name="">
+            <option value="All">All</option>
+            <option value="Today">Today</option>
+            <option value="Yesterday">Yesterday</option>
+            <option value="This Week">This Week</option>
+            <option value="Last Week">Last Week</option>
+            <option value="This Month">This Month</option>
+            <option value="Last Month">Last Month</option>
+            <option value="This Year">This Year</option>
+            <option value="Custom">Custom</option>
+          </select>
                 </div>
 
                 <div class="form-group calendar w-c-50 position-relative" *ngIf="filters.search.filterBy == 'Custom'">
-                    <input class="form-control h-auto" [(ngModel)]="filters.search.filterDate"
-                        (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt1" [selectMode]="'range'"
-                        [owlDateTimeTrigger]="dt1" placeholder="Date Time">
+                    <input class="form-control h-auto" [(ngModel)]="filters.search.filterDate" (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt1" [selectMode]="'range'" [owlDateTimeTrigger]="dt1" placeholder="Date Time">
                     <span class="example-trigger" [owlDateTimeTrigger]="dt1">
-                        <i class="ri-calendar-2-line ml-2"></i>
-                    </span>
+            <i class="ri-calendar-2-line ml-2"></i>
+          </span>
                     <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
                 </div>
                 <div class="pl-2">
-                    <ul ngbNav #nav="ngbNav" [(activeId)]="filters.active" (navChange)="onTabChange($event)"
-                        class="nav-tabs">
+                    <ul ngbNav #nav="ngbNav" [(activeId)]="filters.active" (navChange)="onTabChange($event)" class="nav-tabs">
 
                         <li [ngbNavItem]="2">
                             <a class="c-py-1" ngbNavLink>All Invoices</a>
@@ -270,49 +221,43 @@
                                 <th> #</th>
                                 <th>
                                     <span><i (click)="sortBy('invoice_number','asc')" class="ri-arrow-up-line "
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'invoice_number'}"></i></span>
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'invoice_number'}"></i></span>
                                     <span><i (click)="sortBy('invoice_number','desc')" class="ri-arrow-down-line "
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'invoice_number' }"></i></span>Invoice
-                                    Number
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'invoice_number' }"></i></span>Invoice Number
                                 </th>
-                                <th *ngIf="companyInfo?.e_invoice_missing_date_feature">Expiry days</th>
+                                <th *ngIf="companyInfo?.einvoice_missing_date_feature">Expiry days</th>
                                 <th>
                                     <span><i (click)="sortBy('guest_name','asc')" class="ri-arrow-up-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'guest_name'}"></i></span>
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'guest_name'}"></i></span>
                                     <span><i (click)="sortBy('guest_name','desc')" class="ri-arrow-down-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'guest_name'}"></i></span>
-                                    Guest Name
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'guest_name'}"></i></span> Guest Name
                                 </th>
                                 <th>
                                     <span><i (click)="sortBy('confirmation_number','asc')" class="ri-arrow-up-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'confirmation_number'}"></i></span>
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'confirmation_number'}"></i></span>
                                     <span><i (click)="sortBy('confirmation_number','desc')" class="ri-arrow-down-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'confirmation_number'}"></i></span>
-                                    Confirmation No.
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'confirmation_number'}"></i></span> Confirmation No.
                                 </th>
                                 <th>GST No.</th>
                                 <th>
                                     <span><i (click)="sortBy('room_number','asc')" class="ri-arrow-up-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'room_number'}"></i></span>
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'room_number'}"></i></span>
                                     <span><i (click)="sortBy('room_number','desc')" class="ri-arrow-down-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'room_number'}"></i></span>
-                                    Room No.
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'room_number'}"></i></span> Room No.
                                 </th>
                                 <th>Invoice Type</th>
                                 <th>Rebates</th>
                                 <th>IRN/QR Generated</th>
                                 <!-- <th>Mode</th> -->
                                 <th> <span><i (click)="sortBy('creation','asc')" class="ri-arrow-up-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'creation'}"></i></span>
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'creation'}"></i></span>
                                     <span><i (click)="sortBy('creation','desc')" class="ri-arrow-down-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'creation'}"></i></span>
-                                    Checkout Date
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'creation'}"></i></span> Checkout Date
                                 </th>
                                 <th> <span><i (click)="sortBy('modified','asc')" class="ri-arrow-up-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'modified'}"></i></span>
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'asc' && this.filters.search.sortBy == 'modified'}"></i></span>
                                     <span><i (click)="sortBy('modified','desc')" class="ri-arrow-down-line"
-                                            [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'modified'}"></i></span>
-                                    Printed Date
+                      [ngClass]="{'colorBg':this.filters.search.orderBy== 'desc' && this.filters.search.sortBy == 'modified'}"></i></span> Printed Date
                                 </th>
                                 <th *ngIf="companyInfo?.ezy_gst_module == 1">Sync Status</th>
                                 <th *ngIf="companyInfo?.ezy_gst_module == 1">Sync Date</th>
@@ -324,90 +269,73 @@
                                 <td></td>
                                 <td>
                                     <div class="custom-control custom-checkbox">
-                                        <input (change)="checkedItemsAll($event)" type="checkbox"
-                                            [(ngModel)]="selectAll" class="custom-control-input" id="customCheckAll"
-                                            name="itemAll">
-                                        <label class="custom-control-label" for="customCheckAll"
-                                            ngbTooltip="Select All"></label>
+                                        <input (change)="checkedItemsAll($event)" type="checkbox" [(ngModel)]="selectAll" class="custom-control-input" id="customCheckAll" name="itemAll">
+                                        <label class="custom-control-label" for="customCheckAll" ngbTooltip="Select All"></label>
                                     </div>
                                 </td>
                                 <td class="bg-gray">
                                     <div class="input-group input-group-sm">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
-                                                <i class="ri-search-line"></i>
-                                            </span>
+                        <i class="ri-search-line"></i>
+                      </span>
                                         </div>
-                                        <input #invoiceInp type="search" [(ngModel)]="filters.search.invoice"
-                                            (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                            (keyup.enter)="updateRouterParams()" class="form-control">
+                                        <input #invoiceInp type="search" [(ngModel)]="filters.search.invoice" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                                     </div>
                                 </td>
-                                <td *ngIf="companyInfo?.e_invoice_missing_date_feature"></td>
+                                <td *ngIf="companyInfo?.einvoice_missing_date_feature"></td>
                                 <td class="bg-gray">
                                     <div class="input-group input-group-sm">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
-                                                <i class="ri-search-line"></i>
-                                            </span>
+                        <i class="ri-search-line"></i>
+                      </span>
                                         </div>
-                                        <input #nameInp type="search" [(ngModel)]="filters.search.name"
-                                            (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                            (keyup.enter)="updateRouterParams()" class="form-control">
+                                        <input #nameInp type="search" [(ngModel)]="filters.search.name" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                                     </div>
                                 </td>
                                 <td class="bg-gray">
                                     <div class="input-group input-group-sm">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
-                                                <i class="ri-search-line"></i>
-                                            </span>
+                        <i class="ri-search-line"></i>
+                      </span>
                                         </div>
-                                        <input #confirmNumInp type="search" [(ngModel)]="filters.search.confirmation"
-                                            (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                            (keyup.enter)="updateRouterParams()" class="form-control">
+                                        <input #confirmNumInp type="search" [(ngModel)]="filters.search.confirmation" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                                     </div>
                                 </td>
                                 <td class="bg-gray" style="min-width: 120px;">
                                     <div class="input-group input-group-sm">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
-                                                <i class="ri-search-line"></i>
-                                            </span>
+                        <i class="ri-search-line"></i>
+                      </span>
                                         </div>
-                                        <input #gstNumInp type="search" [(ngModel)]="filters.search.gstNumber"
-                                            (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                            (keyup.enter)="updateRouterParams()" class="form-control">
+                                        <input #gstNumInp type="search" [(ngModel)]="filters.search.gstNumber" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                                     </div>
                                 </td>
                                 <td class="bg-gray">
                                     <div class="input-group input-group-sm">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
-                                                <i class="ri-search-line"></i>
-                                            </span>
+                        <i class="ri-search-line"></i>
+                      </span>
                                         </div>
-                                        <input #roomNumInp type="search" [(ngModel)]="filters.search.roomNo"
-                                            (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                            (keyup.enter)="updateRouterParams()" class="form-control">
+                                        <input #roomNumInp type="search" [(ngModel)]="filters.search.roomNo" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                                     </div>
                                 </td>
                                 <td class="bg-gray">
-                                    <div class="form-group"
-                                        *ngIf="filters.active === 2 || filters.active === 4 || filters.active === 8">
-                                        <select id="invoiceType" class="custom-select"
-                                            [(ngModel)]="filters.search.invoiceType" (change)="onSearch.emit(filters)">
-                                            <option value="">Showing all</option>
-                                            <option value="B2B">B2B</option>
-                                            <option value="B2C">B2C</option>
-                                        </select>
+                                    <div class="form-group" *ngIf="filters.active === 2 || filters.active === 4 || filters.active === 8" >
+                                        <select id="invoiceType" class="custom-select" [(ngModel)]="filters.search.invoiceType" (change)="onSearch.emit(filters)">
+                      <option value="">Showing all</option>
+                      <option value="B2B">B2B</option>
+                      <option value="B2C">B2C</option>
+                    </select>
                                     </div>
                                 </td>
                                 <td class="bg-gray">
                                     <div class="form-group">
-                                        <select id="creditNotes" class="custom-select"
-                                            [(ngModel)]="filters.search.has_credit_items"
-                                            (change)="onSearch.emit(filters)">
+                                        <select id="creditNotes" class="custom-select" [(ngModel)]="filters.search.has_credit_items" (change)="onSearch.emit(filters)">
                                             <option value="">Showing all</option>
                                             <option value="Yes">Yes</option>
                                             <option value="No">No</option>
@@ -418,8 +346,7 @@
 
                                 <td class="bg-gray">
                                     <div class="form-group" *ngIf="filters.active === 2 || filters.active === 8">
-                                        <select id="irn" class="custom-select" [(ngModel)]="filters.search.irn"
-                                            (change)="onSearch.emit(filters)">
+                                        <select id="irn" class="custom-select" [(ngModel)]="filters.search.irn" (change)="onSearch.emit(filters)">
                                             <option value="">Showing all</option>
                                             <option value="Pending">Pending</option>
                                             <option value="Success">Success</option>
@@ -431,12 +358,10 @@
                                     <div class="input-group input-group-sm" *ngIf="filters.active === 4">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">
-                                                <i class="ri-search-line"></i>
-                                            </span>
+                      <i class="ri-search-line"></i>
+                    </span>
                                         </div>
-                                        <input #roomNumInp type="search" [(ngModel)]="filters.search.error_message"
-                                            (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                                            (keyup.enter)="updateRouterParams()" class="form-control">
+                                        <input #roomNumInp type="search" [(ngModel)]="filters.search.error_message" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
                                     </div>
                                 </td>
 
@@ -450,53 +375,31 @@
                                 <td class="bg-gray"></td>
                                 <td class="bg-gray" *ngIf="companyInfo?.ezy_gst_module == 1">
                                     <div class="form-group">
-                                        <select id="synced_to_erp" class="custom-select"
-                                            [(ngModel)]="filters.search.synced_to_erp"
-                                            (change)="onSearch.emit(filters)">
+                                        <select id="synced_to_erp" class="custom-select" [(ngModel)]="filters.search.synced_to_erp" (change)="onSearch.emit(filters)">
                                             <option value="">Showing all</option>
                                             <option value="1">Synced</option>
                                             <option value="0">Not Synced</option>
                                         </select>
-                                    </div>
+                                      </div>
                                 </td>
                                 <td class="bg-gray" *ngIf="companyInfo?.ezy_gst_module == 1"></td>
                                 <td class="bg-gray"></td>
                             </tr>
-                            <tr *ngFor="let invoice of scroll.viewPortItems ;let i = index">
+                            <tr *ngFor="let invoice of scroll.viewPortItems ;let i = index" >
                                 <!-- <td>{{(this.filters.itemsPerPage * (this.filters.currentPage - 1) + i)+1 }}</td> -->
-                                <td>{{invoice.index}} <span
-                                        [ngClass]="{'mode-test':invoice.mode == 'Testing','mode-prod' : invoice.mode == 'Production'}"></span>
+                                <td>{{invoice.index}} <span [ngClass]="{'mode-test':invoice.mode == 'Testing','mode-prod' : invoice.mode == 'Production'}"></span>
                                 </td>
                                 <td>
-                                    <!-- *ngIf=" companyInfo?.e_invoice_missing_date_feature && invoice.irn_generated === 'Pending' && invoice.invoice_type == 'B2B' && invoice?.expiry_days >= 0 " -->
-                                    <div *ngIf=" companyInfo?.e_invoice_missing_date_feature && invoice.irn_generated === 'Pending' && invoice.invoice_type == 'B2B'  && (!invoice?.expiry_days ||invoice?.expiry_days >= 0 )"
-                                        class="custom-control custom-checkbox">
-                                        <input (change)="checkedItems($event, invoice)" type="checkbox"
-                                            class="custom-control-input" id="customCheck{{i}}" name="item{{i}}"
-                                            [(ngModel)]="invoice.checked">
-                                        <label class="custom-control-label" for="customCheck{{i}}"></label>
-                                    </div>
-                                    <div *ngIf="!companyInfo?.e_invoice_missing_date_feature"
-                                        class="custom-control custom-checkbox">
-                                        <input (change)="checkedItems($event, invoice)" type="checkbox"
-                                            class="custom-control-input" id="customCheck{{i}}" name="item{{i}}"
-                                            [(ngModel)]="invoice.checked">
+                                    <div *ngIf="invoice.irn_generated === 'Pending' && invoice.invoice_type == 'B2B'" class="custom-control custom-checkbox">
+                                        <input (change)="checkedItems($event, invoice)" type="checkbox" class="custom-control-input" id="customCheck{{i}}" name="item{{i}}" [(ngModel)]="invoice.checked">
                                         <label class="custom-control-label" for="customCheck{{i}}"></label>
                                     </div>
                                 </td>
-                                <td>{{invoice?.invoice_number ||'NA'}} <i *ngIf="invoice.irn_generated =='Error'"
-                                        class="ri-error-warning-fill text-danger"
-                                        [ngbTooltip]="invoice.error_message"></i>
-
+                                <td >{{invoice?.invoice_number ||'NA'}} <i *ngIf="invoice.irn_generated =='Error'" class="ri-error-warning-fill text-danger" [ngbTooltip]="invoice.error_message"></i>
                                 </td>
-                                <td *ngIf="this.companyInfo?.e_invoice_missing_date_feature">
-                                    <span
-                                        [ngClass]="{'expiring_bg_warn': (invoice?.expiry_days == 0 || invoice?.expiry_days == 1) && ((invoice.irn_generated === 'Pending' || invoice.irn_generated === 'Error')&& invoice.invoice_type == 'B2B')}"
-                                        *ngIf="invoice?.expiry_days >= 0 && invoice.invoice_type == 'B2B'">
-                                        {{invoice?.expiry_days == 0 ? "Today" : invoice?.expiry_days}} </span>
-                                    <span class="expiring_bg"
-                                        *ngIf="invoice?.expiry_days < 0 && ((invoice.irn_generated === 'Pending' || invoice.irn_generated === 'Error')&& invoice.invoice_type == 'B2B')">Expired</span>
-
+                                <td *ngIf="this.companyInfo?.einvoice_missing_date_feature"> 
+                                    <span [ngClass]="{'expiring_bg_warn': (invoice?.expiry_days == 0 || invoice?.expiry_days == 1) && ((invoice.irn_generated === 'Pending' || invoice.irn_generated === 'Error')&& invoice.invoice_type == 'B2B')}" *ngIf="invoice?.expiry_days >= 0 && invoice.invoice_type == 'B2B'" >{{invoice?.expiry_days == 0 ? "Today" : invoice?.expiry_days}} </span>
+                                    <span class="expiring_bg" *ngIf="invoice?.expiry_days < 0 && ((invoice.irn_generated === 'Pending' || invoice.irn_generated === 'Error')&& invoice.invoice_type == 'B2B')">Expired</span>
                                 </td>
                                 <td>{{invoice?.guest_name || 'NA'}}</td>
                                 <td>{{invoice?.confirmation_number || 'NA'}}</td>
@@ -506,8 +409,7 @@
                                 <td>{{invoice?.has_credit_items|| 'NA'}}</td>
                                 <!-- <td *ngIf=" invoice.irn_generated !=='NA' ; else statusBlock" class="text-left"> -->
                                 <td class="text-left">
-                                    <span class="badge"
-                                        [ngClass]="{'badge-success': invoice.irn_generated == 'Zero Invoice','badge-success': invoice.irn_generated == 'Success','badge-warning':invoice.irn_generated == 'Pending','badge-default':invoice.irn_generated == 'Cancelled', 'badge-danger':invoice.irn_generated == 'Error'}">{{invoice.irn_generated}}</span>
+                                    <span class="badge" [ngClass]="{'badge-success': invoice.irn_generated == 'Zero Invoice','badge-success': invoice.irn_generated == 'Success','badge-warning':invoice.irn_generated == 'Pending','badge-default':invoice.irn_generated == 'Cancelled', 'badge-danger':invoice.irn_generated == 'Error'}">{{invoice.irn_generated}}</span>
                                 </td>
                                 <!-- <ng-template #statusBlock>
                                 <td class="text-left"><span class="badge"
@@ -517,26 +419,17 @@
                                 <!-- <td>{{invoice?.mode}}</td> -->
                                 <td>{{invoice?.invoice_date|date:'MMM d yyyy'}}</td>
                                 <td>{{invoice?.creation|date:'MMM d yyyy'}}</td>
-                                <td *ngIf="companyInfo?.ezy_gst_module == 1">{{invoice?.synced_to_erp?'Synced':'Not
-                                    Synced'}}</td>
-
-
+                                <td *ngIf="companyInfo?.ezy_gst_module == 1">{{invoice?.synced_to_erp?'Synced':'Not Synced'}}</td>
                                 <!-- <td *ngIf="companyInfo?.ezy_gst_module == 1">
                                     <span class="badge" [ngClass]="{'badge-success': invoice?.sync_status == 'Success','badge-warning':invoice?.sync_status == 'Pending','badge-danger':invoice?.sync_status == 'Error'}">
                                         {{invoice?.sync_status}}
                                     </span>
                                     <a (click)="SyncErrorLogs(submodel,invoice)" *ngIf="invoice?.sync_status == 'Error'">View Error</a>
                                 </td> -->
-                                <td *ngIf="companyInfo?.ezy_gst_module == 1">{{invoice?.synced_date | date : ["MMM d
-                                    y"]}}</td>
+                                <td *ngIf="companyInfo?.ezy_gst_module == 1">{{invoice?.synced_date | date : ["MMM d y h:mm a"]}}</td>
+                                <td><a [routerLink]="['../../invoice-details/'+invoice.name]" [queryParams]="{prop:'invoice'}" queryParamsHandling="merge" appPermissionButton accessType="read" class="view">View</a>
 
-                                <td><a [routerLink]="['../../invoice-details/'+invoice.name]"
-                                        [queryParams]="{prop:'invoice'}" queryParamsHandling="merge" appPermissionButton
-                                        accessType="read" moduleType="docType" class="view">View</a>
-
-                                    <a *ngIf="invoice?.invoice_from =='Pms'" (click)="print(invoice)"
-                                        appPermissionButton accessType="print" moduleType="docType"
-                                        class="view pl-2">Print</a>
+                                    <a *ngIf="invoice?.invoice_from =='Pms'" (click)="print(invoice)" appPermissionButton class="view pl-2">Print</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -558,18 +451,16 @@
 
             <div class="d-flex justify-content-between" *ngIf="invoicesList.length">
                 <div class="px-3">
-                    <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
-                        (change)="checkPagination()" id="itemsPerPage">
-                        <option [value]="20">20</option>
-                        <option [value]="50">50</option>
-                        <option [value]="100">100</option>
-                        <option [value]="150">150</option>
-                        <option [value]="500">500</option>
-                    </select>
+                    <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage" (change)="checkPagination()" id="itemsPerPage">
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+            <option [value]="150">150</option>
+            <option [value]="500">500</option>
+          </select>
                 </div>
                 <div *ngIf="invoicesList.length  < this.filters.totalCount">
-                    <p class="text-right pr-5 more text-primary"
-                        (click)="this.filters.start = invoicesList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                    <p class="text-right pr-5 more text-primary" (click)="this.filters.start = invoicesList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
                         more
                     </p>
                 </div>
@@ -599,15 +490,14 @@
         <div class="modal-header">
             <h5 class="" id="modal-basic-title">Invoice Add</h5>
             <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <span aria-hidden="true">&times;</span>
+      </button>
         </div>
         <div class="modal-body">
             <div class="row">
                 <div class="col-lg-6 col-md-6">
                     <div class="form-group">
-                        <input type="text" appMatInput class="form-control" id="gstNumber" name="gst_number"
-                            (keyup)="getGstFilters($event)" list="dynmicUserIds" required>
+                        <input type="text" appMatInput class="form-control" id="gstNumber" name="gst_number" (keyup)="getGstFilters($event)" list="dynmicUserIds" required>
                         <label for="gstNumber" class="mat-label">GST Number</label>
                         <datalist id="dynmicUserIds">
                             <option *ngFor="let item of gstList" [value]="item.name">{{item.name}}</option>
@@ -628,25 +518,22 @@
     <div class="modal-header">
         <h5 class="" id="modal-basic-title">Generate IRN</h5>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
+      <span aria-hidden="true">&times;</span>
+    </button>
     </div>
     <div class="modal-body">
         <div *ngIf="dupinvoicesList.length > 0">
             <div *ngFor="let progressInfo of dupinvoicesList" class="mb-2">
                 <div class="d-flex">
                     <span class="col-md-1">
-                        <b *ngIf="progressInfo.uploaded == 'failed'"> <i class="ri-close-line"
-                                style="color: red;"></i></b>
-                        <b *ngIf="progressInfo.uploaded == 'success'"> <i class="ri-check-line"
-                                style="color: green;"></i></b>
-                        <!-- <ngb-progressbar [type]="progressInfo.color" textType="white"
+            <b *ngIf="progressInfo.uploaded == 'failed'"> <i class="ri-close-line" style="color: red;"></i></b>
+            <b *ngIf="progressInfo.uploaded == 'success'"> <i class="ri-check-line" style="color: green;"></i></b>
+            <!-- <ngb-progressbar [type]="progressInfo.color" textType="white"
                              [value]="progressInfo.parserProgress +progressInfo.uploadProgress" [showValue]="true">
                          </ngb-progressbar> -->
-                    </span>
-                    <p class="mr-3 col-md-11"><a [routerLink]="['../../invoice-details/'+progressInfo.name]"
-                            [queryParams]="{prop:'invoice'}" queryParamsHandling="merge">{{ progressInfo.invoice_number
-                            }} <b style="color: black;"> {{progressInfo?.guest_name}} </b></a></p>
+          </span>
+                    <p class="mr-3 col-md-11"><a [routerLink]="['../../invoice-details/'+progressInfo.name]" [queryParams]="{prop:'invoice'}" queryParamsHandling="merge">{{ progressInfo.invoice_number
+              }} <b style="color: black;"> {{progressInfo?.guest_name}} </b></a></p>
 
                 </div>
 
@@ -655,12 +542,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button *ngIf="gerenateIRNITems" class="btn btn-outline-primary mb-0  text-uppercase" type="button"
-            (click)="modal.close('generated')">Ok</button>
-        <button *ngIf="!gerenateIRNITems" type="reset" class="btn btn-outline-dark"
-            (click)="modal.close('Save click')">Cancel</button>
-        <button *ngIf="!gerenateIRNITems" type="button" appPermissionButton accessType="write" class="btn btn-primary"
-            (click)="generateIrn()">Generate</button>
+        <button *ngIf="gerenateIRNITems" class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="modal.close('generated')">Ok</button>
+        <button *ngIf="!gerenateIRNITems" type="reset" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button>
+        <button *ngIf="!gerenateIRNITems" type="button" appPermissionButton accessType="write" class="btn btn-primary" (click)="generateIrn()">Generate</button>
     </div>
 
 </ng-template>
@@ -671,54 +555,47 @@
     <div class="modal-header">
         <h5 class="" id="modal-basic-title">Redo Errors</h5>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
+      <span aria-hidden="true">&times;</span>
+    </button>
     </div>
     <div class="modal-body ">
-        <div class="form-group calendar w-c-50 position-relative m-auto">
-            <input class="form-control h-auto" [(ngModel)]="redoErrDateSelection"
-                (dateTimeChange)="redoErrorDateChange()" [owlDateTime]="dt1" [selectMode]="'range'"
-                [owlDateTimeTrigger]="dt1" placeholder="Select Date">
-            <span class="example-trigger" [owlDateTimeTrigger]="dt1">
-                <i class="ri-calendar-2-line"></i>
-            </span>
-            <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
-        </div>
-        <div>
-            <div *ngIf="errInvoiceList.length > 0" class="scrollBody">
-                <div *ngFor="let progressInfo of errInvoiceList" class="mb-2">
-                    <div class="d-flex">
-                        <span class="col-md-1">
-                            <b *ngIf="progressInfo?.status == 'Error'"> <i class="ri-close-line"
-                                    style="color: red;"></i></b>
-                            <b *ngIf="progressInfo?.status == 'Success'|| progressInfo?.status == 'Pending'"> <i
-                                    class="ri-check-line" style="color: green;"></i></b>
-                            <!-- <ngb-progressbar [type]="progressInfo.color" textType="white"
+      <div class="form-group calendar w-c-50 position-relative m-auto">
+        <input class="form-control h-auto" [(ngModel)]="redoErrDateSelection" (dateTimeChange)="redoErrorDateChange()"
+          [owlDateTime]="dt1" [selectMode]="'range'" [owlDateTimeTrigger]="dt1" placeholder="Select Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+      </div>
+      <div >
+        <div *ngIf="errInvoiceList.length > 0" class="scrollBody">
+            <div *ngFor="let progressInfo of errInvoiceList" class="mb-2">
+                <div class="d-flex">
+                    <span class="col-md-1">
+            <b *ngIf="progressInfo?.status == 'Error'"> <i class="ri-close-line" style="color: red;"></i></b>
+            <b *ngIf="progressInfo?.status == 'Success'|| progressInfo?.status == 'Pending'"> <i class="ri-check-line"
+                style="color: green;"></i></b>
+            <!-- <ngb-progressbar [type]="progressInfo.color" textType="white"
                             [value]="progressInfo.parserProgress +progressInfo.uploadProgress" [showValue]="true">
                         </ngb-progressbar> -->
-                        </span>
-                        <p class="mr-3 col-md-11"><a [routerLink]="['../../invoice-details/'+progressInfo.name]"
-                                [queryParams]="{prop:'invoice'}" queryParamsHandling="merge">{{
-                                progressInfo.invoice_number
-                                }} <b style="color: black;"> {{progressInfo?.guest_name}} </b></a></p>
-
-                    </div>
+          </span>
+                    <p class="mr-3 col-md-11"><a [routerLink]="['../../invoice-details/'+progressInfo.name]" [queryParams]="{prop:'invoice'}" queryParamsHandling="merge">{{ progressInfo.invoice_number
+              }} <b style="color: black;"> {{progressInfo?.guest_name}} </b></a></p>
 
                 </div>
-            </div>
-            <div *ngIf="!errInvoiceList.length">
-                <h6 class="text-center my-3"><strong>No Data</strong></h6>
+
             </div>
         </div>
+        <div *ngIf="!errInvoiceList.length">
+           <h6 class="text-center my-3"><strong>No Data</strong></h6>
+        </div>
+      </div>
 
     </div>
     <div class="modal-footer">
-        <button *ngIf="redoErrItems" class="btn btn-outline-primary mb-0  text-uppercase" type="button"
-            (click)="modal.close('Success')">Ok</button>
-        <button *ngIf="!redoErrItems" type="reset" class="btn btn-outline-dark"
-            (click)="modal.close('Save click')">Cancel</button>
-        <button *ngIf="!redoErrItems" type="button" appPermissionButton accessType="write" class="btn btn-primary"
-            (click)="redoAllErrorInvoices()">Redo Error</button>
+        <button *ngIf="redoErrItems" class="btn btn-outline-primary mb-0  text-uppercase" type="button" (click)="modal.close('Success')">Ok</button>
+        <button *ngIf="!redoErrItems" type="reset" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button>
+        <button *ngIf="!redoErrItems" type="button" appPermissionButton accessType="write" class="btn btn-primary" (click)="redoAllErrorInvoices()">Redo Error</button>
     </div>
 
 </ng-template>

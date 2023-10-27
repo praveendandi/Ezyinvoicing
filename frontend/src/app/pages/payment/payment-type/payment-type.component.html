@@ -3,26 +3,18 @@
     <div class="row mb-3">
         <div class="col-md-9 col-lg-9">
             <div class="d-flex">
-                <h4 class="font-weight-bold text-white my-auto">Payment Types
-                    <small>({{this.filters.totalCount}})</small>
-                </h4>
-                <button class="create btn btn-primary" appPermissionButton accessType="create" moduleType="docType"
-                    *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole "
+                <h4 class="font-weight-bold text-white my-auto">Payment Types <small>({{this.filters.totalCount}})</small></h4>
+                <button class="create btn btn-primary" appPermissionButton accessType="create" moduleType="docType" *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole "
                     [routerLink]="['/home/payment-type-details']"><i class="ri-add-line"></i></button>
             </div>
         </div>
         <div class="col-lg-3 col-md-3">
-            <div class="d-flex">
-                <button class="btn btn-primary btn-small mr-2" type="button"
-                    (click)="paymentType_export()">Export</button>
-                <div class="position-relative mt-2 mt-lg-0 mt-md-0">
-                    <input type="search" class="form-control pl-5" [(ngModel)]="filters.search"
-                        (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)"
-                        #search (keyup.enter)="updateRouterParams()" placeholder="Search">
-                    <span class="search"><i class="ri-search-line"></i></span>
-                </div>
+            <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+                <input type="search" class="form-control pl-5" [(ngModel)]="filters.search"
+                    (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+                    #search (keyup.enter)="updateRouterParams()" placeholder="Search">
+                <span class="search"><i class="ri-search-line"></i></span>
             </div>
-
         </div>
     </div>
 
@@ -53,8 +45,7 @@
                                 <span><a appPermissionButton accessType="read" moduleType="docType"
                                         (click)="navigate(item,'view')">view</a></span>
                                 <span class="ml-3"><a appPermissionButton accessType="write" moduleType="docType"
-                                        *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole "
-                                        (click)="navigate(item,'edit')">Edit</a></span>
+                                    *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole " (click)="navigate(item,'edit')">Edit</a></span>
                             </td>
                         </tr>
                     </tbody>

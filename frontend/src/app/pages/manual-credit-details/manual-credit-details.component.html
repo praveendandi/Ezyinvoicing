@@ -18,34 +18,23 @@
                 <div class="col-md-9 d-flex align-items-center justify-content-between">
 
                     <div class="">
-                        <ng-container *ngIf="companyData?.e_invoice_missing_date_feature">
-                            <p [ngClass]="{'text-danger': invoiceInfo?.expiry_days <= 1}"
+                        <ng-container *ngIf="companyData?.einvoice_missing_date_feature">
+                            <p [ngClass]="{'text-danger': invoiceInfo?.expiry_days <= 1}" class="text-white"
                                 *ngIf="invoiceInfo?.invoice_type == 'B2B' && (invoiceInfo?.irn_generated == 'Pending' || invoiceInfo?.irn_generated == 'Error')">
                                 <b>
-                                    <span *ngIf="invoiceInfo?.expiry_days >= 0 "
-                                        class="irn-text-info-warn">{{invoiceInfo?.expiry_days == 0 ? "Today" :
+                                    <span *ngIf="invoiceInfo?.expiry_days >= 0 " class="irn-text-info-warn">{{invoiceInfo?.expiry_days == 0 ? "Today" :
                                         invoiceInfo?.expiry_days +'days'}} left for IRN generation</span>
-                                    <span *ngIf="invoiceInfo?.expiry_days < 0" class="irn-text-info">IRN generation
-                                        Expired</span>
+                                    <span *ngIf="invoiceInfo?.expiry_days < 0" class="irn-text-info">IRN generation Expired</span>
                                 </b>
                             </p>
                         </ng-container>
-
                     </div>
 
                     <div class="row justify-content-end">
-                        <!-- <button (click)="manualSynctoGST()"
+                        <button (click)="manualSynctoGST()"
                             *ngIf="invoiceInfo.irn_generated === 'Success' && companyData?.b2c_to_b2b == 1 && companyData?.ezy_gst_module == 1 && invoiceInfo.synced_to_erp == 0"
                             class="btn emailBtn mr-2" appPermissionButton accessType="write" type="button">
                             Sync to GST
-                        </button> -->
-
-
-                        <button
-                            *ngIf="invoiceInfo.irn_generated === 'Success' && companyData?.b2b_to_credit == 1 && companyData?.manual_credit_invoice == 1 && companyData?.ezy_gst_module == 1"
-                            (click)="manualSynctoGST()" class="btn emailBtn mr-2" appPermissionButton accessType="write"
-                            type="button">
-                            {{invoiceInfo.synced_to_erp == 0?'Sync to GST':'Re-Sync to GST'}}
                         </button>
                         <button
                             *ngIf="manualType == 'Tax' && invoiceInfo.invoice_type === 'B2B' && invoiceInfo.irn_generated === 'Success' && companyData?.b2b_to_credit == 1 && invoiceInfo?.credit_note_raised === 'No' && loginUSerRole && !invoiceInfo.showCancelIrn && companyData?.manual_credit_invoice == 1"
@@ -64,10 +53,7 @@
                             Convert
                             B2C</button>
 
-                        <button
-                            *ngIf="invoiceInfo.irn_generated == 'Error' || invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Draft'"
-                            (click)="deleteInvoices()" class="btn emailBtn mr-2" appPermissionButton accessType="write"
-                            type="button">Delete
+                        <button *ngIf="invoiceInfo.irn_generated == 'Error' || invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Draft'" (click)="deleteInvoices()" class="btn emailBtn mr-2" appPermissionButton accessType="delete_perm" type="button">Delete
                         </button>
 
                         <button *ngIf="invoiceInfo.irn_generated == 'Success'" (click)="openEmailTemp()"
@@ -76,24 +62,16 @@
 
                         <!-- <div class="text-right" *ngIf="invoiceInfo.invoice_type == 'B2B'"> -->
 
-                        <button
-                            *ngIf="invoiceInfo.invoice_type == 'B2B' && invoiceInfo.irn_generated === 'Pending' && invoiceInfo.items.length>0"
-                            (click)="generateIrn()" class="btn btn-primary" type="button"
-                            [disabled]="companyData?.e_invoice_missing_date_feature &&  checkIRNdate ">GENERATE
-                            IRN</button>
-                        <button
-                            *ngIf="invoiceInfo.invoice_type == 'B2B' && invoiceInfo.irn_generated === 'Success' && invoiceInfo.showCancelIrn"
-                            (click)="cancelIrn()" class="btn btn-danger" type="button">CANCEL IRN</button>
+                        <button *ngIf="invoiceInfo.invoice_type == 'B2B' && invoiceInfo.irn_generated === 'Pending' && invoiceInfo.items.length>0" (click)="generateIrn()" class="btn btn-primary" type="button" appPermissionButton accessType="write" [disabled]="companyData?.einvoice_missing_date_feature &&  checkIRNdate ">GENERATE IRN</button>
+                        <button *ngIf="invoiceInfo.invoice_type == 'B2B' && invoiceInfo.irn_generated === 'Success' && invoiceInfo.showCancelIrn" (click)="cancelIrn()" class="btn btn-danger" type="button" appPermissionButton accessType="write">CANCEL IRN</button>
                         <ng-container *ngIf="invoiceInfo.irn_generated == 'Success'">
                             <button (click)="reAttachInvoice()" appPermissionButton accessType="write"
                                 class="btn btn-danger btn-small ml-1" type="button">Redo QR</button>
                         </ng-container>
                         <!-- </div> -->
                         <!-- <div class="text-right mx-2"> -->
-                        <ng-container
-                            *ngIf="invoiceInfo.allowance_invoice === 'No' && invoiceInfo.ready_to_generate_irn == 'Yes' && invoiceInfo.irn_generated == 'Pending' && invoiceInfo.invoice_type == 'B2C'">
-                            <button (click)="generateQr()" class="btn btn-danger btn-small" appPermissionButton
-                                accessType="submit" type="button">Generate
+                        <ng-container *ngIf="invoiceInfo.allowance_invoice === 'No' && invoiceInfo.ready_to_generate_irn == 'Yes' && invoiceInfo.irn_generated == 'Pending' && invoiceInfo.invoice_type == 'B2C'">
+                            <button (click)="generateQr()" class="btn btn-danger btn-small" appPermissionButton accessType="write" type="button">Generate
                                 QR</button>
                         </ng-container>
 
@@ -175,13 +153,9 @@
                                             <div>
                                                 <h6><strong>Invoice Details</strong>
 
-                                                    <span
-                                                        *ngIf="invoiceInfo.irn_generated === 'Pending' || invoiceInfo.irn_generated === 'Draft' || invoiceInfo.irn_generated === 'Error' "
-                                                        (click)="invoiceEdit()" class="edit">Edit</span>
+                                                    <span *ngIf="invoiceInfo.irn_generated === 'Pending' || invoiceInfo.irn_generated === 'Draft' || invoiceInfo.irn_generated === 'Error' " (click)="invoiceEdit()" class="edit" appPermissionButton accessType="write">Edit</span>
 
-                                                    <span
-                                                        *ngIf="manualType!== 'Tax'&&(invoiceInfo.irn_generated === 'Success' && (!invoiceInfo?.tax_invoice_referrence_number || !invoiceInfo?.tax_invoice_referrence_date))"
-                                                        (click)="invoiceEditSuccess(content)" class="edit">Edit</span>
+                                                    <span *ngIf="manualType!== 'Tax'&&(invoiceInfo.irn_generated === 'Success' && (!invoiceInfo?.tax_invoice_referrence_number || !invoiceInfo?.tax_invoice_referrence_date))" (click)="invoiceEditSuccess(content)" class="edit" appPermissionButton accessType="write">Edit</span>
 
                                                 </h6>
                                             </div>
@@ -203,8 +177,6 @@
                                                     </li>
                                                     <li><span>Invoice Type</span> <strong>{{invoiceInfo.invoice_type||
                                                             'NA'}}</strong></li>
-                                                    <li><span>Invoice Date</span> <strong>{{invoiceInfo.invoice_date |
-                                                            date}}</strong></li>
                                                     <li><span>Confirmation No</span>
                                                         <strong>{{invoiceInfo.confirmation_number|| 'NA'}}</strong>
                                                     </li>
@@ -213,8 +185,7 @@
                                                             Provided'}}</strong>
                                                     </li>
                                                     <li *ngIf="manualType !== 'Tax'"><span>Original Date</span>
-                                                        <strong>{{(invoiceInfo.tax_invoice_referrence_date | date )||
-                                                            'Not
+                                                        <strong>{{invoiceInfo.tax_invoice_referrence_date|| 'Not
                                                             Provided'}}</strong>
                                                     </li>
                                                     <!-- <li *ngIf="active === 4" ngbTooltip="{{invoiceInfo.credit_irn_number}}" placement="top"><span>IRN No</span> <strong class="text-truncate">{{invoiceInfo.credit_irn_number|| 'NA'}}</strong> <i *ngIf="invoiceInfo.credit_irn_number" (click)="copyToClipboard(invoiceInfo.credit_irn_number);" [ngClass]="{'ri-clipboard-fill': isCopy, 'ri-clipboard-line':!isCopy}" class="p-ab cursor-pointer"></i></li> -->
@@ -244,31 +215,20 @@
                                                                 <strong>{{invoiceInfo.gst_number|| 'NA'}}</strong>
                                                             </li>
                                                             <li><span>Address 1 <a
-                                                                        *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' "><i
-                                                                            (click)="editAddress1fun(editAddress1)"
-                                                                            class="ri-pencil-fill ml-2"
-                                                                            style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span>
-                                                                <strong placement="top"
-                                                                    ngbTooltip="{{invoiceInfo.address_1}}"
-                                                                    class="text-truncate">{{(invoiceInfo.address_1 |
-                                                                    trim) || 'NA'}}</strong>
-                                                            </li>
+                                                              *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' " appPermissionButton accessType="write"><i
+                                                                (click)="editAddress1fun(editAddress1)" class="ri-pencil-fill ml-2"
+                                                                style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span> <strong placement="top" ngbTooltip="{{invoiceInfo.address_1}}" class="text-truncate">{{(invoiceInfo.address_1 | trim) || 'NA'}}</strong></li>
                                                             <li><span>Location <a
-                                                                        *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' "><i
-                                                                            (click)="locationfun(editInvoiceLocation)"
-                                                                            class="ri-pencil-fill ml-2"
-                                                                            style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span>
-                                                                <strong>{{(invoiceInfo.location | trim) ||
-                                                                    'NA'}}</strong>
+                                                                  *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' " appPermissionButton accessType="write"><i
+                                                                    (click)="locationfun(editInvoiceLocation)" class="ri-pencil-fill ml-2"
+                                                                    style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span>
+                                                                <strong>{{(invoiceInfo.location | trim) || 'NA'}}</strong>
                                                             </li>
-                                                            <li *ngIf="invoiceInfo.invoice_type === 'B2B'"><span>Place
-                                                                    of Supply <a
-                                                                        *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' "><i
-                                                                            (click)="editPOS(editPlaceOfSupply)"
-                                                                            class="ri-pencil-fill ml-2"
-                                                                            style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span>
-                                                                <strong>{{invoiceInfo?.place_of_supply_name}}({{(invoiceInfo.place_of_supply
-                                                                    | trim) ||
+                                                            <li *ngIf="invoiceInfo.invoice_type === 'B2B'"><span>Place of Supply <a
+                                                                      *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' " appPermissionButton accessType="write"><i
+                                                                        (click)="editPOS(editPlaceOfSupply)" class="ri-pencil-fill ml-2"
+                                                                        style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span>
+                                                                <strong>{{invoiceInfo?.place_of_supply_name}}({{(invoiceInfo.place_of_supply | trim) ||
                                                                     'NA'}})</strong>
                                                             </li>
 
@@ -286,15 +246,9 @@
                                                                     'NA'}})</strong>
                                                             </li>
                                                             <li><span>Address 2 <a
-                                                                        *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' "><i
-                                                                            (click)="editAddress2fun(editAddress2)"
-                                                                            class="ri-pencil-fill ml-2"
-                                                                            style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span>
-                                                                <strong placement="top"
-                                                                    ngbTooltip="{{invoiceInfo.address_2}}"
-                                                                    class="text-truncate">{{(invoiceInfo.address_2 |
-                                                                    trim) || 'NA'}}</strong>
-                                                            </li>
+                                                              *ngIf="invoiceInfo.irn_generated == 'Pending' || invoiceInfo.irn_generated == 'Error' " appPermissionButton accessType="write"><i
+                                                                (click)="editAddress2fun(editAddress2)" class="ri-pencil-fill ml-2"
+                                                                style="color: #000; font-size: 15px; cursor: pointer;"></i></a></span> <strong placement="top" ngbTooltip="{{invoiceInfo.address_2}}" class="text-truncate">{{(invoiceInfo.address_2 | trim) || 'NA'}}</strong></li>
                                                             <li><span>Pincode</span> <strong>{{(invoiceInfo.pincode) ||
                                                                     'NA'}}</strong></li>
                                                         </ul>
@@ -385,16 +339,10 @@
                                                     <div class="d-flex">
                                                         <h5><strong>Invoice Summary</strong></h5>
 
-                                                        <button
-                                                            *ngIf="invoiceInfo.irn_generated !== 'Success' && invoiceInfo.irn_generated !== 'Cancelled'"
-                                                            (click)="addInvoice()"
-                                                            class="btn btn-primary px-3 py-1 ml-2" type="button"><i
+                                                        <button *ngIf="invoiceInfo.irn_generated !== 'Success' && invoiceInfo.irn_generated !== 'Cancelled'" (click)="addInvoice()" class="btn btn-primary px-3 py-1 ml-2" type="button" appPermissionButton accessType="create"><i
                                                                 class="ri-add-line"></i></button>
 
-                                                        <button
-                                                            *ngIf="(invoiceInfo.irn_generated === 'Pending' && sacCodeDetails?.length && isChecked) || (invoiceInfo.irn_generated === 'Error' && sacCodeDetails?.length && isChecked)"
-                                                            (click)="deleteItem()" class="btn btn-danger shadow ml-3"
-                                                            type="button">Delete Items</button>
+                                                        <button *ngIf="(invoiceInfo.irn_generated === 'Pending' && sacCodeDetails?.length && isChecked) || (invoiceInfo.irn_generated === 'Error' && sacCodeDetails?.length && isChecked)" (click)="deleteItem()" class="btn btn-danger shadow ml-3" type="button" appPermissionButton accessType="delete_perm">Delete Items</button>
 
                                                         <button
                                                             *ngIf="(companyData?.auto_adjustment == 'Automatic' && invoiceInfo?.has_credit_items == 'Yes')&&(invoiceInfo.invoice_type === 'B2B' && invoiceInfo.irn_generated == 'Pending' && invoiceInfo.invoice_category !== 'Credit Invoice')"
@@ -429,10 +377,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4 text-right"
-                                                    *ngIf="sacCodeDetails?.length && invoiceInfo.irn_generated !== 'Success'  && invoiceInfo.irn_generated !== 'Cancelled'">
-                                                    <button (click)="saveItems()" class="btn btn-primary shadow"
-                                                        type="button">Save Items</button>
+                                            </div>
+                                                <div class="col-md-4 text-right" *ngIf="sacCodeDetails?.length && invoiceInfo.irn_generated !== 'Success'  && invoiceInfo.irn_generated !== 'Cancelled'">
+                                                    <button (click)="saveItems()" class="btn btn-primary shadow" type="button" appPermissionButton accessType="write">Save Items</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -485,7 +432,7 @@
                                                             </table>
                                                         </th>
 
-                                                        <!-- <th class="p-0">
+                                                        <th class="p-0">
                                                             <table class="table  border-0  mb-0 text-center no-pad">
                                                                 <tr>
                                                                     <th colspan="2">State CESS</th>
@@ -495,7 +442,7 @@
                                                                     <th>Amount</th>
                                                                 </tr>
                                                             </table>
-                                                        </th> -->
+                                                        </th>
                                                         <th class="p-0">
                                                             <table class="table  border-0  mb-0 text-center no-pad">
                                                                 <tr>
@@ -538,7 +485,7 @@
                                                                     for="customCheck{{i}}"></label>
                                                             </div>
                                                         </td>
-                                                        <td>{{item?.date | date:'dd-MM-yyyy'}}</td>
+                                                        <td>{{item?.date}}</td>
                                                         <td>{{item?.item_name}} <a *ngIf="item?.pos_check"
                                                                 (click)="viewBillModel(viewBill,item)"
                                                                 class=" ml-2 view-poscheck">
@@ -597,12 +544,12 @@
                                                             <td>{{item.igst_amount | number:'0.2'}}</td>
                                                         </tr>
                                                     </td>
-                                                    <!-- <td>
+                                                    <td>
                                                         <tr class="no-pad">
                                                             <td>{{item.state_cess | number:'0.2'}}%</td>
                                                             <td>{{item.state_cess_amount | number:'0.2'}}</td>
                                                         </tr>
-                                                    </td> -->
+                                                    </td>
                                                     <td>
                                                         <tr class="no-pad">
                                                             <td>{{item.cess | number:'0.2'}}%</td>
@@ -630,7 +577,7 @@
 
                                         </div>
 
-                                        <div *ngIf="invoiceInfo.sales_amount_before_tax">
+                                        <div *ngIf="invoiceInfo.sales_amount_before_tax" style="width: 100%;">
                                             <table class="table bg-white shadow-sm" id="total-table">
 
                                                 <tr class="text-right">
@@ -683,14 +630,14 @@
                                                             invoiceInfo.total_vat_amount |
                                                             number:'0.2'}}</strong></td>
                                                 </tr>
-                                                <!-- <tr class="text-right">
+                                                <tr class="text-right">
                                                     <td colspan="17" class="total"><span>State CESS</span> </td>
                                                     <td colspan="9" class="text-right"><strong
                                                             class="total">{{invoiceInfo.invoice_category === 'Credit
                                                             Invoice' ? invoiceInfo.total_credit_state_cess_amount :
                                                             invoiceInfo.total_state_cess_amount |
                                                             number:'0.2'}}</strong></td>
-                                                </tr> -->
+                                                </tr>
                                                 <tr class="text-right">
                                                     <td colspan="17" class="total"><span>Central CESS</span> </td>
                                                     <td colspan="9" class="text-right"><strong
@@ -719,7 +666,7 @@
                                         </div>
 
                                     </div>
-                                </div>
+                                <!-- </div> -->
 
                             </ng-template>
                         </li>
@@ -728,6 +675,8 @@
                             <ng-template ngbNavContent>
                                 <div class="cpx-5">
                                     <div class="row">
+
+
                                         <div class="col-md-5">
                                             <div class="summary">
                                                 <h6><strong>GST Summary</strong></h6>
@@ -761,6 +710,8 @@
                                                 </h6>
                                             </div>
                                         </div>
+
+
                                         <div class="col-md-7">
                                             <div class="summary">
                                                 <h6><strong>SAC Code Summary</strong></h6>
@@ -775,8 +726,8 @@
                                                                 <th>CGST</th>
                                                                 <th>SGST</th>
                                                                 <th>IGST</th>
-                                                                <!-- <th>State CESS</th> -->
-                                                                <th>CESS</th>
+                                                                <th>State CESS</th>
+                                                                <th>Central CESS</th>
                                                                 <th>VAT</th>
                                                                 <th>Total Amount</th>
 
@@ -792,7 +743,7 @@
                                                                 <td>{{sac.cgst}}</td>
                                                                 <td>{{sac.sgst}}</td>
                                                                 <td>{{sac.igst}}</td>
-                                                                <!-- <td>{{sac.state_cess}}</td> -->
+                                                                <td>{{sac.state_cess}}</td>
                                                                 <td>{{sac.cess}}</td>
                                                                 <td>{{sac.vat}}</td>
                                                                 <td>{{sac.amount_after_gst}}</td>
@@ -867,11 +818,11 @@
 
                                     <div class="min-h">
                                         <div>
+
                                             <div class="row mb-2">
                                                 <div class="col-md-6">
                                                     <h5 class="text-capitalize text-primary"><strong>{{invoicetypeName ?
                                                             invoicetypeName : 'Tax'}} Invoice</strong></h5>
-
                                                 </div>
                                                 <div class="col-md-6 text-right section-to-print" id="pdfBtn">
                                                     <button (click)="printPdf()" class="btn btn-primary py-1"
@@ -1006,26 +957,12 @@
                                                                             <tr>
                                                                                 <td><span
                                                                                         class="font-weight-bold">State:</span>
-                                                                                    <!-- {{invoiceInfo?.company_state_code}} -->
-                                                                                    <span
-                                                                                        *ngIf="invoiceInfo.state_code<10">
-                                                                                        {{invoiceInfo?.place_of_supply_name}}({{('0'+invoiceInfo.place_of_supply
-                                                                                        | trim) ||
-                                                                                        'NA'}})</span>
-                                                                                    <span
-                                                                                        *ngIf="invoiceInfo.state_code>=10">
-                                                                                        {{invoiceInfo?.place_of_supply_name}}({{(invoiceInfo.place_of_supply
-                                                                                        | trim) ||
-                                                                                        'NA'}})</span>
+                                                                                    {{invoiceInfo?.company_state_code}}
                                                                                 </td>
                                                                                 <td><span
                                                                                         class="font-weight-bold">Code:</span>
                                                                                 </td>
-                                                                                <td *ngIf="invoiceInfo.state_code<10">
-                                                                                    {{('0'+invoiceInfo.state_code |
-                                                                                    trim) || 'NA'}}</td>
-                                                                                <td *ngIf="invoiceInfo.state_code>=10">
-                                                                                    {{(invoiceInfo.state_code |
+                                                                                <td>{{(invoiceInfo.company_pincode |
                                                                                     trim) || 'NA'}}</td>
                                                                             </tr>
                                                                         </tbody>
@@ -1033,10 +970,7 @@
                                                                 </td>
                                                                 <td>
                                                                     <p><span class="font-weight-bold">Place of Supply:
-                                                                        </span><span
-                                                                            *ngIf="invoiceInfo.state_code<10">{{"0"+invoiceInfo?.company_place_of_supply}}</span>
-                                                                        <span
-                                                                            *ngIf="invoiceInfo.state_code>=10">{{invoiceInfo?.company_place_of_supply}}</span>
+                                                                        </span>{{invoiceInfo?.company_place_of_supply}}
                                                                     </p>
                                                                 </td>
                                                             </tr>
@@ -1091,7 +1025,7 @@
                                                               </td> -->
                                                                 <td>
                                                                     <p><span
-                                                                            class="font-weight-bold">GSTIN:</span>{{invoiceInfo?.gst_number}}
+                                                                            class="font-weight-bold">GSTIN:</span>{{invoiceInfo.gst_number}}
                                                                     </p>
                                                                 </td>
                                                             </tr>
@@ -1113,26 +1047,10 @@
                                                                             <tr>
                                                                                 <td><span
                                                                                         class="font-weight-bold">State:</span>
-                                                                                    <span
-                                                                                        *ngIf="invoiceInfo.state_code<10">
-                                                                                        {{invoiceInfo?.place_of_supply_name}}({{('0'+invoiceInfo.place_of_supply
-                                                                                        | trim) ||
-                                                                                        'NA'}})</span>
-                                                                                    <span
-                                                                                        *ngIf="invoiceInfo.state_code>=10">
-                                                                                        {{invoiceInfo?.place_of_supply_name}}({{(invoiceInfo.place_of_supply
-                                                                                        | trim) ||
-                                                                                        'NA'}})</span>
+                                                                                    {{invoiceInfo?.place_of_supply_name}}
                                                                                 </td>
                                                                                 <td class="font-weight-bold">Code</td>
-                                                                                <td
-                                                                                    *ngIf="invoiceInfo?.place_of_supply<10">
-                                                                                    {{'0'+invoiceInfo?.place_of_supply}}
-                                                                                </td>
-                                                                                <td
-                                                                                    *ngIf="invoiceInfo?.place_of_supply>=10">
-                                                                                    {{invoiceInfo?.place_of_supply}}
-                                                                                </td>
+                                                                                <td>{{invoiceInfo.place_of_supply}}</td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
@@ -1493,12 +1411,8 @@
 
                                                 <div class="row">
                                                     <div class="col-md-6">
-                                                        <h5 class="text-capitalize text-primary"><strong>{{manualType}}
-                                                                Invoice</strong>
-                                                        </h5>
-
-                                                        <!-- <p class="mb-0"><strong>{{companyData.e_tax_format}}</strong>
-                                                        </p> -->
+                                                        <p class="mb-0"><strong>{{companyData.e_tax_format}}</strong>
+                                                        </p>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="d-flex justify-content-end mb-2">
@@ -1776,32 +1690,10 @@
                                                                                                 {{invoiceInfo?.company_gst?.substring(2).slice(0,
                                                                                                 -3)}}
                                                                                             </p>
-                                                                                            <div>
-                                                                                                <p class="m-0">
-                                                                                                    <span
-                                                                                                        *ngIf="invoiceInfo?.company_cin_number">
-                                                                                                        <b>CIN No</b>:
-                                                                                                        {{invoiceInfo?.company_cin_number}},
-                                                                                                    </span>
-                                                                                                    <span
-                                                                                                        *ngIf="invoiceInfo?.company_tin_number">
-                                                                                                        <b>TIN No</b>:
-                                                                                                        {{invoiceInfo?.company_tin_number}}
-                                                                                                    </span>
-
-                                                                                                </p>
-                                                                                                <p class="m-0">
-                                                                                                    <span
-                                                                                                        *ngIf="invoiceInfo?.company_fssai_number">
-                                                                                                        <b>FSSAI LIC No
-                                                                                                        </b>:
-                                                                                                        {{invoiceInfo?.company_fssai_number}}
-                                                                                                    </span>
-
-                                                                                                </p>
-                                                                                            </div>
-
-
+                                                                                            <p class="mb-1">
+                                                                                                <b>FSSAI LIC No </b>:
+                                                                                                {{invoiceInfo?.company_fssai_number}}
+                                                                                            </p>
                                                                                             <address>
                                                                                                 {{invoiceInfo?.company_name}}<br>{{invoiceInfo?.company_legal_name}}
                                                                                                 <br>
@@ -1837,8 +1729,7 @@
                                                                                                 <b class="ml-1">PAN
                                                                                                 </b>:
                                                                                                 {{invoiceInfo?.gst_number.substr(2,
-                                                                                                10)}}
-                                                                                            </p>
+                                                                                                10)}}</p>
 
                                                                                             <div
                                                                                                 *ngIf="invoiceInfo?.invoice_type == 'B2B'">
@@ -1903,8 +1794,8 @@
                                                                     <th>GST Amount</th>
                                                                     <th>VAT</th>
 
-                                                                    <!-- <th>S.CESS</th> -->
-                                                                    <th>CESS</th>
+                                                                    <th>S.CESS</th>
+                                                                    <th>C.CESS</th>
                                                                     <th>Quantity</th>
                                                                     <th>
                                                                         Total Item Value
@@ -1916,7 +1807,7 @@
                                                                     <ng-container
                                                                         *ngIf="item.revenue_item != 'Non-Revenue' ">
                                                                         <!-- <td>{{i+1}}</td> -->
-                                                                        <td>{{item?.date | date:'dd- MM-yyyy'}}</td>
+                                                                        <td>{{item.date}}</td>
                                                                         <td>{{item.item_name}}</td>
                                                                         <td>{{item.sac_code}}</td>
                                                                         <td class="text-right">
@@ -1928,9 +1819,9 @@
                                                                             item.igst_amount }}
                                                                         </td>
                                                                         <td class="text-right">{{item.vat_amount}}</td>
-                                                                        <!-- <td class="text-right">
+                                                                        <td class="text-right">
                                                                             {{item.state_cess_amount}}
-                                                                        </td> -->
+                                                                        </td>
                                                                         <td class="text-right">
                                                                             {{item.cess_amount}}
                                                                         </td>
@@ -1970,7 +1861,7 @@
                                                                 <th>Central CESS
 
                                                                 </th>
-                                                                <!-- <th>State CESS </th> -->
+                                                                <th>State CESS </th>
                                                                 <!-- <th>VAT</th> -->
                                                                 <th>Discount(Rs)</th>
                                                                 <th>Other Charges
@@ -2005,10 +1896,10 @@
                                                                     ? invoiceInfo?.total_credit_central_cess_amount :
                                                                     invoiceInfo?.total_central_cess_amount}}
                                                                 </td>
-                                                                <!-- <td>{{invoiceInfo.invoice_category === 'Credit Invoice'
+                                                                <td>{{invoiceInfo.invoice_category === 'Credit Invoice'
                                                                     ? invoiceInfo?.total_credit_state_cess_amount :
                                                                     invoiceInfo?.total_state_cess_amount}}
-                                                                </td> -->
+                                                                </td>
                                                                 <!-- <td>{{invoiceInfo.invoice_category === 'Credit Invoice' ? invoiceInfo?.total_credit_vat_amount : invoiceInfo?.total_vat_amount}}
                                                                 </td> -->
                                                                 <td>{{invoiceInfo?.discount_value_before_gst}}</td>
@@ -2043,7 +1934,7 @@
 
                                                                 </th>
                                                                 <th>CESS TAX </th>
-                                                                <!-- <th>CESS TAX2</th> -->
+                                                                <th>CESS TAX2</th>
 
                                                                 <th>
                                                                     VAT
@@ -2053,7 +1944,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <!-- <tr *ngFor="let item of taxableArr">
+                                                            <tr *ngFor="let item of taxableArr">
 
                                                                 <td>
                                                                     {{item.sac_code }}</td>
@@ -2070,22 +1961,8 @@
                                                                 <td>
                                                                     {{item.cess_amount}}</td>
                                                                 <td>{{item.vat_amount}}</td>
-                                                            </tr> -->
+                                                            </tr>
 
-                                                            <tr
-                                                            *ngFor="let sac of invoiceInfo.sac_hsn_based_taxes;let i = index">
-                                                           
-                                                            <td>{{sac.sac_hsn_code}}</td>
-                                                            <td>{{sac.amount_before_gst}}</td>
-                                                            <td>{{sac.cgst}}</td>
-                                                            <td>{{sac.sgst}}</td>
-                                                            <td>{{sac.igst}}</td>
-                                                            <!-- <td>{{sac.state_cess}}</td> -->
-                                                            <td>{{sac.cess}}</td>
-                                                            
-                                                            
-                                                            <td>{{sac.vat}}</td>
-                                                        </tr>
 
                                                         </tbody>
                                                     </table>
@@ -2229,6 +2106,8 @@
                                     </div>
                                 </div>
                                 <!-- Potrait format end-->
+
+
                                 <!-- Landscape format start-->
                                 <div *ngIf="this.companyData.e_tax_format == 'Landscape'" class="row preview"
                                     id="section-to-print">
@@ -2307,11 +2186,11 @@
                                                                             {{invoiceInfo?.company_gst?.substring(2).slice(0,
                                                                             -3)}}</p>
                                                                         <p class="mb-0"><b>IRN </b>:
-                                                                            {{invoiceInfo?.irn_number}}</p>
+                                                                            {{invoiceInfo.irn_number}}</p>
                                                                         <p class="mb-0"><b>Ack. No</b>:
                                                                             {{invoiceInfo.ack_no}}</p>
                                                                         <p class="mb-0"><b>IRN Date </b>:
-                                                                            {{invoiceInfo?.ack_date | date}}</p>
+                                                                            {{invoiceInfo.ack_date | date}}</p>
                                                                     </div>
 
                                                                 </td>
@@ -2545,8 +2424,7 @@
                                                                     <tr style="background-color: #f4f4f4;">
                                                                         <td colspan="7"
                                                                             class="border-right border-bottom">
-                                                                            <strong>Grand Total</strong>
-                                                                        </td>
+                                                                            <strong>Grand Total</strong></td>
                                                                         <td
                                                                             class="text-right border-right border-bottom">
                                                                             <strong>{{invoiceInfo.amount_before_gst}}</strong>
@@ -2886,10 +2764,10 @@
                         <td>IGST({{sacDetails?.igst}}%)</td>
                         <td class="text-right">{{sacDetails?.igst_amount| currency:'INR'}}</td>
                     </tr>
-                    <!-- <tr>
+                    <tr>
                         <td>State Cess({{sacDetails?.state_cess}}%)</td>
                         <td class="text-right">{{sacDetails?.state_cess_amount| currency:'INR'}}</td>
-                    </tr> -->
+                    </tr>
                     <tr>
                         <td>Central Cess({{sacDetails?.cess}}%)</td>
                         <td class="text-right">{{sacDetails?.cess_amount| currency:'INR'}}</td>
@@ -3044,7 +2922,7 @@
                                                 number:'0.2'}}</strong>
                                         </td>
                                     </tr>
-                                    <!-- <tr class="text-right">
+                                    <tr class="text-right">
                                         <td colspan="17" class="total"><span>State CESS</span> </td>
                                         <td colspan="9" class="text-right">
                                             <strong *ngIf="manualType != 'Credit'"
@@ -3054,7 +2932,7 @@
                                                 class="total">{{invoiceInfo.total_credit_state_cess_amount |
                                                 number:'0.2'}}</strong>
                                         </td>
-                                    </tr> -->
+                                    </tr>
                                     <tr class="text-right">
                                         <td colspan="17" class="total"><span>Central CESS</span> </td>
                                         <td colspan="9" class="text-right">
@@ -3096,8 +2974,8 @@
                                                 <th>CGST</th>
                                                 <th>SGST</th>
                                                 <th>IGST</th>
-                                                <!-- <th>State CESS</th> -->
-                                                <th>CESS</th>
+                                                <th>State CESS</th>
+                                                <th>Central CESS</th>
                                                 <th>VAT</th>
                                                 <th>Total Amount</th>
 
@@ -3112,7 +2990,7 @@
                                                 <td>{{sac.cgst}}</td>
                                                 <td>{{sac.sgst}}</td>
                                                 <td>{{sac.igst}}</td>
-                                                <!-- <td>{{sac.state_cess}}</td> -->
+                                                <td>{{sac.state_cess}}</td>
                                                 <td>{{sac.cess}}</td>
                                                 <td>{{sac.vat}}</td>
                                                 <td>{{sac.amount_after_gst}}</td>
@@ -3418,7 +3296,7 @@
                                                                                     <b>FSSAI LIC No </b>:
                                                                                     {{invoiceInfo?.company_fssai_number}}
                                                                                 </p>
-                                                                                <p>{{invoiceInfo?.company_name}}<br>{{invoiceInfo?.company_legal_name}}
+                                                                                <p>{{invoiceInfo?.company_name}}<br>{{invoiceInfo.company_legal_name}}
                                                                                     <br>
                                                                                     {{invoiceInfo?.company_address_1}}
                                                                                     ,{{invoiceInfo?.company_address_2}}
@@ -3499,8 +3377,8 @@
                                                             <th>Item Value</th>
                                                             <th>GST Rate</th>
 
-                                                            <!-- <th>S.CESS</th> -->
-                                                            <th>CESS</th>
+                                                            <th>S.CESS</th>
+                                                            <th>C.CESS</th>
 
 
 
@@ -3518,7 +3396,7 @@
                                                                 {{i+1}}</td>
                                                             <td style="min-width: 80px;"
                                                                 *ngIf="item.item_mode === 'Debit'">
-                                                                {{item?.date | date:'dd- MM-yyyy'}}</td>
+                                                                {{item.date}}</td>
                                                             <td *ngIf="item.item_mode === 'Debit'">
                                                                 {{item.description}}
                                                             </td>
@@ -3532,8 +3410,8 @@
                                                                 {{item.sgst_amount + item.igst_amount + item.cgst_amount
                                                                 | number : '0.2'}}
                                                             </td>
-                                                            <!-- <td *ngIf="item.item_mode === 'Debit'" class="text-right">
-                                                                N/A</td> -->
+                                                            <td *ngIf="item.item_mode === 'Debit'" class="text-right">
+                                                                N/A</td>
                                                             <td *ngIf="item.item_mode === 'Debit'" class="text-right">
                                                                 N/A</td>
                                                             <td *ngIf="item.item_mode === 'Debit'" class="text-right">
@@ -3834,7 +3712,7 @@
                                                                                     <b>FSSAI LIC No </b>:
                                                                                     {{invoiceInfo?.company_fssai_number}}
                                                                                 </p>
-                                                                                <p>{{invoiceInfo?.company_name}}<br>{{invoiceInfo?.company_legal_name}}
+                                                                                <p>{{invoiceInfo?.company_name}}<br>{{invoiceInfo.company_legal_name}}
                                                                                     <br>
                                                                                     {{invoiceInfo?.company_address_1}}
                                                                                     ,{{invoiceInfo?.company_address_2}}
@@ -3910,8 +3788,8 @@
                                                             <th>Item Value</th>
                                                             <th>GST Rate</th>
 
-                                                            <!-- <th>S.CESS</th> -->
-                                                            <th>CESS</th>
+                                                            <th>S.CESS</th>
+                                                            <th>C.CESS</th>
 
 
 
@@ -3927,7 +3805,7 @@
                                                         <tr *ngFor="let item of invoiceInfo.items; let i = index">
                                                             <td style="min-width: 80px;"
                                                                 *ngIf="item.item_mode === 'Credit'">
-                                                                {{item?.date | date:'dd- MM-yyyy'}}</td>
+                                                                {{item.date}}</td>
                                                             <td *ngIf="item.item_mode === 'Credit'">
                                                                 {{item.description}}
                                                             </td>
@@ -3941,8 +3819,8 @@
                                                                 {{item.sgst_amount + item.igst_amount + item.cgst_amount
                                                                 | number : '0.2'}}
                                                             </td>
-                                                            <!-- <td *ngIf="item.item_mode === 'Credit'" class="text-right">
-                                                                N/A</td> -->
+                                                            <td *ngIf="item.item_mode === 'Credit'" class="text-right">
+                                                                N/A</td>
                                                             <td *ngIf="item.item_mode === 'Credit'" class="text-right">
                                                                 N/A</td>
                                                             <td *ngIf="item.item_mode === 'Credit'" class="text-right">
@@ -4699,8 +4577,8 @@
                                             <th>Item Value</th>
                                             <th>GST</th>
 
-                                            <!-- <th>S.CESS</th> -->
-                                            <th>CESS</th>
+                                            <th>S.CESS</th>
+                                            <th>C.CESS</th>
                                             <th>Quantity</th>
                                             <th>
                                                 Total Item Value
@@ -4710,7 +4588,7 @@
                                     <tbody>
                                         <tr *ngFor="let item of sacCodeDetails;let i = index">
                                             <!-- <td>{{i+1}}</td> -->
-                                            <td>{{item?.date | date:'dd- MM-yyyy'}}</td>
+                                            <td>{{item.date}}</td>
                                             <td>{{item.item_name}}</td>
                                             <td>{{item.sac_code}}</td>
                                             <td class="text-right">
@@ -4718,9 +4596,9 @@
                                             <td class="text-right">
                                                 {{item.cgst_amount + item.sgst_amount + item.igst_amount }}
                                             </td>
-                                            <!-- <td class="text-right">
+                                            <td class="text-right">
                                                 {{item.state_cess_amount}}
-                                            </td> -->
+                                            </td>
                                             <td class="text-right">
                                                 {{item.cess_amount}}
                                             </td>
@@ -4760,7 +4638,7 @@
                                     <th>Central CESS
 
                                     </th>
-                                    <!-- <th>State CESS </th> -->
+                                    <th>State CESS </th>
                                     <th>VAT</th>
                                     <th>Discount(Rs)</th>
                                     <th>Other Charges
@@ -4790,10 +4668,10 @@
                                         invoiceInfo?.total_credit_central_cess_amount :
                                         invoiceInfo?.total_central_cess_amount}}
                                     </td>
-                                    <!-- <td>{{invoiceInfo.invoice_category === 'Credit Invoice' ?
+                                    <td>{{invoiceInfo.invoice_category === 'Credit Invoice' ?
                                         invoiceInfo?.total_credit_state_cess_amount :
                                         invoiceInfo?.total_state_cess_amount}}
-                                    </td> -->
+                                    </td>
                                     <td>{{invoiceInfo.invoice_category === 'Credit Invoice' ?
                                         invoiceInfo?.total_credit_vat_amount : invoiceInfo?.total_vat_amount}}
                                     </td>
@@ -4825,7 +4703,7 @@
 
                                     </th>
                                     <th>CESS TAX </th>
-                                    <!-- <th>CESS TAX2</th> -->
+                                    <th>CESS TAX2</th>
 
                                     <th>
                                         VAT
@@ -4835,7 +4713,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <tr *ngFor="let item of taxableArr">
+                                <tr *ngFor="let item of taxableArr">
 
                                     <td>
                                         {{item.sac_code}}</td>
@@ -4852,23 +4730,8 @@
                                     <td>
                                         {{item.cess_amount}}</td>
                                     <td>{{item.vat_amount}}</td>
-                                </tr> -->
+                                </tr>
 
-
-                                <tr
-                                *ngFor="let sac of invoiceInfo.sac_hsn_based_taxes;let i = index">
-                               
-                                <td>{{sac.sac_hsn_code}}</td>
-                                <td>{{sac.amount_before_gst}}</td>
-                                <td>{{sac.cgst}}</td>
-                                <td>{{sac.sgst}}</td>
-                                <td>{{sac.igst}}</td>
-                                <!-- <td>{{sac.state_cess}}</td> -->
-                                <td>{{sac.cess}}</td>
-                               
-                                
-                                <td>{{sac.vat}}</td>
-                            </tr>
 
                             </tbody>
                         </table>

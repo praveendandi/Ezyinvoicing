@@ -5,7 +5,6 @@ import { forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { ApiUrls } from 'src/app/shared/api-urls';
 import { PaymentTypeService } from '../payment-type.service';
-import { environment } from 'src/environments/environment';
 class PaymentFilter {
   search = '';
   itemsPerPage = 20;
@@ -20,15 +19,13 @@ class PaymentFilter {
   styleUrls: ['./payment-type.component.scss']
 })
 export class PaymentTypeComponent implements OnInit {
-  apiDomain = environment.apiDomain;
   paymentDetails = [];
   p = 1;
   filters = new PaymentFilter();
   onSearch = new EventEmitter();
-  loginUser: any = {};
+  loginUser:any ={};
   loginUSerRole;
   companyDetails;
-  toastr: any;
   constructor(
     private paymentService: PaymentTypeService,
     private router: Router,
@@ -40,14 +37,13 @@ export class PaymentTypeComponent implements OnInit {
     this.companyDetails = JSON.parse(localStorage.getItem('company'))
     this.filters.itemsPerPage = this.companyDetails?.items_per_page
     this.onSearch.pipe(debounceTime(500)).subscribe((res) => {
-      this.paymentDetails = [];
+      this.paymentDetails=[];
       this.filters.start = 0;
       this.filters.totalCount = 0;
-      this.updateRouterParams()
-    });
+      this.updateRouterParams()});
     this.getTotalCountData()
     this.loginUser = JSON.parse(localStorage.getItem('login'))
-    this.loginUSerRole = this.loginUser.rolesFilter.some((each) => (each == 'ezy-IT' || each == 'ezy-Finance'))
+    this.loginUSerRole = this.loginUser.rolesFilter.some((each)=>(each == 'ezy-IT' || each =='ezy-Finance'))
   }
 
   updateRouterParams(): void {
@@ -108,9 +104,9 @@ export class PaymentTypeComponent implements OnInit {
       }
       const [count, data] = res;
       this.filters.totalCount = count.data[0].total_count;
-      data.data = data.data.map((each: any, index) => {
-        if (each) {
-          each.index = this.paymentDetails.length + index + 1;
+      data.data = data.data.map((each:any,index)=>{
+        if(each){
+        each.index = this.paymentDetails.length + index+1;
         }
         return each;
       })
@@ -128,8 +124,8 @@ export class PaymentTypeComponent implements OnInit {
   checkPagination(): void {
     // console.log(this.paymentDetails.length)
     // if(this.filters.itemsPerPage < this.paymentDetails.length){
-    this.filters.currentPage = 1
-    this.updateRouterParams()
+      this.filters.currentPage = 1
+      this.updateRouterParams()
     // }else{
     //   this.updateRouterParams() 
     // }
@@ -174,10 +170,4 @@ export class PaymentTypeComponent implements OnInit {
 
 
   // }
-  paymentType_export() {
-    this.http.get(ApiUrls.payment_details).subscribe((res: any) => {
-      console.log(res)
-      window.open(`${this.apiDomain}${res.message.file_path}`, "_blank");
-    })
-  }
 }

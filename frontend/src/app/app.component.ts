@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FileuploadProgressbarService } from './resuable/fileupload-progressbar/fileupload-progressbar.service';
 import { SocketService } from 'src/app/shared/services/socket.service';
 import { takeUntil } from 'rxjs/operators';
+import { CookieService } from 'ngx-cookie-service';
 
 let MINUTES_UNITL_AUTO_LOGOUT = 30// in mins
 const CHECK_INTERVAL = 5 // in ms
@@ -29,7 +30,8 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     public fileuploadProgressbarService :FileuploadProgressbarService,
-    private socketService: SocketService
+    private socketService: SocketService,
+    private cookie : CookieService
   ){}
 
   ngOnInit(){
@@ -37,6 +39,7 @@ export class AppComponent implements OnInit {
     this.check();
     this.initListener();
     this.initInterval();
+      this.cookie.deleteAll();
     localStorage.setItem(STORE_KEY,Date.now().toString());
     this.fileuploadProgressbarService.isFilesUploading.subscribe((res:any)=>{
       console.log(res)
@@ -76,6 +79,8 @@ export class AppComponent implements OnInit {
 
       if (isTimeout)  {
         localStorage.clear();
+        this.cookie.deleteAll();
+        sessionStorage.clear();
         this.router.navigate(['']);
       }
     }

@@ -4,6 +4,7 @@ import { Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
@@ -45,7 +46,9 @@ export class UsersComponent implements OnInit {
   UserSignature: any = {};
   userName;
   showPassword: boolean = false;
-
+  confirmPassword:any = '';
+  userObj : any = {};
+  userSearchObj :any = {};
   constructor(
     private http: HttpClient,
     private activatedRoute: ActivatedRoute,
@@ -62,10 +65,41 @@ export class UsersComponent implements OnInit {
     this.pfx_password = JSON.parse(localStorage.getItem('pfx_password'))
 
     this.onSearch.pipe(debounceTime(500)).subscribe((res) => this.updateRouterParams());
-    this.getTotalCount();
+    // this.getTotalCount();
+    this.getUSers();
     this.loginUser = JSON.parse(localStorage.getItem('login'))
     this.loginUSerRole = this.loginUser.rolesFilter.some((each:any)=>(each == 'ezy-IT' || each =='ezy-Finance'))
     console.log(this.loginUSerRole)
+  }
+
+  getUSers(){
+    this.http.get(ApiUrls.users_by_roles).subscribe((res:any)=>{
+      let users_data = res?.message
+      if (users_data?.length){
+      const formattedData = users_data?.reduce((result:any, {email=null,username=null,full_name=null,role=null,for_value=null,enabled=false,first_name=null,last_name =null }) => {
+        let filteredRow = result.find((row:any) => row.email === email && row.username === username);
+        // const org = filteredRow ? filteredRow.for_value: [];
+        const rolesList = filteredRow ? filteredRow.role : [];
+        // org?.push(for_value);
+        rolesList?.push(role)
+        filteredRow = {
+          email,username,full_name,role:rolesList, enabled,first_name,last_name
+
+        };
+        if (rolesList.length === 1) result.push(filteredRow);
+        return result;
+      }, [])
+      if(formattedData?.length){
+        this.userList = formattedData.map((each:any)=>{
+          if(each?.role){
+            each.role = [...new Set(each?.role)].toString()
+            each.for_value = [...new Set(each?.for_value)].toString()
+          }
+          return each;
+        })
+      }
+    }
+    })
   }
 
   showHidePassword() {
@@ -238,48 +272,7 @@ export class UsersComponent implements OnInit {
       }
     });
   }
-  // getUSerData(): void {
-  //   this.activatedRoute.queryParams.pipe(switchMap((params: UserFilter) => {
-  //     this.filters.itemsPerPage = parseInt(params.itemsPerPage as any, 0) || this.filters.itemsPerPage;
-  //     this.filters.currentPage = parseInt(params.currentPage as any, 0) || this.filters.currentPage;
-  //     this.filters.totalCount = parseInt(params.totalCount as any, 0) || this.filters.totalCount;
-  //     this.filters.search = params.search || this.filters.search;
-  //     const queryParams: any = { filters: [] };
-  //     // queryParams.limit_start = this.filters.itemsPerPage;
-
-  //     if (this.filters.search) {
-  //       queryParams.filters.push(['name', 'like', `%${this.filters.search}%`]);
-  //       // queryParams.filters.push(['code', 'like', `%${this.filters.search}%`]);
-  //       queryParams.limit_start = 0;
-  //       queryParams.limit_page_length = this.filters.itemsPerPage;
-  //       this.filters.currentPage = 1
-  //     } else {
-  //       queryParams.limit_start = (this.filters.currentPage - 1) * this.filters.itemsPerPage;
-  //       queryParams.limit_page_length = this.filters.itemsPerPage;
-  //     }
-  //     queryParams.order_by = "`tabUser`.`modified` asc"
-  //     queryParams.fields = JSON.stringify(["name", "email","enabled","username"]);
-  //     queryParams.filters = JSON.stringify(queryParams.filters);
-  //     // queryParams.with_comment_count = true;
-  //     const countApi = this.http.get(`${ApiUrls.users}`, {
-  //       params: {
-  //         fields: JSON.stringify(["count( `tabUser`.`name`) AS total_count"]),
-  //         filters: queryParams.filters
-  //       }
-  //     });
-  //     const resultApi = this.http.get(`${ApiUrls.users}`, { params: queryParams });
-  //     return forkJoin([countApi, resultApi]);
-  //   })).subscribe((res: any) => {
-  //     console.log(res);
-  //     const [count, data] = res;
-  //     this.filters.totalCount = count.data[0].total_count;
-  //     if (data.data) {
-  //       this.userList = data.data;
-  //       this.userList = this.userList.reverse();
-  //     }
-  //   });
-  // }
-
+ 
   navigateRoles(each, index): void {
     this.index = index
     this.roles = []
@@ -296,19 +289,22 @@ export class UsersComponent implements OnInit {
     })
   }
   editUSer(item, type) {
-    this.router.navigate(['home/users-details'], { queryParams: { id: item.name, type }, queryParamsHandling: 'merge' })
+    this.router.navigate(['home/users-details'], { queryParams: { id: item.email, type }, queryParamsHandling: 'merge' })
   }
 
   changePassword(content, user) {
+    this.userObj = {}
     this.selectedUser = user;
     this.modal.open(content, {
-      centered: true
+      centered: true, size:'md',backdrop:'static'
     });
   }
 
-  onSubmit() {
-    if (this.new_password) {
-      this.http.put(`${ApiUrls.users}/${this.selectedUser?.email}`, { new_password: this.new_password }).subscribe((res: any) => {
+  onSubmit(form:NgForm) {
+
+    if(form.valid){
+    if (this.userObj.new_password) {
+      this.http.put(`${ApiUrls.users}/${this.selectedUser?.email}`, { new_password: this.userObj.new_password,last_password_reset_date: moment(new Date()).format("YYYY-MM-DD") }).subscribe((res: any) => {
         if (res.data) {
           this.toastr.success("Password Changed");
           this.modal.dismissAll();
@@ -317,6 +313,7 @@ export class UsersComponent implements OnInit {
         }
       })
     }
+  }
   }
 
   /**deleteUser */
@@ -335,4 +332,15 @@ export class UsersComponent implements OnInit {
     }
 
   }
+
+  switchStatus(item){
+    this.http.put(`${ApiUrls.users}/${item.email}`, item).subscribe((res: any) => {
+      if (res.data) {
+        // this.getUsersList()
+        this.getUSers()
+      }
+    })
+  }
+
+
 }

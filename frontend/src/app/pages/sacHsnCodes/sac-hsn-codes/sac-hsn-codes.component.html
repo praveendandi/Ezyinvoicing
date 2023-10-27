@@ -19,7 +19,6 @@
       </div>
     </div>
     <div class="col-md-5 text-right my-auto">
-      <button class="btn btn-primary btn-small mr-2" type="button" (click)="sacHsnType()">Export</button>
       <span (click)="howToAddSac(addSacHsn)" class="cursor-pointer text-white text-underline">How to add SAC HSN Codes
         ?</span>
     </div>
@@ -114,11 +113,10 @@
               <td></td>
               <td *ngIf="companyDetails?.ezy_gst_module == 1">
                 <div class="form-group mb-0">
-                  <select id="creditNotes" class="custom-select" [(ngModel)]="filters.synced_to_erp"
-                    (change)="onSearch.emit(filters)">
-                    <option value="">Showing all</option>
-                    <option value="1">Synced</option>
-                    <option value="0">Not Synced</option>
+                  <select id="creditNotes" class="custom-select" [(ngModel)]="filters.synced_to_erp" (change)="onSearch.emit(filters)">
+                      <option value="">Showing all</option>
+                      <option value="1">Synced</option>
+                      <option value="0">Not Synced</option>
                   </select>
                 </div>
               </td>

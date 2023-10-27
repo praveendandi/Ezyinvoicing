@@ -8,6 +8,7 @@ import { PermissionButtonDirectiveModule } from 'src/app/shared/directives/permi
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MatInputDirectiveModule } from 'src/app/shared/directives/mat-input.directive';
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { SearchUserPipeModule } from 'src/app/shared/pipes/search-user.pipe';
 
 @NgModule({
   declarations: [UsersComponent],
@@ -19,7 +20,8 @@ import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
     PermissionButtonDirectiveModule,
     NgSelectModule,
     MatInputDirectiveModule,
-    NgbNavModule
+    NgbNavModule,
+    SearchUserPipeModule
   ]
 })
 export class UsersModule { }

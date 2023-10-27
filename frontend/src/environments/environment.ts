@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiDomain: 'api',
-  sockectURl :'https://test.ezycheckins.com/', 
+  sockectURl :'http://192.168.1.106:5001/', 
   appUrl : 'http://192.168.1.223:7000'
 };
 

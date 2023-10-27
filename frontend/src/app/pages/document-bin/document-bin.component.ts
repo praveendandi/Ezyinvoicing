@@ -61,8 +61,8 @@ export class DocumentBinComponent implements OnInit {
   reprocessDoc = false;
   reprocessButn = false;
   today = Moment(new Date()).endOf('day').toDate();
-  lastSevenDays = Moment(new Date()).subtract(7, 'days').startOf('day').toDate();
-  dateOfreprocess;
+  lastSevenDays = Moment(new Date()).subtract(7,'days').startOf('day').toDate();
+  dateOfreprocess ;
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -100,7 +100,7 @@ export class DocumentBinComponent implements OnInit {
       if (res?.message?.type === 'document_bin_insert') {
         this.getBinList();
       }
-      if (res?.message?.type === 'redo bin error') {
+      if(res?.message?.type === 'redo bin error'){
         // this.errDocument
       }
     })
@@ -138,9 +138,9 @@ export class DocumentBinComponent implements OnInit {
       return null;
     } else {
       let date = moment(this.filters.searchFilter.creation).format('YYYY-MM-DD')
-      this.http.post(ApiUrls.reprocessDocmentBin, { docdate: date }).subscribe((res: any) => {
-        if (res) {
-          this.modal.dismissAll();
+      this.http.post(ApiUrls.reprocessDocmentBin,{docdate:date}).subscribe((res: any) => {
+        if(res){
+         this.modal.dismissAll();
         }
       })
       // const apiCalls = this.errDocument.map((each: any, idx) => {
@@ -226,7 +226,7 @@ export class DocumentBinComponent implements OnInit {
       queryParams.limit_start = this.filters.start
       queryParams.limit_page_length = this.filters.itemsPerPage;
       queryParams.order_by = "`tabDocument Bin`.`creation` desc"
-      queryParams.fields = JSON.stringify(["name", "invoice_file", "invoice_number", "document_printed", "print_by", "document_type", "error_log", "creation", "modified", "system_name"]);
+      queryParams.fields = JSON.stringify(["name", "invoice_file", "invoice_number", "document_printed", "print_by", "document_type", "error_log", "creation", "modified","system_name"]);
       queryParams.filters = JSON.stringify(queryParams.filters);
       const countApi = this.http.get(`${ApiUrls.resource}/${Doctypes.documentBin}`, {
         params: {
@@ -375,18 +375,16 @@ export class DocumentBinComponent implements OnInit {
     this.updateRouterParams()
   }
   /**diagnostic  */
-  diagnostic() {
-    this.http.post(ApiUrls.diagnostic, { data: { company_code: this.companyDetails?.company_code } }).subscribe((res: any) => {
-      if (res?.message) {
-        console.log(this.domain + res?.message)
-        window.open(this.domain + res?.message, '_blank')
+  diagnostic(){
+    this.http.post(ApiUrls.diagnostic,{data:{company_code:this.companyDetails?.company_code}}).subscribe((res:any)=>{
+      if(res?.message){
+        console.log(this.domain+res?.message)
+        window.open(this.domain+res?.message,'_blank')
       }
     })
   }
-
-
   /************** */
-  downloadExe() {
+  downloadExe(){
     let link = document.createElement('a');
     link.setAttribute('type', 'hidden');
     link.href = 'https://ezyinvoicing-disk.s3.ap-south-1.amazonaws.com/EzyUtility.exe';
@@ -394,21 +392,5 @@ export class DocumentBinComponent implements OnInit {
     document.body.appendChild(link);
     link.click();
     link.remove();
-  }
-
-  reprocess_B2C_pending_invoices() {
-    this.http.get(ApiUrls.reprocess_B2C_pending_invoices).subscribe((res: any) => {
-      if (res?.message?.success) {
-        this.getBinList()
-      } else {
-        this.toastr.error(res?.message?.message)
-      }
-    })
-  }
-  redo_error() {
-    let date = moment(this.filters.searchFilter.creation).format('YYYY-MM-DD')
-    this.http.post(ApiUrls.redo_error, { docdate: date }).subscribe((res: any) => {
-      console.log(res)
-    })
   }
 }
