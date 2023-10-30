@@ -1,9 +1,0 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,KAAK,CAAC,EAAE,CAAC,EAAE,CAAC;EACR,WAAW,EAAE,MAAM;CACtB;;AAED,AAAA,CAAC,CAAC;EACE,cAAc,EAAE,iBAAiB;CACpC;;AAED,AACI,MADE,CACF,CAAC,CAAC;EACE,SAAS,EAAE,IAAI;CAClB;;AAGL,AAAA,UAAU,CAAC;EACP,oBAAoB,EAAE,SAAS;CAClC",
-    "sources": [
-        "advance-received.component.scss"
-    ],
-    "names": [],
-    "file": "advance-received.component.css"
-}

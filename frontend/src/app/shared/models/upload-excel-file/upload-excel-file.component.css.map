@@ -1,9 +1,0 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,YAAY,CAAC;EACT,UAAU,EAAE,IAAI;EAChB,UAAU,EAAE,IAAI;CACnB;;AAED,AAAA,YAAY,CAAC;EACT,UAAU,EAAE,KAAK;EACjB,UAAU,EAAE,MAAM;CACrB;;AAED,AACI,YADQ,CACR,CAAC,CAAC;EACE,SAAS,EAAE,KAAK;CACnB",
-    "sources": [
-        "upload-excel-file.component.scss"
-    ],
-    "names": [],
-    "file": "upload-excel-file.component.css"
-}

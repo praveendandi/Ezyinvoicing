@@ -1,9 +1,0 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,YAAY,CAAC;EACT,YAAY,EAAE,IAAI;EAClB,cAAc,EAAE,IAAI;EACpB,MAAM,EAAE,CAAC;EACT,gBAAgB,EAAE,8DAA8D;EAChF,mBAAmB,EAAE,MAAM;EAC3B,eAAe,EAAE,QAAQ;EACzB,iBAAiB,EAAE,QAAQ;EAC3B,qBAAqB,EAAE,IAAI;EAC3B,KAAK,EAAE,KAAK;CACf;;AAED,AAAA,KAAK,AAAA,MAAM,CAAC;EACR,OAAO,EAAE,eAAe;CAC3B",
-    "sources": [
-        "otp.component.scss"
-    ],
-    "names": [],
-    "file": "otp.component.css"
-}
