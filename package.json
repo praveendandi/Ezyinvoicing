@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "postinstall": "cd dist && npm install",
-    "dev": "cd dist && npm run start",
-    "build": "cd dist && npm run build"
+    "dev": "cd frontend && npm run start",
+    "build": "cd frontend && npm run build"
   }
 }
