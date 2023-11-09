@@ -1,0 +1,28 @@
+.console{
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: rgb(241, 238, 238);
+    height: 30rem;
+    max-height: 40rem;
+    padding: 20px;
+}
+.badge {
+    padding: 3px 15px;
+    border-radius: 30px;
+    font-size: 13px;
+    // color: #fff;
+    // margin-left: 20px;
+    font-weight: 500;
+}
+
+.bgColorRed{
+    background-color: red;
+    color: #fff;
+    padding: 2px 5px;
+}
+.bgColorGreen{
+    background-color: green;
+    color: #fff;
+    padding: 2px 5px;
+}

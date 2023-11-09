@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,MAAM,CAAC,EAAE;AACT,MAAM,CAAC,EAAE,CAAC;EACN,OAAO,EAAE,GAAG;EACZ,SAAS,EAAE,IAAI;EACf,MAAM,EAAE,GAAG,CAAC,KAAK,CAAC,wBAAwB;CAC7C;;AAED,AAAA,WAAW,CAAC;EACR,aAAa,EAAE,IAAI;CAItB;;AALD,AAEI,WAFO,CAEP,KAAK,CAAC;EACF,SAAS,EAAE,IAAI;CAClB;;AAGL,AAAA,KAAK,CAAC;EACF,eAAe,EAAE,SAAS;EAC1B,MAAM,EAAE,OAAO;CAClB",
+    "sources": [
+        "workstations.component.scss"
+    ],
+    "names": [],
+    "file": "workstations.component.css"
+}

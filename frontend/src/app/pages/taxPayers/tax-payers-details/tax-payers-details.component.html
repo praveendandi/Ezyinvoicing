@@ -1,0 +1,238 @@
+<section>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="font-weight-bold">Tax Payers</h4>
+            <div class="sync-status" *ngIf="companyDetails?.ezy_gst_module == 1">
+                <span *ngIf="taxPayerDetails?.synced_to_erp == 0"><p class="ml-3 mb-0 text-danger non-sync"><i class="ri-close-circle-line"></i> Not Synced</p></span>
+                <div *ngIf="taxPayerDetails?.synced_to_erp == 1">
+                    <p class="mb-0 text-success sync"><i class="ri-checkbox-circle-fill"></i> Synced to EzyGST </p>
+                    <p class="text-right " style="font-size: 13px"><i class="ri-calendar-check-line"></i> {{taxPayerDetails?.synced_date |date : ["MMM d y"]}}</p>
+                </div>
+            </div>
+            <div class="btn-right" *ngIf="paramsData?.type == 'View' && taxPayerDetails?.synced_to_erp == 0">
+                <a (click)="TaxsynctoGST()" class="btn btn-primary btn-sm mx-2 btn-right" ngbTooltip="sync to gst"
+                    appPermissionButton accessType="write" type="button">Sync to GST</a>
+            </div>
+            <p class="text-muted"><a [routerLink]="['/home/tax-payers']" [queryParamsHandling]="'preserve'"
+                    [replaceUrl]="true" class="text-primary cursor-pointer">Tax Payer</a>/ {{header}} Tax Payer
+            </p>
+
+            <div class="">
+                <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+                    <div class="col-lg-10 col-md-10">
+                        <div class="text-center">
+                            <small class="text-danger">{{form.form.getError('error')}}</small>
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control text-uppercase" id="gst_number"
+                                            name="gst_number" (ngModelChange)="changeDescription($event)" minlength="15" maxlength="15"  appValidateGST  [(ngModel)]="taxPayerDetails.gst_number"
+                                            #gst_number="ngModel"
+                                            [readonly]="paramsData?.type == 'View' || checkApiMethod" required>
+                                        <label for="taxble" class="mat-label">GST Number</label>
+                                        <!-- <small class="text-danger"
+                                            *ngIf="gst_number?">Required</small> -->
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && gst_number?.errors?.required">Required</small>
+                                            <small class="text-danger"
+                                            *ngIf="form.submitted && gst_number?.invalid">Enter valid GST Number</small>
+                                        <!-- <small class="text-danger" *ngIf="checkName">Already Exists</small> -->
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group d-none">
+                                        <!-- <select appMatInput name="company" id="company" class="custom-select"
+                                            [(ngModel)]="taxPayerDetails.company" #company="ngModel" required>
+                                            <option *ngFor="let item of companyList" [value]="item?.name">{{item?.name}}</option>
+
+                                        </select> -->
+
+                                        <input type="text" appMatInput class="form-control" id="company" name="company"
+                                            [(ngModel)]="taxPayerDetails.company" #company="ngModel" readonly>
+                                        <label for="company" class="mat-label">Company</label>
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && company?.errors?.required">Required</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <div *ngIf="checkApiMethod">
+                            <div class="row">
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="legal_name"
+                                            name="legal_name" [(ngModel)]="taxPayerDetails.legal_name"
+                                            #legal_name="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="taxble" class="mat-label">Legal Name</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="email" appMatInput class="form-control" id="email" name="email"
+                                            [(ngModel)]="taxPayerDetails.email" #email="ngModel"
+                                            [readonly]="paramsData?.type == 'View'">
+                                        <label for="email" class="mat-label">Email</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="trade_name"
+                                            name="trade_name" [(ngModel)]="taxPayerDetails.trade_name"
+                                            #trade_name="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="trade_name" class="mat-label">Trade Name</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="address_1"
+                                            name="address_1" [(ngModel)]="taxPayerDetails.address_1"
+                                            #address_1="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="address_1" class="mat-label">Address 1</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="address_2"
+                                            name="address_2" [(ngModel)]="taxPayerDetails.address_2"
+                                            #address_2="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="address_2" class="mat-label">Address 2</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="phone_number"
+                                            name="phone_number" [(ngModel)]="taxPayerDetails.phone_number"
+                                            #phone_number="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="phone_number" class="mat-label">Phone Number</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="state_code"
+                                            name="state_code" [(ngModel)]="taxPayerDetails.state_code"
+                                            #state_code="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="state_code" class="mat-label">State Code</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="location"
+                                            name="location" [(ngModel)]="taxPayerDetails.location" #location="ngModel"
+                                            [readonly]="paramsData?.type == 'View'">
+                                        <label for="location" class="mat-label">Location</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="last_fetched"
+                                            name="last_fetched" [(ngModel)]="taxPayerDetails.last_fetched"
+                                            #last_fetched="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="last_fetched" class="mat-label">Last Fetched</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="pincode" name="pincode"
+                                            [(ngModel)]="taxPayerDetails.pincode" #pincode="ngModel"
+                                            [readonly]="paramsData?.type == 'View'">
+                                        <label for="pincode" class="mat-label">Pincode</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="address_floor_number"
+                                            name="address_floor_number"
+                                            [(ngModel)]="taxPayerDetails.address_floor_number"
+                                            #address_floor_number="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="address_floor_number" class="mat-label">Address Floor Number</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="gst_status"
+                                            name="gst_status" [(ngModel)]="taxPayerDetails.gst_status"
+                                            #gst_status="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="gst_status" class="mat-label">GST Status</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="address_street"
+                                            name="address_street" [(ngModel)]="taxPayerDetails.address_street"
+                                            #address_street="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="address_street" class="mat-label">Address Street</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="tax_type"
+                                            name="tax_type" [(ngModel)]="taxPayerDetails.tax_type" #tax_type="ngModel"
+                                            [readonly]="paramsData?.type == 'View'">
+                                        <label for="tax_type" class="mat-label">Tax Type</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="block_status"
+                                            name="block_status" [(ngModel)]="taxPayerDetails.block_status"
+                                            #block_status="ngModel" [readonly]="paramsData?.type == 'View'">
+                                        <label for="block_status" class="mat-label">Block Status</label>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <select appMatInput name="status" id="status" class="custom-select"
+                                            [(ngModel)]="taxPayerDetails.status" #status="ngModel">
+                                            <option value="Active">Active</option>
+                                            <option value="In-Active">In-Active</option>
+                                        </select>
+                                        <label for="status" class="mat-label">Status</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <select appMatInput name="disable_auto_irn" id="disable_auto_irn" class="custom-select"
+                                            [(ngModel)]="taxPayerDetails.disable_auto_irn" #disable_auto_irn="ngModel">
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                        <label for="disable_auto_irn" class="mat-label">Disable Auto IRN</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-right" *ngIf="paramsData?.type !== 'View'">
+                            <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                                [routerLink]="['/home/tax-payers']">Cancel</button>
+                            <button class="btn btn-primary mb-0 ml-3 text-uppercase" appPermissionButton accessType="write" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

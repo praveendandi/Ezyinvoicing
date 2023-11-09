@@ -1,0 +1,1067 @@
+<section>
+  <div class="row mb-3">
+    <div class="col-md-6 col-lg-6">
+      <div class="d-flex">
+        <h5 class="font-weight-bold text-white my-auto"> Sync history
+          <!-- <small>({{filters.totalCount}})</small> -->
+        </h5>
+      </div>
+      <p class="text-white pt-2 mb-0">
+        <span class="lastsync">Last Synced on :</span> {{synceLists?.last_sync_time | date:"dd/MM/yyyy hh:mm:ss"}}
+      </p>
+    </div>
+
+    <div class="col-lg-6 col-md-6 text-right d-flex p-0 sync_dash_tabs">
+
+      <!-- <div class="input-group input-group-sm calendar_from my-3" *ngIf="sync_errorlogs">
+
+        <input class="form-control h-auto bg-white" [(ngModel)]="from_date" [owlDateTime]="dt1"
+          [owlDateTimeTrigger]="dt1" placeholder="From Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+      </div>
+      <div class="input-group input-group-sm calendar_from my-3" *ngIf="sync_errorlogs">
+      
+        <input class="form-control h-auto bg-white" [(ngModel)]="to_date" [min]='this.from_date' [owlDateTime]="dt1"
+          [owlDateTimeTrigger]="dt1" placeholder="To Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+      </div> -->
+
+      <button [disabled]="totalSyncProgress?.sync_status"
+        class="btn btn-sm btn-outline-primary outline-d_flag my-3 mr-2" (click)="deflagemodal(deflag)"
+        *ngIf="sync_errorlogs">De Flag</button>
+      <button [disabled]="totalSyncProgress?.sync_status" class="btn btn-sm btn-outline-primary outline-d_flag my-3 "
+        (click)="exportexcel()" *ngIf="sync_error_invoice">Export Error Logs</button>
+      <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
+        <!-- <select id="my-select" [(ngModel)]="seletedMonth"
+          (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)" class="custom-select bg-white" name="">
+          <option value="01">January</option>
+          <option value="02">February</option>
+          <option value="03">March</option>
+          <option value="04">April</option>
+          <option value="05">May</option>
+          <option value="06">June</option>
+          <option value="07">July</option>
+          <option value="08">August</option>
+          <option value="09">September</option>
+          <option value="10">October</option>
+          <option value="11">November</option>
+          <option value="12">December</option>
+        </select> -->
+
+        <!-- <select id="my-selects" class="custom-select bg-white" name="seletedMonth" [(ngModel)]="seletedMonthyears"
+        (ngModelChange)="navtabChange()">
+        <option value="">Select</option>
+
+        <option [disabled]="month.disable" [ngValue]="month.value" *ngFor="let month of monthsYearsList">
+          {{month?.label}}</option>
+      </select> -->
+      
+      <!-- <input type="checkbox" [ngModel]=""> -->
+        <select id="my-selects" class="custom-select bg-white" name="seletedMonth" [(ngModel)]="seletedMonthyears"
+          (ngModelChange)="navtabChange()">
+          <option value="">Select</option>
+
+          <option [disabled]="month.disable" [ngValue]="month.value" *ngFor="let month of monthsYearsList">
+            {{month?.label}}</option>
+        </select>
+
+
+      </div>
+      <!-- <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
+        <select id="my-select" [(ngModel)]="selectedyear"
+          (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)" class="custom-select bg-white" name="">
+          <option *ngFor="let item of years" [value]="item">{{item}}</option>
+        </select>
+      </div> -->
+      <!-- <button [disabled]="totalSyncProgress?.sync_status" class="btn btn-sm btn-primary mx-2 my-3 Sync_Dashboard"
+        (click)="open(content)" (click)="syncfuncDashboard()">Sync Dashboard</button> -->
+      <button [disabled]="totalSyncProgress?.sync_status" class="btn btn-sm btn-primary mx-2 my-3 Sync_Dashboard"
+        (click)="syncfuncDashboard()" *ngIf="showdata_tabs">Sync Dashboard</button>
+
+      <button [disabled]="totalSyncProgress?.sync_status" class="btn btn-sm btn-primary mx-2 my-3" (click)="syncFunc()"
+        *ngIf="sync_error_invoice">Sync Invoices</button>
+
+
+      <button type="button" class="btn btn-sm btn-primary  my-3" (click)="reFresh()"> <i
+          class="ri-restart-line"></i></button>
+    </div>
+  </div>
+
+
+
+
+  <div class="">
+    <div class="form-group ">
+
+      <div class="pl-1">
+
+        <ul ngbNav #nav="ngbNav" [(activeId)]="filters.active" class="nav-tabs " (activeIdChange)="navtabChange()">
+          <li [ngbNavItem]="1">
+            <a ngbNavLink class="nav-hotel">Dashboard</a>
+            <ng-template ngbNavContent>
+              <ng-container [ngTemplateOutlet]="synchistory"></ng-container>
+            </ng-template>
+          </li>
+          <li [ngbNavItem]="2" class="mx-2">
+            <a ngbNavLink class="nav-hotel">Sync Logs</a>
+            <ng-template ngbNavContent>
+              <ng-container [ngTemplateOutlet]="syncLogs"></ng-container>
+            </ng-template>
+          </li>
+        </ul>
+        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+
+
+  <ng-template #synchistory>
+    <div class="card  mt-3">
+      <table border="1" cellpadding="8" cellspacing="0">
+        <tr class="Particulars-bg">
+          <th rowspan="3" class="text-start">Particulars </th>
+          <th rowspan="3" class="text-center">Total Invoices </th>
+          <th rowspan="2" colspan="3" class="text-center"> <span class="badge-success">Success</span></th>
+          <th rowspan="3"><span class="badge-warning pt-2 "> Pending</span></th>
+          <!-- <th rowspan="3">Pending</th> -->
+          <th rowspan="3"><span class="badge-danger  badge-dangertop"> Error</span></th>
+          <th rowspan="3" class="text-center">Cancelled</th>
+        </tr>
+        <tr>
+        </tr>
+        <tr class="Particulars-bg">
+          <th>Total Success</th>
+          <th>Synced </th>
+          <th>Not Synced</th>
+        </tr>
+        <ng-container *ngIf="synceLists">
+          <tr>
+            <td class="subject">B2B</td>
+            <td class="total text-center">{{synceLists?.total_invoices_b2b }}</td>
+            <td class="total text-center">{{synceLists?.b2b_success }}</td>
+            <td class="obtained text-center">{{synceLists?.b2b_synced }}</td>
+            <td class="total text-center">{{synceLists?.b2b_notsynced }}</td>
+            <td class="obtained text-center">{{synceLists?.b2b_pending }}</td>
+            <td class="obtained text-center">{{synceLists?.b2b_error }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cancelled_b2b }}</td>
+          </tr>
+          <tr>
+            <td class="subject">B2C</td>
+            <td class="total text-center">{{synceLists?.total_invoices_b2c_total}}</td>
+            <td class="total text-center">{{synceLists?.b2c_success }}</td>
+            <td class="obtained text-center">{{synceLists?.b2c_synced }}</td>
+            <td class="total text-center">{{synceLists?.b2c_notsynced }}</td>
+            <td class="obtained text-center">{{synceLists?.b2c_pending }}</td>
+            <td class="obtained text-center">{{synceLists?.b2c_error }}</td>
+            <td class="obtained text-center">-</td>
+          </tr>
+          <tr>
+            <td class="subject">Manual B2B</td>
+            <td class="total text-center">{{synceLists?.total_invoices_manual_b2b}}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_manual_b2b_succ}}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2b_succ_sync}}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_manual_b2b_succ_unsync}}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2b_pen }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2b_error }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2b_can }}</td>
+          </tr>
+          <tr>
+            <td class="subject">Manual B2C</td>
+            <td class="total text-center">{{synceLists?.total_invoices_manual_b2c}}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_manual_b2c_succ}}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2c_succ_sync }}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_manual_b2b_succ_unsync}}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2c_pen }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2c_error }}</td>
+            <td class="obtained text-center">-</td>
+          </tr>
+
+
+          <tr>
+            <td class="subject">Manual Credit Note (Registered)</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_reg_man}}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_reg_succ }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cn_reg_sync }}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_reg_unsync }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cn_reg_pend }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cn_reg_err }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_manual_b2b_can_cn }}</td>
+          </tr>
+          <!-- <tr>
+            <td class="subject">Manual Credit Notes (Unregistered)</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_unreg_sync}}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_unreg_succ }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cn_unreg_sync }}</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_unreg_unsync}}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cn_unreg_pend }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cn_unreg_err }}</td>
+          </tr> -->
+          <tr>
+            <td class="subject">Credit Notes (Registered)</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_reg}}</td>
+            <td class="total text-center">{{synceLists?.creditnote_reg_success }}</td>
+            <td class="obtained text-center">{{synceLists?.creditnote_reg_synced }}</td>
+            <td class="total text-center">{{synceLists?.creditnote_reg_notsynced }}</td>
+            <td class="obtained text-center">{{synceLists?.creditnote_reg_pending }}</td>
+            <td class="obtained text-center">{{synceLists?.creditnote_reg_error }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_b2b_can_cn }}</td>
+          </tr>
+
+          <tr>
+            <td class="subject">Credit Notes (Unregistered)</td>
+            <td class="total text-center">{{synceLists?.total_invoices_cn_unreg }}</td>
+            <td class="total text-center">{{synceLists?.creditnote_unreg_success }}</td>
+            <td class="obtained text-center">{{synceLists?.creditnote_unreg_synced }}</td>
+            <td class="total text-center">{{synceLists?.creditnote_unreg_notsynced }}</td>
+            <td class="obtained text-center">{{synceLists?.creditnote_unreg_pending }}</td>
+            <td class="obtained text-center">{{synceLists?.creditnote_unreg_error }}</td>
+            <td class="obtained text-center">-</td>
+          </tr>
+          <tr class="footer">
+            <td class="subject">Total</td>
+            <td class="total text-center">{{synceLists?.total_invoices }}</td>
+            <td class="total text-center">{{synceLists?.total_success_invoices }}</td>
+            <td class="obtained text-center">{{synceLists?.total_synced_invoices }}</td>
+            <td class="total text-center">{{synceLists?.total_notsynced_invoices }}</td>
+            <td class="obtained text-center">{{synceLists?.total_pending }}</td>
+            <td class="obtained text-center">{{synceLists?.total_error_invoices }}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_cancelled }}</td>
+          </tr>
+          <tr class="footer">
+            <td class="subject">Zero Invoices</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_zero_invoices}}</td>
+            <td class="obtained text-center">-</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_zero_invoices_sync}}</td>
+            <td class="obtained text-center">{{synceLists?.total_invoices_zero_invoices_unsync}}</td>
+            <td class="obtained text-center">-</td>
+            <td class="obtained text-center">-</td>
+            <td class="obtained text-center">-</td>
+          </tr>
+
+
+
+
+
+
+
+
+          <tr class="amendments">
+            <td class="subject">Amendments</td>
+            <td class="total text-center">{{synceLists?.total_amendments_count }}</td>
+            <td class="total text-center">{{synceLists?.total_amendments_count }}</td>
+            <td class="obtained text-center">{{synceLists?.total_amendments_count_synced }}</td>
+            <td class="total text-center">{{synceLists?.total_amendments_count_unsynced }}</td>
+            <td class="obtained text-center">-</td>
+            <td class="obtained text-center">-</td>
+            <td class="obtained text-center">-</td>
+          </tr>
+
+        </ng-container>
+
+        <ng-container *ngIf="!synceLists">
+          <tr>
+            <td class="total text-center" colspan="8">No Data Found</td>
+          </tr>
+        </ng-container>
+
+
+
+
+
+      </table>
+
+
+
+
+
+
+      <!-- <div class="table-responsive">
+      <table class="table mb-0">
+
+        <thead class="thead" #head>
+          <tr>
+            <th class="particulars-border">Particulars</th>
+            <th class="p-0">
+              <table class="table  border-0 mb-0 text-center no-pad">
+                <tr class="border">
+                  <th colspan="3" class=" notsysc-td"> <span class="badge-success"> Success</span> </th>
+                </tr>
+                <tr class="text-center">
+                  <th>Total</th>
+                  <th>Synced</th>
+                  <th class="notsysc-td">Not Synced</th>
+                </tr>
+              </table>
+            </th>
+            <th class="text-center pending-border"> <span class="badge-warning pt-2 "> Pending</span></th>
+            <th class="text-center"><span class="badge-danger"> Error</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="listtotal-td pt-2 b2c-text">B2B </td>
+            <td class="listtotal-td">
+              <table class="table inner-table border-0  mb-0 no-pad">
+                <tr class="text-center">
+                  <td>{{synceLists.b2b_success }}</td>
+
+                  <td>{{synceLists.b2b_synced }}</td>
+                  <td>{{synceLists.b2b_notsynced }}</td>
+                </tr>
+              </table>
+            </td>
+            <td class="listtotal-td error-text">{{synceLists.b2b_pending }}</td>
+            <td class="error-text">{{synceLists.b2b_error }}</td>
+          </tr>
+          <tr>
+            <td class="listtotal-td b2c-text">B2C </td>
+            <td class="listtotal-td">
+              <table class="table inner-table border-0  mb-0 no-pad">
+                <tr class="text-center">
+                  <td>{{synceLists.b2c_success }}</td>
+
+                  <td>{{synceLists.b2c_synced }}</td>
+                  <td>{{synceLists.b2c_notsynced }}</td>
+                </tr>
+              </table>
+            </td>
+            <td class="listtotal-td error-text">{{synceLists.b2c_pending }}</td>
+            <td class="error-text">{{synceLists.b2c_error }}</td>
+          </tr>
+
+          <tr>
+            <td class="listtotal-td">Credit Notes (Registered)</td>
+            <td class="listtotal-td">
+              <table class="table inner-table border-0  mb-0 no-pad">
+                <tr class="text-center">
+                  <td>{{synceLists.creditnote_reg_success }}</td>
+
+                  <td>{{synceLists.creditnote_reg_synced }}</td>
+                  <td>{{synceLists.creditnote_reg_notsynced }}</td>
+                </tr>
+              </table>
+            </td>
+            <td class="listtotal-td error-text">{{synceLists.creditnote_reg_pending }}</td>
+            <td class="error-text">{{synceLists.creditnote_reg_error }}</td>
+          </tr>
+          <tr>
+            <td class="listtotal-td b2c-text">Credit Notes (Unregistered)</td>
+            <td class="listtotal-td">
+              <table class="table inner-table border-0  mb-0 no-pad">
+                <tbody>
+                  <tr class="text-center">
+                    <td>{{synceLists.creditnote_unreg_success }}</td>
+
+                    <td>{{synceLists.creditnote_unreg_synced }}</td>
+                    <td>{{synceLists.creditnote_unreg_notsynced }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td class="listtotal-td error-text">{{synceLists.creditnote_unreg_pending }}</td>
+            <td class="error-text">{{synceLists.creditnote_unreg_error }}</td>
+          </tr>
+          <tr class="footer">
+            <td class="listtotal-td b2c-text">Total</td>
+            <td class="listtotal-td">
+              <table class="table inner-table border-0  mb-0 no-pad">
+                <tr>
+                  <td>{{synceLists.total_success_invoices }}</td>
+
+                  <td>{{synceLists.total_notsynced_invoices }}</td>
+                  <td>{{synceLists.total_notsynced_invoices }}</td>
+                </tr>
+              </table>
+            </td>
+            <td class="listtotal-td error-text">{{synceLists.total_pending_invoices }}</td>
+            <td class="error-text">{{synceLists.total_error_invoices }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div> -->
+
+
+    </div>
+    <p class="mt-4  mb-2 missing_invoice_text"><strong>Simple Reconciliation</strong></p>
+    <div class="card">
+      <table border="1" cellpadding="8" cellspacing="0" class="">
+        <tr class="Particulars-bg">
+          <th class="text-start">Date</th>
+          <th class="text-center" *ngFor="let item of invoice_recn_count_first ; let idx=index">
+            {{item?.bill_generation_date}}
+          </th>
+          <th *ngIf="!invoice_recn_count_first">No Data Found</th>
+        </tr>
+        <tr>
+          <td class="subject">#</td>
+          <td class="total text-center" *ngFor="let item_count of invoice_recn_count_first ; let idx=index">
+            {{item_count?.count}}
+          </td>
+          <td *ngIf="!invoice_recn_count_first">No Data Found</td>
+        </tr>
+      </table>
+
+      <table border="1" cellpadding="8" cellspacing="0" class="mt-2">
+        <tr class="Particulars-bg">
+          <th class="text-start">Date</th>
+          <th class="text-center" *ngFor="let item of invoice_recn_count_last ; let idx=index">
+            {{item?.bill_generation_date}}
+          </th>
+          <th *ngIf="!invoice_recn_count_last">No Data Found</th>
+
+        </tr>
+        <tr>
+          <td class="subject">#</td>
+          <td class="total text-center" *ngFor="let item_count of invoice_recn_count_last">{{item_count?.count}}</td>
+          <td *ngIf="!invoice_recn_count_last">No Data Found</td>
+        </tr>
+      </table>
+
+
+    </div>
+  </ng-template>
+
+
+
+  <ng-template #syncLogs>
+    <div class="card pb-1 mt-4">
+      <virtual-scroller #scroll>
+        <div class="table-responsive">
+          <table class="table">
+            <thead class="thead" #head>
+              <tr>
+                <th class="s_no">#</th>
+                <th>Invoice Number</th>
+                <th>Sync Date</th>
+                <!-- <th>Document Type</th> -->
+                <!-- <th>Document Count</th> -->
+                <!-- <th>Synced</th> -->
+                <!-- <th>Non Synced</th> -->
+                <th>Status </th>
+                <th width="150">Actions</th>
+
+              </tr>
+            </thead>
+            <tbody #container>
+              <!-- <tr *ngIf="totalSyncProgress?.sync_taxpayers">
+                <td></td>
+                <td></td>
+                <td>TaxPayers</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+
+                  <div style=" width: -webkit-fill-available;">
+                    <div
+                      *ngIf="totalSyncProgress?.sync_taxpayers?.taxpayer_count == totalSyncProgress?.sync_taxpayers?.count">
+                      <small class="text-center text-success mt-2">Files Uploaded Successfully
+                        {{totalSyncProgress?.sync_taxpayers?.taxpayer_count?totalSyncProgress?.sync_taxpayers?.taxpayer_count:0}}/{{totalSyncProgress?.sync_taxpayers?.count?totalSyncProgress?.sync_taxpayers?.count:0}}</small>
+                    </div>
+                    <p class="m-0"
+                      *ngIf="totalSyncProgress?.sync_taxpayers?.taxpayer_count != totalSyncProgress?.sync_taxpayers?.count">
+                      <small>Creating...{{totalSyncProgress?.sync_taxpayers?.taxpayer_count?totalSyncProgress?.sync_taxpayers?.taxpayer_count:0}}/{{totalSyncProgress?.sync_taxpayers?.count?totalSyncProgress?.sync_taxpayers?.count:0}}</small>
+                    </p>
+                    <ngb-progressbar
+                      [type]="(totalSyncProgress?.sync_taxpayers?.taxpayer_count == totalSyncProgress?.sync_taxpayers?.count) ? 'success' : ''"
+                      textType="white"
+                      [value]="(totalSyncProgress?.sync_taxpayers?.taxpayer_count/totalSyncProgress?.sync_taxpayers?.count)*100"
+                      [showValue]="false">
+                    </ngb-progressbar>
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr *ngIf="totalSyncProgress?.sync_taxpayers || totalSyncProgress?.sync_sac_hsn_codes">
+                <td></td>
+                <td></td>
+                <td>SAC/HSC Codes</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+
+                  <div style=" width: -webkit-fill-available;">
+                    <div
+                      *ngIf="totalSyncProgress?.sync_sac_hsn_codes?.item_count == totalSyncProgress?.sync_sac_hsn_codes?.count">
+                      <small class="text-center text-success mt-2">Files Uploaded Successfully
+                        {{totalSyncProgress?.sync_sac_hsn_codes?.item_count?totalSyncProgress?.sync_sac_hsn_codes?.item_count:0}}/{{totalSyncProgress?.sync_sac_hsn_codes?.count?totalSyncProgress?.sync_sac_hsn_codes?.count:0}}</small>
+                    </div>
+                    <p class="m-0"
+                      *ngIf="totalSyncProgress?.sync_sac_hsn_codes?.item_count != totalSyncProgress?.sync_sac_hsn_codes?.count">
+                      <small>Creating...{{totalSyncProgress?.sync_sac_hsn_codes?.item_count?totalSyncProgress?.sync_sac_hsn_codes?.item_count:0}}/{{totalSyncProgress?.sync_sac_hsn_codes?.count?totalSyncProgress?.sync_sac_hsn_codes?.count:0}}</small>
+                    </p>
+                    <ngb-progressbar
+                      [type]="(totalSyncProgress?.sync_sac_hsn_codes?.item_count == totalSyncProgress?.sync_sac_hsn_codes?.count) ? 'success' : ''"
+                      textType="white"
+                      [value]="(totalSyncProgress?.sync_sac_hsn_codes?.item_count/totalSyncProgress?.sync_sac_hsn_codes?.count)*100"
+                      [showValue]="false">
+                    </ngb-progressbar>
+                  </div>
+                </td>
+                <td></td>
+              </tr> -->
+
+
+              <tr>
+                <td></td>
+                <td class="bg-gray new-input-search">
+                  <div class="input-group input-group-sm ">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="ri-search-line"></i>
+                      </span>
+                    </div>
+                    <input #invoiceInp type="search" [(ngModel)]="filters.searchFilter.invoice"
+                      (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+                      (keyup.enter)="updateRouterParams()" class="form-control">
+                  </div>
+                </td>
+                <td>
+
+                </td>
+                <td class="bg-gray">
+                  <div class="form-group mx-1 my-0">
+                    <select name="invoice_type" id="invoice_type" class="custom-select"
+                      [(ngModel)]="filters.searchFilter.status" (ngModelChange)="onSearch.emit(filters)">
+                      <option value="all">All</option>
+                      <option value="Success">Success</option>
+                      <option value="Error">Error</option>
+                      <!-- <option value="Partial Success">Partial Success</option> -->
+                      <!-- <option value="Running">Running</option> -->
+                    </select>
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <tr *ngIf=" totalSyncProgress?.sync_invoices">
+                <td></td>
+                <td>Invoices</td>
+                <td>
+
+                  <div style=" width: -webkit-fill-available;">
+                    <div
+                      *ngIf="totalSyncProgress?.sync_invoices?.invoice_count && (totalSyncProgress?.sync_invoices?.invoice_count == totalSyncProgress?.sync_invoices?.count)">
+                      <small class="text-center text-success mt-2">Files Uploaded Successfully
+                        {{totalSyncProgress?.sync_invoices?.invoice_count?totalSyncProgress?.sync_invoices?.invoice_count:0}}/{{totalSyncProgress?.sync_invoices?.count?totalSyncProgress?.sync_invoices?.count:0}}</small>
+                    </div>
+                    <p class="m-0"
+                      *ngIf="totalSyncProgress?.sync_invoices?.invoice_count != totalSyncProgress?.sync_invoices?.count">
+                      <small>Creating...{{totalSyncProgress?.sync_invoices?.invoice_count?totalSyncProgress?.sync_invoices?.invoice_count:0}}/{{totalSyncProgress?.sync_invoices?.count?totalSyncProgress?.sync_invoices?.count:0}}</small>
+                    </p>
+                    <ngb-progressbar
+                      [type]="(totalSyncProgress?.sync_invoices?.invoice_count == totalSyncProgress?.sync_invoices?.count) ? 'success' : ''"
+                      textType="white"
+                      [value]="(totalSyncProgress?.sync_invoices?.invoice_count/totalSyncProgress?.sync_invoices?.count)*100"
+                      [showValue]="false">
+                    </ngb-progressbar>
+                  </div>
+                </td>
+                <td></td>
+              </tr>
+              <!-- <tr *ngIf=" totalSyncProgress?.d_sync">
+                <td></td>
+                <td>Invoices</td>
+                <td>
+
+                  <div style=" width: -webkit-fill-available;">
+                    <div
+                      *ngIf="totalSyncProgress?.d_sync?.invoice_count && (totalSyncProgress?.d_sync?.invoice_count == totalSyncProgress?.d_sync?.count)">
+                      <small class="text-center text-success mt-2">Files Uploaded Successfully
+                        {{totalSyncProgress?.d_sync?.invoice_count?totalSyncProgress?.d_sync?.invoice_count:0}}/{{totalSyncProgress?.d_sync?.count?totalSyncProgress?.d_sync?.count:0}}</small>
+                    </div>
+                    <p class="m-0"
+                      *ngIf="totalSyncProgress?.sync_invoices?.invoice_count != totalSyncProgress?.sync_invoices?.count">
+                      <small>Creating...{{totalSyncProgress?.d_sync?.invoice_count?totalSyncProgress?.d_sync?.invoice_count:0}}/{{totalSyncProgress?.d_sync?.count?totalSyncProgress?.d_sync?.count:0}}</small>
+                    </p>
+                    <ngb-progressbar
+                      [type]="(totalSyncProgress?.d_sync?.invoice_count == totalSyncProgress?.d_sync?.count) ? 'success' : ''"
+                      textType="white"
+                      [value]="(totalSyncProgress?.d_sync?.invoice_count/totalSyncProgress?.d_sync?.count)*100"
+                      [showValue]="false">
+                    </ngb-progressbar>
+                  </div>
+                </td>
+                <td></td>
+              </tr> -->
+              <tr *ngFor="let item of syncList;">
+                <td>{{item?.index}}</td>
+                <td>{{item?.invoice_number}}</td>
+
+                <td>{{item?.sync_started_on |date:'dd-MM-yyyy'}}</td>
+                <!-- <td>{{item?.document}}</td> -->
+                <!-- <td>{{item?.total_records_count}}</td> -->
+                <!-- <td>{{item?.success_records_count}}</td> -->
+                <!-- <td>{{(item?.total_records_count)- (item?.success_records_count)}}</td> -->
+                <td>
+
+                  <span class="badge"
+                    [ngClass]="{'badge-success': item.status == 'Success','badge-warning':item.status == 'Partial Success','badge-default':item.status == 'Running', 'badge-danger':item.status == 'Error'}">{{item?.status}}</span>
+                </td>
+                <td class="viewError">
+                  <a (click)="openmodel(submodel,item)" *ngIf="item.status == 'Partial Success'">View Logs</a>
+                  <a (click)="openmodel(submodel,item)" *ngIf="item.status == 'Error'">View Error</a>
+                  <a (click)="errorDownloadJson(item?.message)" *ngIf="item.status == 'Error'"
+                    class="downlaod_error">Download Error</a>
+                  <!-- <a *ngIf="item.status == 'Error'" (click)="reSynctoGST(item?.invoice_number)"
+                    class="re_sync_view_error">Re Sync</a> -->
+                </td>
+              </tr>
+
+
+            </tbody>
+          </table>
+          <div class="text-center py-3" *ngIf="!syncList.length">
+            <h5>No Data Found</h5>
+          </div>
+        </div>
+
+      </virtual-scroller>
+      <div class="d-flex justify-content-between" *ngIf="syncList.length">
+        <div class="px-3">
+          <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
+            (change)="checkPagination()" id="itemsPerPage">
+            <option [value]="20">20</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+            <option [value]="150">150</option>
+            <option [value]="500">500</option>
+          </select>
+        </div>
+        <div *ngIf="syncList.length  < this.filters.totalCount">
+          <p class="text-right pr-5 more text-primary"
+            (click)="this.filters.start = syncList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+            more
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <!-- <div class="card pb-1 mb-1 mt-4">
+    <virtual-scroller #scroll>
+      <div class="table-responsive">
+        <table class="table" id="s-table">
+          <thead class="thead" #head>
+            <tr>
+              <th>#</th>
+              <th>Sync Date</th>
+              <th>Document Type</th>
+              <th>Document Count</th>
+              <th>Synced</th>
+              <th>Non Synced</th>
+              <th>Status </th>
+              <th>Sync Type</th>
+              <th width="150">Actions</th>
+            </tr>
+          </thead>
+          <tbody #container>
+            <tr>
+              <th></th>
+              <th>
+              </th>
+              <th>
+                <div class="form-group mx-1 my-0">
+                  <select name="invoice_type" id="invoice_type" class="custom-select"
+                    [(ngModel)]="filters.searchFilter.document_type" (ngModelChange)="onSearch.emit(filters)">
+                    <option value="all">All</option>
+                    <option value="Invoices">Invoices</option>
+                    <option value="Items">Items</option>
+                    <option value="Taxpayer Details">Taxpayer Details</option>
+                  </select>
+                </div>
+              </th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>
+                <div class="form-group mx-1 my-0">
+                  <select name="invoice_type" id="invoice_type" class="custom-select"
+                    [(ngModel)]="filters.searchFilter.status" (ngModelChange)="onSearch.emit(filters)">
+                    <option value="all">All</option>
+                    <option value="Success">Success</option>
+                    <option value="Error">Error</option>
+                    <option value="Partial Success">Partial Success</option>
+                    <option value="Running">Running</option>
+                  </select>
+                </div>
+              </th>
+              <th>
+                <div class="form-group mx-1 my-0">
+                  <select id="creditNotes" class="custom-select" [(ngModel)]="filters.searchFilter.sync_type"
+                    (change)="onSearch.emit(filters)">
+                    <option value="all">All</option>
+                    <option value="Bulk">Bulk</option>
+                    <option value="Schedule">Schedule</option>
+                    <option value="Manual">Manual</option>
+                  </select>
+                </div>
+              </th>
+              <th></th>
+            </tr>
+            <tr *ngIf="totalSyncProgress?.sync_taxpayers">
+              <td></td>
+              <td></td>
+              <td>TaxPayers</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+
+                <div style=" width: -webkit-fill-available;">
+                  <div
+                    *ngIf="totalSyncProgress?.sync_taxpayers?.taxpayer_count == totalSyncProgress?.sync_taxpayers?.count">
+                    <small class="text-center text-success mt-2">Files Uploaded Successfully
+                      {{totalSyncProgress?.sync_taxpayers?.taxpayer_count?totalSyncProgress?.sync_taxpayers?.taxpayer_count:0}}/{{totalSyncProgress?.sync_taxpayers?.count?totalSyncProgress?.sync_taxpayers?.count:0}}</small>
+                  </div>
+                  <p class="m-0"
+                    *ngIf="totalSyncProgress?.sync_taxpayers?.taxpayer_count != totalSyncProgress?.sync_taxpayers?.count">
+                    <small>Creating...{{totalSyncProgress?.sync_taxpayers?.taxpayer_count?totalSyncProgress?.sync_taxpayers?.taxpayer_count:0}}/{{totalSyncProgress?.sync_taxpayers?.count?totalSyncProgress?.sync_taxpayers?.count:0}}</small>
+                  </p>
+                  <ngb-progressbar
+                    [type]="(totalSyncProgress?.sync_taxpayers?.taxpayer_count == totalSyncProgress?.sync_taxpayers?.count) ? 'success' : ''"
+                    textType="white"
+                    [value]="(totalSyncProgress?.sync_taxpayers?.taxpayer_count/totalSyncProgress?.sync_taxpayers?.count)*100"
+                    [showValue]="false">
+                  </ngb-progressbar>
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr *ngIf="totalSyncProgress?.sync_taxpayers || totalSyncProgress?.sync_sac_hsn_codes">
+              <td></td>
+              <td></td>
+              <td>SAC/HSC Codes</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+
+                <div style=" width: -webkit-fill-available;">
+                  <div
+                    *ngIf="totalSyncProgress?.sync_sac_hsn_codes?.item_count == totalSyncProgress?.sync_sac_hsn_codes?.count">
+                    <small class="text-center text-success mt-2">Files Uploaded Successfully
+                      {{totalSyncProgress?.sync_sac_hsn_codes?.item_count?totalSyncProgress?.sync_sac_hsn_codes?.item_count:0}}/{{totalSyncProgress?.sync_sac_hsn_codes?.count?totalSyncProgress?.sync_sac_hsn_codes?.count:0}}</small>
+                  </div>
+                  <p class="m-0"
+                    *ngIf="totalSyncProgress?.sync_sac_hsn_codes?.item_count != totalSyncProgress?.sync_sac_hsn_codes?.count">
+                    <small>Creating...{{totalSyncProgress?.sync_sac_hsn_codes?.item_count?totalSyncProgress?.sync_sac_hsn_codes?.item_count:0}}/{{totalSyncProgress?.sync_sac_hsn_codes?.count?totalSyncProgress?.sync_sac_hsn_codes?.count:0}}</small>
+                  </p>
+                  <ngb-progressbar
+                    [type]="(totalSyncProgress?.sync_sac_hsn_codes?.item_count == totalSyncProgress?.sync_sac_hsn_codes?.count) ? 'success' : ''"
+                    textType="white"
+                    [value]="(totalSyncProgress?.sync_sac_hsn_codes?.item_count/totalSyncProgress?.sync_sac_hsn_codes?.count)*100"
+                    [showValue]="false">
+                  </ngb-progressbar>
+                </div>
+              </td>
+              <td></td>
+            </tr>
+            <tr
+              *ngIf="totalSyncProgress?.sync_taxpayers || totalSyncProgress?.sync_sac_hsn_codes || totalSyncProgress?.sync_invoices">
+              <td></td>
+              <td></td>
+              <td>Invoices</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>
+
+                <div style=" width: -webkit-fill-available;">
+                  <div
+                    *ngIf="totalSyncProgress?.sync_invoices?.invoice_count && (totalSyncProgress?.sync_invoices?.invoice_count == totalSyncProgress?.sync_invoices?.count)">
+                    <small class="text-center text-success mt-2">Files Uploaded Successfully
+                      {{totalSyncProgress?.sync_invoices?.invoice_count?totalSyncProgress?.sync_invoices?.invoice_count:0}}/{{totalSyncProgress?.sync_invoices?.count?totalSyncProgress?.sync_invoices?.count:0}}</small>
+                  </div>
+                  <p class="m-0"
+                    *ngIf="totalSyncProgress?.sync_invoices?.invoice_count != totalSyncProgress?.sync_invoices?.count">
+                    <small>Creating...{{totalSyncProgress?.sync_invoices?.invoice_count?totalSyncProgress?.sync_invoices?.invoice_count:0}}/{{totalSyncProgress?.sync_invoices?.count?totalSyncProgress?.sync_invoices?.count:0}}</small>
+                  </p>
+                  <ngb-progressbar
+                    [type]="(totalSyncProgress?.sync_invoices?.invoice_count == totalSyncProgress?.sync_invoices?.count) ? 'success' : ''"
+                    textType="white"
+                    [value]="(totalSyncProgress?.sync_invoices?.invoice_count/totalSyncProgress?.sync_invoices?.count)*100"
+                    [showValue]="false">
+                  </ngb-progressbar>
+                </div>
+              </td>
+              <td></td>
+            </tr>
+
+
+            <tr *ngFor="let item of syncList;">
+              <td>{{item?.index}}</td>
+              <td>{{item?.sync_started_on | date:["MMM d, y, h:mm"]}}</td>
+              <td>{{item?.document}}</td>
+              <td>{{item?.total_records_count}}</td>
+              <td>{{item?.success_records_count}}</td>
+              <td>{{(item?.total_records_count)- (item?.success_records_count)}}</td>
+              <td>
+                <span class="badge"
+                  [ngClass]="{'badge-success': item.status == 'Success','badge-warning':item.status == 'Partial Success','badge-default':item.status == 'Running', 'badge-danger':item.status == 'Error'}">{{item?.status}}</span>
+              </td>
+              <td>{{item?.sync_type}}</td>
+              <td>
+                <a (click)="openmodel(submodel,item);searchText=null" *ngIf="item.status == 'Partial Success'">View
+                  Logs</a>
+                <a (click)="openmodel(submodel,item)" *ngIf="item.status == 'Error'">View Error</a>
+              </td>
+            </tr>
+
+
+          </tbody>
+        </table>
+        <div class="text-center py-3" *ngIf="!syncList.length">
+          <h5>No Data Found</h5>
+        </div>
+      </div>
+    </virtual-scroller>
+    <div class="d-flex justify-content-between" *ngIf="syncList.length">
+      <div class="px-3">
+        <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
+          (change)="checkPagination()" id="itemsPerPage">
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+          <option [value]="150">150</option>
+          <option [value]="500">500</option>
+        </select>
+      </div>
+      <div *ngIf="syncList.length  < this.filters.totalCount">
+        <p class="text-right pr-5 more text-primary"
+          (click)="this.filters.start = syncList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+          more
+        </p>
+      </div>
+    </div>
+
+  </div> -->
+
+
+  <ng-template #submodel let-modal>
+    <div class="sync_model">
+      <div class="modal-header py-2">
+        <div class="d-flex flex-row ">
+          <span class="badge m-0"
+            [ngClass]="{'badge-success': syncError.status == 'Success','badge-warning':syncError.status == 'Partial Success','badge-default':syncError.status == 'Running', 'badge-danger':syncError.status == 'Error'}">{{syncError?.status}}</span>
+          <div class="d-flex justify-content-end" style="width: 100%" *ngIf="syncError?.status === 'Partial Success'">
+            <div class="input-group input-group-sm mr-2">
+              <input #search type="search" name="search" placeholder="search" [(ngModel)]="searchText"
+                class="form-control" autocomplete="off">
+            </div>
+            <div class="xml-btn">
+              <button type="button" class="btn btn-sm btn-outline-primary" aria-label="Close" (click)="exportAsXLSX()">
+                Download XML
+              </button>
+            </div>
+          </div>
+          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body">
+
+        <div class="d-flex">
+          <strong>Invoice.No : </strong>&nbsp;
+          <div *ngIf="syncError?.status === 'Error'" [innerHtml]="syncError?.invoice_number"></div>
+        </div>
+        <div class="d-flex">
+          <strong>Message : </strong>&nbsp;
+          <div *ngIf="syncError?.status === 'Error'" [innerHtml]="syncError?.message"></div>
+        </div>
+
+        <div class="card" *ngIf="syncError?.status === 'Partial Success'">
+          <virtual-scroller #scroll>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead class="thead" #head>
+                  <tr>
+                    <th>No.</th>
+                    <th>Invoice</th>
+                    <th>Customer</th>
+                    <th>Item</th>
+                    <th>Address</th>
+                    <th>Error</th>
+                  </tr>
+
+                </thead>
+
+
+                <tbody #container>
+                  <tr *ngFor="let item of syncError.error | filter:searchText">
+                    <td>{{item?.idx}}</td>
+                    <td>{{item?.invoice}}</td>
+                    <td>{{item?.customer}}</td>
+                    <td>{{item?.item}}</td>
+                    <td>{{item?.address}}</td>
+                    <td>{{item?.error}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="text-center py-3" *ngIf="!syncError.error.length">
+                <h5>No Data Found</h5>
+              </div>
+            </div>
+          </virtual-scroller>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-basic-title">Syncing dashboard</span>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    <div class="modal-body p-3">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
+            <select id="my-selects" [(ngModel)]="selectedyearsync" class="custom-select bg-white" name="">
+              <option *ngFor="let item of years" [value]="item">{{item}}</option>
+            </select>
+
+
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showLists">
+            <select id="my-selects" [(ngModel)]="seletedMonthsync" class="custom-select bg-white" name="seletedMonth">
+              <option value="">Select</option>
+
+              <option [disabled]="month.disable" [value]="month.mmm_format" *ngFor="let month of monthList">
+                {{month?.long}}</option>
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="syncfuncDashboard()">Sync</button>
+    </div>
+  </ng-template>
+
+  <ng-template #error let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-basic-title">Syncing Logs</span>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    <div class="modal-body p-3">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showList">
+            <select id="my-selects" [(ngModel)]="selectedyearsync" class="custom-select bg-white" name="">
+              <option *ngFor="let item of years" [value]="item">{{item}}</option>
+            </select>
+
+
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group ml-2 w-c-50 my-auto" *ngIf="!showLists">
+            <select id="my-selects" class="custom-select bg-white" name="seletedMonth" [(ngModel)]="seletedMonthsync">
+              <option value="">Select</option>
+
+              <option [disabled]="month.disable" [value]="month.mmm_format" *ngFor="let month of monthList">
+                {{month?.long}}</option>
+            </select>
+
+
+            <!-- <select id="my-select" [(ngModel)]="seletedMonthsync"
+              (ngModelChange)="onDateFilterMonthChange(seletedMonth,selectedyear)" class="custom-select bg-white"
+              name="">
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select> -->
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="syncFunc()">Sync</button>
+    </div>
+  </ng-template>
+
+  <ng-template #deflag let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Select Date</h4>
+      <button type="button" class="btn-close dissmiss_deflag" aria-label="Close"
+        (click)="modal.dismiss('Cross click')">X</button>
+    </div>
+    <div class="modal-body">
+
+      <div class=" input-group input-group-sm calendar_modal mx-2" *ngIf="sync_errorlogs">
+
+        <input class="form-control h-auto bg-white" [(ngModel)]="from_date" [owlDateTime]="dt1"
+          [owlDateTimeTrigger]="dt1" placeholder="From Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+      </div>
+      <div class="input-group input-group-sm calendar_modal my-3 mx-2" *ngIf="sync_errorlogs">
+
+        <input class="form-control h-auto bg-white" [(ngModel)]="to_date" [min]='this.from_date' [owlDateTime]="dt1"
+          [owlDateTimeTrigger]="dt1" placeholder="To Date">
+        <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+          <i class="ri-calendar-2-line"></i>
+        </span>
+        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+      </div>
+      <div class="form-group mx-2 my-auto" *ngIf="!showList">
+        <select id="my-select-invoicetype" [(ngModel)]="selectedinvoicetype" class="custom-select bg-white" name="">
+          <option value="all">All</option>
+          <option value="B2B">B2B</option>
+          <option value="B2c">B2C</option>
+        </select>
+        <label for="my-select-invoicetype"><small>select invoice type</small></label>
+
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button [disabled]="totalSyncProgress?.sync_status" class="btn btn-sm btn-primary"
+        (click)="d_sync_based_On_dates()" *ngIf="sync_errorlogs">De Flag</button>
+      <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button> -->
+    </div>
+  </ng-template>
+
+
+
+
+</section>

@@ -1,0 +1,647 @@
+<section class="posbills">
+
+  <div class="row">
+      <div class="col-md-9 col-lg-9">
+          <div class="d-flex mb-3">
+              <h4 class="text-white"><b>POS Checks<small>({{this.filters.totalCount}})</small></b></h4>
+              <!-- <button class="create btn btn-primary"
+                  (click)="addOutlet(outletModal,'add',null)"><i class="ri-add-line"></i></button> -->
+
+
+          </div>
+      </div>
+      <div class="col-lg-3 col-md-3 text-right">
+          <div id="dwtcontrolContainer" class="d-none"></div>
+          <button class="btn btn-sm btn-primary mr-2" type="button" (click)="getPOSChecksData()" >Refresh</button>
+          <button *ngIf="companyDetails.clbs == 1 && this.companyDetails?.company_code != 'ZBPK-01'" class="btn btn-sm btn-primary mr-2" type="button" (click)="scanPosChecks(selectDateToScan,'upload')" >Upload</button>
+          <button *ngIf="companyDetails.clbs == 1 && this.companyDetails?.company_code != 'ZBPK-01'" class="btn btn-sm btn-primary" type="button" (click)="scanPosChecks(selectDateToScan,'scan')" >Scan</button>
+          <!-- <button class="btn btn-sm btn-primary ml-2" type="button" (click)="successCallback()" >Open</button> -->
+          <!-- <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+              <input type="search" class="form-control pl-5" [(ngModel)]="filters.search" (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)" #search (keyup.enter)="updateRouterParams()" placeholder="Search">
+              <span class="search"><i class="ri-search-line"></i></span>
+          </div> -->
+      </div>
+  </div>
+
+  <div class="row">
+      <div class="col-md-12">
+          <div class="row mb-2 pl-3">
+              <div class="form-group w-c-50 mb-0">
+                  <select id="my-select" [(ngModel)]="filters.filterBy" (ngModelChange)="onDateFilterChange()" class="custom-select bg-white" name="">
+              <option value="All">All</option>
+              <option value="Today">Today</option>
+              <option value="Yesterday">Yesterday</option>
+              <option value="This Week">This Week</option>
+              <option value="Last Week">Last Week</option>
+              <option value="This Month">This Month</option>
+              <option value="Last Month">Last Month</option>
+              <option value="This Year">This Year</option>
+              <option value="Custom">Custom</option>
+            </select>
+              </div>
+
+              <div class="form-group calendar w-c-50 position-relative" *ngIf="filters.filterBy == 'Custom'">
+                  <input class="form-control h-auto" [max]="today" [(ngModel)]="filters.filterDate" (dateTimeChange)="updateRouterParams()" [owlDateTime]="dt1" [selectMode]="'range'" [owlDateTimeTrigger]="dt1" placeholder="Date Time">
+                  <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+              <i class="ri-calendar-2-line"></i>
+            </span>
+                  <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+              </div>
+              <div class="pl-2">
+                  <ul *ngIf="clbsModule" ngbNav #nav="ngbNav"  (navChange)="onTabChange($event)" class="nav-tabs">
+                      <li [ngbNavItem]="1">
+                          <a class="c-py-1" ngbNavLink>Pending Reviews</a>
+                      </li>
+                      <li [ngbNavItem]="2">
+                          <a class="c-py-1" ngbNavLink>Reviewed</a>
+                      </li>
+                      <li >
+                          <span class="c-pad-l text-white"></span>
+                      </li>
+
+                  </ul>
+              </div>
+              <div class="pl-2">
+                  <div *ngIf="clbsModule" class="custom-control custom-checkbox">
+                      <input (change)="checkedItemsAll($event)" type="checkbox" [(ngModel)]="notSynced" class="custom-control-input" id="customCheckAll" name="itemAll">
+                      <label class="custom-control-label text-white" for="customCheckAll" ngbTooltip="Select Not Synced">Not Synced</label>
+                  </div>
+              </div>
+          </div>
+          <div class="card">
+              <div class="card-body p-0">
+                <virtual-scroller #scroll >
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Outlet Name</th>
+                                <th>Check Number</th>
+                                <th *ngIf="clbsModule">Check Date</th>
+
+
+                                <th>Check Type</th>
+                                <th *ngIf="clbsModule">Invoice Number</th>
+                                <th >Printed</th>
+                                <th>Mode</th>
+
+
+                                <th >No.of Guests</th>
+                                <th *ngIf="clbsModule">Synced</th>
+                                <th *ngIf="clbsModule">Status</th>
+                                <th *ngIf="clbsModule">Creation</th>
+
+
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td class="bg-gray" style="max-width: 250px;">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                        <i class="ri-search-line"></i>
+                      </span>
+                                        </div>
+                                        <input type="search" [(ngModel)]="filters.search" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                                    </div>
+                                </td>
+                                <td class="bg-gray" style="max-width: 250px;">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                        <i class="ri-search-line"></i>
+                      </span>
+                                        </div>
+                                        <input type="search" [(ngModel)]="filters.checkNumber" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                                    </div>
+                                </td>
+                                <td *ngIf="clbsModule" class="bg-gray" style="max-width: 130px;">
+                                    <div class="input-group input-group-sm calendar ">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="ri-search-line"></i>
+                                            </span>
+                                        </div>
+                                        <input class="form-control h-auto" [(ngModel)]="checkDate"   (dateTimeChange)="selectCheckDate()" [owlDateTime]="dt1"  [owlDateTimeTrigger]="dt1" placeholder="Date" [max]="today">
+                                        <!-- <input class="form-control h-auto" [(ngModel)]="filters.checkDate" (dateTimeChange)="updateRouterParams()" (search)="onSearch.emit(filters)" (change)="updateRouterParams()" [owlDateTime]="dt1" [owlDateTimeTrigger]="dt1" placeholder="Date Time"
+                                              [max]="today" > -->
+                                        <span *ngIf="!checkDate" class="example-trigger" [owlDateTimeTrigger]="dt1">
+                                            <i class="ri-calendar-2-line"></i>
+                                        </span>
+                                        <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                                        <i class="ri-close-fill close-icon "  (click)="clearDate()" *ngIf="checkDate"></i>
+                                    </div>
+                                </td>
+
+
+                                <td>
+                                    <!-- <div class="form-group">
+                                    <select id="creditNotes" class="custom-select" [(ngModel)]="filters.printed" (change)="onSearch.emit(filters)">
+                                        <option value="">Showing all</option>
+                                        <option value="0">Normal Check</option>
+                                        <option value="1">Closed Check</option>
+                                    </select>
+                                    </div> -->
+                                </td>
+                                <td *ngIf="clbsModule" class="bg-gray" style="max-width: 250px;">
+                                    <div class="input-group input-group-sm">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                        <i class="ri-search-line"></i>
+                      </span>
+                                        </div>
+                                        <input type="search" [(ngModel)]="filters.invoice_no" (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                                    </div>
+                                </td>
+                                <td >
+                                  <div class="form-group">
+                                    <select id="creditNotes" class="custom-select" [(ngModel)]="filters.printed" (change)="onSearch.emit(filters)">
+                                        <option value="">All</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                    </div>
+                                </td>
+                                <td></td>
+
+
+                                <td ></td>
+                                <td *ngIf="clbsModule">
+                                  <div class="form-group">
+                                    <select id="creditNotes" class="custom-select" [(ngModel)]="filters.sync" (change)="onSearch.emit(filters)">
+                                        <option value="">Showing all</option>
+                                        <option value="Yes">Synced</option>
+                                        <option value="No">Not Synced</option>
+                                    </select>
+                                  </div>
+                                </td>
+                                <td *ngIf="clbsModule" class="bg-gray"></td>
+                                <td *ngIf="clbsModule" class="bg-gray"></td>
+
+
+                                <td class="bg-gray"></td>
+                            </tr>
+                            <tr *ngFor="let item of posCheckList">
+                                <td>{{item?.index}}</td>
+                                <td>
+                                    {{item?.outlet}}
+                                </td>
+
+                                <td>
+                                    {{item?.check_no}}
+                                </td>
+                                <td *ngIf="clbsModule">
+                                    {{item?.check_date | date: 'dd/MM/yyyy' }}
+                                </td>
+
+
+                                <td>
+                                    {{closedCheck(item?.check_type) }}
+                                </td>
+                                <td *ngIf="clbsModule">{{item?.attached_to}}</td>
+                                <td>
+                                    {{item?.printed == '1'?'Yes':'No'}}
+                                </td>
+                                <td>
+                                    {{item?.mode}}
+                                </td>
+
+
+                                <td >{{item?.no_of_guests}}</td>
+                                <td *ngIf="clbsModule">
+                                    <span class="badge" [ngClass]="{'badge-success': item?.sync == 'Yes', 'badge-danger':item?.sync == 'No'}">
+                                    {{item?.sync == "Yes"? 'Synced':'Not Synced'}}</span>
+                                </td>
+                                <td *ngIf="clbsModule">
+                                    {{item?.status}}
+                                </td>
+                                <td *ngIf="clbsModule">
+                                    {{item?.creation | date: 'dd/MM/yyyy'}}
+                                </td>
+
+
+                                <td> <span>
+                                    <a class="mr-2" *ngIf="clbsModule" (click)="openInvoice(invoicePdf, item?.name, selectedInvoiceNo?.invoice_number)"><i class="ri-eye-line" ngbTooltip="Check View"></i></a>
+                                    <a  class="mr-2" (click)="printPOSBill(item  )" ><i class="ri-printer-line" ngbTooltip="print"></i></a>
+                                    <a (click)="viewPOSBill(showQr,item)"><i class="ri-file-text-line" ngbTooltip="Text View"></i></a>
+                                </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center py-3" *ngIf="!posCheckList.length">
+                        <h5>No Data Found</h5>
+                    </div>
+                    <div class="d-flex pb-2 justify-content-between" *ngIf="posCheckList.length">
+                        <div class="px-3">
+                            <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage" (change)="checkPagination()" id="itemsPerPage">
+                                <option [value]="20">20</option>
+                                <option [value]="50">50</option>
+                                <option [value]="100">100</option>
+                                <option [value]="150">150</option>
+                                <option [value]="500">500</option>
+                            </select>
+                        </div>
+                        <div *ngIf="posCheckList.length  < this.filters.totalCount">
+                            <p class="text-right pr-5 more text-primary" (click)="this.filters.start = posCheckList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                                more
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                </virtual-scroller>
+
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+
+<ng-template #invoicePdf let-modal>
+  <div class='row'>
+      <div class="col-md-5 pr-0">
+        <div class="p-2">
+          <div class="total-card summary shadow-sm mt-1 h-fix-table">
+              <div class="row mb-2">
+                <div class="col-md-4 d-flex">
+                  <h6><strong>Pos Bills</strong></h6>
+                  <span *ngIf="posBillsData?.sync == 'No'"><div class="ml-2 text-danger non-sync"><i class="ri-close-circle-line"></i> Not Synced</div></span><span *ngIf="posBillsData?.sync == 'Yes'"><div class="ml-2 text-success sync"><i class="ri-checkbox-circle-line"></i> Synced</div></span>
+                </div>
+                <div class="col-md-8 text-right " >
+                  <button *ngIf="posBillsData?.sync == 'Yes'" class="btn btn-outline-primary btn-sm" (click)="viewBillModel(viewBill)">View Details</button>
+                  <button *ngIf="posBillsData?.status == 'Pending Review'" [disabled]="posBillsData?.status == 'Pending Review' && (!posBillsData.check_date || !posBillsData.check_no)" class="btn btn-primary btn-sm ml-2"  (click)="updatePosBills(posForm);finishReview(invoicePdf);modal.dismiss();">Finish Review</button>
+                </div>
+              </div>
+              <hr class="mt-0" />
+              <div class="pt-1">
+                  <form #posForm="ngForm">
+                      <div class="row">
+                          <div class="col-lg-6 col-md-6 pr-0">
+                              <div class="form-group">
+                                  <input [(ngModel)]="posBillsData.check_no" autocomplete="off" appMatInput id="check_no" #check_no="ngModel" class="form-control" type="text" name="check_no" required>
+                                  <label for="check_no" class="mat-label">Check No</label>
+                                  <small *ngIf="check_no?.errors " class="text-danger">Required</small>
+
+                              </div>
+                          </div>
+                          <div class="col-lg-6 col-md-6">
+                              <div class="form-group">
+                                  <label for="check_date" class="check-label" >Check Date</label>
+                                  <input type="date" [max]="today" [(ngModel)]="posBillsData.check_date" #check_date="ngModel" id="check_date" class="form-control" name="check_date" required>
+                                  <small *ngIf="check_date?.errors" class="text-danger">Required</small>
+                              </div>
+                          </div>
+                              <!-- <div class="col-lg-6 col-md-6 pr-0">
+                                  <div class="form-group">
+                                      <input [(ngModel)]="posBillsData.table_number" appMatInput id="table_number" class="form-control" type="text" name="table_number" required>
+                                      <label for="table_number" class="mat-label">Table Number</label>
+                                      <small *ngIf="check_no?.errors.required && check_no?.errors?.required" class="text-danger">Required</small>
+                                  </div>
+                              </div>
+                              <div class="col-lg-6 col-md-6">
+                                  <div class="form-group">
+                                      <input [(ngModel)]="posBillsData.total_amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..?)\../g, '$1').replace(/(\.\d{2}).+/g, '$1');" appMatInput id="total_amount" class="form-control" type="text" name="total_amount" required>
+                                      <label for="total_amount" class="mat-label">Total Amount</label>
+                                  </div>
+                              </div>
+                              <div class="col-lg-6 col-md-6 pr-0">
+                                  <div class="form-group">
+                                      <input [(ngModel)]="posBillsData.no_of_guests" maxlength="2" appMatInput id="no_of_guests" class="form-control" type="text" name="no_of_guests">
+                                      <label for="no_of_guests" class="mat-label">No.of Guests</label>
+                                  </div>
+                              </div> -->
+
+                      </div>
+                      <div class="row">
+                          <div class="col-lg-12 col-md-12 text-right">
+                            <button class="btn btn-sm btn-primary px-3" (click)="updatePosBills(posForm)">Update</button>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+              <hr/>
+              <div class="mt-1">
+                  <h6><strong>Synced to</strong></h6>
+                  <form #updateInvoicNo="ngForm">
+                      <div class="row mt-3">
+                      <div class="col-md-8">
+                          <div class="form-group contact-select">
+                              <div>
+                                  <input class="form-control" appMatInput type="text" name="attached_to" id="attached_to" [(ngModel)]="posBillsData.attached_to" (keyup)="companySearch(posBillsData.attached_to);"
+                                  (focus)="inputfocus()" (blur)="inputblur()" required  [disabled]="relink" autocomplete="off"/>
+                                  <label for="attached_to">Invoice Number</label>
+                                  <div class="companyInputErrorMsg">
+                                      <small class="text-danger" *ngIf="posBillsData?.attached_to?.touched && posBillsData.attached_to?.errors?.required">Required</small>
+                                      <small class="text-danger m-0">{{erroMessage}}</small>
+                                  </div>
+
+                                  <div class="input-wrapper paragraphClass">
+                                      <ul class="p-0 mb-0">
+                                          <li>
+                                              <ng-container *ngIf="invoicesList?.length !== 0">
+                                              <div class="card" *ngFor="let item of invoicesList">
+                                                  <div class="card-body p-2">
+                                                      <p class="font-weight-bold m-0 cursor-pointer"  (click)="itemSelection(item)">
+                                                          {{ item.name }}, <small>{{item.guest_name}}</small>
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          </ng-container>
+                                          </li>
+                                      </ul>
+                                      <ng-container *ngIf="invoicesList?.length === 0">
+                                          <p class="text-danger"><small>No data</small></p>
+                                      </ng-container>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-md-4 pl-0">
+                          <button class="btn btn-sm btn-outline-primary px-3 py-2 mr-2" (click)="updatePosBills(posForm);invoiceLink(updateInvoicNo, erroMessage);" *ngIf="!relink" [disabled]="(!posBillsData.check_date || !posBillsData.check_no)" >Link</button>
+                          <button class="btn btn-sm btn-outline-primary px-3 py-2" (click)="relink=false;" *ngIf="relink" [disabled]=" (!posBillsData.check_date || !posBillsData.check_no)">Relink</button>
+                      </div>
+                      </div>
+                  </form>
+              </div>
+              <div *ngIf="selectedInvoiceNo?.invoice_number">
+                  <div class="row">
+                      <div class="col-md-12">
+                          <table id="total-table" class="table bg-white mb-3">
+                              <tr>
+                                  <td style="width: 40%">Invoice Number:</td>
+                                  <td>{{selectedInvoiceNo?.invoice_number}}</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 40%">Confirmation Number:</td>
+                                  <td>{{selectedInvoiceNo?.confirmation_number}}</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 40%">Room Number:</td>
+                                  <td>{{selectedInvoiceNo?.room_number}}</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 40%">Guest Name:</td>
+                                  <td>{{selectedInvoiceNo?.guest_name}}</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 40%">GST Number:</td>
+                                  <td>{{selectedInvoiceNo?.gst_number}}</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 40%">Trade Name:</td>
+                                  <td>{{selectedInvoiceNo?.trade_name}}</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 40%">Checkout Date:</td>
+                                  <td>{{selectedInvoiceNo?.invoice_date | date: 'dd/MM/yyyy'}}</td>
+                              </tr>
+                              </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-7">
+          <div class="modal-header border-0 b-r-0 pb-0 summary my-auto text-left d-block">
+              <div class="row no-gutters">
+                  <div class="col-md-4 my-auto">
+                      <div class="px-3">
+                          <h6>
+                              <strong>{{invoiceTitle ? invoiceTitle : 'Check Preview'}}</strong>
+                          </h6>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-body p-2 pdf-view2 bg-white shadow-sm">
+              <div class="card">
+                  <object *ngIf="posBillsData.pos_bill" [data]=" (apiDomain + posBillsData.pos_bill) | safe" type="application/pdf" width="100%" ></object>
+              </div>
+          </div>
+      </div>
+      <div class="close-icon">
+          <i (click)="modal.dismiss(); getPOSChecksData(); selectedInvoiceNo ={}" class="ri-close-line"></i>
+      </div>
+  </div>
+</ng-template>
+
+
+<ng-template #showQr let-modal>
+  <a (click)="modal.close();" class="qr-close text-right pr-3 pt-3 cursor-pointer" > <i class="ri-close-line"></i></a>
+  <div class=" text-center mx-auto" id="section-to-print">
+
+  <div id="invoice-POS">
+          <img class="img-fluid logo" [src]="posBill?.logo" alt="">
+
+          <!-- <div *ngIf="posBill?.qrImg">
+              <pre [innerHTML]="posBill?.bill"> </pre>
+          </div> -->
+          <div>
+              <pre [innerHTML]="posBill?.bill"> </pre>
+          </div>
+
+          <img class="img-fluid qr" [src]="posBill?.qrImg" alt="">
+      </div>
+      </div>
+</ng-template>
+
+<ng-template #viewBill let-modal>
+  <div class="modal-header">
+      <h6 class="mb-0"><strong>View POS Bill</strong></h6>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  </div>
+  <div class="modal-body p-2">
+      <div class="table-responsive">
+          <table class="table">
+            <thead class="thead">
+              <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th>Reference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of posBillList;let i = index">
+                <td>{{i + 1}}</td>
+                <td>{{item?.date}}</td>
+                <td>{{item?.description}}</td>
+                <td>{{item?.item_reference}}</td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="text-center py-3" *ngIf="!posBillList?.length">
+          <h5>No Data Found</h5>
+      </div>
+  </div>
+
+</ng-template>
+
+<ng-template let-modal #uploadPOSChecks>
+  <div class="modal-header">
+      <h5><strong>Upload POS Checks </strong></h5>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="">
+          <div class="fileUpload" *ngIf="selectedFiles.length==0">
+              <label for="file" class="d-block cursor-pointer text-center">
+                  <i class="ri-upload-cloud-line"></i>
+                  <h6><strong>Upload Pdf POS Checks</strong></h6>
+              </label>
+              <input accept=".pdf" (change)="selectFiles($event.target.files)" class="opacity-0 d-none" multiple
+                  type="file" name="" id="file">
+          </div>
+          <div *ngIf="selectedFiles.length>0">
+              <div *ngIf="progressInfos.length == 0" class="row">
+                  <div class="col-md-2 text-center" *ngFor="let file of selectedFiles; let i = index">
+                      <div class="preview-box position-relative">
+                          <div class="p-close"><i (click)="removeFromList(file,i)" class="ri-close-circle-line"></i>
+                          </div>
+                          <div class="p-file"> <i class="ri-file-4-line"></i></div>
+                          <div>
+                              <p class="fixed-width ml-2">{{file?.file?.name}}</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+          </div>
+
+          <div *ngIf="progressInfos.length > 0">
+              <div *ngFor="let progressInfo of progressInfos" class="mb-2">
+                  <div class="d-flex mx-3">
+                      <b *ngIf="progressInfo?.color == 'warning'"> <i class="ri-close-line mr-2" style="color: red;"></i></b>
+                      <b *ngIf="progressInfo?.color == 'success'"> <i class="ri-check-line mr-2" style="color: green;"></i></b>
+                      <small class="mr-3 col-md-9">{{ progressInfo.fileName }}</small>
+                      <span class="col-md-3">
+                          <ngb-progressbar [type]="progressInfo.color" textType="white"
+                              [value]="progressInfo.parserProgress + progressInfo.uploadProgress" [showValue]="true">
+                          </ngb-progressbar>
+                      </span>
+
+                  </div>
+
+              </div>
+          </div>
+
+      </div>
+      <div class="modal-footer d-block  pb-4 border-0" *ngIf="selectedFiles.length > 0 ">
+          <div class="text-right">
+
+              <button *ngIf="allFilesUplaoded" class="btn btn-outline-primary mb-0  text-uppercase" type="button"
+                  (click)="modal.close('success')">Ok</button>
+              <button *ngIf=" progressInfos.length == 0" class="btn btn-outline-primary mb-0  text-uppercase"
+                  type="button" (click)="modal.close()">Cancel</button>
+
+              <button *ngIf=" progressInfos.length == 0" (click)="uploadFiles()" [disabled]="selectedFiles.length == 0 "
+                  class="btn btn-primary mb-0 px-4 ml-3 text-uppercase"
+                  type="button">Upload</button>
+          </div>
+      </div>
+      <!-- <div class="d-flex justify-content-end py-2">
+          <button class="btn btn-sm btn-outline-primary mb-0 pr-2  text-uppercase" type="button" (click)="modal.close()">Cancel</button>
+          <button class="btn btn-sm btn-primary mb-0 mx-2 text-uppercase" type="button" (click)="uploadFiles()" [disabled]="!posChecksDate ">Scan Now</button>
+      </div> -->
+    </div>
+
+</ng-template>
+
+
+<ng-template let-modal #selectDateToScan>
+  <div class="modal-header">
+      <h5><strong>{{date_type | titlecase}} POS Checks </strong></h5>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="poschecks">
+              <div class="form-group calendar position-relative">
+                  <label for="posChecksDate">Select Checks Date</label>
+                  <input class="form-control h-auto" [(ngModel)]="posChecksDate"  [owlDateTime]="dt2"  [owlDateTimeTrigger]="dt2" placeholder="Date" [max]="today">
+                  <span [owlDateTimeTrigger]="dt2">
+              <i class="ri-calendar-2-line"></i>
+            </span>
+                  <owl-date-time [pickerType]="'calendar'" #dt2></owl-date-time>
+
+              </div>
+              <small class=" px-3 py-2 date_note my-1" > <b>Note : </b> Please {{date_type}} the POS bills for the selected date</small>
+
+      </div>
+      <div class="d-flex justify-content-end py-2 mt-2">
+          <button class="btn btn-sm btn-outline-primary mb-0 pr-2  text-uppercase" type="button" (click)="modal.close()">Cancel</button>
+          <button class="btn btn-sm btn-primary mb-0 mx-2 text-uppercase" type="button" *ngIf="date_type == 'scan'" (click)="this.scannerService.acquireImage('scan',null,posChecksDate); modal.close('Success')" [disabled]="!posChecksDate ">Scan Now</button>
+          <button class="btn btn-sm btn-primary mb-0 mx-2 text-uppercase" type="button" *ngIf="date_type == 'upload'" (click)="uploadPosChecksFn(uploadPOSChecks); modal.close('Success')" [disabled]="!posChecksDate ">Upload</button>
+      </div>
+    </div>
+
+</ng-template>
+
+<ng-template let-modal #scannedBillsForReview>
+
+  <div class="modal-body p-0 modalBG">
+      <div class="row ">
+          <div class="col-md-3 bg-white vh-100 pr-0">
+              <h5 class="p-4 pt-2"> <b>Drop Box</b></h5>
+              <ul ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-pills  pl-4 " orientation="vertical">
+                  <li *ngFor="let item of fileTypes;let i = index" [ngbNavItem]="i+1" (click)="onChangeCategory(item,i+1)">
+                      <a ngbNavLink>{{item?.document_type}}</a>
+                      <ng-template ngbNavContent>
+                          <!-- <ng-container *ngTemplateOutlet="items;context:{foliosList: filteredFoliosByCategory}"></ng-container> -->
+                      </ng-template>
+                  </li>
+                  <div [ngbNavOutlet]="nav" class="navList pl-1" style="overflow-y: auto;"></div>
+              </ul>
+          </div>
+          <div class="col-md-6 vh-100">
+              <div  class="pt-2">
+
+              </div>
+          </div>
+          <div class="col-md-3 bg-white vh-100">
+              <div class="pt-2 pr-2">
+                  <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="p-4 pt-2">
+                  <h5 > <b>Check Details</b></h5>
+
+                      <form class="pt-3">
+                          <div class="form-group">
+                              <input type="text" appMatInput class="form-control" id="check_no" name="check_no" [(ngModel)]="billDetails.check_no" #check_no="ngModel">
+                              <label for="check_no" class="mat-label">Check No</label>
+                          </div>
+                          <div class="form-group">
+                              <input type="text" appMatInput class="form-control" id="bill_date" name="bill_date" [(ngModel)]="billDetails.bill_date" #bill_date="ngModel">
+                              <label for="bill_date" class="mat-label">Check Date</label>
+                          </div>
+                          <div class="form-group">
+                              <input type="text" appMatInput class="form-control" id="table_number" name="table_number" [(ngModel)]="billDetails.table_number" #table_number="ngModel">
+                              <label for="table_number" class="mat-label">Table No</label>
+                          </div>
+                          <div class="form-group">
+                              <input type="text" appMatInput class="form-control" id="total_amount" name="total_amount" [(ngModel)]="billDetails.total_amount" #total_amount="ngModel">
+                              <label for="total_amount" class="mat-label">Total Amount</label>
+                          </div>
+
+                      </form>
+              </div>
+
+          </div>
+      </div>
+  </div>
+</ng-template>
+

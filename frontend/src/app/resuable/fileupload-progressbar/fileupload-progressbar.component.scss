@@ -1,0 +1,53 @@
+.file-upload{
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  width: 440px;
+  max-height: 50vh;
+  min-height: 3vh;
+  box-shadow: 1px 1px 11px #d5c3c3;
+  background-color: white;
+  .card-body{
+    overflow-y: scroll;
+    height: 39vh;
+  }
+}
+.file-title{
+  font-size: 15px;
+}
+.tag {
+  border-radius: 50%;
+  height: 15px;
+  width: 15px;
+  display: inline-block;
+}
+
+.tag-default {
+  background-color: gray;
+}
+
+.tag-success {
+  background-color: green;
+}
+
+.tag-warning {
+  background-color: orange;
+}
+
+.tag-danger {
+  background-color: red;
+}
+
+.fixed-width{
+  width: 205px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0px;
+}
+.card-header{
+  background: #272868;
+  color: white;
+  padding: 7px !important;
+}
+

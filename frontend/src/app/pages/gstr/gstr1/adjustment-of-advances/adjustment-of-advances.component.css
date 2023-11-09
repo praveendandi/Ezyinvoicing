@@ -1,0 +1,17 @@
+table tr th {
+  white-space: nowrap;
+}
+
+i {
+  vertical-align: middle !important;
+}
+
+.crums p {
+  font-size: 15px;
+}
+
+.underline {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+}
+/*# sourceMappingURL=adjustment-of-advances.component.css.map */

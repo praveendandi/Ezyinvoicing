@@ -1,0 +1,164 @@
+<section class="taxpayers position-relative">
+    <div class="row m-0 py-2">
+        <div class="col-md-10 col-lg-10">
+            <div class="d-flex">
+                <h4 class="font-weight-bold text-white">Tax Payers <small>({{this.filters.totalCount}})</small></h4>
+                <button class="create btn btn-primary" [routerLink]="['/home/tax-payers-details']"
+                    *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole " appPermissionButton
+                    accessType="create" moduleType="docType"><i class="ri-add-line"></i></button>
+                <!-- <button (click)="taxSynctoGST()" *ngIf="companyDetails?.ezy_gst_module == 1" class="btn btn-primary btn-small mx-2 btn-right" ngbTooltip="sync to gst"
+                    appPermissionButton accessType="write" type="button">Sync to GST</button> -->
+
+
+            </div>
+        </div>
+        <div class="col-md-2 col-lg-2">
+            <div class="text-right">
+                <button class="btn btn-primary btn-small mr-2" type="button"
+                    (click)="taxPayerDetails_export()">Export</button>
+            </div>
+        </div>
+        <!-- <div class="col-lg-3 col-md-3">
+            <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+                <input type="search" class="form-control pl-5" #gstNumber [(ngModel)]="filters.search.gstNumber" (keyup)="onSearch.emit(filters)"
+                (search)="onSearch.emit(filters)" placeholder="Search">
+                <span class="search"><i class="ri-search-line"></i></span>
+            </div>
+        </div> -->
+    </div>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table" id="s-table">
+                <thead class="thead">
+                    <tr>
+                        <th>#</th>
+                        <th>Trade Name</th>
+                        <th>Legal Name</th>
+                        <th>GST No.</th>
+                        <th>Status</th>
+                        <th>Invoices</th>
+                        <th>Credit</th>
+                        <th>Debit</th>
+                        <th>Sort by</th>
+                        <th *ngIf="companyDetails?.ezy_gst_module == 1">Sync Status</th>
+                        <th *ngIf="companyDetails?.ezy_gst_module == 1">Sync Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="ri-search-line"></i>
+                                    </span>
+                                </div>
+                                <input #tradeName [(ngModel)]="filters.search.tradeName"
+                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)" type="search"
+                                    (keyup.enter)="updateRouterParams()" class="form-control">
+                                <!-- <input type="text" (keyup)="search('tradeName')"  class="form-control" placeholder="Search" #tradeName [(ngModel)]="filters.search.tradeName"> -->
+                            </div>
+                        </td>
+                        <td>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="ri-search-line"></i>
+                                    </span>
+                                </div>
+                                <input #legalName [(ngModel)]="filters.search.legalName"
+                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+                                    (keyup.enter)="updateRouterParams()" type="search" class="form-control">
+                                <!-- <input type="text" (keyup)="search('legalName')"  class="form-control" placeholder="Search" #legalName [(ngModel)]="filters.search.legalName"> -->
+                            </div>
+                        </td>
+                        <td>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="ri-search-line"></i>
+                                    </span>
+                                </div>
+                                <input #gstNumber [(ngModel)]="filters.search.gstNumber"
+                                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+                                    (keyup.enter)="updateRouterParams()" type="search" class="form-control">
+                                <!-- <input type="text" (keyup)="search('gstNumber')"  class="form-control" placeholder="Search" #gstNumber [(ngModel)]="filters.search.gstNumber"> -->
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <select id="sortBy" class="custom-select" [(ngModel)]="filters.status"
+                                    (change)="onSearch.emit(filters)">
+                                    <option value="Active">Active</option>
+                                    <option value="In-Active">In-Active</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+
+                        <td>
+                            <div class="form-group">
+                                <select id="sortBy" class="custom-select" [(ngModel)]="filters.sortBy"
+                                    (change)="onSearch.emit(filters)">
+                                    <option value="creation">Creation</option>
+                                    <option value="modified">Modified</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td *ngIf="companyDetails?.ezy_gst_module == 1">
+                            <!-- <select id="creditNotes" class="custom-select" [(ngModel)]="filters.synced_to_erp" (change)="onSearch.emit(filters)">
+                                <option value="">Showing all</option>
+                                <option value=1>Synced</option>
+                                <option value=0>Not Synced</option>
+                            </select> -->
+                        </td>
+                        <td *ngIf="companyDetails?.ezy_gst_module == 1"></td>
+                        <td></td>
+                    </tr>
+                    <tr
+                        *ngFor="let item of (taxPayersList| paginate:{itemsPerPage: this.filters.itemsPerPage, currentPage: this.filters.currentPage,totalItems:this.filters.totalCount});let i = index">
+                        <td>{{this.filters.itemsPerPage * (this.filters.currentPage - 1) + (i+1 ) }}</td>
+
+                        <td>{{item?.trade_name}}</td>
+                        <td>{{item?.legal_name}}</td>
+                        <td>{{item?.gstNumber}}</td>
+                        <td>{{item?.status}}</td>
+                        <td>{{item?.invoice_count}} <span><a *ngIf="item?.invoice_count !==0"
+                                    [routerLink]="['../../invoices']"
+                                    [queryParams]="{value:item.gstNumber,prop:'invoice'}"
+                                    queryParamsHandling="merge">view</a></span></td>
+                        <td>{{item?.credit_count}} <span><a *ngIf="item?.credit_count !==0"
+                                    [routerLink]="['../../credit-invoices']"
+                                    [queryParams]="{value:item.gstNumber,prop:'credit_count'}"
+                                    queryParamsHandling="merge">view</a></span></td>
+                        <td>{{item?.invoice_count}}</td>
+                        <td>{{item?.creation | date : 'MMM dd y h:mm:ss'}}</td>
+                        <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_to_erp?'Synced':'Not Synced'}}
+                        </td>
+                        <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_date|date : ["MMM d y"]}}</td>
+                        <td>
+                            <span><a appPermissionButton accessType="read" moduleType="docType"
+                                    (click)="navigate(item,'View')">view</a></span>
+
+                            <span class="ml-3"><a appPermissionButton accessType="write" moduleType="docType"
+                                    (click)="navigate(item,'Edit')">Edit</a></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center py-3" *ngIf="!taxPayersList.length">
+                <h4>No Data Found</h4>
+            </div>
+        </div>
+        <div *ngIf="taxPayersList.length < this.filters.totalCount">
+            <p class="text-right pr-5 more text-primary"
+                (click)="this.filters.start = taxPayersList.length;this.filters.itemsPerPage= this.filters.itemsPerPage+20; updateRouterParams()">
+                more
+            </p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,311 @@
+<section>
+    <!-- <div class="row mb-3">
+        <div class="col-md-9 col-lg-9">
+            <h4 class="text-white"><b>Outlets</b></h4>
+        </div>
+
+        <div class="col-md-3 text-right">
+            <button (click)="addOutlet(outletModal,'add',null)" class="btn btn-primary" type="button">Add Outlet</button>
+        </div>
+    </div> -->
+    <div class="row mb-3">
+        <div class="col-md-9 col-lg-9">
+            <div class="d-flex">
+                <h4 class="font-weight-bold text-white my-auto">Outlets<small>({{this.filters.totalCount}})</small></h4>
+                <button class="create btn btn-primary" (click)="addOutlet(outletModal,'add',null);"><i class="ri-add-line"></i></button>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3">
+            <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+                <input type="search" class="form-control pl-5" [(ngModel)]="filters.search" (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)" #search (keyup.enter)="updateRouterParams()" placeholder="Search by Outlet Name">
+                <span class="search"><i class="ri-search-line"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Outlet Name</th>
+                                    <!-- <th *ngIf="companyDetails?.enable_pos_extra_text == '1'">GSTIN</th> -->
+                                    <th>Static Payment QR Code</th>
+                                    <th>Outlet Logo</th>
+                                    <th>Payment QR Type</th>
+                                    <th>Last Sync.</th>
+                                    <!-- <ng-container *ngIf="this.loginData?.name == 'Administrator'">
+                                        <th>Void</th>
+                                        <th>Start</th>
+                                        <th>Cancelled</th>
+                                        <th>Closed</th>
+                                    </ng-container> -->
+                                    <th>Print</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of outletList">
+                                    <td>{{item?.index}}</td>
+                                    <td>
+                                        {{item?.outlet_name}}
+                                    </td>
+                                    <!-- <td *ngIf="companyDetails?.enable_pos_extra_text == '1'">{{item?.gstin}}</td> -->
+                                    <td>
+                                        <a (click)="showQRImg(showQr, item?.static_payment_qr_code)">{{item?.payqr}}</a>
+                                    </td>
+                                    <td>
+                                        <a (click)="showQRImg(showQr, item?.outlet_logo)">{{item?.logo}}</a>
+                                    </td>
+                                    <td>
+                                        {{item?.payment_mode}}
+                                    </td>
+                                    <td>
+                                        {{item?.last_updated | date: 'medium'}}
+                                    </td>
+
+                                    <!-- <ng-container *ngIf="this.loginData?.name == 'Administrator'">
+                                        <td>
+                                            {{item?.void}}
+                                        </td>
+                                        <td>
+                                            {{item?.start}}
+                                        </td>
+                                        <td>
+                                            {{item?.cancelled}}
+                                        </td>
+                                        <td>
+                                            {{item?.closed}}
+                                        </td>
+                                    </ng-container> -->
+                                    <td>
+                                        {{item?.print}}
+                                    </td>
+                                    <td> <a (click)="addOutlet(outletModal,'edit',item)">Edit</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center py-3" *ngIf="!outletList.length">
+                            <h5>No Data Found</h5>
+                        </div>
+                        <div class="d-flex pb-2 justify-content-between" *ngIf="outletList.length">
+                            <div class="px-3">
+                                <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage" (change)="checkPagination()" id="itemsPerPage">
+                                    <option [value]="20">20</option>
+                                    <option [value]="50">50</option>
+                                    <option [value]="100">100</option>
+                                    <option [value]="150">150</option>
+                                    <option [value]="500">500</option>
+                                </select>
+                            </div>
+                            <div *ngIf="outletList.length  < this.filters.totalCount">
+                                <p class="text-right pr-5 more text-primary" (click)="this.filters.start = outletList.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+                                    more
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<ng-template #outletModal let-modal>
+    <div class="modal-header">
+        <h6><b>{{viewType}} Outlet</b></h6>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click');outletDetails=''">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #form="ngForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="outlet_name">Outlet Name</label>
+                        <input (change)="getOutlets($event)" title="Enter Outlet" type="text" class="form-control" id="TransactionCode" name="outlet_name" [(ngModel)]="outletDetails.outlet_name" #outlet_name="ngModel">
+
+
+                        <div *ngIf="outletValid && outletCheck">
+                            <small class="text-danger"><b>This Outlet: {{outletCheck}} already
+                            exist</b></small>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                    <label for="outlet_logo">Static Payment QR</label>
+                    <div class="form-group">
+                        <input class="form-control" accept="image/png, image/gif, image/jpeg" (change)="handleFileInput($event, 'static_payment_qr_code')" type="file" name="static_payment_qr_code" id="static_payment_qr_code" class="d-none form-control" required>
+                        <label for="font_file" class="border d-block  f-upload clearfix rounded-sm position-relative w-100">
+                                                    <small class="text-muted">{{outletDetails?.static_payment_qr_code ?
+                                                        outletDetails.static_payment_qr_code : 'Static Payment QR'}}</small>
+                                                </label>
+
+                        <label for="static_payment_qr_code" class="float-right upload-btn">
+                                                    {{outletDetails.static_payment_qr_code ? 'Change' : 'Upload' }}
+                                                </label>
+                        <p><small>Note: Size should be less than 409*403 pixels</small></p>
+
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+
+                    <label for="outlet_logo">Outlet Logo</label>
+                    <div class="form-group">
+                        <input class="form-control" accept="image/png, image/gif, image/jpeg" (change)="handleFileInput($event, 'outlet_logo')" type="file" name="outlet_logo" id="outlet_logo" class="d-none form-control" required>
+                        <label for="font_file" class="border d-block  f-upload clearfix rounded-sm position-relative w-100">
+                                                    <small class="text-muted">{{outletDetails?.outlet_logo ?
+                                                        outletDetails?.outlet_logo : 'Outlet Logo'}}</small>
+                                                </label>
+
+                        <label for="outlet_logo" class="float-right upload-btn">
+                                                    {{outletDetails.outlet_logo ? 'Change' : 'Upload' }}
+                                                </label>
+                        <p><small>Note: Size should be less than 380*180 pixels</small></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="payment_mode">Payment QR Type</label>
+                        <select class="custom-select" [(ngModel)]="outletDetails.payment_mode" #payment_mode="ngModel" name="payment_mode" required>
+                            <option value="Static">Static</option>
+                            <option value="Dynamic">Dynamic</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6" *ngIf="outletDetails.payment_mode === 'Dynamic' || payment_mode.value === 'Dynamic'">
+                    <div class="form-group">
+                        <label for="payment_gateway">Payment Gateway</label>
+                        <select class="custom-select" [(ngModel)]="outletDetails.payment_gateway" #payment_gateway="ngModel" name="payment_gateway" required>
+                            <option value="Razorpay">Razorpay</option>
+                            <option value="Paytm">Paytm</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- <ng-container *ngIf="this.loginData?.name == 'Administrator'">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="void">Void</label>
+                            <input id="void" class="form-control" type="text" name="void" [(ngModel)]="outletDetails.void" #void="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="start">Start</label>
+                            <input id="start" class="form-control" type="text" name="start" [(ngModel)]="outletDetails.start" #start="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cancelled">Cancelled</label>
+                            <input id="cancelled" class="form-control" type="text" name="cancelled" [(ngModel)]="outletDetails.cancelled" #cancelled="ngModel" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="closed">Closed</label>
+                            <input id="closed" class="form-control" type="text" name="closed" [(ngModel)]="outletDetails.closed" #closed="ngModel" required>
+                        </div>
+                    </div>
+                </ng-container> -->
+                <!-- <ng-container *ngIf="companyDetails?.enable_pos_extra_text == '1'">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="gstin">GSTIN</label>
+                            <input title="Enter GSTIN" type="text" class="form-control" id="gstin" name="gstin" appValidateGST [(ngModel)]="outletDetails.gstin" #gstin="ngModel">
+
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="fssai">FSSAI</label>
+                            <input title="Enter fssai" type="text" class="form-control" id="fssai" name="fssai" [(ngModel)]="outletDetails.fssai" #fssai="ngModel">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="tin_no">TIN NO</label>
+                            <input title="Enter tin_no" type="text" class="form-control" id="tin_no" name="tin_no" [(ngModel)]="outletDetails.tin_no" #tin_no="ngModel">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cin_no">CIN NO</label>
+                            <input title="Enter CIN NO" type="text" class="form-control" id="cin_no" name="cin_no" [(ngModel)]="outletDetails.cin_no" #cin_no="ngModel">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="service_tax_no">Service Tax No.</label>
+                            <input title="Enter Service Tax Number" type="text" class="form-control" id="service_tax_no" name="service_tax_no" [(ngModel)]="outletDetails.service_tax_no" #service_tax_no="ngModel">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="website">Property Website</label>
+                            <input title="Enter Property Website Link" type="text" class="form-control" id="website" name="website" [(ngModel)]="outletDetails.website" #website="ngModel">
+                        </div>
+                    </div>
+                </ng-container> -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="print">Print</label>
+                        <select class="custom-select" [(ngModel)]="outletDetails.print" name="print" #print="ngModel" required>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="invoice_number_format">Invoice Number Format</label>
+                        <input title="Enter Invoice Number" type="text" class="form-control" id="invoice_number_format" name="invoice_number_format" [(ngModel)]="outletDetails.invoice_number_format" #invoice_number_format="ngModel">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="print_count">Print Counts</label>
+                        <!-- <input title="Enter Print Count" type="text" class="form-control" id="print_count" name="print_count" [(ngModel)]="outletDetails.print_count" #print_count="ngModel"> -->
+                        <select class="custom-select" [(ngModel)]="outletDetails.print_count" name="print_count" #print_count="ngModel" required>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+
+                      </select>
+                    </div>
+                </div>
+                <div class="col-md-6" *ngIf="btnType=='edit'">
+                    <div class="form-group">
+                        <label for="print_count">Last Sync.</label>
+                        <input title="last_updated" disabled=true type="text" class="form-control" id="last_updated" name="last_updated" [ngModel]="outletDetails.last_updated | date: 'medium'" #last_updated="ngModel">
+                    </div>
+                </div>
+
+                <div class="text-right col-md-12">
+                    <button (click)="modal.dismiss('Cross click');outletDetails=''" class="btn btn-outline-primary" type="button">Cancel</button>
+                    <button [disabled]="outletValid" class="btn btn-primary ml-3" type="button" (click)="onSubmit(form)">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</ng-template>
+
+<ng-template #showQr>
+    <div class="container p-3 text-center">
+        <img class="img-fluid" [src]="qrImg" alt="">
+    </div>
+</ng-template>

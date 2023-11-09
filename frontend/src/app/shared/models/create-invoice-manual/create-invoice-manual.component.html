@@ -1,0 +1,154 @@
+<div #addCredit>
+    <div class="modal-header  addCredit">
+        <h5 class="mb-0" id="modal-basic-title"><strong>Create {{manualType}} Invoice</strong></h5>
+        <button type="button" class="close" aria-label="Close" (click)="form.reset();closeModal()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body px-4 pt-2 pb-4">
+        <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+            <div class="row">
+                <div class="col-md-12 addCredit mb-2">
+                    <h5><strong>Tax Payer Details</strong></h5>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <input placeholder="Enter GST Number *" type="text" appMatInput class="form-control text-uppercase" id="gst_number" name="gst_number" (ngModelChange)="changeDescription($event)" minlength="15" maxlength="15" appValidateGST [(ngModel)]="taxPayerDetails.gst_number"
+                            #gst_number="ngModel" >
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="invoice_number">Invoice Number *</label>
+                        <input [(ngModel)]="creditInvoice.invoice_number" #invoice_number="ngModel" appMatInput noWhiteSpace id="invoice_number" class="form-control" type="text" name="invoice_number" required>
+                        <small class="text-danger" *ngIf="invoice_number.touched && invoice_number?.errors?.specialCharacter">{{invoice_number?.errors?.specialCharacter}}</small> {{invoice_number?.error | json}}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="invoice_date">Invoice Date *</label>
+                        <input type="text" [max]="today_date" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" [(ngModel)]="creditInvoice.invoice_date" appMatInput id="invoice_date" class="form-control" type="text" name="invoice_date" required>
+                    </div>
+                </div>
+                <!-- <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="guest_name">Trade Name *</label>
+                        <input readonly [(ngModel)]="taxPayerDetails.trade_name" appMatInput id="guest_name" class="form-control" type="text" name="guest_name" required>
+                    </div>
+                </div> -->
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="guest_name">Guest Name *</label>
+                        <input [(ngModel)]="creditInvoice.guest_name" id="guest_name" appMatInput class="form-control" type="text" name="guest_name">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="room_number">Room <span *ngIf="manualType == 'Tax' && companyData?.company_code== paxEnableCompanyCode">/ PAX</span> Number</label>
+                        <input appNumberInput maxlength="9" [(ngModel)]="creditInvoice.room_number" appMatInput id="room_number" class="form-control" type="text" name="room_number">
+                    </div>
+                </div>
+
+                <!-- <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="total_invoice_amount">Final Invoice Amount With GST *</label>
+                        <input appMatInput appDecimaNumber id="total_invoice_amount"
+                            [(ngModel)]="creditInvoice.total_invoice_amount" class="form-control" type="text"
+                            name="total_invoice_amount" required>
+                    </div>
+                </div> -->
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <ng-select class="custom" [items]="stateCodes" bindLabel="state" placeholder="Place of supply" name="place_of_supply" (ngModelChange)="modelChangeFn($event)" [(ngModel)]="creditInvoice.place_of_supply" #place_of_supply="ngModel" required>
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-md-6" *ngIf="manualType !== 'Tax'">
+                    <div class="form-group">
+                        <label class="mat-label" for="tax_invoice_referrence_number">Original Tax Invoice Number</label>
+                        <input appMatInput appDecimaNumber id="tax_invoice_referrence_number" [(ngModel)]="creditInvoice.tax_invoice_referrence_number" class="form-control" type="text" name="tax_invoice_referrence_number">
+                    </div>
+                </div>
+                <div class="col-md-6" *ngIf="manualType !== 'Tax'">
+                    <div class="form-group">
+                        <label class="mat-label" for="tax_invoice_referrence_date">Original Tax Invoice Date</label>
+
+                        <input type="text" [max]="today_date" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" [(ngModel)]="creditInvoice.tax_invoice_referrence_date" appMatInput id="tax_invoice_referrence_date" class="form-control" type="text" name="tax_invoice_referrence_date">
+                    </div>
+                </div>
+
+                <!-- <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="mat-label" for="note">Note</label>
+                        <textarea [(ngModel)]="creditInvoice.note" #note="ngModel" appMatInput id="note"
+                            class="form-control" maxlength="200" type="text" name="note">
+                        </textarea>
+                    </div>
+                </div> -->
+
+                <div class="col-md-6 my-auto" *ngIf="companyData?.disable_sez !== 1 ">
+                    <div class="form-group pl-2">
+                        <div class="custom-control custom-checkbox">
+                            <input name="sez" [(ngModel)]="creditInvoice.sez" type="checkbox" class="custom-control-input" id="SEZ">
+                            <label class="custom-control-label scale-2" for="SEZ">SEZ</label>
+                        </div>
+                    </div>
+                </div>
+
+                <quill-editor *ngIf="companyData?.custom_e_tax_invoice == 1" class="ql-container mb-3 mx-3" id="note" name="note" [(ngModel)]="creditInvoice.note" #note="ngModel">
+                </quill-editor>
+
+                <div class="col-md-12">
+                    <div class="bg-gray each-block" *ngIf="taxDetails">
+                        <div class="row" *ngIf="!gstNumberError">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><span>Legal Name</span> <strong placement="top" ngbTooltip="{{ taxPayerDetails.legal_name}}" class="text-truncate">{{(taxPayerDetails.legal_name)
+                                            || 'NA'}}</strong></li>
+                                    <li><span>GST Number</span> <strong>{{taxPayerDetails.gst_number || 'NA'}}</strong>
+                                    </li>
+                                    <li><span>Address 1</span> <strong placement="top" ngbTooltip="{{taxPayerDetails.address_1}}" class="text-truncate">{{(taxPayerDetails.address_1)|| 'NA'}}</strong></li>
+                                    <li><span>Location</span> <strong>{{(taxPayerDetails.location)}}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled text-right">
+                                    <li><span>Trade Name</span> <strong placement="top" ngbTooltip="{{taxPayerDetails.trade_name}}" class="text-truncate">{{(taxPayerDetails.trade_name)||'NA'}}</strong></li>
+                                    <li><span>State code</span>
+                                        <strong>{{(taxPayerDetails.state_code)||'NA'}}</strong>
+                                    </li>
+                                    <li><span>Address 2</span> <strong placement="top" ngbTooltip="{{taxPayerDetails.address_2}}" class="text-truncate">{{(taxPayerDetails.address_2)|| 'NA'}}</strong></li>
+                                    <li><span>Pincode</span> <strong>{{(taxPayerDetails.pincode)||'NA'}}</strong></li>
+                                </ul>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+                    <div class="bg-gray each-block text-center" *ngIf="gstNumberError">
+                        <h6 class="py-3"><strong>Please Enter Valid GST Number</strong></h6>
+                    </div>
+                </div>
+
+
+
+
+                <div class="col-md-12 mt-3">
+                    <div class="text-right">
+                        <button (click)="form.reset();closeModal()" class="btn btn-outline-dark" type="button">Cancel</button>
+                        <button [disabled]="!taxDetails" class="btn btn-primary ml-3" type="submit">Save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>

@@ -1,0 +1,468 @@
+<section>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h4 class="text-white mt-1"><b>Email Settings</b></h4>
+        </div>
+        <div class="col-md-6">
+            <div class="text-right">
+                <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                    [routerLink]="['/home']">Cancel</button>
+                <!-- <button (click)="onSubmit(form)" class="btn btn-primary mb-0 text-uppercase ml-3"
+                    type="button">save</button> -->
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ngb-accordion [closeOthers]="true" activeIds="static-1">
+                <ngb-panel id="static-1" *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole ">
+                    <ng-template ngbPanelTitle>
+                        <span>SMTP Settings <i class="ri-add-line float-right"></i></span>
+                    </ng-template>
+                    <ng-template ngbPanelContent>
+                        <form #form="ngForm">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="email_id" id="email_id"
+                                                    class="form-control" [(ngModel)]="smtpSettings.email_id"
+                                                    #email_id="ngModel" required>
+                                                <label for="email_id" class="mat-label">Email Address</label>
+                                                <small class="text-danger"
+                                                    *ngIf="email_id.touched && email_id?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="name" id="name"
+                                                    class="form-control" [(ngModel)]="smtpSettings.name" #name="ngModel"
+                                                    required>
+                                                <label for="name" class="mat-label">Domain name</label>
+                                                <small class="text-danger"
+                                                    *ngIf="name.touched && name?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="email_server" id="email_server"
+                                                    class="form-control" [(ngModel)]="smtpSettings.email_server"
+                                                    #email_server="ngModel" required>
+                                                <label for="email_server" class="mat-label">Email Server</label>
+                                                <small class="text-danger"
+                                                    *ngIf="email_server.touched && email_server?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput appNumberInput name="incoming_port"
+                                                    id="incoming_port" class="form-control"
+                                                    [(ngModel)]="smtpSettings.incoming_port" #incoming_port="ngModel"
+                                                    required>
+                                                <label for="incoming_port" class="mat-label">Incoming Port</label>
+                                                <small class="text-danger"
+                                                    *ngIf="incoming_port.touched && incoming_port?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput appNumberInput name="attachment_limit"
+                                                    id="attachment_limit" class="form-control"
+                                                    #attachment_limit="ngModel" required
+                                                    [(ngModel)]="smtpSettings.attachment_limit">
+                                                <label for="attachment_limit" class="mat-label">Attachment Limit(in
+                                                    MB)</label>
+                                                <small class="text-danger"
+                                                    *ngIf="attachment_limit.touched && attachment_limit?.errors?.required">Required</small>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="smtp_server" id="smtp_server"
+                                                    class="form-control" #smtp_server="ngModel" required
+                                                    [(ngModel)]="smtpSettings.smtp_server">
+                                                <label for="smtp_server" class="mat-label">SMTP Server</label>
+                                                <small class="text-danger"
+                                                    *ngIf="smtp_server.touched && smtp_server?.errors?.required">Required</small>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput appNumberInput name="smtp_port"
+                                                    id="smtp_port" class="form-control"
+                                                    [(ngModel)]="smtpSettings.smtp_port" #smtp_port="ngModel" required>
+                                                <label for="smtp_port" class="mat-label">SMTP Port</label>
+                                                <small class="text-danger"
+                                                    *ngIf="smtp_port.touched && smtp_port?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator'">
+                                            <div class="form-group">
+                                                <label for="use_ssl" class="mat-label">Use SSL</label>
+                                                <select appMatInput name="use_ssl" id="use_ssl" class="custom-select"
+                                                    [(ngModel)]="smtpSettings.use_ssl" #use_ssl="ngModel" required>
+                                                    <option selected hidden disabled>Select Status</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="use_ssl.touched && use_ssl?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator'">
+                                            <div class="form-group">
+                                                <label for="use_ssl" class="mat-label">Use TLS</label>
+                                                <select appMatInput name="use_tls" id="use_tls" class="custom-select"
+                                                    [(ngModel)]="smtpSettings.use_tls" #use_tls="ngModel" required>
+                                                    <option selected hidden disabled>Select Status</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="use_tls.touched && use_tls?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                    <div class="text-right">
+                                        <!-- <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                                            [routerLink]="['/home']">Cancel</button> -->
+                                        <button (click)="onSubmit(form)"
+                                            class="btn btn-primary mb-0 text-uppercase ml-3" type="button">save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel id="static-2" *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole ">
+                    <ng-template ngbPanelTitle>
+                        <span>Email Templates <i class="ri-add-line float-right"></i></span>
+                    </ng-template>
+                    <ng-template ngbPanelContent>
+
+                        <div class="row mb-3">
+
+
+
+                        </div>
+
+
+                        <div class="row">
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="text-center newTemplate" (click)="addNewTemp(emailtemplate)">
+                                    <h6><b><i class="ri-add-line"></i> Create New Template </b></h6>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-3 email-trmplates" *ngFor="let item of emailTemplates">
+                                <div class="row m-0 justify-content-between align-items-center p-2 listTemplate">
+                                    <div class="col">
+                                        <h6><b>{{item.name}}</b></h6>
+                                        <p><b>Subject</b> <span class="text-truncate-company"> : {{item.subject}}
+                                            </span> </p>
+
+                                    </div>
+                                    <div class="col text-right">
+                                        <!-- <button class="btn btn-md btn-info " (click)="open(content) ">
+                                            Preview
+
+                                        </button> -->
+                                        <button class="btn btn-info ml-2" type="button"
+                                            (click)="deleteTemp(item)">Delete</button>
+                                        <button class="btn btn-info ml-2" (click)="editTemp(item,emailtemplate)"
+                                            type="button">Edit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </ng-template>
+                </ngb-panel>
+
+                <ngb-panel id="static-3" *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole ">
+                    <ng-template ngbPanelTitle>
+                        <span>Email Account <i class="ri-add-line float-right"></i></span>
+                    </ng-template>
+                    <ng-template ngbPanelContent>
+                        <form #accountForm="ngForm">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="email_id" id="email_id_ac"
+                                                    class="form-control" [(ngModel)]="emailAccount.email_id"
+                                                    #email_id="ngModel" required>
+                                                <label for="email_id_ac" class="mat-label">Email Address</label>
+                                                <small class="text-danger"
+                                                    *ngIf="email_id.touched && email_id?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="password" appMatInput name="password" id="password"
+                                                    class="form-control" [(ngModel)]="emailAccount.password"
+                                                    #password="ngModel" required>
+                                                <label for="password" class="mat-label">Password</label>
+                                                <small class="text-danger"
+                                                    *ngIf="password.touched && password?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="email_account_name"
+                                                    id="email_account_name" class="form-control"
+                                                    [(ngModel)]="emailAccount.email_account_name"
+                                                    #email_account_name="ngModel" required>
+                                                <label for="email_account_name" class="mat-label">Email Account
+                                                    Name</label>
+                                                <small class="text-danger"
+                                                    *ngIf="email_account_name.touched && email_account_name?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" appMatInput name="domain" id="domain"
+                                                    class="form-control" [(ngModel)]="emailAccount.domain"
+                                                    #domain="ngModel" required>
+                                                <label for="domain" class="mat-label">Domain</label>
+                                                <small class="text-danger"
+                                                    *ngIf="domain.touched && domain?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator' ">
+                                            <div class="form-group">
+                                                <label for="initial_sync_count" class="mat-label">Initial Sync
+                                                    Count</label>
+                                                <select appMatInput name="initial_sync_count" id="initial_sync_count"
+                                                    class="custom-select" [(ngModel)]="emailAccount.initial_sync_count"
+                                                    #initial_sync_count="ngModel" required>
+                                                    <option selected hidden disabled>Selected Mode</option>
+                                                    <option value="100">100</option>
+                                                    <option value="250">250</option>
+                                                    <option value="500">500</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="initial_sync_count.touched && initial_sync_count?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator'">
+                                            <div class="form-group">
+                                                <label for="create_contact" class="mat-label">Create Contact</label>
+                                                <select appMatInput name="create_contact" id="create_contact"
+                                                    class="custom-select" [(ngModel)]="emailAccount.create_contact"
+                                                    #create_contact="ngModel" required>
+                                                    <option selected hidden disabled>Select Status</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="create_contact.touched && create_contact?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator'">
+                                            <div class="form-group">
+                                                <label for="enable_outgoing" class="mat-label">Enable Outgoing</label>
+                                                <select appMatInput name="enable_outgoing" id="enable_outgoing"
+                                                    class="custom-select" [(ngModel)]="emailAccount.enable_outgoing"
+                                                    #enable_outgoing="ngModel" required>
+                                                    <option selected hidden disabled>Select Status</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="enable_outgoing.touched && enable_outgoing?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator'">
+                                            <div class="form-group">
+                                                <label for="default_outgoing" class="mat-label">Default Outgoing</label>
+                                                <select appMatInput name="default_outgoing" id="default_outgoing"
+                                                    class="custom-select" [(ngModel)]="emailAccount.default_outgoing"
+                                                    #default_outgoing="ngModel" required>
+                                                    <option selected hidden disabled>Select Status</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="default_outgoing.touched && default_outgoing?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6"
+                                            *ngIf="this.loginUser?.full_name == 'Administrator'">
+                                            <div class="form-group">
+                                                <label for="track_email_status" class="mat-label">Track Email
+                                                    Status</label>
+                                                <select appMatInput name="track_email_status" id="track_email_status"
+                                                    class="custom-select" [(ngModel)]="emailAccount.track_email_status"
+                                                    #track_email_status="ngModel" required>
+                                                    <option selected hidden disabled>Select Status</option>
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                                <small class="text-danger"
+                                                    *ngIf="track_email_status.touched && track_email_status?.errors?.required">Required</small>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <!-- <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                                    [routerLink]="['/home']">Cancel</button> -->
+                                <button (click)="onSubmitaccountForm(accountForm)"
+                                    class="btn btn-primary mb-0 text-uppercase ml-3" type="button">save</button>
+                            </div>
+                        </form>
+                    </ng-template>
+                </ngb-panel>
+            </ngb-accordion>
+        </div>
+    </div>
+</section>
+
+<ng-template #emailtemplate let-modal>
+    <div class="modal-header">
+        <h5 class="" id="modal-basic-title">Email</h5>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form #form="ngForm" (ngSubmit)="emailForm(form,modal)" *ngIf="emailTempData">
+
+            <div class="form-group">
+                <input type="text" appMatInput class="form-control" id="template_name" name="template_name"
+                    [(ngModel)]="emailTempData.name" #template_name="ngModel" [readonly]="checkTempMethod" required>
+                <label for="GuestName" class="mat-label">Email Template</label>
+            </div>
+            <div class="form-group">
+                <input type="text" appMatInput class="form-control" id="subject" name="subject"
+                    [(ngModel)]="emailTempData.subject" #subject="ngModel" required>
+                <label for="subject" class="mat-label">Subject</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" name="use_html"
+                    [(ngModel)]="emailTempData.use_html" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    html code
+                </label>
+            </div>
+            <quill-editor *ngIf="emailTempData.use_html" class="ql-container" id="message" name="message"
+                [(ngModel)]="emailTempData.response_html" #message="ngModel" required accept="image/png">
+                <object [data]="domain+emailTempData.email_client_banner" type="image"></object>
+            </quill-editor>
+            <textarea *ngIf="emailTempData.use_html" name="" id="" cols="30" rows="10" class="w-100" id="message"
+                name="message" [(ngModel)]="emailTempData.response_html" placeholder="Enter html code">
+
+            </textarea>
+
+            <textarea *ngIf="!emailTempData.use_html" name="" id="" cols="30" rows="10" class="w-100"
+                id="emailTemplatesText" name="emailTemplatesText" [(ngModel)]="emailTempData.response">
+                <!-- <img [src]="domain+emailTempData.email_client_banner" height="200"> -->
+                
+            </textarea>
+
+            <!-- <img [src]="domain+emailTempData.email_client_banner" alt="Banner" class="img-fluid"> -->
+
+
+
+
+
+            <div class="form-group">
+                <small>Client Banner</small>
+                <input class="form-control" (change)="handleFileInput($event.target.files, 'email_client_banner')"
+                    type="file" name="email_client_banner" id="email_client_banner" class="d-none form-control"
+                    accept="image/png">
+                <label for="font_file" class="border d-block  f-upload clearfix rounded-sm position-relative w-100">
+                    <small class="text-muted">{{emailTempData?.email_client_banner ?emailTempData.email_client_banner :
+                        'Upload'}} </small>
+                </label>
+
+                <label for="email_client_banner" class="float-right upload-btn">
+                    {{emailTempData.email_client_banner ? 'Change' : 'Upload' }}
+                </label>
+            </div>
+
+
+            <img [src]="domain+emailTempData.email_client_banner" height="200">
+
+
+
+            <div class=" mt-3 text-right">
+                <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                    (click)="modal.dismiss('Cross click')">Cancel</button>
+                <button class="btn btn-primary ml-2" type="submit">Save</button>
+                <!-- <button *ngIf="emailTempData?.name" class="btn btn-primary ml-2" type="submit">Edit</button> -->
+            </div>
+        </form>
+        <div *ngIf="!emailTempData" class="text-center p-4">
+            <h3>Please Wait</h3>
+        </div>
+
+    </div>
+</ng-template>
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Email Preview</h4>
+        <button type="button" class="btn btn-primary" aria-label="Close" (click)="d('Cross click')">
+            <i class="ri-close-line"></i></button>
+    </div>
+    <div class="modal-body">
+
+        <form #form="ngForm" (ngSubmit)="emailForm(form,modal)" *ngIf="emailTempData">
+
+            <div class="form-group">
+                <input type="text" appMatInput class="form-control" id="template_name" name="template_name"
+                    [(ngModel)]="emailTempData.name" #template_name="ngModel" [readonly]="checkTempMethod" required>
+                <label for="GuestName" class="mat-label">Email Template</label>
+            </div>
+            <div class="form-group">
+                <input type="text" appMatInput class="form-control" id="subject" name="subject"
+                    [(ngModel)]="emailTempData.subject" #subject="ngModel" required>
+                <label for="subject" class="mat-label">Subject</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" name="use_html"
+                    [(ngModel)]="emailTempData.use_html" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    html code
+                </label>
+            </div>
+            <quill-editor *ngIf="emailTempData.use_html" class="ql-container" id="message" name="message"
+                [(ngModel)]="emailTempData.response_html" #message="ngModel" required>
+            </quill-editor>
+            <textarea *ngIf="emailTempData.use_html" name="" id="" cols="30" rows="10" class="w-100" id="message"
+                name="message" [(ngModel)]="emailTempData.response_html" placeholder="Enter html code">
+            </textarea>
+
+            <textarea *ngIf="!emailTempData.use_html" name="" id="" cols="30" rows="10" class="w-100"
+                id="emailTemplatesText" name="emailTemplatesText" [(ngModel)]="emailTempData.response"></textarea>
+
+            <img [src]="domain+emailTempData.email_client_banner" height="200">
+
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="succesToaster()">Save</button>
+    </div>
+</ng-template>

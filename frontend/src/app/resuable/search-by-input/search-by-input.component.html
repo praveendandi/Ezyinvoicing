@@ -1,0 +1,11 @@
+<div class="d-flex border  search-dropdown align-items-center">
+    <div ngbDropdown class="">
+        <button class="btn mb-0 border-right rounded-0" id="dropdownBasic1" ngbDropdownToggle>{{searchCond}}</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button ngbDropdownItem *ngFor="let item of searchCondList" (click)="selectSearchCond(item)">{{item}}</button>
+        </div>
+    </div>
+
+    <input type="text" class="form-control border-0 searchInput" placeholder="Search" [(ngModel)]="searchBy" (ngModelChange)="OnchangeValue($event)">
+
+</div>

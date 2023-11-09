@@ -1,0 +1,918 @@
+<section>
+
+  <div class="row mb-3">
+    <div class="col-md-7">
+      <div class="d-flex">
+        <h4 class="font-weight-bold text-white">SAC HSN CODES <small>({{this.filters.totalCount}})</small></h4>
+        <button class="create btn btn-primary" (click)="addHsn('add')" appPermissionButton accessType="create"
+          *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole " moduleType="docType"><i
+            class="ri-add-line"></i></button>
+        <div class="custom-control custom-checkbox ml-2 form-group text-white show-active">
+          <input type="checkbox" class="custom-control-input" id="sacStatus" name="sacStatus" [(ngModel)]="status"
+            #sacStatus="ngModel" (click)="getInactive()">
+          <label class="custom-control-label" for="sacStatus">Show In-Active</label>
+        </div>
+        <!-- <div class="text-right">
+          <button (click)="synctoGST()" *ngIf="companyDetails?.ezy_gst_module == 1" class="btn btn-primary btn-small mx-2 btn-right" ngbTooltip="sync to gst"
+              appPermissionButton accessType="write" type="button">Sync to GST</button>
+        </div> -->
+      </div>
+    </div>
+    <div class="col-md-5 text-right my-auto">
+      <button class="btn btn-primary btn-small mr-2" type="button" (click)="sacHsnType()">Export</button>
+      <span (click)="howToAddSac(addSacHsn)" class="cursor-pointer text-white text-underline">How to add SAC HSN Codes
+        ?</span>
+    </div>
+    <!-- <div class="col-lg-3 col-md-3">
+      <div class="position-relative mt-2 mt-lg-0 mt-md-0">
+        <input type="search" class="form-control pl-5" [(ngModel)]="filters.search"
+          (keyup)="filters.search = search.value;onSearch.emit(filters)" (search)="onSearch.emit(filters)" #search
+          placeholder="Search by Description">
+        <span class="search"><i class="ri-search-line"></i></span>
+      </div>
+    </div> -->
+  </div>
+
+  <div class="card pb-1">
+    <virtual-scroller #scroll [items]="codesDetails">
+      <div class="table-responsive">
+        <table class="table" id="s-table">
+          <thead class="thead" #head>
+            <tr>
+              <th>#</th>
+              <th>Code</th>
+              <th>Description</th>
+              <th>SAC/HSN Code</th>
+              <th>Type</th>
+              <th>Taxable</th>
+              <th>Net</th>
+              <th>Service Charge Net</th>
+              <th>Slab</th>
+              <th>Service Charge</th>
+              <th class="text-right">CGST</th>
+              <th class="text-right">SGST</th>
+              <th class="text-right">IGST</th>
+              <th class="text-right">VAT</th>
+              <th class="text-right">State CESS</th>
+              <th class="text-right">Central CESS</th>
+              <th>Status</th>
+              <th *ngIf="companyDetails?.ezy_gst_module == 1">Sync Status</th>
+              <th *ngIf="companyDetails?.ezy_gst_module == 1">Sync Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody #container>
+            <tr>
+              <td></td>
+              <td class="bg-gray" style="min-width: 200px;">
+                <div class="input-group input-group-sm">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="ri-search-line"></i>
+                    </span>
+                  </div>
+                  <input #codeInp type="search" [(ngModel)]="filters.searchFilter.code" (keyup)="onSearch.emit(filters)"
+                    (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                </div>
+              </td>
+              <td class="bg-gray" style="min-width: 400px;">
+                <div class="input-group input-group-sm">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="ri-search-line"></i>
+                    </span>
+                  </div>
+                  <input #nameInp type="search" [(ngModel)]="filters.searchFilter.name" (keyup)="onSearch.emit(filters)"
+                    (search)="onSearch.emit(filters)" (keyup.enter)="updateRouterParams()" class="form-control">
+                </div>
+              </td>
+
+              <td class="bg-gray" style="min-width: 200px;">
+                <div class="input-group input-group-sm">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="ri-search-line"></i>
+                    </span>
+                  </div>
+                  <input #nameInp type="search" [(ngModel)]="filters.searchFilter.sacCode"
+                    (keyup)="onSearch.emit(filters)" (search)="onSearch.emit(filters)"
+                    (keyup.enter)="updateRouterParams()" class="form-control">
+                </div>
+              </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td *ngIf="companyDetails?.ezy_gst_module == 1">
+                <div class="form-group mb-0">
+                  <select id="creditNotes" class="custom-select" [(ngModel)]="filters.synced_to_erp"
+                    (change)="onSearch.emit(filters)">
+                    <option value="">Showing all</option>
+                    <option value="1">Synced</option>
+                    <option value="0">Not Synced</option>
+                  </select>
+                </div>
+              </td>
+              <td *ngIf="companyDetails?.ezy_gst_module == 1"></td>
+              <td></td>
+            </tr>
+            <tr *ngFor="let item of scroll.viewPortItems;let i =index">
+              <!-- <td>{{this.filters.itemsPerPage * (this.filters.currentPage - 1) + (i+1) }}</td> -->
+              <td>{{item?.index}}</td>
+              <td>{{item?.transactioncode}}</td>
+              <td>{{item?.description}}</td>
+              <td>{{item?.code}}</td>
+              <td>{{item?.type}}</td>
+
+              <td>{{item?.taxble}}</td>
+              <td>{{item?.net}}</td>
+              <td>{{item?.service_charge_net}}</td>
+              <td>{{item?.accommodation_slab === 0? 'No':'Yes'}}</td>
+              <td>{{item?.service_charge}}</td>
+              <td class="text-right">{{item?.cgst}}%</td>
+              <td class="text-right">{{item?.sgst}}%</td>
+              <td class="text-right">{{item?.igst}}%</td>
+              <td class="text-right">{{item?.vat_rate}}%</td>
+              <td class="text-right">{{item?.state_cess_rate}}%</td>
+              <td class="text-right">{{item?.central_cess_rate}}%</td>
+              <td>{{item?.status}}</td>
+              <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_to_erp?'Synced':'Not Synced'}}</td>
+              <td *ngIf="companyDetails?.ezy_gst_module == 1">{{item?.synced_date|date : ["MMM d y"]}}</td>
+              <td>
+                <!-- <span><a appPermissionButton accessType="read" moduleType="docType"
+                  (click)="navigate(item,'view')">view</a></span> -->
+                <span class="ml-3"><a appPermissionButton accessType="write" moduleType="docType"
+                    *ngIf="this.loginUser?.full_name == 'Administrator' || loginUSerRole "
+                    (click)="editHsn(item, 'edit','sacEdit')">Edit</a></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-center py-3" *ngIf="!codesDetails.length">
+          <h5>No Data Found</h5>
+        </div>
+      </div>
+    </virtual-scroller>
+    <div class="d-flex justify-content-between" *ngIf="codesDetails.length">
+      <div class="px-3">
+        <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
+          (change)="checkPagination()" id="itemsPerPage">
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+          <option [value]="150">150</option>
+          <option [value]="500">500</option>
+        </select>
+      </div>
+      <div *ngIf="codesDetails.length  < this.filters.totalCount">
+        <p class="text-right pr-5 more text-primary"
+          (click)="this.filters.start = codesDetails.length;this.filters.currentPage = this.filters.currentPage+1;  updateRouterParams()">
+          more
+        </p>
+      </div>
+    </div>
+    <!-- <div *ngIf="codesDetails.length < this.filters.totalCount">
+      <p class="text-right pr-5 more text-primary"
+        (click)="this.filters.start = codesDetails.length; updateRouterParams()">more
+      </p>
+    </div> -->
+    <!-- <div class="d-flex justify-content-between"  >
+      <div class="px-3">
+        <select class="custom-select" name="itemsPerPage" [(ngModel)]="filters.itemsPerPage"
+          (change)="checkPagination()" id="itemsPerPage">
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+          <option [value]="150">150</option>
+          <option [value]="500">500</option>
+        </select>
+      </div>
+      <pagination-controls (pageChange)="this.filters.currentPage = $event;updateRouterParams()">
+      </pagination-controls>
+    </div> -->
+
+  </div>
+</section>
+
+
+
+<ng-template #content let-modal>
+  <div class="modal-header py-2">
+    <h5 class="" id="modal-basic-title"><strong>SAC HSN Codes</strong></h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body pt-4">
+    <form #form="ngForm">
+      <div class="col-lg-12">
+        <div class="text-center">
+          <small class="text-danger">{{form.form.getError('error')}}</small>
+        </div>
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+            <div class="form-group">
+              <input title="Enter Opera transaction description" type="text" appMatInput class="form-control"
+                id="description" name="description" [(ngModel)]="sacCodeDetails.description" #description="ngModel"
+                [readonly]="viewType === 'edit'" required>
+              <label for="taxble" class="mat-label">Description </label>
+              <small class="text-danger" *ngIf="form.submitted && description?.errors?.required">Required</small>
+              <!-- <small class="text-danger" *ngIf="checkName">Already Exists</small> -->
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <input title="Enter Transaction code of description" type="text" appMatInput appNumberInput
+                class="form-control" id="TransactionCode" name="transactioncode"
+                [(ngModel)]="sacCodeDetails.transactioncode" #TransactionCode="ngModel">
+              <label for="TransactionCode" class="mat-label">TransactionCode</label>
+              <!-- <small class="text-danger" *ngIf="form.submitted && TransactionCode?.errors?.required">Required</small> -->
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <input title="Enter the SAC/HSN code of the description" type="text" appMatInput class="form-control"
+                id="code" name="code" [(ngModel)]="sacCodeDetails.code" #code="ngModel" required>
+              <label for="code" class="mat-label">SAC/HSN Code</label>
+              <small class="text-danger" *ngIf="form.submitted && code?.errors?.required">Required</small>
+            </div>
+          </div>
+
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <select appMatInput name="type" id="type" class="custom-select" [(ngModel)]="sacCodeDetails.type"
+                #type="ngModel" required>
+                <option value="SAC">SAC</option>
+                <option value="HSN">HSN</option>
+              </select>
+
+              <label for="type" class="mat-label">Type</label>
+              <small class="text-danger" *ngIf="form.submitted && type?.errors?.required">Required</small>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <select appMatInput name="taxble" id="taxble" class="custom-select" [(ngModel)]="sacCodeDetails.taxble"
+                #taxble="ngModel" required>
+                <option title="value1" value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <label for="taxble" class="mat-label">Taxble</label>
+              <small class="text-danger" *ngIf="form.submitted && taxble?.errors?.required">Required</small>
+            </div>
+          </div>
+
+
+
+
+
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="Type" class="mat-label">Net</label>
+              <select appMatInput name="net" id="Net" class="custom-select" [(ngModel)]="sacCodeDetails.net"
+                #Net="ngModel">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="service_charge" class="mat-label">Service Charge</label>
+              <select appMatInput name="service_charge" id="service_charge" class="custom-select"
+                [(ngModel)]="sacCodeDetails.service_charge" #service_charge="ngModel">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="service_charge_net" class="mat-label">Service Charge Net</label>
+              <select appMatInput name="service_charge_net" id="service_charge_net" class="custom-select"
+                [(ngModel)]="sacCodeDetails.service_charge_net" #service_charge_net="ngModel">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div> -->
+
+
+          <div
+            *ngIf="(sacCodeDetails.code === '997321'||sacCodeDetails.code === '996311' ) || (code.value === '997321'||code.value === '996311')"
+            class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="accommodation_slab" class="mat-label">Accommodation Slab</label>
+              <select appMatInput name="accommodation_slab" id="accommodation_slab" class="custom-select"
+                [(ngModel)]="sacCodeDetails.accommodation_slab" #accommodation_slab="ngModel">
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6">
+            <div class="custom-control custom-checkbox form-group">
+              <input type="checkbox" class="custom-control-input" id="ignore" name="ignore"
+                [(ngModel)]="sacCodeDetails.ignore" #ignore="ngModel">
+              <label class="custom-control-label" for="ignore">Ignore</label>
+            </div>
+
+          </div>
+          <!-- <div *ngIf="sacCodeDetails.service_charge == 'Yes' || service_charge.value == 'Yes'"
+            class="col-lg-6 col-md-6">
+            <div class="custom-control custom-checkbox form-group">
+
+              <input type="checkbox" class="custom-control-input" id="one_sc_applies_to_all"
+                name="one_sc_applies_to_all" [(ngModel)]="sacCodeDetails.one_sc_applies_to_all"
+                #one_sc_applies_to_all="ngModel">
+              <label class="custom-control-label" for="one_sc_applies_to_all">One Service Charge</label>
+            </div>
+
+          </div> -->
+
+
+          <!-- <div *ngIf="sacCodeDetails.one_sc_applies_to_all == false || sacCodeDetails.service_charge == 'No' "
+            class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <input type="text" appMatInput appDecimaNumber class="form-control" id="service_charge_rate"
+                name="service_charge_rate"
+                [(ngModel)]="sacCodeDetails.one_sc_applies_to_all?0:sacCodeDetails.service_charge_rate"
+                #service_charge_rate="ngModel" required>
+              <label for="service_charge_rate" class="mat-label">Service Charge Rate</label>
+            </div>
+
+          </div> -->
+
+          <!-- <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <select appMatInput name="status" id="status" class="custom-select" [(ngModel)]="sacCodeDetails.status"
+                #status="ngModel" required>
+                <option value="Active">Active</option>
+                <option value="In-Active">In-Active</option>
+              </select>
+              <label for="status" class="mat-label">Status</label>
+              <small class="text-danger" *ngIf="form.submitted && status?.errors?.required">Required</small>
+            </div>
+          </div> -->
+
+
+
+
+          <!-- <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="Type" class="mat-label">Is Service</label>
+              <select appMatInput name="is_service" id="IsService" class="custom-select"
+                [(ngModel)]="sacCodeDetails.is_service" #IsService="ngModel" required>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+              <small class="text-danger" *ngIf="IsService.touched && IsService?.errors?.required">Required</small>
+            </div>
+          </div> -->
+
+          <!-- <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                      <label for="Type" class="mat-label">Cess</label>
+                      <select appMatInput name="cess" id="Cess" class="custom-select"
+                          [(ngModel)]="sacCodeDetails.cess" #Cess="ngModel" required>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                      </select>
+                      <small class="text-danger" *ngIf="Cess.touched && Cess?.errors?.required">Required</small>
+                  </div>
+              </div> -->
+
+
+
+
+
+
+          <!-- <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                      <label for="Type" class="mat-label">State Cess</label>
+                      <select appMatInput name="state_cess" id="StateCess" class="custom-select"
+                          [(ngModel)]="sacCodeDetails.state_cess" #StateCess="ngModel" required>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                      </select>
+                      <small class="text-danger" *ngIf="StateCess.touched && StateCess?.errors?.required">Required</small>
+                  </div>
+              </div> -->
+
+
+
+          <!-- <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                      <label for="Type" class="mat-label">Central Cess</label>
+                      <select appMatInput name="central_cess" id="CentralCess" class="custom-select"
+                          [(ngModel)]="sacCodeDetails.central_cess" #CentralCess="ngModel" required>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                      </select>
+                      <small class="text-danger" *ngIf="CentralCess.touched && CentralCess?.errors?.required">Required</small>
+                  </div>
+              </div> -->
+
+
+
+
+
+
+          <!-- <div class="col-lg-6 col-md-6">
+                  <div class="form-group">
+                      <label for="Type" class="mat-label">Vat</label>
+                      <select appMatInput name="vat" id="Vat" class="custom-select"
+                          [(ngModel)]="sacCodeDetails.vat" #Vat="ngModel" required>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                      </select>
+                      <small class="text-danger" *ngIf="Vat.touched && Vat?.errors?.required">Required</small>
+                  </div>
+              </div> -->
+
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <h6 class="c-border-bottom pb-2 mb-4"><strong>Service Charge</strong></h6>
+          </div>
+          <!-- <div> -->
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="service_charge" class="mat-label">Service Charge</label>
+              <select appMatInput name="service_charge" id="service_charge" class="custom-select"
+                [(ngModel)]="sacCodeDetails.service_charge" #service_charge="ngModel">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <label for="service_charge_net" class="mat-label">Service Charge Net</label>
+              <select appMatInput name="service_charge_net" id="service_charge_net" class="custom-select"
+                [(ngModel)]="sacCodeDetails.service_charge_net" #service_charge_net="ngModel">
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- <div class="col-lg-6 col-md-6">
+              <div class="custom-control custom-checkbox form-group">
+                <input type="checkbox" class="custom-control-input" id="ignore" name="ignore"
+                  [(ngModel)]="sacCodeDetails.ignore" #ignore="ngModel">
+                <label class="custom-control-label" for="ignore">Ignore</label>
+              </div>
+
+            </div> -->
+          <div *ngIf="sacCodeDetails.service_charge == 'Yes' || service_charge.value == 'Yes'"
+            class="col-lg-6 col-md-6">
+            <div class="custom-control custom-checkbox form-group">
+
+              <input type="checkbox" class="custom-control-input" id="one_sc_applies_to_all"
+                name="one_sc_applies_to_all" [(ngModel)]="sacCodeDetails.one_sc_applies_to_all"
+                #one_sc_applies_to_all="ngModel">
+              <label class="custom-control-label" for="one_sc_applies_to_all">One Service Charge</label>
+            </div>
+
+          </div>
+
+
+          <div *ngIf="sacCodeDetails.one_sc_applies_to_all == false || sacCodeDetails.service_charge == 'No' "
+            class="col-lg-6 col-md-6">
+            <div class="form-group">
+              <input type="text" appMatInput appDecimaNumber class="form-control" id="service_charge_rate"
+                name="service_charge_rate"
+                [(ngModel)]="sacCodeDetails.one_sc_applies_to_all?0:sacCodeDetails.service_charge_rate"
+                #service_charge_rate="ngModel" required>
+              <label for="service_charge_rate" class="mat-label">Service Charge Rate</label>
+            </div>
+
+          </div>
+
+
+          <!-- </div> -->
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <h6 class="c-border-bottom pb-2 mb-4"><strong>Tax Rates</strong></h6>
+          </div>
+          <div class="col-md-6">
+            <div class="">
+              <div class="form-group">
+                <input type="text" appMatInput appDecimaNumber class="form-control" id="cgst" name="cgst"
+                  [(ngModel)]="sacCodeDetails.ignore?0:sacCodeDetails.cgst" #cgst="ngModel"
+                  [readOnly]="(viewType == 'edit' && sacCodeDetails?.accommodation_slab == '1')||sacCodeDetails.ignore"
+                  required>
+                <label for="cgst" class="mat-label">CGST</label>
+                <small class="text-danger" *ngIf="form.submitted && cgst?.errors?.required">Required</small>
+              </div>
+            </div>
+
+            <div class="">
+              <div class="form-group">
+                <input type="text" appMatInput appDecimaNumber class="form-control" id="igst" name="igst"
+                  [(ngModel)]="sacCodeDetails.ignore?0:sacCodeDetails.igst" #igst="ngModel"
+                  [readOnly]="(viewType == 'edit' && sacCodeDetails?.accommodation_slab == '1')||sacCodeDetails.ignore"
+                  required>
+                <label for="igst" class="mat-label">IGST</label>
+                <small class="text-danger" *ngIf="form.submitted && igst?.errors?.required">Required</small>
+              </div>
+            </div>
+
+            <div class="">
+              <div class="form-group mb-0">
+                <input type="text" appMatInput appDecimaNumber class="form-control" id="sgst" name="sgst"
+                  [(ngModel)]="sacCodeDetails.ignore?0:sacCodeDetails.sgst" #sgst="ngModel"
+                  [readOnly]="(viewType == 'edit' && sacCodeDetails?.accommodation_slab == '1')||sacCodeDetails.ignore"
+                  required>
+                <label for="sgst" class="mat-label">SGST</label>
+                <small class="text-danger" *ngIf="form.submitted && sgst?.errors?.required">Required</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="">
+              <div class="form-group">
+                <input type="text" appMatInput appDecimaNumber class="form-control" id="State Cess Rate"
+                  name="state_cess_rate" [(ngModel)]="sacCodeDetails.state_cess_rate">
+                <label for="StateCessRate" class="mat-label">State Cess Rate</label>
+              </div>
+            </div>
+            <div class="">
+              <div class="form-group">
+                <input type="text" appMatInput appDecimaNumber class="form-control" id="Central Cess Rate"
+                  name="central_cess_rate" [(ngModel)]="sacCodeDetails.central_cess_rate" #CentralCessRate="ngModel">
+                <label for="Central Cess Rate" class="mat-label">Central Cess Rate</label>
+              </div>
+            </div>
+            <div class="">
+              <div class="form-group mb-0">
+                <input type="text" appMatInput appDecimaNumber class="form-control" id="VatRate" name="vat_rate"
+                  [(ngModel)]="sacCodeDetails.vat_rate" #VatRate="ngModel">
+                <label for="VatRate" class="mat-label">Vat Rate</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer d-block  pb-4 border-0 py-2">
+    <div class="text-center">
+
+      <button (click)="modal.dismiss('Cross click')" class="btn btn-outline-primary mb-0  text-uppercase"
+        type="button">Cancel</button>
+
+      <button (click)="onSubmit(form)" class="btn btn-primary mb-0 px-4 ml-3 text-uppercase" appPermissionButton
+        accessType="write" type="button">Save</button>
+
+    </div>
+  </div>
+
+</ng-template>
+
+
+
+<ng-template #addSacHsn let-modal>
+  <div class="modal-header">
+    <h5 class="mb-0"><b>How to add the SAC/HSN codes in Ezy Invoicing ?</b></h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div>
+          <p> 1. Go SAC/HSN Codes list
+          </p>
+
+          <p> 2. Click on add
+          </p>
+
+          <p> 3. Fill the following information required to create a SAC/HSN code in the system</p>
+        </div>
+
+
+        <div class="table-responsive sac">
+          <table class="table table-bordered">
+            <thead>
+              <th>S.no</th>
+              <th>Field</th>
+              <th>Definition</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Description</td>
+                <td>Enter Opera transaction description</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td> Transaction code</td>
+                <td>Enter Transaction code of description</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Taxable</td>
+                <td>
+                  <div>
+                    Select <b>Yes</b> if the description is
+                    taxable (Eg. Room Charges)
+                  </div>
+                  <div>
+                    Select <b>No</b> if the descriptions in
+                    not taxable (Eg. Liqour)
+
+                  </div>
+
+                </td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Type</td>
+                <td>
+
+                  Select <b>SAC or HSN</b>
+
+
+                </td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Sac/HSN code</td>
+                <td>
+
+                  Enter the <b>SAC/HSN</b> code of the
+                  description
+
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>6</td>
+                <td>Net</td>
+                <td>
+
+                  <div>
+
+                    Select <b>Yes</b> if the taxes are
+                    included in the price
+
+
+
+                  </div>
+
+                  <div>
+                    Select <b>No</b> if the price in
+                    excluding of taxes
+                  </div>
+
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>7</td>
+                <td>
+                  SEZ exempted
+
+                </td>
+                <td>
+
+                  <div>
+
+                    Select this options exempts the taxes
+                    for the SAC code
+
+
+
+
+                  </div>
+
+                  <div>
+                    De selecting this applies the taxes to
+                    the SAC code
+
+                  </div>
+
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>8</td>
+                <td>Service charge</td>
+                <td>
+                  Select <b>Yes</b> if the description has
+                  Service charger or else select <b>No</b>
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>9</td>
+                <td>Service charge net</td>
+                <td>
+
+                  Select <b>Yes</b> if the service charge
+                  applies on Net price or else select
+                  <b>No</b>
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>10</td>
+                <td>Service charges taxes applies</td>
+                <td>
+
+
+                  <div>
+                    This option will be visible only if you
+                    select service charge yes.
+
+                  </div>
+
+                  <div class="my-2">
+                    Select Apply from parent –Service
+                    charges of the parent item will be
+                    applied.
+
+                  </div>
+
+                  <div class="mb-2">
+                    Select Separate GST if the description
+                    has separate Service charge > Enter SC
+                    sac code > Enter SC GST Tax Rate (%)
+
+                  </div>
+
+                  <div>
+                    Select No tax – if taxes are not
+                    applicable for the service charge
+
+                  </div>
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>11</td>
+                <td>CGST</td>
+                <td>
+                  Enter CGST value
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>12</td>
+                <td>SGST</td>
+                <td>
+
+                  SGST value autofill once the CGST value is
+                  given
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>13</td>
+                <td>IGST</td>
+                <td>
+
+                  Enter IGST Value(* if the description has
+                  CGST and SGST then IGST field gets disabled
+                  and vice versa)
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>14</td>
+                <td>
+                  State Cess rate
+
+                </td>
+                <td>
+
+
+                  Enter State Cess rate if any
+
+
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>15</td>
+                <td>
+
+                  Central Cess rate
+
+
+
+                </td>
+                <td>
+
+
+
+                  Enter central cess rate if any
+
+
+
+
+
+
+
+                </td>
+              </tr>
+
+              <tr>
+                <td>16</td>
+                <td>
+
+                  VAT Rate
+
+
+
+                </td>
+                <td>
+
+
+
+
+                  Enter VAT rate if any
+
+
+
+
+
+
+
+
+
+                </td>
+              </tr>
+
+
+            </tbody>
+          </table>
+        </div>
+
+        <ul class="list-unstyled">
+          <li>4. After enter all the required details please click on
+            save
+          </li>
+
+          <li>You can use Edit option provided under actions column if
+            you want to make any changes to particular SAC/HSN code.
+          </li>
+        </ul>
+
+
+
+      </div>
+    </div>
+  </div>
+
+</ng-template>

@@ -1,0 +1,25 @@
+.border-dots {
+  border: dotted 1px;
+  border-radius: 3px;
+}
+
+.editbtn {
+  position: absolute;
+  top: 4px;
+  right: 7px;
+}
+
+table .table-add {
+  padding: 0px !important;
+}
+
+.signature-div {
+  height: 200px;
+  width: 200px;
+}
+
+.logo-div {
+  height: 100px;
+  width: 100px;
+}
+/*# sourceMappingURL=summary-details-view.component.css.map */

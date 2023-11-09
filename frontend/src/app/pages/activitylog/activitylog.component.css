@@ -1,0 +1,31 @@
+.modal-header .ri-arrow-left-line {
+  font-size: 30px;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  top: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.a-logs strong {
+  font-size: 13px;
+  margin-bottom: 6px;
+  position: relative;
+  top: -8px;
+}
+
+.a-logs li {
+  font-size: 13px;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 15px;
+}
+
+.card-max-height {
+  max-height: 100vh;
+  height: auto;
+  overflow-y: scroll;
+}
+/*# sourceMappingURL=activitylog.component.css.map */

@@ -1,0 +1,68 @@
+<div class="container-fluid h-100vh">
+  <section >
+    <div class="row py-3 filter-card shadow-sm">
+        <div class="col-md-9 col-lg-9">
+            <div class="d-flex">
+                <h6 class="my-auto mx-1"><b>Reports</b></h6>
+                <div class="form-group my-0 mx-1">
+                    <select id="my-select" [(ngModel)]="filterDate.reportType" (ngModelChange)="onreportTypeChange($event)" class="custom-select" name="">
+                        <!-- <option value="">select</option> -->
+                        <option *ngFor="let item of reportTypeList" [value]="item?.name">{{item?.name}}</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group my-0 mx-1">
+                    <select id="my-select" [(ngModel)]="filterDate.default_Date" (ngModelChange)="onDateFilterChange()" class="custom-select" name="">
+                        <option value="Today">Today</option>
+                        <option value="Yesterday">Yesterday</option>
+                        <option value="This Week">This Week</option>
+                        <option value="Last Week">Last Week</option>
+                        <option value="This Month">This Month</option>
+                        <option value="Last Month">Last Month</option>
+                        <option value="This Year">This Year</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="form-group calendar position-relative my-0 mx-1" *ngIf="filterDate?.default_Date == 'Custom'">
+                    <input class="form-control h-auto" [(ngModel)]="filterDate.custom" [owlDateTime]="dt1" [selectMode]="'range'" (dateTimeChange)="updateRouterParams()" [owlDateTimeTrigger]="dt1" placeholder="Date Time">
+                    <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+                        <i class="ri-calendar-2-line"></i>
+                    </span>
+                    <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                </div>
+                <div class="ml-1">
+                    <input class="form-control h-auto" autocomplete="off" type="search" placeholder="Select by Company" name="taxpayer" id="taxpayer" #taxpayer='ngModel' [(ngModel)]="filterDate.taxpayer" (keyup)="onSearch.emit(filterDate);" (keydown)="onSearch.emit(filterDate)"
+                        (focus)="inputfocus()" (blur)="inputblur()" (search)="onSearch.emit(filterDate)" noWhiteSpace/>
+                    <div class="input-wrapper paragraphClass shadow-sm">
+                        <ul class="px-2">
+                            <li>
+                                <div class="border-bottom text-left" *ngFor="let item1 of taxpayerList" (click)="filterDate.taxpayer= item1?.name;inputfocus();onSearch.emit(filterDate);">
+                                    <p class="font-weight-bold m-0 ">{{ item1.name }}</p>
+                                    <small class="m-0 ">{{ item1?.trade_name || "NA" }}</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-lg-3 text-right">
+
+            <div ngbDropdown class="d-inline-block" *ngIf="unableExport">
+                <button class="btn btn-primary btn-sm" id="dropdownBasic1" appPermissionButton accessType="export" ngbDropdownToggle>Export</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                    <button class="pl-2" (click)="exportData('Excel')" ngbDropdownItem>Excel</button>
+                    <!-- <button (click)="exportData('CSV')" ngbDropdownItem>CSV</button> -->
+                </div>
+            </div>
+            <button class="btn btn-primary btn-sm mb-0 text-case ml-3" (click)="getActivatedParamsData()">Refresh</button>
+        </div>
+    </div>
+    <div class="card mt-3">
+
+        <div id="datatable"></div>
+    </div>
+</section>
+</div>

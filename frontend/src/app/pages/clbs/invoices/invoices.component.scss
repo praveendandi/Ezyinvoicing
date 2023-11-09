@@ -1,0 +1,94 @@
+@import '../../../shared/styles/clbs-global.scss';
+
+header {
+  background: $clbs-primary;
+  ul li {
+      font-weight: 300 !important;
+      font-size: 13px;
+      &:hover {
+          cursor: pointer;
+          // color: rgb(228, 228, 35);
+      }
+      i {
+          font-size: 20px;
+      }
+  }
+  p {
+      font-size: 13px;
+  }
+}
+
+.back {
+  font-size: 25px;
+  cursor: pointer;
+}
+.c-b-b {
+    width: 50px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.555);
+    margin: 0 8px;
+}
+
+i {
+    vertical-align: middle;
+}
+
+.arrow-back {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#invoice-d input {
+    height: 35px;
+}
+
+.c-footer {
+    position: fixed;
+    width: 100%;
+    padding: 10px 20px;
+    bottom: 0;
+    background: #fff;
+    left: 0;
+    z-index: 99;
+}
+
+.table tbody td:first-child {
+    padding: 0.3rem !important;
+}
+
+.list-table table thead tr th {
+    background: #214350;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.table tbody tr:nth-of-type(even) {
+    background-color: #fff !important;
+}
+
+.selected {
+    cursor: not-allowed;
+}
+.input-wrapper {
+    position: absolute;
+    z-index: 111;
+    width: 100%;
+}
+
+ul {
+    list-style-type: none;
+    overflow-y: scroll;
+    max-height: 184px;
+    max-width: 250px;
+    background: white;
+    box-shadow: 5px 10px #fff
+
+}
+li:hover{
+    background-color: #214350;
+    color: #fff;
+}
+.paragraphClass {
+    display: none;
+}

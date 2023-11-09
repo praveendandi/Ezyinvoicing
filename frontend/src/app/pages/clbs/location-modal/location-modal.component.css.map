@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "",
+    "sources": [
+        "location-modal.component.scss"
+    ],
+    "names": [],
+    "file": "location-modal.component.css"
+}

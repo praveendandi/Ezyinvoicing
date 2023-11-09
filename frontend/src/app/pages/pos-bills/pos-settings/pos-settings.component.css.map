@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,MAAM,CAAC,EAAE;AACT,MAAM,CAAC,EAAE,CAAC;EACR,OAAO,EAAE,GAAG;EACZ,SAAS,EAAE,IAAI;EACf,MAAM,EAAE,GAAG,CAAC,KAAK,CAAC,wBAAwB;CAC3C;;AAED,AAAA,WAAW,CAAC;EACV,aAAa,EAAE,IAAI;CAIpB;;AALD,AAEE,WAFS,CAET,KAAK,CAAC;EACJ,SAAS,EAAE,IAAI;CAChB",
+    "sources": [
+        "pos-settings.component.scss"
+    ],
+    "names": [],
+    "file": "pos-settings.component.css"
+}

@@ -1,0 +1,14 @@
+{
+    "/api": {
+        "target": "http://192.168.1.8:8002/",
+        "secure": false,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/api": ""
+        }
+    },
+    "/socket.io": {
+        "target": "http://192.168.1.203:5000",
+        "ws": true
+    }
+}

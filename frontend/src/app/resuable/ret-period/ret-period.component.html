@@ -1,0 +1,31 @@
+<div class="d-flex align-items-center">
+    <div>
+        <p class="m-0"> <small class="pr-2 text-white">Return Period</small></p>
+    </div>
+    <div class="flex-fill">
+
+        <div class="">
+            <select id="my-select" class="form-control" name="month" [(ngModel)]="month" (ngModelChange)="selectMonthYear($event,'month')">
+                <option *ngFor="let mon of monthList" [value]="mon.short">{{mon.long}}</option>                            
+            </select>
+        </div>
+    </div>
+
+    <div class="flex-fill ml-3">
+
+        <div class="">
+            <select id="my-select" class="form-control px-4" name="year" [(ngModel)]="year" (ngModelChange)="selectMonthYear($event,'year')">
+                <option *ngFor="let yr of yearsList">{{yr}}</option>  
+            </select>
+        </div>
+    </div>
+
+    <!-- <div class="flex-fill ml-3" *ngIf="propertyList.length >= 2">
+        <div class="">
+            <select id="my-select" class="form-control" name="property" [(ngModel)]="property" (ngModelChange)="selectMonthYear($event,'property')">
+                <option  [value]="'all'">All Properties</option> 
+                <option  *ngFor="let prop of propertyList" [value]="prop.name">{{prop.name}}</option>                            
+            </select>
+        </div>
+    </div> -->
+</div>

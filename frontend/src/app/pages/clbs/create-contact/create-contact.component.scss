@@ -1,0 +1,84 @@
+@import '../../../shared/styles/clbs-global.scss';
+
+header {
+    background: $clbs-primary;
+    color: #fff;
+    padding: 3px 0;
+}
+
+.c-invoice .form-control,
+.c-invoice .custom-select {
+    background: #ffffff;
+    border: 1px solid #eaeaea;
+    height: 53px;
+    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 8%) !important;
+}
+
+small {
+    font-size: 81% !important;
+}
+
+.table-responsive {
+    height: 450px;
+}
+
+.c-o-b {
+    box-sizing: border-box;
+    border-radius: 4px;
+    height: 42px;
+    font-size: 13px;
+    i {
+        font-size: 20px;
+    }
+    &:hover {
+        color: #dc362b;
+    }
+}
+
+.c-o-b1 {
+    box-sizing: border-box;
+    border-radius: 4px;
+    height: 42px;
+    font-size: 13px;
+    i {
+        font-size: 20px;
+    }
+}
+
+.input-wrapper {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+}
+
+ul {
+    list-style-type: none;
+    overflow-y: scroll;
+    max-height: 184px;
+    width: 368px;
+    background: white;
+}
+
+.paragraphClass {
+    display: none;
+}
+
+select:disabled {
+    background: #dddddd !important;
+    color: black !important;
+}
+
+.ng-select.ng-touched.ng-invalid:not(form) {
+    border: none !important;
+}
+
+.borderless td,
+.borderless th {
+    border: none;
+    background-color: white;
+    padding: 9px;
+}
+
+.img-fluid {
+    max-width: 52% !important;
+}

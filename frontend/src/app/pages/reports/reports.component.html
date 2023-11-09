@@ -1,0 +1,60 @@
+<section>
+    <div class="row mb-3">
+        <div class="col-md-9 col-lg-9">
+            <div class="d-flex">
+                <h4 class="text-white"><b>Reports</b></h4>
+                <div class="form-group ml-3 w-c-50">
+                    <select id="my-select" [(ngModel)]="filterDate.reportType"
+                        (ngModelChange)="onreportTypeChange($event)" class="custom-select" name="">
+                        <!-- <option value="">select</option> -->
+                        <option *ngFor="let item of reportTypeList" [value]="item?.name">{{item?.name}}</option>
+                        <!-- {{companyDetails.e_invoice_missing_date_feature }} -->
+
+                    </select>
+                </div>
+
+                <div class="form-group w-c-50 ml-1">
+                    <select id="my-select" [(ngModel)]="filterDate.default_Date" (ngModelChange)="onDateFilterChange()"
+                        class="custom-select" name=""
+                        *ngIf="filterDate.reportType != 'Irn Expired Report' && filterDate.reportType != 'Irn Due Report'">
+                        <option value="Today">Today</option>
+                        <option value="Yesterday">Yesterday</option>
+                        <option value="This Week">This Week</option>
+                        <option value="Last Week">Last Week</option>
+                        <option value="This Month">This Month</option>
+                        <option value="Last Month">Last Month</option>
+                        <option value="This Year">This Year</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="form-group calendar w-c-50 position-relative ml-1"
+                    *ngIf="filterDate?.default_Date == 'Custom'">
+                    <input class="form-control h-auto" [(ngModel)]="filterDate.custom" [owlDateTime]="dt1"
+                        [selectMode]="'range'" (dateTimeChange)="updateRouterParams()" [owlDateTimeTrigger]="dt1"
+                        placeholder="Date Time">
+                    <span class="example-trigger" [owlDateTimeTrigger]="dt1">
+                        <i class="ri-calendar-2-line"></i>
+                    </span>
+                    <owl-date-time [pickerType]="'calendar'" #dt1></owl-date-time>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-lg-3 text-right">
+
+            <div ngbDropdown class="d-inline-block">
+                <button class="btn btn-primary" id="dropdownBasic1" appPermissionButton accessType="export"
+                    ngbDropdownToggle>Export</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                    <button (click)="exportData('Excel')" ngbDropdownItem>Excel</button>
+                    <!-- <button (click)="exportData('CSV')" ngbDropdownItem>CSV</button> -->
+                </div>
+            </div>
+            <button class="btn btn-primary mb-0 text-case ml-3" (click)="getActivatedParamsData()">Refresh</button>
+        </div>
+    </div>
+    <div class="card">
+
+        <div id="datatable"></div>
+    </div>
+</section>

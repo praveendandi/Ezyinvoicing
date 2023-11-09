@@ -1,0 +1,1414 @@
+<section class="faqs">
+    <header class="py-2 shadow-md bg-white header">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2">
+                    <div>
+                        <a class="cursor-pointer" (click)="logoNav()"><img class="img-fluid" src="assets/images/EzyInvoicelogo.svg" alt=""></a>
+                    </div>
+                </div>
+                <div class="col-md-10 my-auto">
+                    <div class="text-right">
+                        <ul class="list-unstyled m-0">
+                            <li class="list-inline-item"><a class="text-white" href="mailto:support@ezyinvoicing.com"><i
+                                        class="ri-mail-line"></i> support@ezyinvoicing.com</a></li>
+                            <li class="list-inline-item"><span class="px-2">|</span></li>
+                            <li class="list-inline-item">
+                                <a class="text-white" href="tel:+91 40 4851 8336"> <i class="ri-customer-service-line"></i> +91 40 4851 8336</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="py-2 shadow-sm bg-white bred-c">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h5 class="m-0"><strong>FAQs</strong></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="faq-section mt-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="text-center">
+                        <ul ngbNav #nav="ngbNav" class="nav-pills" orientation="vertical">
+
+                            <li ngbNavItem="summary">
+                                <a ngbNavLink>Summary</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-2">
+
+
+
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. what is summary ?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+
+
+                                                    <div>
+
+
+                                                        <div>
+                                                            <table class="table table-light">
+                                                                <thead>
+                                                                    <th>Action/Buttons</th>
+                                                                    <th>Definitions</th>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>Delete</td>
+                                                                        <td>
+                                                                            This action is used to delete an invoice
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Generate IRN</td>
+                                                                        <td>
+                                                                            To generate IRN
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Print</td>
+                                                                        <td>
+                                                                            Click on print and select the document you wanted to print You can print Invoice with QR only for the IRN generated invoices
+
+                                                                        </td>
+
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Convert to B2B
+
+                                                                        </td>
+                                                                        <td>This option is provided for all the B2C invoices which are in pending status.
+                                                                            <div>
+                                                                                Click on convert to B2B , enter the GST number and click on save.Now the invoice is converted to B2B and you can generate IRN for that particular invoice
+                                                                            </div>
+                                                                        </td>
+
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>Convert to B2C</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                This option is available for all the B2B invoices
+
+                                                                            </div>
+                                                                            <div>
+                                                                                Click on convert to B2C , the invoice immediately changes to B2B invoice
+
+                                                                            </div>
+                                                                        </td>
+
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>Cancel IRN</td>
+                                                                        <td>
+                                                                            Once the IRN is generated, you can find cancel IRN option for that invoice.Click on cancel IRN to cancel the invoice
+
+                                                                        </td>
+
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>Re-upload</td>
+
+                                                                        <td>
+
+                                                                            <div>
+
+                                                                                This option is used re - upload the folio.
+
+
+
+
+
+                                                                            </div>
+
+                                                                            <div>
+                                                                                Click on the re -upload
+
+
+                                                                            </div>
+
+                                                                            <div>
+                                                                                Select file you wanted to upload and click upload.
+
+                                                                            </div>
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>Re- Process</td>
+                                                                        <td>
+                                                                            Clicking on the Re-Process, the system re calculates the whole values again
+
+                                                                        </td>
+
+                                                                    </tr>
+
+
+
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+
+
+
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li>
+                            <!-- <li ngbNavItem="Filters">
+                                <a ngbNavLink>Filters</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-1"
+                                        (panelChange)="test($event)">
+                                        <ngb-panel id="static-1">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. What type of documents are covered under e-Invoicing?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i> </span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. What is the process of amendment / cancellation of an
+                                                    e-invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-3">
+                                            <ng-template ngbPanelTitle>
+                                                <span>3. Is it mandatory to generate IRN within 24 hours?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-4">
+                                            <ng-template ngbPanelTitle>
+                                                <span>4. Will e-invoice be mapped to GSTR-1 by IRP?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-5">
+                                            <ng-template ngbPanelTitle>
+                                                <span>5. Does the IRP provide an archiving facility?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static6">
+                                            <ng-template ngbPanelTitle>
+                                                <span>6. What is the process of amendment / cancellation of an
+                                                    e-invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li> -->
+                            <li ngbNavItem="Managment">
+                                <a ngbNavLink>User Managment</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-1" (panelChange)="test($event)">
+                                        <ngb-panel id="static-1">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. How to create a user?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i> </span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Go to <span class="cursor-pointer text-primary" (click)="userManagement()">User Management</span>
+                                                            </li>
+                                                            <li>2. Click on add</li>
+                                                            <li>3. Fill the required data ( First Name, Email ID, User Name, select role)</li>
+                                                            <li>4. You can assign single or multiple roles to the user
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. How to edit user?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Go to <span class="cursor-pointer text-primary" (click)="userManagement()">User Management</span>
+                                                            </li>
+                                                            <li>2. Click on edit</li>
+                                                            <li>3. User Name, Roles and Status are only editable</li>
+                                                            <li>4. Edit the required data </li>
+                                                            <li>5. Click on save</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-3">
+                                            <ng-template ngbPanelTitle>
+                                                <span>3. How to change password for a particular user?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Go to <span class="cursor-pointer text-primary" (click)="userManagement()">User Management</span>
+                                                            </li>
+                                                            <li>2. Click on change password </li>
+                                                            <li>3. Enter new password and save</li>
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-4">
+                                            <ng-template ngbPanelTitle>
+                                                <span>4. How to view permissions for each role?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Go to <span class="cursor-pointer text-primary" (click)="permissions()">permissions</span></li>
+                                                            <li>2. Select the role </li>
+                                                            <li>3. List of permissions for select role will be displayed
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li>
+                            <li ngbNavItem="middle">
+                                <a ngbNavLink>SAC/HSN Codes</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-1">
+
+                                        <ngb-panel id="static-1">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. What is a sac code ?
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <p>A classification system developed and issued by the (CBIC) Service Tax Department of India to classify various services is known as SAC or Services Accounting Code. These codes are used to classify
+                                                            services for better measurement, taxation, and recognition of services. These codes are controlled by the (CBEC) central board of excise and customs.</p>
+                                                    </div>
+                                                </div>
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. How to add the SAC/HSN codes in Ezy Invoicing ?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Go to <span (click)="sac()" class="text-primary cursor-pointer">SAC/HSN codes
+                                                                    list</span> </li>
+                                                            <li>2. Click on Add </li>
+                                                            <li>3. Fill the following information required to create a SAC/HSN code in the system </li>
+                                                        </ul>
+
+                                                        <div>
+                                                            <table class="table table-light">
+                                                                <thead>
+                                                                    <th>S.no</th>
+                                                                    <th>Field</th>
+                                                                    <th>Definition</th>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>1</td>
+                                                                        <td>Description</td>
+                                                                        <td>Enter Opera transaction description</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>2</td>
+                                                                        <td> Transaction code</td>
+                                                                        <td>Enter Transaction code of description</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>3</td>
+                                                                        <td>Taxable</td>
+                                                                        <td>
+                                                                            <div>
+                                                                                Select <b>Yes</b> if the description is taxable (Eg. Room Charges)
+                                                                            </div>
+                                                                            <div>
+                                                                                Select <b>No</b> if the descriptions in not taxable (Eg. Liqour)
+
+                                                                            </div>
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>4</td>
+                                                                        <td>Type</td>
+                                                                        <td>
+
+                                                                            Select <b>SAC or HSN</b>
+
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>5</td>
+                                                                        <td>Sac/HSN code</td>
+                                                                        <td>
+
+                                                                            Enter the <b>SAC/HSN</b> code of the description
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>6</td>
+                                                                        <td>Net</td>
+                                                                        <td>
+
+                                                                            <div>
+
+                                                                                Select <b>Yes</b> if the taxes are included in the price
+
+
+
+                                                                            </div>
+
+                                                                            <div>
+                                                                                Select <b>No</b> if the price in excluding of taxes
+                                                                            </div>
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>7</td>
+                                                                        <td>
+                                                                            SEZ exempted
+
+                                                                        </td>
+                                                                        <td>
+
+                                                                            <div>
+
+                                                                                Select this options exempts the taxes for the SAC code
+
+
+
+
+                                                                            </div>
+
+                                                                            <div>
+                                                                                De selecting this applies the taxes to the SAC code
+
+                                                                            </div>
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>8</td>
+                                                                        <td>Service charge</td>
+                                                                        <td>
+                                                                            Select <b>Yes</b> if the description has Service charger or else select <b>No</b>
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>9</td>
+                                                                        <td>Service charge net</td>
+                                                                        <td>
+
+                                                                            Select <b>Yes</b> if the service charge applies on Net price or else select
+                                                                            <b>No</b>
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>10</td>
+                                                                        <td>Service charges taxes applies</td>
+                                                                        <td>
+
+
+                                                                            <div>
+                                                                                This option will be visible only if you select service charge yes.
+
+                                                                            </div>
+
+                                                                            <div class="my-2">
+                                                                                Select Apply from parent –Service charges of the parent item will be applied.
+
+                                                                            </div>
+
+                                                                            <div class="mb-2">
+                                                                                Select Separate GST if the description has separate Service charge > Enter SC sac code > Enter SC GST Tax Rate (%)
+
+                                                                            </div>
+
+                                                                            <div>
+                                                                                Select No tax – if taxes are not applicable for the service charge
+
+                                                                            </div>
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>11</td>
+                                                                        <td>CGST</td>
+                                                                        <td>
+                                                                            Enter CGST value
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>12</td>
+                                                                        <td>SGST</td>
+                                                                        <td>
+
+                                                                            SGST value autofill once the CGST value is given
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>13</td>
+                                                                        <td>IGST</td>
+                                                                        <td>
+
+                                                                            Enter IGST Value(* if the description has CGST and SGST then IGST field gets disabled and vice versa)
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>14</td>
+                                                                        <td>
+                                                                            State Cess rate
+
+                                                                        </td>
+                                                                        <td>
+
+
+                                                                            Enter State Cess rate if any
+
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>15</td>
+                                                                        <td>
+
+                                                                            Central Cess rate
+
+
+
+                                                                        </td>
+                                                                        <td>
+
+
+
+                                                                            Enter central cess rate if any
+
+
+
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+                                                                    <tr>
+                                                                        <td>16</td>
+                                                                        <td>
+
+                                                                            VAT Rate
+
+
+
+                                                                        </td>
+                                                                        <td>
+
+
+
+
+                                                                            Enter VAT rate if any
+
+
+
+
+
+
+
+
+
+                                                                        </td>
+                                                                    </tr>
+
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                        <ul class="list-unstyled">
+                                                            <li>4. After enter all the required details please click on save
+                                                            </li>
+
+                                                            <li>You can use Edit option provided under actions column if you want to make any changes to particular SAC/HSN code.
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+
+
+
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li>
+                            <li ngbNavItem="IRNGenerated">
+                                <a ngbNavLink>IRN Generation</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-1">
+                                        <ngb-panel id="static-1">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. How to generate IRN for an Invoice?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <h4><strong>Steps</strong></h4>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Go to <span (click)="invoices()" class="cursor-pointer text-primary">invoice
+                                                                    list</span></li>
+                                                            <li>2. Check the status of the invoice</li>
+                                                            <li>3. If the invoice is in pending status, click on view
+                                                            </li>
+                                                            <li>4. Check the invoice and click on Generate IRN button
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="py-2">
+                                                    <img class="img-fluid" src="assets/gif/Generating_invoice.gif" alt="">
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. How to cancel IRN for an invoice ?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <h4><strong>Steps</strong></h4>
+                                                <div>
+                                                    <ul class="list-unstyled">
+                                                        <li>1. Go to <span (click)="invoices()" class="cursor-pointer text-primary">invoice list</span>
+                                                        </li>
+                                                        <li>2. Find the invoice for which you need to cancel IRN</li>
+                                                        <li>3. Click on view invoice</li>
+                                                        <li>4. Click on cancel IRN</li>
+                                                        <li>5. Note : IRN cannot be cancelled after 24 hrs.</li>
+                                                    </ul>
+                                                </div>
+
+                                                <div class="py-2">
+                                                    <img class="img-fluid" src="assets/gif/Cancel_IRN.gif" alt="">
+                                                </div>
+
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-3">
+                                            <ng-template ngbPanelTitle>
+                                                <span>3. How to print IRN generated invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <h4><strong>Steps</strong></h4>
+                                                <div>
+                                                    <ul class="list-unstyled">
+                                                        <li>1. Login to Ezy Invoicing website</li>
+                                                        <li>2. Go to invoice list</li>
+                                                        <li>3. Check the status of the invoice</li>
+                                                        <li>4. If the invoice with success status, click on view</li>
+                                                        <li>5. Click on print</li>
+                                                    </ul>
+                                                </div>
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-4">
+                                            <ng-template ngbPanelTitle>
+                                                <span>4. How to handle error invoice?
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                <h4><strong>Steps</strong></h4>
+                                                <div>
+                                                    <ul class="list-unstyled">
+                                                        <li>1. Go to <span (click)="invoices()" class="cursor-pointer text-primary">invoice list</span>
+                                                        </li>
+                                                        <li>2. Find the error invoice and click view</li>
+                                                        <li>3. The error is displayed on the screen</li>
+                                                        <li>4. You can use either Re upload or Reprocess option.</li>
+
+                                                    </ul>
+                                                </div>
+
+                                                <h4><strong>Re- Upload </strong></h4>
+                                                <div>
+                                                    <ul class="list-unstyled">
+                                                        <li>1. Click on reupload </li>
+                                                        <li>2. Upload new invoice</li>
+                                                        <li>3. If the newly uploaded is in the right format than invoice status changes to pending and you can now generate IRN for that invoice </li>
+
+
+                                                    </ul>
+
+                                                    <div class="py-2">
+                                                        <img class="img-fluid" src="assets/gif/Re-Upload -Errorinvoice.gif" alt="">
+                                                    </div>
+                                                </div>
+
+                                                <h4><strong>Re-process</strong></h4>
+                                                <div>
+                                                    <ul class="list-unstyled">
+                                                        <li>1. Click on Re – process </li>
+                                                        <li>2. The system will re process the uploaded invoice.</li>
+                                                        <li>3. If there is no error found after re processing than the status of the invoice will be changed pending and you can now generate IRN for that invoice. </li>
+
+
+                                                    </ul>
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li>
+                            <!-- <li ngbNavItem="B2BPENDING">
+                                <a ngbNavLink>B2B PENDING</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-1">
+                                        <ngb-panel id="static-1">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. What type of documents are covered under e-Invoicing?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. What is the process of amendment / cancellation of an
+                                                    e-invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-3">
+                                            <ng-template ngbPanelTitle>
+                                                <span>3. Is it mandatory to generate IRN within 24 hours?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-4">
+                                            <ng-template ngbPanelTitle>
+                                                <span>4. Will e-invoice be mapped to GSTR-1 by IRP?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-5">
+                                            <ng-template ngbPanelTitle>
+                                                <span>5. Does the IRP provide an archiving facility?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static6">
+                                            <ng-template ngbPanelTitle>
+                                                <span>6. What is the process of amendment / cancellation of an
+                                                    e-invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li>
+                            <li ngbNavItem="CreditNotes">
+                                <a ngbNavLink>Credit Notes</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-1">
+                                        <ngb-panel id="static-1">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. What type of documents are covered under e-Invoicing?</span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-2">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. What is the process of amendment / cancellation of an
+                                                    e-invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+                                        <ngb-panel id="static-3">
+                                            <ng-template ngbPanelTitle>
+                                                <span>3. Is it mandatory to generate IRN within 24 hours?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-4">
+                                            <ng-template ngbPanelTitle>
+                                                <span>4. Will e-invoice be mapped to GSTR-1 by IRP?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-5">
+                                            <ng-template ngbPanelTitle>
+                                                <span>5. Does the IRP provide an archiving facility?
+
+
+
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static6">
+                                            <ng-template ngbPanelTitle>
+                                                <span>6. What is the process of amendment / cancellation of an
+                                                    e-invoice?
+
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+                                            <ng-template ngbPanelContent>
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, earum
+                                                labore. Ipsam pariatur doloribus explicabo nesciunt repudiandae nostrum
+                                                a molestias voluptas, deserunt, distinctio minima eum laboriosam beatae
+                                                error non debitis. Lorem ipsum dolor sit amet consectetur adipisicing
+                                                elit. Aliquid voluptates ipsam tenetur repudiandae maiores veritatis
+                                                cupiditate, aperiam sunt id officiis molestias rerum? Hic temporibus
+                                                commodi aut. Numquam sequi dignissimos voluptatibus? Lorem ipsum dolor
+                                                sit, amet consectetur adipisicing elit. Nam debitis sunt nobis, velit
+                                                corporis minima consequatur quaerat possimus quibusdam, asperiores iste
+                                                vero dolores eveniet enim a quisquam. Ea, cumque fugiat.
+
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li> -->
+
+
+                            <li ngbNavItem="ErrorHandling">
+                                <a ngbNavLink>Error Handling</a>
+                                <ng-template ngbNavContent>
+                                    <ngb-accordion [closeOthers]="true" activeIds="static-3">
+                                        <ngb-panel id="static-3">
+                                            <ng-template ngbPanelTitle>
+                                                <span>1. How to solve SAC Code not found error ?
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <div>
+                                                        <p>If you find this error in an invoice that means a particular SAC code or payment type is not available in your SAC code or payment type master data.
+                                                        </p>
+
+                                                        <p>To solve this issue</p>
+                                                    </div>
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Click on add button provided beside the error
+                                                            </li>
+                                                            <li>2. If you add it under payment type click on payment type and fill the required details</li>
+
+                                                            <li>3. If you add it under SAC/HSN Codes click on sac and fill the required details.
+                                                                <span (click)="sac()" class="text-primary cursor-pointer">Click</span> here to check guidelines to add a SAC/HSN codes.
+                                                            </li>
+
+
+                                                            <li>4. After adding the SAC/HSN code,Click on Re-Proccess .Now the invoice status would change to pending</li>
+
+                                                            <li>5. Click on Generate IRN.</li>
+                                                        </ul>
+
+
+                                                    </div>
+
+                                                    <div>
+                                                        <iframe src="https://www.youtube.com/embed/6p0HU3oinsg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+
+                                        <ngb-panel id="static-4">
+                                            <ng-template ngbPanelTitle>
+                                                <span>2. How to solve Invalid GST number error ?
+
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <div>
+                                                        <p>If you find this error in an invoice that means the GST number in provided in the invoice is invalid .
+
+
+                                                        </p>
+
+                                                    </div>
+
+                                                    <div>
+                                                        <p>To solve this issue,
+                                                        </p>
+
+                                                        <ol class="px-2">
+                                                            <li>Click on edit in tax payer details
+                                                            </li>
+                                                            <li>Enter valid GST number and save
+                                                            </li>
+                                                            <li>Click on Re-Process and generate IRN</li>
+                                                        </ol>
+                                                    </div>
+
+
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+                                        <ngb-panel id="static-5">
+                                            <ng-template ngbPanelTitle>
+                                                <span>3. How to solve invoice total mismatch error ?
+                                                </span>
+                                                <span class="float-right"><i class="ri-add-line"></i></span>
+                                            </ng-template>
+
+                                            <ng-template ngbPanelContent>
+                                                <div>
+                                                    <div>
+                                                        <p><b>Step 1 :</b> Go to Pdf view
+
+                                                        </p>
+
+                                                        <p> <b>Step 2 : </b> Find out the difference amount.</p>
+
+
+                                                        <div>
+                                                            <table class="table table-light">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <td>
+                                                                            Total amount in opera folio
+
+                                                                        </td>
+
+                                                                        <td>Total amount in Ezy Invoicing</td>
+                                                                        <td>
+                                                                            Difference amount
+
+                                                                        </td>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td>1000</td>
+                                                                        <td>1010</td>
+                                                                        <td>-10</td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>1000</td>
+                                                                        <td>900</td>
+                                                                        <td>10</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                        <p><b>Step 3 :</b> Now our goal would be finding out from where this difference amount came from.
+                                                        </p>
+                                                        <p><b>Step 4 :</b> To do that first compare SAC code Summary of opera invoice and SAC code Summary shown in ezy invoicing and check which sac codes values are mismatched. Assume that there the two different
+                                                            sac codes in the invoice Eg 996311, 996364 and you found that values of 996311 are mismatched with values shown in Ezy invoice
+                                                        </p>
+
+                                                        <p><b>Step 5 :</b> Now that you now that there is a mismatch in 996311 sac code values.Now you need compare the line items related to 996311 sac with that line items shown in Ezy invoicing. You will
+                                                            be finding some line items where this difference is coming from. After finding the mismatched line items you have 3 options to solve this issue depending on scenarios
+                                                        </p>
+
+                                                        <ol class="list-unstyle">
+                                                            <li><b>Edit Sac item : </b>if the taxes the taxes for the particular item are wrongly picked you need to use this option edit sac item to change the taxes values for that particular sac
+                                                            </li>
+                                                            <li><b>Edit Line item :</b> If the taxes are correctly picked up based on the sac code but you like to change the taxes only for this particular line item then you should use this option</li>
+                                                            <li><b>Split bill :</b> This option is used to split the line to two or many. For example, If the liquor price is added in the Restaurant food description , to separate the liquor item for this description
+                                                                you use this option,
+                                                            </li>
+                                                        </ol>
+                                                    </div>
+
+                                                    <div>
+                                                        <ul class="list-unstyled">
+                                                            <li>1. Click on add button provided beside the error
+                                                            </li>
+                                                            <li>2. If you add it under payment type click on payment type and fill the required details</li>
+
+                                                            <li>3. If you add it under SAC/HSN Codes click on sac and fill the required details.
+                                                                <span (click)="sac()" class="text-primary cursor-pointer">Click</span> here to check guidelines to add a SAC/HSN codes.
+                                                            </li>
+
+
+                                                            <li>4. After adding the SAC/HSN code,Click on Re-Proccess .Now the invoice status would change to pending</li>
+
+                                                            <li>5. Click on Generate IRN.</li>
+                                                        </ul>
+
+
+                                                    </div>
+
+                                                    <div>
+                                                        <iframe src="https://www.youtube.com/embed/6p0HU3oinsg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                    </div>
+                                                </div>
+                                            </ng-template>
+                                        </ngb-panel>
+
+
+                                    </ngb-accordion>
+                                </ng-template>
+                            </li>
+                        </ul>
+
+
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div [ngbNavOutlet]="nav"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,9 @@
+:host {
+  font-size: 14px;
+  color: #333;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/*# sourceMappingURL=app.component.css.map */

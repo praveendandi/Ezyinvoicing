@@ -1,0 +1,253 @@
+<section>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="font-weight-bold">SAC HSN Codes</h4>
+            <p class="text-muted"><a [routerLink]="['/home/sac-hsn-codes']" [queryParamsHandling]="'preserve'"
+                    [replaceUrl]="true" class="text-primary cursor-pointer">SAC HSN
+                    Codes</a>/ {{header}} SAC HSN Codes
+            </p>
+
+            <div class="row">
+                <form #form="ngForm" (ngSubmit)="onSubmit(form)">
+                    <div class="col-lg-10 col-md-10">
+                        <div class="text-center">
+                            <small class="text-danger">{{form.form.getError('error')}}</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="description"
+                                        name="description" (ngModelChange)="changeDescription($event)"
+                                        [(ngModel)]="sacCodeDetails.description" #description="ngModel"
+                                        [readonly]="paramsData?.type == 'view'" required>
+                                    <label for="taxble" class="mat-label">Description</label>
+                                    <small class="text-danger"
+                                        *ngIf="form.submitted && description?.errors?.required">Required</small>
+                                    <small class="text-danger" *ngIf="checkName">Already Exists</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <select appMatInput name="taxble" id="taxble" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.taxble" #taxble="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <!-- <input type="text" appMatInput class="form-control" id="taxble" name="taxble"
+                                        [(ngModel)]="sacCodeDetails.taxble" #taxble="ngModel"
+                                        [readonly]="paramsData?.type == 'view'" required> -->
+                                    <label for="taxble" class="mat-label">Taxble</label>
+                                    <small class="text-danger"
+                                        *ngIf="form.submitted && taxble?.errors?.required">Required</small>
+                                </div>
+                            </div>
+                            <ng-template [ngIf]="sacCodeDetails.taxble === 'Yes'">
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="code" name="code"
+                                            [(ngModel)]="sacCodeDetails.code" #code="ngModel"
+                                            [readonly]="paramsData?.type == 'view'" required>
+                                        <label for="code" class="mat-label">Code</label>
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && code?.errors?.required">Required</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <select appMatInput name="type" id="type" class="custom-select"
+                                            [(ngModel)]="sacCodeDetails.type" #type="ngModel" required>
+                                            <option value="SAC">SAC</option>
+                                            <option value="HSN">HSN</option>
+                                        </select>
+                                        <!-- <input type="text" appMatInput class="form-control" id="type" name="type"
+                                        [(ngModel)]="sacCodeDetails.type" #type="ngModel"
+                                        [readonly]="paramsData?.type == 'view'" required> -->
+                                        <label for="type" class="mat-label">Type</label>
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && type?.errors?.required">Required</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="sgst" name="sgst"
+                                            [(ngModel)]="sacCodeDetails.sgst" #sgst="ngModel"
+                                            [readonly]="paramsData?.type == 'view'" required>
+                                        <label for="sgst" class="mat-label">SGST</label>
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && sgst?.errors?.required">Required</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="cgst" name="cgst"
+                                            [(ngModel)]="sacCodeDetails.cgst" #cgst="ngModel"
+                                            [readonly]="paramsData?.type == 'view'" required>
+                                        <label for="cgst" class="mat-label">CGST</label>
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && cgst?.errors?.required">Required</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <input type="text" appMatInput class="form-control" id="igst" name="igst"
+                                            [(ngModel)]="sacCodeDetails.igst" #igst="ngModel"
+                                            [readonly]="paramsData?.type == 'view'" required>
+                                        <label for="igst" class="mat-label">IGST</label>
+                                        <small class="text-danger"
+                                            *ngIf="form.submitted && igst?.errors?.required">Required</small>
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <select appMatInput name="status" id="status" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.status" #status="ngModel" required>
+                                        <option value="Active">Active</option>
+                                        <option value="In-Active">In-Active</option>
+                                    </select>
+                                    <label for="status" class="mat-label">Status</label>
+                                    <small class="text-danger"
+                                        *ngIf="form.submitted && status?.errors?.required">Required</small>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <!-- <select appMatInput name="company" id="company" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.company" #company="ngModel" required>
+                                        <option *ngFor="let item of companyList" [value]="item?.name">{{item?.name}}</option>
+                                        
+                                    </select> -->
+                                    <input type="text" appMatInput class="form-control" id="company" name="company"
+                                        [(ngModel)]="sacCodeDetails.company" #company="ngModel" readonly required>
+                                    <label for="company" class="mat-label">Company</label>
+                                    <small class="text-danger"
+                                        *ngIf="form.submitted && company?.errors?.required">Required</small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="TransactionCode"
+                                        name="transactioncode" [(ngModel)]="sacCodeDetails.transactioncode"
+                                        #TransactionCode="ngModel" required>
+                                    <label for="TransactionCode" class="mat-label">TransactionCode</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label for="Type" class="mat-label">Is Service</label>
+                                    <select appMatInput name="is_service" id="IsService" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.is_service" #IsService="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <small class="text-danger"
+                                        *ngIf="IsService.touched && IsService?.errors?.required">Required</small>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label for="Type" class="mat-label">Cess</label>
+                                    <select appMatInput name="cess" id="Cess" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.cess" #Cess="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <small class="text-danger" *ngIf="Cess.touched && Cess?.errors?.required">Required</small>
+                                </div>
+                            </div> -->
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label for="Type" class="mat-label">Net</label>
+                                    <select appMatInput name="net" id="Net" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.net" #Net="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <small class="text-danger"
+                                        *ngIf="Net.touched && Net?.errors?.required">Required</small>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="State Cess Rate"
+                                        name="state_cess_rate" [(ngModel)]="sacCodeDetails.state_cess_rate"
+                                        #StateCessRate="ngModel" required>
+                                    <label for="StateCessRate" class="mat-label">State Cess Rate</label>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label for="Type" class="mat-label">State Cess</label>
+                                    <select appMatInput name="state_cess" id="StateCess" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.state_cess" #StateCess="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <small class="text-danger" *ngIf="StateCess.touched && StateCess?.errors?.required">Required</small>
+                                </div>
+                            </div> -->
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="Central Cess Rate"
+                                        name="central_cess_rate" [(ngModel)]="sacCodeDetails.central_cess_rate" #Central
+                                        Cess Rate="ngModel" required>
+                                    <label for="Central Cess Rate" class="mat-label">Central Cess Rate</label>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label for="Type" class="mat-label">Central Cess</label>
+                                    <select appMatInput name="central_cess" id="CentralCess" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.central_cess" #CentralCess="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <small class="text-danger" *ngIf="CentralCess.touched && CentralCess?.errors?.required">Required</small>
+                                </div>
+                            </div> -->
+
+
+
+
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <input type="text" appMatInput class="form-control" id="VatRate" name="vat_rate"
+                                        [(ngModel)]="sacCodeDetails.vat_rate" #VatRate="ngModel" required>
+                                    <label for="VatRate" class="mat-label">Vat Rate</label>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label for="Type" class="mat-label">Vat</label>
+                                    <select appMatInput name="vat" id="Vat" class="custom-select"
+                                        [(ngModel)]="sacCodeDetails.vat" #Vat="ngModel" required>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                    <small class="text-danger" *ngIf="Vat.touched && Vat?.errors?.required">Required</small>
+                                </div>
+                            </div> -->
+
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-outline-primary mb-0 text-uppercase" type="button"
+                                [routerLink]="['/home/sac-hsn-codes']">Cancel</button>
+                            <button class="btn btn-primary mb-0 ml-3 text-uppercase" appPermissionButton
+                                accessType="write" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

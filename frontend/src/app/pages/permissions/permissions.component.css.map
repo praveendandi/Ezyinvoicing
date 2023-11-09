@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,cAAc,CAAA;EACV,KAAK,EAAE,OAAO;EACd,SAAS,EAAE,IAAI;EACf,WAAW,EAAE,MACjB;CAAC",
+    "sources": [
+        "permissions.component.scss"
+    ],
+    "names": [],
+    "file": "permissions.component.css"
+}
