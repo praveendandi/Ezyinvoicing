@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "postinstall": "cd frontend && npm install",
-    "dev": "cd frontend && npm run start",
-    "build": "cd frontend && npm run build"
+    "dev": "cd frontend && npm run start-ui",
+    "build": "cd frontend && npm run build && cp index.js ./dist/Ezy-Invoice"
   }
 }
