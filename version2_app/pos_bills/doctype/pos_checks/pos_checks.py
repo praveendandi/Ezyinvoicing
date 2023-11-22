@@ -17,7 +17,6 @@ from datetime import datetime
 import os,re
 import razorpay
 from escpos.printer import Network
-from frappe.integrations.utils import get_payment_gateway_controller
 from version2_app.version2_app.doctype.paytm_integrate import *
 from datetime import date
 from datetime import datetime
