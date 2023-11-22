@@ -37,3 +37,4 @@ uharfbuzz
 fontTools
 mail-parser
 email-listener
+tools
