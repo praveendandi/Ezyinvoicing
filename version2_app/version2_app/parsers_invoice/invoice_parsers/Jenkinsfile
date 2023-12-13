@@ -1,0 +1,22 @@
+pipeline {
+    agent ezyinvoicing
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building.....'
+            }
+        }
+        stage('Updating Parsers') {
+            steps {
+                echo 'Updating..'
+                sh deploy.sh
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
+    }
+}
